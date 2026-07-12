@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>价值分层模型 · 金字塔</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #080a0e;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+            padding: 24px;
+        }
+
+        .pyramid {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 780px;
+            gap: 6px;
+        }
+
+        /* 每一层共用 */
+        .layer {
+            width: 100%;
+            padding: 24px 30px;
+            border-radius: 16px;
+            position: relative;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            cursor: default;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        .layer:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        /* 层级宽度：从下往上收窄 —— 金字塔视觉 */
+        .layer-1 {
+            width: 100%;
+            background: linear-gradient(135deg, #0f1a2e, #162033);
+            border-bottom: 3px solid #2a6f8f;
+        }
+        .layer-2 {
+            width: 92%;
+            background: linear-gradient(135deg, #112236, #1a2b42);
+            border-bottom: 3px solid #3a8aaa;
+        }
+        .layer-3 {
+            width: 80%;
+            background: linear-gradient(135deg, #142b42, #1f3755);
+            border-bottom: 3px solid #5aa8c9;
+        }
+        .layer-4 {
+            width: 64%;
+            background: linear-gradient(135deg, #183650, #234666);
+            border-bottom: 3px solid #7ac4e6;
+        }
+        .layer-0 {
+            width: 48%;
+            background: linear-gradient(135deg, #0d1117, #161c26);
+            border: 1px dashed rgba(255, 255, 255, 0.12);
+            border-bottom: 3px solid #f0c060;
+            margin-top: 12px;
+            opacity: 0.7;
+        }
+
+        /* 层级数字标 */
+        .layer-badge {
+            display: inline-block;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            color: rgba(255, 255, 255, 0.25);
+            background: rgba(255, 255, 255, 0.04);
+            padding: 2px 12px;
+            border-radius: 20px;
+            margin-bottom: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        .layer-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: #ffffff;
+            letter-spacing: 0.5px;
+        }
+
+        .layer-title .highlight {
+            color: #7ac4e6;
+        }
+
+        .layer-0 .layer-title .highlight {
+            color: #f0c060;
+        }
+
+        .layer-desc {
+            font-size: 15px;
+            color: rgba(255, 255, 255, 0.6);
+            margin-top: 6px;
+            font-weight: 400;
+            letter-spacing: 0.3px;
+        }
+
+        .layer-value {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.35);
+            margin-top: 8px;
+            padding-top: 10px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            font-weight: 300;
+            letter-spacing: 0.5px;
+        }
+
+        .layer-value strong {
+            color: rgba(255, 255, 255, 0.55);
+            font-weight: 500;
+        }
+
+        .layer-0 .layer-value strong {
+            color: #f0c060;
+        }
+
+        /* 箭头指示 */
+        .arrow-hint {
+            color: rgba(255, 255, 255, 0.1);
+            font-size: 20px;
+            margin: 0;
+            padding: 0;
+            line-height: 1;
+            user-select: none;
+        }
+
+        /* 顶部小标签 */
+        .top-tag {
+            text-align: center;
+            margin-bottom: 8px;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.15);
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            font-weight: 300;
+        }
+
+        /* 响应式 */
+        @media (max-width: 600px) {
+            .layer {
+                padding: 18px 20px;
+            }
+            .layer-title {
+                font-size: 18px;
+            }
+            .layer-desc {
+                font-size: 13px;
+            }
+            .layer-value {
+                font-size: 12px;
+            }
+            .layer-1 {
+                width: 100%;
+            }
+            .layer-2 {
+                width: 94%;
+            }
+            .layer-3 {
+                width: 86%;
+            }
+            .layer-4 {
+                width: 74%;
+            }
+            .layer-0 {
+                width: 60%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="pyramid">
+
+        <div class="top-tag">▼ 价值金字塔 · 从基石到顶端</div>
+
+        <!-- 第四层：壁垒价值 -->
+        <div class="layer layer-4">
+            <div class="layer-badge">第四层</div>
+            <div class="layer-title">壁垒价值</div>
+            <div class="layer-desc">认知 × 模型 × 迭代 · 三重不可复制</div>
+            <div class="layer-value"><strong>→ 定价锚点：</strong>标准定义权</div>
+        </div>
+
+        <div class="arrow-hint">▾</div>
+
+        <!-- 第三层：认知价值 -->
+        <div class="layer layer-3">
+            <div class="layer-badge">第三层</div>
+            <div class="layer-title">认知价值</div>
+            <div class="layer-desc">跨行业通用系统的首个完整证明</div>
+            <div class="layer-value"><strong>→ 价值：</strong>不只值一个行业</div>
+        </div>
+
+        <div class="arrow-hint">▾</div>
+
+        <!-- 第二层：体系价值 -->
+        <div class="layer layer-2">
+            <div class="layer-badge">第二层</div>
+            <div class="layer-title">体系价值</div>
+            <div class="layer-desc">金融资管逻辑完整迁移至 MCN</div>
+            <div class="layer-value"><strong>→ 价值：</strong>从流量作坊到资产平台</div>
+        </div>
+
+        <div class="arrow-hint">▾</div>
+
+        <!-- 第一层：功能价值 -->
+        <div class="layer layer-1">
+            <div class="layer-badge">第一层</div>
+            <div class="layer-title">功能价值</div>
+            <div class="layer-desc">MCN 运营 SOP + 风控 + 分层 + 评级</div>
+            <div class="layer-value"><strong>→ 价值：</strong>管好我的矩阵</div>
+        </div>
+
+        <div class="arrow-hint" style="color:rgba(255,255,255,0.06);">▾</div>
+
+        <!-- 待补充 -->
+        <div class="layer layer-0">
+            <div class="layer-badge" style="color:rgba(240,192,96,0.5);border-color:rgba(240,192,96,0.1);">待补充</div>
+            <div class="layer-title">这里留给 <span class="highlight">真正要定义标准</span> 的人</div>
+            <div class="layer-desc" style="color:rgba(255,255,255,0.35);">—— 你来填这一层 ——</div>
+            <div class="layer-value"><strong>→ 位置：</strong>标准定义权的共建者</div>
+        </div>
+
+    </div>
+
+</body>
+</html>
