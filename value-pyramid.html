@@ -1,193 +1,1012 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Y.Mine · 价值金字塔</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Y.Mine · 价值金字塔</title>
+  <style>
+    /* ===== 全局重置 & 容器 ===== */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-        body {
-            background: #f8fafc;
-            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 24px;
-        }
+    body {
+      background: #0b1120;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      padding: 40px 20px;
+      display: flex;
+      justify-content: center;
+    }
 
-        .container {
-            max-width: 700px;
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
+    .container {
+      max-width: 1100px;
+      width: 100%;
+      background: #121b2e;
+      border-radius: 32px;
+      padding: 48px 44px;
+      border: 1px solid #1e293b;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+    }
 
-        h1 {
-            font-size: 28px;
-            font-weight: 700;
-            color: #0f172a;
-            letter-spacing: 0.5px;
-        }
+    .page-header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    .page-header h1 {
+      font-size: 34px;
+      font-weight: 700;
+      color: #f1f5f9;
+      letter-spacing: 1px;
+    }
+    .page-header .sub {
+      color: #94a3b8;
+      font-size: 15px;
+      margin-top: 6px;
+      letter-spacing: 2px;
+    }
 
-        .sub {
-            font-size: 14px;
-            color: #64748b;
-            margin-top: 4px;
-            margin-bottom: 32px;
-            border-bottom: 2px solid #e2e8f0;
-            padding-bottom: 16px;
-            width: 100%;
-            text-align: center;
-        }
+    /* ===== 核心心法（精简版） ===== */
+    .core-mind {
+      background: #0a1222;
+      border: 1px solid #facc15;
+      border-radius: 20px;
+      padding: 28px 30px;
+      margin-bottom: 32px;
+      box-shadow: 0 0 40px rgba(250, 204, 21, 0.04);
+    }
+    .core-mind .mind-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: #facc15;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      text-align: center;
+      margin-bottom: 18px;
+    }
 
-        .tier {
-            width: 100%;
-            padding: 20px 28px;
-            margin-bottom: 12px;
-            border-radius: 16px;
-            text-align: center;
-            transition: transform 0.2s ease;
-            border: 1px solid rgba(255, 255, 255, 0.25);
-        }
+    .mind-flow {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 4px 8px;
+      margin-bottom: 20px;
+    }
+    .mind-node {
+      background: #121b2e;
+      border: 1px solid #2d3a4f;
+      border-radius: 12px;
+      padding: 10px 18px;
+      text-align: center;
+      min-width: 60px;
+    }
+    .mind-node .label {
+      font-size: 11px;
+      color: #94a3b8;
+    }
+    .mind-node .value {
+      font-size: 22px;
+      font-weight: 700;
+      color: #f1f5f9;
+    }
+    .mind-node .sub {
+      font-size: 11px;
+      color: #94a3b8;
+      font-weight: 400;
+    }
+    .mind-node.highlight-node {
+      border-color: #facc15;
+      background: rgba(250, 204, 21, 0.06);
+    }
+    .mind-arrow {
+      color: #64748b;
+      font-size: 20px;
+      font-weight: 300;
+    }
 
-        .tier:hover {
-            transform: translateY(-2px);
-        }
+    .mind-desc-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 12px 30px;
+      padding: 10px 0;
+      border-top: 1px solid #1e293b;
+      border-bottom: 1px solid #1e293b;
+      margin-bottom: 14px;
+    }
+    .mind-desc-row .item {
+      text-align: center;
+    }
+    .mind-desc-row .item .num {
+      font-size: 18px;
+      font-weight: 700;
+      color: #facc15;
+    }
+    .mind-desc-row .item .txt {
+      font-size: 13px;
+      color: #94a3b8;
+      margin-top: 2px;
+    }
 
-        .tier .label {
-            font-size: 12px;
-            font-weight: 600;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            opacity: 0.7;
-            margin-bottom: 4px;
-        }
+    .mind-table-wrap {
+      margin: 16px 0 0 0;
+      overflow-x: auto;
+    }
+    .mind-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      color: #e2e8f0;
+    }
+    .mind-table th {
+      background: #1a2538;
+      color: #94a3b8;
+      font-weight: 600;
+      padding: 10px 14px;
+      text-align: left;
+      border-bottom: 2px solid #2d3a4f;
+      font-size: 12px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+    .mind-table td {
+      padding: 10px 14px;
+      border-bottom: 1px solid #1a2538;
+      color: #cbd5e1;
+    }
+    .mind-table tr:last-child td {
+      border-bottom: none;
+    }
+    .mind-table .tag {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 500;
+    }
+    .tag-need {
+      background: rgba(59, 130, 246, 0.2);
+      color: #3b82f6;
+    }
+    .tag-none {
+      background: rgba(250, 204, 21, 0.15);
+      color: #facc15;
+    }
+    .tag-mid {
+      background: rgba(167, 139, 250, 0.2);
+      color: #a78bfa;
+    }
 
-        .tier .name {
-            font-size: 22px;
-            font-weight: 700;
-            margin-bottom: 4px;
-        }
+    /* ===== 金字塔主体 ===== */
+    .pyramid {
+      display: flex;
+      flex-direction: column-reverse;
+      align-items: center;
+      gap: 6px;
+      margin: 20px 0 10px 0;
+    }
 
-        .tier .desc {
-            font-size: 15px;
-            font-weight: 400;
-            opacity: 0.9;
-            margin-bottom: 8px;
-        }
+    .pyramid-layer {
+      width: 100%;
+      padding: 18px 24px;
+      border-radius: 14px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.4s ease;
+      border: 1px solid transparent;
+      background: #0f1829;
+      position: relative;
+    }
 
-        .tier .evi {
-            font-size: 13px;
-            font-weight: 400;
-            opacity: 0.7;
-            border-top: 1px dashed rgba(255, 255, 255, 0.25);
-            padding-top: 10px;
-            margin-top: 6px;
-        }
+    .pyramid-layer[data-level="0"] { max-width: 96%; border-color: #3b82f6; background: rgba(59, 130, 246, 0.08); }
+    .pyramid-layer[data-level="1"] { max-width: 86%; border-color: #4f8cf7; background: rgba(79, 140, 247, 0.08); }
+    .pyramid-layer[data-level="2"] { max-width: 76%; border-color: #8b5cf6; background: rgba(139, 92, 246, 0.08); }
+    .pyramid-layer[data-level="3"] { max-width: 66%; border-color: #a78bfa; background: rgba(167, 139, 250, 0.08); }
+    .pyramid-layer[data-level="4"] { max-width: 56%; border-color: #facc15; background: rgba(250, 204, 21, 0.06); }
+    .pyramid-layer[data-level="5"] { max-width: 46%; border-color: #fbbf24; background: rgba(251, 191, 36, 0.06); }
 
-        /* 三层配色 */
-        .top {
-            background: linear-gradient(145deg, #1e293b, #0f172a);
-            color: #f1f5f9;
-            box-shadow: 0 8px 24px rgba(15, 23, 42, 0.20);
-        }
+    .pyramid-layer:hover {
+      transform: scale(1.02);
+      box-shadow: 0 0 30px rgba(255, 255, 255, 0.05);
+    }
 
-        .mid {
-            background: linear-gradient(145deg, #3b82f6, #2563eb);
-            color: #fff;
-            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.25);
-            width: 88%;
-        }
+    /* 高亮状态（由JS控制） */
+    .pyramid-layer.active {
+      border-color: #facc15 !important;
+      background: rgba(250, 204, 21, 0.12) !important;
+      box-shadow: 0 0 40px rgba(250, 204, 21, 0.15);
+      transform: scale(1.02);
+    }
 
-        .base {
-            background: linear-gradient(145deg, #8b5cf6, #7c3aed);
-            color: #fff;
-            box-shadow: 0 6px 20px rgba(139, 92, 246, 0.25);
-            width: 76%;
-        }
+    .pyramid-layer .level-tag {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      color: #94a3b8;
+      text-transform: uppercase;
+    }
+    .pyramid-layer .level-name {
+      font-size: 20px;
+      font-weight: 700;
+      color: #f1f5f9;
+      margin: 2px 0;
+    }
+    .pyramid-layer .level-desc {
+      font-size: 13px;
+      color: #94a3b8;
+      letter-spacing: 0.3px;
+    }
+    .pyramid-layer .click-hint {
+      font-size: 11px;
+      color: #64748b;
+      margin-top: 6px;
+      opacity: 0.5;
+    }
 
-        .footer {
-            margin-top: 32px;
-            font-size: 13px;
-            color: #94a3b8;
-            text-align: center;
-            border-top: 1px solid #e2e8f0;
-            padding-top: 20px;
-            width: 100%;
-        }
+    /* ===== 技术底座 ===== */
+    .tech-base {
+      max-width: 96%;
+      width: 100%;
+      margin: 0 auto 10px auto;
+      background: #0a1222;
+      border: 1px solid #2d3a4f;
+      border-radius: 16px;
+      padding: 20px 24px;
+      text-align: center;
+    }
+    .tech-base .tech-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: #94a3b8;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    .tech-grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px 40px;
+    }
+    .tech-item {
+      color: #cbd5e1;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .tech-item .icon { font-size: 18px; }
+    .tech-item .label { color: #94a3b8; font-weight: 300; }
+    .tech-item .value { color: #f1f5f9; font-weight: 500; }
 
-        .footer a {
-            color: #3b82f6;
-            text-decoration: none;
-        }
+    /* ===== 结论文案 ===== */
+    .conclusion {
+      max-width: 86%;
+      width: 100%;
+      margin: 6px auto 20px auto;
+      padding: 14px 20px;
+      border-top: 1px solid #1e293b;
+      border-bottom: 1px solid #1e293b;
+      text-align: center;
+      color: #facc15;
+      font-size: 15px;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+      line-height: 1.6;
+    }
+    .conclusion span {
+      color: #94a3b8;
+      font-weight: 400;
+    }
 
-        .footer a:hover {
-            text-decoration: underline;
-        }
+    /* ===== 底部详细列表 ===== */
+    .overview-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: #f1f5f9;
+      margin: 48px 0 16px 0;
+      text-align: center;
+      letter-spacing: 0.5px;
+    }
+    .overview-title span {
+      color: #94a3b8;
+      font-size: 14px;
+      font-weight: 400;
+      display: block;
+      margin-top: 4px;
+    }
 
-        @media (max-width: 480px) {
-            .tier {
-                padding: 16px 18px;
-            }
-            .tier .name {
-                font-size: 18px;
-            }
-            .tier .desc {
-                font-size: 13px;
-            }
-            h1 {
-                font-size: 22px;
-            }
-            .mid,
-            .base {
-                width: 100%;
-            }
-        }
-    </style>
+    .layer-block {
+      margin-bottom: 32px;
+      scroll-margin-top: 20px;
+      padding: 16px 20px;
+      background: #0f1829;
+      border-radius: 16px;
+      border-left: 4px solid #3b82f6;
+      transition: all 0.3s;
+    }
+    .layer-block.highlight {
+      border-left-color: #facc15;
+      background: #1a2538;
+      box-shadow: 0 0 30px rgba(250, 204, 21, 0.05);
+    }
+    .layer-block .layer-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #f1f5f9;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .layer-block .layer-title .badge {
+      font-size: 12px;
+      background: #1e293b;
+      color: #94a3b8;
+      padding: 2px 14px;
+      border-radius: 20px;
+      font-weight: 400;
+    }
+    .layer-block .layer-desc {
+      color: #94a3b8;
+      font-size: 13px;
+      margin: 4px 0 10px 0;
+    }
+    .layer-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      gap: 8px;
+    }
+    .layer-item {
+      background: #121b2e;
+      border: 1px solid #1e293b;
+      border-radius: 10px;
+      padding: 8px 10px;
+      text-align: center;
+      color: #cbd5e1;
+      font-size: 13px;
+      transition: 0.2s;
+    }
+    .layer-item:hover {
+      border-color: #3b82f6;
+      background: #1a2538;
+    }
+    .layer-item.highlight-item {
+      border-color: #facc15;
+      background: #1a2538;
+    }
+    .layer-item.connect-item {
+      border-color: #a78bfa;
+      background: rgba(167, 139, 250, 0.10);
+    }
+    .layer-item.mind-item {
+      border-color: #34d399;
+      background: rgba(52, 211, 153, 0.06);
+    }
+
+    /* ===== 第0层流程图 ===== */
+    .flowchart {
+      background: #0a1222;
+      border: 1px solid #2d3a4f;
+      border-radius: 16px;
+      padding: 20px 24px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    .flowchart .flow-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: #94a3b8;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+    .flow-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 8px 4px;
+    }
+    .flow-node {
+      background: #121b2e;
+      border: 1px solid #2d3a4f;
+      border-radius: 12px;
+      padding: 10px 16px;
+      min-width: 100px;
+      text-align: center;
+    }
+    .flow-node .node-label {
+      font-size: 12px;
+      color: #94a3b8;
+      font-weight: 400;
+    }
+    .flow-node .node-value {
+      font-size: 15px;
+      font-weight: 600;
+      color: #f1f5f9;
+      margin-top: 2px;
+    }
+    .flow-node.hard { border-color: #facc15; }
+    .flow-node.connect { border-color: #a78bfa; }
+    .flow-node.soft { border-color: #3b82f6; }
+    .flow-node.model { border-color: #34d399; background: rgba(52, 211, 153, 0.06); }
+    .flow-node.lever { border-color: #f472b6; background: rgba(244, 114, 182, 0.06); }
+    .flow-node.stable { border-color: #facc15; background: rgba(250, 204, 21, 0.08); }
+    .flow-arrow {
+      color: #64748b;
+      font-size: 20px;
+      font-weight: 300;
+      padding: 0 2px;
+    }
+    .flow-branch {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 8px 4px;
+      margin-top: 6px;
+    }
+    .flow-branch .flow-arrow { font-size: 16px; }
+    .flow-divider {
+      width: 100%;
+      border-top: 1px dashed #2d3a4f;
+      margin: 6px 0;
+    }
+
+    /* ===== 工程落地循环 ===== */
+    .engineering-loop {
+      background: #0a1222;
+      border: 1px solid #34d399;
+      border-radius: 20px;
+      padding: 28px 30px;
+      margin-top: 40px;
+      box-shadow: 0 0 40px rgba(52, 211, 153, 0.04);
+    }
+    .engineering-loop .eng-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: #34d399;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      text-align: center;
+      margin-bottom: 16px;
+    }
+    .eng-flow {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 8px 14px;
+    }
+    .eng-node {
+      background: #121b2e;
+      border: 1px solid #2d3a4f;
+      border-radius: 12px;
+      padding: 12px 20px;
+      text-align: center;
+      min-width: 80px;
+    }
+    .eng-node .icon { font-size: 22px; }
+    .eng-node .label {
+      font-size: 13px;
+      font-weight: 600;
+      color: #f1f5f9;
+      margin-top: 4px;
+    }
+    .eng-node .sub { font-size: 11px; color: #94a3b8; }
+    .eng-node.highlight-eng {
+      border-color: #34d399;
+      background: rgba(52, 211, 153, 0.06);
+    }
+    .eng-arrow {
+      color: #64748b;
+      font-size: 22px;
+      font-weight: 300;
+    }
+    .eng-closing {
+      text-align: center;
+      color: #94a3b8;
+      font-size: 13px;
+      margin-top: 16px;
+      padding-top: 14px;
+      border-top: 1px solid #1e293b;
+    }
+    .eng-closing strong { color: #34d399; }
+    .eng-closing .highlight { color: #facc15; font-weight: 600; }
+
+    /* ===== 底部返回 ===== */
+    .back-home {
+      margin-top: 40px;
+      text-align: center;
+      border-top: 1px solid #1e293b;
+      padding-top: 24px;
+    }
+    .back-home a {
+      color: #3b82f6;
+      text-decoration: none;
+      font-size: 14px;
+      transition: 0.2s;
+    }
+    .back-home a:hover { text-decoration: underline; }
+
+    /* ===== 响应式 ===== */
+    @media (max-width: 700px) {
+      .container { padding: 24px 16px; }
+      .pyramid-layer .level-name { font-size: 16px; }
+      .pyramid-layer { padding: 14px 16px; }
+      .layer-grid { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); }
+      .page-header h1 { font-size: 26px; }
+      .tech-grid { flex-direction: column; align-items: center; gap: 10px; }
+      .conclusion { font-size: 13px; padding: 12px 14px; }
+      .flow-node { min-width: 70px; padding: 6px 10px; }
+      .flow-node .node-value { font-size: 13px; }
+      .flow-arrow { font-size: 16px; }
+      .mind-node { padding: 6px 12px; min-width: 50px; }
+      .mind-node .value { font-size: 18px; }
+      .mind-table th, .mind-table td { padding: 6px 8px; font-size: 12px; }
+      .eng-node { min-width: 60px; padding: 8px 12px; }
+      .eng-node .icon { font-size: 18px; }
+      .eng-node .label { font-size: 12px; }
+    }
+  </style>
 </head>
 <body>
 
-    <div class="container">
+<div class="container">
 
-        <h1>Y.Mine · 价值金字塔</h1>
-        <div class="sub">三层递进 · 从单点能力到系统架构</div>
+  <!-- ===== 标题 ===== -->
+  <div class="page-header">
+    <h1>🧠 Y.Mine · 价值金字塔</h1>
+    <div class="sub">从底层认知到系统底座 · 产品经理能力登顶路径</div>
+  </div>
 
-        <!-- 顶层：战略 -->
-        <div class="tier top">
-            <div class="label">战略级</div>
-            <div class="name">能帮公司搭建系统</div>
-            <div class="desc">完整体系已可迁移复用</div>
-            <div class="evi">📁 知识资产全景图</div>
-        </div>
+  <!-- ============================================================ -->
+  <!-- ===== 核心心法（精简版） ===== -->
+  <!-- ============================================================ -->
+  <div class="core-mind">
+    <div class="mind-title">⚛️ 核心心法 · 产品设计闭环</div>
 
-        <!-- 中层：战役 -->
-        <div class="tier mid">
-            <div class="label">战役级</div>
-            <div class="name">能独立攻克陌生领域</div>
-            <div class="desc">跨领域方法已验证成立</div>
-            <div class="evi">⚡ 6小时吞噬6个陌生领域</div>
-        </div>
-
-        <!-- 底层：战术 -->
-        <div class="tier base">
-            <div class="label">战术级</div>
-            <div class="name">能深度拆解一个领域</div>
-            <div class="desc">单一领域已穿透至底层</div>
-            <div class="evi">🔍 元架构重构营销学</div>
-        </div>
-
-        <div class="footer">
-           <a href="index.html">← 返回 Y.Mine 作品集首页</a> 
-        </div>
-
+    <div class="mind-flow">
+      <div class="mind-node highlight-node">
+        <div class="label">用户视角</div>
+        <div class="value">3</div>
+        <div class="sub">三个方向</div>
+      </div>
+      <span class="mind-arrow">→</span>
+      <div class="mind-node highlight-node">
+        <div class="label">收敛</div>
+        <div class="value">1</div>
+        <div class="sub">核心需求</div>
+      </div>
+      <span class="mind-arrow">→</span>
+      <div class="mind-node highlight-node">
+        <div class="label">设计</div>
+        <div class="value">1</div>
+        <div class="sub">架构</div>
+      </div>
+      <span class="mind-arrow">→</span>
+      <div class="mind-node">
+        <div class="label">变现</div>
+        <div class="value">3</div>
+        <div class="sub">盈利维度</div>
+      </div>
+      <span class="mind-arrow">→</span>
+      <div class="mind-node">
+        <div class="label">覆盖</div>
+        <div class="value">100</div>
+        <div class="sub">场景延展</div>
+      </div>
     </div>
+
+    <div class="mind-desc-row">
+      <div class="item">
+        <div class="num">3 → 1</div>
+        <div class="txt">收敛 · 回归本心</div>
+      </div>
+      <div class="item">
+        <div class="num">1 → 1</div>
+        <div class="txt">设计 · 架构骨架</div>
+      </div>
+      <div class="item">
+        <div class="num">1 → 3</div>
+        <div class="txt">变现 · 定价盈利交付</div>
+      </div>
+      <div class="item">
+        <div class="num">3 → 100</div>
+        <div class="txt">延展 · 无限场景</div>
+      </div>
+    </div>
+
+    <div class="mind-table-wrap">
+      <table class="mind-table">
+        <thead>
+          <tr>
+            <th>用户状态</th>
+            <th>产品动作</th>
+            <th>核心目标</th>
+            <th>对应能力层</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="tag tag-need">需要</span></td>
+            <td>提升服务体验</td>
+            <td>优化 · 迭代</td>
+            <td>底层认知 + 思维框架</td>
+          </tr>
+          <tr>
+            <td><span class="tag tag-none">不需要</span></td>
+            <td>创造需要</td>
+            <td>定义 · 破局</td>
+            <td>迁移能力 + 产品封装</td>
+          </tr>
+          <tr>
+            <td><span class="tag tag-mid">中间地带</span></td>
+            <td>传播 + 营销</td>
+            <td>品牌 · 认知</td>
+            <td>价值表达</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- ===== 金字塔 ===== -->
+  <!-- ============================================================ -->
+  <div class="pyramid">
+
+    <!-- 技术底座 -->
+    <div class="tech-base">
+      <div class="tech-title">⬇ 技术底座 · 开源 + 大模型</div>
+      <div class="tech-grid">
+        <span class="tech-item">
+          <span class="icon">📦</span>
+          <span class="label">开源平台</span>
+          <span class="value">Milvus · GitHub · 跨领域项目</span>
+        </span>
+        <span class="tech-item">
+          <span class="icon">🧠</span>
+          <span class="label">大模型平台</span>
+          <span class="value">私有AI引擎 · 11层推理架构 · 多场景适配</span>
+        </span>
+      </div>
+    </div>
+
+    <!-- 金字塔每一层都加上了 data-level 和 id 用于滚动联动 -->
+    <div class="pyramid-layer" data-level="0" id="pyramid-0" onclick="scrollToLayer(0)">
+      <div class="level-tag">第 0 层</div>
+      <div class="level-name">⚛️ 底层认知</div>
+      <div class="level-desc">硬技能 · 连接层 · 软技能 · 商业心法</div>
+      <div class="click-hint">点击查看详情 ↓</div>
+    </div>
+    <div class="pyramid-layer" data-level="1" id="pyramid-1" onclick="scrollToLayer(1)">
+      <div class="level-tag">第 1 层</div>
+      <div class="level-name">🧩 思维框架</div>
+      <div class="level-desc">拆解 · 建模 · 方法论</div>
+      <div class="click-hint">点击查看详情 ↓</div>
+    </div>
+    <div class="pyramid-layer" data-level="2" id="pyramid-2" onclick="scrollToLayer(2)">
+      <div class="level-tag">第 2 层</div>
+      <div class="level-name">🚀 迁移能力</div>
+      <div class="level-desc">跨领域 · 快速入局</div>
+      <div class="click-hint">点击查看详情 ↓</div>
+    </div>
+    <div class="pyramid-layer" data-level="3" id="pyramid-3" onclick="scrollToLayer(3)">
+      <div class="level-tag">第 3 层</div>
+      <div class="level-name">📦 产品封装</div>
+      <div class="level-desc">商业方案 · 可交付</div>
+      <div class="click-hint">点击查看详情 ↓</div>
+    </div>
+    <div class="pyramid-layer" data-level="4" id="pyramid-4" onclick="scrollToLayer(4)">
+      <div class="level-tag">第 4 层</div>
+      <div class="level-name">📢 价值表达</div>
+      <div class="level-desc">品牌 · 叙事 · 传播</div>
+      <div class="click-hint">点击查看详情 ↓</div>
+    </div>
+    <div class="pyramid-layer" data-level="5" id="pyramid-5" onclick="scrollToLayer(5)">
+      <div class="level-tag">第 5 层</div>
+      <div class="level-name">🧠 系统底座</div>
+      <div class="level-desc">AI引擎 · 资产化 · 平台化</div>
+      <div class="click-hint">点击查看详情 ↓</div>
+    </div>
+  </div>
+
+  <!-- 结论文案 -->
+  <div class="conclusion">
+    ⛰️ 从开源 + 大模型平台挖起，先创造产品，再从底层技术往上走，
+    <span>产品经理的成长路径才会真正走得顺。</span>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- ===== 知识体系总览 ===== -->
+  <!-- ============================================================ -->
+  <div class="overview-title">
+    📖 知识体系总览
+    <span>点击金字塔每一层，自动滚动到对应层级</span>
+  </div>
+
+  <!-- 第0层 -->
+  <div class="layer-block" id="layer-0">
+    <div class="layer-title">⚛️ 第0层 · 底层认知 <span class="badge">硬技能 → 连接层 → 软技能 → 商业心法</span></div>
+    <div class="layer-desc">产品经理的底层基石：从平台怎么搭（硬），到算力怎么用（连接），到怎么思考（软），再到怎么稳住（心法）</div>
+
+    <div class="flowchart">
+      <div class="flow-title">⬇ 商业思维模型生成路径</div>
+      <div class="flow-row">
+        <div class="flow-node hard"><div class="node-label">🔧 硬技能</div><div class="node-value">平台演进</div></div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-node connect"><div class="node-label">⚡ 连接层</div><div class="node-value">算力+Token</div></div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-node soft"><div class="node-label">🧠 软技能</div><div class="node-value">结构化思维</div></div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-node model"><div class="node-label">📊 商业模型</div><div class="node-value">商业判断力</div></div>
+      </div>
+      <div class="flow-divider"></div>
+      <div class="flow-branch">
+        <span style="color:#94a3b8; font-size:13px;">稳定杠杆</span>
+        <span class="flow-arrow">⇢</span>
+        <div class="flow-node lever"><div class="node-label">💰 金融工具</div><div class="node-value">杠杆1</div></div>
+        <span style="color:#64748b; font-size:16px; padding:0 4px;">+</span>
+        <div class="flow-node lever"><div class="node-label">🧘 商业心法</div><div class="node-value">博弈论×国学</div></div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-node stable"><div class="node-label">⚖️ 稳定底座</div><div class="node-value">商业思维稳态</div></div>
+      </div>
+    </div>
+
+    <div style="margin: 12px 0 6px 0; color: #facc15; font-size: 14px; font-weight: 600;">🔧 硬技能 · 平台演进路径</div>
+    <div class="layer-grid" style="margin-bottom: 12px;">
+      <div class="layer-item highlight-item">IaaS</div>
+      <div class="layer-item highlight-item">PaaS</div>
+      <div class="layer-item highlight-item">SaaS</div>
+      <div class="layer-item highlight-item">私有化部署</div>
+    </div>
+
+    <div style="margin: 12px 0 6px 0; color: #a78bfa; font-size: 14px; font-weight: 600;">⚡ 连接层 · 算力 + Token → 推理</div>
+    <div class="layer-grid" style="margin-bottom: 12px;">
+      <div class="layer-item connect-item">算力（GPU/CPU）</div>
+      <div class="layer-item connect-item">Token 调度</div>
+      <div class="layer-item connect-item">推理引擎</div>
+    </div>
+
+    <div style="margin: 12px 0 6px 0; color: #3b82f6; font-size: 14px; font-weight: 600;">🧠 软技能 · 结构化思维</div>
+    <div class="layer-grid" style="margin-bottom: 12px;">
+      <div class="layer-item">熵值模型</div>
+      <div class="layer-item">概率论</div>
+      <div class="layer-item">0.5/0.68阈值</div>
+      <div class="layer-item">权重叠加</div>
+      <div class="layer-item">商业数学表达</div>
+      <div class="layer-item">凯利公式</div>
+      <div class="layer-item">交互判定系统</div>
+      <div class="layer-item">势能场理论</div>
+      <div class="layer-item">判定证据链</div>
+      <div class="layer-item">正态风控</div>
+      <div class="layer-item">财务建模</div>
+    </div>
+
+    <div style="margin: 12px 0 6px 0; color: #34d399; font-size: 14px; font-weight: 600;">🧘 商业心法 · 博弈论 × 国学五家</div>
+    <div class="layer-grid">
+      <div class="layer-item mind-item">博弈论</div>
+      <div class="layer-item mind-item">道家 · 顺势</div>
+      <div class="layer-item mind-item">阴阳家 · 平衡</div>
+      <div class="layer-item mind-item">法家 · 规则</div>
+      <div class="layer-item mind-item">纵横家 · 合纵</div>
+      <div class="layer-item mind-item">儒家 · 修己</div>
+    </div>
+  </div>
+
+  <!-- 第1层 -->
+  <div class="layer-block" id="layer-1">
+    <div class="layer-title">🧩 第1层 · 思维框架 <span class="badge">10项</span></div>
+    <div class="layer-desc">拆解 · 建模 · 方法论 —— 产品经理的核心思维工具</div>
+    <div class="layer-grid">
+      <div class="layer-item">元架构定义</div>
+      <div class="layer-item">两个底层模型</div>
+      <div class="layer-item">定价双版本</div>
+      <div class="layer-item">反向倒推</div>
+      <div class="layer-item">四项核心洞察</div>
+      <div class="layer-item">博主成长模型</div>
+      <div class="layer-item">国学四维框架</div>
+      <div class="layer-item">十一维估值</div>
+      <div class="layer-item">元架构可迁移</div>
+      <div class="layer-item">3→1→3路径</div>
+    </div>
+  </div>
+
+  <!-- 第2层 -->
+  <div class="layer-block" id="layer-2">
+    <div class="layer-title">🚀 第2层 · 迁移能力 <span class="badge">15项</span></div>
+    <div class="layer-desc">跨领域 · 快速入局 —— 产品经理的广度验证</div>
+    <div class="layer-grid">
+      <div class="layer-item">财务→CAD</div>
+      <div class="layer-item">CAD→乐高</div>
+      <div class="layer-item">电池系统</div>
+      <div class="layer-item">园林→财务</div>
+      <div class="layer-item">运营→工程</div>
+      <div class="layer-item">大模型原理</div>
+      <div class="layer-item">地质学</div>
+      <div class="layer-item">营销学吞噬</div>
+      <div class="layer-item">金融市场</div>
+      <div class="layer-item">公司治理</div>
+      <div class="layer-item">瑞幸9.9拆解</div>
+      <div class="layer-item">低空经济适配</div>
+      <div class="layer-item">头条双态估值</div>
+      <div class="layer-item">应急管理适配</div>
+      <div class="layer-item">空地一体构想</div>
+    </div>
+  </div>
+
+  <!-- 第3层 -->
+  <div class="layer-block" id="layer-3">
+    <div class="layer-title">📦 第3层 · 产品封装 <span class="badge">5组</span></div>
+    <div class="layer-desc">商业方案 · 可交付 —— 产品经理的落地能力</div>
+    <div class="layer-grid">
+      <div class="layer-item">MCN/文娱AI</div>
+      <div class="layer-item">低空经济方案</div>
+      <div class="layer-item">商业认知资产</div>
+      <div class="layer-item">个人能力评估</div>
+      <div class="layer-item">商业化与竞品</div>
+    </div>
+  </div>
+
+  <!-- 第4层 -->
+  <div class="layer-block" id="layer-4">
+    <div class="layer-title">📢 第4层 · 价值表达 <span class="badge">8项</span></div>
+    <div class="layer-desc">品牌 · 叙事 · 传播 —— 产品经理的影响力构建</div>
+    <div class="layer-grid">
+      <div class="layer-item">品牌定义</div>
+      <div class="layer-item">Y.Mine</div>
+      <div class="layer-item">GitHub</div>
+      <div class="layer-item">知识库</div>
+      <div class="layer-item">产品说明书</div>
+      <div class="layer-item">README</div>
+      <div class="layer-item">飞书知识库</div>
+      <div class="layer-item">网页/首页导航</div>
+    </div>
+  </div>
+
+  <!-- 第5层 -->
+  <div class="layer-block" id="layer-5">
+    <div class="layer-title">🧠 第5层 · 系统底座 <span class="badge">3+1</span></div>
+    <div class="layer-desc">AI引擎 · 资产化 · 平台化 —— 产品经理的终极封装与交付</div>
+    <div class="layer-grid">
+      <div class="layer-item">127项资产分类</div>
+      <div class="layer-item">向量库联动设计</div>
+      <div class="layer-item">Milvus搭建构想</div>
+      <div class="layer-item" style="border-color:#facc15; background:#1a2538;">🧩 11层底层架构</div>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- ===== 工程落地循环 ===== -->
+  <!-- ============================================================ -->
+  <div class="engineering-loop">
+    <div class="eng-title">⚙️ 工程落地循环</div>
+    <div class="eng-flow">
+      <div class="eng-node highlight-eng">
+        <div class="icon">⚙️</div>
+        <div class="label">技术实现</div>
+        <div class="sub">架构落地 · 系统部署</div>
+      </div>
+      <span class="eng-arrow">→</span>
+      <div class="eng-node highlight-eng">
+        <div class="icon">📊</div>
+        <div class="label">商业验证</div>
+        <div class="sub">ROI · 市场反馈</div>
+      </div>
+      <span class="eng-arrow">→</span>
+      <div class="eng-node highlight-eng">
+        <div class="icon">🎯</div>
+        <div class="label">场景验证</div>
+        <div class="sub">真实环境 · 用户测试</div>
+      </div>
+      <span class="eng-arrow">→</span>
+      <div class="eng-node highlight-eng">
+        <div class="icon">🔧</div>
+        <div class="label">运维调试</div>
+        <div class="sub">监控 · 调优 · 迭代</div>
+      </div>
+    </div>
+    <div class="eng-closing">
+      🔄 技术 + 商业 + 场景 + 运维 四者联动，形成工程闭环
+      <br>
+      <span style="color:#64748b; font-size:12px;">每循环一轮，系统稳定性 <strong class="highlight">指数级上升</strong></span>
+    </div>
+  </div>
+
+  <!-- ===== 底部返回 ===== -->
+  <div class="back-home">
+    <a href="index.html">← 返回 Y.Mine 作品集首页</a>
+  </div>
+
+</div>
+
+<script>
+  // ===== 点击金字塔层滚动到对应内容 =====
+  function scrollToLayer(level) {
+    const target = document.getElementById('layer-' + level);
+    if (!target) return;
+    document.querySelectorAll('.layer-block').forEach(el => el.classList.remove('highlight'));
+    target.classList.add('highlight');
+    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    setTimeout(() => target.classList.remove('highlight'), 3000);
+  }
+
+  // ===== 滚动时高亮对应的金字塔层 =====
+  function updateActiveLayer() {
+    // 获取所有层级块（内容区）
+    const blocks = document.querySelectorAll('.layer-block');
+    // 获取所有金字塔层
+    const pyramidLayers = document.querySelectorAll('.pyramid-layer');
+    
+    // 先全部移除 active
+    pyramidLayers.forEach(l => l.classList.remove('active'));
+
+    // 从底部往上找，第一个进入视口的层级
+    let activeLevel = -1;
+    blocks.forEach((block, index) => {
+      const rect = block.getBoundingClientRect();
+      // 如果该层级内容顶部进入视口（距顶部<200px）
+      if (rect.top < 200) {
+        activeLevel = index;
+      }
+    });
+
+    // 如果没有任何层级进入视口，默认高亮第0层（如果顶部已划过第0层则保持最后一个）
+    if (activeLevel === -1) {
+      // 检查是否已经滚过第0层
+      const firstBlock = document.querySelector('.layer-block');
+      if (firstBlock && firstBlock.getBoundingClientRect().top < 0) {
+        // 已经滚过第0层，高亮最后一层
+        const lastBlock = blocks[blocks.length - 1];
+        if (lastBlock && lastBlock.getBoundingClientRect().top < window.innerHeight) {
+          const lastLevel = blocks.length - 1;
+          const targetPyramid = document.querySelector(`.pyramid-layer[data-level="${lastLevel}"]`);
+          if (targetPyramid) targetPyramid.classList.add('active');
+        }
+        return;
+      }
+      // 否则高亮第0层
+      const firstPyramid = document.querySelector('.pyramid-layer[data-level="0"]');
+      if (firstPyramid) firstPyramid.classList.add('active');
+      return;
+    }
+
+    // 高亮对应的金字塔层
+    const targetPyramid = document.querySelector(`.pyramid-layer[data-level="${activeLevel}"]`);
+    if (targetPyramid) targetPyramid.classList.add('active');
+  }
+
+  // 滚动监听 + 节流优化
+  let scrollTimeout;
+  window.addEventListener('scroll', function() {
+    if (scrollTimeout) return;
+    scrollTimeout = setTimeout(() => {
+      updateActiveLayer();
+      scrollTimeout = null;
+    }, 80);
+  });
+
+  // 页面加载完成后执行一次
+  window.addEventListener('load', function() {
+    // 默认高亮第0层
+    const firstPyramid = document.querySelector('.pyramid-layer[data-level="0"]');
+    if (firstPyramid) firstPyramid.classList.add('active');
+    
+    // 同时高亮第一个内容块
+    const firstBlock = document.getElementById('layer-0');
+    if (firstBlock) {
+      firstBlock.classList.add('highlight');
+      setTimeout(() => firstBlock.classList.remove('highlight'), 2500);
+    }
+
+    // 延迟执行一次滚动检测，确保布局稳定
+    setTimeout(updateActiveLayer, 300);
+  });
+</script>
 
 </body>
 </html>
