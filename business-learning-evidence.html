@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>商业知识学习证据链 · 可视化</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0b1120;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            padding: 48px 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1100px;
+            width: 100%;
+        }
+
+        /* 头部 */
+        .header {
+            margin-bottom: 48px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 32px;
+            font-weight: 700;
+            color: #f1f5f9;
+            letter-spacing: 0.5px;
+        }
+
+        .header .sub {
+            font-size: 15px;
+            color: #94a3b8;
+            margin-top: 6px;
+            border-bottom: 1px solid #1e293b;
+            padding-bottom: 16px;
+        }
+
+        /* 阶段横向流 */
+        .stages {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px 16px;
+            margin-bottom: 40px;
+        }
+
+        .stage-badge {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #1e293b;
+            padding: 10px 20px;
+            border-radius: 40px;
+            color: #e2e8f0;
+            font-size: 14px;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+            border: 1px solid #334155;
+            flex-shrink: 0;
+        }
+
+        .stage-badge .num {
+            background: #3b82f6;
+            color: #fff;
+            border-radius: 50%;
+            width: 26px;
+            height: 26px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .stage-arrow {
+            color: #475569;
+            font-size: 20px;
+            font-weight: 300;
+            display: flex;
+            align-items: center;
+        }
+
+        @media (max-width: 640px) {
+            .stage-arrow {
+                display: none;
+            }
+            .stages {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 8px;
+            }
+            .stage-badge {
+                justify-content: center;
+            }
+        }
+
+        /* 卡片网格 */
+        .phase-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 28px;
+            margin-top: 8px;
+        }
+
+        .phase {
+            background: #121b2e;
+            border-radius: 20px;
+            padding: 28px 32px;
+            border: 1px solid #1e293b;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .phase:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+        }
+
+        .phase-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 16px;
+        }
+
+        .phase-tag {
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            padding: 4px 14px;
+            border-radius: 30px;
+            background: #1e293b;
+            color: #94a3b8;
+            border: 1px solid #2d3a4f;
+        }
+
+        .phase-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #f1f5f9;
+        }
+
+        .phase-desc {
+            font-size: 14px;
+            color: #94a3b8;
+            margin-bottom: 14px;
+            line-height: 1.6;
+        }
+
+        .node-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding-left: 6px;
+        }
+
+        .node-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            font-size: 14px;
+            color: #cbd5e1;
+            line-height: 1.5;
+            padding: 6px 0;
+            border-bottom: 1px solid #1e293b;
+        }
+
+        .node-item:last-child {
+            border-bottom: none;
+        }
+
+        .node-bullet {
+            color: #3b82f6;
+            font-weight: 700;
+            font-size: 16px;
+            flex-shrink: 0;
+            width: 22px;
+            text-align: center;
+        }
+
+        .node-highlight {
+            color: #facc15;
+            font-weight: 500;
+        }
+
+        /* 底部总览图 */
+        .overview {
+            margin-top: 48px;
+            background: #0f172a;
+            border-radius: 20px;
+            padding: 32px 28px;
+            border: 1px solid #1e293b;
+        }
+
+        .overview h3 {
+            font-size: 18px;
+            color: #f1f5f9;
+            margin-bottom: 16px;
+            text-align: center;
+            letter-spacing: 0.5px;
+        }
+
+        .overview-flow {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 8px 14px;
+            font-size: 14px;
+            color: #e2e8f0;
+        }
+
+        .overview-flow .step {
+            background: #1e293b;
+            padding: 8px 18px;
+            border-radius: 30px;
+            border: 1px solid #2d3a4f;
+            white-space: nowrap;
+        }
+
+        .overview-flow .step.highlight {
+            border-color: #3b82f6;
+            background: #1e3a5f;
+        }
+
+        .overview-flow .arrow {
+            color: #475569;
+            font-size: 18px;
+        }
+
+        .overview-tag {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 13px;
+            color: #64748b;
+            border-top: 1px solid #1e293b;
+            padding-top: 18px;
+        }
+
+        .overview-tag span {
+            background: #1e293b;
+            padding: 4px 12px;
+            border-radius: 20px;
+            border: 1px solid #2d3a4f;
+        }
+
+        /* 响应式 */
+        @media (max-width: 600px) {
+            .phase {
+                padding: 20px 18px;
+            }
+            .phase-title {
+                font-size: 17px;
+            }
+            .header h1 {
+                font-size: 24px;
+            }
+            .node-item {
+                font-size: 13px;
+            }
+            .overview-flow {
+                font-size: 12px;
+                gap: 6px 10px;
+            }
+            .overview-flow .step {
+                padding: 6px 12px;
+                white-space: normal;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+
+        <div class="header">
+            <h1>商业知识学习证据链</h1>
+            <div class="sub">从现象观察到总控平台 · 完整推演路径</div>
+        </div>
+
+        <!-- 阶段徽章导航 -->
+        <div class="stages">
+            <div class="stage-badge"><span class="num">1</span> 现象层</div>
+            <span class="stage-arrow">→</span>
+            <div class="stage-badge"><span class="num">2</span> 规律层</div>
+            <span class="stage-arrow">→</span>
+            <div class="stage-badge"><span class="num">3</span> 模型层</div>
+            <span class="stage-arrow">→</span>
+            <div class="stage-badge"><span class="num">4</span> 验证层</div>
+            <span class="stage-arrow">→</span>
+            <div class="stage-badge"><span class="num">5</span> 总控层</div>
+        </div>
+
+        <!-- 五大阶段卡片 -->
+        <div class="phase-grid">
+
+            <!-- 阶段1 -->
+            <div class="phase">
+                <div class="phase-header">
+                    <span class="phase-tag">第一阶段</span>
+                    <span class="phase-title">现象捕捉与 AB 对照验证</span>
+                </div>
+                <div class="phase-desc">观察两个“9.9”的不同命运，提炼核心差异。</div>
+                <div class="node-list">
+                    <div class="node-item"><span class="node-bullet">·</span> <span>观察瑞幸 9.9：<span class="node-highlight">实物标品</span>，单杯可盈利，规模越大越赚钱</span></div>
+                    <div class="node-item"><span class="node-bullet">·</span> <span>观察情感博主 9.9：<span class="node-highlight">非标时间</span>，卖一份亏一份，价值感知跌破价格</span></div>
+                    <div class="node-item"><span class="node-bullet">·</span> <span>AB 对照验证 → 同样是 9.9，底层逻辑完全不同</span></div>
+                </div>
+            </div>
+
+            <!-- 阶段2 -->
+            <div class="phase">
+                <div class="phase-header">
+                    <span class="phase-tag">第二阶段</span>
+                    <span class="phase-title">提炼底层规律</span>
+                </div>
+                <div class="phase-desc">从对照中剥离本质，发现商业阶段的迁移规律。</div>
+                <div class="node-list">
+                    <div class="node-item"><span class="node-bullet">·</span> <span>信息差时代结束，<span class="node-highlight">认知差时代</span>开始</span></div>
+                    <div class="node-item"><span class="node-bullet">·</span> <span>9.9 失效的本质是 <span class="node-highlight">“价值感知衰减”</span>——用户觉得“听这个浪费的 10 分钟比 9.9 还贵”</span></div>
+                    <div class="node-item"><span class="node-bullet">·</span> <span>饱和期 = 噪音消失期 → <span class="node-highlight">逆向套利窗口</span></span></div>
+                </div>
+            </div>
+
+            <!-- 阶段3 -->
+            <div class="phase">
+                <div class="phase-header">
+                    <span class="phase-tag">第三阶段</span>
+                    <span class="phase-title">模型构建与系统设计</span>
+                </div>
+                <div class="phase-desc">把规律固化为可复用的结构化系统。</div>
+                <div class="node-list">
+                    <div class="node-item"><span class="node-bullet">·</span> <span>9.9 = <span class="node-highlight">目录</span>（全局可见性）</span></div>
+                    <div class="node-item"><span class="node-bullet">·</span> <span>99 = <span class="node-highlight">说明书</span>（标准化可复制路径）</span></div>
+                    <div class="node-item"><span class="node-bullet">·</span> <span>999 = <span class="node-highlight">指挥</span>（低频率高杠杆干预）</span></div>
+                    <div class="node-item"><span class="node-bullet">·</span> <span>产品=故事 · 运营=说明书 · 营销=传播方法</span></div>
+                    <div class="node-item"><span class="node-bullet">·</span> <span>慢蓄力（修体系）→ <span class="node-highlight">快破局</span>（开闸放水）</span></div>
+                    <div class="node-item"><span class="node-bullet">·</span> <span>SWOT 工具平移 + <span class="node-highlight">“价值前置”</span>倒转破局</span></div>
+                </div>
+            </div>
+
+            <!-- 阶段4 -->
+            <div class="phase">
+                <div class="phase-header">
+                    <span class="phase-tag">第四阶段</span>
+                    <span class="phase-title">跨域压力测试与延展验证</span>
+                </div>
+                <div class="phase-desc">把同一套结构平移到多个陌生领域，验证其普适性。</div>
+                <div class="node-list">
+                    <div class="node-item"><span class="node-bullet">·</span> <span>MCN 博主资产管理</span></div>
+                    <div class="node-item"><span class="node-bullet">·</span> <span>漫威 IP 宇宙</span></div>
+                    <div class="node-item"><span class="node-bullet">·</span> <span>低空物流（高端商务文件急送）</span></div>
+                    <div class="node-item"><span class="node-bullet">·</span> <span>向量库 · MAS · IA · AS 技术架构</span></div>
+                </div>
+            </div>
+
+            <!-- 阶段5 -->
+            <div class="phase">
+                <div class="phase-header">
+                    <span class="phase-tag">第五阶段</span>
+                    <span class="phase-title">返回原点，用新系统重新解释旧现象</span>
+                </div>
+                <div class="phase-desc">验证完成后的闭环——用新语言重新回答最初的问题。</div>
+                <div class="node-list">
+                    <div class="node-item"><span class="node-bullet">·</span> <span>瑞幸 9.9：实物标品的获客成本逻辑，销量够大就盈利</span></div>
+                    <div class="node-item"><span class="node-bullet">·</span> <span>情感博主 9.9：非标时间的认知税逻辑，规模越大亏损越大</span></div>
+                    <div class="node-item"><span class="node-bullet">·</span> <span>终极规律提炼：<span class="node-highlight">入口提供全局可见性（9.9）→ 中段提供标准化路径（99）→ 节点提供高杠杆干预（999）</span></span></div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- 底部总览图 -->
+        <div class="overview">
+            <h3>完整证据链总览图</h3>
+            <div class="overview-flow">
+                <span class="step">现象层</span>
+                <span class="arrow">→</span>
+                <span class="step">规律层</span>
+                <span class="arrow">→</span>
+                <span class="step highlight">模型层</span>
+                <span class="arrow">→</span>
+                <span class="step">验证层</span>
+                <span class="arrow">→</span>
+                <span class="step highlight">总控层</span>
+            </div>
+            <div class="overview-tag">
+                <span>观察 → 提炼 → 系统设计 → 跨域验证 → 闭环回归</span>
+            </div>
+        </div>
+
+        <!-- 底部返回 -->
+        <div style="text-align:center; margin-top: 32px; font-size:13px; color:#475569; border-top:1px solid #1e293b; padding-top:20px;">
+            <a href="./README.md" style="color:#3b82f6; text-decoration:none;">← 返回 Y.Mine 知识资产全景图</a>
+        </div>
+
+    </div>
+
+</body>
+</html>
