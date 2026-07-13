@@ -22,10 +22,10 @@
 ## 快速入口
 
 - [📐 价值金字塔](https://hellomind-star.github.io/ymine/value-pyramid.html) 
-- [⚡ 6小时吞噬6个陌生领域](./cross-domain-mapping.md) —— 验证元架构的**广度**
-- [🔍 元架构重构营销学](./marketing-reinvented.md) —— 验证元架构的**深度**
+- [⚡ 6小时吞噬6个陌生领域](https://hellomind-star.github.io/ymine/cross-domain-mapping.html) —— 验证元架构的**广度**
+- [🔍 元架构重构营销学](https://hellomind-star.github.io/ymine/marketing-reinvented.html) —— 验证元架构的**深度**
 - [📊 商业知识学习证据链](https://hellomind-star.github.io/ymine/business-learning-evidence.html)
-- [🌏 跨语种结构化学习验证](./language-mapping-evidence.md) —— 验证元架构在**语言**层面的迁移能力
+- [🌏 跨语种结构化学习验证](https://hellomind-star.github.io/ymine/language-mapping-evidence.html) —— 验证元架构在**语言**层面的迁移能力
 
 ---
 
