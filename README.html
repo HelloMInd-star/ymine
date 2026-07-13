@@ -1,141 +1,666 @@
-        <!-- 顶部导航：返回作品集首页 -->
-        <div class="top-nav">
-            <a href="index.html">← 返回作品集首页</a>
-        </div>
+       <!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Y.Mine · 价值金字塔</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-        <h1>Y.Mine · 知识资产全景图</h1>
-        <div class="subhead">把任何专业变成可迁移的元架构，封装成可交付的商业方案。</div>
+    body {
+      background: #0b1120;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      padding: 40px 20px;
+      display: flex;
+      justify-content: center;
+    }
 
-        <!-- 我是谁 -->
-        <h2>我是谁</h2>
-        <p>财务 + MBA硕士，没有工程或计算机学科出身，但独立完成了：</p>
-        <ul>
-            <li><strong>一套11层AI决策系统（V3.2）</strong>，覆盖MCN资管、低空经济、文旅三大场景</li>
-            <li><strong>一套跨领域迁移方法论（元架构）</strong>，已在6个陌生领域完成验证</li>
-            <li><strong>一套非标资产估值操作系统</strong>，可平移至任意复杂系统</li>
-        </ul>
-        <p><strong>我的工作方式：</strong></p>
-        <ul>
-            <li>系统设计：画蓝图、设边界、定义每一层的接入条件</li>
-            <li>证据链构建：用可验证的推演路径证明设计成立</li>
-            <li>跨域迁移：把同一套结构平移到陌生领域，并跑通验证</li>
-        </ul>
+    .container {
+      max-width: 1100px;
+      width: 100%;
+      background: #121b2e;
+      border-radius: 32px;
+      padding: 48px 44px;
+      border: 1px solid #1e293b;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+    }
 
-        <!-- 快速入口 -->
-        <h2>快速入口</h2>
-        <div class="link-grid">
-            <a href="value-pyramid.html">📐 价值金字塔</a>
-            <a href="cross-domain-mapping.html">⚡ 6小时吞噬6个陌生领域</a>
-            <a href="marketing-reinvented.html">🔍 元架构重构营销学</a>
-            <a href="business-learning-evidence.html">📊 商业知识学习证据链</a>
-            <a href="language-mapping-evidence.html">🌏 跨语种结构化学习验证</a>
-        </div>
+    /* ---- 标题 ---- */
+    .page-header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    .page-header h1 {
+      font-size: 34px;
+      font-weight: 700;
+      color: #f1f5f9;
+      letter-spacing: 1px;
+    }
+    .page-header .sub {
+      color: #94a3b8;
+      font-size: 15px;
+      margin-top: 6px;
+      letter-spacing: 2px;
+    }
 
-        <!-- 价值金字塔 -->
-        <h2>价值金字塔</h2>
-        <p style="color:#94a3b8; font-size:14px;">我的能力层级，用一份可视化页面说清楚。</p>
-        <div style="text-align:center; margin:8px 0 12px 0;">
-            <a href="value-pyramid.html" style="display:inline-block; padding:12px 32px; background:#1e293b; border-radius:8px; color:#e2e8f0; text-decoration:none; border:1px solid #2d3a4f;">
-                📐 查看价值金字塔
-            </a>
-        </div>
-        <p>金字塔三层结构对应：</p>
-        <ul>
-            <li><strong>战术级</strong>：深度拆解一个陌生领域（营销学吞噬）</li>
-            <li><strong>战役级</strong>：同时攻克多个陌生领域（6小时6领域）</li>
-            <li><strong>战略级</strong>：构建可迁移复用的完整体系（知识资产全景图）</li>
-        </ul>
+    /* ---- 核心底座 ---- */
+    .core-base {
+      background: #0f1829;
+      border: 1px solid #2d3a4f;
+      border-radius: 20px;
+      padding: 24px 28px;
+      margin-bottom: 40px;
+    }
+    .core-base .core-title {
+      color: #facc15;
+      font-weight: 600;
+      font-size: 18px;
+      letter-spacing: 1px;
+      margin-bottom: 14px;
+    }
+    .core-tabs {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .core-tab {
+      background: #1a2538;
+      border: 1px solid #2d3a4f;
+      border-radius: 30px;
+      padding: 8px 22px;
+      color: #94a3b8;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: 0.25s;
+    }
+    .core-tab:hover {
+      border-color: #3b82f6;
+      color: #e2e8f0;
+    }
+    .core-tab.active {
+      background: #3b82f6;
+      border-color: #3b82f6;
+      color: #fff;
+    }
+    .core-content {
+      margin-top: 18px;
+      background: #0b1120;
+      border-radius: 14px;
+      padding: 18px 22px;
+      border-left: 3px solid #3b82f6;
+      color: #cbd5e1;
+      font-size: 15px;
+      line-height: 1.7;
+      display: none;
+    }
+    .core-content.show {
+      display: block;
+    }
+    .core-content strong {
+      color: #f1f5f9;
+    }
 
-        <!-- 知识体系总览 -->
-        <h2>知识体系总览</h2>
+    /* ---- 我是谁（逐卡出现） ---- */
+    .whoami {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-bottom: 40px;
+    }
+    .who-card {
+      background: #0f1829;
+      border: 1px solid #1e293b;
+      border-radius: 16px;
+      padding: 20px 24px;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .who-card.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .who-card .label {
+      font-size: 13px;
+      color: #94a3b8;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+    }
+    .who-card .value {
+      font-size: 18px;
+      font-weight: 600;
+      color: #f1f5f9;
+      margin-top: 4px;
+    }
+    .who-card .value span {
+      color: #3b82f6;
+    }
+    .who-card .desc {
+      color: #cbd5e1;
+      font-size: 14px;
+      line-height: 1.6;
+      margin-top: 6px;
+    }
 
-        <h3>⚛️ 第0层 · 物理与数学底层</h3>
-        <div class="badge-list">
-            <span>熵值模型</span><span>概率论</span><span>0.5/0.68阈值</span>
-            <span>权重叠加</span><span>商业数学表达</span><span>凯利公式</span>
-            <span>交互判定系统</span><span>势能场理论</span><span>判定证据链</span>
-            <span>正态风控+财务建模</span>
-        </div>
+    /* ---- 快速入口（纵向） ---- */
+    .quick-links {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 40px;
+    }
+    .quick-link {
+      background: #0f1829;
+      border: 1px solid #1e293b;
+      border-radius: 14px;
+      padding: 14px 20px;
+      color: #e2e8f0;
+      text-decoration: none;
+      font-size: 15px;
+      font-weight: 500;
+      transition: 0.25s;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .quick-link:hover {
+      border-color: #3b82f6;
+      background: #1a2538;
+      transform: translateX(6px);
+    }
+    .quick-link .icon {
+      font-size: 20px;
+    }
+    .quick-link .arrow {
+      margin-left: auto;
+      color: #64748b;
+    }
 
-        <h3>🧠 第1层 · 元架构思维体系</h3>
-        <div class="badge-list">
-            <span>元架构定义</span><span>两个底层模型</span><span>定价双版本</span>
-            <span>反向倒推</span><span>四项核心洞察</span><span>博主成长模型</span>
-            <span>国学四维框架</span><span>十一维估值</span><span>元架构可迁移</span>
-            <span>3→1→3路径</span>
-        </div>
+    /* ---- 价值金字塔（三层） ---- */
+    .pyramid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 40px;
+    }
+    .pyramid-card {
+      background: #0f1829;
+      border: 1px solid #1e293b;
+      border-radius: 16px;
+      padding: 20px 18px;
+      text-align: center;
+      transition: 0.25s;
+    }
+    .pyramid-card:hover {
+      border-color: #3b82f6;
+      transform: translateY(-4px);
+    }
+    .pyramid-card .level {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      color: #94a3b8;
+      text-transform: uppercase;
+    }
+    .pyramid-card .title {
+      font-size: 20px;
+      font-weight: 700;
+      color: #f1f5f9;
+      margin: 6px 0 4px;
+    }
+    .pyramid-card .desc {
+      color: #94a3b8;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    .pyramid-card.strategic {
+      border-top: 4px solid #facc15;
+    }
+    .pyramid-card.campaign {
+      border-top: 4px solid #3b82f6;
+    }
+    .pyramid-card.tactical {
+      border-top: 4px solid #a78bfa;
+    }
 
-        <h3>🔬 第2层 · 跨领域吞噬验证</h3>
-        <div class="badge-list">
-            <span>财务→CAD</span><span>CAD→乐高</span><span>电池系统</span>
-            <span>园林→财务</span><span>运营→工程</span><span>大模型原理</span>
-            <span>地质学</span><span>营销学吞噬</span><span>金融市场</span>
-            <span>公司治理</span><span>瑞幸9.9拆解</span><span>低空经济适配</span>
-            <span>头条双态估值</span><span>应急管理适配</span><span>空地一体构想</span>
-        </div>
+    /* ---- 知识体系总览（每层一个区块） ---- */
+    .layer-block {
+      margin-bottom: 32px;
+    }
+    .layer-block .layer-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: #f1f5f9;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .layer-block .layer-title .badge {
+      font-size: 13px;
+      background: #1e293b;
+      color: #94a3b8;
+      padding: 2px 14px;
+      border-radius: 20px;
+      font-weight: 400;
+    }
+    .layer-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 10px;
+    }
+    .layer-item {
+      background: #0f1829;
+      border: 1px solid #1e293b;
+      border-radius: 12px;
+      padding: 10px 12px;
+      text-align: center;
+      color: #cbd5e1;
+      font-size: 13px;
+      transition: 0.2s;
+    }
+    .layer-item:hover {
+      border-color: #3b82f6;
+      background: #1a2538;
+    }
+    .layer-item .sub {
+      font-size: 11px;
+      color: #64748b;
+      display: block;
+      margin-top: 2px;
+    }
 
-        <h3>💼 第3层 · 商业落地产品</h3>
-        <ul>
-            <li><strong>MCN/文娱AI系统：</strong>资管运营 · 大模型 · 私有云 · 全链路</li>
-            <li><strong>低空经济方案：</strong>时隙调度 · 精算 · 基建 · 空地一体</li>
-            <li><strong>商业认知资产：</strong>证据链 · 资产沉淀 · 呼吸感复盘</li>
-            <li><strong>个人能力评估：</strong>SWOT · 七步法 · 定级</li>
-            <li><strong>商业化与竞品：</strong>交付流程 · 格局分析</li>
-        </ul>
+    /* ---- 每层底部按钮占位 ---- */
+    .layer-btn-wrap {
+      margin-top: 14px;
+      text-align: right;
+    }
+    .layer-btn {
+      background: transparent;
+      border: 1px dashed #3b82f6;
+      border-radius: 30px;
+      padding: 6px 24px;
+      color: #3b82f6;
+      font-size: 13px;
+      cursor: pointer;
+      transition: 0.25s;
+      opacity: 0.6;
+    }
+    .layer-btn:hover {
+      background: #1a2538;
+      opacity: 1;
+    }
 
-        <h3>🌐 第4层 · 品牌叙事与传播</h3>
-        <div class="badge-list">
-            <span>品牌定义</span><span>Y.Mine</span><span>GitHub</span>
-            <span>知识库</span><span>产品说明书</span><span>README</span>
-            <span>飞书知识库</span><span>网页</span><span>首页导航</span>
-        </div>
+    /* ---- 第3层特殊（分组展示） ---- */
+    .group-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 12px;
+    }
+    .group-card {
+      background: #0f1829;
+      border: 1px solid #1e293b;
+      border-radius: 14px;
+      padding: 14px 16px;
+    }
+    .group-card .g-title {
+      color: #facc15;
+      font-weight: 600;
+      font-size: 14px;
+      margin-bottom: 6px;
+    }
+    .group-card .g-items {
+      color: #cbd5e1;
+      font-size: 13px;
+      line-height: 1.6;
+    }
 
-        <h3>🤖 第5层 · 私有AI引擎</h3>
-        <div class="badge-list">
-            <span>127项资产分类</span><span>向量库联动设计</span><span>Milvus搭建构想</span>
-        </div>
+    /* ---- 第5层 独立模块 ---- */
+    .engine-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 12px;
+    }
+    .engine-card {
+      background: #0f1829;
+      border: 1px solid #1e293b;
+      border-radius: 14px;
+      padding: 14px 12px;
+      text-align: center;
+      color: #cbd5e1;
+      font-size: 14px;
+      font-weight: 500;
+      transition: 0.25s;
+    }
+    .engine-card:hover {
+      border-color: #3b82f6;
+      background: #1a2538;
+    }
+    .engine-card .sub {
+      font-size: 12px;
+      color: #64748b;
+      font-weight: 400;
+      display: block;
+      margin-top: 4px;
+    }
+    .engine-highlight {
+      background: #1e293b;
+      border: 1px solid #facc15;
+      border-radius: 14px;
+      padding: 16px 18px;
+      text-align: center;
+      color: #f1f5f9;
+      font-weight: 600;
+      font-size: 16px;
+      letter-spacing: 0.5px;
+      grid-column: 1 / -1;
+    }
 
-        <!-- 核心证据链 -->
-        <h2>核心证据链</h2>
-        <table>
-            <thead>
-                <tr><th>证据</th><th>证明什么</th></tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td><a href="cross-domain-mapping.html">⚡ 6小时吞噬6个陌生领域</a></td>
-                    <td>元架构的<strong>广度</strong>——同一套方法能跨多少个领域</td>
-                </tr>
-                <tr>
-                    <td><a href="marketing-reinvented.html">🔍 元架构重构营销学</a></td>
-                    <td>元架构的<strong>深度</strong>——单一领域能拆到多底层</td>
-                </tr>
-                <tr>
-                    <td><a href="value-pyramid.html">📐 价值金字塔</a></td>
-                    <td>三层价值的<strong>可视化总结</strong>——从单点到系统</td>
-                </tr>
-                <tr>
-                    <td><a href="business-learning-evidence.html">📊 商业知识学习证据链</a></td>
-                    <td>元架构的<strong>过程还原</strong>——从现象观察到总控平台的完整推演路径</td>
-                </tr>
-                <tr>
-                    <td><a href="language-mapping-evidence.html">🌏 跨语种结构化学习验证</a></td>
-                    <td>元架构在<strong>语言</strong>层面的迁移能力 + 英语实际应用能力</td>
-                </tr>
-            </tbody>
-        </table>
+    /* ---- 底部 ---- */
+    .back-home {
+      margin-top: 40px;
+      text-align: center;
+      border-top: 1px solid #1e293b;
+      padding-top: 24px;
+    }
+    .back-home a {
+      color: #3b82f6;
+      text-decoration: none;
+      font-size: 14px;
+      transition: 0.2s;
+    }
+    .back-home a:hover {
+      text-decoration: underline;
+    }
 
-        <!-- 关于这套体系 -->
-        <h2>关于这套体系</h2>
-        <div class="highlight-box">
-            <p><strong>任何专业领域，都可以被拆解、翻译、重构为可迁移的元架构，并封装为可交付的商业方案。</strong></p>
-            <p style="margin-top:8px; color:#94a3b8; font-size:15px;">它不是知识点的堆砌，而是一套<strong>可运行、可迁移、可验证的认知操作系统。</strong></p>
-        </div>
+    /* ---- 响应式 ---- */
+    @media (max-width: 700px) {
+      .container {
+        padding: 24px 16px;
+      }
+      .pyramid {
+        grid-template-columns: 1fr;
+      }
+      .layer-grid {
+        grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+      }
+      .group-grid {
+        grid-template-columns: 1fr;
+      }
+      .engine-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+      .core-tabs {
+        flex-direction: column;
+      }
+      .page-header h1 {
+        font-size: 26px;
+      }
+    }
+  </style>
+</head>
+<body>
 
-        <!-- 底部返回链接 -->
-        <a href="index.html" class="back-link">← 返回 Y.Mine 作品集首页</a>
+<div class="container">
 
+  <!-- ===== 标题 ===== -->
+  <div class="page-header">
+    <h1>🧠 Y.Mine · 价值金字塔</h1>
+    <div class="sub">三层递进 · 从单点能力到系统架构</div>
+  </div>
+
+  <!-- ===== 核心底座（Tab切换） ===== -->
+  <div class="core-base">
+    <div class="core-title">⚙️ 核心底座</div>
+    <div class="core-tabs">
+      <span class="core-tab active" data-tab="tab1">系统设计</span>
+      <span class="core-tab" data-tab="tab2">证据链构建</span>
+      <span class="core-tab" data-tab="tab3">跨域迁移</span>
     </div>
+    <div id="tab1" class="core-content show">
+      <strong>画蓝图 · 设边界 · 定义每一层的接入条件</strong><br>
+      从顶层架构出发，明确系统范围、模块职责和接口规范，确保每一层都可独立演进。
+    </div>
+    <div id="tab2" class="core-content">
+      <strong>用可验证的推演路径证明设计成立</strong><br>
+      通过结构化证据链，将抽象逻辑转化为可追溯、可复现的验证闭环，支撑系统可信度。
+    </div>
+    <div id="tab3" class="core-content">
+      <strong>把同一套结构平移到陌生领域，并跑通验证</strong><br>
+      基于元架构的通用性，将已验证的方法论快速迁移至新场景，实现跨领域复用。
+    </div>
+  </div>
+
+  <!-- ===== 我是谁（逐卡出现） ===== -->
+  <div class="whoami" id="whoami">
+    <div class="who-card">
+      <div class="label">🧑‍💻 背景</div>
+      <div class="value">财务 + <span>MBA硕士</span></div>
+      <div class="desc">没有工程或计算机学科出身，但独立完成了三套系统性成果。</div>
+    </div>
+    <div class="who-card">
+      <div class="label">🏆 成果一</div>
+      <div class="value">11层AI决策系统 <span>V3.2</span></div>
+      <div class="desc">覆盖 MCN资管 · 低空经济 · 文旅 三大场景</div>
+    </div>
+    <div class="who-card">
+      <div class="label">🏆 成果二</div>
+      <div class="value">跨领域迁移方法论 · <span>元架构</span></div>
+      <div class="desc">已在 6 个陌生领域完成验证</div>
+    </div>
+    <div class="who-card">
+      <div class="label">🏆 成果三</div>
+      <div class="value">非标资产估值操作系统</div>
+      <div class="desc">可平移至任意复杂系统</div>
+    </div>
+  </div>
+
+  <!-- ===== 快速入口（纵向） ===== -->
+  <div class="quick-links">
+    <a href="README.md" class="quick-link">
+      <span class="icon">📄</span> 知识资产全景图
+      <span class="arrow">→</span>
+    </a>
+    <a href="cross-domain-mapping.html" class="quick-link">
+      <span class="icon">⚡</span> 6小时吞噬6个陌生领域
+      <span class="arrow">→</span>
+    </a>
+    <a href="marketing-reinvented.html" class="quick-link">
+      <span class="icon">🔍</span> 元架构重构营销学
+      <span class="arrow">→</span>
+    </a>
+    <a href="business-learning-evidence.html" class="quick-link">
+      <span class="icon">📊</span> 商业知识学习证据链
+      <span class="arrow">→</span>
+    </a>
+    <a href="language-mapping-evidence.html" class="quick-link">
+      <span class="icon">🌏</span> 跨语种结构化学习验证
+      <span class="arrow">→</span>
+    </a>
+  </div>
+
+  <!-- ===== 价值金字塔（三层） ===== -->
+  <div class="pyramid">
+    <div class="pyramid-card strategic">
+      <div class="level">战略级</div>
+      <div class="title">🏛️ 完整体系</div>
+      <div class="desc">能帮公司搭建系统<br>已可迁移复用</div>
+    </div>
+    <div class="pyramid-card campaign">
+      <div class="level">战役级</div>
+      <div class="title">⚔️ 跨领域吞噬</div>
+      <div class="desc">能独立攻克陌生领域<br>方法已验证成立</div>
+    </div>
+    <div class="pyramid-card tactical">
+      <div class="level">战术级</div>
+      <div class="title">🔬 深度拆解</div>
+      <div class="desc">能穿透单一领域底层<br>营销学已重构</div>
+    </div>
+  </div>
+
+  <!-- ========================================================== -->
+  <!-- ===== 知识体系总览（0～5层） ===== -->
+  <!-- ========================================================== -->
+
+  <!-- 第0层 -->
+  <div class="layer-block">
+    <div class="layer-title">⚛️ 第0层 · 物理与数学底层 <span class="badge">12项</span></div>
+    <div class="layer-grid">
+      <div class="layer-item">熵值模型</div>
+      <div class="layer-item">概率论</div>
+      <div class="layer-item">0.5/0.68阈值</div>
+      <div class="layer-item">权重叠加</div>
+      <div class="layer-item">商业数学表达</div>
+      <div class="layer-item">凯利公式</div>
+      <div class="layer-item">交互判定系统</div>
+      <div class="layer-item">势能场理论</div>
+      <div class="layer-item">判定证据链</div>
+      <div class="layer-item">正态风控</div>
+      <div class="layer-item">财务建模</div>
+    </div>
+    <div class="layer-btn-wrap"><span class="layer-btn">+ 自定义按钮占位</span></div>
+  </div>
+
+  <!-- 第1层 -->
+  <div class="layer-block">
+    <div class="layer-title">🧠 第1层 · 元架构思维体系 <span class="badge">10项</span></div>
+    <div class="layer-grid">
+      <div class="layer-item">元架构定义</div>
+      <div class="layer-item">两个底层模型</div>
+      <div class="layer-item">定价双版本</div>
+      <div class="layer-item">反向倒推</div>
+      <div class="layer-item">四项核心洞察</div>
+      <div class="layer-item">博主成长模型</div>
+      <div class="layer-item">国学四维框架</div>
+      <div class="layer-item">十一维估值</div>
+      <div class="layer-item">元架构可迁移</div>
+      <div class="layer-item">3→1→3路径</div>
+    </div>
+    <div class="layer-btn-wrap"><span class="layer-btn">+ 自定义按钮占位</span></div>
+  </div>
+
+  <!-- 第2层 -->
+  <div class="layer-block">
+    <div class="layer-title">🔬 第2层 · 跨领域吞噬验证 <span class="badge">15项</span></div>
+    <div class="layer-grid">
+      <div class="layer-item">财务→CAD</div>
+      <div class="layer-item">CAD→乐高</div>
+      <div class="layer-item">电池系统</div>
+      <div class="layer-item">园林→财务</div>
+      <div class="layer-item">运营→工程</div>
+      <div class="layer-item">大模型原理</div>
+      <div class="layer-item">地质学</div>
+      <div class="layer-item">营销学吞噬</div>
+      <div class="layer-item">金融市场</div>
+      <div class="layer-item">公司治理</div>
+      <div class="layer-item">瑞幸9.9拆解</div>
+      <div class="layer-item">低空经济适配</div>
+      <div class="layer-item">头条双态估值</div>
+      <div class="layer-item">应急管理适配</div>
+      <div class="layer-item">空地一体构想</div>
+    </div>
+    <div class="layer-btn-wrap"><span class="layer-btn">+ 自定义按钮占位</span></div>
+  </div>
+
+  <!-- 第3层（分组展示） -->
+  <div class="layer-block">
+    <div class="layer-title">💼 第3层 · 商业落地产品 <span class="badge">5组</span></div>
+    <div class="group-grid">
+      <div class="group-card"><div class="g-title">🎬 MCN/文娱AI</div><div class="g-items">资管运营 · 大模型 · 私有云 · 全链路</div></div>
+      <div class="group-card"><div class="g-title">🚁 低空经济方案</div><div class="g-items">时隙调度 · 精算 · 基建 · 空地一体</div></div>
+      <div class="group-card"><div class="g-title">📦 商业认知资产</div><div class="g-items">证据链 · 资产沉淀 · 呼吸感复盘</div></div>
+      <div class="group-card"><div class="g-title">📊 个人能力评估</div><div class="g-items">SWOT · 七步法 · 定级</div></div>
+      <div class="group-card"><div class="g-title">🏷️ 商业化与竞品</div><div class="g-items">交付流程 · 格局分析</div></div>
+    </div>
+    <div class="layer-btn-wrap"><span class="layer-btn">+ 自定义按钮占位</span></div>
+  </div>
+
+  <!-- 第4层 -->
+  <div class="layer-block">
+    <div class="layer-title">🌐 第4层 · 品牌叙事与传播 <span class="badge">8项</span></div>
+    <div class="layer-grid">
+      <div class="layer-item">品牌定义</div>
+      <div class="layer-item">Y.Mine</div>
+      <div class="layer-item">GitHub</div>
+      <div class="layer-item">知识库</div>
+      <div class="layer-item">产品说明书</div>
+      <div class="layer-item">README</div>
+      <div class="layer-item">飞书知识库</div>
+      <div class="layer-item">网页 / 首页导航</div>
+    </div>
+    <div class="layer-btn-wrap"><span class="layer-btn">+ 自定义按钮占位</span></div>
+  </div>
+
+  <!-- 第5层（独立卡片 + 高亮模块） -->
+  <div class="layer-block">
+    <div class="layer-title">🤖 第5层 · 私有AI引擎 <span class="badge">3+1</span></div>
+    <div class="engine-grid">
+      <div class="engine-card">📂 127项资产分类 <span class="sub">结构化分层</span></div>
+      <div class="engine-card">🔗 向量库联动设计 <span class="sub">RAG 架构</span></div>
+      <div class="engine-card">🧠 Milvus搭建构想 <span class="sub">向量数据库</span></div>
+      <div class="engine-highlight">🧩 11层底层架构 · 完整推理链</div>
+    </div>
+    <div class="layer-btn-wrap"><span class="layer-btn">+ 自定义按钮占位</span></div>
+  </div>
+
+  <!-- ===== 底部返回 ===== -->
+  <div class="back-home">
+    <a href="index.html">← 返回 Y.Mine 作品集首页</a>
+  </div>
+
+</div>
+
+<script>
+  // ===== 核心底座 Tab 切换 =====
+  const tabs = document.querySelectorAll('.core-tab');
+  const contents = {
+    tab1: document.getElementById('tab1'),
+    tab2: document.getElementById('tab2'),
+    tab3: document.getElementById('tab3')
+  };
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', function () {
+      tabs.forEach(t => t.classList.remove('active'));
+      this.classList.add('active');
+
+      Object.keys(contents).forEach(key => {
+        contents[key].classList.remove('show');
+      });
+
+      const target = this.dataset.tab;
+      if (contents[target]) contents[target].classList.add('show');
+    });
+  });
+
+  // ===== 我是谁 · 逐卡出现（滚动触发） =====
+  const cards = document.querySelectorAll('.who-card');
+
+  function checkCards() {
+    const windowHeight = window.innerHeight;
+    cards.forEach(card => {
+      const rect = card.getBoundingClientRect();
+      if (rect.top < windowHeight - 60) {
+        card.classList.add('visible');
+      }
+    });
+  }
+
+  window.addEventListener('scroll', checkCards);
+  window.addEventListener('load', checkCards);
+
+  // ===== 每层“自定义按钮”占位点击提示 =====
+  document.querySelectorAll('.layer-btn').forEach(btn => {
+    btn.addEventListener('click', function () {
+      alert('🧩 这里是自定义按钮占位，你可以替换成你自己的功能或链接。');
+    });
+  });
+</script>
 
 </body>
 </html>
