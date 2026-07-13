@@ -21,10 +21,10 @@
 
 ## 快速入口
 
-- [📐 价值金字塔](https://HelloMind-star.github.io/ymine/value-pyramid.html) —— 三层价值递进，从单点能力到系统架构
+- [📐 价值金字塔](https://hellomind-star.github.io/ymine/value-pyramid.html) 
 - [⚡ 6小时吞噬6个陌生领域](./cross-domain-mapping.md) —— 验证元架构的**广度**
 - [🔍 元架构重构营销学](./marketing-reinvented.md) —— 验证元架构的**深度**
-- [📊 商业知识学习证据链](https://Hellomlnd-star.github.io/ymine/business-learning-evidence.html) —— 从现象观察到总控平台的完整推演路径
+- [📊 商业知识学习证据链](https://hellomind-star.github.io/ymine/business-learning-evidence.html)
 - [🌏 跨语种结构化学习验证](./language-mapping-evidence.md) —— 验证元架构在**语言**层面的迁移能力
 
 ---
@@ -80,8 +80,8 @@
 |------|----------|
 | [⚡ 6小时吞噬6个陌生领域](./cross-domain-mapping.md) | 元架构的**广度**——同一套方法能跨多少个领域 |
 | [🔍 元架构重构营销学](./marketing-reinvented.md) | 元架构的**深度**——单一领域能拆到多底层 |
-| [📐 价值金字塔](https://HelloMind-star.github.io/ymine/value-pyramid.html) | 三层价值的**可视化总结**——从单点到系统 |
-| [📊 商业知识学习证据链](./business-learning-evidence.html) | 元架构的**过程还原**——从现象观察到总控平台的完整推演路径 |
+| [📐 价值金字塔](https://hellomind-star.github.io/ymine/value-pyramid.html) | 三层价值的**可视化总结**——从单点到系统 |
+| [📊 商业知识学习证据链](https://hellomind-star.github.io/ymine/business-learning-evidence.html) | 元架构的**过程还原**——从现象观察到总控平台的完整推演路径 |
 | [🌏 跨语种结构化学习验证](./language-mapping-evidence.md) | 元架构在**语言**层面的迁移能力 + 英语实际应用能力 |
 
 ---
