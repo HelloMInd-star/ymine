@@ -8,7 +8,8 @@
 
 - [📐 价值金字塔](./value-pyramid.html) —— 三层价值递进，从单点能力到系统架构
 - [⚡ 6小时吞噬6个陌生领域](./cross-domain-mapping.md) —— 验证元架构的**广度**
-- [🔍 元架构重构营销学](./marketing-mapping.md) —— 验证元架构的**深度**
+- [🔍 元架构重构营销学](./marketing-reinvented.md) —— 验证元架构的**深度**
+- [📊 商业知识学习证据链](./business-learning-evidence.html) —— 从现象观察到总控平台的完整推演路径## 快速入口
 
 ---
 
@@ -62,8 +63,9 @@
 | 证据 | 证明什么 |
 |------|----------|
 | [⚡ 6小时吞噬6个陌生领域](./cross-domain-mapping.md) | 元架构的**广度**——同一套方法能跨多少个领域 |
-| [🔍 元架构重构营销学](./marketing-mapping.md) | 元架构的**深度**——单一领域能拆到多底层 |
+| [🔍 元架构重构营销学](./marketing-reinvented.md) | 元架构的**深度**——单一领域能拆到多底层 |
 | [📐 价值金字塔](./value-pyramid.html) | 三层价值的**可视化总结**——从单点到系统 |
+| [📊 商业知识学习证据链](./business-learning-evidence.html) | 元架构的**过程还原**——从现象观察到总控平台的完整推演路径 |## 核心证据链
 
 ---
 
