@@ -1,4 +1,4 @@
-[🚀 进入作品集](https://你的用户名.github.io/你的仓库名/)
+[🚀 进入作品集](https://hellomind-star.github.io/ymine/)
 
 # Y.Mine 知识资产全景图
 
