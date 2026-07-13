@@ -1,107 +1,76 @@
 # Y.Mine 知识资产全景图
-> 把任何专业变成可迁移的元架构，封装成可交付的商业方案。
+
+**把任何专业变成可迁移的元架构，封装成可交付的商业方案。**
 
 ---
 
-<table>
-  <tr align="center">
-    <td colspan="5" style="background-color: #f0f4f8; padding: 12px; font-weight: bold; font-size: 16px;">
-      🌐 第4层 · 品牌叙事与传播（你的“三”）
-    </td>
-  </tr>
-  <tr align="center">
-    <td>品牌定义<br>Y.Mine</td>
-    <td>GitHub<br>知识库</td>
-    <td>产品说明书<br>网页</td>
-    <td>README<br>首页导航</td>
-    <td>飞书知识库<br>(待搭建)</td>
-  </tr>
-  <tr align="center">
-    <td colspan="5" style="background-color: #e8f4e8; padding: 12px; font-weight: bold; font-size: 16px;">
-      💼 第3层 · 商业落地产品（你的“二”）
-    </td>
-  </tr>
-  <tr align="center">
-    <td><b>MCN/文娱AI系统</b><br>资管运营·大模型·私有云·全链路</td>
-    <td><b>低空经济方案</b><br>时隙调度·精算·基建·空地一体</td>
-    <td><b>商业认知资产</b><br>证据链·资产沉淀·呼吸感复盘</td>
-    <td><b>个人能力评估</b><br>SWOT·七步法·定级</td>
-    <td><b>商业化与竞品</b><br>交付流程·格局分析</td>
-  </tr>
-  <tr align="center">
-    <td colspan="5" style="background-color: #e8ecf4; padding: 12px; font-weight: bold; font-size: 16px;">
-      🔬 第2层 · 跨领域吞噬验证（万物——佐证链）
-    </td>
-  </tr>
-  <tr align="center">
-    <td>财务→CAD</td>
-    <td>CAD→乐高</td>
-    <td>电池系统</td>
-    <td>园林→财务</td>
-    <td>运营→工程</td>
-  </tr>
-  <tr align="center">
-    <td>大模型原理</td>
-    <td>地质学</td>
-    <td>营销学吞噬</td>
-    <td>金融市场</td>
-    <td>公司治理</td>
-  </tr>
-  <tr align="center">
-    <td>瑞幸9.9拆解</td>
-    <td>低空经济适配</td>
-    <td>头条双态估值</td>
-    <td>应急管理适配</td>
-    <td>空地一体构想</td>
-  </tr>
-  <tr align="center">
-    <td colspan="5" style="background-color: #fcf8e8; padding: 12px; font-weight: bold; font-size: 16px;">
-      🧠 第1层 · 元架构思维体系（你的“一”）
-    </td>
-  </tr>
-  <tr align="center">
-    <td>元架构定义</td>
-    <td>两个底层模型</td>
-    <td>定价双版本</td>
-    <td>反向倒推</td>
-    <td>四项核心洞察</td>
-  </tr>
-  <tr align="center">
-    <td>博主成长模型</td>
-    <td>国学四维框架</td>
-    <td>十一维估值</td>
-    <td>元架构可迁移</td>
-    <td>3→1→3路径</td>
-  </tr>
-  <tr align="center">
-    <td colspan="5" style="background-color: #f8e8e8; padding: 12px; font-weight: bold; font-size: 16px;">
-      ⚛️ 第0层 · 物理与数学底层（你的“道”）
-    </td>
-  </tr>
-  <tr align="center">
-    <td>熵值模型</td>
-    <td>概率论</td>
-    <td>0.5/0.68阈值</td>
-    <td>权重叠加</td>
-    <td>商业数学表达</td>
-  </tr>
-  <tr align="center">
-    <td>凯利公式</td>
-    <td>交互判定系统</td>
-    <td>势能场理论</td>
-    <td>判定证据链</td>
-    <td>正态风控+财务建模</td>
-  </tr>
-  <tr align="center">
-    <td colspan="5" style="background-color: #f0f0f0; padding: 12px; font-weight: bold; font-size: 16px;">
-      🤖 第5层 · 私有AI引擎（你的“软芯片”）
-    </td>
-  </tr>
-  <tr align="center">
-    <td>127项资产分类</td>
-    <td>向量库联动设计</td>
-    <td colspan="3">Milvus搭建构想</td>
-  </tr>
-</table>
+## 快速入口
+
+- [📐 价值金字塔](./value-pyramid.html) —— 三层价值递进，从单点能力到系统架构
+- [⚡ 6小时吞噬6个陌生领域](./cross-domain-mapping.md) —— 验证元架构的**广度**
+- [🔍 元架构重构营销学](./marketing-mapping.md) —— 验证元架构的**深度**
 
 ---
+
+## 价值金字塔
+
+> 我的能力层级，用一份可视化页面说清楚。
+
+[![价值金字塔](./value-pyramid.png)](./value-pyramid.html)
+
+点击上方图片或链接可查看完整交互版。金字塔三层结构对应：
+- **战术级**：深度拆解一个陌生领域（营销学吞噬）
+- **战役级**：同时攻克多个陌生领域（6小时6领域）
+- **战略级**：构建可迁移复用的完整体系（知识资产全景图）
+
+---
+
+## 知识体系总览
+
+### ⚛️ 第0层 · 物理与数学底层
+
+熵值模型 · 概率论 · 0.5/0.68阈值 · 权重叠加 · 商业数学表达 · 凯利公式 · 交互判定系统 · 势能场理论 · 判定证据链 · 正态风控+财务建模
+
+### 🧠 第1层 · 元架构思维体系
+
+元架构定义 · 两个底层模型 · 定价双版本 · 反向倒推 · 四项核心洞察 · 博主成长模型 · 国学四维框架 · 十一维估值 · 元架构可迁移 · 3→1→3路径
+
+### 🔬 第2层 · 跨领域吞噬验证
+
+财务→CAD · CAD→乐高 · 电池系统 · 园林→财务 · 运营→工程 · 大模型原理 · 地质学 · 营销学吞噬 · 金融市场 · 公司治理 · 瑞幸9.9拆解 · 低空经济适配 · 头条双态估值 · 应急管理适配 · 空地一体构想
+
+### 💼 第3层 · 商业落地产品
+
+- MCN/文娱AI系统：资管运营 · 大模型 · 私有云 · 全链路
+- 低空经济方案：时隙调度 · 精算 · 基建 · 空地一体
+- 商业认知资产：证据链 · 资产沉淀 · 呼吸感复盘
+- 个人能力评估：SWOT · 七步法 · 定级
+- 商业化与竞品：交付流程 · 格局分析
+
+### 🌐 第4层 · 品牌叙事与传播
+
+品牌定义 · Y.Mine · GitHub · 知识库 · 产品说明书 · README · 飞书知识库 · 网页 · 首页导航
+
+### 🤖 第5层 · 私有AI引擎
+
+127项资产分类 · 向量库联动设计 · Milvus搭建构想
+
+---
+
+## 核心证据链
+
+| 证据 | 证明什么 |
+|------|----------|
+| [⚡ 6小时吞噬6个陌生领域](./cross-domain-mapping.md) | 元架构的**广度**——同一套方法能跨多少个领域 |
+| [🔍 元架构重构营销学](./marketing-mapping.md) | 元架构的**深度**——单一领域能拆到多底层 |
+| [📐 价值金字塔](./value-pyramid.html) | 三层价值的**可视化总结**——从单点到系统 |
+
+---
+
+## 关于这套体系
+
+这套知识体系的核心命题是：
+
+> **任何专业领域，都可以被拆解、翻译、重构为可迁移的元架构，并封装为可交付的商业方案。**
+
+它不是知识点的堆砌，而是一套**可运行、可迁移、可验证的认知操作系统**。
