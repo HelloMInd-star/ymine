@@ -92,6 +92,7 @@
             transition: all 0.2s;
             text-decoration: none;
             display: block;
+            color: #94a3b8;
         }
 
         .evidence-steps .step:hover {
@@ -115,6 +116,14 @@
         .evidence-steps .step.active {
             border-color: #facc15;
             background: #1e293b;
+        }
+        
+        .evidence-steps .step.active .num {
+            color: #facc15;
+        }
+        
+        .evidence-steps .step.active .label {
+            color: #f1f5f9;
         }
 
         /* ===== 通用标题 ===== */
@@ -463,11 +472,11 @@
 
             <!-- 证据链步骤条（点击滚动到对应模块） -->
             <div class="evidence-steps">
-                <a href="#evidence-1" class="step active"><div class="num">①</div><div class="label">语序规则</div></a>
-                <a href="#evidence-2" class="step"><div class="num">②</div><div class="label">时态标记</div></a>
-                <a href="#evidence-3" class="step"><div class="num">③</div><div class="label">词缀派生</div></a>
-                <a href="#evidence-4" class="step"><div class="num">④</div><div class="label">句式同源</div></a>
-                <a href="#evidence-5" class="step"><div class="num">⑤</div><div class="label">差异边界</div></a>
+                <a href="#evidence-1" class="step active"><span class="num">①</span><span class="label">语序规则</span></a>
+                <a href="#evidence-2" class="step"><span class="num">②</span><span class="label">时态标记</span></a>
+                <a href="#evidence-3" class="step"><span class="num">③</span><span class="label">词缀派生</span></a>
+                <a href="#evidence-4" class="step"><span class="num">④</span><span class="label">句式同源</span></a>
+                <a href="#evidence-5" class="step"><span class="num">⑤</span><span class="label">差异边界</span></a>
             </div>
         </div>
 
@@ -814,6 +823,16 @@
                 `;
             }
         }
+
+        // ===== 步骤条点击切换高亮（动态 active） =====
+        document.querySelectorAll('.evidence-steps .step').forEach(step => {
+            step.addEventListener('click', function(e) {
+                // 移除所有步骤的 active 类
+                document.querySelectorAll('.evidence-steps .step').forEach(s => s.classList.remove('active'));
+                // 给当前点击的步骤加上 active 类
+                this.classList.add('active');
+            });
+        });
 
         // 页面加载后默认显示一个例句
         window.onload = function() {
