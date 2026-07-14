@@ -26,10 +26,12 @@
             width: 100%;
         }
 
-        /* 头部 */
+        /* ===== 头部 ===== */
         .header {
             margin-bottom: 48px;
             text-align: center;
+            opacity: 0;
+            animation: fadeInUp 0.8s ease forwards;
         }
 
         .header h1 {
@@ -37,6 +39,11 @@
             font-weight: 700;
             color: #f1f5f9;
             letter-spacing: 0.5px;
+            background: linear-gradient(135deg, #f1f5f9, #a78bfa, #60a5fa, #f1f5f9);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradientFlow 6s ease-in-out infinite;
         }
 
         .header .sub {
@@ -47,13 +54,38 @@
             padding-bottom: 16px;
         }
 
-        /* 阶段横向流 */
+        @keyframes fadeInUp {
+            0% {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes gradientFlow {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        /* ===== 阶段徽章导航 ===== */
         .stages {
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
             gap: 12px 16px;
             margin-bottom: 40px;
+            opacity: 0;
+            animation: fadeInUp 0.6s ease 0.1s forwards;
         }
 
         .stage-badge {
@@ -69,6 +101,14 @@
             letter-spacing: 0.3px;
             border: 1px solid #334155;
             flex-shrink: 0;
+            transition: all 0.3s ease;
+            cursor: default;
+        }
+
+        .stage-badge:hover {
+            border-color: #3b82f6;
+            background: #1e3a5f;
+            transform: translateY(-2px);
         }
 
         .stage-badge .num {
@@ -82,6 +122,7 @@
             justify-content: center;
             font-size: 13px;
             font-weight: 700;
+            flex-shrink: 0;
         }
 
         .stage-arrow {
@@ -106,32 +147,51 @@
             }
         }
 
-        /* 卡片网格 */
+        /* ===== 五层卡片 ===== */
         .phase-grid {
             display: flex;
             flex-direction: column;
-            gap: 28px;
+            gap: 32px;
             margin-top: 8px;
         }
 
         .phase {
             background: #121b2e;
             border-radius: 20px;
-            padding: 28px 32px;
+            padding: 32px 34px 34px;
             border: 1px solid #1e293b;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            transition: all 0.3s ease;
+            opacity: 0;
+            animation: fadeInUp 0.6s ease forwards;
+        }
+
+        .phase:nth-child(1) {
+            animation-delay: 0.15s;
+        }
+        .phase:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        .phase:nth-child(3) {
+            animation-delay: 0.25s;
+        }
+        .phase:nth-child(4) {
+            animation-delay: 0.3s;
+        }
+        .phase:nth-child(5) {
+            animation-delay: 0.35s;
         }
 
         .phase:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+            border-color: #2a3a55;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
         }
 
         .phase-header {
             display: flex;
             align-items: center;
             gap: 14px;
-            margin-bottom: 16px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
         }
 
         .phase-tag {
@@ -141,8 +201,9 @@
             padding: 4px 14px;
             border-radius: 30px;
             background: #1e293b;
-            color: #94a3b8;
+            color: #3b82f6;
             border: 1px solid #2d3a4f;
+            flex-shrink: 0;
         }
 
         .phase-title {
@@ -154,14 +215,20 @@
         .phase-desc {
             font-size: 14px;
             color: #94a3b8;
-            margin-bottom: 14px;
-            line-height: 1.6;
+            margin-bottom: 16px;
+            line-height: 1.7;
+            padding-left: 4px;
         }
 
+        .phase-desc strong {
+            color: #e2e8f0;
+        }
+
+        /* ===== 节点列表 ===== */
         .node-list {
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 6px;
             padding-left: 6px;
         }
 
@@ -171,9 +238,9 @@
             gap: 12px;
             font-size: 14px;
             color: #cbd5e1;
-            line-height: 1.5;
-            padding: 6px 0;
-            border-bottom: 1px solid #1e293b;
+            line-height: 1.6;
+            padding: 8px 0;
+            border-bottom: 1px solid #1a2538;
         }
 
         .node-item:last-child {
@@ -187,6 +254,7 @@
             flex-shrink: 0;
             width: 22px;
             text-align: center;
+            margin-top: 1px;
         }
 
         .node-highlight {
@@ -194,13 +262,25 @@
             font-weight: 500;
         }
 
-        /* 底部总览图 */
+        .node-item .node-detail {
+            display: block;
+            font-size: 13px;
+            color: #64748b;
+            margin-top: 2px;
+            padding-left: 4px;
+            border-left: 2px solid #1e293b;
+            padding-left: 12px;
+        }
+
+        /* ===== 底部总览图 ===== */
         .overview {
             margin-top: 48px;
             background: #0f172a;
             border-radius: 20px;
             padding: 32px 28px;
             border: 1px solid #1e293b;
+            opacity: 0;
+            animation: fadeInUp 0.6s ease 0.4s forwards;
         }
 
         .overview h3 {
@@ -227,11 +307,18 @@
             border-radius: 30px;
             border: 1px solid #2d3a4f;
             white-space: nowrap;
+            transition: all 0.3s ease;
+        }
+
+        .overview-flow .step:hover {
+            border-color: #3b82f6;
+            background: #1e3a5f;
         }
 
         .overview-flow .step.highlight {
-            border-color: #3b82f6;
-            background: #1e3a5f;
+            border-color: #facc15;
+            background: #1e293b;
+            color: #facc15;
         }
 
         .overview-flow .arrow {
@@ -253,9 +340,34 @@
             padding: 4px 12px;
             border-radius: 20px;
             border: 1px solid #2d3a4f;
+            color: #94a3b8;
         }
 
-        /* 响应式 */
+        .overview-tag .highlight {
+            color: #facc15;
+        }
+
+        /* ===== 返回链接 ===== */
+        .back-link {
+            text-align: center;
+            margin-top: 36px;
+            padding-top: 20px;
+            border-top: 1px solid #1e293b;
+        }
+
+        .back-link a {
+            color: #3b82f6;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s ease;
+        }
+
+        .back-link a:hover {
+            color: #60a5fa;
+            text-decoration: underline;
+        }
+
+        /* ===== 响应式 ===== */
         @media (max-width: 600px) {
             .phase {
                 padding: 20px 18px;
@@ -277,6 +389,9 @@
                 padding: 6px 12px;
                 white-space: normal;
             }
+            .overview-flow .arrow {
+                font-size: 14px;
+            }
         }
     </style>
 </head>
@@ -284,12 +399,13 @@
 
     <div class="container">
 
+        <!-- ===== 头部 ===== -->
         <div class="header">
             <h1>商业知识学习证据链</h1>
             <div class="sub">从现象观察到总控平台 · 完整推演路径</div>
         </div>
 
-        <!-- 阶段徽章导航 -->
+        <!-- ===== 阶段徽章导航 ===== -->
         <div class="stages">
             <div class="stage-badge"><span class="num">1</span> 现象层</div>
             <span class="stage-arrow">→</span>
@@ -302,86 +418,217 @@
             <div class="stage-badge"><span class="num">5</span> 总控层</div>
         </div>
 
-        <!-- 五大阶段卡片 -->
+        <!-- ===== 五大阶段卡片 ===== -->
         <div class="phase-grid">
 
-            <!-- 阶段1 -->
+            <!-- 阶段1：现象层 -->
             <div class="phase">
                 <div class="phase-header">
                     <span class="phase-tag">第一阶段</span>
                     <span class="phase-title">现象捕捉与 AB 对照验证</span>
                 </div>
-                <div class="phase-desc">观察两个“9.9”的不同命运，提炼核心差异。</div>
+                <div class="phase-desc">
+                    从两个“9.9”的不同命运切入，用 AB 对照剥离表象，锁定核心差异。
+                </div>
                 <div class="node-list">
-                    <div class="node-item"><span class="node-bullet">·</span> <span>观察瑞幸 9.9：<span class="node-highlight">实物标品</span>，单杯可盈利，规模越大越赚钱</span></div>
-                    <div class="node-item"><span class="node-bullet">·</span> <span>观察情感博主 9.9：<span class="node-highlight">非标时间</span>，卖一份亏一份，价值感知跌破价格</span></div>
-                    <div class="node-item"><span class="node-bullet">·</span> <span>AB 对照验证 → 同样是 9.9，底层逻辑完全不同</span></div>
+                    <div class="node-item">
+                        <span class="node-bullet">·</span>
+                        <span>
+                            <span class="node-highlight">瑞幸 9.9</span>：实物标品 · 单杯可盈利 · 规模越大越赚钱
+                            <span class="node-detail">典型案例：瑞幸用 9.9 获客，杯均成本约 6 元，每卖一杯赚 3 元，规模越大边际成本越低。</span>
+                        </span>
+                    </div>
+                    <div class="node-item">
+                        <span class="node-bullet">·</span>
+                        <span>
+                            <span class="node-highlight">情感博主 9.9</span>：非标时间 · 卖一份亏一份 · 价值感知跌破价格
+                            <span class="node-detail">典型场景：博主一对一咨询 10 分钟收 9.9，但用户觉得“听这 10 分钟浪费的时间比 9.9 还贵”。</span>
+                        </span>
+                    </div>
+                    <div class="node-item">
+                        <span class="node-bullet">·</span>
+                        <span>
+                            <strong>AB 对照验证结论：</strong>同样是 9.9，底层逻辑完全不同。
+                            <span class="node-detail">瑞幸在卖“可复制的标品”，情感博主在卖“不可复制的个人时间”。标品可规模化，时间不可规模化。</span>
+                        </span>
+                    </div>
                 </div>
             </div>
 
-            <!-- 阶段2 -->
+            <!-- 阶段2：规律层 -->
             <div class="phase">
                 <div class="phase-header">
                     <span class="phase-tag">第二阶段</span>
                     <span class="phase-title">提炼底层规律</span>
                 </div>
-                <div class="phase-desc">从对照中剥离本质，发现商业阶段的迁移规律。</div>
+                <div class="phase-desc">
+                    从 AB 对照中剥离本质，发现商业阶段的迁移规律和价值感知的底层逻辑。
+                </div>
                 <div class="node-list">
-                    <div class="node-item"><span class="node-bullet">·</span> <span>信息差时代结束，<span class="node-highlight">认知差时代</span>开始</span></div>
-                    <div class="node-item"><span class="node-bullet">·</span> <span>9.9 失效的本质是 <span class="node-highlight">“价值感知衰减”</span>——用户觉得“听这个浪费的 10 分钟比 9.9 还贵”</span></div>
-                    <div class="node-item"><span class="node-bullet">·</span> <span>饱和期 = 噪音消失期 → <span class="node-highlight">逆向套利窗口</span></span></div>
+                    <div class="node-item">
+                        <span class="node-bullet">·</span>
+                        <span>
+                            <span class="node-highlight">信息差时代结束</span>，<span class="node-highlight">认知差时代</span>开始
+                            <span class="node-detail">过去靠“知道别人不知道的”赚钱，现在靠“比别人更早看透结构”赚钱。信息泛滥，但认知稀缺。</span>
+                        </span>
+                    </div>
+                    <div class="node-item">
+                        <span class="node-bullet">·</span>
+                        <span>
+                            9.9 失效的本质是 <span class="node-highlight">“价值感知衰减”</span>
+                            <span class="node-detail">用户对价格的敏感度在降低，对“时间成本”的敏感度在升高。一个产品如果让用户觉得“浪费我的时间”，价格再低也没用。</span>
+                        </span>
+                    </div>
+                    <div class="node-item">
+                        <span class="node-bullet">·</span>
+                        <span>
+                            饱和期 = 噪音消失期 → <span class="node-highlight">逆向套利窗口</span>
+                            <span class="node-detail">当所有人都觉得“这个领域已经很卷了”，恰恰是噪音最少的时刻。真正有价值的东西不会被淹没，只会被噪音掩盖——噪音消失时，价值自然浮现。</span>
+                        </span>
+                    </div>
                 </div>
             </div>
 
-            <!-- 阶段3 -->
+            <!-- 阶段3：模型层 -->
             <div class="phase">
                 <div class="phase-header">
                     <span class="phase-tag">第三阶段</span>
                     <span class="phase-title">模型构建与系统设计</span>
                 </div>
-                <div class="phase-desc">把规律固化为可复用的结构化系统。</div>
+                <div class="phase-desc">
+                    把规律固化为可复用的结构化系统，形成完整的商业操作模型。
+                </div>
                 <div class="node-list">
-                    <div class="node-item"><span class="node-bullet">·</span> <span>9.9 = <span class="node-highlight">目录</span>（全局可见性）</span></div>
-                    <div class="node-item"><span class="node-bullet">·</span> <span>99 = <span class="node-highlight">说明书</span>（标准化可复制路径）</span></div>
-                    <div class="node-item"><span class="node-bullet">·</span> <span>999 = <span class="node-highlight">指挥</span>（低频率高杠杆干预）</span></div>
-                    <div class="node-item"><span class="node-bullet">·</span> <span>产品=故事 · 运营=说明书 · 营销=传播方法</span></div>
-                    <div class="node-item"><span class="node-bullet">·</span> <span>慢蓄力（修体系）→ <span class="node-highlight">快破局</span>（开闸放水）</span></div>
-                    <div class="node-item"><span class="node-bullet">·</span> <span>SWOT 工具平移 + <span class="node-highlight">“价值前置”</span>倒转破局</span></div>
+                    <div class="node-item">
+                        <span class="node-bullet">·</span>
+                        <span>
+                            <span class="node-highlight">9.9 = 目录</span>（全局可见性 · 让用户知道“这里有东西”）
+                            <span class="node-detail">目录的作用不是卖钱，是让用户看到“全貌”。9.9 是入口，不是产品。</span>
+                        </span>
+                    </div>
+                    <div class="node-item">
+                        <span class="node-bullet">·</span>
+                        <span>
+                            <span class="node-highlight">99 = 说明书</span>（标准化可复制路径 · 让用户知道“怎么走”）
+                            <span class="node-detail">说明书的作用是把“经验”变成“步骤”。99 是方法论，不是知识。</span>
+                        </span>
+                    </div>
+                    <div class="node-item">
+                        <span class="node-bullet">·</span>
+                        <span>
+                            <span class="node-highlight">999 = 指挥</span>（低频率 · 高杠杆干预 · 让用户“走对”）
+                            <span class="node-detail">指挥的作用是在关键节点做决策。999 是系统干预，不是咨询服务。</span>
+                        </span>
+                    </div>
+                    <div class="node-item">
+                        <span class="node-bullet">·</span>
+                        <span>
+                            <span class="node-highlight">产品 = 故事</span> · 运营 = 说明书 · 营销 = 传播方法
+                            <span class="node-detail">产品需要被感知，所以是故事；运营需要被复制，所以是说明书；营销需要被传播，所以是方法。三者各司其职，不混淆。</span>
+                        </span>
+                    </div>
+                    <div class="node-item">
+                        <span class="node-bullet">·</span>
+                        <span>
+                            <span class="node-highlight">慢蓄力（修体系）</span> → <span class="node-highlight">快破局（开闸放水）</span>
+                            <span class="node-detail">蓄力期做结构，破局期做爆发。蓄力阶段没有数据反馈是正常的，破局阶段数据自然涌现。</span>
+                        </span>
+                    </div>
+                    <div class="node-item">
+                        <span class="node-bullet">·</span>
+                        <span>
+                            <span class="node-highlight">SWOT 工具平移 + “价值前置”倒转破局</span>
+                            <span class="node-detail">把 SWOT 从“评估工具”变成“破局工具”——先定义“我想要什么结局”，再倒推 SWOT 的条件。价值前置：先让用户感知到价值，再让用户付费。</span>
+                        </span>
+                    </div>
                 </div>
             </div>
 
-            <!-- 阶段4 -->
+            <!-- 阶段4：验证层 -->
             <div class="phase">
                 <div class="phase-header">
                     <span class="phase-tag">第四阶段</span>
                     <span class="phase-title">跨域压力测试与延展验证</span>
                 </div>
-                <div class="phase-desc">把同一套结构平移到多个陌生领域，验证其普适性。</div>
+                <div class="phase-desc">
+                    把同一套结构平移到多个陌生领域，验证其普适性——证明这不是“一个领域的偶然”，而是“可迁移的必然”。
+                </div>
                 <div class="node-list">
-                    <div class="node-item"><span class="node-bullet">·</span> <span>MCN 博主资产管理</span></div>
-                    <div class="node-item"><span class="node-bullet">·</span> <span>漫威 IP 宇宙</span></div>
-                    <div class="node-item"><span class="node-bullet">·</span> <span>低空物流（高端商务文件急送）</span></div>
-                    <div class="node-item"><span class="node-bullet">·</span> <span>向量库 · MAS · IA · AS 技术架构</span></div>
+                    <div class="node-item">
+                        <span class="node-bullet">·</span>
+                        <span>
+                            <span class="node-highlight">MCN 博主资产管理</span>
+                            <span class="node-detail">四维定价（流量盘 + 人设盘 + 变现盘 - 风险盘）→ α值分级（S/A/B/C/D）→ 赛道组合优化。同一套框架，从“商业产品”迁移到“非标资产”。</span>
+                        </span>
+                    </div>
+                    <div class="node-item">
+                        <span class="node-bullet">·</span>
+                        <span>
+                            <span class="node-highlight">漫威 IP 宇宙</span>
+                            <span class="node-detail">单 IP（钢铁侠）→ 赛道组合（复仇者联盟）→ 全域矩阵（漫威宇宙）。9.9 = 独立电影（入口），99 = 联动电影（说明书），999 = 终局之战（指挥）。</span>
+                        </span>
+                    </div>
+                    <div class="node-item">
+                        <span class="node-bullet">·</span>
+                        <span>
+                            <span class="node-highlight">低空物流（高端商务文件急送）</span>
+                            <span class="node-detail">9.9 = 无人机配送可见性入口，99 = 标准化配送路径，999 = 紧急调度指挥。同一套定价逻辑，从“知识服务”迁移到“物流服务”。</span>
+                        </span>
+                    </div>
+                    <div class="node-item">
+                        <span class="node-bullet">·</span>
+                        <span>
+                            <span class="node-highlight">向量库 · MAS · IA · AS 技术架构</span>
+                            <span class="node-detail">向量库 = 目录（全局可见性），MAS（多智能体系统）= 说明书（标准化协作路径），IA（智能增强）+ AS（自动化系统）= 指挥（高杠杆干预）。</span>
+                        </span>
+                    </div>
                 </div>
             </div>
 
-            <!-- 阶段5 -->
+            <!-- 阶段5：总控层 -->
             <div class="phase">
                 <div class="phase-header">
                     <span class="phase-tag">第五阶段</span>
                     <span class="phase-title">返回原点，用新系统重新解释旧现象</span>
                 </div>
-                <div class="phase-desc">验证完成后的闭环——用新语言重新回答最初的问题。</div>
+                <div class="phase-desc">
+                    验证完成后的闭环——用新语言重新回答最初的问题，证明系统能“自解释”。
+                </div>
                 <div class="node-list">
-                    <div class="node-item"><span class="node-bullet">·</span> <span>瑞幸 9.9：实物标品的获客成本逻辑，销量够大就盈利</span></div>
-                    <div class="node-item"><span class="node-bullet">·</span> <span>情感博主 9.9：非标时间的认知税逻辑，规模越大亏损越大</span></div>
-                    <div class="node-item"><span class="node-bullet">·</span> <span>终极规律提炼：<span class="node-highlight">入口提供全局可见性（9.9）→ 中段提供标准化路径（99）→ 节点提供高杠杆干预（999）</span></span></div>
+                    <div class="node-item">
+                        <span class="node-bullet">·</span>
+                        <span>
+                            <span class="node-highlight">瑞幸 9.9</span>：实物标品的获客成本逻辑
+                            <span class="node-detail">瑞幸的 9.9 不是“卖咖啡”，是“买流量”。一杯咖啡的成本是固定的，流量越大，获客成本越低。销量够大就盈利。</span>
+                        </span>
+                    </div>
+                    <div class="node-item">
+                        <span class="node-bullet">·</span>
+                        <span>
+                            <span class="node-highlight">情感博主 9.9</span>：非标时间的认知税逻辑
+                            <span class="node-detail">情感博主的 9.9 不是“卖咨询”，是“收认知税”。每一个咨询都需要消耗不可复制的时间，规模越大，亏损越大。</span>
+                        </span>
+                    </div>
+                    <div class="node-item">
+                        <span class="node-bullet">·</span>
+                        <span>
+                            <span class="node-highlight">终极规律提炼</span>
+                            <span class="node-detail"><span class="node-highlight">入口提供全局可见性（9.9）→ 中段提供标准化路径（99）→ 节点提供高杠杆干预（999）</span>。这是从信息差到认知差的完整迁移路径。</span>
+                        </span>
+                    </div>
+                    <div class="node-item">
+                        <span class="node-bullet">·</span>
+                        <span>
+                            <span class="node-highlight">总控台闭环</span>
+                            <span class="node-detail">现象层提供原始数据 → 规律层提炼核心变量 → 模型层固化为可复用系统 → 验证层跨域测试 → 总控层回归原点，用系统语言重新解释现象。闭环完成。</span>
+                        </span>
+                    </div>
                 </div>
             </div>
 
         </div>
 
-        <!-- 底部总览图 -->
+        <!-- ===== 底部总览图 ===== -->
         <div class="overview">
             <h3>完整证据链总览图</h3>
             <div class="overview-flow">
@@ -398,12 +645,14 @@
             <div class="overview-tag">
                 <span>观察 → 提炼 → 系统设计 → 跨域验证 → 闭环回归</span>
             </div>
+            <div class="overview-tag" style="margin-top: 10px; border-top: none; padding-top: 6px;">
+                <span class="highlight">9.9 = 目录</span> · <span class="highlight">99 = 说明书</span> · <span class="highlight">999 = 指挥</span>
+            </div>
         </div>
 
-        <!-- 底部返回 -->
-        
-        <div style="text-align:center; margin-top: 32px; font-size:13px; color:#475569; border-top:1px solid #1e293b; padding-top:20px;">
-            <a href="index.html" style="color:#3b82f6; text-decoration:none;">← 返回 Y.Mine 知识资产全景图</a>
+        <!-- ===== 返回链接 ===== -->
+        <div class="back-link">
+            <a href="index.html">← 返回 Y.Mine 知识资产全景图</a>
         </div>
 
     </div>
