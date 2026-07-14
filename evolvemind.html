@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EvolveMind · 进阶思维 认知系统</title>
+    <title>画圈实验 · 认知方法论</title>
     <style>
-        /* ===== 全局重置 ===== */
         * {
             margin: 0;
             padding: 0;
@@ -13,8 +12,8 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            background: #f8fafc;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #f1f5f9;
             min-height: 100vh;
             padding: 40px 24px;
             display: flex;
@@ -31,13 +30,14 @@
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.06);
         }
 
-        /* ===== 头部 ===== */
-        .header {
-            margin-bottom: 40px;
-            text-align: center;
+        /* ===== 头部概念说明 ===== */
+        .concept {
+            margin-bottom: 32px;
+            padding-bottom: 24px;
+            border-bottom: 2px solid #f1f5f9;
         }
 
-        .badge {
+        .concept .badge {
             display: inline-block;
             background: #eef2ff;
             color: #4f46e5;
@@ -49,255 +49,151 @@
             margin-bottom: 12px;
         }
 
-        h1 {
-            font-size: 36px;
+        .concept h1 {
+            font-size: 32px;
             font-weight: 700;
             color: #0f172a;
             letter-spacing: -0.5px;
         }
 
-        h1 span {
+        .concept h1 span {
             color: #4f46e5;
         }
 
-        .slogan {
-            margin-top: 8px;
-            font-size: 18px;
+        .concept .sub {
+            font-size: 16px;
             color: #64748b;
-            font-weight: 400;
+            margin-top: 6px;
+            line-height: 1.6;
         }
 
-        .slogan::before {
-            content: "“";
-            color: #4f46e5;
-        }
-        .slogan::after {
-            content: "”";
-            color: #4f46e5;
-        }
-
-        /* ===== README 摘要 ===== */
-        .readme-summary {
+        .concept .logic-flow {
             background: #f8fafc;
-            border-radius: 20px;
-            padding: 24px 28px;
-            margin-bottom: 32px;
-            border-left: 4px solid #4f46e5;
-        }
-
-        .readme-summary h2 {
-            font-size: 18px;
-            font-weight: 600;
+            border-radius: 16px;
+            padding: 16px 20px;
+            margin-top: 14px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px 12px;
+            font-size: 14px;
             color: #0f172a;
-            margin-bottom: 8px;
         }
 
-        .readme-summary p {
-            color: #475569;
-            line-height: 1.8;
-            font-size: 15px;
-            margin-bottom: 6px;
-        }
-
-        .readme-summary .highlight {
-            color: #4f46e5;
+        .concept .logic-flow .step {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 20px;
+            padding: 4px 14px;
             font-weight: 500;
         }
 
-        .readme-summary .tag {
-            display: inline-block;
-            background: #e0e7ff;
+        .concept .logic-flow .step.highlight {
+            background: #eef2ff;
+            border-color: #4f46e5;
             color: #4f46e5;
-            font-size: 12px;
-            font-weight: 600;
-            padding: 2px 12px;
-            border-radius: 20px;
-            margin-right: 4px;
         }
 
-        /* ===== 产品结构图 ===== */
-        .structure {
+        .concept .logic-flow .arrow {
+            color: #94a3b8;
+            font-weight: 300;
+        }
+
+        /* ===== 画布区 ===== */
+        .canvas-wrapper {
             background: #f8fafc;
             border-radius: 20px;
-            padding: 28px 24px;
-            margin-bottom: 32px;
-            text-align: center;
+            padding: 16px;
+            margin-bottom: 24px;
         }
 
-        .structure h3 {
-            font-size: 15px;
-            font-weight: 600;
-            color: #64748b;
-            letter-spacing: 1px;
+        canvas {
+            display: block;
+            width: 100%;
+            height: auto;
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.02);
+        }
+
+        /* ===== 控制区 ===== */
+        .controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px 24px;
             margin-bottom: 20px;
-            text-transform: uppercase;
         }
 
-        .structure .layers {
+        .control-group {
             display: flex;
             flex-direction: column;
-            align-items: center;
-            gap: 12px;
+            gap: 4px;
         }
 
-        .structure .product-box {
-            display: flex;
-            gap: 16px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-
-        .structure .product-item {
-            background: white;
-            border: 2px solid #4f46e5;
-            border-radius: 16px;
-            padding: 12px 20px;
-            font-weight: 600;
-            font-size: 15px;
-            color: #0f172a;
-            min-width: 120px;
-            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.06);
-        }
-
-        .structure .product-item span {
-            color: #4f46e5;
-        }
-
-        .structure .arrow-down {
-            font-size: 24px;
-            color: #94a3b8;
-        }
-
-        .structure .user-layer {
-            background: white;
-            border: 2px dashed #4f46e5;
-            border-radius: 16px;
-            padding: 14px 28px;
-            font-weight: 600;
-            font-size: 16px;
-            color: #0f172a;
-        }
-
-        .structure .user-layer span {
-            color: #4f46e5;
-        }
-
-        .structure .user-layer .note {
-            font-weight: 400;
+        .control-group label {
             font-size: 13px;
-            color: #94a3b8;
-            display: block;
-            margin-top: 4px;
-        }
-
-        .structure .migrate-layer {
-            background: #eef2ff;
-            border-radius: 16px;
-            padding: 12px 24px;
             font-weight: 500;
-            font-size: 14px;
+            color: #475569;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .control-group label span {
             color: #4f46e5;
+            font-weight: 600;
         }
 
-        /* ===== 卡片入场动画 ===== */
-        .card {
-            opacity: 0;
-            transform: translateY(30px);
-            animation: fadeInUp 0.6s ease forwards;
-        }
-        .card:nth-child(1) { animation-delay: 0.1s; }
-        .card:nth-child(2) { animation-delay: 0.2s; }
-        .card:nth-child(3) { animation-delay: 0.3s; }
-        .card:nth-child(4) { animation-delay: 0.4s; }
-
-        @keyframes fadeInUp {
-            to { opacity: 1; transform: translateY(0); }
+        input[type="range"] {
+            width: 100%;
+            accent-color: #4f46e5;
+            height: 4px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            -webkit-appearance: none;
+            appearance: none;
         }
 
-        /* ===== 卡片样式 ===== */
-        .cards {
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #4f46e5;
+            cursor: pointer;
+        }
+
+        /* ===== 反馈面板 ===== */
+        .feedback {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 16px;
-            margin: 32px 0 28px;
+            gap: 12px;
+            background: #f8fafc;
+            border-radius: 16px;
+            padding: 16px 20px;
+            margin-bottom: 16px;
+            font-size: 14px;
         }
 
-        .card {
-            background: #f1f5f9;
-            border-radius: 20px;
-            padding: 24px 20px 20px;
-            border: 2px solid transparent;
-            transition: all 0.25s ease;
-            cursor: pointer;
-            text-decoration: none;
-            color: inherit;
+        .feedback-item {
             display: flex;
             flex-direction: column;
-            will-change: transform;
         }
 
-        .card:hover {
-            background: #e9edf4;
-            border-color: #4f46e5;
-            transform: translateY(-4px);
-            box-shadow: 0 12px 28px rgba(79, 70, 229, 0.10);
+        .feedback-item .label {
+            color: #94a3b8;
+            font-size: 12px;
         }
 
-        .card:active {
-            transform: scale(0.96);
-            transition: transform 0.1s;
-        }
-
-        .card .icon {
-            font-size: 32px;
-            margin-bottom: 8px;
-        }
-
-        .card h3 {
-            font-size: 18px;
+        .feedback-item .value {
             font-weight: 600;
             color: #0f172a;
-            margin-bottom: 4px;
+            font-size: 16px;
+            margin-top: 2px;
         }
 
-        .card .desc {
-            font-size: 14px;
-            color: #64748b;
-            line-height: 1.5;
-            flex: 1;
-        }
-
-        .card .tag {
-            display: inline-block;
-            margin-top: 12px;
-            font-size: 12px;
-            font-weight: 500;
+        .feedback-item .value.highlight {
             color: #4f46e5;
-            background: #e0e7ff;
-            padding: 2px 12px;
-            border-radius: 20px;
-            align-self: flex-start;
-        }
-
-        .card .status {
-            font-size: 12px;
-            color: #94a3b8;
-            margin-top: 8px;
-        }
-
-        .card .enter-link {
-            margin-top: 12px;
-            font-size: 13px;
-            font-weight: 500;
-            color: #4f46e5;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            transition: gap 0.2s;
-        }
-
-        .card:hover .enter-link {
-            gap: 8px;
         }
 
         /* ===== 底部 ===== */
@@ -305,78 +201,113 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding-top: 20px;
-            border-top: 1px solid #e9edf4;
-            font-size: 14px;
-            color: #94a3b8;
             flex-wrap: wrap;
+            gap: 12px;
+            padding-top: 16px;
+            border-top: 1px solid #e9edf4;
+        }
+
+        .footer .actions {
+            display: flex;
             gap: 12px;
         }
 
-        .footer-links a {
-            color: #64748b;
-            text-decoration: none;
-            margin-right: 20px;
-            transition: color 0.2s;
+        .footer .actions button {
+            padding: 8px 24px;
+            border: none;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.2s;
+            background: #f1f5f9;
+            color: #0f172a;
         }
 
-        .footer-links a:hover {
+        .footer .actions button.primary {
+            background: #4f46e5;
+            color: white;
+        }
+
+        .footer .actions button.primary:hover {
+            background: #4338ca;
+        }
+
+        .footer .actions button:hover {
+            background: #e2e8f0;
+        }
+
+        .footer .back-link {
+            color: #64748b;
+            text-decoration: none;
+            font-size: 14px;
+            border: 1px solid #e2e8f0;
+            padding: 6px 16px;
+            border-radius: 20px;
+            transition: 0.2s;
+        }
+
+        .footer .back-link:hover {
+            background: #f1f5f9;
+            border-color: #4f46e5;
             color: #4f46e5;
         }
 
-        .footer-status {
-            display: flex;
-            align-items: center;
-            gap: 6px;
+        /* ===== 底部说明（11层架构映射） ===== */
+        .mapping {
+            margin-top: 20px;
+            padding-top: 16px;
+            border-top: 1px solid #e9edf4;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px 24px;
+            font-size: 13px;
+            color: #64748b;
         }
 
-        .dot {
-            display: inline-block;
-            width: 8px;
-            height: 8px;
-            background: #22c55e;
-            border-radius: 50%;
+        .mapping .item {
+            display: flex;
+            gap: 8px;
+        }
+
+        .mapping .item .num {
+            font-weight: 600;
+            color: #4f46e5;
         }
 
         /* ===== 响应式 ===== */
-        @media (max-width: 860px) {
-            .cards {
-                grid-template-columns: repeat(2, 1fr);
+        @media (max-width: 700px) {
+            .container {
+                padding: 24px 16px 20px;
             }
-            .structure .product-box {
-                gap: 10px;
+            .controls {
+                grid-template-columns: 1fr 1fr;
             }
-            .structure .product-item {
-                min-width: 80px;
-                font-size: 13px;
-                padding: 10px 14px;
+            .feedback {
+                grid-template-columns: 1fr 1fr;
+            }
+            .mapping {
+                grid-template-columns: 1fr;
+            }
+            .concept .logic-flow {
+                flex-direction: column;
+                align-items: flex-start;
             }
         }
 
         @media (max-width: 480px) {
-            .container {
-                padding: 24px 16px 20px;
-            }
-            .cards {
+            .controls {
                 grid-template-columns: 1fr;
             }
-            h1 {
-                font-size: 26px;
+            .feedback {
+                grid-template-columns: 1fr;
+            }
+            .concept h1 {
+                font-size: 24px;
             }
             .footer {
                 flex-direction: column;
-                align-items: flex-start;
-            }
-            .readme-summary {
-                padding: 16px 18px;
-            }
-            .structure {
-                padding: 20px 16px;
-            }
-            .structure .product-item {
-                min-width: 60px;
-                font-size: 12px;
-                padding: 8px 12px;
+                align-items: stretch;
             }
         }
     </style>
@@ -385,140 +316,296 @@
 
 <div class="container">
 
-    <!-- ===== 头部 ===== -->
-    <div class="header">
-        <div class="badge">⚡ 系统已就绪</div>
-        <h1>EvolveMind · <span>进阶思维</span> 认知系统</h1>
-        <div class="slogan">你给我一个数字，我还你一套系统</div>
-    </div>
-
-    <!-- ===== README 摘要 ===== -->
-    <div class="readme-summary">
-        <h2>🧠 什么是 EvolveMind？</h2>
-        <p>
-            EvolveMind 是一套 <span class="highlight">可迁移、可验证、可进化</span> 的认知操作系统。
-            它从 <strong>三个真实需求</strong> 出发：
-        </p>
-        <p>
-            <span class="tag">学生端</span> 需要一个可重复使用的思维框架，面对任何陌生问题都能自己拆出答案。<br>
-            <span class="tag">家长端</span> 需要一个可量化的验证系统，能看到孩子的正确率变化和能力成长。<br>
-            <span class="tag">经济客户</span> 需要一个可交互的经济学认知工具，理解市场运行的底层逻辑。
-        </p>
-        <p>
-            → 这三个需求，收敛到 <strong>一个核心产品</strong>：一套基于 <span class="highlight">3→1→1→3→100</span> 框架的认知训练系统。
-        </p>
-        <p>
-            → 再拆成 <strong>三个交付维度</strong>：学生用演练页 + 家长用数据看板 + 客户用经济模拟器。
-        </p>
-        <p>
-            → 然后 <strong>无限延展</strong>：任何需要“拆结构”的领域，都可以用这个框架重新设计。
-        </p>
-    </div>
-
-    <!-- ===== 产品结构图 ===== -->
-    <div class="structure">
-        <h3>📐 产品结构图</h3>
-        <div class="layers">
-
-            <!-- 产品层：三个封装模块 -->
-            <div class="product-box">
-                <div class="product-item">📐 数学思维</div>
-                <div class="product-item">📈 经济思维</div>
-                <div class="product-item">🌐 语言思维</div>
-            </div>
-
-            <!-- 箭头 -->
-            <div class="arrow-down">↓</div>
-
-            <!-- 用户内化层 -->
-            <div class="user-layer">
-                🧠 AI思维
-                <span class="note">用户通过产品学到的认知引擎 · 自然内化</span>
-            </div>
-
-            <!-- 箭头 -->
-            <div class="arrow-down">↓</div>
-
-            <!-- 迁移层 -->
-            <div class="migrate-layer">
-                🚀 迁移到任何领域 · 拆解一切陌生问题
-            </div>
-
+    <!-- ===== 概念说明区 ===== -->
+    <div class="concept">
+        <div class="badge">🧠 认知方法论</div>
+        <h1>画圈实验 · <span>3→1→1→3→100</span></h1>
+        <div class="sub">
+            通过操作圈的动态变化，理解“如何拆解任何陌生问题”的底层逻辑。
+        </div>
+        <div class="logic-flow">
+            <span class="step">三维 · 世界</span>
+            <span class="arrow">→</span>
+            <span class="step">一维 · 人</span>
+            <span class="arrow">→</span>
+            <span class="step highlight">人能动 · 动画</span>
+            <span class="arrow">→</span>
+            <span class="step highlight">画圈函数</span>
+            <span class="arrow">→</span>
+            <span class="step">宏观 · 市场</span>
+            <span class="arrow">→</span>
+            <span class="step">底座 · 政策</span>
         </div>
     </div>
 
-    <!-- ===== 四个卡片 ===== -->
-    <div class="cards">
+    <!-- ===== 画布区 ===== -->
+    <div class="canvas-wrapper">
+        <canvas id="canvas" width="800" height="400"></canvas>
+    </div>
 
-        <!-- 数学 -->
-        <a href="math/index.html" class="card" id="cardMath">
-            <div class="icon">📐</div>
-            <h3>数学思维</h3>
-            <div class="desc">奥数体系 · 多模块封装<br>覆盖鸡兔同笼、行程、工程、浓度等专题</div>
-            <span class="tag">面向学生端</span>
-            <div class="status">🔜 持续扩展中</div>
-            <div class="enter-link">进入模块 →</div>
-        </a>
+    <!-- ===== 控制区 ===== -->
+    <div class="controls">
+        <div class="control-group">
+            <label>弹性（波动幅度） <span id="elasticValue">1.0</span></label>
+            <input type="range" id="elastic" min="0.2" max="2.0" step="0.05" value="1.0">
+        </div>
+        <div class="control-group">
+            <label>政策（基准偏移） <span id="policyValue">0</span></label>
+            <input type="range" id="policy" min="-50" max="50" step="1" value="0">
+        </div>
+        <div class="control-group">
+            <label>速度 <span id="speedValue">1.0</span></label>
+            <input type="range" id="speed" min="0.0" max="2.5" step="0.1" value="1.0">
+        </div>
+    </div>
 
-        <!-- 经济 -->
-        <a href="econ/index.html" class="card" id="cardEcon">
-            <div class="icon">📈</div>
-            <h3>经济思维</h3>
-            <div class="desc">微观 + 宏观 · 双层次架构<br>涵盖供需、弹性、政策、经济周期等</div>
-            <span class="tag">面向经济客户</span>
-            <div class="status">✅ 已实现</div>
-            <div class="enter-link">进入模块 →</div>
-        </a>
-
-        <!-- AI（内置引擎） -->
-        <a href="ai/index.html" class="card" id="cardAI">
-            <div class="icon">🧠</div>
-            <h3>AI思维</h3>
-            <div class="desc">系统内置认知引擎<br>用户在使用数学、经济、语言模块的过程中自然习得</div>
-            <span class="tag">内置引擎</span>
-            <div class="status">🔜 待实现</div>
-            <div class="enter-link">进入模块 →</div>
-        </a>
-
-        <!-- 语言 -->
-        <a href="lingua/index.html" class="card" id="cardLingua">
-            <div class="icon">🌐</div>
-            <h3>语言思维</h3>
-            <div class="desc">多语对照 · 结构拆解体系<br>覆盖马来/印尼/英语句法结构对照</div>
-            <span class="tag">面向学生端</span>
-            <div class="status">🔜 待实现</div>
-            <div class="enter-link">进入模块 →</div>
-        </a>
-
+    <!-- ===== 反馈面板 ===== -->
+    <div class="feedback">
+        <div class="feedback-item">
+            <span class="label">当前角度</span>
+            <span class="value" id="angleDisplay">0°</span>
+        </div>
+        <div class="feedback-item">
+            <span class="label">需求指数</span>
+            <span class="value highlight" id="demandDisplay">50%</span>
+        </div>
+        <div class="feedback-item">
+            <span class="label">供给指数</span>
+            <span class="value highlight" id="supplyDisplay">50%</span>
+        </div>
+        <div class="feedback-item">
+            <span class="label">状态</span>
+            <span class="value" id="stateDisplay">⚖️ 均衡</span>
+        </div>
     </div>
 
     <!-- ===== 底部 ===== -->
     <div class="footer">
-        <div class="footer-links">
-            <a href="#">👨‍👩‍👦 家长端</a>
-            <a href="#">🎯 学生端</a>
-            <a href="#">💼 经济客户</a>
-            <a href="#">📄 README</a>
+        <div class="actions">
+            <button class="primary" id="toggleBtn">⏸️ 暂停</button>
+            <button id="resetBtn">🔄 重置</button>
         </div>
-        <div class="footer-status">
-            <span class="dot"></span>
-            <span>系统运行中 · v1.0</span>
-        </div>
+        <a href="#" class="back-link">← 返回作品集</a>
+    </div>
+
+    <!-- ===== 底部说明：11层架构映射 ===== -->
+    <div class="mapping">
+        <div class="item"><span class="num">第0层</span> 体感 · 拖动滑块</div>
+        <div class="item"><span class="num">第1层</span> 观察 · 需求上下，供给左右</div>
+        <div class="item"><span class="num">第2层</span> 命名 · 这是一个圈</div>
+        <div class="item"><span class="num">第3层</span> 结构 · 圆心、半径、角度</div>
+        <div class="item"><span class="num">第4层</span> 变量 · 弹性、政策、速度</div>
+        <div class="item"><span class="num">第5层</span> 映射 · 圈 = 市场运行</div>
+        <div class="item"><span class="num">第6层</span> 迁移 · 圈 = 认知框架</div>
+        <div class="item"><span class="num">第7-10层</span> 验证 · 系统 · 迭代 · 独立</div>
     </div>
 
 </div>
 
-<!-- ===== 交互脚本 ===== -->
 <script>
-    document.querySelectorAll('.card').forEach(card => {
-        card.addEventListener('click', function(e) {
-            this.style.transition = 'transform 0.1s';
-            this.style.transform = 'scale(0.96)';
-            setTimeout(() => {
-                this.style.transform = 'scale(1)';
-            }, 100);
+    (function() {
+        // ===== DOM 引用 =====
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        const elasticSlider = document.getElementById('elastic');
+        const policySlider = document.getElementById('policy');
+        const speedSlider = document.getElementById('speed');
+
+        const elasticValue = document.getElementById('elasticValue');
+        const policyValue = document.getElementById('policyValue');
+        const speedValue = document.getElementById('speedValue');
+
+        const angleDisplay = document.getElementById('angleDisplay');
+        const demandDisplay = document.getElementById('demandDisplay');
+        const supplyDisplay = document.getElementById('supplyDisplay');
+        const stateDisplay = document.getElementById('stateDisplay');
+
+        const toggleBtn = document.getElementById('toggleBtn');
+        const resetBtn = document.getElementById('resetBtn');
+
+        // ===== 状态 =====
+        let angle = 0;
+        let running = true;
+        let animationId = null;
+
+        function getParams() {
+            return {
+                elastic: parseFloat(elasticSlider.value),
+                policy: parseFloat(policySlider.value),
+                speed: parseFloat(speedSlider.value)
+            };
+        }
+
+        // ===== 绘制 =====
+        function draw() {
+            const w = canvas.width;
+            const h = canvas.height;
+            const cx = w / 2;
+            const cy = h / 2;
+
+            const params = getParams();
+            const elastic = params.elastic;
+            const policy = params.policy;
+            const radius = 120 * elastic;
+            const offsetY = policy * 0.6;
+
+            const demand = Math.sin(angle) * radius + offsetY;
+            const supply = Math.cos(angle) * radius;
+
+            const maxOffset = 120 * 2.0 + 50;
+            const demandPercent = Math.round(((demand + maxOffset) / (maxOffset * 2)) * 100);
+            const supplyPercent = Math.round(((supply + maxOffset) / (maxOffset * 2)) * 100);
+
+            let stateText = '⚖️ 均衡';
+            if (demandPercent > supplyPercent + 8) stateText = '📈 供不应求';
+            else if (supplyPercent > demandPercent + 8) stateText = '📉 供过于求';
+
+            // --- 绘制 ---
+            ctx.clearRect(0, 0, w, h);
+
+            // 网格
+            ctx.strokeStyle = '#f1f5f9';
+            ctx.lineWidth = 1;
+            for (let i = 0; i <= 10; i++) {
+                const x = (i / 10) * w;
+                const y = (i / 10) * h;
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, h);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(w, y);
+                ctx.stroke();
+            }
+
+            // 基准线
+            ctx.strokeStyle = '#e2e8f0';
+            ctx.lineWidth = 1.5;
+            ctx.setLineDash([6, 6]);
+            ctx.beginPath();
+            ctx.moveTo(0, cy + offsetY);
+            ctx.lineTo(w, cy + offsetY);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(cx, 0);
+            ctx.lineTo(cx, h);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // 圆
+            ctx.strokeStyle = '#e2e8f0';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            for (let t = 0; t <= Math.PI * 2; t += 0.02) {
+                const dx = Math.cos(t) * radius;
+                const dy = Math.sin(t) * radius + offsetY;
+                if (t === 0) ctx.moveTo(cx + dx, cy + dy);
+                else ctx.lineTo(cx + dx, cy + dy);
+            }
+            ctx.stroke();
+
+            // 需求点
+            const demandX = cx;
+            const demandY = cy + demand;
+            ctx.fillStyle = '#4f46e5';
+            ctx.shadowColor = 'rgba(79,70,229,0.2)';
+            ctx.shadowBlur = 12;
+            ctx.beginPath();
+            ctx.arc(demandX, demandY, 10, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.shadowBlur = 0;
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 12px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'bottom';
+            ctx.fillText('需求', demandX, demandY - 14);
+
+            // 供给点
+            const supplyX = cx + supply;
+            const supplyY = cy + offsetY;
+            ctx.fillStyle = '#0f172a';
+            ctx.shadowColor = 'rgba(15,23,42,0.15)';
+            ctx.shadowBlur = 12;
+            ctx.beginPath();
+            ctx.arc(supplyX, supplyY, 10, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.shadowBlur = 0;
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 12px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'bottom';
+            ctx.fillText('供给', supplyX, supplyY - 14);
+
+            // 圆心标记
+            ctx.fillStyle = '#94a3b8';
+            ctx.shadowBlur = 0;
+            ctx.beginPath();
+            ctx.arc(cx, cy + offsetY, 4, 0, Math.PI * 2);
+            ctx.fill();
+
+            // 角度标签
+            const deg = Math.round((angle * 180 / Math.PI) % 360);
+            angleDisplay.textContent = `${deg}°`;
+            demandDisplay.textContent = `${Math.min(100, Math.max(0, demandPercent))}%`;
+            supplyDisplay.textContent = `${Math.min(100, Math.max(0, supplyPercent))}%`;
+            stateDisplay.textContent = stateText;
+        }
+
+        // ===== 动画循环 =====
+        function animate() {
+            if (running) {
+                const params = getParams();
+                angle += 0.02 * params.speed;
+                if (angle > Math.PI * 2) angle -= Math.PI * 2;
+            }
+            draw();
+            animationId = requestAnimationFrame(animate);
+        }
+
+        // ===== 控制函数 =====
+        function toggleRun() {
+            running = !running;
+            toggleBtn.textContent = running ? '⏸️ 暂停' : '▶️ 运行';
+        }
+
+        function resetAll() {
+            angle = 0;
+            elasticSlider.value = '1.0';
+            policySlider.value = '0';
+            speedSlider.value = '1.0';
+            elasticValue.textContent = '1.0';
+            policyValue.textContent = '0';
+            speedValue.textContent = '1.0';
+            running = true;
+            toggleBtn.textContent = '⏸️ 暂停';
+            draw();
+        }
+
+        // ===== 滑块事件 =====
+        elasticSlider.addEventListener('input', function() {
+            elasticValue.textContent = this.value;
         });
-    });
+        policySlider.addEventListener('input', function() {
+            policyValue.textContent = this.value;
+        });
+        speedSlider.addEventListener('input', function() {
+            speedValue.textContent = this.value;
+        });
+
+        toggleBtn.addEventListener('click', toggleRun);
+        resetBtn.addEventListener('click', resetAll);
+
+        // ===== 启动 =====
+        animate();
+        draw();
+
+        // ===== 清理 =====
+        window.addEventListener('beforeunload', function() {
+            if (animationId) cancelAnimationFrame(animationId);
+        });
+    })();
 </script>
 
 </body>
