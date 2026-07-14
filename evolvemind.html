@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EvolveMind · 进阶思维 认知系统</title>
+    <style>
+        /* ===== 全局重置 ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: #f8fafc;
+            min-height: 100vh;
+            padding: 40px 24px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        .container {
+            max-width: 1100px;
+            width: 100%;
+            background: white;
+            border-radius: 40px;
+            padding: 48px 40px 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.06);
+        }
+
+        /* ===== 头部 ===== */
+        .header {
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        .badge {
+            display: inline-block;
+            background: #eef2ff;
+            color: #4f46e5;
+            font-size: 13px;
+            font-weight: 600;
+            padding: 4px 16px;
+            border-radius: 20px;
+            letter-spacing: 0.3px;
+            margin-bottom: 12px;
+        }
+
+        h1 {
+            font-size: 36px;
+            font-weight: 700;
+            color: #0f172a;
+            letter-spacing: -0.5px;
+        }
+
+        h1 span {
+            color: #4f46e5;
+        }
+
+        .slogan {
+            margin-top: 8px;
+            font-size: 18px;
+            color: #64748b;
+            font-weight: 400;
+        }
+
+        .slogan::before {
+            content: "“";
+            color: #4f46e5;
+        }
+        .slogan::after {
+            content: "”";
+            color: #4f46e5;
+        }
+
+        /* ===== README 摘要 ===== */
+        .readme-summary {
+            background: #f8fafc;
+            border-radius: 20px;
+            padding: 24px 28px;
+            margin-bottom: 32px;
+            border-left: 4px solid #4f46e5;
+        }
+
+        .readme-summary h2 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #0f172a;
+            margin-bottom: 8px;
+        }
+
+        .readme-summary p {
+            color: #475569;
+            line-height: 1.8;
+            font-size: 15px;
+            margin-bottom: 6px;
+        }
+
+        .readme-summary .highlight {
+            color: #4f46e5;
+            font-weight: 500;
+        }
+
+        .readme-summary .tag {
+            display: inline-block;
+            background: #e0e7ff;
+            color: #4f46e5;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 2px 12px;
+            border-radius: 20px;
+            margin-right: 4px;
+        }
+
+        /* ===== 产品结构图 ===== */
+        .structure {
+            background: #f8fafc;
+            border-radius: 20px;
+            padding: 28px 24px;
+            margin-bottom: 32px;
+            text-align: center;
+        }
+
+        .structure h3 {
+            font-size: 15px;
+            font-weight: 600;
+            color: #64748b;
+            letter-spacing: 1px;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+
+        .structure .layers {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .structure .product-box {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .structure .product-item {
+            background: white;
+            border: 2px solid #4f46e5;
+            border-radius: 16px;
+            padding: 12px 20px;
+            font-weight: 600;
+            font-size: 15px;
+            color: #0f172a;
+            min-width: 120px;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.06);
+        }
+
+        .structure .product-item span {
+            color: #4f46e5;
+        }
+
+        .structure .arrow-down {
+            font-size: 24px;
+            color: #94a3b8;
+        }
+
+        .structure .user-layer {
+            background: white;
+            border: 2px dashed #4f46e5;
+            border-radius: 16px;
+            padding: 14px 28px;
+            font-weight: 600;
+            font-size: 16px;
+            color: #0f172a;
+        }
+
+        .structure .user-layer span {
+            color: #4f46e5;
+        }
+
+        .structure .user-layer .note {
+            font-weight: 400;
+            font-size: 13px;
+            color: #94a3b8;
+            display: block;
+            margin-top: 4px;
+        }
+
+        .structure .migrate-layer {
+            background: #eef2ff;
+            border-radius: 16px;
+            padding: 12px 24px;
+            font-weight: 500;
+            font-size: 14px;
+            color: #4f46e5;
+        }
+
+        /* ===== 卡片入场动画 ===== */
+        .card {
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 0.6s ease forwards;
+        }
+        .card:nth-child(1) { animation-delay: 0.1s; }
+        .card:nth-child(2) { animation-delay: 0.2s; }
+        .card:nth-child(3) { animation-delay: 0.3s; }
+        .card:nth-child(4) { animation-delay: 0.4s; }
+
+        @keyframes fadeInUp {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ===== 卡片样式 ===== */
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin: 32px 0 28px;
+        }
+
+        .card {
+            background: #f1f5f9;
+            border-radius: 20px;
+            padding: 24px 20px 20px;
+            border: 2px solid transparent;
+            transition: all 0.25s ease;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+            will-change: transform;
+        }
+
+        .card:hover {
+            background: #e9edf4;
+            border-color: #4f46e5;
+            transform: translateY(-4px);
+            box-shadow: 0 12px 28px rgba(79, 70, 229, 0.10);
+        }
+
+        .card:active {
+            transform: scale(0.96);
+            transition: transform 0.1s;
+        }
+
+        .card .icon {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .card h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #0f172a;
+            margin-bottom: 4px;
+        }
+
+        .card .desc {
+            font-size: 14px;
+            color: #64748b;
+            line-height: 1.5;
+            flex: 1;
+        }
+
+        .card .tag {
+            display: inline-block;
+            margin-top: 12px;
+            font-size: 12px;
+            font-weight: 500;
+            color: #4f46e5;
+            background: #e0e7ff;
+            padding: 2px 12px;
+            border-radius: 20px;
+            align-self: flex-start;
+        }
+
+        .card .status {
+            font-size: 12px;
+            color: #94a3b8;
+            margin-top: 8px;
+        }
+
+        .card .enter-link {
+            margin-top: 12px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #4f46e5;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            transition: gap 0.2s;
+        }
+
+        .card:hover .enter-link {
+            gap: 8px;
+        }
+
+        /* ===== 底部 ===== */
+        .footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 20px;
+            border-top: 1px solid #e9edf4;
+            font-size: 14px;
+            color: #94a3b8;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .footer-links a {
+            color: #64748b;
+            text-decoration: none;
+            margin-right: 20px;
+            transition: color 0.2s;
+        }
+
+        .footer-links a:hover {
+            color: #4f46e5;
+        }
+
+        .footer-status {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: #22c55e;
+            border-radius: 50%;
+        }
+
+        /* ===== 响应式 ===== */
+        @media (max-width: 860px) {
+            .cards {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .structure .product-box {
+                gap: 10px;
+            }
+            .structure .product-item {
+                min-width: 80px;
+                font-size: 13px;
+                padding: 10px 14px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 24px 16px 20px;
+            }
+            .cards {
+                grid-template-columns: 1fr;
+            }
+            h1 {
+                font-size: 26px;
+            }
+            .footer {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .readme-summary {
+                padding: 16px 18px;
+            }
+            .structure {
+                padding: 20px 16px;
+            }
+            .structure .product-item {
+                min-width: 60px;
+                font-size: 12px;
+                padding: 8px 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- ===== 头部 ===== -->
+    <div class="header">
+        <div class="badge">⚡ 系统已就绪</div>
+        <h1>EvolveMind · <span>进阶思维</span> 认知系统</h1>
+        <div class="slogan">你给我一个数字，我还你一套系统</div>
+    </div>
+
+    <!-- ===== README 摘要 ===== -->
+    <div class="readme-summary">
+        <h2>🧠 什么是 EvolveMind？</h2>
+        <p>
+            EvolveMind 是一套 <span class="highlight">可迁移、可验证、可进化</span> 的认知操作系统。
+            它从 <strong>三个真实需求</strong> 出发：
+        </p>
+        <p>
+            <span class="tag">学生端</span> 需要一个可重复使用的思维框架，面对任何陌生问题都能自己拆出答案。<br>
+            <span class="tag">家长端</span> 需要一个可量化的验证系统，能看到孩子的正确率变化和能力成长。<br>
+            <span class="tag">经济客户</span> 需要一个可交互的经济学认知工具，理解市场运行的底层逻辑。
+        </p>
+        <p>
+            → 这三个需求，收敛到 <strong>一个核心产品</strong>：一套基于 <span class="highlight">3→1→1→3→100</span> 框架的认知训练系统。
+        </p>
+        <p>
+            → 再拆成 <strong>三个交付维度</strong>：学生用演练页 + 家长用数据看板 + 客户用经济模拟器。
+        </p>
+        <p>
+            → 然后 <strong>无限延展</strong>：任何需要“拆结构”的领域，都可以用这个框架重新设计。
+        </p>
+    </div>
+
+    <!-- ===== 产品结构图 ===== -->
+    <div class="structure">
+        <h3>📐 产品结构图</h3>
+        <div class="layers">
+
+            <!-- 产品层：三个封装模块 -->
+            <div class="product-box">
+                <div class="product-item">📐 数学思维</div>
+                <div class="product-item">📈 经济思维</div>
+                <div class="product-item">🌐 语言思维</div>
+            </div>
+
+            <!-- 箭头 -->
+            <div class="arrow-down">↓</div>
+
+            <!-- 用户内化层 -->
+            <div class="user-layer">
+                🧠 AI思维
+                <span class="note">用户通过产品学到的认知引擎 · 自然内化</span>
+            </div>
+
+            <!-- 箭头 -->
+            <div class="arrow-down">↓</div>
+
+            <!-- 迁移层 -->
+            <div class="migrate-layer">
+                🚀 迁移到任何领域 · 拆解一切陌生问题
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ===== 四个卡片 ===== -->
+    <div class="cards">
+
+        <!-- 数学 -->
+        <a href="math/index.html" class="card" id="cardMath">
+            <div class="icon">📐</div>
+            <h3>数学思维</h3>
+            <div class="desc">奥数体系 · 多模块封装<br>覆盖鸡兔同笼、行程、工程、浓度等专题</div>
+            <span class="tag">面向学生端</span>
+            <div class="status">🔜 持续扩展中</div>
+            <div class="enter-link">进入模块 →</div>
+        </a>
+
+        <!-- 经济 -->
+        <a href="econ/index.html" class="card" id="cardEcon">
+            <div class="icon">📈</div>
+            <h3>经济思维</h3>
+            <div class="desc">微观 + 宏观 · 双层次架构<br>涵盖供需、弹性、政策、经济周期等</div>
+            <span class="tag">面向经济客户</span>
+            <div class="status">✅ 已实现</div>
+            <div class="enter-link">进入模块 →</div>
+        </a>
+
+        <!-- AI（内置引擎） -->
+        <a href="ai/index.html" class="card" id="cardAI">
+            <div class="icon">🧠</div>
+            <h3>AI思维</h3>
+            <div class="desc">系统内置认知引擎<br>用户在使用数学、经济、语言模块的过程中自然习得</div>
+            <span class="tag">内置引擎</span>
+            <div class="status">🔜 待实现</div>
+            <div class="enter-link">进入模块 →</div>
+        </a>
+
+        <!-- 语言 -->
+        <a href="lingua/index.html" class="card" id="cardLingua">
+            <div class="icon">🌐</div>
+            <h3>语言思维</h3>
+            <div class="desc">多语对照 · 结构拆解体系<br>覆盖马来/印尼/英语句法结构对照</div>
+            <span class="tag">面向学生端</span>
+            <div class="status">🔜 待实现</div>
+            <div class="enter-link">进入模块 →</div>
+        </a>
+
+    </div>
+
+    <!-- ===== 底部 ===== -->
+    <div class="footer">
+        <div class="footer-links">
+            <a href="#">👨‍👩‍👦 家长端</a>
+            <a href="#">🎯 学生端</a>
+            <a href="#">💼 经济客户</a>
+            <a href="#">📄 README</a>
+        </div>
+        <div class="footer-status">
+            <span class="dot"></span>
+            <span>系统运行中 · v1.0</span>
+        </div>
+    </div>
+
+</div>
+
+<!-- ===== 交互脚本 ===== -->
+<script>
+    document.querySelectorAll('.card').forEach(card => {
+        card.addEventListener('click', function(e) {
+            this.style.transition = 'transform 0.1s';
+            this.style.transform = 'scale(0.96)';
+            setTimeout(() => {
+                this.style.transform = 'scale(1)';
+            }, 100);
+        });
+    });
+</script>
+
+</body>
+</html>
