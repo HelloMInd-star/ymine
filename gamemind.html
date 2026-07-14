@@ -145,23 +145,27 @@
             margin-top: 6px;
         }
 
-        .section {
-            margin-bottom: 32px;
+        /* ===== 方框结构（主要改动） ===== */
+        .block {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 20px;
+            padding: 28px 28px 24px;
+            margin-bottom: 28px;
             opacity: 0;
             animation: fadeInUp 0.6s ease forwards;
         }
 
-        .section:nth-child(2) { animation-delay: 0.05s; }
-        .section:nth-child(3) { animation-delay: 0.1s; }
-        .section:nth-child(4) { animation-delay: 0.15s; }
-        .section:nth-child(5) { animation-delay: 0.2s; }
-        .section:nth-child(6) { animation-delay: 0.25s; }
+        .block:nth-child(2) { animation-delay: 0.05s; }
+        .block:nth-child(3) { animation-delay: 0.1s; }
+        .block:nth-child(4) { animation-delay: 0.15s; }
+        .block:nth-child(5) { animation-delay: 0.2s; }
 
-        .section h2 {
-            font-size: 22px;
+        .block-title {
+            font-size: 20px;
             font-weight: 600;
             color: rgba(255, 255, 255, 0.8);
-            margin-bottom: 12px;
+            margin-bottom: 16px;
             display: flex;
             align-items: center;
             gap: 10px;
@@ -169,7 +173,7 @@
             padding-bottom: 8px;
         }
 
-        .section h2 .tag {
+        .block-title .tag {
             font-size: 12px;
             font-weight: 500;
             color: #a78bfa;
@@ -178,26 +182,47 @@
             border-radius: 20px;
         }
 
-        .section p {
+        .step-title {
+            font-size: 17px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.7);
+            margin-top: 16px;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .step-title:first-of-type {
+            margin-top: 0;
+        }
+
+        .step-title .num {
+            color: #a78bfa;
+            font-weight: 400;
+            font-size: 14px;
+        }
+
+        .block p {
             color: rgba(255, 255, 255, 0.5);
             line-height: 1.8;
             font-size: 15px;
             margin-bottom: 10px;
         }
 
-        .section ul {
+        .block ul {
             padding-left: 20px;
             margin-bottom: 12px;
         }
 
-        .section li {
+        .block li {
             color: rgba(255, 255, 255, 0.5);
             line-height: 1.8;
             font-size: 15px;
             margin-bottom: 4px;
         }
 
-        .section li strong {
+        .block li strong {
             color: rgba(255, 255, 255, 0.7);
         }
 
@@ -291,6 +316,7 @@
             border-radius: 20px;
             padding: 16px;
             margin: 12px 0 16px;
+            position: relative;
         }
 
         canvas {
@@ -439,44 +465,41 @@
             <div class="sub">从低空经济博弈到资源分配 · 完整思考链路</div>
         </div>
 
-        <!-- ===== 1. 思考起点（含动态画布） ===== -->
-        <div class="section">
-            <h2>1. 思考起点 <span class="tag">低空经济博弈</span></h2>
+        <!-- ===== 方框1：思考链路 ===== -->
+        <div class="block">
+            <div class="block-title">🧠 思考链路 <span class="tag">推导过程</span></div>
+
+            <!-- 1. 低空经济博弈 -->
+            <div class="step-title">低空经济博弈</div>
             <p>
                 低空经济中，无人机越来越多，但航道有限。资源稀缺带来了竞争，而竞争的本质是<strong style="color: rgba(255,255,255,0.7);">博弈</strong>。
             </p>
             <p>
                 如果把航线公开市场化、自由竞价，价格会被哄抬，最终形成垄断。这让我想到：<strong style="color: rgba(255,255,255,0.7);">这本质上是一个资源博弈问题</strong>。
             </p>
-
-            <!-- ===== 画布一：需求 vs 供给 博弈 ===== -->
             <div class="canvas-wrapper">
                 <canvas id="gameCanvas1" width="800" height="300"></canvas>
-                <div class="canvas-caption">需求（蓝）与供给（橙）在基准线（市场/外部环境）上下博弈 · 时而逼近 · 时而远离</div>
+                <div class="canvas-caption">需求（蓝）与供给（橙）在基准线上下博弈 · 球体代表博弈的“不确定性”</div>
             </div>
 
-            <div class="highlight-box">
-                <p><strong>核心问题：</strong>在资源有限、参与者众多的情况下，如何设计一套机制，让资源分配既高效又可持续？</p>
-            </div>
-        </div>
-
-        <!-- ===== 2. 逻辑推导（含第二个动态画布 + 凯利公式） ===== -->
-        <div class="section">
-            <h2>2. 逻辑推导 <span class="tag">从拍卖到凯利公式</span></h2>
+            <!-- 2. 拍卖逻辑 -->
+            <div class="step-title">拍卖逻辑</div>
             <p>
                 航线资源争夺，和<strong style="color: rgba(255,255,255,0.7);">拍卖</strong>的逻辑高度相似——参与者出价，价高者得。
             </p>
             <p>
                 但低空经济有一个特殊之处：<strong style="color: rgba(255,255,255,0.7);">前期投入巨大，一旦成功占据航线，收益暴增；一旦失败，没有回头路。</strong>这种“全有或全无”的结构，和<strong style="color: rgba(255,255,255,0.7);">赌球、赌场、拍卖</strong>的逻辑完全一致。
             </p>
-
-            <!-- ===== 画布二：厂商 vs 政府 博弈 ===== -->
             <div class="canvas-wrapper">
                 <canvas id="gameCanvas2" width="800" height="300"></canvas>
-                <div class="canvas-caption">无人机厂商（蓝）与政府（橙）的博弈 · 差值到达临界点时形成杂乱波动</div>
+                <div class="canvas-caption">无人机厂商（蓝）与政府（橙）的博弈 · 球体代表博弈的“冲突点”</div>
             </div>
 
-            <!-- 凯利公式 -->
+            <!-- 3. 凯利公式 -->
+            <div class="step-title">凯利公式</div>
+            <p>
+                凯利公式用胜率和赔率计算<strong style="color: rgba(255,255,255,0.7);">最优下注比例</strong>。在低空经济中，它帮助我们计算“投入多少资源去抢一条航线”的最优策略。
+            </p>
             <div class="kelly-box">
                 <div class="formula">
                     f* = (<span class="highlight">b</span> × <span class="highlight">p</span> − <span class="highlight">q</span>) / <span class="highlight">b</span>
@@ -488,8 +511,6 @@
                     <span><span class="var">q</span> = 败率 (1 − p)</span>
                 </div>
             </div>
-
-            <!-- 赌球/彩票 解释 -->
             <p>
                 举个例子：如果你去买一张彩票，<strong style="color: rgba(255,255,255,0.7);">中奖概率是 20%（p = 0.2）</strong>，<strong style="color: rgba(255,255,255,0.7);">赔率是 5 倍（b = 5）</strong>，那么凯利公式告诉你：
             </p>
@@ -499,10 +520,46 @@
             <p>
                 也就是说，<strong style="color: rgba(255,255,255,0.7);">你最多只应该投入 4% 的资金</strong>去买这张彩票。超过这个比例，长期来看一定会亏。
             </p>
+
+            <!-- 4. 决策临界点 -->
+            <div class="step-title">决策临界点</div>
             <p>
-                同样的逻辑映射到低空经济：<strong style="color: rgba(255,255,255,0.7);">在不确定的航线竞拍中，凯利公式可以帮助你计算“最优投入比例”</strong>——投入太少，抢不到航线；投入太多，一旦失败就万劫不复。
+                <strong style="color: rgba(255,255,255,0.7);">凯利公式的核心价值，不在于“算出数字”，而在于“给出决策边界”。</strong>
+            </p>
+            <p>
+                在低空经济中，<strong style="color: rgba(255,255,255,0.7);">无人机厂商</strong>看到凯利公式算出的最优投入比例后，就知道：
+            </p>
+            <ul>
+                <li>如果计算结果 <strong style="color: rgba(167, 139, 250, 0.8);">高于某个阈值</strong>，说明这条航线的“胜率×赔率”足够高 → <strong style="color: rgba(255,255,255,0.7);">值得压注，去争取这条航线</strong></li>
+                <li>如果计算结果 <strong style="color: rgba(251, 146, 60, 0.8);">低于某个阈值</strong>，说明风险过大，投入产出不划算 → <strong style="color: rgba(255,255,255,0.7);">应该放弃，等待下一个机会</strong></li>
+            </ul>
+            <p>
+                同样，<strong style="color: rgba(255,255,255,0.7);">政府</strong>看到这个逻辑后，就知道：
+            </p>
+            <ul>
+                <li>如果所有厂商都“压注”某条航线，说明市场需求集中 → <strong style="color: rgba(255,255,255,0.7);">政府需要介入，防止垄断</strong></li>
+                <li>如果所有厂商都“观望”，说明航线吸引力不足 → <strong style="color: rgba(255,255,255,0.7);">政府需要调整政策，激活市场</strong></li>
+            </ul>
+            <div class="highlight-box">
+                <p><strong>💡 决策临界点：</strong>凯利公式提供了一个<strong>可量化的决策边界</strong>——当最优投入比例超过临界值时，博弈进入“压注区”；低于临界值时，博弈进入“观望区”。这个临界点，就是厂商和政府博弈的<strong>真实决策节点</strong>。</p>
+            </div>
+            <p>
+                换句话说，<strong style="color: rgba(255,255,255,0.7);">凯利公式把“赌赢率和赔率”变成了“可操作的行动规则”</strong>——它让博弈从“直觉判断”变成了“量化决策”。
             </p>
 
+            <!-- 5. 概率论 + 排列组合 -->
+            <div class="step-title">概率论 + 排列组合</div>
+            <p>
+                概率论和排列组合，是理解“不确定性”的底层工具。在低空经济中，它帮助我们计算“不同航线分配方案的成功概率”和“多种竞争策略的排列组合结果”。
+            </p>
+
+            <!-- 6. 大模型运行机制 -->
+            <div class="step-title">大模型运行机制</div>
+            <p>
+                大模型运行机制的核心是<strong style="color: rgba(255,255,255,0.7);">算力不断推理下一个字的概率</strong>——本质上也是在“计算最优路径”。这和博弈论中“在不确定环境下做出最优决策”的逻辑完全一致。
+            </p>
+
+            <!-- 流程链 -->
             <div class="flow-chain">
                 <span class="step">低空经济博弈</span>
                 <span class="arrow">→</span>
@@ -510,19 +567,22 @@
                 <span class="arrow">→</span>
                 <span class="step">凯利公式</span>
                 <span class="arrow">→</span>
+                <span class="step">决策临界点</span>
+                <span class="arrow">→</span>
                 <span class="step">概率论 + 排列组合</span>
                 <span class="arrow">→</span>
                 <span class="step">大模型运行机制</span>
             </div>
 
-            <p>
-                而<strong style="color: rgba(255,255,255,0.7);">概率论+排列组合</strong>，则是大模型运行机制的基础——算力不断推理下一个字的概率，本质上也是在“计算最优路径”。
-            </p>
+            <!-- 推导结论 -->
+            <div class="highlight-box" style="margin-top: 16px;">
+                <p><strong>💡 推导结论：</strong>画圈实验中的“供给需求均衡”是博弈论的微观基础。当需求曲线和供给曲线在基准线上下波动时，它们本质上是在进行一场持续的博弈——<strong>每一次逼近均衡，都是博弈双方达成暂时妥协；每一次远离均衡，都是博弈重新启动。</strong></p>
+            </div>
         </div>
 
-        <!-- ===== 3. 核心框架 ===== -->
-        <div class="section">
-            <h2>3. 核心框架 <span class="tag">三类变量</span></h2>
+        <!-- ===== 方框2：核心框架 ===== -->
+        <div class="block">
+            <div class="block-title">📐 核心框架 <span class="tag">三类变量</span></div>
             <p>
                 博弈论底座的完整框架，由<strong style="color: rgba(255,255,255,0.7);">三类变量</strong>构成：
             </p>
@@ -548,9 +608,9 @@
             </div>
         </div>
 
-        <!-- ===== 4. 能做什么 ===== -->
-        <div class="section">
-            <h2>4. 能做什么 <span class="tag">应用场景</span></h2>
+        <!-- ===== 方框3：能做什么 ===== -->
+        <div class="block">
+            <div class="block-title">⚡ 能做什么 <span class="tag">应用场景</span></div>
             <ul>
                 <li><strong>资源分配决策：</strong>在有限航线下，计算最优的航线分配策略</li>
                 <li><strong>竞拍策略设计：</strong>在公开竞价中，计算最优出价策略（凯利公式 + 概率模型）</li>
@@ -560,9 +620,9 @@
             </ul>
         </div>
 
-        <!-- ===== 5. 与全栖系统的关系 ===== -->
-        <div class="section">
-            <h2>5. 与全栖系统的关系 <span class="tag">底座层</span></h2>
+        <!-- ===== 方框4：与全栖系统的关系 ===== -->
+        <div class="block">
+            <div class="block-title">🔗 与全栖系统的关系 <span class="tag">底座层</span></div>
             <p>
                 GameMind 是 <strong style="color: rgba(255,255,255,0.7);">EvolveMind</strong> 和 <strong style="color: rgba(255,255,255,0.7);">MoodMind</strong> 的“博弈层”。
             </p>
@@ -594,7 +654,7 @@
             glow.style.setProperty('--y', y + '%');
         });
 
-        // ===== 画布一：需求 vs 供给 博弈 =====
+        // ===== 画布一：需求 vs 供给 博弈 + 弹跳球 =====
         (function() {
             const canvas = document.getElementById('gameCanvas1');
             if (!canvas) return;
@@ -603,11 +663,20 @@
                 h = canvas.height;
             let time = 0;
 
+            let bx = 150,
+                by = 150;
+            let vx = 1.8,
+                vy = 2.2;
+
             function draw() {
                 time += 0.02;
                 ctx.clearRect(0, 0, w, h);
 
-                // 基准线
+                bx += vx;
+                by += vy;
+                if (bx < 10 || bx > w - 10) vx = -vx * (0.95 + 0.05 * Math.sin(time));
+                if (by < 10 || by > h - 10) vy = -vy * (0.95 + 0.05 * Math.cos(time * 0.7));
+
                 const baseY = h * 0.6;
                 ctx.strokeStyle = 'rgba(255,255,255,0.15)';
                 ctx.lineWidth = 1.5;
@@ -624,7 +693,6 @@
                 ctx.textBaseline = 'top';
                 ctx.fillText('市场 / 外部环境', w - 10, baseY + 8);
 
-                // 需求曲线
                 const demandAmp = 50 + 20 * Math.sin(time * 0.5);
                 const demandOffset = 30 * Math.sin(time * 0.3);
                 ctx.strokeStyle = 'rgba(96, 165, 250, 0.7)';
@@ -645,7 +713,6 @@
                 const lastY = baseY - demandAmp * Math.sin(1 * Math.PI * 2 + time * 0.8) - demandOffset * 0.5;
                 ctx.fillText('需求', 10, lastY - 6);
 
-                // 供给曲线
                 const supplyAmp = 40 + 25 * Math.sin(time * 0.4 + 1.2);
                 const supplyOffset = 25 * Math.sin(time * 0.25 + 0.8);
                 ctx.strokeStyle = 'rgba(251, 146, 60, 0.7)';
@@ -666,7 +733,29 @@
                 const lastSupplyY = baseY + supplyAmp * Math.sin(1 * Math.PI * 2 + time * 0.6 + 0.5) + supplyOffset * 0.5;
                 ctx.fillText('供给', 10, lastSupplyY + 6);
 
-                // 博弈状态
+                const gradient = ctx.createRadialGradient(bx - 4, by - 4, 2, bx, by, 18);
+                gradient.addColorStop(0, 'rgba(255, 255, 255, 0.8)');
+                gradient.addColorStop(0.3, 'rgba(167, 139, 250, 0.6)');
+                gradient.addColorStop(1, 'rgba(167, 139, 250, 0.1)');
+                ctx.shadowColor = 'rgba(167, 139, 250, 0.3)';
+                ctx.shadowBlur = 25;
+                ctx.fillStyle = gradient;
+                ctx.beginPath();
+                ctx.arc(bx, by, 16, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.shadowBlur = 0;
+
+                ctx.fillStyle = 'rgba(255,255,255,0.2)';
+                ctx.beginPath();
+                ctx.arc(bx - 4, by - 5, 4, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = 'rgba(255,255,255,0.3)';
+                ctx.font = '10px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'top';
+                ctx.fillText('⚡ 博弈点', bx, by + 20);
+
                 const diff = Math.sin(time * 0.3);
                 let stateText = '⚖️ 逼近均衡';
                 let stateColor = 'rgba(255,255,255,0.2)';
@@ -688,7 +777,7 @@
             draw();
         })();
 
-        // ===== 画布二：无人机厂商 vs 政府 博弈 =====
+        // ===== 画布二：厂商 vs 政府 博弈 + 弹跳球 =====
         (function() {
             const canvas = document.getElementById('gameCanvas2');
             if (!canvas) return;
@@ -697,11 +786,20 @@
                 h = canvas.height;
             let time = 0;
 
+            let bx = 300,
+                by = 120;
+            let vx = 2.5,
+                vy = -2.8;
+
             function draw() {
                 time += 0.025;
                 ctx.clearRect(0, 0, w, h);
 
-                // 两条基准线
+                bx += vx + 0.3 * Math.sin(time * 1.2);
+                by += vy + 0.3 * Math.cos(time * 0.9);
+                if (bx < 10 || bx > w - 10) vx = -vx * (0.92 + 0.08 * Math.sin(time * 0.5));
+                if (by < 10 || by > h - 10) vy = -vy * (0.92 + 0.08 * Math.cos(time * 0.6));
+
                 const baseY1 = h * 0.45;
                 const baseY2 = h * 0.75;
 
@@ -721,7 +819,6 @@
                 ctx.stroke();
                 ctx.setLineDash([]);
 
-                // 厂商曲线
                 const amp1 = 35 + 15 * Math.sin(time * 0.3);
                 const offset1 = 20 * Math.sin(time * 0.4 + 0.5);
                 ctx.strokeStyle = 'rgba(96, 165, 250, 0.7)';
@@ -742,7 +839,6 @@
                 const lastY1 = baseY1 + amp1 * Math.sin(1 * Math.PI * 2 * 1.5 + time * 0.9) + offset1 * 0.3;
                 ctx.fillText('厂商', 10, lastY1 - 6);
 
-                // 政府曲线
                 const amp2 = 30 + 20 * Math.sin(time * 0.35 + 1.0);
                 const offset2 = 25 * Math.sin(time * 0.25 + 0.8);
                 ctx.strokeStyle = 'rgba(251, 146, 60, 0.7)';
@@ -763,7 +859,29 @@
                 const lastY2 = baseY2 + amp2 * Math.sin(1 * Math.PI * 2 * 1.5 + time * 0.7 + 1.2) + offset2 * 0.3;
                 ctx.fillText('政府', 10, lastY2 + 6);
 
-                // 临界点检测 + 杂乱波动
+                const gradient = ctx.createRadialGradient(bx - 4, by - 4, 2, bx, by, 20);
+                gradient.addColorStop(0, 'rgba(255, 200, 100, 0.9)');
+                gradient.addColorStop(0.3, 'rgba(255, 150, 50, 0.6)');
+                gradient.addColorStop(1, 'rgba(255, 100, 20, 0.1)');
+                ctx.shadowColor = 'rgba(255, 150, 50, 0.4)';
+                ctx.shadowBlur = 30;
+                ctx.fillStyle = gradient;
+                ctx.beginPath();
+                ctx.arc(bx, by, 18, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.shadowBlur = 0;
+
+                ctx.fillStyle = 'rgba(255,255,255,0.2)';
+                ctx.beginPath();
+                ctx.arc(bx - 5, by - 6, 5, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = 'rgba(255,200,100,0.3)';
+                ctx.font = '10px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'top';
+                ctx.fillText('⚡ 冲突点', bx, by + 22);
+
                 const diff = Math.sin(time * 0.3) * 0.7 + 0.3 * Math.sin(time * 0.7 + 0.5);
                 const threshold = 0.6;
                 const statusX = w * 0.78;
