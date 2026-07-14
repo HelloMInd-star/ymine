@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Y.Mine · 知识资产全景图</title>
     <style>
-        /* ===== 重置 & 全局 ===== */
         * {
             margin: 0;
             padding: 0;
@@ -69,7 +68,6 @@
             }
         }
 
-        /* ===== 主布局 ===== */
         .hero {
             display: flex;
             align-items: center;
@@ -79,7 +77,6 @@
             flex-wrap: wrap;
         }
 
-        /* ===== 头像 ===== */
         .avatar-wrapper {
             flex: 0 0 180px;
             height: 220px;
@@ -290,7 +287,6 @@
             }
         }
 
-        /* ===== 右侧文字 ===== */
         .hero-text {
             flex: 1;
             min-width: 240px;
@@ -343,7 +339,7 @@
             font-weight: 500;
         }
 
-        /* ===== 导航入口（三个核心系统 + 其他） ===== */
+        /* ===== 入口网格 ===== */
         .nav-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -391,6 +387,44 @@
 
         .nav-card:hover .arrow {
             opacity: 0.6;
+        }
+
+        /* ===== 工具分类 ===== */
+        .tool-section {
+            margin-top: 28px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .tool-category {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 14px;
+            padding: 14px 18px;
+        }
+
+        .tool-category h4 {
+            font-size: 13px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.4);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+
+        .tool-category p {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.3);
+            line-height: 1.6;
+        }
+
+        .tool-category p .highlight {
+            color: rgba(255, 255, 255, 0.6);
         }
 
         /* ===== 响应式 ===== */
@@ -448,6 +482,9 @@
             .nav-grid {
                 grid-template-columns: 1fr 1fr;
             }
+            .tool-section {
+                grid-template-columns: 1fr;
+            }
         }
 
         @media (max-width: 440px) {
@@ -493,28 +530,36 @@
 
         </div>
 
-        <!-- ===== 导航入口 ===== -->
+        <!-- ===== 第一排：画圈实验（起源） ===== -->
         <div class="nav-grid">
-
-            <!-- 核心系统 1：画圈实验 -->
-            <a href="circle-lab.html" class="nav-card">
-                <span class="icon">🧪</span> 画圈实验 · 认知方法论
+            <a href="circle-lab.html" class="nav-card" style="grid-column: 1 / -1; justify-content: center; border-color: rgba(255,255,255,0.08);">
+                <span class="icon">🧪</span> 画圈实验 · 认知方法论（起源）
                 <span class="arrow">→</span>
             </a>
+        </div>
 
-            <!-- 核心系统 2：EvolveMind -->
+        <!-- ===== 第二排：EvolveMind + GameMind（并列底座） ===== -->
+        <div class="nav-grid">
             <a href="evolvemind/index.html" class="nav-card">
                 <span class="icon">🧠</span> EvolveMind · 认知系统
                 <span class="arrow">→</span>
             </a>
-
-            <!-- 核心系统 3：GameMind -->
             <a href="gamemind.html" class="nav-card">
                 <span class="icon">🎯</span> GameMind · 博弈论底座
                 <span class="arrow">→</span>
             </a>
+        </div>
 
-            <!-- 其他已有入口（保留） -->
+        <!-- ===== 第三排：MoodMind（商业落地） ===== -->
+        <div class="nav-grid">
+            <a href="moodmind.html" class="nav-card" style="grid-column: 1 / -1; justify-content: center; border-color: rgba(255,255,255,0.08);">
+                <span class="icon">📊</span> MoodMind · 非标资产估值底座（商业落地）
+                <span class="arrow">→</span>
+            </a>
+        </div>
+
+        <!-- ===== 其他已有入口（保留） ===== -->
+        <div class="nav-grid">
             <a href="value-pyramid.html" class="nav-card">
                 <span class="icon">📐</span> 价值金字塔
                 <span class="arrow">→</span>
@@ -539,7 +584,18 @@
                 <span class="icon">📄</span> 知识资产全景图
                 <span class="arrow">→</span>
             </a>
+        </div>
 
+        <!-- ===== 第四排：工具分类 ===== -->
+        <div class="tool-section">
+            <div class="tool-category">
+                <h4>🛠️ 应用工具</h4>
+                <p>画圈实验 · EvolveMind · GameMind · MoodMind</p>
+            </div>
+            <div class="tool-category">
+                <h4>⚙️ 技术工具</h4>
+                <p>11层架构 · 四层溯源治理 · 门控权限 · 插件体系</p>
+            </div>
         </div>
 
     </div>
