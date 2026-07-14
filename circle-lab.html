@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>画圈实验 · 认知方法论</title>
     <style>
+        /* ===== 重置 & 深色背景 ===== */
         * {
             margin: 0;
             padding: 0;
@@ -12,108 +13,162 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background: #f1f5f9;
+            background: #0b0b1a;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
             min-height: 100vh;
-            padding: 40px 24px;
             display: flex;
             justify-content: center;
-            align-items: flex-start;
+            align-items: center;
+            padding: 40px 20px;
+            overflow-x: hidden;
+            cursor: default;
+        }
+
+        /* ===== 鼠标跟随光晕 ===== */
+        #glow {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            background: radial-gradient(600px circle at var(--x, 50%) var(--y, 50%), rgba(120, 80, 255, 0.06), transparent 80%);
+            transition: background 0.1s;
         }
 
         .container {
-            max-width: 1100px;
+            max-width: 960px;
             width: 100%;
-            background: white;
-            border-radius: 40px;
+            background: radial-gradient(ellipse at 30% 30%, #120b24, #0b0b1a 70%, #05030a);
+            border-radius: 32px;
             padding: 48px 40px 40px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            box-shadow: 0 30px 80px rgba(40, 10, 80, 0.4);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+            backdrop-filter: blur(2px);
         }
 
-        /* ===== 头部概念说明 ===== */
-        .concept {
+        /* ===== 星云背景动画 ===== */
+        .container::before {
+            content: '';
+            position: absolute;
+            top: -100px;
+            right: -100px;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(80, 30, 140, 0.15), transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: floatBg 12s ease-in-out infinite alternate;
+        }
+
+        .container::after {
+            content: '';
+            position: absolute;
+            bottom: -80px;
+            left: -80px;
+            width: 350px;
+            height: 350px;
+            background: radial-gradient(circle, rgba(30, 60, 150, 0.1), transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: floatBg 10s ease-in-out infinite alternate-reverse;
+        }
+
+        @keyframes floatBg {
+            0% {
+                transform: translate(0, 0) scale(1);
+            }
+            100% {
+                transform: translate(30px, -20px) scale(1.1);
+            }
+        }
+
+        /* ===== 头部（入场动画） ===== */
+        .header {
+            text-align: center;
             margin-bottom: 32px;
-            padding-bottom: 24px;
-            border-bottom: 2px solid #f1f5f9;
+            opacity: 0;
+            animation: fadeInUp 0.8s ease forwards;
         }
 
-        .concept .badge {
+        .header .badge {
             display: inline-block;
-            background: #eef2ff;
-            color: #4f46e5;
-            font-size: 13px;
-            font-weight: 600;
-            padding: 4px 16px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 11px;
+            padding: 4px 14px;
             border-radius: 20px;
-            letter-spacing: 0.3px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
             margin-bottom: 12px;
         }
 
-        .concept h1 {
+        .header h1 {
             font-size: 32px;
             font-weight: 700;
-            color: #0f172a;
-            letter-spacing: -0.5px;
+            color: #f1f5f9;
+            line-height: 1.2;
+            margin-bottom: 6px;
+            background: linear-gradient(135deg, #f1f5f9, #a78bfa, #60a5fa, #f1f5f9);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradientFlow 6s ease-in-out infinite;
         }
 
-        .concept h1 span {
-            color: #4f46e5;
-        }
-
-        .concept .sub {
+        .header .sub {
             font-size: 16px;
-            color: #64748b;
-            margin-top: 6px;
-            line-height: 1.6;
-        }
-
-        .concept .logic-flow {
-            background: #f8fafc;
-            border-radius: 16px;
-            padding: 16px 20px;
-            margin-top: 14px;
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            gap: 8px 12px;
-            font-size: 14px;
-            color: #0f172a;
-        }
-
-        .concept .logic-flow .step {
-            background: white;
-            border: 1px solid #e2e8f0;
-            border-radius: 20px;
-            padding: 4px 14px;
-            font-weight: 500;
-        }
-
-        .concept .logic-flow .step.highlight {
-            background: #eef2ff;
-            border-color: #4f46e5;
-            color: #4f46e5;
-        }
-
-        .concept .logic-flow .arrow {
-            color: #94a3b8;
+            color: rgba(255, 255, 255, 0.4);
             font-weight: 300;
+            letter-spacing: 0.3px;
+        }
+
+        @keyframes gradientFlow {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        @keyframes fadeInUp {
+            0% {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         /* ===== 画布区 ===== */
         .canvas-wrapper {
-            background: #f8fafc;
+            background: rgba(255, 255, 255, 0.02);
             border-radius: 20px;
             padding: 16px;
             margin-bottom: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            opacity: 0;
+            animation: fadeInUp 0.6s ease 0.1s forwards;
         }
 
         canvas {
             display: block;
             width: 100%;
             height: auto;
-            background: #ffffff;
+            background: rgba(255, 255, 255, 0.03);
             border-radius: 16px;
-            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.02);
+            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.3);
         }
 
         /* ===== 控制区 ===== */
@@ -122,6 +177,8 @@
             grid-template-columns: 1fr 1fr 1fr;
             gap: 20px 24px;
             margin-bottom: 20px;
+            opacity: 0;
+            animation: fadeInUp 0.6s ease 0.15s forwards;
         }
 
         .control-group {
@@ -133,21 +190,21 @@
         .control-group label {
             font-size: 13px;
             font-weight: 500;
-            color: #475569;
+            color: rgba(255, 255, 255, 0.5);
             display: flex;
             justify-content: space-between;
         }
 
         .control-group label span {
-            color: #4f46e5;
+            color: #a78bfa;
             font-weight: 600;
         }
 
         input[type="range"] {
             width: 100%;
-            accent-color: #4f46e5;
+            accent-color: #a78bfa;
             height: 4px;
-            background: #e2e8f0;
+            background: rgba(255, 255, 255, 0.1);
             border-radius: 4px;
             -webkit-appearance: none;
             appearance: none;
@@ -159,8 +216,9 @@
             width: 16px;
             height: 16px;
             border-radius: 50%;
-            background: #4f46e5;
+            background: #a78bfa;
             cursor: pointer;
+            box-shadow: 0 0 20px rgba(167, 139, 250, 0.3);
         }
 
         /* ===== 反馈面板 ===== */
@@ -168,11 +226,14 @@
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 12px;
-            background: #f8fafc;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
             border-radius: 16px;
             padding: 16px 20px;
             margin-bottom: 16px;
             font-size: 14px;
+            opacity: 0;
+            animation: fadeInUp 0.6s ease 0.2s forwards;
         }
 
         .feedback-item {
@@ -181,98 +242,90 @@
         }
 
         .feedback-item .label {
-            color: #94a3b8;
+            color: rgba(255, 255, 255, 0.3);
             font-size: 12px;
         }
 
         .feedback-item .value {
             font-weight: 600;
-            color: #0f172a;
+            color: #f1f5f9;
             font-size: 16px;
             margin-top: 2px;
         }
 
         .feedback-item .value.highlight {
-            color: #4f46e5;
+            color: #a78bfa;
         }
 
-        /* ===== 底部 ===== */
-        .footer {
+        /* ===== 底部操作区 ===== */
+        .footer-actions {
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
             gap: 12px;
             padding-top: 16px;
-            border-top: 1px solid #e9edf4;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+            opacity: 0;
+            animation: fadeInUp 0.6s ease 0.25s forwards;
         }
 
-        .footer .actions {
+        .footer-actions .actions {
             display: flex;
             gap: 12px;
         }
 
-        .footer .actions button {
+        .footer-actions .actions button {
             padding: 8px 24px;
             border: none;
             border-radius: 20px;
             font-size: 14px;
             font-weight: 500;
             cursor: pointer;
-            transition: 0.2s;
-            background: #f1f5f9;
-            color: #0f172a;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.04);
+            color: rgba(255, 255, 255, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.04);
         }
 
-        .footer .actions button.primary {
-            background: #4f46e5;
-            color: white;
+        .footer-actions .actions button.primary {
+            background: rgba(167, 139, 250, 0.15);
+            color: #a78bfa;
+            border-color: rgba(167, 139, 250, 0.15);
         }
 
-        .footer .actions button.primary:hover {
-            background: #4338ca;
+        .footer-actions .actions button.primary:hover {
+            background: rgba(167, 139, 250, 0.25);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(167, 139, 250, 0.15);
         }
 
-        .footer .actions button:hover {
-            background: #e2e8f0;
+        .footer-actions .actions button:hover {
+            background: rgba(255, 255, 255, 0.06);
+            color: #f1f5f9;
+            transform: translateY(-2px);
         }
 
-        .footer .back-link {
-            color: #64748b;
+        /* ===== 返回链接（核心修复） ===== */
+        .back-link-wrapper {
+            text-align: center;
+            margin-top: 28px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+            opacity: 0;
+            animation: fadeInUp 0.6s ease 0.3s forwards;
+        }
+
+        .back-link-wrapper a {
+            color: rgba(255, 255, 255, 0.3);
             text-decoration: none;
             font-size: 14px;
-            border: 1px solid #e2e8f0;
-            padding: 6px 16px;
-            border-radius: 20px;
-            transition: 0.2s;
+            transition: color 0.3s ease;
+            letter-spacing: 0.3px;
         }
 
-        .footer .back-link:hover {
-            background: #f1f5f9;
-            border-color: #4f46e5;
-            color: #4f46e5;
-        }
-
-        /* ===== 底部说明（11层架构映射） ===== */
-        .mapping {
-            margin-top: 20px;
-            padding-top: 16px;
-            border-top: 1px solid #e9edf4;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px 24px;
-            font-size: 13px;
-            color: #64748b;
-        }
-
-        .mapping .item {
-            display: flex;
-            gap: 8px;
-        }
-
-        .mapping .item .num {
-            font-weight: 600;
-            color: #4f46e5;
+        .back-link-wrapper a:hover {
+            color: rgba(255, 255, 255, 0.8);
         }
 
         /* ===== 响应式 ===== */
@@ -286,12 +339,8 @@
             .feedback {
                 grid-template-columns: 1fr 1fr;
             }
-            .mapping {
-                grid-template-columns: 1fr;
-            }
-            .concept .logic-flow {
-                flex-direction: column;
-                align-items: flex-start;
+            .header h1 {
+                font-size: 24px;
             }
         }
 
@@ -302,311 +351,291 @@
             .feedback {
                 grid-template-columns: 1fr;
             }
-            .concept h1 {
-                font-size: 24px;
-            }
-            .footer {
+            .footer-actions {
                 flex-direction: column;
                 align-items: stretch;
+            }
+            .footer-actions .actions {
+                justify-content: center;
             }
         }
     </style>
 </head>
 <body>
 
-<div class="container">
+    <!-- ===== 鼠标跟随光晕 ===== -->
+    <div id="glow"></div>
 
-    <!-- ===== 概念说明区 ===== -->
-    <div class="concept">
-        <div class="badge">🧠 认知方法论</div>
-        <h1>画圈实验 · <span>3→1→1→3→100</span></h1>
-        <div class="sub">
-            通过操作圈的动态变化，理解“如何拆解任何陌生问题”的底层逻辑。
+    <div class="container">
+
+        <!-- ===== 头部 ===== -->
+        <div class="header">
+            <div class="badge">🧠 认知方法论</div>
+            <h1>画圈实验 · 3→1→1→3→100</h1>
+            <div class="sub">通过操作理解“如何拆解任何陌生问题”</div>
         </div>
-        <div class="logic-flow">
-            <span class="step">三维 · 世界</span>
-            <span class="arrow">→</span>
-            <span class="step">一维 · 人</span>
-            <span class="arrow">→</span>
-            <span class="step highlight">人能动 · 动画</span>
-            <span class="arrow">→</span>
-            <span class="step highlight">画圈函数</span>
-            <span class="arrow">→</span>
-            <span class="step">宏观 · 市场</span>
-            <span class="arrow">→</span>
-            <span class="step">底座 · 政策</span>
+
+        <!-- ===== 画布区 ===== -->
+        <div class="canvas-wrapper">
+            <canvas id="canvas" width="800" height="400"></canvas>
         </div>
+
+        <!-- ===== 控制区 ===== -->
+        <div class="controls">
+            <div class="control-group">
+                <label>弹性（波动幅度） <span id="elasticValue">1.0</span></label>
+                <input type="range" id="elastic" min="0.2" max="2.0" step="0.05" value="1.0">
+            </div>
+            <div class="control-group">
+                <label>政策（基准偏移） <span id="policyValue">0</span></label>
+                <input type="range" id="policy" min="-50" max="50" step="1" value="0">
+            </div>
+            <div class="control-group">
+                <label>速度 <span id="speedValue">1.0</span></label>
+                <input type="range" id="speed" min="0.0" max="2.5" step="0.1" value="1.0">
+            </div>
+        </div>
+
+        <!-- ===== 反馈面板 ===== -->
+        <div class="feedback">
+            <div class="feedback-item">
+                <span class="label">当前角度</span>
+                <span class="value" id="angleDisplay">0°</span>
+            </div>
+            <div class="feedback-item">
+                <span class="label">需求指数</span>
+                <span class="value highlight" id="demandDisplay">50%</span>
+            </div>
+            <div class="feedback-item">
+                <span class="label">供给指数</span>
+                <span class="value highlight" id="supplyDisplay">50%</span>
+            </div>
+            <div class="feedback-item">
+                <span class="label">状态</span>
+                <span class="value" id="stateDisplay">⚖️ 均衡</span>
+            </div>
+        </div>
+
+        <!-- ===== 底部操作区 ===== -->
+        <div class="footer-actions">
+            <div class="actions">
+                <button class="primary" id="toggleBtn">⏸️ 暂停</button>
+                <button id="resetBtn">🔄 重置</button>
+            </div>
+        </div>
+
+        <!-- ===== ★★★ 返回链接（加在这里） ★★★ ===== -->
+        <div class="back-link-wrapper">
+            <a href="index.html">← 返回作品集首页</a>
+        </div>
+
     </div>
 
-    <!-- ===== 画布区 ===== -->
-    <div class="canvas-wrapper">
-        <canvas id="canvas" width="800" height="400"></canvas>
-    </div>
+    <script>
+        // ===== 鼠标跟随光晕 =====
+        const glow = document.getElementById('glow');
+        document.addEventListener('mousemove', (e) => {
+            const x = e.clientX / window.innerWidth * 100;
+            const y = e.clientY / window.innerHeight * 100;
+            glow.style.setProperty('--x', x + '%');
+            glow.style.setProperty('--y', y + '%');
+        });
 
-    <!-- ===== 控制区 ===== -->
-    <div class="controls">
-        <div class="control-group">
-            <label>弹性（波动幅度） <span id="elasticValue">1.0</span></label>
-            <input type="range" id="elastic" min="0.2" max="2.0" step="0.05" value="1.0">
-        </div>
-        <div class="control-group">
-            <label>政策（基准偏移） <span id="policyValue">0</span></label>
-            <input type="range" id="policy" min="-50" max="50" step="1" value="0">
-        </div>
-        <div class="control-group">
-            <label>速度 <span id="speedValue">1.0</span></label>
-            <input type="range" id="speed" min="0.0" max="2.5" step="0.1" value="1.0">
-        </div>
-    </div>
+        // ===== 画圈实验核心逻辑 =====
+        (function() {
+            const canvas = document.getElementById('canvas');
+            const ctx = canvas.getContext('2d');
 
-    <!-- ===== 反馈面板 ===== -->
-    <div class="feedback">
-        <div class="feedback-item">
-            <span class="label">当前角度</span>
-            <span class="value" id="angleDisplay">0°</span>
-        </div>
-        <div class="feedback-item">
-            <span class="label">需求指数</span>
-            <span class="value highlight" id="demandDisplay">50%</span>
-        </div>
-        <div class="feedback-item">
-            <span class="label">供给指数</span>
-            <span class="value highlight" id="supplyDisplay">50%</span>
-        </div>
-        <div class="feedback-item">
-            <span class="label">状态</span>
-            <span class="value" id="stateDisplay">⚖️ 均衡</span>
-        </div>
-    </div>
+            const elasticSlider = document.getElementById('elastic');
+            const policySlider = document.getElementById('policy');
+            const speedSlider = document.getElementById('speed');
 
-    <!-- ===== 底部 ===== -->
-    <div class="footer">
-        <div class="actions">
-            <button class="primary" id="toggleBtn">⏸️ 暂停</button>
-            <button id="resetBtn">🔄 重置</button>
-        </div>
-        <a href="#" class="back-link">← 返回作品集</a>
-    </div>
+            const elasticValue = document.getElementById('elasticValue');
+            const policyValue = document.getElementById('policyValue');
+            const speedValue = document.getElementById('speedValue');
 
-    <!-- ===== 底部说明：11层架构映射 ===== -->
-    <div class="mapping">
-        <div class="item"><span class="num">第0层</span> 体感 · 拖动滑块</div>
-        <div class="item"><span class="num">第1层</span> 观察 · 需求上下，供给左右</div>
-        <div class="item"><span class="num">第2层</span> 命名 · 这是一个圈</div>
-        <div class="item"><span class="num">第3层</span> 结构 · 圆心、半径、角度</div>
-        <div class="item"><span class="num">第4层</span> 变量 · 弹性、政策、速度</div>
-        <div class="item"><span class="num">第5层</span> 映射 · 圈 = 市场运行</div>
-        <div class="item"><span class="num">第6层</span> 迁移 · 圈 = 认知框架</div>
-        <div class="item"><span class="num">第7-10层</span> 验证 · 系统 · 迭代 · 独立</div>
-    </div>
+            const angleDisplay = document.getElementById('angleDisplay');
+            const demandDisplay = document.getElementById('demandDisplay');
+            const supplyDisplay = document.getElementById('supplyDisplay');
+            const stateDisplay = document.getElementById('stateDisplay');
 
-</div>
+            const toggleBtn = document.getElementById('toggleBtn');
+            const resetBtn = document.getElementById('resetBtn');
 
-<script>
-    (function() {
-        // ===== DOM 引用 =====
-        const canvas = document.getElementById('canvas');
-        const ctx = canvas.getContext('2d');
+            let angle = 0;
+            let running = true;
+            let animationId = null;
 
-        const elasticSlider = document.getElementById('elastic');
-        const policySlider = document.getElementById('policy');
-        const speedSlider = document.getElementById('speed');
-
-        const elasticValue = document.getElementById('elasticValue');
-        const policyValue = document.getElementById('policyValue');
-        const speedValue = document.getElementById('speedValue');
-
-        const angleDisplay = document.getElementById('angleDisplay');
-        const demandDisplay = document.getElementById('demandDisplay');
-        const supplyDisplay = document.getElementById('supplyDisplay');
-        const stateDisplay = document.getElementById('stateDisplay');
-
-        const toggleBtn = document.getElementById('toggleBtn');
-        const resetBtn = document.getElementById('resetBtn');
-
-        // ===== 状态 =====
-        let angle = 0;
-        let running = true;
-        let animationId = null;
-
-        function getParams() {
-            return {
-                elastic: parseFloat(elasticSlider.value),
-                policy: parseFloat(policySlider.value),
-                speed: parseFloat(speedSlider.value)
-            };
-        }
-
-        // ===== 绘制 =====
-        function draw() {
-            const w = canvas.width;
-            const h = canvas.height;
-            const cx = w / 2;
-            const cy = h / 2;
-
-            const params = getParams();
-            const elastic = params.elastic;
-            const policy = params.policy;
-            const radius = 120 * elastic;
-            const offsetY = policy * 0.6;
-
-            const demand = Math.sin(angle) * radius + offsetY;
-            const supply = Math.cos(angle) * radius;
-
-            const maxOffset = 120 * 2.0 + 50;
-            const demandPercent = Math.round(((demand + maxOffset) / (maxOffset * 2)) * 100);
-            const supplyPercent = Math.round(((supply + maxOffset) / (maxOffset * 2)) * 100);
-
-            let stateText = '⚖️ 均衡';
-            if (demandPercent > supplyPercent + 8) stateText = '📈 供不应求';
-            else if (supplyPercent > demandPercent + 8) stateText = '📉 供过于求';
-
-            // --- 绘制 ---
-            ctx.clearRect(0, 0, w, h);
-
-            // 网格
-            ctx.strokeStyle = '#f1f5f9';
-            ctx.lineWidth = 1;
-            for (let i = 0; i <= 10; i++) {
-                const x = (i / 10) * w;
-                const y = (i / 10) * h;
-                ctx.beginPath();
-                ctx.moveTo(x, 0);
-                ctx.lineTo(x, h);
-                ctx.stroke();
-                ctx.beginPath();
-                ctx.moveTo(0, y);
-                ctx.lineTo(w, y);
-                ctx.stroke();
+            function getParams() {
+                return {
+                    elastic: parseFloat(elasticSlider.value),
+                    policy: parseFloat(policySlider.value),
+                    speed: parseFloat(speedSlider.value)
+                };
             }
 
-            // 基准线
-            ctx.strokeStyle = '#e2e8f0';
-            ctx.lineWidth = 1.5;
-            ctx.setLineDash([6, 6]);
-            ctx.beginPath();
-            ctx.moveTo(0, cy + offsetY);
-            ctx.lineTo(w, cy + offsetY);
-            ctx.stroke();
-            ctx.beginPath();
-            ctx.moveTo(cx, 0);
-            ctx.lineTo(cx, h);
-            ctx.stroke();
-            ctx.setLineDash([]);
+            function draw() {
+                const w = canvas.width;
+                const h = canvas.height;
+                const cx = w / 2;
+                const cy = h / 2;
 
-            // 圆
-            ctx.strokeStyle = '#e2e8f0';
-            ctx.lineWidth = 2;
-            ctx.beginPath();
-            for (let t = 0; t <= Math.PI * 2; t += 0.02) {
-                const dx = Math.cos(t) * radius;
-                const dy = Math.sin(t) * radius + offsetY;
-                if (t === 0) ctx.moveTo(cx + dx, cy + dy);
-                else ctx.lineTo(cx + dx, cy + dy);
-            }
-            ctx.stroke();
-
-            // 需求点
-            const demandX = cx;
-            const demandY = cy + demand;
-            ctx.fillStyle = '#4f46e5';
-            ctx.shadowColor = 'rgba(79,70,229,0.2)';
-            ctx.shadowBlur = 12;
-            ctx.beginPath();
-            ctx.arc(demandX, demandY, 10, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.shadowBlur = 0;
-            ctx.fillStyle = '#ffffff';
-            ctx.font = 'bold 12px sans-serif';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'bottom';
-            ctx.fillText('需求', demandX, demandY - 14);
-
-            // 供给点
-            const supplyX = cx + supply;
-            const supplyY = cy + offsetY;
-            ctx.fillStyle = '#0f172a';
-            ctx.shadowColor = 'rgba(15,23,42,0.15)';
-            ctx.shadowBlur = 12;
-            ctx.beginPath();
-            ctx.arc(supplyX, supplyY, 10, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.shadowBlur = 0;
-            ctx.fillStyle = '#ffffff';
-            ctx.font = 'bold 12px sans-serif';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'bottom';
-            ctx.fillText('供给', supplyX, supplyY - 14);
-
-            // 圆心标记
-            ctx.fillStyle = '#94a3b8';
-            ctx.shadowBlur = 0;
-            ctx.beginPath();
-            ctx.arc(cx, cy + offsetY, 4, 0, Math.PI * 2);
-            ctx.fill();
-
-            // 角度标签
-            const deg = Math.round((angle * 180 / Math.PI) % 360);
-            angleDisplay.textContent = `${deg}°`;
-            demandDisplay.textContent = `${Math.min(100, Math.max(0, demandPercent))}%`;
-            supplyDisplay.textContent = `${Math.min(100, Math.max(0, supplyPercent))}%`;
-            stateDisplay.textContent = stateText;
-        }
-
-        // ===== 动画循环 =====
-        function animate() {
-            if (running) {
                 const params = getParams();
-                angle += 0.02 * params.speed;
-                if (angle > Math.PI * 2) angle -= Math.PI * 2;
+                const elastic = params.elastic;
+                const policy = params.policy;
+                const radius = 120 * elastic;
+                const offsetY = policy * 0.6;
+
+                const demand = Math.sin(angle) * radius + offsetY;
+                const supply = Math.cos(angle) * radius;
+
+                const maxOffset = 120 * 2.0 + 50;
+                const demandPercent = Math.round(((demand + maxOffset) / (maxOffset * 2)) * 100);
+                const supplyPercent = Math.round(((supply + maxOffset) / (maxOffset * 2)) * 100);
+
+                let stateText = '⚖️ 均衡';
+                if (demandPercent > supplyPercent + 8) stateText = '📈 供不应求';
+                else if (supplyPercent > demandPercent + 8) stateText = '📉 供过于求';
+
+                ctx.clearRect(0, 0, w, h);
+
+                // 网格
+                ctx.strokeStyle = 'rgba(255,255,255,0.03)';
+                ctx.lineWidth = 1;
+                for (let i = 0; i <= 10; i++) {
+                    const x = (i / 10) * w;
+                    const y = (i / 10) * h;
+                    ctx.beginPath();
+                    ctx.moveTo(x, 0);
+                    ctx.lineTo(x, h);
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.moveTo(0, y);
+                    ctx.lineTo(w, y);
+                    ctx.stroke();
+                }
+
+                // 基准线
+                ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+                ctx.lineWidth = 1.5;
+                ctx.setLineDash([6, 6]);
+                ctx.beginPath();
+                ctx.moveTo(0, cy + offsetY);
+                ctx.lineTo(w, cy + offsetY);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(cx, 0);
+                ctx.lineTo(cx, h);
+                ctx.stroke();
+                ctx.setLineDash([]);
+
+                // 圆
+                ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                for (let t = 0; t <= Math.PI * 2; t += 0.02) {
+                    const dx = Math.cos(t) * radius;
+                    const dy = Math.sin(t) * radius + offsetY;
+                    if (t === 0) ctx.moveTo(cx + dx, cy + dy);
+                    else ctx.lineTo(cx + dx, cy + dy);
+                }
+                ctx.stroke();
+
+                // 需求点
+                const demandX = cx;
+                const demandY = cy + demand;
+                ctx.fillStyle = '#a78bfa';
+                ctx.shadowColor = 'rgba(167,139,250,0.3)';
+                ctx.shadowBlur = 20;
+                ctx.beginPath();
+                ctx.arc(demandX, demandY, 10, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.shadowBlur = 0;
+                ctx.fillStyle = '#ffffff';
+                ctx.font = 'bold 12px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'bottom';
+                ctx.fillText('需求', demandX, demandY - 14);
+
+                // 供给点
+                const supplyX = cx + supply;
+                const supplyY = cy + offsetY;
+                ctx.fillStyle = '#60a5fa';
+                ctx.shadowColor = 'rgba(96,165,250,0.3)';
+                ctx.shadowBlur = 20;
+                ctx.beginPath();
+                ctx.arc(supplyX, supplyY, 10, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.shadowBlur = 0;
+                ctx.fillStyle = '#ffffff';
+                ctx.font = 'bold 12px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'bottom';
+                ctx.fillText('供给', supplyX, supplyY - 14);
+
+                // 圆心标记
+                ctx.fillStyle = 'rgba(255,255,255,0.3)';
+                ctx.shadowBlur = 0;
+                ctx.beginPath();
+                ctx.arc(cx, cy + offsetY, 4, 0, Math.PI * 2);
+                ctx.fill();
+
+                const deg = Math.round((angle * 180 / Math.PI) % 360);
+                angleDisplay.textContent = `${deg}°`;
+                demandDisplay.textContent = `${Math.min(100, Math.max(0, demandPercent))}%`;
+                supplyDisplay.textContent = `${Math.min(100, Math.max(0, supplyPercent))}%`;
+                stateDisplay.textContent = stateText;
             }
+
+            function animate() {
+                if (running) {
+                    const params = getParams();
+                    angle += 0.02 * params.speed;
+                    if (angle > Math.PI * 2) angle -= Math.PI * 2;
+                }
+                draw();
+                animationId = requestAnimationFrame(animate);
+            }
+
+            function toggleRun() {
+                running = !running;
+                toggleBtn.textContent = running ? '⏸️ 暂停' : '▶️ 运行';
+            }
+
+            function resetAll() {
+                angle = 0;
+                elasticSlider.value = '1.0';
+                policySlider.value = '0';
+                speedSlider.value = '1.0';
+                elasticValue.textContent = '1.0';
+                policyValue.textContent = '0';
+                speedValue.textContent = '1.0';
+                running = true;
+                toggleBtn.textContent = '⏸️ 暂停';
+                draw();
+            }
+
+            elasticSlider.addEventListener('input', function() {
+                elasticValue.textContent = this.value;
+            });
+            policySlider.addEventListener('input', function() {
+                policyValue.textContent = this.value;
+            });
+            speedSlider.addEventListener('input', function() {
+                speedValue.textContent = this.value;
+            });
+
+            toggleBtn.addEventListener('click', toggleRun);
+            resetBtn.addEventListener('click', resetAll);
+
+            animate();
             draw();
-            animationId = requestAnimationFrame(animate);
-        }
 
-        // ===== 控制函数 =====
-        function toggleRun() {
-            running = !running;
-            toggleBtn.textContent = running ? '⏸️ 暂停' : '▶️ 运行';
-        }
-
-        function resetAll() {
-            angle = 0;
-            elasticSlider.value = '1.0';
-            policySlider.value = '0';
-            speedSlider.value = '1.0';
-            elasticValue.textContent = '1.0';
-            policyValue.textContent = '0';
-            speedValue.textContent = '1.0';
-            running = true;
-            toggleBtn.textContent = '⏸️ 暂停';
-            draw();
-        }
-
-        // ===== 滑块事件 =====
-        elasticSlider.addEventListener('input', function() {
-            elasticValue.textContent = this.value;
-        });
-        policySlider.addEventListener('input', function() {
-            policyValue.textContent = this.value;
-        });
-        speedSlider.addEventListener('input', function() {
-            speedValue.textContent = this.value;
-        });
-
-        toggleBtn.addEventListener('click', toggleRun);
-        resetBtn.addEventListener('click', resetAll);
-
-        // ===== 启动 =====
-        animate();
-        draw();
-
-        // ===== 清理 =====
-        window.addEventListener('beforeunload', function() {
-            if (animationId) cancelAnimationFrame(animationId);
-        });
-    })();
-</script>
+            window.addEventListener('beforeunload', function() {
+                if (animationId) cancelAnimationFrame(animationId);
+            });
+        })();
+    </script>
 
 </body>
 </html>
