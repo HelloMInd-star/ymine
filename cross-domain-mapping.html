@@ -22,7 +22,7 @@
         }
 
         .container {
-            max-width: 900px;
+            max-width: 1000px;
             width: 100%;
             background: #121b2e;
             border-radius: 24px;
@@ -30,96 +30,763 @@
             border: 1px solid #1e293b;
         }
 
-        h1 {
-            font-size: 28px;
+        .header {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+
+        .header h1 {
+            font-size: 30px;
             font-weight: 700;
             color: #f1f5f9;
-            margin-bottom: 16px;
             letter-spacing: 0.3px;
         }
 
-        .meta {
+        .header .badge {
+            display: inline-block;
             background: #1e293b;
-            padding: 16px 20px;
-            border-radius: 12px;
+            padding: 6px 18px;
+            border-radius: 20px;
+            color: #3b82f6;
+            font-size: 13px;
+            font-weight: 500;
+            margin-top: 8px;
+            border: 1px solid #1e293b;
+        }
+
+        .snapshot-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
             margin-bottom: 28px;
-            border-left: 4px solid #3b82f6;
         }
 
-        .meta p {
+        .snapshot-item {
+            background: #0f172a;
+            border: 1px solid #1e293b;
+            border-radius: 12px;
+            padding: 14px 18px;
+            transition: border-color 0.3s ease;
+        }
+
+        .snapshot-item:hover {
+            border-color: #2a3a55;
+        }
+
+        .snapshot-item .label {
+            font-size: 11px;
+            font-weight: 600;
+            color: #3b82f6;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 2px;
+        }
+
+        .snapshot-item .value {
+            font-size: 15px;
+            font-weight: 500;
+            color: #f1f5f9;
+            line-height: 1.4;
+        }
+
+        .snapshot-item .value .highlight {
+            color: #3b82f6;
+        }
+
+        .snapshot-item .value .small {
+            font-size: 13px;
+            font-weight: 400;
             color: #94a3b8;
+        }
+
+        .mindmap {
+            position: relative;
+            width: 100%;
+            min-height: 500px;
+            padding: 20px 0;
+            margin-bottom: 32px;
+            border: 1px solid #1e293b;
+            border-radius: 16px;
+            background: #0f172a;
+            overflow: hidden;
+        }
+
+        .mindmap .center-node {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #1e293b;
+            border: 2px solid #3b82f6;
+            border-radius: 50%;
+            width: 120px;
+            height: 120px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: #f1f5f9;
+            font-weight: 700;
             font-size: 14px;
-            line-height: 1.7;
-            margin-bottom: 4px;
+            padding: 12px;
+            z-index: 5;
+            box-shadow: 0 0 40px rgba(59, 130, 246, 0.15);
+            cursor: default;
         }
 
-        .meta strong {
-            color: #e2e8f0;
+        .mindmap .center-node .big {
+            font-size: 24px;
+            color: #3b82f6;
         }
 
-        h2 {
+        .mindmap .center-node .small {
+            font-size: 11px;
+            color: #94a3b8;
+            font-weight: 400;
+        }
+
+        .radial-node {
+            position: absolute;
+            background: #1e293b;
+            border: 1px solid #2a3a55;
+            border-radius: 12px;
+            padding: 12px 16px;
+            max-width: 180px;
+            text-align: center;
+            z-index: 3;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .radial-node:hover {
+            border-color: #3b82f6;
+            transform: scale(1.04);
+            box-shadow: 0 0 30px rgba(59, 130, 246, 0.10);
+        }
+
+        .radial-node .label {
+            font-size: 12px;
+            color: #94a3b8;
+            font-weight: 500;
+        }
+
+        .radial-node .title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #f1f5f9;
+            margin-top: 2px;
+        }
+
+        .radial-node .analogy {
+            font-size: 11px;
+            color: #3b82f6;
+            margin-top: 4px;
+            background: #0f172a;
+            padding: 2px 10px;
+            border-radius: 12px;
+            display: inline-block;
+        }
+
+        .mindmap svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .mindmap svg line {
+            stroke: #2a3a55;
+            stroke-width: 1.5;
+            stroke-dasharray: 4 4;
+        }
+
+        .detail-section {
+            margin-top: 16px;
+        }
+
+        .detail-section h2 {
             font-size: 20px;
             font-weight: 600;
             color: #f1f5f9;
-            margin-top: 32px;
-            margin-bottom: 16px;
+            margin: 32px 0 16px;
             padding-bottom: 8px;
             border-bottom: 1px solid #1e293b;
         }
 
-        h3 {
-            font-size: 17px;
+        .detail-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .detail-card {
+            background: #0f172a;
+            border: 1px solid #1e293b;
+            border-radius: 12px;
+            padding: 16px 18px;
+            transition: border-color 0.3s ease;
+            scroll-margin-top: 20px;
+        }
+
+        .detail-card:hover {
+            border-color: #2a3a55;
+        }
+
+        .detail-card .step {
+            font-size: 12px;
+            color: #3b82f6;
             font-weight: 600;
-            color: #e2e8f0;
-            margin-top: 24px;
+            margin-bottom: 4px;
+        }
+
+        .detail-card h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #f1f5f9;
+            margin-bottom: 6px;
+        }
+
+        .detail-card .analogy-tag {
+            display: inline-block;
+            background: #1e293b;
+            color: #3b82f6;
+            font-size: 12px;
+            padding: 2px 12px;
+            border-radius: 12px;
             margin-bottom: 8px;
         }
 
-        p {
-            color: #cbd5e1;
-            font-size: 15px;
-            line-height: 1.8;
-            margin-bottom: 12px;
+        .detail-card p {
+            color: #94a3b8;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 4px;
         }
 
-        ul {
-            list-style: none;
-            padding: 0;
-            margin: 12px 0 16px 0;
+        .detail-card .conclusion {
+            color: #e2e8f0;
+            font-size: 14px;
+            font-weight: 500;
+            margin-top: 6px;
+            padding-top: 6px;
+            border-top: 1px solid #1e293b;
         }
 
-        ul li {
-            color: #cbd5e1;
-            font-size: 15px;
-            line-height: 1.7;
-            padding: 6px 0 6px 28px;
-            position: relative;
+        .detail-card .conclusion .highlight {
+            color: #3b82f6;
+        }
+
+        .detail-card .jump-btn {
+            display: inline-block;
+            margin-top: 12px;
+            padding: 6px 16px;
+            background: #1e293b;
+            color: #3b82f6;
+            font-size: 13px;
+            font-weight: 500;
+            border: 1px solid #1e293b;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .detail-card .jump-btn:hover {
+            background: #2a3a55;
+            border-color: #3b82f6;
+            transform: translateX(4px);
+        }
+
+        .detail-card .jump-btn .arrow {
+            display: inline-block;
+            transition: transform 0.3s ease;
+        }
+
+        .detail-card .jump-btn:hover .arrow {
+            transform: translateX(4px);
+        }
+
+        /* ===== 乐高双塔 ===== */
+        .lego-tower {
+            background: #0f172a;
+            border: 1px solid #1e293b;
+            border-radius: 16px;
+            padding: 28px 30px;
+            margin: 32px 0 20px;
+        }
+
+        .lego-tower .tower-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #f1f5f9;
+            margin-bottom: 4px;
+        }
+
+        .lego-tower .tower-sub {
+            font-size: 14px;
+            color: #94a3b8;
+            margin-bottom: 20px;
+        }
+
+        .mapping-row {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 0;
             border-bottom: 1px solid #1a2538;
+            cursor: pointer;
+            transition: background 0.2s ease;
+            border-radius: 6px;
+            padding-left: 6px;
+            padding-right: 6px;
         }
 
-        ul li:last-child {
+        .mapping-row:last-child {
             border-bottom: none;
         }
 
-        ul li::before {
-            content: "▸";
-            color: #3b82f6;
-            position: absolute;
-            left: 4px;
-            font-weight: 700;
+        .mapping-row:hover {
+            background: rgba(59, 130, 246, 0.04);
         }
 
-        .highlight-box {
+        .mapping-row .left {
+            text-align: right;
+            color: #cbd5e1;
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+        .mapping-row .left .sub {
+            font-weight: 400;
+            color: #94a3b8;
+            font-size: 13px;
+        }
+
+        .mapping-row .center-lego {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
             background: #1e293b;
-            border-radius: 12px;
-            padding: 16px 20px;
-            margin: 16px 0;
-            border-left: 3px solid #facc15;
+            border: 1px solid #facc15;
+            border-radius: 30px;
+            padding: 4px 16px;
+            color: #facc15;
+            font-weight: 700;
+            font-size: 14px;
+            letter-spacing: 0.5px;
+            box-shadow: 0 0 20px rgba(250, 204, 21, 0.05);
+            min-width: 60px;
         }
 
-        .highlight-box p {
+        .mapping-row .center-lego .sub {
+            font-size: 9px;
+            font-weight: 400;
+            color: #94a3b8;
+            letter-spacing: 0.3px;
+        }
+
+        .mapping-row .right {
+            text-align: left;
+            color: #f1f5f9;
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+        .mapping-row .right .sub {
+            font-weight: 400;
+            color: #94a3b8;
+            font-size: 13px;
+        }
+
+        /* ===== 塔图卡片区 ===== */
+        .tower-detail-section {
+            margin-top: 20px;
+        }
+
+        .tower-detail-section h2 {
+            font-size: 20px;
+            font-weight: 600;
+            color: #f1f5f9;
+            margin: 32px 0 16px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #1e293b;
+        }
+
+        .tower-card {
+            background: #0f172a;
+            border: 1px solid #1e293b;
+            border-radius: 12px;
+            padding: 16px 18px;
+            margin-bottom: 16px;
+            transition: border-color 0.3s ease;
+            scroll-margin-top: 20px;
+        }
+
+        .tower-card:hover {
+            border-color: #2a3a55;
+        }
+
+        .tower-card .tower-step {
+            font-size: 12px;
+            color: #3b82f6;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .tower-card h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #f1f5f9;
+            margin-bottom: 6px;
+        }
+
+        .tower-card .tower-analogy {
+            display: inline-block;
+            background: #1e293b;
+            color: #facc15;
+            font-size: 12px;
+            padding: 2px 12px;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            border: 1px solid #2a3a55;
+        }
+
+        .tower-card p {
+            color: #94a3b8;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 4px;
+        }
+
+        .tower-card .tower-conclusion {
             color: #e2e8f0;
+            font-size: 14px;
+            font-weight: 500;
+            margin-top: 6px;
+            padding-top: 6px;
+            border-top: 1px solid #1e293b;
+        }
+
+        .tower-card .tower-conclusion .highlight {
+            color: #3b82f6;
+        }
+
+        .tower-card .tower-jump {
+            display: inline-block;
+            margin-top: 12px;
+            padding: 6px 16px;
+            background: #1e293b;
+            color: #3b82f6;
+            font-size: 13px;
+            font-weight: 500;
+            border: 1px solid #1e293b;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .tower-card .tower-jump:hover {
+            background: #2a3a55;
+            border-color: #3b82f6;
+            transform: translateX(4px);
+        }
+
+        .tower-card .tower-jump .arrow {
+            display: inline-block;
+            transition: transform 0.3s ease;
+        }
+
+        .tower-card .tower-jump:hover .arrow {
+            transform: translateX(4px);
+        }
+
+        /* ===== 一休拼乐高场景 ===== */
+        .ikkyu-lego-scene {
+            background: #0f172a;
+            border: 1px solid #1e293b;
+            border-radius: 16px;
+            padding: 32px 30px 24px;
+            margin: 16px 0 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ikkyu-lego-scene .scene-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #f1f5f9;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .ikkyu-lego-scene .scene-title span {
+            color: #facc15;
+        }
+
+        .scene-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 40px;
+            flex-wrap: wrap;
+            min-height: 220px;
+        }
+
+        .ikkyu-figure {
+            position: relative;
+            width: 120px;
+            height: 170px;
+            flex-shrink: 0;
+        }
+
+        .ikkyu-figure .head {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 66px;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            border-radius: 50% 50% 45% 45%;
+            box-shadow: 0 0 25px rgba(180, 160, 255, 0.06);
+            background: rgba(255, 255, 255, 0.02);
+            animation: breathe 3s ease-in-out infinite 0.2s;
+        }
+
+        .ikkyu-figure .head .eye {
+            position: absolute;
+            width: 8px;
+            height: 10px;
+            border: 2px solid rgba(255, 255, 255, 0.7);
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            top: 26px;
+            animation: lookAround 4s ease-in-out infinite;
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .ikkyu-figure .head .eye-left {
+            left: 14px;
+        }
+        .ikkyu-figure .head .eye-right {
+            right: 14px;
+        }
+
+        .ikkyu-figure .head .eye::after {
+            content: '';
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: #fff;
+            border-radius: 50%;
+            bottom: 2px;
+            left: 2px;
+            box-shadow: 0 0 16px rgba(180, 200, 255, 0.5);
+            animation: pupilGlow 2s ease-in-out infinite alternate;
+        }
+
+        .ikkyu-figure .body {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 72px;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            border-radius: 50% 50% 40% 40% / 60% 60% 30% 30%;
+            box-shadow: 0 0 30px rgba(180, 160, 255, 0.08);
+            animation: breathe 3s ease-in-out infinite;
+        }
+
+        .ikkyu-figure .arm {
+            position: absolute;
+            right: -4px;
+            top: 30px;
+            width: 40px;
+            height: 40px;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            border-radius: 50% 50% 50% 0;
+            transform: rotate(35deg);
+            box-shadow: 0 0 20px rgba(180, 160, 255, 0.05);
+            animation: thinkPulse 2.5s ease-in-out infinite;
+        }
+
+        .ikkyu-figure .arm::after {
+            content: '';
+            position: absolute;
+            top: -3px;
+            right: -3px;
+            width: 8px;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            box-shadow: 0 0 30px rgba(200, 180, 255, 0.25);
+            animation: tapGlow 1.8s ease-in-out infinite alternate;
+        }
+
+        .lego-bricks {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            flex-shrink: 0;
+        }
+
+        .lego-bricks .row {
+            display: flex;
+            gap: 4px;
+        }
+
+        .lego-brick {
+            width: 22px;
+            height: 10px;
+            background: #facc15;
+            border-radius: 2px;
+            box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.2);
+        }
+
+        .lego-brick.red {
+            background: #ef4444;
+        }
+        .lego-brick.blue {
+            background: #3b82f6;
+        }
+        .lego-brick.green {
+            background: #22c55e;
+        }
+        .lego-brick.purple {
+            background: #a78bfa;
+        }
+
+        .math-cloud {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px 16px;
+            max-width: 260px;
+            justify-content: center;
+            opacity: 0.5;
+            font-size: 18px;
+            color: rgba(255, 255, 255, 0.15);
+            font-family: 'Courier New', monospace;
+            line-height: 1.6;
+        }
+
+        .math-cloud .symbol {
+            animation: floatSymbol 4s ease-in-out infinite alternate;
+        }
+
+        .math-cloud .symbol:nth-child(2) {
+            animation-delay: 0.5s;
+        }
+        .math-cloud .symbol:nth-child(3) {
+            animation-delay: 1s;
+        }
+        .math-cloud .symbol:nth-child(4) {
+            animation-delay: 1.5s;
+        }
+        .math-cloud .symbol:nth-child(5) {
+            animation-delay: 2s;
+        }
+        .math-cloud .symbol:nth-child(6) {
+            animation-delay: 2.5s;
+        }
+        .math-cloud .symbol:nth-child(7) {
+            animation-delay: 0.8s;
+        }
+        .math-cloud .symbol:nth-child(8) {
+            animation-delay: 1.8s;
+        }
+
+        @keyframes floatSymbol {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 0.3;
+            }
+            100% {
+                transform: translateY(-12px) rotate(6deg);
+                opacity: 0.7;
+            }
+        }
+
+        .scene-footer {
+            margin-top: 24px;
+            padding-top: 16px;
+            border-top: 1px solid #1e293b;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .scene-footer .item {
+            text-align: center;
+            padding: 10px 14px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 10px;
+            border: 1px solid #1e293b;
+        }
+
+        .scene-footer .item .tag {
+            display: inline-block;
+            background: #1e293b;
+            color: #facc15;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 2px 12px;
+            border-radius: 12px;
+            margin-bottom: 4px;
+        }
+
+        .scene-footer .item p {
+            color: #94a3b8;
+            font-size: 14px;
+            line-height: 1.6;
             margin-bottom: 0;
+        }
+
+        .scene-footer .item p strong {
+            color: #e2e8f0;
+        }
+
+        /* ===== 终极验证 ===== */
+        .verify-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 16px;
+            margin: 16px 0 24px;
+        }
+
+        .verify-card {
+            background: #0f172a;
+            border: 1px solid #1e293b;
+            border-radius: 12px;
+            padding: 16px 18px;
+            text-align: center;
+        }
+
+        .verify-card .icon {
+            font-size: 28px;
+            margin-bottom: 6px;
+        }
+
+        .verify-card h4 {
+            color: #f1f5f9;
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .verify-card p {
+            color: #94a3b8;
+            font-size: 13px;
+            line-height: 1.6;
         }
 
         .back-link {
@@ -138,19 +805,190 @@
             text-decoration: underline;
         }
 
-        @media (max-width: 600px) {
-            .container {
-                padding: 24px 18px;
+        @keyframes lookAround {
+            0%,
+            100% {
+                transform: translateX(0);
             }
-            h1 {
-                font-size: 22px;
+            25% {
+                transform: translateX(2px);
             }
-            h2 {
+            75% {
+                transform: translateX(-2px);
+            }
+        }
+
+        @keyframes pupilGlow {
+            0% {
+                opacity: 0.6;
+                transform: scale(0.9);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1.3);
+            }
+        }
+
+        @keyframes thinkPulse {
+            0%,
+            100% {
+                transform: rotate(35deg) scale(1);
+            }
+            50% {
+                transform: rotate(32deg) scale(1.02);
+            }
+        }
+
+        @keyframes tapGlow {
+            0% {
+                opacity: 0.3;
+                transform: scale(0.8);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1.4);
+            }
+        }
+
+        @keyframes breathe {
+            0%,
+            100% {
+                opacity: 0.8;
+                transform: translateX(-50%) scale(1);
+            }
+            50% {
+                opacity: 1;
+                transform: translateX(-50%) scale(1.015);
+            }
+        }
+
+        @media (max-width: 800px) {
+            .mindmap {
+                min-height: 580px;
+            }
+            .mindmap .center-node {
+                width: 90px;
+                height: 90px;
+                font-size: 12px;
+            }
+            .mindmap .center-node .big {
                 font-size: 18px;
             }
-            p,
-            ul li {
+            .radial-node {
+                max-width: 130px;
+                padding: 8px 10px;
+            }
+            .radial-node .title {
+                font-size: 13px;
+            }
+            .detail-grid {
+                grid-template-columns: 1fr;
+            }
+            .verify-grid {
+                grid-template-columns: 1fr;
+            }
+            .snapshot-grid {
+                grid-template-columns: 1fr;
+            }
+            .mapping-row {
+                grid-template-columns: 1fr;
+                text-align: center;
+                gap: 6px;
+            }
+            .mapping-row .left {
+                text-align: center;
+            }
+            .mapping-row .right {
+                text-align: center;
+            }
+            .mapping-row .center-lego {
+                flex-direction: row;
+                gap: 8px;
+                padding: 4px 14px;
+                width: auto;
+                margin: 0 auto;
+            }
+            .mapping-row .center-lego .sub {
+                display: inline;
+            }
+            .scene-container {
+                flex-direction: column;
+                gap: 20px;
+            }
+            .math-cloud {
+                max-width: 100%;
+                font-size: 16px;
+            }
+            .scene-footer {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px 16px;
+            }
+            .header h1 {
+                font-size: 22px;
+            }
+            .mindmap {
+                min-height: 480px;
+            }
+            .mindmap .center-node {
+                width: 70px;
+                height: 70px;
+                font-size: 10px;
+                padding: 6px;
+            }
+            .mindmap .center-node .big {
                 font-size: 14px;
+            }
+            .radial-node {
+                max-width: 100px;
+                padding: 6px 8px;
+            }
+            .radial-node .title {
+                font-size: 11px;
+            }
+            .radial-node .label {
+                font-size: 9px;
+            }
+            .radial-node .analogy {
+                font-size: 9px;
+                padding: 1px 6px;
+            }
+            .ikkyu-figure {
+                width: 80px;
+                height: 120px;
+            }
+            .ikkyu-figure .head {
+                width: 44px;
+                height: 48px;
+            }
+            .ikkyu-figure .head .eye {
+                width: 6px;
+                height: 8px;
+                top: 18px;
+            }
+            .ikkyu-figure .head .eye-left {
+                left: 10px;
+            }
+            .ikkyu-figure .head .eye-right {
+                right: 10px;
+            }
+            .ikkyu-figure .body {
+                width: 56px;
+                height: 50px;
+            }
+            .ikkyu-figure .arm {
+                width: 28px;
+                height: 28px;
+                right: -2px;
+                top: 20px;
+            }
+            .lego-brick {
+                width: 16px;
+                height: 8px;
             }
         }
     </style>
@@ -159,69 +997,482 @@
 
     <div class="container">
 
-        <h1>6小时，一个财务人如何用元架构吞噬6个陌生领域？</h1>
-
-        <div class="meta">
-            <p><strong>定位：</strong>Y.Mine 知识资产全景图 · 第2层「跨领域吞噬验证」核心条目</p>
-            <p><strong>验证目标：</strong>证明元架构在多个陌生领域之间具备可迁移性</p>
-            <p><strong>验证对象：</strong>财务本科 + MBA硕士，0工程/设计/计算机背景</p>
-            <p><strong>验证时长：</strong>约6小时连续对话，全程无准备，全部实时推导</p>
-            <p><strong>核心结论：</strong>拥有元架构思维的复合背景，不是被逼疯的混乱体，而是认知的永动机。</p>
+        <!-- ===== 顶部标题 ===== -->
+        <div class="header">
+            <h1>6小时，一个财务人如何用元架构吞噬6个陌生领域？</h1>
+            <div class="badge">⚡ 跨领域吞噬验证 · 核心证据链</div>
         </div>
 
-        <h2>核心推导路径</h2>
+        <!-- ===== 验证快照 ===== -->
+        <div class="snapshot-grid">
+            <div class="snapshot-item">
+                <div class="label">🎯 验证目标</div>
+                <div class="value">证明元架构在多个陌生领域之间具备 <span class="highlight">可迁移性</span></div>
+            </div>
+            <div class="snapshot-item">
+                <div class="label">🧑‍💻 验证对象</div>
+                <div class="value">财务本科 + MBA 硕士<br><span class="small">0 工程/设计/计算机背景</span></div>
+            </div>
+            <div class="snapshot-item">
+                <div class="label">⏱️ 验证时长</div>
+                <div class="value">约 <span class="highlight">6 小时</span> 连续对话<br><span class="small">全程无准备，全部实时推导</span></div>
+            </div>
+            <div class="snapshot-item">
+                <div class="label">💡 核心结论</div>
+                <div class="value">拥有元架构思维的复合背景，不是被逼疯的混乱体，而是 <span class="highlight">认知的永动机</span></div>
+            </div>
+        </div>
 
-        <h3>第一步：财务 → CAD</h3>
-        <p><strong>类比：</strong>图层 = 会计科目体系（分类分层管理）</p>
-        <p><strong>类比：</strong>图块 = 标准凭证模板（定义一次，处处复用）</p>
-        <p><strong>类比：</strong>装配体 = 合并报表（独立零件=独立子公司，装配关系=合并抵销）</p>
-        <p><strong>结论：</strong>CAD就是一个可视化的会计信息系统。财务思维完全可迁移。</p>
+        <!-- ===== 中心辐射图 ===== -->
+        <div class="mindmap" id="mindmap">
+            <div class="center-node">
+                <div class="big">⚡</div>
+                元架构
+                <div class="small">6小时吞噬6个领域</div>
+            </div>
+            <svg id="mindmapSvg"></svg>
+        </div>
 
-        <h3>第二步：CAD → 乐高</h3>
-        <p><strong>类比：</strong>乐高说明书首页的零件清单 = CAD的物料清单（BOM表）</p>
-        <p><strong>类比：</strong>乐高拼装步骤 = CAD的装配体配合关系</p>
-        <p><strong>结论：</strong>CAD制图本质上就是在虚拟空间里玩乐高。任何拼过乐高的人，都已经具备理解CAD底层逻辑的直观经验。</p>
+        <!-- ===== 详细推导卡片 ===== -->
+        <div class="detail-section">
+            <h2>🧠 完整推导链路</h2>
+            <div class="detail-grid">
 
-        <h3>第三步：电池 → CAD装配体</h3>
-        <p><strong>问题：</strong>单一电池的物理极限无法突破。</p>
-        <p><strong>方案：</strong>把高能量密度电池和高功率密度电池，当成CAD里的两个标准零件，用智能管理系统做“装配”。</p>
-        <p><strong>结论：</strong>电池的突破点，不一定只在材料化学里，也可能在系统架构里。</p>
+                <div class="detail-card" id="card-step1">
+                    <div class="step">第 1 步</div>
+                    <h3>财务 → CAD</h3>
+                    <span class="analogy-tag">类比：图层 = 会计科目体系</span>
+                    <p>图块 = 标准凭证模板，装配体 = 合并报表。</p>
+                    <div class="conclusion">✅ CAD 就是一个可视化的会计信息系统。</div>
+                    <a href="#" class="jump-btn">查看完整推导 <span class="arrow">→</span></a>
+                </div>
 
-        <h3>第四步：园林 → 财务</h3>
-        <p><strong>洞察：</strong>园林设计里，种下去只完成30%，剩下70%是植物在时间轴上的生长。</p>
-        <p><strong>映射：</strong>园林设计的本质 = 一个跨期的财务模型（初始投资=在建工程，植物生长=资产增值）。</p>
-        <p><strong>结论：</strong>元架构不仅能让旧知识解释新领域，还能让新领域的独特视角反过来增强旧领域。</p>
+                <div class="detail-card" id="card-step2">
+                    <div class="step">第 2 步</div>
+                    <h3>CAD → 乐高</h3>
+                    <span class="analogy-tag">类比：零件清单 = BOM 表</span>
+                    <p>拼装步骤 = 装配体配合关系。</p>
+                    <div class="conclusion">✅ CAD 就是在虚拟空间里玩乐高。</div>
+                    <a href="#" class="jump-btn">查看完整推导 <span class="arrow">→</span></a>
+                </div>
 
-        <h3>第五步：运营 → 工程</h3>
-        <p><strong>提炼：</strong>顶尖运营的内核 = 系统构建能力 + 资源编排能力 + 反馈闭环思维。</p>
-        <p><strong>映射：</strong>这套内核和工程管理的PDCA循环完全同构。</p>
-        <p><strong>结论：</strong>所有领域的顶尖者，学的不是那个领域的知识，而是从那个领域里提炼出一套通用操作系统。</p>
+                <div class="detail-card" id="card-step3">
+                    <div class="step">第 3 步</div>
+                    <h3>电池 → CAD 装配体</h3>
+                    <span class="analogy-tag">类比：电池组合 = 零件装配</span>
+                    <p>高能量 + 高功率电池通过智能管理“装配”。</p>
+                    <div class="conclusion">✅ 电池突破点可能在系统架构，不只在材料化学。</div>
+                    <a href="#" class="jump-btn">查看完整推导 <span class="arrow">→</span></a>
+                </div>
 
-        <h3>第六步：工程管理 → 大模型</h3>
-        <p><strong>洞察：</strong>大模型生成文本，是一个Token一个Token地预测下一个字。</p>
-        <p><strong>映射：</strong>这本质上就是在每一个字上做一次PDCA。</p>
-        <p><strong>结论：</strong>大模型和工程管理，在底层逻辑上完全同构——都是在动态排列组合中，通过实时反馈修正，逼近最优解。</p>
+                <div class="detail-card" id="card-step4">
+                    <div class="step">第 4 步</div>
+                    <h3>园林 → 财务</h3>
+                    <span class="analogy-tag">类比：植物生长 = 资产增值</span>
+                    <p>种下去只完成 30%，剩下 70% 是时间轴上的生长。</p>
+                    <div class="conclusion">✅ 园林设计本质是一个跨期财务模型。</div>
+                    <a href="#" class="jump-btn">查看完整推导 <span class="arrow">→</span></a>
+                </div>
 
-        <h3>第七步：地质学（补上空间维度）</h3>
-        <p><strong>洞察：</strong>低空经济关注0-500米空域，对应地下0-500米是能源储存带。</p>
-        <p><strong>结论：</strong>元架构不仅能横跨学科，还能纵贯空间和时间尺度。</p>
+                <div class="detail-card" id="card-step5">
+                    <div class="step">第 5 步</div>
+                    <h3>运营 → 工程</h3>
+                    <span class="analogy-tag">类比：运营内核 = PDCA 循环</span>
+                    <p>系统构建 + 资源编排 + 反馈闭环。</p>
+                    <div class="conclusion">✅ 顶尖者学的不是领域知识，而是通用操作系统。</div>
+                    <a href="#" class="jump-btn">查看完整推导 <span class="arrow">→</span></a>
+                </div>
 
-        <h2>终极验证</h2>
-        <ul>
-            <li><strong>竞品抄不走</strong>：别人能抄输出的文档，但抄不走生成文档的能力。</li>
-            <li><strong>大脑不是知识库，是知识生成器</strong>：数据丢失也能靠元架构的推演能力从零重建。</li>
-            <li><strong>体系自洽</strong>：之前搭建的整个V4.0体系，在全部新知识的压力测试下，没有被推翻任何一个点。</li>
-        </ul>
+                <div class="detail-card" id="card-step6">
+                    <div class="step">第 6 步</div>
+                    <h3>工程管理 → 大模型</h3>
+                    <span class="analogy-tag">类比：Token 预测 = PDCA 循环</span>
+                    <p>大模型在每一个字上做一次 PDCA。</p>
+                    <div class="conclusion">✅ 大模型和工程管理在底层逻辑上完全同构。</div>
+                    <a href="#" class="jump-btn">查看完整推导 <span class="arrow">→</span></a>
+                </div>
 
-        <h2>乐高环节的特殊价值</h2>
-        <div class="highlight-box">
-            <p><strong>降维：</strong>把CAD从“专业工程软件”降到“童年积木游戏”，彻底破除对陌生领域的恐惧感。</p>
-            <p style="margin-top:8px;"><strong>验证普适性：</strong>证明元架构不需要任何专业门槛，任何人都可以用自己已有的经验去秒懂陌生领域。</p>
+                <div class="detail-card" id="card-step7" style="grid-column: 1 / -1;">
+                    <div class="step">第 7 步 · 补上空间维度</div>
+                    <h3>地质学</h3>
+                    <span class="analogy-tag">类比：低空 0-500 米 ↔ 地下 0-500 米</span>
+                    <p>低空经济对应地下能源储存带。</p>
+                    <div class="conclusion">✅ 元架构能横跨学科，还能纵贯空间和时间尺度。</div>
+                    <a href="#" class="jump-btn">查看完整推导 <span class="arrow">→</span></a>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ===== 乐高双塔 ===== -->
+        <div class="lego-tower">
+            <div class="tower-title">🧱 乐高双塔 · 类比映射的 AB 对照结构</div>
+            <div class="tower-sub">点击任意一行，跳转到下方对应的“塔图”详情 · 乐高是元架构的“通用翻译器”</div>
+
+            <div class="mapping-row" data-target="tower-card-1">
+                <div class="left">CAD 制图 <span class="sub">（专业工程软件）</span></div>
+                <div class="center-lego">🧱 乐高</div>
+                <div class="right">虚拟空间里的乐高 <span class="sub">（童年积木游戏）</span></div>
+            </div>
+
+            <div class="mapping-row" data-target="tower-card-2">
+                <div class="left">会计科目体系 <span class="sub">（财务分类分层）</span></div>
+                <div class="center-lego">🧱 乐高</div>
+                <div class="right">CAD 图层 <span class="sub">（制图分层管理）</span></div>
+            </div>
+
+            <div class="mapping-row" data-target="tower-card-3">
+                <div class="left">电池组合 <span class="sub">（物理储能单元）</span></div>
+                <div class="center-lego">🧱 乐高</div>
+                <div class="right">CAD 零件装配 <span class="sub">（系统集成思维）</span></div>
+            </div>
+
+            <div class="mapping-row" data-target="tower-card-4">
+                <div class="left">植物生长 <span class="sub">（时间轴上的自然演化）</span></div>
+                <div class="center-lego">🧱 乐高</div>
+                <div class="right">财务资产增值 <span class="sub">（跨期价值模型）</span></div>
+            </div>
+
+            <div class="mapping-row" data-target="tower-card-5">
+                <div class="left">运营内核 <span class="sub">（系统构建 + 资源编排）</span></div>
+                <div class="center-lego">🧱 乐高</div>
+                <div class="right">工程 PDCA 循环 <span class="sub">（计划-执行-检查-改进）</span></div>
+            </div>
+
+            <div class="mapping-row" data-target="tower-card-6">
+                <div class="left">Token 预测 <span class="sub">（大模型逐字推理）</span></div>
+                <div class="center-lego">🧱 乐高</div>
+                <div class="right">PDCA 循环 <span class="sub">（动态反馈修正）</span></div>
+            </div>
+
+            <div class="mapping-row" data-target="tower-card-7">
+                <div class="left">低空 0-500 米 <span class="sub">（无人机空域）</span></div>
+                <div class="center-lego">🧱 乐高</div>
+                <div class="right">地下 0-500 米能源带 <span class="sub">（空间尺度迁移）</span></div>
+            </div>
+
+            <div style="margin-top: 16px; padding-top: 14px; border-top: 1px solid #1e293b; text-align: center; color: #94a3b8; font-size: 14px;">
+                💡 乐高是元架构的“通用翻译器” —— 左边是输入，右边是输出，中间是降维/升维的枢纽。
+            </div>
+        </div>
+
+        <!-- ===== 塔图卡片区 ===== -->
+        <div class="tower-detail-section">
+            <h2>📐 塔图 · 每个映射的完整推导</h2>
+
+            <div class="tower-card" id="tower-card-1">
+                <div class="tower-step">映射 1</div>
+                <h3>CAD 制图 → 虚拟空间里的乐高</h3>
+                <span class="tower-analogy">🧱 乐高锚点：拼装 = 装配体</span>
+                <p>CAD 制图的本质是在虚拟空间里组装零件，和玩乐高的逻辑完全一致。零件清单 = BOM 表，拼装步骤 = 装配体配合关系。</p>
+                <div class="tower-conclusion">✅ 任何拼过乐高的人，都已经具备理解 CAD 底层逻辑的直观经验。</div>
+                <a href="#" class="tower-jump">查看完整推导 <span class="arrow">→</span></a>
+            </div>
+
+            <div class="tower-card" id="tower-card-2">
+                <div class="tower-step">映射 2</div>
+                <h3>会计科目体系 → CAD 图层</h3>
+                <span class="tower-analogy">🧱 乐高锚点：分层 = 分类管理</span>
+                <p>会计科目体系按资产、负债、权益分类分层管理，和 CAD 图层的逻辑完全一致。图层 = 会计科目体系，图块 = 标准凭证模板。</p>
+                <div class="tower-conclusion">✅ CAD 就是一个可视化的会计信息系统。</div>
+                <a href="#" class="tower-jump">查看完整推导 <span class="arrow">→</span></a>
+            </div>
+
+            <div class="tower-card" id="tower-card-3">
+                <div class="tower-step">映射 3</div>
+                <h3>电池组合 → CAD 零件装配</h3>
+                <span class="tower-analogy">🧱 乐高锚点：组合 = 装配</span>
+                <p>高能量密度电池和高功率密度电池通过智能管理系统“装配”在一起，和 CAD 里把多个零件装配成一个整体完全同构。</p>
+                <div class="tower-conclusion">✅ 电池的突破点，不一定只在材料化学里，也可能在系统架构里。</div>
+                <a href="#" class="tower-jump">查看完整推导 <span class="arrow">→</span></a>
+            </div>
+
+            <div class="tower-card" id="tower-card-4">
+                <div class="tower-step">映射 4</div>
+                <h3>植物生长 → 财务资产增值</h3>
+                <span class="tower-analogy">🧱 乐高锚点：生长 = 时间轴上的价值变化</span>
+                <p>园林设计里，种下去只完成 30%，剩下 70% 是植物在时间轴上的生长。这和财务资产增值的跨期模型完全同构。</p>
+                <div class="tower-conclusion">✅ 园林设计的本质 = 一个跨期的财务模型（初始投资 = 在建工程，植物生长 = 资产增值）。</div>
+                <a href="#" class="tower-jump">查看完整推导 <span class="arrow">→</span></a>
+            </div>
+
+            <div class="tower-card" id="tower-card-5">
+                <div class="tower-step">映射 5</div>
+                <h3>运营内核 → 工程 PDCA 循环</h3>
+                <span class="tower-analogy">🧱 乐高锚点：系统构建 = PDCA 循环</span>
+                <p>顶尖运营的内核 = 系统构建能力 + 资源编排能力 + 反馈闭环思维，和工程管理的 PDCA 循环完全同构。</p>
+                <div class="tower-conclusion">✅ 所有领域的顶尖者，学的不是那个领域的知识，而是从那个领域里提炼出一套通用操作系统。</div>
+                <a href="#" class="tower-jump">查看完整推导 <span class="arrow">→</span></a>
+            </div>
+
+            <div class="tower-card" id="tower-card-6">
+                <div class="tower-step">映射 6</div>
+                <h3>Token 预测 → PDCA 循环</h3>
+                <span class="tower-analogy">🧱 乐高锚点：逐字推理 = 实时反馈修正</span>
+                <p>大模型生成文本，是一个 Token 一个 Token 地预测下一个字，本质上就是在每一个字上做一次 PDCA。</p>
+                <div class="tower-conclusion">✅ 大模型和工程管理，在底层逻辑上完全同构——都是在动态排列组合中，通过实时反馈修正，逼近最优解。</div>
+                <a href="#" class="tower-jump">查看完整推导 <span class="arrow">→</span></a>
+            </div>
+
+            <div class="tower-card" id="tower-card-7">
+                <div class="tower-step">映射 7</div>
+                <h3>低空 0-500 米 → 地下 0-500 米能源带</h3>
+                <span class="tower-analogy">🧱 乐高锚点：空间尺度迁移</span>
+                <p>低空经济关注 0-500 米空域，对应地下 0-500 米是能源储存带。同一套空间尺度逻辑，从空中迁移到地下。</p>
+                <div class="tower-conclusion">✅ 元架构不仅能横跨学科，还能纵贯空间和时间尺度。</div>
+                <a href="#" class="tower-jump">查看完整推导 <span class="arrow">→</span></a>
+            </div>
+        </div>
+
+        <!-- ===== 用积木降维复杂世界（已删除“一休拼乐高”文字） ===== -->
+        <div class="ikkyu-lego-scene">
+            <div class="scene-title">🧱 <span>用积木降维复杂世界</span></div>
+
+            <div class="scene-container">
+
+                <!-- 一休小人 -->
+                <div class="ikkyu-figure">
+                    <div class="head">
+                        <div class="eye eye-left"></div>
+                        <div class="eye eye-right"></div>
+                    </div>
+                    <div class="arm"></div>
+                    <div class="body"></div>
+                </div>
+
+                <!-- 乐高积木堆 -->
+                <div class="lego-bricks">
+                    <div class="row">
+                        <div class="lego-brick blue"></div>
+                        <div class="lego-brick red"></div>
+                        <div class="lego-brick blue"></div>
+                    </div>
+                    <div class="row">
+                        <div class="lego-brick purple"></div>
+                        <div class="lego-brick blue"></div>
+                        <div class="lego-brick green"></div>
+                        <div class="lego-brick red"></div>
+                    </div>
+                    <div class="row">
+                        <div class="lego-brick green"></div>
+                        <div class="lego-brick purple"></div>
+                        <div class="lego-brick red"></div>
+                        <div class="lego-brick blue"></div>
+                        <div class="lego-brick green"></div>
+                    </div>
+                    <div class="row">
+                        <div class="lego-brick red"></div>
+                        <div class="lego-brick blue"></div>
+                        <div class="lego-brick purple"></div>
+                        <div class="lego-brick green"></div>
+                        <div class="lego-brick red"></div>
+                        <div class="lego-brick blue"></div>
+                    </div>
+                    <div class="row">
+                        <div class="lego-brick blue"></div>
+                        <div class="lego-brick green"></div>
+                        <div class="lego-brick red"></div>
+                        <div class="lego-brick purple"></div>
+                        <div class="lego-brick blue"></div>
+                    </div>
+                </div>
+
+                <!-- 数学符号云 -->
+                <div class="math-cloud">
+                    <span class="symbol">∫</span>
+                    <span class="symbol">∑</span>
+                    <span class="symbol">∂</span>
+                    <span class="symbol">π</span>
+                    <span class="symbol">∞</span>
+                    <span class="symbol">√</span>
+                    <span class="symbol">λ</span>
+                    <span class="symbol">Δ</span>
+                    <span class="symbol">∇</span>
+                    <span class="symbol">Φ</span>
+                    <span class="symbol">θ</span>
+                    <span class="symbol">ω</span>
+                </div>
+
+            </div>
+
+            <!-- 底部说明 -->
+            <div class="scene-footer">
+                <div class="item">
+                    <div class="tag">🧱 降维</div>
+                    <p>把 CAD 从<strong>“专业工程软件”</strong>降到<strong>“童年积木游戏”</strong>，彻底破除对陌生领域的恐惧感。</p>
+                </div>
+                <div class="item">
+                    <div class="tag">🧩 验证普适性</div>
+                    <p>元架构<strong>不需要任何专业门槛</strong>，任何人都可以用自己已有的经验去秒懂陌生领域。</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== 终极验证 ===== -->
+        <h2 style="font-size:20px; font-weight:600; color:#f1f5f9; margin-top:16px; padding-bottom:8px; border-bottom:1px solid #1e293b;">⚡ 终极验证</h2>
+        <div class="verify-grid">
+            <div class="verify-card">
+                <div class="icon">🚫</div>
+                <h4>竞品抄不走</h4>
+                <p>别人能抄输出的文档，但抄不走生成文档的能力。</p>
+            </div>
+            <div class="verify-card">
+                <div class="icon">🧠</div>
+                <h4>大脑是生成器</h4>
+                <p>数据丢失也能靠元架构的推演能力从零重建。</p>
+            </div>
+            <div class="verify-card">
+                <div class="icon">🔗</div>
+                <h4>体系自洽</h4>
+                <p>V4.0 体系在全部新知识的压力测试下，没有被推翻任何一个点。</p>
+            </div>
         </div>
 
         <a href="index.html" class="back-link">← 返回 Y.Mine 作品集首页</a>
 
     </div>
+
+    <script>
+        // ===== 节点数据 =====
+        const nodesData = [{
+            id: 'n1',
+            title: '财务 → CAD',
+            analogy: '图层 = 会计科目',
+            x: 0.12,
+            y: 0.15,
+            target: 'card-step1'
+        }, {
+            id: 'n2',
+            title: 'CAD → 乐高',
+            analogy: '拼装 = 装配体',
+            x: 0.88,
+            y: 0.12,
+            target: 'card-step2'
+        }, {
+            id: 'n3',
+            title: '电池 → CAD',
+            analogy: '电池组合 = 零件',
+            x: 0.92,
+            y: 0.45,
+            target: 'card-step3'
+        }, {
+            id: 'n4',
+            title: '园林 → 财务',
+            analogy: '生长 = 资产增值',
+            x: 0.78,
+            y: 0.82,
+            target: 'card-step4'
+        }, {
+            id: 'n5',
+            title: '运营 → 工程',
+            analogy: '运营 = PDCA',
+            x: 0.45,
+            y: 0.88,
+            target: 'card-step5'
+        }, {
+            id: 'n6',
+            title: '工程管理 → 大模型',
+            analogy: 'Token = PDCA',
+            x: 0.15,
+            y: 0.78,
+            target: 'card-step6'
+        }, {
+            id: 'n7',
+            title: '地质学',
+            analogy: '低空 ↔ 地下',
+            x: 0.08,
+            y: 0.48,
+            target: 'card-step7'
+        }];
+
+        const mindmap = document.getElementById('mindmap');
+        const svg = document.getElementById('mindmapSvg');
+
+        function placeNodes() {
+            const rect = mindmap.getBoundingClientRect();
+            const w = mindmap.clientWidth || rect.width || 800;
+            const h = mindmap.clientHeight || rect.height || 500;
+
+            const container = mindmap;
+            nodesData.forEach(node => {
+                const px = node.x * w;
+                const py = node.y * h;
+
+                let el = document.getElementById(node.id);
+                if (!el) {
+                    el = document.createElement('div');
+                    el.id = node.id;
+                    el.className = 'radial-node';
+                    container.appendChild(el);
+                }
+                el.style.left = (px - 60) + 'px';
+                el.style.top = (py - 30) + 'px';
+                el.innerHTML = `
+                        <div class="label">迁移</div>
+                        <div class="title">${node.title}</div>
+                        <div class="analogy">${node.analogy}</div>
+                    `;
+
+                el.addEventListener('click', function() {
+                    const target = document.getElementById(node.target);
+                    if (target) {
+                        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        target.style.transition = 'border-color 0.3s';
+                        target.style.borderColor = '#3b82f6';
+                        setTimeout(() => {
+                            target.style.borderColor = '';
+                        }, 1200);
+                    }
+                });
+            });
+
+            const cx = w / 2;
+            const cy = h / 2;
+            const padding = 70;
+
+            let svgContent = '';
+            nodesData.forEach(node => {
+                const px = node.x * w;
+                const py = node.y * h;
+                const dx = px - cx;
+                const dy = py - cy;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist < 10) return;
+                const ratio = (dist - padding) / dist;
+                const startX = cx + dx * (1 - ratio);
+                const startY = cy + dy * (1 - ratio);
+                svgContent += `<line x1="${startX}" y1="${startY}" x2="${px}" y2="${py}" />`;
+            });
+
+            svg.innerHTML = svgContent;
+        }
+
+        setTimeout(placeNodes, 50);
+
+        let resizeTimer;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(placeNodes, 200);
+        });
+
+        // ===== 乐高双塔点击联动 =====
+        document.querySelectorAll('.mapping-row').forEach(row => {
+            row.addEventListener('click', function() {
+                const targetId = this.dataset.target;
+                const target = document.getElementById(targetId);
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    target.style.transition = 'border-color 0.3s, box-shadow 0.3s';
+                    target.style.borderColor = '#facc15';
+                    target.style.boxShadow = '0 0 30px rgba(250, 204, 21, 0.08)';
+                    setTimeout(() => {
+                        target.style.borderColor = '';
+                        target.style.boxShadow = '';
+                    }, 1500);
+                }
+            });
+        });
+    </script>
 
 </body>
 </html>
