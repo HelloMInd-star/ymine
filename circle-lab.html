@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>画圈实验 · 认知方法论</title>
     <style>
-        /* ===== 重置 ===== */
         * {
             margin: 0;
             padding: 0;
@@ -18,7 +17,6 @@
             min-height: 100vh;
             padding: 24px 20px;
             overflow-x: hidden;
-            cursor: default;
         }
 
         #glow {
@@ -33,168 +31,8 @@
             transition: background 0.1s;
         }
 
-        /* ===== 折叠式侧边目录 ===== */
-        .sidebar-toggle {
-            position: fixed;
-            top: 28px;
-            left: 28px;
-            z-index: 1000;
-            background: rgba(20, 20, 40, 0.7);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            border-radius: 12px;
-            padding: 10px 12px;
-            cursor: pointer;
-            color: rgba(255, 255, 255, 0.4);
-            font-size: 20px;
-            transition: all 0.3s ease;
-            line-height: 1;
-        }
-
-        .sidebar-toggle:hover {
-            background: rgba(30, 30, 60, 0.8);
-            color: rgba(255, 255, 255, 0.8);
-            border-color: rgba(167, 139, 250, 0.15);
-        }
-
-        .sidebar-toggle .label {
-            font-size: 10px;
-            display: block;
-            text-align: center;
-            letter-spacing: 0.5px;
-            margin-top: 2px;
-            color: rgba(255, 255, 255, 0.15);
-        }
-
-        .sidebar-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 998;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s ease;
-        }
-
-        .sidebar-overlay.active {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        .sidebar-nav {
-            position: fixed;
-            top: 0;
-            left: -320px;
-            width: 280px;
-            height: 100vh;
-            background: rgba(15, 15, 35, 0.95);
-            backdrop-filter: blur(20px);
-            border-right: 1px solid rgba(255, 255, 255, 0.04);
-            z-index: 999;
-            padding: 32px 20px 24px;
-            transition: left 0.35s cubic-bezier(0.22, 1, 0.36, 1);
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .sidebar-nav.open {
-            left: 0;
-        }
-
-        .sidebar-nav::-webkit-scrollbar {
-            width: 3px;
-        }
-        .sidebar-nav::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        .sidebar-nav::-webkit-scrollbar-thumb {
-            background: rgba(167, 139, 250, 0.15);
-            border-radius: 4px;
-        }
-
-        .sidebar-nav .nav-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding-bottom: 16px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-            margin-bottom: 16px;
-        }
-
-        .sidebar-nav .nav-header .title {
-            font-size: 14px;
-            font-weight: 700;
-            color: #f1f5f9;
-        }
-
-        .sidebar-nav .nav-header .title span {
-            color: #a78bfa;
-        }
-
-        .sidebar-nav .nav-header .close-btn {
-            background: none;
-            border: none;
-            color: rgba(255, 255, 255, 0.2);
-            font-size: 18px;
-            cursor: pointer;
-            transition: color 0.3s ease;
-            padding: 4px 6px;
-        }
-
-        .sidebar-nav .nav-header .close-btn:hover {
-            color: rgba(255, 255, 255, 0.6);
-        }
-
-        .sidebar-nav .nav-item {
-            display: block;
-            padding: 8px 14px;
-            margin-bottom: 2px;
-            border-radius: 8px;
-            color: rgba(255, 255, 255, 0.35);
-            font-size: 13px;
-            font-weight: 500;
-            text-decoration: none;
-            transition: all 0.2s ease;
-            cursor: pointer;
-            border-left: 2px solid transparent;
-        }
-
-        .sidebar-nav .nav-item:hover {
-            background: rgba(255, 255, 255, 0.03);
-            color: rgba(255, 255, 255, 0.7);
-            border-left-color: rgba(167, 139, 250, 0.2);
-        }
-
-        .sidebar-nav .nav-item .num {
-            display: inline-block;
-            width: 20px;
-            font-size: 11px;
-            color: rgba(255, 255, 255, 0.12);
-            margin-right: 6px;
-        }
-
-        .sidebar-nav .nav-divider {
-            border: none;
-            border-top: 1px solid rgba(255, 255, 255, 0.03);
-            margin: 8px 0 12px;
-        }
-
-        .sidebar-nav .nav-footer {
-            margin-top: auto;
-            padding-top: 16px;
-            border-top: 1px solid rgba(255, 255, 255, 0.03);
-            font-size: 11px;
-            color: rgba(255, 255, 255, 0.1);
-            text-align: center;
-        }
-
-        /* ===== 主容器 ===== */
         .page-wrapper {
-            max-width: 1400px;
+            max-width: 1200px;
             margin: 0 auto;
             background: radial-gradient(ellipse at 30% 30%, #120b24, #0b0b1a 70%, #05030a);
             border-radius: 32px;
@@ -205,33 +43,39 @@
             z-index: 1;
         }
 
-        /* ===== 顶部：映射对照表 ===== */
+        /* ===== 通用标题 ===== */
+        .section-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: #f1f5f9;
+            padding: 24px 40px 8px;
+            letter-spacing: -0.3px;
+        }
+
+        .section-title span {
+            color: #a78bfa;
+        }
+
+        .section-sub {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.25);
+            padding: 0 40px 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        /* ===== 第一层：映射对照 ===== */
         .mapping-header {
             display: flex;
             border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-            scroll-margin-top: 16px;
         }
 
         .mapping-header .col {
             flex: 1;
-            padding: 32px 28px 28px;
-            max-height: 260px;
-            overflow-y: auto;
+            padding: 32px 36px 28px;
         }
 
         .mapping-header .col:first-child {
             border-right: 1px solid rgba(255, 255, 255, 0.04);
-        }
-
-        .mapping-header .col::-webkit-scrollbar {
-            width: 4px;
-        }
-        .mapping-header .col::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        .mapping-header .col::-webkit-scrollbar-thumb {
-            background: rgba(167, 139, 250, 0.2);
-            border-radius: 4px;
         }
 
         .mapping-header .col .col-label {
@@ -239,11 +83,11 @@
             text-transform: uppercase;
             letter-spacing: 1.5px;
             color: rgba(255, 255, 255, 0.2);
-            margin-bottom: 12px;
+            margin-bottom: 14px;
             font-weight: 600;
         }
 
-        .mapping-header .col .col-label .highlight {
+        .mapping-header .col .col-label .hl {
             color: #a78bfa;
         }
 
@@ -283,31 +127,13 @@
             color: #fbbf24;
         }
 
-        /* ===== 第2层：核心路径 ===== */
-        .core-path {
-            padding: 32px 40px 28px;
+        /* ===== 第二层：核心路径 ===== */
+        .core-section {
+            padding: 28px 40px 24px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-            scroll-margin-top: 16px;
         }
 
-        .core-path .path-title {
-            font-size: 20px;
-            font-weight: 700;
-            color: #f1f5f9;
-            margin-bottom: 4px;
-        }
-
-        .core-path .path-title span {
-            color: #a78bfa;
-        }
-
-        .core-path .path-sub {
-            font-size: 14px;
-            color: rgba(255, 255, 255, 0.3);
-            margin-bottom: 14px;
-        }
-
-        .core-path .path-flow {
+        .core-section .path-flow {
             display: flex;
             flex-wrap: wrap;
             align-items: center;
@@ -319,7 +145,7 @@
             margin-bottom: 12px;
         }
 
-        .core-path .path-flow .s {
+        .core-section .path-flow .s {
             background: rgba(167, 139, 250, 0.08);
             color: rgba(255, 255, 255, 0.65);
             padding: 4px 16px;
@@ -328,46 +154,46 @@
             font-weight: 500;
         }
 
-        .core-path .path-flow .s.highlight {
+        .core-section .path-flow .s.highlight {
             background: rgba(167, 139, 250, 0.18);
             color: #a78bfa;
         }
 
-        .core-path .path-flow .arrow {
+        .core-section .path-flow .arrow {
             color: rgba(255, 255, 255, 0.1);
             font-size: 14px;
         }
 
-        .core-path .path-desc {
+        .core-section .path-desc {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 12px 24px;
+            gap: 6px 24px;
             font-size: 13px;
             color: rgba(255, 255, 255, 0.45);
             line-height: 1.6;
         }
 
-        .core-path .path-desc .item {
+        .core-section .path-desc .item {
             display: flex;
             align-items: baseline;
             gap: 6px;
         }
 
-        .core-path .path-desc .item .tag {
+        .core-section .path-desc .item .tag {
             color: rgba(255, 255, 255, 0.2);
             font-weight: 500;
             min-width: 28px;
         }
 
-        .core-path .path-desc .item .val {
+        .core-section .path-desc .item .val {
             color: rgba(255, 255, 255, 0.6);
         }
 
-        .core-path .path-desc .item .val .hl {
+        .core-section .path-desc .item .val .hl {
             color: #a78bfa;
         }
 
-        .core-path .path-econ {
+        .core-section .path-econ {
             margin-top: 12px;
             background: rgba(167, 139, 250, 0.03);
             border-left: 3px solid #a78bfa;
@@ -378,14 +204,13 @@
             line-height: 1.7;
         }
 
-        .core-path .path-econ strong {
+        .core-section .path-econ strong {
             color: rgba(255, 255, 255, 0.7);
         }
 
-        /* ===== 第3层：左右对照（四个模式） ===== */
+        /* ===== 第三层：四个模式 ===== */
         .mode-block {
             border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-            scroll-margin-top: 16px;
         }
 
         .mode-block:last-of-type {
@@ -393,7 +218,7 @@
         }
 
         .mode-block .mode-label {
-            padding: 14px 40px 4px;
+            padding: 16px 40px 4px;
             font-size: 12px;
             text-transform: uppercase;
             letter-spacing: 1px;
@@ -405,66 +230,46 @@
             color: #a78bfa;
         }
 
-        .split-layout {
+        .mode-split {
             display: flex;
             gap: 0;
             padding: 0 0 8px 0;
         }
 
-        /* 左侧：理论 */
-        .theory-panel {
-            width: 42%;
-            padding: 16px 28px 20px 32px;
+        .mode-split .theory {
+            width: 34%;
+            padding: 12px 20px 16px 32px;
             border-right: 1px solid rgba(255, 255, 255, 0.04);
-            overflow-y: auto;
-            max-height: 380px;
-            flex-shrink: 0;
         }
 
-        .theory-panel::-webkit-scrollbar {
-            width: 4px;
-        }
-        .theory-panel::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        .theory-panel::-webkit-scrollbar-thumb {
-            background: rgba(167, 139, 250, 0.15);
-            border-radius: 4px;
-        }
-
-        .theory-panel .th-title {
-            font-size: 16px;
+        .mode-split .theory .th-title {
+            font-size: 15px;
             font-weight: 600;
             color: #f1f5f9;
-            margin-bottom: 4px;
+            margin-bottom: 2px;
         }
 
-        .theory-panel .th-sub {
+        .mode-split .theory .th-sub {
             font-size: 12px;
-            color: rgba(255, 255, 255, 0.25);
+            color: rgba(255, 255, 255, 0.2);
             margin-bottom: 8px;
         }
 
-        .theory-panel .th-item {
+        .mode-split .theory .th-item {
             font-size: 13px;
             color: rgba(255, 255, 255, 0.45);
             line-height: 1.6;
-            margin-bottom: 4px;
+            margin-bottom: 2px;
             padding-left: 12px;
-            border-left: 2px solid rgba(167, 139, 250, 0.1);
+            border-left: 2px solid rgba(167, 139, 250, 0.08);
         }
 
-        .theory-panel .th-item .hl {
+        .mode-split .theory .th-item .hl {
             color: #a78bfa;
             font-weight: 500;
         }
 
-        .theory-panel .th-item .hl-blue {
-            color: #60a5fa;
-            font-weight: 500;
-        }
-
-        .theory-panel .th-conclusion {
+        .mode-split .theory .th-conclusion {
             margin-top: 8px;
             font-size: 12px;
             color: rgba(255, 255, 255, 0.35);
@@ -472,72 +277,58 @@
             padding-top: 8px;
         }
 
-        .theory-panel .th-conclusion strong {
+        .mode-split .theory .th-conclusion strong {
             color: rgba(255, 255, 255, 0.55);
         }
 
-        /* 右侧：演示 */
-        .demo-panel {
+        .mode-split .demo {
             flex: 1;
-            padding: 16px 32px 20px 28px;
-            overflow-y: auto;
-            max-height: 380px;
+            padding: 12px 32px 16px 24px;
             display: flex;
             flex-direction: column;
             justify-content: center;
         }
 
-        .demo-panel::-webkit-scrollbar {
-            width: 4px;
-        }
-        .demo-panel::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        .demo-panel::-webkit-scrollbar-thumb {
-            background: rgba(167, 139, 250, 0.15);
-            border-radius: 4px;
-        }
-
-        .demo-panel .demo-label {
+        .mode-split .demo .demo-label {
             font-size: 10px;
             text-transform: uppercase;
             letter-spacing: 1px;
-            color: rgba(255, 255, 255, 0.1);
-            margin-bottom: 8px;
+            color: rgba(255, 255, 255, 0.08);
+            margin-bottom: 6px;
             text-align: center;
         }
 
-        .demo-panel .canvas-wrapper {
+        .mode-split .demo .canvas-wrap {
             background: rgba(255, 255, 255, 0.02);
             border-radius: 16px;
-            padding: 10px;
+            padding: 8px;
             border: 1px solid rgba(255, 255, 255, 0.04);
             margin-bottom: 10px;
         }
 
-        .demo-panel canvas {
+        .mode-split .demo canvas {
             display: block;
             width: 100%;
             height: auto;
             background: rgba(255, 255, 255, 0.02);
             border-radius: 12px;
-            box-shadow: inset 0 2px 12px rgba(0, 0, 0, 0.3);
+            aspect-ratio: 16 / 7;
         }
 
-        .demo-panel .controls {
+        .mode-split .demo .controls {
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
             gap: 10px 14px;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
 
-        .demo-panel .controls .control-group {
+        .mode-split .demo .controls .ctrl {
             display: flex;
             flex-direction: column;
             gap: 2px;
         }
 
-        .demo-panel .controls .control-group label {
+        .mode-split .demo .controls .ctrl label {
             font-size: 11px;
             font-weight: 500;
             color: rgba(255, 255, 255, 0.3);
@@ -545,12 +336,12 @@
             justify-content: space-between;
         }
 
-        .demo-panel .controls .control-group label span {
+        .mode-split .demo .controls .ctrl label span {
             color: #a78bfa;
             font-weight: 600;
         }
 
-        .demo-panel .controls input[type="range"] {
+        .mode-split .demo .controls input[type="range"] {
             width: 100%;
             accent-color: #a78bfa;
             height: 3px;
@@ -560,7 +351,7 @@
             appearance: none;
         }
 
-        .demo-panel .controls input[type="range"]::-webkit-slider-thumb {
+        .mode-split .demo .controls input[type="range"]::-webkit-slider-thumb {
             -webkit-appearance: none;
             appearance: none;
             width: 12px;
@@ -568,10 +359,9 @@
             border-radius: 50%;
             background: #a78bfa;
             cursor: pointer;
-            box-shadow: 0 0 16px rgba(167, 139, 250, 0.15);
         }
 
-        .demo-panel .feedback {
+        .mode-split .demo .feedback {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 6px;
@@ -579,37 +369,37 @@
             border: 1px solid rgba(255, 255, 255, 0.04);
             border-radius: 12px;
             padding: 10px 14px;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
 
-        .demo-panel .feedback .fb-item {
+        .mode-split .demo .feedback .fb {
             display: flex;
             flex-direction: column;
         }
 
-        .demo-panel .feedback .fb-item .label {
+        .mode-split .demo .feedback .fb .lbl {
             color: rgba(255, 255, 255, 0.15);
             font-size: 9px;
         }
 
-        .demo-panel .feedback .fb-item .value {
+        .mode-split .demo .feedback .fb .val {
             font-weight: 600;
             color: #f1f5f9;
             font-size: 14px;
             margin-top: 1px;
         }
 
-        .demo-panel .feedback .fb-item .value.highlight {
+        .mode-split .demo .feedback .fb .val.highlight {
             color: #a78bfa;
         }
 
-        .demo-panel .actions {
+        .mode-split .demo .actions {
             display: flex;
             gap: 8px;
             justify-content: center;
         }
 
-        .demo-panel .actions button {
+        .mode-split .demo .actions button {
             padding: 5px 16px;
             border: none;
             border-radius: 16px;
@@ -622,28 +412,27 @@
             border: 1px solid rgba(255, 255, 255, 0.04);
         }
 
-        .demo-panel .actions button.primary {
+        .mode-split .demo .actions button.primary {
             background: rgba(167, 139, 250, 0.12);
             color: #a78bfa;
             border-color: rgba(167, 139, 250, 0.12);
         }
 
-        .demo-panel .actions button.primary:hover {
+        .mode-split .demo .actions button.primary:hover {
             background: rgba(167, 139, 250, 0.22);
             transform: translateY(-2px);
         }
 
-        .demo-panel .actions button:hover {
+        .mode-split .demo .actions button:hover {
             background: rgba(255, 255, 255, 0.06);
             color: #f1f5f9;
             transform: translateY(-2px);
         }
 
-        /* ===== 第4层：迁移延伸 ===== */
+        /* ===== 第四层：封顶 + 延伸方向（标签化） ===== */
         .extension-section {
-            padding: 28px 40px 32px;
+            padding: 32px 40px 28px;
             border-top: 1px solid rgba(255, 255, 255, 0.04);
-            scroll-margin-top: 16px;
         }
 
         .extension-section .ext-title {
@@ -662,51 +451,83 @@
             text-align: center;
             font-size: 13px;
             color: rgba(255, 255, 255, 0.2);
-            margin-bottom: 14px;
+            margin-bottom: 16px;
         }
 
         .extension-section .ext-grid {
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
-            gap: 10px 16px;
+            gap: 10px 14px;
+            margin-bottom: 16px;
         }
 
         .extension-section .ext-grid .tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
             background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
             border-radius: 30px;
-            padding: 6px 18px;
+            padding: 8px 20px;
             font-size: 13px;
             color: rgba(255, 255, 255, 0.4);
+            text-decoration: none;
             transition: all 0.3s ease;
+            cursor: pointer;
         }
 
         .extension-section .ext-grid .tag:hover {
-            background: rgba(167, 139, 250, 0.04);
-            border-color: rgba(167, 139, 250, 0.1);
+            background: rgba(167, 139, 250, 0.06);
+            border-color: rgba(167, 139, 250, 0.15);
             color: rgba(255, 255, 255, 0.7);
+            transform: translateY(-2px);
         }
 
         .extension-section .ext-grid .tag .hl {
             color: #a78bfa;
         }
 
+        .extension-section .ext-grid .tag .lock {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.1);
+        }
+
         .extension-section .ext-footer {
             text-align: center;
-            margin-top: 16px;
             font-size: 12px;
             color: rgba(255, 255, 255, 0.1);
             border-top: 1px solid rgba(255, 255, 255, 0.02);
             padding-top: 14px;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
         }
 
         .extension-section .ext-footer .infinity {
             color: #a78bfa;
-            font-size: 18px;
+            font-size: 16px;
         }
 
-        /* ===== 底部返回 ===== */
+        .extension-section .ext-footer .private-note {
+            color: rgba(255, 255, 255, 0.08);
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .extension-section .ext-footer .private-note .dot {
+            display: inline-block;
+            width: 4px;
+            height: 4px;
+            background: #22c55e;
+            border-radius: 50%;
+            opacity: 0.3;
+        }
+
+        /* ===== 底部 ===== */
         .back-bottom {
             text-align: center;
             padding: 20px 0 24px;
@@ -725,7 +546,7 @@
         }
 
         /* ===== 响应式 ===== */
-        @media (max-width: 1024px) {
+        @media (max-width: 900px) {
             .mapping-header {
                 flex-direction: column;
             }
@@ -734,183 +555,137 @@
                 border-bottom: 1px solid rgba(255, 255, 255, 0.04);
             }
             .mapping-header .col {
-                max-height: 200px;
-                padding: 20px 24px 18px;
+                padding: 24px 28px 20px;
             }
-            .core-path {
-                padding: 24px 24px 20px;
+            .section-title {
+                padding: 20px 28px 6px;
+                font-size: 19px;
             }
-            .core-path .path-desc {
+            .section-sub {
+                padding: 0 28px 12px;
+            }
+            .core-section {
+                padding: 20px 28px 18px;
+            }
+            .core-section .path-desc {
                 grid-template-columns: 1fr;
             }
             .mode-block .mode-label {
-                padding: 12px 24px 4px;
+                padding: 12px 28px 4px;
             }
-            .split-layout {
+            .mode-split {
                 flex-direction: column;
             }
-            .theory-panel {
+            .mode-split .theory {
                 width: 100%;
                 border-right: none;
                 border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-                max-height: 280px;
-                padding: 16px 24px 18px;
+                padding: 12px 28px 14px;
             }
-            .demo-panel {
-                max-height: 480px;
-                padding: 16px 24px 20px;
+            .mode-split .demo {
+                padding: 14px 28px 18px;
+            }
+            .mode-split .demo .controls {
+                grid-template-columns: 1fr 1fr;
+            }
+            .mode-split .demo .feedback {
+                grid-template-columns: 1fr 1fr;
             }
             .extension-section {
-                padding: 20px 24px 24px;
+                padding: 24px 28px 20px;
+            }
+            .extension-section .ext-grid {
+                gap: 8px 10px;
+            }
+            .extension-section .ext-grid .tag {
+                font-size: 12px;
+                padding: 6px 14px;
             }
         }
 
-        @media (max-width: 700px) {
+        @media (max-width: 600px) {
             body {
                 padding: 12px 10px;
             }
-            .sidebar-toggle {
-                top: 16px;
-                left: 16px;
-                padding: 8px 10px;
-                font-size: 16px;
-            }
-            .sidebar-nav {
-                width: 240px;
-                left: -260px;
-                padding: 24px 16px 20px;
-            }
-            .sidebar-nav.open {
-                left: 0;
-            }
             .mapping-header .col {
-                padding: 16px 16px 14px;
-                max-height: 160px;
+                padding: 18px 18px 16px;
             }
             .mapping-header .col .map-item .text {
                 font-size: 12px;
             }
-            .core-path {
-                padding: 18px 16px 16px;
-            }
-            .core-path .path-title {
+            .section-title {
+                padding: 16px 18px 4px;
                 font-size: 17px;
             }
-            .core-path .path-flow {
-                padding: 10px 14px;
-                gap: 4px 8px;
-            }
-            .core-path .path-flow .s {
+            .section-sub {
+                padding: 0 18px 10px;
                 font-size: 12px;
-                padding: 2px 12px;
             }
-            .core-path .path-econ {
-                font-size: 12px;
-                padding: 10px 14px;
+            .core-section {
+                padding: 16px 18px 14px;
+            }
+            .core-section .path-flow {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 4px;
+            }
+            .core-section .path-flow .arrow {
+                transform: rotate(90deg);
             }
             .mode-block .mode-label {
-                padding: 10px 16px 4px;
+                padding: 10px 18px 4px;
                 font-size: 10px;
             }
-            .theory-panel {
-                padding: 14px 16px 16px;
-                max-height: 240px;
+            .mode-split .theory {
+                padding: 10px 18px 12px;
             }
-            .theory-panel .th-title {
+            .mode-split .theory .th-title {
                 font-size: 14px;
             }
-            .demo-panel {
-                padding: 14px 12px 18px;
-                max-height: 420px;
-                min-height: 300px;
+            .mode-split .demo {
+                padding: 12px 14px 16px;
             }
-            .demo-panel .controls {
-                grid-template-columns: 1fr 1fr;
-                gap: 8px 12px;
+            .mode-split .demo .controls {
+                grid-template-columns: 1fr;
+                gap: 8px;
             }
-            .demo-panel .feedback {
-                grid-template-columns: 1fr 1fr;
-                padding: 8px 12px;
+            .mode-split .demo .feedback {
+                grid-template-columns: 1fr;
+                gap: 4px;
             }
             .extension-section {
-                padding: 16px 16px 20px;
+                padding: 18px 16px 16px;
             }
             .extension-section .ext-title {
                 font-size: 15px;
             }
             .extension-section .ext-grid {
-                gap: 6px 10px;
+                gap: 6px 8px;
             }
             .extension-section .ext-grid .tag {
                 font-size: 11px;
-                padding: 4px 12px;
+                padding: 5px 12px;
             }
-        }
-
-        @media (max-width: 480px) {
-            .demo-panel .controls {
-                grid-template-columns: 1fr;
-            }
-            .demo-panel .feedback {
-                grid-template-columns: 1fr;
-            }
-            .core-path .path-flow {
+            .extension-section .ext-footer {
                 flex-direction: column;
-                align-items: flex-start;
-                gap: 4px;
-            }
-            .core-path .path-flow .arrow {
-                transform: rotate(90deg);
-            }
-            .sidebar-nav {
-                width: 200px;
-                left: -220px;
-            }
-            .sidebar-nav.open {
-                left: 0;
+                gap: 8px;
             }
         }
     </style>
 </head>
 <body>
 
-    <!-- ===== 鼠标跟随光晕 ===== -->
     <div id="glow"></div>
 
-    <!-- ===== 折叠式侧边目录 ===== -->
-    <div class="sidebar-toggle" id="sidebarToggle">
-        ☰
-        <span class="label">目录</span>
-    </div>
-
-    <div class="sidebar-overlay" id="sidebarOverlay"></div>
-
-    <div class="sidebar-nav" id="sidebarNav">
-        <div class="nav-header">
-            <div class="title">画圈<span>实验</span></div>
-            <button class="close-btn" id="sidebarClose">✕</button>
-        </div>
-
-        <a class="nav-item" data-target="section-mapping"><span class="num">01</span> 映射对照</a>
-        <a class="nav-item" data-target="section-core"><span class="num">02</span> 核心路径 · 经济学应用</a>
-        <hr class="nav-divider" />
-        <a class="nav-item" data-target="section-math"><span class="num">03</span> 数学模式</a>
-        <a class="nav-item" data-target="section-econ"><span class="num">04</span> 经济模式</a>
-        <a class="nav-item" data-target="section-ai"><span class="num">05</span> AI 模式</a>
-        <a class="nav-item" data-target="section-lingua"><span class="num">06</span> 语言模式</a>
-        <hr class="nav-divider" />
-        <a class="nav-item" data-target="section-extension"><span class="num">∞</span> 迁移延伸</a>
-
-        <div class="nav-footer">EvolveMind · 认知系统</div>
-    </div>
-
-    <!-- ===== 主容器 ===== -->
     <div class="page-wrapper">
 
-        <!-- ===== 第1层：顶部映射表 ===== -->
-        <div class="mapping-header" id="section-mapping">
+        <!-- ===== 第一层：映射对照 ===== -->
+        <div class="section-title">🧠 画圈实验 · <span>3→1→1→3→100</span></div>
+        <div class="section-sub">认知方法论 · 原生思路 vs 科学对照</div>
+
+        <div class="mapping-header">
             <div class="col">
-                <div class="col-label">🧠 原生思路 <span class="highlight">· 你的推导</span></div>
+                <div class="col-label">🧠 原生思路 <span class="hl">· 你的推导</span></div>
                 <div class="map-item">
                     <span class="icon">💡</span>
                     <span class="text"><strong>从体感出发</strong> — 甩手时发现“手在画圈”，联想到“圈”可以作为认知训练的基本单元</span>
@@ -930,14 +705,14 @@
             </div>
 
             <div class="col">
-                <div class="col-label">🔬 科学对照 <span class="highlight">· 领域映射</span></div>
+                <div class="col-label">🔬 科学对照 <span class="hl">· 领域映射</span></div>
                 <div class="map-item">
                     <span class="icon">🧪</span>
-                    <span class="text"><strong>认知科学 · 奖励学习</strong> — 儿童通过画圈获得反馈，调整行为逼近目标值，和你用“框架反馈”训练认知高度同构</span>
+                    <span class="text"><strong>认知科学 · 奖励学习</strong> — 儿童通过画圈获得反馈，调整行为逼近目标值</span>
                 </div>
                 <div class="map-item">
                     <span class="icon">🏥</span>
-                    <span class="text"><strong>医学 · 阿尔兹海默症诊断</strong> — 画钟测试（CDT）通过“画圈”筛查认知障碍，你的画圈实验则是反过来“训练”认知能力</span>
+                    <span class="text"><strong>医学 · 阿尔兹海默症诊断</strong> — 画钟测试（CDT）通过“画圈”筛查认知障碍，你反过来“训练”认知能力</span>
                 </div>
                 <div class="map-item">
                     <span class="icon">📚</span>
@@ -950,11 +725,11 @@
             </div>
         </div>
 
-        <!-- ===== 第2层：核心路径 + 经济学应用 ===== -->
-        <div class="core-path" id="section-core">
-            <div class="path-title">核心路径 · <span>3→1→1→3→100</span></div>
-            <div class="path-sub">方法论骨架 · 先在经济/商业领域应用</div>
+        <!-- ===== 第二层：核心路径 ===== -->
+        <div class="section-title" style="border-top:1px solid rgba(255,255,255,0.04); padding-top:20px;">⚡ 核心路径 · <span>经济学应用</span></div>
+        <div class="section-sub">方法论骨架 · 先在经济/商业领域落地</div>
 
+        <div class="core-section">
             <div class="path-flow">
                 <span class="s highlight">3</span>
                 <span class="arrow">→</span>
@@ -976,18 +751,19 @@
             </div>
 
             <div class="path-econ">
-                <strong>💡 经济学应用：</strong>画圈实验的底层逻辑是“供给需求均衡”——需求在垂直方向波动，供给在水平方向波动，政策决定圆心的偏移。这个结构可以直接映射到市场分析、资源配置、博弈决策等商业场景。<br />
-                每一次逼近均衡，都是博弈双方达成暂时妥协；每一次远离均衡，都是博弈重新启动。这就是商业系统的<strong>动态循环</strong>。
+                <strong>💡 经济学应用：</strong>画圈实验的底层逻辑是“供给需求均衡”——需求在垂直方向波动，供给在水平方向波动，政策决定圆心的偏移。每一次逼近均衡，都是博弈双方达成暂时妥协；每一次远离均衡，都是博弈重新启动。这就是商业系统的<strong>动态循环</strong>。
             </div>
         </div>
 
-        <!-- ===== 第3层：左右对照 · 四个模式 ===== -->
+        <!-- ===== 第三层：四个模式 ===== -->
+        <div class="section-title" style="border-top:1px solid rgba(255,255,255,0.04); padding-top:20px;">📐 模式映射 · <span>理论 ↔ 实验</span></div>
+        <div class="section-sub">每个模式独立对照 · 数学 / 经济 / AI / 语言</div>
 
-        <!-- 数学模式 -->
-        <div class="mode-block" id="section-math">
+        <!-- 数学 -->
+        <div class="mode-block">
             <div class="mode-label">📐 <span class="hl">数学模式</span> · 静态平衡</div>
-            <div class="split-layout">
-                <div class="theory-panel">
+            <div class="mode-split">
+                <div class="theory">
                     <div class="th-title">鸡兔同笼 · 两个变量互相约束</div>
                     <div class="th-sub">圈静止 · 求方程解</div>
                     <div class="th-item"><span class="hl">需求</span> → 鸡的数量（垂直）</div>
@@ -996,34 +772,34 @@
                     <div class="th-item"><span class="hl">政策</span> → 腿数约束</div>
                     <div class="th-conclusion"><strong>结论：</strong>画圈实验是<span class="hl">线性方程组的可视化</span>——两个变量在圈上找到唯一解。</div>
                 </div>
-                <div class="demo-panel">
+                <div class="demo">
                     <div class="demo-label">⚡ 数学演示 · 方程求解</div>
-                    <div class="canvas-wrapper">
-                        <canvas id="canvasMath" width="600" height="280"></canvas>
+                    <div class="canvas-wrap">
+                        <canvas id="canvasMath" width="800" height="350"></canvas>
                     </div>
                     <div class="controls" style="grid-template-columns:1fr 1fr;">
-                        <div class="control-group">
+                        <div class="ctrl">
                             <label>头数 <span id="mathHeads">10</span></label>
                             <input type="range" id="mathHeadsInput" min="5" max="20" step="1" value="10">
                         </div>
-                        <div class="control-group">
+                        <div class="ctrl">
                             <label>腿数 <span id="mathLegs">28</span></label>
                             <input type="range" id="mathLegsInput" min="10" max="40" step="1" value="28">
                         </div>
                     </div>
                     <div class="feedback" style="grid-template-columns:1fr 1fr;">
-                        <div class="fb-item"><span class="label">鸡</span><span class="value highlight" id="mathChicken">6</span></div>
-                        <div class="fb-item"><span class="label">兔</span><span class="value highlight" id="mathRabbit">4</span></div>
+                        <div class="fb"><span class="lbl">鸡</span><span class="val highlight" id="mathChicken">6</span></div>
+                        <div class="fb"><span class="lbl">兔</span><span class="val highlight" id="mathRabbit">4</span></div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- 经济模式 -->
-        <div class="mode-block" id="section-econ">
+        <!-- 经济 -->
+        <div class="mode-block">
             <div class="mode-label">📈 <span class="hl">经济模式</span> · 动态波动</div>
-            <div class="split-layout">
-                <div class="theory-panel">
+            <div class="mode-split">
+                <div class="theory">
                     <div class="th-title">供给需求 · 市场在圈上运行</div>
                     <div class="th-sub">圈转动 · 动态均衡</div>
                     <div class="th-item"><span class="hl">需求</span> → 垂直方向（消费者）</div>
@@ -1033,30 +809,30 @@
                     <div class="th-item"><span class="hl">速度</span> → 转动快慢（市场节奏）</div>
                     <div class="th-conclusion"><strong>结论：</strong>市场运行就像一个圈——<span class="hl">需求</span>和<span class="hl">供给</span>不断博弈，围绕均衡点转动。</div>
                 </div>
-                <div class="demo-panel">
+                <div class="demo">
                     <div class="demo-label">⚡ 经济演示 · 供需博弈</div>
-                    <div class="canvas-wrapper">
-                        <canvas id="canvasEcon" width="600" height="280"></canvas>
+                    <div class="canvas-wrap">
+                        <canvas id="canvasEcon" width="800" height="350"></canvas>
                     </div>
                     <div class="controls">
-                        <div class="control-group">
+                        <div class="ctrl">
                             <label>弹性 <span id="econElastic">1.0</span></label>
                             <input type="range" id="econElasticInput" min="0.2" max="2.0" step="0.05" value="1.0">
                         </div>
-                        <div class="control-group">
+                        <div class="ctrl">
                             <label>政策 <span id="econPolicy">0</span></label>
                             <input type="range" id="econPolicyInput" min="-30" max="30" step="1" value="0">
                         </div>
-                        <div class="control-group">
+                        <div class="ctrl">
                             <label>速度 <span id="econSpeed">1.0</span></label>
                             <input type="range" id="econSpeedInput" min="0.0" max="2.0" step="0.1" value="1.0">
                         </div>
                     </div>
                     <div class="feedback">
-                        <div class="fb-item"><span class="label">需求</span><span class="value highlight" id="econDemand">50%</span></div>
-                        <div class="fb-item"><span class="label">供给</span><span class="value highlight" id="econSupply">50%</span></div>
-                        <div class="fb-item"><span class="label">状态</span><span class="value" id="econState">⚖️ 均衡</span></div>
-                        <div class="fb-item"><span class="label">角度</span><span class="value" id="econAngle">0°</span></div>
+                        <div class="fb"><span class="lbl">需求</span><span class="val highlight" id="econDemand">50%</span></div>
+                        <div class="fb"><span class="lbl">供给</span><span class="val highlight" id="econSupply">50%</span></div>
+                        <div class="fb"><span class="lbl">状态</span><span class="val" id="econState">⚖️ 均衡</span></div>
+                        <div class="fb"><span class="lbl">角度</span><span class="val" id="econAngle">0°</span></div>
                     </div>
                     <div class="actions">
                         <button class="primary" id="econToggle">⏸️ 暂停</button>
@@ -1066,29 +842,29 @@
             </div>
         </div>
 
-        <!-- AI模式 -->
-        <div class="mode-block" id="section-ai">
+        <!-- AI -->
+        <div class="mode-block">
             <div class="mode-label">🤖 <span class="hl">AI 模式</span> · 反馈循环</div>
-            <div class="split-layout">
-                <div class="theory-panel">
+            <div class="mode-split">
+                <div class="theory">
                     <div class="th-title">人机交互 · 信息输入→输出</div>
                     <div class="th-sub">圈闪烁 · 反馈回路</div>
                     <div class="th-item"><span class="hl">需求</span> → 用户输入（提示词）</div>
                     <div class="th-item"><span class="hl">供给</span> → AI 输出（生成内容）</div>
                     <div class="th-item"><span class="hl">弹性</span> → 上下文长度</div>
-                    <div class="th-item"><span class="hl">政策</span> → 系统指令（system prompt）</div>
+                    <div class="th-item"><span class="hl">政策</span> → 系统指令</div>
                     <div class="th-item"><span class="hl">速度</span> → 推理速度（Token 生成）</div>
                     <div class="th-conclusion"><strong>结论：</strong>AI 的每一次推理都是在<span class="hl">需求</span>和<span class="hl">供给</span>之间寻找均衡——输入决定输出，反馈修正下一次输入。</div>
                 </div>
-                <div class="demo-panel">
+                <div class="demo">
                     <div class="demo-label">⚡ AI 演示 · 反馈回路</div>
-                    <div class="canvas-wrapper">
-                        <canvas id="canvasAI" width="600" height="280"></canvas>
+                    <div class="canvas-wrap">
+                        <canvas id="canvasAI" width="800" height="350"></canvas>
                     </div>
                     <div class="feedback" style="grid-template-columns:1fr 1fr 1fr;">
-                        <div class="fb-item"><span class="label">输入</span><span class="value highlight" id="aiInput">提示词</span></div>
-                        <div class="fb-item"><span class="label">输出</span><span class="value highlight" id="aiOutput">生成中…</span></div>
-                        <div class="fb-item"><span class="label">状态</span><span class="value" id="aiState">⚡ 推理中</span></div>
+                        <div class="fb"><span class="lbl">输入</span><span class="val highlight" id="aiInput">提示词</span></div>
+                        <div class="fb"><span class="lbl">输出</span><span class="val highlight" id="aiOutput">等待输入…</span></div>
+                        <div class="fb"><span class="lbl">状态</span><span class="val" id="aiState">⚡ 推理中</span></div>
                     </div>
                     <div class="actions">
                         <button class="primary" id="aiTrigger">▶️ 触发推理</button>
@@ -1098,11 +874,11 @@
             </div>
         </div>
 
-        <!-- 语言模式 -->
-        <div class="mode-block" id="section-lingua">
+        <!-- 语言 -->
+        <div class="mode-block">
             <div class="mode-label">🌐 <span class="hl">语言模式</span> · 结构对照</div>
-            <div class="split-layout">
-                <div class="theory-panel">
+            <div class="mode-split">
+                <div class="theory">
                     <div class="th-title">多语对照 · 句法结构拆解</div>
                     <div class="th-sub">圈分叉 · 语言迁移</div>
                     <div class="th-item"><span class="hl">需求</span> → 母语结构</div>
@@ -1112,14 +888,14 @@
                     <div class="th-item"><span class="hl">速度</span> → 语言切换速度</div>
                     <div class="th-conclusion"><strong>结论：</strong>语言学习就是在<span class="hl">母语</span>和<span class="hl">目标语</span>之间建立映射——圈的分叉点就是语法转换的临界点。</div>
                 </div>
-                <div class="demo-panel">
+                <div class="demo">
                     <div class="demo-label">⚡ 语言演示 · 结构映射</div>
-                    <div class="canvas-wrapper">
-                        <canvas id="canvasLingua" width="600" height="280"></canvas>
+                    <div class="canvas-wrap">
+                        <canvas id="canvasLingua" width="800" height="350"></canvas>
                     </div>
                     <div class="feedback" style="grid-template-columns:1fr 1fr;">
-                        <div class="fb-item"><span class="label">母语</span><span class="value highlight" id="linguaNative">中文</span></div>
-                        <div class="fb-item"><span class="label">目标语</span><span class="value highlight" id="linguaTarget">英语</span></div>
+                        <div class="fb"><span class="lbl">母语</span><span class="val highlight" id="linguaNative">中文</span></div>
+                        <div class="fb"><span class="lbl">目标语</span><span class="val highlight" id="linguaTarget">英语</span></div>
                     </div>
                     <div class="actions">
                         <button class="primary" id="linguaTrigger">🔄 切换映射</button>
@@ -1128,31 +904,34 @@
             </div>
         </div>
 
-        <!-- ===== 第4层：迁移延伸 ===== -->
-        <div class="extension-section" id="section-extension">
-            <div class="ext-title">∞ 从 <span>3→1→1→3→100</span> 到 <span>正无穷</span></div>
-            <div class="ext-sub">画圈实验的迁移路径 · 不断扩展</div>
+        <!-- ===== 第四层：封顶 + 延伸方向（标签化） ===== -->
+        <div class="extension-section">
+            <div class="ext-title">∞ 画圈模型的 <span>延伸方向</span></div>
+            <div class="ext-sub">每个标签代表一个可迁移的领域 · 点击查看私有化部署详情</div>
+
             <div class="ext-grid">
-                <span class="tag">📐 数学</span>
-                <span class="tag">📈 经济</span>
-                <span class="tag">🤖 AI</span>
-                <span class="tag">🌐 语言</span>
-                <span class="tag">🧠 认知科学</span>
-                <span class="tag">🏥 医疗诊断</span>
-                <span class="tag">📚 教育</span>
-                <span class="tag">🎯 博弈论</span>
-                <span class="tag">📊 金融</span>
-                <span class="tag">⚙️ 工程</span>
-                <span class="tag">🌍 地理</span>
-                <span class="tag"><span class="hl">+∞</span></span>
+                <a href="#" class="tag"><span class="hl">🧠 大模型联动</span> <span class="lock">🔒</span></a>
+                <a href="#" class="tag"><span class="hl">🤖 AI 技术底座</span> <span class="lock">🔒</span></a>
+                <a href="#" class="tag"><span class="hl">☁️ 云平台部署</span> <span class="lock">🔒</span></a>
+                <a href="#" class="tag"><span class="hl">🛩️ 低空经济运营</span> <span class="lock">🔒</span></a>
+                <a href="#" class="tag"><span class="hl">📊 MCN 资产估值</span> <span class="lock">🔒</span></a>
+                <a href="#" class="tag"><span class="hl">💰 金融测算系统</span> <span class="lock">🔒</span></a>
+                <a href="#" class="tag"><span class="hl">📚 教育认知训练</span> <span class="lock">🔒</span></a>
+                <a href="#" class="tag"><span class="hl">🏥 医疗诊断辅助</span> <span class="lock">🔒</span></a>
+                <a href="#" class="tag"><span class="hl">⚙️ 工程决策系统</span> <span class="lock">🔒</span></a>
+                <a href="#" class="tag"><span class="hl">🌍 地理空间分析</span> <span class="lock">🔒</span></a>
+                <a href="#" class="tag"><span class="hl">🎯 博弈策略设计</span> <span class="lock">🔒</span></a>
+                <a href="#" class="tag"><span class="hl">🧩 认知科学实验</span> <span class="lock">🔒</span></a>
             </div>
+
             <div class="ext-footer">
-                三维空间的移动体 → 二维平面的投影 → 无限认知迁移<br />
-                <span class="infinity">∞</span> 思维的潜力没有边界
+                <span>版本 <span class="infinity">v1.0</span> · 封顶</span>
+                <span class="private-note"><span class="dot"></span> 私有化部署 · 内容不公开</span>
+                <span><span class="infinity">∞</span> 可扩展标签列表</span>
             </div>
         </div>
 
-        <!-- ===== 底部返回 ===== -->
+        <!-- ===== 底部 ===== -->
         <div class="back-bottom">
             <a href="index.html">← 返回作品集首页</a>
         </div>
@@ -1160,50 +939,13 @@
     </div>
 
     <script>
-        // ===== 鼠标跟随光晕 =====
+        // ===== 鼠标光晕 =====
         const glow = document.getElementById('glow');
         document.addEventListener('mousemove', (e) => {
             const x = e.clientX / window.innerWidth * 100;
             const y = e.clientY / window.innerHeight * 100;
             glow.style.setProperty('--x', x + '%');
             glow.style.setProperty('--y', y + '%');
-        });
-
-        // ===== 侧边目录 =====
-        const sidebarToggle = document.getElementById('sidebarToggle');
-        const sidebarNav = document.getElementById('sidebarNav');
-        const sidebarOverlay = document.getElementById('sidebarOverlay');
-        const sidebarClose = document.getElementById('sidebarClose');
-
-        function openSidebar() {
-            sidebarNav.classList.add('open');
-            sidebarOverlay.classList.add('active');
-        }
-
-        function closeSidebar() {
-            sidebarNav.classList.remove('open');
-            sidebarOverlay.classList.remove('active');
-        }
-
-        sidebarToggle.addEventListener('click', openSidebar);
-        sidebarClose.addEventListener('click', closeSidebar);
-        sidebarOverlay.addEventListener('click', closeSidebar);
-
-        // 点击目录项 → 滚动到对应板块 → 自动收起
-        document.querySelectorAll('.nav-item').forEach(item => {
-            item.addEventListener('click', function(e) {
-                e.preventDefault();
-                const target = document.getElementById(this.dataset.target);
-                if (target) {
-                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    setTimeout(closeSidebar, 400);
-                }
-            });
-        });
-
-        // ESC 键关闭
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') closeSidebar();
         });
 
         // ===== 数学模式 =====
@@ -1223,17 +965,12 @@
                 headsDisplay.textContent = heads;
                 legsDisplay.textContent = legs;
 
-                // 解方程：鸡 + 兔 = heads, 2*鸡 + 4*兔 = legs
                 let chicken = 0,
                     rabbit = 0;
-                const found = false;
                 for (let c = 0; c <= heads; c++) {
                     const r = heads - c;
-                    if (2 * c + 4 * r === legs) {
-                        chicken = c;
-                        rabbit = r;
-                        break;
-                    }
+                    if (2 * c + 4 * r === legs) { chicken = c;
+                        rabbit = r; break; }
                 }
 
                 chickenDisplay.textContent = chicken;
@@ -1243,16 +980,15 @@
                     h = canvas.height;
                 const cx = w / 2,
                     cy = h / 2;
-                const radius = 90;
+                const radius = Math.min(w, h) * 0.28;
 
                 ctx.clearRect(0, 0, w, h);
 
-                // 网格
                 ctx.strokeStyle = 'rgba(255,255,255,0.03)';
                 ctx.lineWidth = 1;
                 for (let i = 0; i <= 10; i++) {
-                    const x = (i / 10) * w;
-                    const y = (i / 10) * h;
+                    const x = (i / 10) * w,
+                        y = (i / 10) * h;
                     ctx.beginPath();
                     ctx.moveTo(x, 0);
                     ctx.lineTo(x, h);
@@ -1263,7 +999,6 @@
                     ctx.stroke();
                 }
 
-                // 基准线
                 ctx.strokeStyle = 'rgba(255,255,255,0.06)';
                 ctx.lineWidth = 1;
                 ctx.setLineDash([4, 4]);
@@ -1277,27 +1012,25 @@
                 ctx.stroke();
                 ctx.setLineDash([]);
 
-                // 圈
                 ctx.strokeStyle = 'rgba(255,255,255,0.08)';
                 ctx.lineWidth = 1.5;
                 ctx.beginPath();
                 for (let t = 0; t <= Math.PI * 2; t += 0.02) {
-                    const dx = Math.cos(t) * radius;
-                    const dy = Math.sin(t) * radius;
+                    const dx = Math.cos(t) * radius,
+                        dy = Math.sin(t) * radius;
                     if (t === 0) ctx.moveTo(cx + dx, cy + dy);
                     else ctx.lineTo(cx + dx, cy + dy);
                 }
                 ctx.stroke();
 
-                // 目标点（方程解）
                 const ratio = heads > 0 ? chicken / heads : 0.5;
                 const angle = ratio * Math.PI * 2;
-                const px = cx + Math.cos(angle) * radius;
-                const py = cy + Math.sin(angle) * radius;
+                const px = cx + Math.cos(angle) * radius,
+                    py = cy + Math.sin(angle) * radius;
 
                 ctx.fillStyle = '#a78bfa';
                 ctx.shadowColor = 'rgba(167,139,250,0.2)';
-                ctx.shadowBlur = 16;
+                ctx.shadowBlur = 14;
                 ctx.beginPath();
                 ctx.arc(px, py, 8, 0, Math.PI * 2);
                 ctx.fill();
@@ -1309,8 +1042,7 @@
                 ctx.textBaseline = 'top';
                 ctx.fillText('解', px, py + 10);
 
-                // 标签
-                ctx.fillStyle = 'rgba(255,255,255,0.12)';
+                ctx.fillStyle = 'rgba(255,255,255,0.1)';
                 ctx.font = '10px sans-serif';
                 ctx.textAlign = 'left';
                 ctx.textBaseline = 'bottom';
@@ -1318,8 +1050,8 @@
                 ctx.fillText('兔', cx + 6, 12);
                 ctx.textAlign = 'right';
                 ctx.textBaseline = 'top';
-                ctx.fillText('鸡 = ' + chicken, w - 10, 8);
-                ctx.fillText('兔 = ' + rabbit, w - 10, 24);
+                ctx.fillText('鸡=' + chicken, w - 10, 6);
+                ctx.fillText('兔=' + rabbit, w - 10, 20);
             }
 
             headsInput.addEventListener('input', drawMath);
@@ -1360,13 +1092,11 @@
                 policyDisplay.textContent = policy;
                 speedDisplay.textContent = speed.toFixed(1);
 
-                const radius = 80 * elastic;
-                const offsetY = policy * 0.4;
-
+                const radius = Math.min(w, h) * 0.25 * elastic;
+                const offsetY = policy * 0.3;
                 const demand = Math.sin(angle) * radius + offsetY;
                 const supply = Math.cos(angle) * radius;
-
-                const maxOffset = 80 * 2.0 + 20;
+                const maxOffset = Math.min(w, h) * 0.25 * 2.0 + 20;
                 const demandPct = Math.round(((demand + maxOffset) / (maxOffset * 2)) * 100);
                 const supplyPct = Math.round(((supply + maxOffset) / (maxOffset * 2)) * 100);
                 demandDisplay.textContent = Math.min(100, Math.max(0, demandPct)) + '%';
@@ -1376,18 +1106,14 @@
                 if (demandPct > supplyPct + 8) state = '📈 供不应求';
                 else if (supplyPct > demandPct + 8) state = '📉 供过于求';
                 stateDisplay.textContent = state;
-
-                const deg = Math.round((angle * 180 / Math.PI) % 360);
-                angleDisplay.textContent = deg + '°';
+                angleDisplay.textContent = Math.round((angle * 180 / Math.PI) % 360) + '°';
 
                 ctx.clearRect(0, 0, w, h);
-
-                // 网格
                 ctx.strokeStyle = 'rgba(255,255,255,0.03)';
                 ctx.lineWidth = 1;
                 for (let i = 0; i <= 10; i++) {
-                    const x = (i / 10) * w;
-                    const y = (i / 10) * h;
+                    const x = (i / 10) * w,
+                        y = (i / 10) * h;
                     ctx.beginPath();
                     ctx.moveTo(x, 0);
                     ctx.lineTo(x, h);
@@ -1397,8 +1123,6 @@
                     ctx.lineTo(w, y);
                     ctx.stroke();
                 }
-
-                // 基准线
                 ctx.strokeStyle = 'rgba(255,255,255,0.05)';
                 ctx.lineWidth = 1;
                 ctx.setLineDash([4, 4]);
@@ -1411,55 +1135,50 @@
                 ctx.lineTo(cx, h);
                 ctx.stroke();
                 ctx.setLineDash([]);
-
-                // 圈
                 ctx.strokeStyle = 'rgba(255,255,255,0.08)';
                 ctx.lineWidth = 1.5;
                 ctx.beginPath();
                 for (let t = 0; t <= Math.PI * 2; t += 0.02) {
-                    const dx = Math.cos(t) * radius;
-                    const dy = Math.sin(t) * radius + offsetY;
+                    const dx = Math.cos(t) * radius,
+                        dy = Math.sin(t) * radius + offsetY;
                     if (t === 0) ctx.moveTo(cx + dx, cy + dy);
                     else ctx.lineTo(cx + dx, cy + dy);
                 }
                 ctx.stroke();
 
-                // 需求点
                 const dX = cx,
                     dY = cy + demand;
                 ctx.fillStyle = '#a78bfa';
                 ctx.shadowColor = 'rgba(167,139,250,0.2)';
                 ctx.shadowBlur = 14;
                 ctx.beginPath();
-                ctx.arc(dX, dY, 7, 0, Math.PI * 2);
+                ctx.arc(dX, dY, 8, 0, Math.PI * 2);
                 ctx.fill();
                 ctx.shadowBlur = 0;
-                ctx.fillStyle = 'rgba(255,255,255,0.4)';
-                ctx.font = '9px sans-serif';
+                ctx.fillStyle = 'rgba(255,255,255,0.3)';
+                ctx.font = '10px sans-serif';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'bottom';
                 ctx.fillText('需求', dX, dY - 10);
 
-                // 供给点
                 const sX = cx + supply,
                     sY = cy + offsetY;
                 ctx.fillStyle = '#60a5fa';
                 ctx.shadowColor = 'rgba(96,165,250,0.2)';
                 ctx.shadowBlur = 14;
                 ctx.beginPath();
-                ctx.arc(sX, sY, 7, 0, Math.PI * 2);
+                ctx.arc(sX, sY, 8, 0, Math.PI * 2);
                 ctx.fill();
                 ctx.shadowBlur = 0;
-                ctx.fillStyle = 'rgba(255,255,255,0.4)';
-                ctx.font = '9px sans-serif';
+                ctx.fillStyle = 'rgba(255,255,255,0.3)';
+                ctx.font = '10px sans-serif';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'bottom';
                 ctx.fillText('供给', sX, sY - 10);
 
-                // 圆心
-                ctx.fillStyle = 'rgba(255,255,255,0.15)';
+                ctx.fillStyle = 'rgba(255,255,255,0.12)';
                 ctx.beginPath();
-                ctx.arc(cx, cy + offsetY, 3, 0, Math.PI * 2);
+                ctx.arc(cx, cy + offsetY, 4, 0, Math.PI * 2);
                 ctx.fill();
             }
 
@@ -1510,34 +1229,22 @@
                 animId = null,
                 flashing = false,
                 pulse = 0;
-
             const w = canvas.width,
                 h = canvas.height;
             const cx = w / 2,
                 cy = h / 2;
-
-            const prompts = [
-                '你好，世界',
-                '解释量子力学',
-                '写一首诗',
-                '推荐一本书',
-                '什么是认知？',
-                '未来会怎样？'
-            ];
+            const prompts = ['你好，世界', '解释量子力学', '写一首诗', '推荐一本书', '什么是认知？', '未来会怎样？'];
             let idx = 0;
 
             function drawAI() {
-                const radius = 70 + 20 * Math.sin(pulse);
-                const offsetY = 10 * Math.sin(pulse * 0.7);
-
+                const radius = Math.min(w, h) * 0.22 + 12 * Math.sin(pulse);
+                const offsetY = 8 * Math.sin(pulse * 0.7);
                 ctx.clearRect(0, 0, w, h);
-
-                // 网格
                 ctx.strokeStyle = 'rgba(255,255,255,0.03)';
                 ctx.lineWidth = 1;
                 for (let i = 0; i <= 10; i++) {
-                    const x = (i / 10) * w;
-                    const y = (i / 10) * h;
+                    const x = (i / 10) * w,
+                        y = (i / 10) * h;
                     ctx.beginPath();
                     ctx.moveTo(x, 0);
                     ctx.lineTo(x, h);
@@ -1547,8 +1254,6 @@
                     ctx.lineTo(w, y);
                     ctx.stroke();
                 }
-
-                // 基准线
                 ctx.strokeStyle = 'rgba(255,255,255,0.04)';
                 ctx.lineWidth = 1;
                 ctx.setLineDash([3, 3]);
@@ -1562,53 +1267,49 @@
                 ctx.stroke();
                 ctx.setLineDash([]);
 
-                // 闪烁圈
                 const alpha = 0.06 + 0.04 * Math.sin(pulse * 1.5);
                 ctx.strokeStyle = flashing ? `rgba(167,139,250,${alpha + 0.06})` : 'rgba(255,255,255,0.04)';
                 ctx.lineWidth = 1.5;
                 ctx.beginPath();
                 for (let t = 0; t <= Math.PI * 2; t += 0.02) {
-                    const dx = Math.cos(t) * radius;
-                    const dy = Math.sin(t) * radius + offsetY;
+                    const dx = Math.cos(t) * radius,
+                        dy = Math.sin(t) * radius + offsetY;
                     if (t === 0) ctx.moveTo(cx + dx, cy + dy);
                     else ctx.lineTo(cx + dx, cy + dy);
                 }
                 ctx.stroke();
 
-                // 输入点（需求）
                 const inX = cx,
-                    inY = cy - radius * 0.6 + offsetY;
+                    inY = cy - radius * 0.55 + offsetY;
                 ctx.fillStyle = '#a78bfa';
-                ctx.shadowColor = 'rgba(167,139,250,0.15)';
+                ctx.shadowColor = 'rgba(167,139,250,0.12)';
                 ctx.shadowBlur = 12;
                 ctx.beginPath();
                 ctx.arc(inX, inY, 6, 0, Math.PI * 2);
                 ctx.fill();
                 ctx.shadowBlur = 0;
-                ctx.fillStyle = 'rgba(255,255,255,0.3)';
-                ctx.font = '8px sans-serif';
+                ctx.fillStyle = 'rgba(255,255,255,0.25)';
+                ctx.font = '9px sans-serif';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'bottom';
                 ctx.fillText('输入', inX, inY - 8);
 
-                // 输出点（供给）
-                const outX = cx + radius * 0.5,
-                    outY = cy + radius * 0.5 + offsetY;
+                const outX = cx + radius * 0.45,
+                    outY = cy + radius * 0.45 + offsetY;
                 ctx.fillStyle = '#60a5fa';
-                ctx.shadowColor = 'rgba(96,165,250,0.15)';
+                ctx.shadowColor = 'rgba(96,165,250,0.12)';
                 ctx.shadowBlur = 12;
                 ctx.beginPath();
                 ctx.arc(outX, outY, 6, 0, Math.PI * 2);
                 ctx.fill();
                 ctx.shadowBlur = 0;
-                ctx.fillStyle = 'rgba(255,255,255,0.3)';
-                ctx.font = '8px sans-serif';
+                ctx.fillStyle = 'rgba(255,255,255,0.25)';
+                ctx.font = '9px sans-serif';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'bottom';
                 ctx.fillText('输出', outX, outY - 8);
 
-                // 连接线（动态）
-                ctx.strokeStyle = flashing ? 'rgba(167,139,250,0.06)' : 'rgba(255,255,255,0.02)';
+                ctx.strokeStyle = flashing ? 'rgba(167,139,250,0.05)' : 'rgba(255,255,255,0.02)';
                 ctx.lineWidth = 1;
                 ctx.setLineDash([4, 6]);
                 ctx.beginPath();
@@ -1617,13 +1318,11 @@
                 ctx.stroke();
                 ctx.setLineDash([]);
 
-                // 中心标签
-                ctx.fillStyle = 'rgba(255,255,255,0.05)';
-                ctx.font = '9px sans-serif';
+                ctx.fillStyle = 'rgba(255,255,255,0.04)';
+                ctx.font = '10px sans-serif';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
                 ctx.fillText('AI 推理', cx, cy);
-
                 pulse += 0.03;
             }
 
@@ -1639,26 +1338,20 @@
                 aiInput.textContent = prompts[idx % prompts.length];
                 idx++;
                 aiOutput.textContent = '生成中...';
-
                 setTimeout(() => {
-                    const outputs = [
-                        '你好！今天天气不错。',
-                        '量子力学非常复杂...',
-                        '夜色温柔，星光不语。',
-                        '《认知觉醒》值得一读。',
-                        '认知是感知世界的方式。',
+                    const outputs = ['你好！今天天气不错。', '量子力学非常复杂...', '夜色温柔，星光不语。', '《认知觉醒》值得一读。', '认知是感知世界的方式。',
                         '未来属于会思考的人。'
                     ];
                     aiOutput.textContent = outputs[(idx - 1) % outputs.length];
                     aiState.textContent = '✅ 已生成';
                     aiState.style.color = 'rgba(255,255,255,0.3)';
                     flashing = false;
-                }, 1200 + Math.random() * 800);
+                }, 1000 + Math.random() * 600);
             });
 
             resetBtn.addEventListener('click', function() {
                 aiInput.textContent = '提示词';
-                aiOutput.textContent = '等待输入...';
+                aiOutput.textContent = '等待输入…';
                 aiState.textContent = '⚡ 推理中';
                 aiState.style.color = 'rgba(255,255,255,0.2)';
                 flashing = false;
@@ -1683,26 +1376,22 @@
                 h = canvas.height;
             const cx = w / 2,
                 cy = h / 2;
-
             const pairs = [
-                { native: '中文', target: '英语', color: '#a78bfa' },
-                { native: '中文', target: '日语', color: '#60a5fa' },
-                { native: '中文', target: '法语', color: '#fbbf24' },
+                { native: '中文', target: '英语' },
+                { native: '中文', target: '日语' },
+                { native: '中文', target: '法语' },
             ];
 
             function drawLingua() {
-                const radius = 90;
-                const offsetY = 15 * Math.sin(angle * 0.5);
-                const spread = 20 * Math.sin(angle * 0.3);
-
+                const radius = Math.min(w, h) * 0.24;
+                const offsetY = 12 * Math.sin(angle * 0.5);
+                const spread = 16 * Math.sin(angle * 0.3);
                 ctx.clearRect(0, 0, w, h);
-
-                // 网格
                 ctx.strokeStyle = 'rgba(255,255,255,0.03)';
                 ctx.lineWidth = 1;
                 for (let i = 0; i <= 10; i++) {
-                    const x = (i / 10) * w;
-                    const y = (i / 10) * h;
+                    const x = (i / 10) * w,
+                        y = (i / 10) * h;
                     ctx.beginPath();
                     ctx.moveTo(x, 0);
                     ctx.lineTo(x, h);
@@ -1712,8 +1401,6 @@
                     ctx.lineTo(w, y);
                     ctx.stroke();
                 }
-
-                // 基准线
                 ctx.strokeStyle = 'rgba(255,255,255,0.04)';
                 ctx.lineWidth = 1;
                 ctx.setLineDash([3, 3]);
@@ -1727,84 +1414,80 @@
                 ctx.stroke();
                 ctx.setLineDash([]);
 
-                // 母语圈（左）
-                const leftX = cx - radius * 0.8;
-                const leftY = cy + offsetY;
-                ctx.strokeStyle = 'rgba(167,139,250,0.15)';
+                const leftX = cx - radius * 0.75,
+                    leftY = cy + offsetY;
+                ctx.strokeStyle = 'rgba(167,139,250,0.12)';
                 ctx.lineWidth = 1.5;
                 ctx.beginPath();
                 for (let t = 0; t <= Math.PI * 2; t += 0.02) {
-                    const dx = Math.cos(t) * 40;
-                    const dy = Math.sin(t) * 40;
+                    const dx = Math.cos(t) * radius * 0.45,
+                        dy = Math.sin(t) * radius * 0.45;
                     if (t === 0) ctx.moveTo(leftX + dx, leftY + dy);
                     else ctx.lineTo(leftX + dx, leftY + dy);
                 }
                 ctx.stroke();
-                ctx.fillStyle = 'rgba(167,139,250,0.08)';
+                ctx.fillStyle = 'rgba(167,139,250,0.06)';
                 ctx.beginPath();
                 for (let t = 0; t <= Math.PI * 2; t += 0.02) {
-                    const dx = Math.cos(t) * 40;
-                    const dy = Math.sin(t) * 40;
+                    const dx = Math.cos(t) * radius * 0.45,
+                        dy = Math.sin(t) * radius * 0.45;
                     if (t === 0) ctx.moveTo(leftX + dx, leftY + dy);
                     else ctx.lineTo(leftX + dx, leftY + dy);
                 }
                 ctx.fill();
-                ctx.fillStyle = 'rgba(255,255,255,0.3)';
-                ctx.font = '10px sans-serif';
+                ctx.fillStyle = 'rgba(255,255,255,0.25)';
+                ctx.font = '11px sans-serif';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
                 ctx.fillText('母语', leftX, leftY);
 
-                // 目标语圈（右）
-                const rightX = cx + radius * 0.8;
-                const rightY = cy + offsetY + spread;
-                ctx.strokeStyle = 'rgba(96,165,250,0.15)';
+                const rightX = cx + radius * 0.75,
+                    rightY = cy + offsetY + spread;
+                ctx.strokeStyle = 'rgba(96,165,250,0.12)';
                 ctx.lineWidth = 1.5;
                 ctx.beginPath();
                 for (let t = 0; t <= Math.PI * 2; t += 0.02) {
-                    const dx = Math.cos(t) * 40;
-                    const dy = Math.sin(t) * 40;
+                    const dx = Math.cos(t) * radius * 0.45,
+                        dy = Math.sin(t) * radius * 0.45;
                     if (t === 0) ctx.moveTo(rightX + dx, rightY + dy);
                     else ctx.lineTo(rightX + dx, rightY + dy);
                 }
                 ctx.stroke();
-                ctx.fillStyle = 'rgba(96,165,250,0.08)';
+                ctx.fillStyle = 'rgba(96,165,250,0.06)';
                 ctx.beginPath();
                 for (let t = 0; t <= Math.PI * 2; t += 0.02) {
-                    const dx = Math.cos(t) * 40;
-                    const dy = Math.sin(t) * 40;
+                    const dx = Math.cos(t) * radius * 0.45,
+                        dy = Math.sin(t) * radius * 0.45;
                     if (t === 0) ctx.moveTo(rightX + dx, rightY + dy);
                     else ctx.lineTo(rightX + dx, rightY + dy);
                 }
                 ctx.fill();
-                ctx.fillStyle = 'rgba(255,255,255,0.3)';
-                ctx.font = '10px sans-serif';
+                ctx.fillStyle = 'rgba(255,255,255,0.25)';
+                ctx.font = '11px sans-serif';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
                 ctx.fillText('目标语', rightX, rightY);
 
-                // 连接线（分叉效果）
-                ctx.strokeStyle = `rgba(167,139,250,0.06)`;
+                const midX = (leftX + rightX) / 2,
+                    midY = (leftY + rightY) / 2 + spread * 0.25;
+                ctx.strokeStyle = 'rgba(167,139,250,0.05)';
                 ctx.lineWidth = 1;
                 ctx.setLineDash([3, 6]);
-                const midX = (leftX + rightX) / 2;
-                const midY = (leftY + rightY) / 2 + spread * 0.3;
                 ctx.beginPath();
-                ctx.moveTo(leftX + 40, leftY);
-                ctx.quadraticCurveTo(midX, midY, rightX - 40, rightY);
+                ctx.moveTo(leftX + radius * 0.45, leftY);
+                ctx.quadraticCurveTo(midX, midY, rightX - radius * 0.45, rightY);
                 ctx.stroke();
                 ctx.setLineDash([]);
 
-                // 分叉点标记
-                ctx.fillStyle = 'rgba(255,200,100,0.08)';
+                ctx.fillStyle = 'rgba(255,200,100,0.06)';
                 ctx.beginPath();
-                ctx.arc(midX, midY + 4, 16, 0, Math.PI * 2);
+                ctx.arc(midX, midY + 3, 14, 0, Math.PI * 2);
                 ctx.fill();
-                ctx.fillStyle = 'rgba(255,200,100,0.2)';
-                ctx.font = '8px sans-serif';
+                ctx.fillStyle = 'rgba(255,200,100,0.15)';
+                ctx.font = '9px sans-serif';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
-                ctx.fillText('↗ 映射', midX, midY + 4);
+                ctx.fillText('↗ 映射', midX, midY + 3);
 
                 angle += 0.015;
             }
