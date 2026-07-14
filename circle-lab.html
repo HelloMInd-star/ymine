@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>画圈实验 · 认知方法论</title>
     <style>
-        /* ===== 重置 & 深色背景 ===== */
+        /* ===== 重置 ===== */
         * {
             margin: 0;
             padding: 0;
@@ -16,10 +16,7 @@
             background: #0b0b1a;
             font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
             min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 40px 20px;
+            padding: 32px 24px 32px 24px;
             overflow-x: hidden;
             cursor: default;
         }
@@ -37,65 +34,44 @@
             transition: background 0.1s;
         }
 
-        .container {
-            max-width: 960px;
-            width: 100%;
-            background: radial-gradient(ellipse at 30% 30%, #120b24, #0b0b1a 70%, #05030a);
+        /* ===== 左右对照布局 ===== */
+        .split-layout {
+            display: flex;
+            gap: 0;
+            max-width: 1400px;
+            margin: 0 auto;
+            min-height: calc(100vh - 64px);
+            position: relative;
+            z-index: 1;
             border-radius: 32px;
-            padding: 48px 40px 40px;
+            overflow: hidden;
+            background: radial-gradient(ellipse at 30% 30%, #120b24, #0b0b1a 70%, #05030a);
             border: 1px solid rgba(255, 255, 255, 0.06);
             box-shadow: 0 30px 80px rgba(40, 10, 80, 0.4);
-            position: relative;
-            overflow: hidden;
-            z-index: 1;
-            backdrop-filter: blur(2px);
         }
 
-        /* ===== 星云背景动画 ===== */
-        .container::before {
-            content: '';
-            position: absolute;
-            top: -100px;
-            right: -100px;
-            width: 400px;
-            height: 400px;
-            background: radial-gradient(circle, rgba(80, 30, 140, 0.15), transparent 70%);
-            border-radius: 50%;
-            pointer-events: none;
-            animation: floatBg 12s ease-in-out infinite alternate;
+        /* ===== 左侧：理论区 ===== */
+        .theory-panel {
+            width: 42%;
+            padding: 48px 36px 48px 40px;
+            border-right: 1px solid rgba(255, 255, 255, 0.04);
+            overflow-y: auto;
+            max-height: calc(100vh - 64px);
+            flex-shrink: 0;
         }
 
-        .container::after {
-            content: '';
-            position: absolute;
-            bottom: -80px;
-            left: -80px;
-            width: 350px;
-            height: 350px;
-            background: radial-gradient(circle, rgba(30, 60, 150, 0.1), transparent 70%);
-            border-radius: 50%;
-            pointer-events: none;
-            animation: floatBg 10s ease-in-out infinite alternate-reverse;
+        .theory-panel::-webkit-scrollbar {
+            width: 4px;
+        }
+        .theory-panel::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .theory-panel::-webkit-scrollbar-thumb {
+            background: rgba(167, 139, 250, 0.2);
+            border-radius: 4px;
         }
 
-        @keyframes floatBg {
-            0% {
-                transform: translate(0, 0) scale(1);
-            }
-            100% {
-                transform: translate(30px, -20px) scale(1.1);
-            }
-        }
-
-        /* ===== 头部（入场动画） ===== */
-        .header {
-            text-align: center;
-            margin-bottom: 32px;
-            opacity: 0;
-            animation: fadeInUp 0.8s ease forwards;
-        }
-
-        .header .badge {
+        .theory-panel .badge {
             display: inline-block;
             background: rgba(255, 255, 255, 0.04);
             border: 1px solid rgba(255, 255, 255, 0.06);
@@ -105,27 +81,20 @@
             border-radius: 20px;
             letter-spacing: 1.5px;
             text-transform: uppercase;
-            margin-bottom: 12px;
+            margin-bottom: 16px;
         }
 
-        .header h1 {
-            font-size: 32px;
+        .theory-panel h1 {
+            font-size: 28px;
             font-weight: 700;
             color: #f1f5f9;
             line-height: 1.2;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
             background: linear-gradient(135deg, #f1f5f9, #a78bfa, #60a5fa, #f1f5f9);
             background-size: 300% 300%;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             animation: gradientFlow 6s ease-in-out infinite;
-        }
-
-        .header .sub {
-            font-size: 16px;
-            color: rgba(255, 255, 255, 0.4);
-            font-weight: 300;
-            letter-spacing: 0.3px;
         }
 
         @keyframes gradientFlow {
@@ -140,146 +109,258 @@
             }
         }
 
-        @keyframes fadeInUp {
-            0% {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            100% {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .theory-panel .subhead {
+            font-size: 15px;
+            color: rgba(255, 255, 255, 0.4);
+            margin-bottom: 24px;
+            font-weight: 300;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            padding-bottom: 16px;
         }
 
-        /* ===== 画布区 ===== */
-        .canvas-wrapper {
+        .theory-panel .section {
+            margin-bottom: 24px;
+        }
+
+        .theory-panel .section-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.6);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+
+        .theory-panel .section p {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 14px;
+            line-height: 1.7;
+            margin-bottom: 8px;
+        }
+
+        .theory-panel .section .highlight {
+            color: #a78bfa;
+            font-weight: 500;
+        }
+
+        .theory-panel .step-flow {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 4px 8px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 12px;
+            padding: 12px 14px;
+            margin: 10px 0 12px;
+        }
+
+        .theory-panel .step-flow .s {
+            background: rgba(167, 139, 250, 0.08);
+            color: rgba(255, 255, 255, 0.7);
+            padding: 2px 12px;
+            border-radius: 16px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .theory-panel .step-flow .s.highlight {
+            background: rgba(167, 139, 250, 0.15);
+            color: #a78bfa;
+        }
+
+        .theory-panel .step-flow .arrow {
+            color: rgba(255, 255, 255, 0.12);
+            font-size: 14px;
+        }
+
+        .theory-panel .mapping-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px 16px;
+            margin: 8px 0 4px;
+        }
+
+        .theory-panel .mapping-grid .item {
+            display: flex;
+            align-items: baseline;
+            gap: 6px;
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .theory-panel .mapping-grid .item .label {
+            color: rgba(255, 255, 255, 0.25);
+            font-size: 12px;
+            min-width: 36px;
+        }
+
+        .theory-panel .mapping-grid .item .val {
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 500;
+        }
+
+        .theory-panel .conclusion-box {
+            background: rgba(167, 139, 250, 0.04);
+            border-left: 3px solid #a78bfa;
+            border-radius: 0 10px 10px 0;
+            padding: 12px 16px;
+            margin: 12px 0 6px;
+        }
+
+        .theory-panel .conclusion-box p {
+            margin-bottom: 0;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.55);
+        }
+
+        .theory-panel .conclusion-box p strong {
+            color: rgba(255, 255, 255, 0.75);
+        }
+
+        .theory-panel .back-link {
+            display: inline-block;
+            margin-top: 28px;
+            color: rgba(255, 255, 255, 0.2);
+            text-decoration: none;
+            font-size: 13px;
+            transition: color 0.3s ease;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+            padding-top: 16px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .theory-panel .back-link:hover {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        /* ===== 右侧：演示区 ===== */
+        .demo-panel {
+            flex: 1;
+            padding: 40px 36px 40px 32px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-height: 600px;
+        }
+
+        .demo-panel .demo-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: rgba(255, 255, 255, 0.15);
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        .demo-panel .canvas-wrapper {
             background: rgba(255, 255, 255, 0.02);
             border-radius: 20px;
             padding: 16px;
-            margin-bottom: 24px;
             border: 1px solid rgba(255, 255, 255, 0.04);
-            opacity: 0;
-            animation: fadeInUp 0.6s ease 0.1s forwards;
+            margin-bottom: 18px;
         }
 
-        canvas {
+        .demo-panel canvas {
             display: block;
             width: 100%;
             height: auto;
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: 16px;
-            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.3);
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 14px;
+            box-shadow: inset 0 2px 12px rgba(0, 0, 0, 0.3);
         }
 
-        /* ===== 控制区 ===== */
-        .controls {
+        .demo-panel .controls {
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
-            gap: 20px 24px;
-            margin-bottom: 20px;
-            opacity: 0;
-            animation: fadeInUp 0.6s ease 0.15s forwards;
+            gap: 16px 20px;
+            margin-bottom: 16px;
         }
 
-        .control-group {
+        .demo-panel .controls .control-group {
             display: flex;
             flex-direction: column;
-            gap: 4px;
+            gap: 3px;
         }
 
-        .control-group label {
-            font-size: 13px;
+        .demo-panel .controls .control-group label {
+            font-size: 12px;
             font-weight: 500;
-            color: rgba(255, 255, 255, 0.5);
+            color: rgba(255, 255, 255, 0.4);
             display: flex;
             justify-content: space-between;
         }
 
-        .control-group label span {
+        .demo-panel .controls .control-group label span {
             color: #a78bfa;
             font-weight: 600;
         }
 
-        input[type="range"] {
+        .demo-panel .controls input[type="range"] {
             width: 100%;
             accent-color: #a78bfa;
             height: 4px;
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.08);
             border-radius: 4px;
             -webkit-appearance: none;
             appearance: none;
         }
 
-        input[type="range"]::-webkit-slider-thumb {
+        .demo-panel .controls input[type="range"]::-webkit-slider-thumb {
             -webkit-appearance: none;
             appearance: none;
-            width: 16px;
-            height: 16px;
+            width: 14px;
+            height: 14px;
             border-radius: 50%;
             background: #a78bfa;
             cursor: pointer;
-            box-shadow: 0 0 20px rgba(167, 139, 250, 0.3);
+            box-shadow: 0 0 20px rgba(167, 139, 250, 0.25);
         }
 
-        /* ===== 反馈面板 ===== */
-        .feedback {
+        .demo-panel .feedback {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 12px;
+            gap: 10px;
             background: rgba(255, 255, 255, 0.02);
             border: 1px solid rgba(255, 255, 255, 0.04);
-            border-radius: 16px;
-            padding: 16px 20px;
+            border-radius: 14px;
+            padding: 14px 18px;
             margin-bottom: 16px;
-            font-size: 14px;
-            opacity: 0;
-            animation: fadeInUp 0.6s ease 0.2s forwards;
         }
 
-        .feedback-item {
+        .demo-panel .feedback .fb-item {
             display: flex;
             flex-direction: column;
         }
 
-        .feedback-item .label {
-            color: rgba(255, 255, 255, 0.3);
-            font-size: 12px;
+        .demo-panel .feedback .fb-item .label {
+            color: rgba(255, 255, 255, 0.25);
+            font-size: 11px;
         }
 
-        .feedback-item .value {
+        .demo-panel .feedback .fb-item .value {
             font-weight: 600;
             color: #f1f5f9;
             font-size: 16px;
-            margin-top: 2px;
+            margin-top: 1px;
         }
 
-        .feedback-item .value.highlight {
+        .demo-panel .feedback .fb-item .value.highlight {
             color: #a78bfa;
         }
 
-        /* ===== 底部操作区 ===== */
-        .footer-actions {
+        .demo-panel .actions {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 12px;
-            padding-top: 16px;
-            border-top: 1px solid rgba(255, 255, 255, 0.04);
-            opacity: 0;
-            animation: fadeInUp 0.6s ease 0.25s forwards;
+            gap: 10px;
+            justify-content: center;
         }
 
-        .footer-actions .actions {
-            display: flex;
-            gap: 12px;
-        }
-
-        .footer-actions .actions button {
-            padding: 8px 24px;
+        .demo-panel .actions button {
+            padding: 8px 22px;
             border: none;
             border-radius: 20px;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 500;
             cursor: pointer;
             transition: all 0.3s ease;
@@ -288,145 +369,206 @@
             border: 1px solid rgba(255, 255, 255, 0.04);
         }
 
-        .footer-actions .actions button.primary {
+        .demo-panel .actions button.primary {
             background: rgba(167, 139, 250, 0.15);
             color: #a78bfa;
             border-color: rgba(167, 139, 250, 0.15);
         }
 
-        .footer-actions .actions button.primary:hover {
+        .demo-panel .actions button.primary:hover {
             background: rgba(167, 139, 250, 0.25);
             transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(167, 139, 250, 0.15);
+            box-shadow: 0 8px 25px rgba(167, 139, 250, 0.12);
         }
 
-        .footer-actions .actions button:hover {
+        .demo-panel .actions button:hover {
             background: rgba(255, 255, 255, 0.06);
             color: #f1f5f9;
             transform: translateY(-2px);
         }
 
-        /* ===== 返回链接（核心修复） ===== */
-        .back-link-wrapper {
-            text-align: center;
-            margin-top: 28px;
-            padding-top: 20px;
-            border-top: 1px solid rgba(255, 255, 255, 0.04);
-            opacity: 0;
-            animation: fadeInUp 0.6s ease 0.3s forwards;
-        }
-
-        .back-link-wrapper a {
-            color: rgba(255, 255, 255, 0.3);
-            text-decoration: none;
-            font-size: 14px;
-            transition: color 0.3s ease;
-            letter-spacing: 0.3px;
-        }
-
-        .back-link-wrapper a:hover {
-            color: rgba(255, 255, 255, 0.8);
-        }
-
         /* ===== 响应式 ===== */
+        @media (max-width: 1024px) {
+            .split-layout {
+                flex-direction: column;
+                border-radius: 24px;
+            }
+            .theory-panel {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+                max-height: none;
+                padding: 32px 28px;
+            }
+            .demo-panel {
+                padding: 28px 24px 32px;
+                min-height: 500px;
+            }
+            .theory-panel .mapping-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
         @media (max-width: 700px) {
-            .container {
-                padding: 24px 16px 20px;
+            body {
+                padding: 16px 12px;
             }
-            .controls {
+            .theory-panel {
+                padding: 24px 18px;
+            }
+            .theory-panel h1 {
+                font-size: 22px;
+            }
+            .demo-panel {
+                padding: 20px 14px 24px;
+                min-height: 400px;
+            }
+            .demo-panel .controls {
                 grid-template-columns: 1fr 1fr;
             }
-            .feedback {
+            .demo-panel .feedback {
                 grid-template-columns: 1fr 1fr;
             }
-            .header h1 {
-                font-size: 24px;
+            .demo-panel .actions {
+                flex-wrap: wrap;
             }
         }
 
         @media (max-width: 480px) {
-            .controls {
+            .demo-panel .controls {
                 grid-template-columns: 1fr;
             }
-            .feedback {
+            .demo-panel .feedback {
                 grid-template-columns: 1fr;
             }
-            .footer-actions {
+            .theory-panel .step-flow {
                 flex-direction: column;
-                align-items: stretch;
+                align-items: flex-start;
+                gap: 4px;
             }
-            .footer-actions .actions {
-                justify-content: center;
+            .theory-panel .step-flow .arrow {
+                transform: rotate(90deg);
             }
         }
     </style>
 </head>
 <body>
 
-    <!-- ===== 鼠标跟随光晕 ===== -->
     <div id="glow"></div>
 
-    <div class="container">
+    <div class="split-layout">
 
-        <!-- ===== 头部 ===== -->
-        <div class="header">
+        <!-- ===== 左侧：理论区 ===== -->
+        <div class="theory-panel">
             <div class="badge">🧠 认知方法论</div>
             <h1>画圈实验 · 3→1→1→3→100</h1>
-            <div class="sub">通过操作理解“如何拆解任何陌生问题”</div>
+            <div class="subhead">通过操作理解“如何拆解任何陌生问题”</div>
+
+            <div class="section">
+                <div class="section-title">核心路径</div>
+                <div class="step-flow">
+                    <span class="s highlight">3</span>
+                    <span class="arrow">→</span>
+                    <span class="s">1</span>
+                    <span class="arrow">→</span>
+                    <span class="s">1</span>
+                    <span class="arrow">→</span>
+                    <span class="s highlight">3</span>
+                    <span class="arrow">→</span>
+                    <span class="s">100</span>
+                </div>
+                <p style="font-size:13px; color:rgba(255,255,255,0.3); margin-top:-2px; margin-bottom:10px;">
+                    从三个方向 → 收敛到核心 → 设计可迁移架构 → 拆成三个交付维度 → 无限延展
+                </p>
+            </div>
+
+            <div class="section">
+                <div class="section-title">画圈实验的映射逻辑</div>
+                <div class="mapping-grid">
+                    <div class="item"><span class="label">需求</span><span class="val">→ 垂直方向</span></div>
+                    <div class="item"><span class="label">供给</span><span class="val">→ 水平方向</span></div>
+                    <div class="item"><span class="label">弹性</span><span class="val">→ 圆的半径</span></div>
+                    <div class="item"><span class="label">政策</span><span class="val">→ 圆心偏移</span></div>
+                    <div class="item"><span class="label">速度</span><span class="val">→ 转动快慢</span></div>
+                    <div class="item"><span class="label">均衡</span><span class="val">→ 需求 = 供给</span></div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">控制参数说明</div>
+                <p><span class="highlight">弹性</span> — 调节圈的半径大小，模拟市场对价格变化的敏感程度。</p>
+                <p><span class="highlight">政策</span> — 调节圈的垂直偏移，模拟政府补贴/税收对市场的干预。</p>
+                <p><span class="highlight">速度</span> — 调节圈的转动快慢，模拟市场调整节奏的快慢。</p>
+            </div>
+
+            <div class="section">
+                <div class="section-title">为什么用“圈”？</div>
+                <p>传统的供给需求曲线是静态的“交叉图”，但市场是动态的。用“圈”来展示，是因为：</p>
+                <p style="font-size:13px; color:rgba(255,255,255,0.35); padding-left:12px; border-left:2px solid rgba(167,139,250,0.15); margin-bottom:4px;">
+                    <strong style="color:rgba(255,255,255,0.5);">直观</strong> — 一眼看到“需求在动、供给也在动”
+                </p>
+                <p style="font-size:13px; color:rgba(255,255,255,0.35); padding-left:12px; border-left:2px solid rgba(167,139,250,0.15); margin-bottom:4px;">
+                    <strong style="color:rgba(255,255,255,0.5);">可调</strong> — 拖动滑块，实时看到变化
+                </p>
+                <p style="font-size:13px; color:rgba(255,255,255,0.35); padding-left:12px; border-left:2px solid rgba(167,139,250,0.15); margin-bottom:4px;">
+                    <strong style="color:rgba(255,255,255,0.5);">可迁移</strong> — 同一个“圈”可以切换到数学、AI、语言模式
+                </p>
+            </div>
+
+            <div class="conclusion-box">
+                <p><strong>💡 核心洞察：</strong>市场运行就像一个“圈”——需求在垂直方向波动，供给在水平方向波动，两者共同围绕均衡点转动。<br>
+                每一次逼近均衡，都是博弈双方达成暂时妥协；每一次远离均衡，都是博弈重新启动。</p>
+            </div>
+
+            <a href="index.html" class="back-link">← 返回作品集首页</a>
         </div>
 
-        <!-- ===== 画布区 ===== -->
-        <div class="canvas-wrapper">
-            <canvas id="canvas" width="800" height="400"></canvas>
-        </div>
+        <!-- ===== 右侧：演示区 ===== -->
+        <div class="demo-panel">
+            <div class="demo-label">⚡ 交互演示 · 画圈实验</div>
 
-        <!-- ===== 控制区 ===== -->
-        <div class="controls">
-            <div class="control-group">
-                <label>弹性（波动幅度） <span id="elasticValue">1.0</span></label>
-                <input type="range" id="elastic" min="0.2" max="2.0" step="0.05" value="1.0">
+            <div class="canvas-wrapper">
+                <canvas id="canvas" width="800" height="400"></canvas>
             </div>
-            <div class="control-group">
-                <label>政策（基准偏移） <span id="policyValue">0</span></label>
-                <input type="range" id="policy" min="-50" max="50" step="1" value="0">
-            </div>
-            <div class="control-group">
-                <label>速度 <span id="speedValue">1.0</span></label>
-                <input type="range" id="speed" min="0.0" max="2.5" step="0.1" value="1.0">
-            </div>
-        </div>
 
-        <!-- ===== 反馈面板 ===== -->
-        <div class="feedback">
-            <div class="feedback-item">
-                <span class="label">当前角度</span>
-                <span class="value" id="angleDisplay">0°</span>
+            <div class="controls">
+                <div class="control-group">
+                    <label>弹性（波动幅度） <span id="elasticValue">1.0</span></label>
+                    <input type="range" id="elastic" min="0.2" max="2.0" step="0.05" value="1.0">
+                </div>
+                <div class="control-group">
+                    <label>政策（基准偏移） <span id="policyValue">0</span></label>
+                    <input type="range" id="policy" min="-50" max="50" step="1" value="0">
+                </div>
+                <div class="control-group">
+                    <label>速度 <span id="speedValue">1.0</span></label>
+                    <input type="range" id="speed" min="0.0" max="2.5" step="0.1" value="1.0">
+                </div>
             </div>
-            <div class="feedback-item">
-                <span class="label">需求指数</span>
-                <span class="value highlight" id="demandDisplay">50%</span>
-            </div>
-            <div class="feedback-item">
-                <span class="label">供给指数</span>
-                <span class="value highlight" id="supplyDisplay">50%</span>
-            </div>
-            <div class="feedback-item">
-                <span class="label">状态</span>
-                <span class="value" id="stateDisplay">⚖️ 均衡</span>
-            </div>
-        </div>
 
-        <!-- ===== 底部操作区 ===== -->
-        <div class="footer-actions">
+            <div class="feedback">
+                <div class="fb-item">
+                    <span class="label">当前角度</span>
+                    <span class="value" id="angleDisplay">0°</span>
+                </div>
+                <div class="fb-item">
+                    <span class="label">需求指数</span>
+                    <span class="value highlight" id="demandDisplay">50%</span>
+                </div>
+                <div class="fb-item">
+                    <span class="label">供给指数</span>
+                    <span class="value highlight" id="supplyDisplay">50%</span>
+                </div>
+                <div class="fb-item">
+                    <span class="label">状态</span>
+                    <span class="value" id="stateDisplay">⚖️ 均衡</span>
+                </div>
+            </div>
+
             <div class="actions">
                 <button class="primary" id="toggleBtn">⏸️ 暂停</button>
                 <button id="resetBtn">🔄 重置</button>
             </div>
-        </div>
-
-        <!-- ===== ★★★ 返回链接（加在这里） ★★★ ===== -->
-        <div class="back-link-wrapper">
-            <a href="index.html">← 返回作品集首页</a>
         </div>
 
     </div>
