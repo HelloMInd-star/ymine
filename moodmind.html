@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>MoodMind · 非标资产估值底座</title>
     <style>
         * {
@@ -15,10 +15,7 @@
             background: #0b0b1a;
             font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
             min-height: 100vh;
-            padding: 40px 24px;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
+            padding: 40px 24px 40px 100px;
             overflow-x: hidden;
             cursor: default;
         }
@@ -35,6 +32,87 @@
             transition: background 0.1s;
         }
 
+        /* ===== 右侧固定导航栏 ===== */
+        .sidebar-nav {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 72px;
+            height: 100vh;
+            padding: 32px 0 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            z-index: 100;
+            background: rgba(11, 11, 26, 0.6);
+            backdrop-filter: blur(12px);
+            border-left: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        .sidebar-nav .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            color: rgba(255, 255, 255, 0.12);
+            font-size: 11px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+            text-decoration: none;
+            font-family: 'Courier New', monospace;
+        }
+
+        .sidebar-nav .nav-item:hover {
+            color: rgba(255, 255, 255, 0.5);
+            background: rgba(255, 255, 255, 0.03);
+            border-color: rgba(255, 255, 255, 0.06);
+        }
+
+        .sidebar-nav .nav-item.active {
+            color: #a78bfa;
+            background: rgba(167, 139, 250, 0.06);
+            border-color: rgba(167, 139, 250, 0.12);
+        }
+
+        .sidebar-nav .nav-item .num {
+            font-size: 10px;
+            font-weight: 600;
+            line-height: 1;
+        }
+
+        .sidebar-nav .nav-item .label {
+            font-size: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            opacity: 0.3;
+            margin-top: 1px;
+            font-family: system-ui, sans-serif;
+        }
+
+        .sidebar-nav .nav-divider {
+            width: 20px;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.04);
+            margin: 2px 0;
+        }
+
+        .sidebar-nav .nav-bottom {
+            margin-top: auto;
+            font-size: 7px;
+            color: rgba(255, 255, 255, 0.04);
+            writing-mode: vertical-rl;
+            letter-spacing: 2px;
+            font-weight: 300;
+        }
+
+        /* ===== 主容器 ===== */
         .container {
             max-width: 1100px;
             width: 100%;
@@ -109,7 +187,7 @@
 
         .header {
             text-align: center;
-            margin-bottom: 40px;
+            margin-bottom: 32px;
             opacity: 0;
             animation: fadeInUp 0.8s ease forwards;
         }
@@ -145,18 +223,104 @@
             margin-top: 6px;
         }
 
+        /* ===== 锚点 ===== */
+        .section-anchor {
+            scroll-margin-top: 16px;
+        }
+
+        /* ===== 顶部映射说明 ===== */
+        .mapping-intro {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 16px;
+            padding: 24px 28px;
+            margin-bottom: 36px;
+            opacity: 0;
+            animation: fadeInUp 0.6s ease 0.05s forwards;
+        }
+
+        .mapping-intro .intro-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 12px;
+            text-align: center;
+        }
+
+        .mapping-intro .intro-flow {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            gap: 6px 12px;
+        }
+
+        .mapping-intro .intro-flow .node {
+            background: rgba(167, 139, 250, 0.06);
+            border: 1px solid rgba(167, 139, 250, 0.08);
+            border-radius: 12px;
+            padding: 8px 16px;
+            text-align: center;
+            min-width: 70px;
+        }
+
+        .mapping-intro .intro-flow .node .n-label {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.2);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .mapping-intro .intro-flow .node .n-value {
+            font-size: 13px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.7);
+            margin-top: 1px;
+        }
+
+        .mapping-intro .intro-flow .node.highlight {
+            border-color: rgba(167, 139, 250, 0.2);
+            background: rgba(167, 139, 250, 0.08);
+        }
+
+        .mapping-intro .intro-flow .node.highlight .n-value {
+            color: #a78bfa;
+        }
+
+        .mapping-intro .intro-flow .arrow-icon {
+            color: rgba(255, 255, 255, 0.08);
+            font-size: 16px;
+        }
+
+        .mapping-intro .intro-flow .node .n-desc {
+            font-size: 9px;
+            color: rgba(255, 255, 255, 0.15);
+            margin-top: 2px;
+        }
+
+        .mapping-intro .intro-flow .node .n-status {
+            font-size: 9px;
+            color: #22c55e;
+            margin-top: 2px;
+        }
+
+        .mapping-intro .intro-flow .node .n-status.locked {
+            color: rgba(255, 255, 255, 0.15);
+        }
+
+        /* ===== 通用板块 ===== */
         .section {
             margin-bottom: 40px;
             opacity: 0;
             animation: fadeInUp 0.6s ease forwards;
         }
 
-        .section:nth-child(2) { animation-delay: 0.1s; }
-        .section:nth-child(3) { animation-delay: 0.15s; }
-        .section:nth-child(4) { animation-delay: 0.2s; }
-        .section:nth-child(5) { animation-delay: 0.25s; }
-        .section:nth-child(6) { animation-delay: 0.3s; }
-        .section:nth-child(7) { animation-delay: 0.35s; }
+        .section:nth-child(3) { animation-delay: 0.1s; }
+        .section:nth-child(4) { animation-delay: 0.15s; }
+        .section:nth-child(5) { animation-delay: 0.2s; }
+        .section:nth-child(6) { animation-delay: 0.25s; }
+        .section:nth-child(7) { animation-delay: 0.3s; }
+        .section:nth-child(8) { animation-delay: 0.35s; }
 
         .section h2 {
             font-size: 22px;
@@ -180,7 +344,7 @@
         }
 
         .section h3 {
-            font-size: 18px;
+            font-size: 17px;
             font-weight: 500;
             color: rgba(255, 255, 255, 0.7);
             margin-bottom: 8px;
@@ -324,6 +488,161 @@
             border-bottom: none;
         }
 
+        /* ===== 动态估值交互区 ===== */
+        .valuation-sim {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 16px;
+            padding: 20px 24px;
+            margin: 12px 0 16px;
+        }
+
+        .valuation-sim .sim-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 12px;
+        }
+
+        .valuation-sim .slider-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px 20px;
+            margin-bottom: 12px;
+        }
+
+        .valuation-sim .slider-group .ctrl {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .valuation-sim .slider-group .ctrl label {
+            font-size: 12px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.35);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .valuation-sim .slider-group .ctrl label span {
+            color: #a78bfa;
+            font-weight: 600;
+        }
+
+        .valuation-sim .slider-group .ctrl input[type="range"] {
+            width: 100%;
+            accent-color: #a78bfa;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 4px;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        .valuation-sim .slider-group .ctrl input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #a78bfa;
+            cursor: pointer;
+            box-shadow: 0 0 16px rgba(167, 139, 250, 0.2);
+        }
+
+        .valuation-sim .result-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px 24px;
+            justify-content: center;
+            padding-top: 12px;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        .valuation-sim .result-row .res-item {
+            text-align: center;
+        }
+
+        .valuation-sim .result-row .res-item .res-label {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.2);
+        }
+
+        .valuation-sim .result-row .res-item .res-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #f1f5f9;
+            margin-top: 2px;
+        }
+
+        .valuation-sim .result-row .res-item .res-value.highlight {
+            color: #a78bfa;
+        }
+
+        .valuation-sim .result-row .res-item .res-value.gold {
+            color: #fbbf24;
+        }
+
+        .valuation-sim .result-row .res-item .res-sub {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.2);
+            margin-top: 2px;
+        }
+
+        /* ===== 延伸方向（锁住） ===== */
+        .extension-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin: 12px 0 16px;
+        }
+
+        .extension-grid .ext-item {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 14px;
+            padding: 16px 18px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.3s ease;
+            cursor: default;
+        }
+
+        .extension-grid .ext-item .ext-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .extension-grid .ext-item .ext-info .ext-name {
+            font-size: 15px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .extension-grid .ext-item .ext-info .ext-desc {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.2);
+            margin-top: 2px;
+        }
+
+        .extension-grid .ext-item .ext-lock {
+            font-size: 18px;
+            color: rgba(255, 255, 255, 0.08);
+            padding: 6px 12px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 8px;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.12);
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .extension-grid .ext-item .ext-lock .lock-icon {
+            margin-right: 4px;
+        }
+
+        /* ===== 底部 ===== */
         .back-bottom {
             text-align: center;
             margin-top: 40px;
@@ -344,9 +663,35 @@
             color: rgba(255, 255, 255, 0.8);
         }
 
+        /* ===== 响应式 ===== */
+        @media (max-width: 900px) {
+            body {
+                padding: 24px 16px 24px 16px;
+            }
+            .sidebar-nav {
+                display: none;
+            }
+            .container {
+                padding: 32px 24px 28px;
+            }
+            .mapping-intro .intro-flow {
+                flex-direction: column;
+                gap: 6px;
+            }
+            .mapping-intro .intro-flow .arrow-icon {
+                transform: rotate(90deg);
+            }
+            .valuation-sim .slider-group {
+                grid-template-columns: 1fr;
+            }
+            .extension-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
         @media (max-width: 700px) {
             .container {
-                padding: 28px 20px;
+                padding: 24px 16px 20px;
             }
             .header h1 {
                 font-size: 26px;
@@ -358,14 +703,27 @@
                 flex-direction: column;
                 align-items: flex-start;
             }
+            .mapping-intro {
+                padding: 18px 16px;
+            }
+            .valuation-sim {
+                padding: 16px 14px;
+            }
+            .valuation-sim .result-row .res-item .res-value {
+                font-size: 20px;
+            }
         }
 
         @media (max-width: 480px) {
             .container {
-                padding: 20px 14px;
+                padding: 18px 12px 16px;
             }
             .header h1 {
                 font-size: 22px;
+            }
+            .valuation-sim .result-row {
+                flex-direction: column;
+                gap: 10px;
             }
         }
     </style>
@@ -374,6 +732,22 @@
 
     <div id="glow"></div>
 
+    <!-- ===== 右侧固定导航栏 ===== -->
+    <div class="sidebar-nav">
+        <a class="nav-item" data-target="section-intro"><span class="num">①</span><span class="label">映射</span></a>
+        <a class="nav-item" data-target="section-position"><span class="num">②</span><span class="label">定位</span></a>
+        <a class="nav-item" data-target="section-layers"><span class="num">③</span><span class="label">架构</span></a>
+        <a class="nav-item" data-target="section-single"><span class="num">④</span><span class="label">四维</span></a>
+        <a class="nav-item" data-target="section-track"><span class="num">⑤</span><span class="label">赛道</span></a>
+        <a class="nav-item" data-target="section-matrix"><span class="num">⑥</span><span class="label">矩阵</span></a>
+        <a class="nav-item" data-target="section-iterate"><span class="num">⑦</span><span class="label">迭代</span></a>
+        <a class="nav-item" data-target="section-link"><span class="num">⑧</span><span class="label">链路</span></a>
+        <div class="nav-divider"></div>
+        <a class="nav-item" data-target="section-extension"><span class="num">∞</span><span class="label">延伸</span></a>
+        <div class="nav-bottom">MoodMind</div>
+    </div>
+
+    <!-- ===== 主容器 ===== -->
     <div class="container">
 
         <!-- ===== 头部 ===== -->
@@ -383,7 +757,46 @@
             <div class="sub">MCN博主 · IP · 账号矩阵 · 不确定性资产估值框架</div>
         </div>
 
+        <!-- ===== 顶部映射说明 ===== -->
+        <div class="section-anchor" id="section-intro"></div>
+        <div class="mapping-intro">
+            <div class="intro-title">📌 估值模型 → 映射体 → 应用方向</div>
+            <div class="intro-flow">
+                <div class="node">
+                    <div class="n-label">3 →</div>
+                    <div class="n-value">三个方向</div>
+                    <div class="n-desc">估值模型 · 赛道组合 · 全域矩阵</div>
+                </div>
+                <span class="arrow-icon">→</span>
+                <div class="node highlight">
+                    <div class="n-label">→ 1</div>
+                    <div class="n-value">核心资产</div>
+                    <div class="n-desc">非标资产 · 不确定性资产</div>
+                </div>
+                <span class="arrow-icon">→</span>
+                <div class="node highlight">
+                    <div class="n-label">→ 1</div>
+                    <div class="n-value">可迁移架构</div>
+                    <div class="n-desc">同一套估值框架 · 任意非标领域</div>
+                </div>
+                <span class="arrow-icon">→</span>
+                <div class="node">
+                    <div class="n-label">→ 3</div>
+                    <div class="n-value">三个应用方向</div>
+                    <div class="n-desc">✅ MCN博主 · 🔜 股票 · 🔜 熵值</div>
+                    <div class="n-status">✅ 已实现 · 🔒 待解锁</div>
+                </div>
+                <span class="arrow-icon">→</span>
+                <div class="node">
+                    <div class="n-label">→ 100</div>
+                    <div class="n-value">无限延展</div>
+                    <div class="n-desc">任何需要评估不确定性资产的场景</div>
+                </div>
+            </div>
+        </div>
+
         <!-- ===== 一、模型定位 ===== -->
+        <div class="section-anchor" id="section-position"></div>
         <div class="section">
             <h2>1. 模型定位 <span class="tag">全栖系统 1.7.2</span></h2>
             <div class="card-grid">
@@ -414,6 +827,7 @@
         </div>
 
         <!-- ===== 二、三层架构 ===== -->
+        <div class="section-anchor" id="section-layers"></div>
         <div class="section">
             <h2>2. 三层架构 <span class="tag">穿透式估值</span></h2>
             <div class="flow-row" style="flex-direction: column; align-items: stretch; gap: 8px;">
@@ -438,35 +852,76 @@
             </div>
         </div>
 
-        <!-- ===== 三、第一层：单博主四维定价 ===== -->
+        <!-- ===== 三、第一层：单博主四维定价（含动态交互） ===== -->
+        <div class="section-anchor" id="section-single"></div>
         <div class="section">
-            <h2>3. 第一层 · 单博主四维定价</h2>
+            <h2>3. 第一层 · 单博主四维定价 <span class="tag">动态估值</span></h2>
 
             <h3>估值公式</h3>
             <div class="highlight-box">
                 <p><strong>单博主综合估值 = 流量盘 × 0.30 + 人设盘 × 0.25 + 变现盘 × 0.35 - 风险盘 × 0.10</strong></p>
             </div>
 
+            <!-- 动态估值交互器 -->
+            <div class="valuation-sim">
+                <div class="sim-title">🎛️ 权重调节 · 实时估值</div>
+                <div class="slider-group">
+                    <div class="ctrl">
+                        <label>流量盘 <span id="weightFlow">0.30</span></label>
+                        <input type="range" id="flowWeight" min="0.05" max="0.50" step="0.01" value="0.30">
+                    </div>
+                    <div class="ctrl">
+                        <label>人设盘 <span id="weightPersona">0.25</span></label>
+                        <input type="range" id="personaWeight" min="0.05" max="0.50" step="0.01" value="0.25">
+                    </div>
+                    <div class="ctrl">
+                        <label>变现盘 <span id="weightMonetize">0.35</span></label>
+                        <input type="range" id="monetizeWeight" min="0.05" max="0.50" step="0.01" value="0.35">
+                    </div>
+                    <div class="ctrl">
+                        <label>风险盘 <span id="weightRisk">0.10</span></label>
+                        <input type="range" id="riskWeight" min="0.00" max="0.30" step="0.01" value="0.10">
+                    </div>
+                </div>
+                <div class="result-row">
+                    <div class="res-item">
+                        <div class="res-label">综合估值</div>
+                        <div class="res-value highlight" id="totalValuation">0.000</div>
+                        <div class="res-sub">归一化值</div>
+                    </div>
+                    <div class="res-item">
+                        <div class="res-label">α 值</div>
+                        <div class="res-value gold" id="alphaValue">0.000</div>
+                        <div class="res-sub">余弦相似度</div>
+                    </div>
+                    <div class="res-item">
+                        <div class="res-label">资产等级</div>
+                        <div class="res-value" id="assetGrade" style="color:#94a3b8;">—</div>
+                        <div class="res-sub" id="gradeStrategy">等待计算</div>
+                    </div>
+                </div>
+            </div>
+
             <h3>四维详解</h3>
             <div class="card-grid">
                 <div class="card-item">
                     <div class="label">📊 流量盘</div>
-                    <div class="value">30%</div>
+                    <div class="value" id="flowDisplay">30%</div>
                     <div class="desc">流量获取能力 · 流量质量 · 增长趋势 · 来源健康度</div>
                 </div>
                 <div class="card-item">
                     <div class="label">🧑‍🎤 人设盘</div>
-                    <div class="value">25%</div>
+                    <div class="value" id="personaDisplay">25%</div>
                     <div class="desc">粉丝增速 · 粘性 · 内容辨识度 · 跨平台影响力 · 舆情健康度</div>
                 </div>
                 <div class="card-item">
                     <div class="label">💰 变现盘</div>
-                    <div class="value">35%</div>
+                    <div class="value" id="monetizeDisplay">35%</div>
                     <div class="desc">变现规模 · 效率 · 稳定性 · 潜力 · 多元化</div>
                 </div>
                 <div class="card-item">
                     <div class="label">⚠️ 风险盘</div>
-                    <div class="value">10%</div>
+                    <div class="value" id="riskDisplay">10%</div>
                     <div class="desc">舆情风险 · 合规风险 · 流量下滑 · 变现中断 · 人设崩塌</div>
                 </div>
             </div>
@@ -488,8 +943,9 @@
         </div>
 
         <!-- ===== 四、第二层：赛道组合估值 ===== -->
+        <div class="section-anchor" id="section-track"></div>
         <div class="section">
-            <h2>4. 第二层 · 赛道组合估值</h2>
+            <h2>4. 第二层 · 赛道组合估值 <span class="tag">中观层</span></h2>
 
             <h3>赛道级核心指标</h3>
             <div class="card-grid">
@@ -540,8 +996,9 @@
         </div>
 
         <!-- ===== 五、第三层：全域矩阵估值 ===== -->
+        <div class="section-anchor" id="section-matrix"></div>
         <div class="section">
-            <h2>5. 第三层 · 全域矩阵估值</h2>
+            <h2>5. 第三层 · 全域矩阵估值 <span class="tag">宏观层</span></h2>
 
             <h3>矩阵整体核心指标</h3>
             <div class="card-grid">
@@ -591,8 +1048,9 @@
         </div>
 
         <!-- ===== 六、迭代逼近机制 ===== -->
+        <div class="section-anchor" id="section-iterate"></div>
         <div class="section">
-            <h2>6. 不确定性资产 · 迭代逼近机制</h2>
+            <h2>6. 不确定性资产 · 迭代逼近机制 <span class="tag">动态逼近</span></h2>
             <div class="highlight-box">
                 <p><strong>核心本质：</strong>博主、IP、账号矩阵属于不确定性资产——不存在标准态，价值无法一次性精确计算。只能通过持续校验、不停组合搭配，不断向确定性资产圆柱体靠近。</p>
             </div>
@@ -611,8 +1069,9 @@
         </div>
 
         <!-- ===== 七、应用链路 ===== -->
+        <div class="section-anchor" id="section-link"></div>
         <div class="section">
-            <h2>7. 完整应用链路</h2>
+            <h2>7. 完整应用链路 <span class="tag">端到端</span></h2>
             <div class="flow-row" style="flex-direction: column; align-items: stretch; gap: 6px;">
                 <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
                     <span class="step">单博主数据采集</span>
@@ -637,6 +1096,32 @@
             </div>
         </div>
 
+        <!-- ===== 八、延伸方向（锁住） ===== -->
+        <div class="section-anchor" id="section-extension"></div>
+        <div class="section">
+            <h2>8. 延伸方向 <span class="tag">可迁移架构</span></h2>
+            <p>同一套估值框架，可平移到任何非标资产领域。以下方向正在建设中：</p>
+            <div class="extension-grid">
+                <div class="ext-item">
+                    <div class="ext-info">
+                        <div class="ext-name">📈 股票估值</div>
+                        <div class="ext-desc">PE/PB/DCF 模型 · 风险评估 · 投资组合优化</div>
+                    </div>
+                    <div class="ext-lock"><span class="lock-icon">🔒</span> 待解锁</div>
+                </div>
+                <div class="ext-item">
+                    <div class="ext-info">
+                        <div class="ext-name">🧪 熵值映射（物理/化学）</div>
+                        <div class="ext-desc">用估值框架理解熵值 · 状态概率 · 系统无序度</div>
+                    </div>
+                    <div class="ext-lock"><span class="lock-icon">🔒</span> 待解锁</div>
+                </div>
+            </div>
+            <div class="highlight-box" style="margin-top: 8px;">
+                <p><strong>💡 迁移逻辑：</strong>不确定性资产的估值框架，本质上是“状态概率 × 价值评估”的通用结构。博主是“状态概率”的具象化，股票是“市场状态”的具象化，熵值是“物理状态”的具象化——同一套框架，三种不同领域的映射。</p>
+            </div>
+        </div>
+
         <!-- ===== 底部返回 ===== -->
         <div class="back-bottom">
             <a href="index.html">← 返回作品集首页</a>
@@ -645,6 +1130,7 @@
     </div>
 
     <script>
+        // ===== 鼠标光晕 =====
         const glow = document.getElementById('glow');
         document.addEventListener('mousemove', (e) => {
             const x = e.clientX / window.innerWidth * 100;
@@ -652,6 +1138,155 @@
             glow.style.setProperty('--x', x + '%');
             glow.style.setProperty('--y', y + '%');
         });
+
+        // ===== 右侧导航栏交互 =====
+        const navItems = document.querySelectorAll('.nav-item');
+        const sections = [
+            document.getElementById('section-intro'),
+            document.getElementById('section-position'),
+            document.getElementById('section-layers'),
+            document.getElementById('section-single'),
+            document.getElementById('section-track'),
+            document.getElementById('section-matrix'),
+            document.getElementById('section-iterate'),
+            document.getElementById('section-link'),
+            document.getElementById('section-extension')
+        ];
+
+        navItems.forEach((item, index) => {
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = sections[index];
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+                navItems.forEach(el => el.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        function updateActiveNav() {
+            let currentIndex = 0;
+            sections.forEach((section, i) => {
+                if (section) {
+                    const rect = section.getBoundingClientRect();
+                    if (rect.top <= 120) {
+                        currentIndex = i;
+                    }
+                }
+            });
+            navItems.forEach((el, i) => {
+                el.classList.toggle('active', i === currentIndex);
+            });
+        }
+
+        window.addEventListener('scroll', updateActiveNav);
+        window.addEventListener('load', updateActiveNav);
+
+        // ===== 动态估值计算 =====
+        (function() {
+            const flowSlider = document.getElementById('flowWeight');
+            const personaSlider = document.getElementById('personaWeight');
+            const monetizeSlider = document.getElementById('monetizeWeight');
+            const riskSlider = document.getElementById('riskWeight');
+
+            const flowDisplay = document.getElementById('flowDisplay');
+            const personaDisplay = document.getElementById('personaDisplay');
+            const monetizeDisplay = document.getElementById('monetizeDisplay');
+            const riskDisplay = document.getElementById('riskDisplay');
+
+            const flowVal = document.getElementById('weightFlow');
+            const personaVal = document.getElementById('weightPersona');
+            const monetizeVal = document.getElementById('weightMonetize');
+            const riskVal = document.getElementById('weightRisk');
+
+            const totalDisplay = document.getElementById('totalValuation');
+            const alphaDisplay = document.getElementById('alphaValue');
+            const gradeDisplay = document.getElementById('assetGrade');
+            const strategyDisplay = document.getElementById('gradeStrategy');
+
+            // 模拟各维度的子指标得分（0-1）
+            function getScores() {
+                return {
+                    flow: 0.72 + 0.15 * Math.random(),
+                    persona: 0.65 + 0.20 * Math.random(),
+                    monetize: 0.58 + 0.25 * Math.random(),
+                    risk: 0.30 + 0.20 * Math.random()
+                };
+            }
+
+            function updateValuation() {
+                const wFlow = parseFloat(flowSlider.value);
+                const wPersona = parseFloat(personaSlider.value);
+                const wMonetize = parseFloat(monetizeSlider.value);
+                const wRisk = parseFloat(riskSlider.value);
+
+                flowVal.textContent = wFlow.toFixed(2);
+                personaVal.textContent = wPersona.toFixed(2);
+                monetizeVal.textContent = wMonetize.toFixed(2);
+                riskVal.textContent = wRisk.toFixed(2);
+
+                flowDisplay.textContent = Math.round(wFlow * 100) + '%';
+                personaDisplay.textContent = Math.round(wPersona * 100) + '%';
+                monetizeDisplay.textContent = Math.round(wMonetize * 100) + '%';
+                riskDisplay.textContent = Math.round(wRisk * 100) + '%';
+
+                // 模拟子指标得分（用确定性 + 随机性模拟动态演变）
+                const scores = getScores();
+                const flowScore = scores.flow;
+                const personaScore = scores.persona;
+                const monetizeScore = scores.monetize;
+                const riskScore = scores.risk;
+
+                // 综合估值
+                const total = wFlow * flowScore + wPersona * personaScore + wMonetize * monetizeScore - wRisk * riskScore;
+                const clampedTotal = Math.max(0, Math.min(1, total));
+                totalDisplay.textContent = clampedTotal.toFixed(3);
+
+                // α值（模拟余弦相似度）
+                const alpha = 0.5 + 0.4 * clampedTotal + 0.1 * Math.sin(Date.now() / 5000);
+                const clampedAlpha = Math.max(0, Math.min(1, alpha));
+                alphaDisplay.textContent = clampedAlpha.toFixed(3);
+
+                // 资产等级判定
+                let grade, strategy, color;
+                if (clampedAlpha >= 0.85) {
+                    grade = 'S级';
+                    strategy = '重点保护 · 开放杠杆';
+                    color = '#a78bfa';
+                } else if (clampedAlpha >= 0.70) {
+                    grade = 'A级';
+                    strategy = '深度赋能 · 推动跃迁';
+                    color = '#60a5fa';
+                } else if (clampedAlpha >= 0.55) {
+                    grade = 'B级';
+                    strategy = '标准化培育 · 攻克短板';
+                    color = '#fbbf24';
+                } else if (clampedAlpha >= 0.40) {
+                    grade = 'C级';
+                    strategy = '限资源观察 · 逾期降级';
+                    color = '#fb923c';
+                } else {
+                    grade = 'D级';
+                    strategy = '清退评估 · 处置流程';
+                    color = '#ef4444';
+                }
+                gradeDisplay.textContent = grade;
+                gradeDisplay.style.color = color;
+                strategyDisplay.textContent = strategy;
+            }
+
+            // 滑块事件
+            [flowSlider, personaSlider, monetizeSlider, riskSlider].forEach(slider => {
+                slider.addEventListener('input', updateValuation);
+            });
+
+            // 初始计算
+            updateValuation();
+
+            // 每3秒微调一次，模拟动态演变
+            setInterval(updateValuation, 3000);
+        })();
     </script>
 
 </body>
