@@ -19,6 +19,21 @@
             justify-content: center;
             align-items: center;
             padding: 40px 20px;
+            overflow-x: hidden;
+            cursor: default;
+        }
+
+        /* ===== 鼠标跟随光晕 ===== */
+        #glow {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            background: radial-gradient(600px circle at var(--x, 50%) var(--y, 50%), rgba(120, 80, 255, 0.06), transparent 80%);
+            transition: background 0.1s;
         }
 
         .container {
@@ -31,8 +46,11 @@
             box-shadow: 0 30px 80px rgba(40, 10, 80, 0.4);
             position: relative;
             overflow: hidden;
+            z-index: 1;
+            backdrop-filter: blur(2px);
         }
 
+        /* ===== 星云背景动画 ===== */
         .container::before {
             content: '';
             position: absolute;
@@ -68,6 +86,7 @@
             }
         }
 
+        /* ===== 英雄区 ===== */
         .hero {
             display: flex;
             align-items: center;
@@ -75,6 +94,8 @@
             position: relative;
             z-index: 1;
             flex-wrap: wrap;
+            opacity: 0;
+            animation: fadeInUp 0.8s ease forwards;
         }
 
         .avatar-wrapper {
@@ -178,6 +199,7 @@
             animation: tapGlow 1.8s ease-in-out infinite alternate;
         }
 
+        /* ===== 星星装饰（增强闪烁） ===== */
         .star-dot {
             position: absolute;
             width: 3px;
@@ -287,6 +309,7 @@
             }
         }
 
+        /* ===== 右侧文字 ===== */
         .hero-text {
             flex: 1;
             min-width: 240px;
@@ -303,6 +326,7 @@
             letter-spacing: 1.5px;
             text-transform: uppercase;
             margin-bottom: 12px;
+            animation: shimmer 4s ease-in-out infinite;
         }
 
         .hero-text h1 {
@@ -311,12 +335,11 @@
             color: #f1f5f9;
             line-height: 1.2;
             margin-bottom: 6px;
-        }
-
-        .hero-text h1 span {
-            background: linear-gradient(135deg, #a78bfa, #60a5fa);
+            background: linear-gradient(135deg, #f1f5f9, #a78bfa, #60a5fa, #f1f5f9);
+            background-size: 300% 300%;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            animation: gradientFlow 6s ease-in-out infinite;
         }
 
         .hero-text .sub {
@@ -339,12 +362,46 @@
             font-weight: 500;
         }
 
-        /* ===== 入口网格 ===== */
+        @keyframes shimmer {
+            0%,
+            100% {
+                opacity: 0.6;
+            }
+            50% {
+                opacity: 1;
+            }
+        }
+
+        @keyframes gradientFlow {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        /* ===== 全局入场动画 ===== */
+        @keyframes fadeInUp {
+            0% {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ===== 导航卡片 ===== */
         .nav-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 10px;
-            margin-top: 32px;
+            margin-top: 20px;
             position: relative;
             z-index: 1;
         }
@@ -353,40 +410,122 @@
             background: rgba(255, 255, 255, 0.02);
             border: 1px solid rgba(255, 255, 255, 0.04);
             border-radius: 14px;
-            padding: 16px 18px;
+            padding: 14px 16px;
             text-decoration: none;
             color: rgba(255, 255, 255, 0.5);
             font-size: 13px;
             font-weight: 500;
-            transition: all 0.3s;
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             display: flex;
             align-items: center;
             gap: 10px;
             backdrop-filter: blur(4px);
+            opacity: 0;
+            animation: fadeInUp 0.6s ease forwards;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-card:nth-child(1) {
+            animation-delay: 0.05s;
+        }
+        .nav-card:nth-child(2) {
+            animation-delay: 0.1s;
+        }
+        .nav-card:nth-child(3) {
+            animation-delay: 0.15s;
+        }
+        .nav-card:nth-child(4) {
+            animation-delay: 0.2s;
+        }
+        .nav-card:nth-child(5) {
+            animation-delay: 0.25s;
+        }
+        .nav-card:nth-child(6) {
+            animation-delay: 0.3s;
+        }
+        .nav-card:nth-child(7) {
+            animation-delay: 0.35s;
+        }
+        .nav-card:nth-child(8) {
+            animation-delay: 0.4s;
+        }
+        .nav-card:nth-child(9) {
+            animation-delay: 0.45s;
+        }
+
+        .nav-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.03), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .nav-card:hover::before {
+            left: 100%;
         }
 
         .nav-card:hover {
-            background: rgba(255, 255, 255, 0.04);
-            border-color: rgba(255, 255, 255, 0.08);
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.12);
             color: #f1f5f9;
-            transform: translateY(-2px);
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+            transform: translateY(-3px) scale(1.01);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4), 0 0 30px rgba(120, 80, 255, 0.05);
         }
 
         .nav-card .icon {
             font-size: 18px;
             flex-shrink: 0;
+            transition: transform 0.3s ease;
+        }
+
+        .nav-card:hover .icon {
+            transform: scale(1.15);
         }
 
         .nav-card .arrow {
             margin-left: auto;
             opacity: 0.2;
             font-size: 12px;
-            transition: opacity 0.3s;
+            transition: all 0.3s ease;
         }
 
         .nav-card:hover .arrow {
-            opacity: 0.6;
+            opacity: 0.8;
+            transform: translateX(4px);
+        }
+
+        /* ===== 全宽卡片特殊样式 ===== */
+        .nav-card.full-width {
+            grid-column: 1 / -1;
+            justify-content: center;
+            border-color: rgba(255, 255, 255, 0.06);
+        }
+
+        .nav-card.full-width:hover {
+            border-color: rgba(255, 255, 255, 0.12);
+        }
+
+        /* ===== 分隔标题 ===== */
+        .section-label {
+            font-size: 12px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.12);
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-top: 24px;
+            margin-bottom: 6px;
+            padding-left: 4px;
+            opacity: 0;
+            animation: fadeInUp 0.6s ease 0.1s forwards;
+        }
+
+        .section-label:first-of-type {
+            margin-top: 0;
         }
 
         /* ===== 工具分类 ===== */
@@ -399,6 +538,8 @@
             gap: 16px;
             position: relative;
             z-index: 1;
+            opacity: 0;
+            animation: fadeInUp 0.6s ease 0.2s forwards;
         }
 
         .tool-category {
@@ -406,6 +547,13 @@
             border: 1px solid rgba(255, 255, 255, 0.04);
             border-radius: 14px;
             padding: 14px 18px;
+            transition: all 0.4s ease;
+        }
+
+        .tool-category:hover {
+            background: rgba(255, 255, 255, 0.03);
+            border-color: rgba(255, 255, 255, 0.08);
+            transform: translateY(-2px);
         }
 
         .tool-category h4 {
@@ -421,10 +569,6 @@
             font-size: 13px;
             color: rgba(255, 255, 255, 0.3);
             line-height: 1.6;
-        }
-
-        .tool-category p .highlight {
-            color: rgba(255, 255, 255, 0.6);
         }
 
         /* ===== 响应式 ===== */
@@ -496,11 +640,13 @@
 </head>
 <body>
 
+    <!-- ===== 鼠标跟随光晕 ===== -->
+    <div id="glow"></div>
+
     <div class="container">
 
         <!-- ===== 英雄区 ===== -->
         <div class="hero">
-
             <div class="avatar-wrapper">
                 <div class="avatar">
                     <div class="ikkyu">
@@ -527,19 +673,24 @@
                     <strong>0→5层</strong> · 68项资产 · 4条证据链闭环
                 </div>
             </div>
-
         </div>
 
         <!-- ===== 第一排：画圈实验（起源） ===== -->
+        <div class="section-label">◈ 起源</div>
         <div class="nav-grid">
-            <a href="circle-lab.html" class="nav-card" style="grid-column: 1 / -1; justify-content: center; border-color: rgba(255,255,255,0.08);">
-                <span class="icon">🧪</span> 画圈实验 · 认知方法论（起源）
+            <a href="circle-lab.html" class="nav-card full-width">
+                <span class="icon">🧪</span> 画圈实验 · 认知方法论
                 <span class="arrow">→</span>
             </a>
         </div>
 
-        <!-- ===== 第二排：EvolveMind + GameMind（并列底座） ===== -->
+        <!-- ===== 第二排：能力层 + 三个系统 ===== -->
+        <div class="section-label">◈ 能力层 · 系统底座</div>
         <div class="nav-grid">
+            <a href="value-pyramid.html" class="nav-card">
+                <span class="icon">📐</span> 价值金字塔
+                <span class="arrow">→</span>
+            </a>
             <a href="evolvemind/index.html" class="nav-card">
                 <span class="icon">🧠</span> EvolveMind · 认知系统
                 <span class="arrow">→</span>
@@ -548,22 +699,15 @@
                 <span class="icon">🎯</span> GameMind · 博弈论底座
                 <span class="arrow">→</span>
             </a>
-        </div>
-
-        <!-- ===== 第三排：MoodMind（商业落地） ===== -->
-        <div class="nav-grid">
-            <a href="moodmind.html" class="nav-card" style="grid-column: 1 / -1; justify-content: center; border-color: rgba(255,255,255,0.08);">
-                <span class="icon">📊</span> MoodMind · 非标资产估值底座（商业落地）
+            <a href="moodmind.html" class="nav-card">
+                <span class="icon">📊</span> MoodMind · 估值底座
                 <span class="arrow">→</span>
             </a>
         </div>
 
-        <!-- ===== 其他已有入口（保留） ===== -->
+        <!-- ===== 第三排：证据链层 ===== -->
+        <div class="section-label">◈ 证据链闭环</div>
         <div class="nav-grid">
-            <a href="value-pyramid.html" class="nav-card">
-                <span class="icon">📐</span> 价值金字塔
-                <span class="arrow">→</span>
-            </a>
             <a href="cross-domain-mapping.html" class="nav-card">
                 <span class="icon">⚡</span> 跨领域吞噬验证
                 <span class="arrow">→</span>
@@ -572,12 +716,12 @@
                 <span class="icon">🔍</span> 元架构重构营销学
                 <span class="arrow">→</span>
             </a>
-            <a href="business-learning-evidence.html" class="nav-card">
-                <span class="icon">📊</span> 商业知识学习证据链
-                <span class="arrow">→</span>
-            </a>
             <a href="language-mapping-evidence.html" class="nav-card">
                 <span class="icon">🧩</span> 翻译器设计逻辑 · 证据链
+                <span class="arrow">→</span>
+            </a>
+            <a href="business-learning-evidence.html" class="nav-card">
+                <span class="icon">📊</span> 商业知识学习证据链
                 <span class="arrow">→</span>
             </a>
             <a href="README.html" class="nav-card">
@@ -599,6 +743,17 @@
         </div>
 
     </div>
+
+    <script>
+        // ===== 鼠标跟随光晕 =====
+        const glow = document.getElementById('glow');
+        document.addEventListener('mousemove', (e) => {
+            const x = e.clientX / window.innerWidth * 100;
+            const y = e.clientY / window.innerHeight * 100;
+            glow.style.setProperty('--x', x + '%');
+            glow.style.setProperty('--y', y + '%');
+        });
+    </script>
 
 </body>
 </html>
