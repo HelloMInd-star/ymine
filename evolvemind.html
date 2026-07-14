@@ -84,57 +84,12 @@
             }
         }
 
-        /* ===== 顶部导航（整合后） ===== */
-        .back-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 28px;
-            flex-wrap: wrap;
-            gap: 12px;
-            opacity: 0;
-            animation: fadeInUp 0.6s ease forwards;
-        }
-
-        .back-row .breadcrumb {
-            font-size: 14px;
-            color: rgba(255, 255, 255, 0.3);
-        }
-
-        .back-row .breadcrumb span {
-            color: rgba(255, 255, 255, 0.7);
-            font-weight: 500;
-        }
-
-        .back-row .nav-links {
-            display: flex;
-            gap: 10px;
-        }
-
-        .back-row .nav-links a {
-            color: rgba(255, 255, 255, 0.4);
-            text-decoration: none;
-            font-weight: 500;
-            font-size: 14px;
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            padding: 6px 18px;
-            border-radius: 20px;
-            transition: all 0.3s ease;
-        }
-
-        .back-row .nav-links a:hover {
-            background: rgba(255, 255, 255, 0.04);
-            border-color: rgba(255, 255, 255, 0.12);
-            color: #f1f5f9;
-            transform: translateY(-2px);
-        }
-
         /* ===== 头部 ===== */
         .header {
             text-align: center;
             margin-bottom: 40px;
             opacity: 0;
-            animation: fadeInUp 0.6s ease 0.05s forwards;
+            animation: fadeInUp 0.6s ease forwards;
         }
 
         .badge {
@@ -372,6 +327,27 @@
             box-shadow: 0 0 12px rgba(34, 197, 94, 0.2);
         }
 
+        /* ===== 底部返回链接（新增） ===== */
+        .back-bottom {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+            opacity: 0;
+            animation: fadeInUp 0.6s ease 0.4s forwards;
+        }
+
+        .back-bottom a {
+            color: rgba(255, 255, 255, 0.3);
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s ease;
+        }
+
+        .back-bottom a:hover {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
         /* ===== 响应式 ===== */
         @media (max-width: 860px) {
             .cards {
@@ -382,14 +358,6 @@
         @media (max-width: 700px) {
             .container {
                 padding: 28px 20px;
-            }
-            .back-row {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            .back-row .nav-links {
-                width: 100%;
-                justify-content: flex-start;
             }
         }
 
@@ -418,20 +386,6 @@
     <div id="glow"></div>
 
     <div class="container">
-
-        <!-- ===== 顶部导航（面包屑 + 返回作品集） ===== -->
-        <div class="back-row">
-            <div class="breadcrumb">
-                📂 <a href="../index.html" style="color: rgba(255,255,255,0.4); text-decoration: none; transition: color 0.3s;" 
-                   onmouseover="this.style.color='rgba(255,255,255,0.8)'" 
-                   onmouseout="this.style.color='rgba(255,255,255,0.4)'">作品集</a>
-                <span style="color: rgba(255,255,255,0.2);"> / </span>
-                <span style="color: rgba(255,255,255,0.7); font-weight: 500;">EvolveMind 认知系统</span>
-            </div>
-            <div class="nav-links">
-                <a href="../index.html">← 返回作品集</a>
-            </div>
-        </div>
 
         <!-- ===== 头部 ===== -->
         <div class="header">
@@ -511,6 +465,11 @@
             </div>
         </div>
 
+        <!-- ===== 底部返回链接 ===== -->
+        <div class="back-bottom">
+            <a href="index.html">← 返回作品集首页</a>
+        </div>
+
     </div>
 
     <script>
@@ -537,11 +496,3 @@
 
 </body>
 </html>
-<!-- ===== 底部返回链接 ===== -->
-<div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.04);">
-    <a href="../index.html" style="color: rgba(255,255,255,0.3); text-decoration: none; font-size: 14px; transition: color 0.3s;"
-       onmouseover="this.style.color='rgba(255,255,255,0.8)'"
-       onmouseout="this.style.color='rgba(255,255,255,0.3)'">
-        ← 返回作品集首页
-    </a>
-</div>
