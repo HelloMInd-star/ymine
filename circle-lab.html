@@ -15,7 +15,7 @@
             background: #0b0b1a;
             font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
             min-height: 100vh;
-            padding: 24px 20px;
+            padding: 24px 20px 24px 100px;
             overflow-x: hidden;
         }
 
@@ -31,6 +31,88 @@
             transition: background 0.1s;
         }
 
+        /* ===== 左侧固定索引 ===== */
+        .sidebar-index {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 72px;
+            height: 100vh;
+            padding: 32px 0 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            z-index: 100;
+            background: rgba(11, 11, 26, 0.6);
+            backdrop-filter: blur(12px);
+            border-right: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        .sidebar-index .idx-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            color: rgba(255, 255, 255, 0.15);
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            border: 1px solid transparent;
+            position: relative;
+            font-family: 'Courier New', monospace;
+        }
+
+        .sidebar-index .idx-item:hover {
+            color: rgba(255, 255, 255, 0.6);
+            background: rgba(255, 255, 255, 0.03);
+            border-color: rgba(255, 255, 255, 0.06);
+        }
+
+        .sidebar-index .idx-item.active {
+            color: #a78bfa;
+            background: rgba(167, 139, 250, 0.06);
+            border-color: rgba(167, 139, 250, 0.12);
+        }
+
+        .sidebar-index .idx-item .label {
+            font-size: 7px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            opacity: 0.3;
+            margin-top: 1px;
+            font-family: system-ui, sans-serif;
+        }
+
+        .sidebar-index .idx-item .num {
+            font-size: 11px;
+            font-weight: 600;
+            line-height: 1;
+        }
+
+        .sidebar-index .idx-divider {
+            width: 20px;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.04);
+            margin: 2px 0;
+        }
+
+        .sidebar-index .idx-bottom {
+            margin-top: auto;
+            font-size: 8px;
+            color: rgba(255, 255, 255, 0.06);
+            writing-mode: vertical-rl;
+            letter-spacing: 2px;
+            font-weight: 300;
+        }
+
+        /* ===== 主容器 ===== */
         .page-wrapper {
             max-width: 1200px;
             margin: 0 auto;
@@ -61,6 +143,11 @@
             color: rgba(255, 255, 255, 0.25);
             padding: 0 40px 16px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        /* ===== 板块锚点 ===== */
+        .section-anchor {
+            scroll-margin-top: 16px;
         }
 
         /* ===== 第一层：映射对照 ===== */
@@ -429,7 +516,7 @@
             transform: translateY(-2px);
         }
 
-        /* ===== 第四层：封顶 + 延伸方向（标签化） ===== */
+        /* ===== 第四层：封顶 + 延伸方向 ===== */
         .extension-section {
             padding: 32px 40px 28px;
             border-top: 1px solid rgba(255, 255, 255, 0.04);
@@ -547,6 +634,12 @@
 
         /* ===== 响应式 ===== */
         @media (max-width: 900px) {
+            body {
+                padding: 20px 16px 20px 16px;
+            }
+            .sidebar-index {
+                display: none;
+            }
             .mapping-header {
                 flex-direction: column;
             }
@@ -675,11 +768,49 @@
 </head>
 <body>
 
+    <!-- ===== 鼠标跟随光晕 ===== -->
     <div id="glow"></div>
 
+    <!-- ===== 左侧固定索引 ===== -->
+    <div class="sidebar-index" id="sidebarIndex">
+        <a class="idx-item" data-target="section-mapping">
+            <span class="num">①</span>
+            <span class="label">映射</span>
+        </a>
+        <a class="idx-item" data-target="section-core">
+            <span class="num">②</span>
+            <span class="label">路径</span>
+        </a>
+        <div class="idx-divider"></div>
+        <a class="idx-item" data-target="section-math">
+            <span class="num">③</span>
+            <span class="label">数学</span>
+        </a>
+        <a class="idx-item" data-target="section-econ">
+            <span class="num">④</span>
+            <span class="label">经济</span>
+        </a>
+        <a class="idx-item" data-target="section-ai">
+            <span class="num">⑤</span>
+            <span class="label">AI</span>
+        </a>
+        <a class="idx-item" data-target="section-lingua">
+            <span class="num">⑥</span>
+            <span class="label">语言</span>
+        </a>
+        <div class="idx-divider"></div>
+        <a class="idx-item" data-target="section-extension">
+            <span class="num">∞</span>
+            <span class="label">延伸</span>
+        </a>
+        <div class="idx-bottom">画圈实验</div>
+    </div>
+
+    <!-- ===== 主容器 ===== -->
     <div class="page-wrapper">
 
         <!-- ===== 第一层：映射对照 ===== -->
+        <div class="section-anchor" id="section-mapping"></div>
         <div class="section-title">🧠 画圈实验 · <span>3→1→1→3→100</span></div>
         <div class="section-sub">认知方法论 · 原生思路 vs 科学对照</div>
 
@@ -726,6 +857,7 @@
         </div>
 
         <!-- ===== 第二层：核心路径 ===== -->
+        <div class="section-anchor" id="section-core"></div>
         <div class="section-title" style="border-top:1px solid rgba(255,255,255,0.04); padding-top:20px;">⚡ 核心路径 · <span>经济学应用</span></div>
         <div class="section-sub">方法论骨架 · 先在经济/商业领域落地</div>
 
@@ -760,7 +892,7 @@
         <div class="section-sub">每个模式独立对照 · 数学 / 经济 / AI / 语言</div>
 
         <!-- 数学 -->
-        <div class="mode-block">
+        <div class="mode-block section-anchor" id="section-math">
             <div class="mode-label">📐 <span class="hl">数学模式</span> · 静态平衡</div>
             <div class="mode-split">
                 <div class="theory">
@@ -796,7 +928,7 @@
         </div>
 
         <!-- 经济 -->
-        <div class="mode-block">
+        <div class="mode-block section-anchor" id="section-econ">
             <div class="mode-label">📈 <span class="hl">经济模式</span> · 动态波动</div>
             <div class="mode-split">
                 <div class="theory">
@@ -843,7 +975,7 @@
         </div>
 
         <!-- AI -->
-        <div class="mode-block">
+        <div class="mode-block section-anchor" id="section-ai">
             <div class="mode-label">🤖 <span class="hl">AI 模式</span> · 反馈循环</div>
             <div class="mode-split">
                 <div class="theory">
@@ -875,7 +1007,7 @@
         </div>
 
         <!-- 语言 -->
-        <div class="mode-block">
+        <div class="mode-block section-anchor" id="section-lingua">
             <div class="mode-label">🌐 <span class="hl">语言模式</span> · 结构对照</div>
             <div class="mode-split">
                 <div class="theory">
@@ -904,7 +1036,8 @@
             </div>
         </div>
 
-        <!-- ===== 第四层：封顶 + 延伸方向（标签化） ===== -->
+        <!-- ===== 第四层：封顶 + 延伸方向 ===== -->
+        <div class="section-anchor" id="section-extension"></div>
         <div class="extension-section">
             <div class="ext-title">∞ 画圈模型的 <span>延伸方向</span></div>
             <div class="ext-sub">每个标签代表一个可迁移的领域 · 点击查看私有化部署详情</div>
@@ -947,6 +1080,51 @@
             glow.style.setProperty('--x', x + '%');
             glow.style.setProperty('--y', y + '%');
         });
+
+        // ===== 左侧索引交互 =====
+        const indexItems = document.querySelectorAll('.idx-item');
+        const sections = [
+            document.getElementById('section-mapping'),
+            document.getElementById('section-core'),
+            document.getElementById('section-math'),
+            document.getElementById('section-econ'),
+            document.getElementById('section-ai'),
+            document.getElementById('section-lingua'),
+            document.getElementById('section-extension')
+        ];
+
+        // 点击索引项 → 滚动到对应板块
+        indexItems.forEach((item, index) => {
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = sections[index];
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+                // 更新激活状态
+                indexItems.forEach(el => el.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // 滚动时高亮当前板块
+        function updateActiveIndex() {
+            let currentIndex = 0;
+            sections.forEach((section, i) => {
+                if (section) {
+                    const rect = section.getBoundingClientRect();
+                    if (rect.top <= 120) {
+                        currentIndex = i;
+                    }
+                }
+            });
+            indexItems.forEach((el, i) => {
+                el.classList.toggle('active', i === currentIndex);
+            });
+        }
+
+        window.addEventListener('scroll', updateActiveIndex);
+        window.addEventListener('load', updateActiveIndex);
 
         // ===== 数学模式 =====
         (function() {
