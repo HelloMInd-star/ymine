@@ -15,7 +15,7 @@
             background: #0b0b1a;
             font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
             min-height: 100vh;
-            padding: 24px 20px 24px 24px;
+            padding: 24px 20px 24px 110px;
             overflow-x: hidden;
         }
 
@@ -31,65 +31,88 @@
             transition: background 0.1s;
         }
 
-        /* ===== 右侧固定导航 ===== */
+        /* ===== 左侧固定导航（含量化信息） ===== */
         .side-nav {
             position: fixed;
-            top: 50%;
-            right: 20px;
-            transform: translateY(-50%);
+            top: 0;
+            left: 0;
+            width: 80px;
+            height: 100vh;
+            padding: 32px 0 24px;
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
             z-index: 100;
-            background: rgba(11, 11, 26, 0.5);
+            background: rgba(11, 11, 26, 0.6);
             backdrop-filter: blur(12px);
-            padding: 12px 8px;
-            border-radius: 16px;
-            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-right: 1px solid rgba(255, 255, 255, 0.04);
         }
 
-        .side-nav .nav-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.04);
+        .side-nav .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 52px;
+            padding: 6px 0;
+            border-radius: 10px;
+            color: rgba(255, 255, 255, 0.15);
             cursor: pointer;
             transition: all 0.3s ease;
-            position: relative;
+            border: 1px solid transparent;
+            text-decoration: none;
+            gap: 1px;
         }
 
-        .side-nav .nav-dot:hover {
-            background: rgba(255, 255, 255, 0.2);
-            transform: scale(1.2);
-        }
-
-        .side-nav .nav-dot.active {
-            background: #a78bfa;
-            border-color: #a78bfa;
-            box-shadow: 0 0 20px rgba(167, 139, 250, 0.2);
-        }
-
-        .side-nav .nav-dot .tooltip {
-            position: absolute;
-            right: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: rgba(20, 20, 40, 0.9);
-            backdrop-filter: blur(8px);
-            padding: 4px 12px;
-            border-radius: 6px;
-            font-size: 11px;
+        .side-nav .nav-item:hover {
             color: rgba(255, 255, 255, 0.5);
-            white-space: nowrap;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s ease;
-            border: 1px solid rgba(255, 255, 255, 0.04);
+            background: rgba(255, 255, 255, 0.03);
+            border-color: rgba(255, 255, 255, 0.06);
         }
 
-        .side-nav .nav-dot:hover .tooltip {
-            opacity: 1;
+        .side-nav .nav-item.active {
+            color: #a78bfa;
+            background: rgba(167, 139, 250, 0.06);
+            border-color: rgba(167, 139, 250, 0.12);
+        }
+
+        .side-nav .nav-item .num {
+            font-size: 14px;
+            font-weight: 600;
+            line-height: 1.2;
+            font-family: 'Courier New', monospace;
+        }
+
+        .side-nav .nav-item .label {
+            font-size: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            opacity: 0.4;
+            font-family: system-ui, sans-serif;
+        }
+
+        .side-nav .nav-item .count {
+            font-size: 7px;
+            color: rgba(255, 255, 255, 0.1);
+            letter-spacing: 0.2px;
+        }
+
+        .side-nav .nav-divider {
+            width: 24px;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.04);
+            margin: 2px 0;
+        }
+
+        .side-nav .nav-bottom {
+            margin-top: auto;
+            font-size: 7px;
+            color: rgba(255, 255, 255, 0.06);
+            writing-mode: vertical-rl;
+            letter-spacing: 2px;
+            font-weight: 300;
         }
 
         /* ===== 主容器 ===== */
@@ -158,7 +181,7 @@
             }
         }
 
-        /* ===== 阶段徽章导航 ===== */
+        /* ===== 阶段徽章导航（顶部辅助） ===== */
         .stages {
             display: flex;
             flex-wrap: wrap;
@@ -450,6 +473,7 @@
             border: 1px solid rgba(255, 255, 255, 0.04);
             opacity: 0;
             animation: fadeInUp 0.6s ease 0.4s forwards;
+            scroll-margin-top: 20px;
         }
 
         .overview h3 {
@@ -535,11 +559,14 @@
 
         /* ===== 响应式 ===== */
         @media (max-width: 900px) {
-            .container {
-                padding: 24px 20px 20px;
+            body {
+                padding: 20px 16px 20px 16px;
             }
             .side-nav {
                 display: none;
+            }
+            .container {
+                padding: 24px 20px 20px;
             }
         }
 
@@ -581,26 +608,40 @@
 
     <div id="glow"></div>
 
-    <!-- ===== 右侧固定导航 ===== -->
+    <!-- ===== 左侧固定导航（含量化） ===== -->
     <nav class="side-nav" id="sideNav">
-        <div class="nav-dot active" data-target="phase-1">
-            <span class="tooltip">现象层</span>
+        <div class="nav-item active" data-target="phase-1">
+            <span class="num">①</span>
+            <span class="label">现象</span>
+            <span class="count">3项</span>
         </div>
-        <div class="nav-dot" data-target="phase-2">
-            <span class="tooltip">规律层</span>
+        <div class="nav-item" data-target="phase-2">
+            <span class="num">②</span>
+            <span class="label">规律</span>
+            <span class="count">3项</span>
         </div>
-        <div class="nav-dot" data-target="phase-3">
-            <span class="tooltip">模型层</span>
+        <div class="nav-item" data-target="phase-3">
+            <span class="num">③</span>
+            <span class="label">模型</span>
+            <span class="count">6项</span>
         </div>
-        <div class="nav-dot" data-target="phase-4">
-            <span class="tooltip">验证层</span>
+        <div class="nav-item" data-target="phase-4">
+            <span class="num">④</span>
+            <span class="label">验证</span>
+            <span class="count">4项</span>
         </div>
-        <div class="nav-dot" data-target="phase-5">
-            <span class="tooltip">总控层</span>
+        <div class="nav-item" data-target="phase-5">
+            <span class="num">⑤</span>
+            <span class="label">总控</span>
+            <span class="count">4项</span>
         </div>
-        <div class="nav-dot" data-target="overview">
-            <span class="tooltip">总览</span>
+        <div class="nav-divider"></div>
+        <div class="nav-item" data-target="overview">
+            <span class="num">∞</span>
+            <span class="label">总览</span>
+            <span class="count">闭环</span>
         </div>
+        <div class="nav-bottom">证据链</div>
     </nav>
 
     <div class="container">
@@ -949,46 +990,42 @@
             glow.style.setProperty('--y', y + '%');
         });
 
-        // ===== 右侧导航 =====
-        const navDots = document.querySelectorAll('.nav-dot');
-        const phases = document.querySelectorAll('.phase');
-        const overview = document.getElementById('overview');
+        // ===== 左侧导航交互 =====
+        const navItems = document.querySelectorAll('.nav-item');
+        const targetIds = ['phase-1', 'phase-2', 'phase-3', 'phase-4', 'phase-5', 'overview'];
+        const sections = targetIds.map(id => document.getElementById(id));
 
-        function updateActiveDot() {
-            let currentId = null;
-            const scrollY = window.scrollY + 100;
-
-            phases.forEach((p, i) => {
-                const rect = p.getBoundingClientRect();
-                if (rect.top <= 120) {
-                    currentId = p.id;
-                }
-            });
-
-            if (overview) {
-                const rect = overview.getBoundingClientRect();
-                if (rect.top <= 120 && rect.bottom > 0) {
-                    currentId = 'overview';
-                }
-            }
-
-            navDots.forEach(dot => {
-                dot.classList.toggle('active', dot.dataset.target === currentId);
-            });
-        }
-
-        navDots.forEach(dot => {
-            dot.addEventListener('click', function() {
-                const targetId = this.dataset.target;
-                const target = document.getElementById(targetId);
+        // 点击导航项
+        navItems.forEach((item, index) => {
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = sections[index];
                 if (target) {
                     target.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }
+                navItems.forEach(el => el.classList.remove('active'));
+                this.classList.add('active');
             });
         });
 
-        window.addEventListener('scroll', updateActiveDot);
-        window.addEventListener('load', updateActiveDot);
+        // 滚动时高亮当前
+        function updateActiveNav() {
+            let currentIndex = 0;
+            sections.forEach((section, i) => {
+                if (section) {
+                    const rect = section.getBoundingClientRect();
+                    if (rect.top <= 120) {
+                        currentIndex = i;
+                    }
+                }
+            });
+            navItems.forEach((el, i) => {
+                el.classList.toggle('active', i === currentIndex);
+            });
+        }
+
+        window.addEventListener('scroll', updateActiveNav);
+        window.addEventListener('load', updateActiveNav);
 
         // ===== 动态数据：AB 对照 =====
         (function() {
@@ -1098,7 +1135,6 @@
             els.logistics.addEventListener('click', () => setActive('logistics'));
             els.tech.addEventListener('click', () => setActive('tech'));
 
-            // 默认激活 MCN
             setActive('mcn');
         })();
     </script>
