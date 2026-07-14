@@ -18,9 +18,116 @@
       min-height: 100vh;
       display: flex;
       justify-content: center;
-      padding: 40px 20px;
+      padding: 40px 20px 40px 260px;
       overflow-x: hidden;
       cursor: default;
+    }
+
+    /* ===== 左侧固定检索目录 ===== */
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 240px;
+      height: 100vh;
+      padding: 40px 16px 30px;
+      background: rgba(11, 11, 26, 0.92);
+      backdrop-filter: blur(12px);
+      border-right: 1px solid rgba(255, 255, 255, 0.04);
+      overflow-y: auto;
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .sidebar .logo {
+      font-size: 14px;
+      font-weight: 700;
+      color: #f1f5f9;
+      margin-bottom: 6px;
+      letter-spacing: -0.3px;
+    }
+
+    .sidebar .logo span {
+      color: #a78bfa;
+    }
+
+    .sidebar .sub-logo {
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.2);
+      margin-bottom: 24px;
+      letter-spacing: 0.5px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      padding-bottom: 14px;
+    }
+
+    .sidebar .nav-item {
+      display: block;
+      padding: 8px 12px;
+      margin-bottom: 2px;
+      border-radius: 8px;
+      color: rgba(255, 255, 255, 0.35);
+      font-size: 13px;
+      font-weight: 500;
+      text-decoration: none;
+      transition: all 0.25s ease;
+      cursor: pointer;
+      border-left: 2px solid transparent;
+    }
+
+    .sidebar .nav-item:hover {
+      background: rgba(255, 255, 255, 0.03);
+      color: rgba(255, 255, 255, 0.7);
+      border-left-color: rgba(167, 139, 250, 0.3);
+    }
+
+    .sidebar .nav-item.active {
+      color: #f1f5f9;
+      background: rgba(167, 139, 250, 0.06);
+      border-left-color: #a78bfa;
+    }
+
+    .sidebar .nav-item .num {
+      display: inline-block;
+      width: 18px;
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.15);
+      margin-right: 6px;
+    }
+
+    .sidebar .nav-divider {
+      border: none;
+      border-top: 1px solid rgba(255, 255, 255, 0.03);
+      margin: 12px 0;
+    }
+
+    .sidebar .nav-section-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: rgba(255, 255, 255, 0.12);
+      padding: 8px 12px 4px;
+      font-weight: 600;
+    }
+
+    .sidebar .footer-nav {
+      margin-top: auto;
+      padding-top: 16px;
+      border-top: 1px solid rgba(255, 255, 255, 0.04);
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.15);
+      text-align: center;
+    }
+
+    .sidebar .footer-nav a {
+      color: rgba(255, 255, 255, 0.2);
+      text-decoration: none;
+      font-size: 12px;
+      transition: color 0.3s ease;
+    }
+
+    .sidebar .footer-nav a:hover {
+      color: rgba(255, 255, 255, 0.6);
     }
 
     /* ===== 鼠标跟随光晕 ===== */
@@ -41,7 +148,7 @@
       width: 100%;
       background: radial-gradient(ellipse at 30% 30%, #120b24, #0b0b1a 70%, #05030a);
       border-radius: 32px;
-      padding: 48px 44px;
+      padding: 48px 44px 44px;
       border: 1px solid rgba(255, 255, 255, 0.06);
       box-shadow: 0 30px 80px rgba(40, 10, 80, 0.4);
       position: relative;
@@ -90,7 +197,7 @@
 
     .page-header {
       text-align: center;
-      margin-bottom: 32px;
+      margin-bottom: 40px;
       opacity: 0;
       animation: fadeInUp 0.8s ease forwards;
     }
@@ -125,11 +232,12 @@
       background: rgba(255, 255, 255, 0.02);
       border: 1px solid rgba(250, 204, 21, 0.15);
       border-radius: 20px;
-      padding: 28px 30px;
-      margin-bottom: 32px;
+      padding: 32px 34px;
+      margin-bottom: 40px;
       box-shadow: 0 0 40px rgba(250, 204, 21, 0.04);
       opacity: 0;
       animation: fadeInUp 0.6s ease 0.05s forwards;
+      scroll-margin-top: 20px;
     }
 
     .core-mind .mind-title {
@@ -401,7 +509,7 @@
       font-size: 24px;
       font-weight: 700;
       color: #f1f5f9;
-      margin: 48px 0 16px 0;
+      margin: 56px 0 20px 0;
       text-align: center;
       letter-spacing: 0.5px;
       opacity: 0;
@@ -416,9 +524,9 @@
     }
 
     .layer-block {
-      margin-bottom: 32px;
+      margin-bottom: 36px;
       scroll-margin-top: 20px;
-      padding: 16px 20px;
+      padding: 20px 24px;
       background: rgba(255, 255, 255, 0.02);
       border-radius: 16px;
       border-left: 4px solid rgba(59, 130, 246, 0.3);
@@ -569,11 +677,12 @@
       background: rgba(255, 255, 255, 0.02);
       border: 1px solid rgba(52, 211, 153, 0.15);
       border-radius: 20px;
-      padding: 28px 30px;
-      margin-top: 40px;
+      padding: 32px 34px;
+      margin-top: 44px;
       box-shadow: 0 0 40px rgba(52, 211, 153, 0.04);
       opacity: 0;
       animation: fadeInUp 0.6s ease 0.36s forwards;
+      scroll-margin-top: 20px;
     }
 
     .engineering-loop .eng-title {
@@ -631,9 +740,9 @@
     .eng-closing strong { color: #34d399; }
     .eng-closing .highlight { color: #facc15; font-weight: 600; }
 
-    /* ===== ★★★ 返回链接 ★★★ ===== */
+    /* ===== 返回链接 ===== */
     .back-home {
-      margin-top: 40px;
+      margin-top: 44px;
       text-align: center;
       border-top: 1px solid rgba(255, 255, 255, 0.04);
       padding-top: 24px;
@@ -651,8 +760,23 @@
     }
 
     /* ===== 响应式 ===== */
+    @media (max-width: 900px) {
+      body {
+        padding: 32px 20px 32px 20px;
+      }
+      .sidebar {
+        display: none;
+      }
+      .container {
+        padding: 32px 24px 28px;
+      }
+    }
+
     @media (max-width: 700px) {
-      .container { padding: 24px 16px; }
+      body {
+        padding: 24px 16px 24px 16px;
+      }
+      .container { padding: 24px 16px 20px; }
       .pyramid-layer .level-name { font-size: 16px; }
       .pyramid-layer { padding: 14px 16px; }
       .layer-grid { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); }
@@ -668,10 +792,43 @@
       .eng-node { min-width: 60px; padding: 8px 12px; }
       .eng-node .icon { font-size: 18px; }
       .eng-node .label { font-size: 12px; }
+      .core-mind { padding: 20px 18px; }
+      .layer-block { padding: 16px 16px; }
+      .engineering-loop { padding: 20px 18px; }
     }
   </style>
 </head>
 <body>
+
+  <!-- ===== 左侧固定检索目录 ===== -->
+  <div class="sidebar" id="sidebar">
+    <div class="logo">Y.<span>Mine</span></div>
+    <div class="sub-logo">价值金字塔 · 导航</div>
+
+    <hr class="nav-divider">
+
+    <div class="nav-section-label">核心</div>
+    <a class="nav-item" data-target="core-mind"><span class="num">01</span> 核心心法</a>
+
+    <hr class="nav-divider">
+
+    <div class="nav-section-label">金字塔</div>
+    <a class="nav-item" data-target="layer-0"><span class="num">02</span> 第0层 · 底层认知</a>
+    <a class="nav-item" data-target="layer-1"><span class="num">03</span> 第1层 · 思维框架</a>
+    <a class="nav-item" data-target="layer-2"><span class="num">04</span> 第2层 · 迁移能力</a>
+    <a class="nav-item" data-target="layer-3"><span class="num">05</span> 第3层 · 产品封装</a>
+    <a class="nav-item" data-target="layer-4"><span class="num">06</span> 第4层 · 价值表达</a>
+    <a class="nav-item" data-target="layer-5"><span class="num">07</span> 第5层 · 系统底座</a>
+
+    <hr class="nav-divider">
+
+    <div class="nav-section-label">闭环</div>
+    <a class="nav-item" data-target="engineering-loop"><span class="num">08</span> 工程落地循环</a>
+
+    <div class="footer-nav">
+      <a href="index.html">← 返回作品集</a>
+    </div>
+  </div>
 
   <!-- ===== 鼠标跟随光晕 ===== -->
   <div id="glow"></div>
@@ -687,7 +844,7 @@
     <!-- ============================================================ -->
     <!-- ===== 核心心法 ===== -->
     <!-- ============================================================ -->
-    <div class="core-mind">
+    <div class="core-mind" id="core-mind">
       <div class="mind-title">⚛️ 核心心法 · 产品设计闭环</div>
 
       <div class="mind-flow">
@@ -992,7 +1149,7 @@
     <!-- ============================================================ -->
     <!-- ===== 工程落地循环 ===== -->
     <!-- ============================================================ -->
-    <div class="engineering-loop">
+    <div class="engineering-loop" id="engineering-loop">
       <div class="eng-title">⚙️ 工程落地循环</div>
       <div class="eng-flow">
         <div class="eng-node highlight-eng">
@@ -1026,7 +1183,7 @@
       </div>
     </div>
 
-    <!-- ===== ★★★ 返回链接 ★★★ ===== -->
+    <!-- ===== 返回链接 ===== -->
     <div class="back-home">
       <a href="index.html">← 返回作品集首页</a>
     </div>
@@ -1043,6 +1200,40 @@
       glow.style.setProperty('--y', y + '%');
     });
 
+    // ===== 侧边栏滚动联动 =====
+    document.querySelectorAll('.nav-item').forEach(item => {
+      item.addEventListener('click', function(e) {
+        e.preventDefault();
+        const targetId = this.dataset.target;
+        const target = document.getElementById(targetId);
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+          this.classList.add('active');
+        }
+      });
+    });
+
+    // ===== 滚动时高亮当前板块 =====
+    const blocks = document.querySelectorAll('.core-mind, .layer-block, .engineering-loop');
+    const navItems = document.querySelectorAll('.nav-item');
+
+    function updateActiveNav() {
+      let currentId = null;
+      blocks.forEach(block => {
+        const rect = block.getBoundingClientRect();
+        if (rect.top <= 120) {
+          currentId = block.id;
+        }
+      });
+      navItems.forEach(item => {
+        item.classList.toggle('active', item.dataset.target === currentId);
+      });
+    }
+
+    window.addEventListener('scroll', updateActiveNav);
+    window.addEventListener('load', updateActiveNav);
+
     // ===== 点击金字塔层滚动到对应内容 =====
     function scrollToLayer(level) {
       const target = document.getElementById('layer-' + level);
@@ -1051,6 +1242,13 @@
       target.classList.add('highlight');
       target.scrollIntoView({ behavior: 'smooth', block: 'start' });
       setTimeout(() => target.classList.remove('highlight'), 3000);
+
+      // 同时更新侧边栏高亮
+      const targetNav = document.querySelector(`.nav-item[data-target="layer-${level}"]`);
+      if (targetNav) {
+        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+        targetNav.classList.add('active');
+      }
     }
 
     // ===== 滚动时高亮对应的金字塔层 =====
@@ -1105,6 +1303,7 @@
         setTimeout(() => firstBlock.classList.remove('highlight'), 2500);
       }
       setTimeout(updateActiveLayer, 300);
+      setTimeout(updateActiveNav, 300);
     });
   </script>
 
