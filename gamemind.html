@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>GameMind · 博弈论底座</title>
     <style>
+        /* ===== 全局重置 ===== */
         * {
             margin: 0;
             padding: 0;
@@ -15,7 +16,7 @@
             background: #0b0b1a;
             font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
             min-height: 100vh;
-            padding: 40px 24px 40px 280px;
+            padding: 20px 20px 20px 260px;
             overflow-x: hidden;
             cursor: default;
         }
@@ -27,7 +28,7 @@
             left: 0;
             width: 240px;
             height: 100vh;
-            padding: 40px 16px 30px;
+            padding: 36px 16px 28px;
             background: rgba(11, 11, 26, 0.92);
             backdrop-filter: blur(12px);
             border-right: 1px solid rgba(255, 255, 255, 0.04);
@@ -41,7 +42,7 @@
             font-size: 14px;
             font-weight: 700;
             color: #f1f5f9;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
             letter-spacing: -0.3px;
         }
 
@@ -52,18 +53,18 @@
         .sidebar .sub-logo {
             font-size: 11px;
             color: rgba(255, 255, 255, 0.2);
-            margin-bottom: 24px;
+            margin-bottom: 20px;
             letter-spacing: 0.5px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-            padding-bottom: 14px;
+            padding-bottom: 12px;
         }
 
         .sidebar .nav-item {
             display: block;
-            padding: 8px 12px;
+            padding: 7px 12px;
             margin-bottom: 2px;
             border-radius: 8px;
-            color: rgba(255, 255, 255, 0.35);
+            color: rgba(255, 255, 255, 0.3);
             font-size: 13px;
             font-weight: 500;
             text-decoration: none;
@@ -75,7 +76,7 @@
         .sidebar .nav-item:hover {
             background: rgba(255, 255, 255, 0.03);
             color: rgba(255, 255, 255, 0.7);
-            border-left-color: rgba(167, 139, 250, 0.3);
+            border-left-color: rgba(167, 139, 250, 0.25);
         }
 
         .sidebar .nav-item.active {
@@ -88,32 +89,43 @@
             display: inline-block;
             width: 18px;
             font-size: 11px;
-            color: rgba(255, 255, 255, 0.15);
+            color: rgba(255, 255, 255, 0.12);
             margin-right: 6px;
+            font-family: 'Courier New', monospace;
         }
 
         .sidebar .nav-divider {
             border: none;
             border-top: 1px solid rgba(255, 255, 255, 0.03);
-            margin: 12px 0;
+            margin: 10px 0;
         }
 
         .sidebar .nav-section-label {
             font-size: 10px;
             text-transform: uppercase;
             letter-spacing: 1px;
-            color: rgba(255, 255, 255, 0.12);
+            color: rgba(255, 255, 255, 0.1);
             padding: 8px 12px 4px;
             font-weight: 600;
         }
 
         .sidebar .footer-nav {
             margin-top: auto;
-            padding-top: 16px;
+            padding-top: 14px;
             border-top: 1px solid rgba(255, 255, 255, 0.04);
             font-size: 12px;
-            color: rgba(255, 255, 255, 0.15);
+            color: rgba(255, 255, 255, 0.12);
             text-align: center;
+        }
+
+        .sidebar .footer-nav a {
+            color: rgba(255, 255, 255, 0.2);
+            text-decoration: none;
+            font-size: 12px;
+            transition: color 0.3s ease;
+        }
+        .sidebar .footer-nav a:hover {
+            color: rgba(255, 255, 255, 0.6);
         }
 
         /* ===== 鼠标跟随光晕 ===== */
@@ -129,12 +141,13 @@
             transition: background 0.1s;
         }
 
+        /* ===== 主容器 ===== */
         .container {
-            max-width: 900px;
+            max-width: 1000px;
             width: 100%;
             background: radial-gradient(ellipse at 30% 30%, #120b24, #0b0b1a 70%, #05030a);
             border-radius: 32px;
-            padding: 48px 40px 40px;
+            padding: 48px 44px 40px;
             border: 1px solid rgba(255, 255, 255, 0.06);
             box-shadow: 0 30px 80px rgba(40, 10, 80, 0.4);
             position: relative;
@@ -204,7 +217,7 @@
         /* ===== 头部 ===== */
         .header {
             text-align: center;
-            margin-bottom: 60px;
+            margin-bottom: 48px;
             opacity: 0;
             animation: fadeInUp 0.8s ease forwards;
         }
@@ -215,14 +228,15 @@
             border: 1px solid rgba(255, 255, 255, 0.06);
             color: rgba(255, 255, 255, 0.3);
             font-size: 13px;
+            font-weight: 600;
             padding: 4px 16px;
             border-radius: 20px;
             letter-spacing: 0.3px;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
         }
 
         .header h1 {
-            font-size: 36px;
+            font-size: 32px;
             font-weight: 700;
             color: #f1f5f9;
             letter-spacing: -0.5px;
@@ -240,13 +254,13 @@
             margin-top: 6px;
         }
 
-        /* ===== 大板块容器（间距拉大） ===== */
+        /* ===== 大板块 ===== */
         .block {
             background: rgba(255, 255, 255, 0.02);
             border: 1px solid rgba(255, 255, 255, 0.06);
             border-radius: 20px;
-            padding: 40px 34px 36px;
-            margin-bottom: 56px;
+            padding: 36px 34px 32px;
+            margin-bottom: 48px;
             opacity: 0;
             animation: fadeInUp 0.6s ease forwards;
             position: relative;
@@ -256,7 +270,7 @@
         .block::after {
             content: '';
             position: absolute;
-            bottom: -28px;
+            bottom: -24px;
             left: 10%;
             width: 80%;
             height: 1px;
@@ -266,21 +280,29 @@
             display: none;
         }
 
-        .block:nth-child(2) { animation-delay: 0.05s; }
-        .block:nth-child(3) { animation-delay: 0.1s; }
-        .block:nth-child(4) { animation-delay: 0.15s; }
-        .block:nth-child(5) { animation-delay: 0.2s; }
+        .block:nth-child(2) {
+            animation-delay: 0.05s;
+        }
+        .block:nth-child(3) {
+            animation-delay: 0.1s;
+        }
+        .block:nth-child(4) {
+            animation-delay: 0.15s;
+        }
+        .block:nth-child(5) {
+            animation-delay: 0.2s;
+        }
 
         .block-title {
             font-size: 22px;
-            font-weight: 700;
-            color: #f1f5f9;
-            margin-bottom: 22px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 18px;
             display: flex;
             align-items: center;
             gap: 12px;
-            padding-bottom: 14px;
-            border-bottom: 2px solid rgba(255, 255, 255, 0.04);
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
             letter-spacing: -0.3px;
         }
 
@@ -294,13 +316,13 @@
             letter-spacing: 0.3px;
         }
 
-        /* ===== 小卡片（间距拉大） ===== */
+        /* ===== 小卡片（统一风格） ===== */
         .mini-card {
             background: rgba(255, 255, 255, 0.02);
             border: 1px solid rgba(255, 255, 255, 0.04);
             border-radius: 16px;
-            padding: 24px 26px 22px;
-            margin-bottom: 24px;
+            padding: 22px 24px;
+            margin-bottom: 22px;
             transition: border-color 0.3s ease;
         }
 
@@ -336,6 +358,10 @@
             margin-bottom: 10px;
         }
 
+        .mini-card p strong {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
         .mini-card ul {
             padding-left: 20px;
             margin-bottom: 10px;
@@ -352,11 +378,12 @@
             color: rgba(255, 255, 255, 0.7);
         }
 
+        /* ===== 卡片网格 ===== */
         .mini-card .card-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 14px;
-            margin: 14px 0 0;
+            margin: 12px 0 0;
         }
 
         .mini-card .card-item {
@@ -394,20 +421,68 @@
             margin-top: 2px;
         }
 
-        /* ===== 高亮框 ===== */
-        .highlight-box {
-            background: rgba(167, 139, 250, 0.06);
-            border-left: 4px solid #a78bfa;
-            border-radius: 0 12px 12px 0;
+        /* ===== 结果框（统一为参考标准风格） ===== */
+        .result-box {
+            background: rgba(255, 255, 255, 0.01);
+            border-radius: 12px;
             padding: 14px 18px;
-            margin: 12px 0 14px;
+            border-left: 3px solid #facc15;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 15px;
+            min-height: 48px;
+            line-height: 1.7;
+            margin: 10px 0 12px;
         }
 
-        .highlight-box p {
+        .result-box p {
             margin-bottom: 0;
         }
-        .highlight-box strong {
+        .result-box strong {
+            color: #facc15;
+        }
+        .result-box .highlight {
+            color: #facc15;
+            font-weight: 600;
+        }
+        .result-box .en {
+            color: #60a5fa;
+        }
+        .result-box .my {
+            color: #facc15;
+        }
+
+        .result-box.purple {
+            border-left-color: #a78bfa;
+        }
+
+        /* ===== 按钮（统一风格） ===== */
+        .btn {
+            background: #a78bfa;
+            border: none;
+            color: #0b0b1a;
+            padding: 6px 18px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            background: #8b6fd9;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(167, 139, 250, 0.15);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid rgba(167, 139, 250, 0.2);
             color: #a78bfa;
+        }
+
+        .btn-outline:hover {
+            background: rgba(167, 139, 250, 0.06);
+            border-color: #a78bfa;
         }
 
         /* ===== 流程链 ===== */
@@ -437,13 +512,13 @@
             font-size: 16px;
         }
 
-        /* ===== 画布区 ===== */
+        /* ===== Canvas ===== */
         .canvas-wrapper {
             background: rgba(255, 255, 255, 0.02);
             border: 1px solid rgba(255, 255, 255, 0.04);
-            border-radius: 20px;
-            padding: 16px;
-            margin: 12px 0 16px;
+            border-radius: 16px;
+            padding: 14px;
+            margin: 12px 0 14px;
             position: relative;
         }
 
@@ -458,11 +533,11 @@
         .canvas-caption {
             text-align: center;
             font-size: 13px;
-            color: rgba(255, 255, 255, 0.25);
+            color: rgba(255, 255, 255, 0.2);
             margin-top: 8px;
         }
 
-        /* ===== 凯利公式 ===== */
+        /* ===== 凯利公式展示 ===== */
         .kelly-box {
             background: rgba(167, 139, 250, 0.04);
             border: 1px solid rgba(167, 139, 250, 0.08);
@@ -505,22 +580,7 @@
             font-weight: 500;
         }
 
-        .example-box {
-            background: rgba(255, 255, 255, 0.02);
-            border-radius: 12px;
-            padding: 12px 16px;
-            border-left: 3px solid #a78bfa;
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 15px;
-            line-height: 1.7;
-            margin: 10px 0 12px;
-        }
-
-        .example-box strong {
-            color: #a78bfa;
-        }
-
-        /* ===== 凯利公式交互器 ===== */
+        /* ===== 凯利模拟器 ===== */
         .kelly-simulator {
             background: rgba(255, 255, 255, 0.02);
             border: 1px solid rgba(255, 255, 255, 0.06);
@@ -638,11 +698,11 @@
             display: flex;
             justify-content: space-between;
             font-size: 11px;
-            color: rgba(255, 255, 255, 0.15);
+            color: rgba(255, 255, 255, 0.12);
             margin-top: 4px;
         }
 
-        /* ===== 决策临界点 · 人机协作二八管控 ===== */
+        /* ===== 二八管控可视化 ===== */
         .threshold-visual {
             background: rgba(255, 255, 255, 0.02);
             border: 1px solid rgba(255, 255, 255, 0.06);
@@ -684,13 +744,13 @@
             top: 0;
             height: 100%;
             width: 20%;
-            background: linear-gradient(90deg, rgba(251, 146, 60, 0.05), rgba(251, 146, 60, 0.15));
+            background: linear-gradient(90deg, rgba(250, 204, 21, 0.05), rgba(250, 204, 21, 0.15));
             border-radius: 0 12px 12px 0;
             display: flex;
             align-items: center;
             justify-content: flex-end;
             padding-right: 16px;
-            color: rgba(251, 146, 60, 0.6);
+            color: rgba(250, 204, 21, 0.6);
             font-size: 13px;
             font-weight: 500;
         }
@@ -742,7 +802,7 @@
             margin-top: 2px;
         }
 
-        /* ===== 概率论+排列组合 → 大模型 工程化流程 ===== */
+        /* ===== 管道流程 ===== */
         .pipeline {
             background: rgba(255, 255, 255, 0.02);
             border: 1px solid rgba(255, 255, 255, 0.06);
@@ -828,8 +888,8 @@
         /* ===== 底部 ===== */
         .back-bottom {
             text-align: center;
-            margin-top: 48px;
-            padding-top: 24px;
+            margin-top: 40px;
+            padding-top: 20px;
             border-top: 1px solid rgba(255, 255, 255, 0.04);
             display: flex;
             justify-content: center;
@@ -840,33 +900,46 @@
         }
 
         .back-bottom a {
-            color: rgba(255, 255, 255, 0.3);
+            color: rgba(255, 255, 255, 0.2);
             text-decoration: none;
             font-size: 14px;
             transition: color 0.3s ease;
         }
 
         .back-bottom a:hover {
-            color: rgba(255, 255, 255, 0.8);
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        /* ===== 滚动条 ===== */
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(167, 139, 250, 0.15);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(167, 139, 250, 0.3);
         }
 
         /* ===== 响应式 ===== */
         @media (max-width: 900px) {
             body {
-                padding: 32px 20px 32px 20px;
+                padding: 0;
             }
             .sidebar {
                 display: none;
             }
             .container {
                 padding: 32px 24px 28px;
+                border-radius: 0;
             }
         }
 
         @media (max-width: 700px) {
-            body {
-                padding: 24px 16px 24px 16px;
-            }
             .container {
                 padding: 24px 16px 20px;
             }
@@ -952,39 +1025,40 @@
 </head>
 <body>
 
+    <!-- ===== 鼠标跟随光晕 ===== -->
+    <div id="glow"></div>
+
     <!-- ===== 左侧固定检索目录 ===== -->
     <div class="sidebar" id="sidebar">
         <div class="logo">Game<span>Mind</span></div>
         <div class="sub-logo">博弈论底座 · 导航</div>
 
-        <hr class="nav-divider">
+        <hr class="nav-divider" />
 
         <div class="nav-section-label">思考链路</div>
         <a class="nav-item" data-target="block-chain"><span class="num">01</span> 推导过程</a>
 
-        <hr class="nav-divider">
+        <hr class="nav-divider" />
 
         <div class="nav-section-label">核心框架</div>
         <a class="nav-item" data-target="block-framework"><span class="num">02</span> 三类变量</a>
 
-        <hr class="nav-divider">
+        <hr class="nav-divider" />
 
         <div class="nav-section-label">应用</div>
         <a class="nav-item" data-target="block-applications"><span class="num">03</span> 能做什么</a>
 
-        <hr class="nav-divider">
+        <hr class="nav-divider" />
 
         <div class="nav-section-label">系统关系</div>
         <a class="nav-item" data-target="block-relation"><span class="num">04</span> 与全栖系统的关系</a>
 
         <div class="footer-nav">
-            <a href="index.html" style="color:rgba(255,255,255,0.2); text-decoration:none; font-size:12px;">← 返回作品集</a>
+            <a href="index.html">← 返回作品集</a>
         </div>
     </div>
 
-    <!-- ===== 鼠标跟随光晕 ===== -->
-    <div id="glow"></div>
-
+    <!-- ===== 主容器 ===== -->
     <div class="container">
 
         <!-- ===== 头部 ===== -->
@@ -994,33 +1068,33 @@
             <div class="sub">从低空经济博弈到资源分配 · 完整思考链路</div>
         </div>
 
-        <!-- ===== 大板块：思考链路 ===== -->
+        <!-- ===== 板块：思考链路 ===== -->
         <div class="block" id="block-chain">
             <div class="block-title">🧠 思考链路 <span class="tag">推导过程</span></div>
 
-            <!-- 小卡 1：低空经济博弈 + 拍卖逻辑 -->
+            <!-- 小卡：低空经济博弈 + 拍卖逻辑 -->
             <div class="mini-card">
                 <div class="step-title">低空经济博弈</div>
-                <p>低空经济中，无人机越来越多，但航道有限。资源稀缺带来了竞争，而竞争的本质是<strong style="color: rgba(255,255,255,0.7);">博弈</strong>。</p>
-                <p>如果把航线公开市场化、自由竞价，价格会被哄抬，最终形成垄断。这让我想到：<strong style="color: rgba(255,255,255,0.7);">这本质上是一个资源博弈问题</strong>。</p>
+                <p>低空经济中，无人机越来越多，但航道有限。资源稀缺带来了竞争，而竞争的本质是<strong>博弈</strong>。</p>
+                <p>如果把航线公开市场化、自由竞价，价格会被哄抬，最终形成垄断。这让我想到：<strong>这本质上是一个资源博弈问题</strong>。</p>
                 <div class="canvas-wrapper">
                     <canvas id="gameCanvas1" width="800" height="300"></canvas>
                     <div class="canvas-caption">需求（蓝）与供给（橙）在基准线上下博弈 · 球体代表博弈的“不确定性”</div>
                 </div>
 
-                <div class="step-title" style="margin-top:12px;">拍卖逻辑</div>
-                <p>航线资源争夺，和<strong style="color: rgba(255,255,255,0.7);">拍卖</strong>的逻辑高度相似——参与者出价，价高者得。</p>
-                <p>但低空经济有一个特殊之处：<strong style="color: rgba(255,255,255,0.7);">前期投入巨大，一旦成功占据航线，收益暴增；一旦失败，没有回头路。</strong>这种“全有或全无”的结构，和<strong style="color: rgba(255,255,255,0.7);">赌球、赌场、拍卖</strong>的逻辑完全一致。</p>
+                <div class="step-title" style="margin-top: 12px;">拍卖逻辑</div>
+                <p>航线资源争夺，和<strong>拍卖</strong>的逻辑高度相似——参与者出价，价高者得。</p>
+                <p>但低空经济有一个特殊之处：<strong>前期投入巨大，一旦成功占据航线，收益暴增；一旦失败，没有回头路。</strong>这种“全有或全无”的结构，和<strong>赌球、赌场、拍卖</strong>的逻辑完全一致。</p>
                 <div class="canvas-wrapper">
                     <canvas id="gameCanvas2" width="800" height="300"></canvas>
                     <div class="canvas-caption">无人机厂商（蓝）与政府（橙）的博弈 · 球体代表博弈的“冲突点”</div>
                 </div>
             </div>
 
-            <!-- 小卡 2：凯利公式 -->
+            <!-- 小卡：凯利公式 -->
             <div class="mini-card">
                 <div class="step-title">凯利公式</div>
-                <p>凯利公式用胜率和赔率计算<strong style="color: rgba(255,255,255,0.7);">最优下注比例</strong>。在低空经济中，它帮助我们计算“投入多少资源去抢一条航线”的最优策略。</p>
+                <p>凯利公式用胜率和赔率计算<strong>最优下注比例</strong>。在低空经济中，它帮助我们计算“投入多少资源去抢一条航线”的最优策略。</p>
                 <div class="kelly-box">
                     <div class="formula">f* = (<span class="highlight">b</span> × <span class="highlight">p</span> − <span class="highlight">q</span>) / <span class="highlight">b</span></div>
                     <div class="legend">
@@ -1031,16 +1105,17 @@
                     </div>
                 </div>
 
+                <!-- 凯利公式模拟器 -->
                 <div class="kelly-simulator">
                     <div class="sim-title">🎯 凯利公式 · 交互式模拟器</div>
                     <div class="slider-group">
                         <div>
                             <label>胜率 (p) <span id="kellyP">0.50</span></label>
-                            <input type="range" id="kellyPInput" min="0.01" max="0.99" step="0.01" value="0.50">
+                            <input type="range" id="kellyPInput" min="0.01" max="0.99" step="0.01" value="0.50" />
                         </div>
                         <div>
                             <label>赔率 (b) <span id="kellyB">2.00</span></label>
-                            <input type="range" id="kellyBInput" min="0.50" max="10.00" step="0.10" value="2.00">
+                            <input type="range" id="kellyBInput" min="0.50" max="10.00" step="0.10" value="2.00" />
                         </div>
                     </div>
                     <div class="result-row">
@@ -1060,19 +1135,19 @@
                     <div class="bar-labels"><span>0% 压注</span><span>临界点</span><span>100% 压注</span></div>
                 </div>
 
-                <p>举个例子：如果你去买一张彩票，<strong style="color: rgba(255,255,255,0.7);">中奖概率是 20%（p = 0.2）</strong>，<strong style="color: rgba(255,255,255,0.7);">赔率是 5 倍（b = 5）</strong>，那么凯利公式告诉你：</p>
-                <div class="example-box">f* = (5 × 0.2 − 0.8) / 5 = (1 − 0.8) / 5 = <strong>0.04</strong></div>
-                <p>也就是说，<strong style="color: rgba(255,255,255,0.7);">你最多只应该投入 4% 的资金</strong>去买这张彩票。超过这个比例，长期来看一定会亏。</p>
+                <p>举个例子：如果你去买一张彩票，<strong>中奖概率是 20%（p = 0.2）</strong>，<strong>赔率是 5 倍（b = 5）</strong>，那么凯利公式告诉你：</p>
+                <div class="result-box">f* = (5 × 0.2 − 0.8) / 5 = (1 − 0.8) / 5 = <strong>0.04</strong></div>
+                <p>也就是说，<strong>你最多只应该投入 4% 的资金</strong>去买这张彩票。超过这个比例，长期来看一定会亏。</p>
             </div>
 
-            <!-- 小卡 3：决策临界点 · 人机协作 -->
+            <!-- 小卡：决策临界点 · 人机协作 -->
             <div class="mini-card">
                 <div class="step-title">决策临界点 · 人机协作</div>
-                <p><strong style="color: rgba(255,255,255,0.7);">凯利公式的核心价值，不在于“算出数字”，而在于“给出决策边界”。</strong></p>
-                <p>在低空经济中，<strong style="color: rgba(255,255,255,0.7);">无人机厂商</strong>看到凯利公式算出的最优投入比例后，就知道：</p>
+                <p><strong>凯利公式的核心价值，不在于“算出数字”，而在于“给出决策边界”。</strong></p>
+                <p>在低空经济中，<strong>无人机厂商</strong>看到凯利公式算出的最优投入比例后，就知道：</p>
                 <ul>
-                    <li>如果计算结果 <strong style="color: rgba(167, 139, 250, 0.8);">高于某个阈值</strong>，说明这条航线的“胜率×赔率”足够高 → <strong style="color: rgba(255,255,255,0.7);">值得压注</strong></li>
-                    <li>如果计算结果 <strong style="color: rgba(251, 146, 60, 0.8);">低于某个阈值</strong>，说明风险过大 → <strong style="color: rgba(255,255,255,0.7);">应该放弃</strong></li>
+                    <li>如果计算结果 <strong style="color: #a78bfa;">高于某个阈值</strong>，说明这条航线的“胜率×赔率”足够高 → <strong>值得压注</strong></li>
+                    <li>如果计算结果 <strong style="color: #facc15;">低于某个阈值</strong>，说明风险过大 → <strong>应该放弃</strong></li>
                 </ul>
 
                 <div class="threshold-visual">
@@ -1090,7 +1165,7 @@
                     </div>
                     <div class="stats">
                         <div class="stat-item"><div class="num" style="color:#a78bfa;">80%</div><div class="label">自动化决策</div></div>
-                        <div class="stat-item"><div class="num" style="color:#fbbf24;">20%</div><div class="label">人工干预阈值</div></div>
+                        <div class="stat-item"><div class="num" style="color:#facc15;">20%</div><div class="label">人工干预阈值</div></div>
                         <div class="stat-item"><div class="num" style="color:rgba(255,255,255,0.4);">⚡</div><div class="label">人机协作边界</div></div>
                     </div>
                     <div style="margin-top: 12px; font-size: 13px; color: rgba(255,255,255,0.35); border-top: 1px solid rgba(255,255,255,0.04); padding-top: 12px;">
@@ -1098,17 +1173,17 @@
                     </div>
                 </div>
 
-                <p>同样，<strong style="color: rgba(255,255,255,0.7);">政府</strong>看到这个逻辑后，就知道：</p>
+                <p>同样，<strong>政府</strong>看到这个逻辑后，就知道：</p>
                 <ul>
-                    <li>如果所有厂商都“压注”某条航线 → <strong style="color: rgba(255,255,255,0.7);">政府需要介入，防止垄断</strong></li>
-                    <li>如果所有厂商都“观望” → <strong style="color: rgba(255,255,255,0.7);">政府需要调整政策，激活市场</strong></li>
+                    <li>如果所有厂商都“压注”某条航线 → <strong>政府需要介入，防止垄断</strong></li>
+                    <li>如果所有厂商都“观望” → <strong>政府需要调整政策，激活市场</strong></li>
                 </ul>
-                <div class="highlight-box">
+                <div class="result-box purple">
                     <p><strong>💡 决策临界点：</strong>凯利公式提供了一个<strong>可量化的决策边界</strong>——当最优投入比例超过临界值时，博弈进入“压注区”；低于临界值时，博弈进入“观望区”。这个临界点，就是<strong>人机协作的管控边界</strong>。</p>
                 </div>
             </div>
 
-            <!-- 小卡 4：概率论 + 排列组合 → 大模型运行机制 -->
+            <!-- 小卡：概率论 + 排列组合 → 大模型 -->
             <div class="mini-card">
                 <div class="step-title">概率论 + 排列组合 → 大模型运行机制</div>
                 <p>概率论和排列组合，是理解“不确定性”的底层工具。在低空经济中，它帮助我们计算“不同航线分配方案的成功概率”和“多种竞争策略的排列组合结果”。</p>
@@ -1129,7 +1204,7 @@
                     <div style="display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; margin-top: 12px; font-size: 12px; color: rgba(255,255,255,0.2); border-top: 1px solid rgba(255,255,255,0.04); padding-top: 12px;">
                         <span><span class="pulse-dot"></span> 概率推理层</span>
                         <span><span class="pulse-dot" style="background: #60a5fa;"></span> 排列组合层</span>
-                        <span><span class="pulse-dot" style="background: #fbbf24;"></span> 大模型推演层</span>
+                        <span><span class="pulse-dot" style="background: #facc15;"></span> 大模型推演层</span>
                     </div>
                     <div style="margin-top: 10px; font-size: 13px; color: rgba(255,255,255,0.3); text-align: center;">
                         大模型运行机制的核心是 <strong style="color: rgba(255,255,255,0.5);">算力不断推理下一个字的概率</strong> —— 本质上也是在“计算最优路径”。
@@ -1150,18 +1225,18 @@
             <!-- 推导结论 -->
             <div class="mini-card" style="margin-top: 18px;">
                 <div class="step-title">💡 推导结论</div>
-                <div class="highlight-box" style="margin-top: 4px;">
+                <div class="result-box purple" style="margin-top: 4px;">
                     <p><strong>画圈实验中的“供给需求均衡”是博弈论的微观基础。</strong>每一次逼近均衡，都是博弈双方达成暂时妥协；每一次远离均衡，都是博弈重新启动。</p>
                 </div>
             </div>
         </div>
 
-        <!-- ===== 大板块：核心框架 ===== -->
+        <!-- ===== 板块：核心框架 ===== -->
         <div class="block" id="block-framework">
             <div class="block-title">📐 核心框架 <span class="tag">三类变量</span></div>
 
             <div class="mini-card">
-                <p style="margin-bottom: 8px;">博弈论底座的完整框架，由 <strong style="color: rgba(255,255,255,0.7);">三类变量</strong> 构成：</p>
+                <p style="margin-bottom: 8px;">博弈论底座的完整框架，由 <strong>三类变量</strong> 构成：</p>
                 <div class="card-grid">
                     <div class="card-item">
                         <div class="label">🧑‍🤝‍🧑 人</div>
@@ -1179,13 +1254,13 @@
                         <div class="desc">概率、统计、算法</div>
                     </div>
                 </div>
-                <div class="highlight-box" style="margin-top: 12px;">
+                <div class="result-box purple" style="margin-top: 12px;">
                     <p><strong>核心洞察：</strong>博弈论不是“算计别人”，而是<strong>在不确定的环境中，做出最优决策</strong>。</p>
                 </div>
             </div>
         </div>
 
-        <!-- ===== 大板块：能做什么 ===== -->
+        <!-- ===== 板块：能做什么 ===== -->
         <div class="block" id="block-applications">
             <div class="block-title">⚡ 能做什么 <span class="tag">应用场景</span></div>
             <div class="mini-card">
@@ -1199,17 +1274,17 @@
             </div>
         </div>
 
-        <!-- ===== 大板块：与全栖系统的关系 ===== -->
+        <!-- ===== 板块：与全栖系统的关系 ===== -->
         <div class="block" id="block-relation">
             <div class="block-title">🔗 与全栖系统的关系 <span class="tag">底座层</span></div>
             <div class="mini-card">
-                <p>GameMind 是 <strong style="color: rgba(255,255,255,0.7);">EvolveMind</strong> 和 <strong style="color: rgba(255,255,255,0.7);">MoodMind</strong> 的“博弈层”。</p>
+                <p>GameMind 是 <strong>EvolveMind</strong> 和 <strong>MoodMind</strong> 的“博弈层”。</p>
                 <ul>
                     <li><strong>EvolveMind</strong> 管“认知进化”——教你怎么想</li>
                     <li><strong>GameMind</strong> 管“博弈决策”——教你怎么在竞争中做选择</li>
                     <li><strong>MoodMind</strong> 管“资产估值”——教你怎么评估不确定性资产</li>
                 </ul>
-                <div class="highlight-box" style="margin-top: 10px;">
+                <div class="result-box purple" style="margin-top: 10px;">
                     <p><strong>一句话定位：</strong>EvolveMind 是大脑，GameMind 是策略，MoodMind 是算盘。</p>
                 </div>
             </div>
@@ -1234,23 +1309,21 @@
         });
 
         // ===== 侧边栏滚动联动 =====
-        document.querySelectorAll('.nav-item').forEach(item => {
+        const navItems = document.querySelectorAll('.nav-item');
+        const blocks = document.querySelectorAll('.block');
+
+        navItems.forEach(item => {
             item.addEventListener('click', function(e) {
                 e.preventDefault();
                 const targetId = this.dataset.target;
                 const target = document.getElementById(targetId);
                 if (target) {
                     target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    // 更新激活状态
-                    document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+                    navItems.forEach(el => el.classList.remove('active'));
                     this.classList.add('active');
                 }
             });
         });
-
-        // ===== 滚动时高亮当前板块 =====
-        const blocks = document.querySelectorAll('.block');
-        const navItems = document.querySelectorAll('.nav-item');
 
         function updateActiveNav() {
             let currentId = null;
@@ -1303,7 +1376,7 @@
                     adviceDisplay.style.color = '#a78bfa';
                 } else if (f > 0) {
                     adviceDisplay.textContent = '⚡ 临界区 · 谨慎投入';
-                    adviceDisplay.style.color = '#fbbf24';
+                    adviceDisplay.style.color = '#facc15';
                 } else {
                     adviceDisplay.textContent = '⚖️ 观望区 · 不建议投入';
                     adviceDisplay.style.color = 'rgba(255,255,255,0.3)';
@@ -1536,7 +1609,8 @@
                         ctx.beginPath();
                         for (let x = 0; x <= 80; x += 1) {
                             const t = x / 80;
-                            const y = statusY + 20 * Math.cos(t * Math.PI * 8 + phase) + 10 * Math.cos(t * Math.PI * 12 + phase * 1.3);
+                            const y = statusY + 20 * Math.cos(t * Math.PI * 8 + phase) + 10 * Math.cos(t * Math.PI * 12 +
+                                phase * 1.3);
                             x === 0 ? ctx.moveTo(statusX - 40 + x, y) : ctx.lineTo(statusX - 40 + x, y);
                         }
                         ctx.stroke();
