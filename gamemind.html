@@ -3,274 +3,819 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>博弈论底座 · 全栖低空运营总纲</title>
+    <title>GameMind · 博弈论底座</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background: #f8fafc;
+            background: #0b0b1a;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            min-height: 100vh;
             padding: 40px 24px;
             display: flex;
             justify-content: center;
+            align-items: flex-start;
+            overflow-x: hidden;
+            cursor: default;
         }
-        .container {
-            max-width: 960px;
+
+        #glow {
+            position: fixed;
+            top: 0;
+            left: 0;
             width: 100%;
-            background: white;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            background: radial-gradient(600px circle at var(--x, 50%) var(--y, 50%), rgba(120, 80, 255, 0.06), transparent 80%);
+            transition: background 0.1s;
+        }
+
+        .container {
+            max-width: 900px;
+            width: 100%;
+            background: radial-gradient(ellipse at 30% 30%, #120b24, #0b0b1a 70%, #05030a);
             border-radius: 32px;
             padding: 48px 40px 40px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            box-shadow: 0 30px 80px rgba(40, 10, 80, 0.4);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+            backdrop-filter: blur(2px);
         }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: -100px;
+            right: -100px;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(80, 30, 140, 0.15), transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: floatBg 12s ease-in-out infinite alternate;
+        }
+
+        .container::after {
+            content: '';
+            position: absolute;
+            bottom: -80px;
+            left: -80px;
+            width: 350px;
+            height: 350px;
+            background: radial-gradient(circle, rgba(30, 60, 150, 0.1), transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: floatBg 10s ease-in-out infinite alternate-reverse;
+        }
+
+        @keyframes floatBg {
+            0% {
+                transform: translate(0, 0) scale(1);
+            }
+            100% {
+                transform: translate(30px, -20px) scale(1.1);
+            }
+        }
+
+        @keyframes fadeInUp {
+            0% {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes gradientFlow {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 32px;
+            opacity: 0;
+            animation: fadeInUp 0.8s ease forwards;
+        }
+
         .badge {
             display: inline-block;
-            background: #eef2ff;
-            color: #4f46e5;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            color: rgba(255, 255, 255, 0.3);
             font-size: 13px;
-            font-weight: 600;
             padding: 4px 16px;
             border-radius: 20px;
+            letter-spacing: 0.3px;
             margin-bottom: 12px;
         }
-        h1 {
-            font-size: 32px;
+
+        .header h1 {
+            font-size: 36px;
             font-weight: 700;
-            color: #0f172a;
+            color: #f1f5f9;
             letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #f1f5f9, #a78bfa, #60a5fa, #f1f5f9);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradientFlow 6s ease-in-out infinite;
         }
-        h1 span {
-            color: #4f46e5;
-        }
-        .sub {
+
+        .header .sub {
             font-size: 16px;
-            color: #64748b;
-            margin: 6px 0 24px;
-            line-height: 1.6;
+            color: rgba(255, 255, 255, 0.4);
+            font-weight: 300;
+            margin-top: 6px;
         }
-        .back-link {
-            display: inline-block;
-            color: #4f46e5;
-            text-decoration: none;
-            font-size: 14px;
-            margin-bottom: 24px;
-            border: 1px solid #e2e8f0;
-            padding: 6px 16px;
-            border-radius: 20px;
-            transition: 0.2s;
+
+        .section {
+            margin-bottom: 32px;
+            opacity: 0;
+            animation: fadeInUp 0.6s ease forwards;
         }
-        .back-link:hover {
-            background: #f1f5f9;
-            border-color: #4f46e5;
-        }
-        h2 {
+
+        .section:nth-child(2) { animation-delay: 0.05s; }
+        .section:nth-child(3) { animation-delay: 0.1s; }
+        .section:nth-child(4) { animation-delay: 0.15s; }
+        .section:nth-child(5) { animation-delay: 0.2s; }
+        .section:nth-child(6) { animation-delay: 0.25s; }
+
+        .section h2 {
             font-size: 22px;
-            font-weight: 700;
-            color: #0f172a;
-            margin: 32px 0 12px;
-            border-bottom: 2px solid #f1f5f9;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
             padding-bottom: 8px;
         }
-        h3 {
-            font-size: 18px;
-            font-weight: 600;
-            color: #0f172a;
-            margin: 20px 0 8px;
+
+        .section h2 .tag {
+            font-size: 12px;
+            font-weight: 500;
+            color: #a78bfa;
+            background: rgba(167, 139, 250, 0.12);
+            padding: 2px 12px;
+            border-radius: 20px;
         }
-        p {
-            color: #475569;
+
+        .section p {
+            color: rgba(255, 255, 255, 0.5);
             line-height: 1.8;
             font-size: 15px;
             margin-bottom: 10px;
         }
-        ul, ol {
-            padding-left: 24px;
+
+        .section ul {
+            padding-left: 20px;
             margin-bottom: 12px;
         }
-        li {
-            color: #475569;
+
+        .section li {
+            color: rgba(255, 255, 255, 0.5);
             line-height: 1.8;
             font-size: 15px;
             margin-bottom: 4px;
         }
+
+        .section li strong {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
         .highlight-box {
-            background: #f8fafc;
-            border-left: 4px solid #4f46e5;
-            padding: 16px 20px;
+            background: rgba(167, 139, 250, 0.06);
+            border-left: 4px solid #a78bfa;
             border-radius: 0 12px 12px 0;
-            margin: 16px 0;
+            padding: 16px 20px;
+            margin: 12px 0 16px;
         }
+
+        .highlight-box p {
+            margin-bottom: 0;
+        }
+
         .highlight-box strong {
-            color: #4f46e5;
+            color: #a78bfa;
         }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 14px;
-            margin: 16px 0 20px;
+
+        .flow-chain {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 6px 12px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 14px;
+            padding: 14px 18px;
+            margin: 12px 0;
         }
-        th {
-            background: #f1f5f9;
-            text-align: left;
-            padding: 10px 12px;
-            font-weight: 600;
-            color: #0f172a;
-        }
-        td {
-            padding: 10px 12px;
-            border-bottom: 1px solid #e9edf4;
-            color: #475569;
-            vertical-align: top;
-        }
-        tr:last-child td {
-            border-bottom: none;
-        }
-        .tag {
-            display: inline-block;
-            background: #e0e7ff;
-            color: #4f46e5;
-            font-size: 12px;
-            font-weight: 600;
-            padding: 2px 12px;
+
+        .flow-chain .step {
+            background: rgba(167, 139, 250, 0.08);
+            color: rgba(255, 255, 255, 0.7);
+            padding: 4px 14px;
             border-radius: 20px;
-            margin-right: 4px;
+            font-size: 13px;
+            font-weight: 500;
         }
-        .footer-note {
-            margin-top: 32px;
-            padding-top: 20px;
-            border-top: 1px solid #e9edf4;
-            font-size: 14px;
-            color: #94a3b8;
+
+        .flow-chain .arrow {
+            color: rgba(255, 255, 255, 0.15);
+            font-size: 16px;
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+            margin: 12px 0 16px;
+        }
+
+        .card-item {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 14px;
+            padding: 16px 18px;
+            transition: all 0.3s ease;
+        }
+
+        .card-item:hover {
+            background: rgba(255, 255, 255, 0.04);
+            border-color: rgba(255, 255, 255, 0.08);
+            transform: translateY(-2px);
+        }
+
+        .card-item .label {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .card-item .value {
+            font-size: 18px;
+            font-weight: 600;
+            color: #f1f5f9;
+            margin-top: 4px;
+        }
+
+        .card-item .desc {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.3);
+            margin-top: 2px;
+        }
+
+        /* ===== 画布区 ===== */
+        .canvas-wrapper {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 20px;
+            padding: 16px;
+            margin: 12px 0 16px;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: auto;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 12px;
+        }
+
+        .canvas-caption {
+            text-align: center;
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.25);
+            margin-top: 8px;
+        }
+
+        /* ===== 凯利公式展示 ===== */
+        .kelly-box {
+            background: rgba(167, 139, 250, 0.04);
+            border: 1px solid rgba(167, 139, 250, 0.08);
+            border-radius: 16px;
+            padding: 20px 24px;
+            margin: 16px 0;
             text-align: center;
         }
-        .layer-grid {
-            display: grid;
-            grid-template-columns: 1fr 2fr 2fr;
-            gap: 6px 16px;
-            background: #f8fafc;
-            border-radius: 12px;
-            padding: 12px 16px;
-            font-size: 13px;
-            margin: 8px 0 12px;
-        }
-        .layer-grid .l {
+
+        .kelly-box .formula {
+            font-size: 24px;
             font-weight: 600;
-            color: #4f46e5;
+            color: #f1f5f9;
+            letter-spacing: 0.5px;
+            font-family: 'Courier New', monospace;
         }
-        .layer-grid .l2 {
-            color: #0f172a;
+
+        .kelly-box .formula .highlight {
+            color: #a78bfa;
         }
-        .layer-grid .l3 {
-            color: #64748b;
+
+        .kelly-box .legend {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.4);
         }
+
+        .kelly-box .legend span {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .kelly-box .legend .var {
+            color: #a78bfa;
+            font-weight: 500;
+        }
+
+        .example-box {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 12px;
+            padding: 14px 18px;
+            border-left: 3px solid #a78bfa;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 15px;
+            line-height: 1.7;
+            margin: 10px 0;
+        }
+
+        .example-box strong {
+            color: #a78bfa;
+        }
+
+        .back-bottom {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            flex-wrap: wrap;
+            opacity: 0;
+            animation: fadeInUp 0.6s ease 0.35s forwards;
+        }
+
+        .back-bottom a {
+            color: rgba(255, 255, 255, 0.3);
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s ease;
+        }
+
+        .back-bottom a:hover {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
         @media (max-width: 700px) {
             .container {
-                padding: 24px 16px 20px;
+                padding: 28px 20px;
             }
-            h1 {
-                font-size: 24px;
+            .header h1 {
+                font-size: 26px;
             }
-            .layer-grid {
+            .card-grid {
                 grid-template-columns: 1fr;
-                gap: 4px;
             }
-            table {
+            .flow-chain {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .kelly-box .formula {
+                font-size: 20px;
+            }
+            .kelly-box .legend {
+                gap: 10px;
                 font-size: 12px;
             }
-            th, td {
-                padding: 6px 8px;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 20px 14px;
+            }
+            .header h1 {
+                font-size: 22px;
+            }
+            .kelly-box .formula {
+                font-size: 18px;
             }
         }
     </style>
 </head>
 <body>
-<div class="container">
 
-    <a href="index.html" class="back-link">← 返回作品集</a>
+    <div id="glow"></div>
 
-    <div class="badge">🧠 博弈论底座</div>
-    <h1>全栖低空运营总纲 · <span>V4.0</span></h1>
-    <div class="sub">一套可跨业务复用的非标资产估值、全周期风控运营框架<br>对外脱敏公开版 · 不含私有化运算内核</div>
+    <div class="container">
 
-    <h2>🧠 这是什么？</h2>
-    <p>这是一套<strong>低空经济全域项目顶层规划总纲</strong>。它不是一套软件，不包含任何私有化运算内核或数学模型。它是一个<strong>可迁移的业务架构</strong>——只更换行业插件，核心整体架构保持不变，可衍生出森林防火巡查、地质灾害监测、航空器构件质检、文旅航拍等多个子项目方案。</p>
-    <p><strong>一句话定义：用一套框架，管理所有低空项目。</strong></p>
+        <!-- ===== 头部 ===== -->
+        <div class="header">
+            <div class="badge">🎯 博弈论底座</div>
+            <h1>GameMind · 博弈论底座</h1>
+            <div class="sub">从低空经济博弈到资源分配 · 完整思考链路</div>
+        </div>
 
-    <h2>🎯 核心价值</h2>
-    <ul>
-        <li><strong>可迁移</strong>：同一套架构，更换行业插件即可适配不同低空业务场景</li>
-        <li><strong>可降本</strong>：单次飞行同时承接两项业务，分摊固定成本</li>
-        <li><strong>可验证</strong>：完整的十一层业务链路，每层可追溯、可校验</li>
-        <li><strong>可商业化</strong>：阶梯化产品包，从诊断到全域总包逐级升级</li>
-    </ul>
+        <!-- ===== 1. 思考起点（含动态画布） ===== -->
+        <div class="section">
+            <h2>1. 思考起点 <span class="tag">低空经济博弈</span></h2>
+            <p>
+                低空经济中，无人机越来越多，但航道有限。资源稀缺带来了竞争，而竞争的本质是<strong style="color: rgba(255,255,255,0.7);">博弈</strong>。
+            </p>
+            <p>
+                如果把航线公开市场化、自由竞价，价格会被哄抬，最终形成垄断。这让我想到：<strong style="color: rgba(255,255,255,0.7);">这本质上是一个资源博弈问题</strong>。
+            </p>
 
-    <h2>🏛️ 顶层架构：四层溯源治理体系</h2>
-    <div class="highlight-box">
-        <strong>完整逻辑链条：</strong>人类情绪化决策存在天然缺陷 → 单纯依靠人为决策会持续出现偏差 → 必须建立刚性商业制度约束行为 → 落地为分权自治的整套工程架构
+            <!-- ===== 画布一：需求 vs 供给 博弈 ===== -->
+            <div class="canvas-wrapper">
+                <canvas id="gameCanvas1" width="800" height="300"></canvas>
+                <div class="canvas-caption">需求（蓝）与供给（橙）在基准线（市场/外部环境）上下博弈 · 时而逼近 · 时而远离</div>
+            </div>
+
+            <div class="highlight-box">
+                <p><strong>核心问题：</strong>在资源有限、参与者众多的情况下，如何设计一套机制，让资源分配既高效又可持续？</p>
+            </div>
+        </div>
+
+        <!-- ===== 2. 逻辑推导（含第二个动态画布 + 凯利公式） ===== -->
+        <div class="section">
+            <h2>2. 逻辑推导 <span class="tag">从拍卖到凯利公式</span></h2>
+            <p>
+                航线资源争夺，和<strong style="color: rgba(255,255,255,0.7);">拍卖</strong>的逻辑高度相似——参与者出价，价高者得。
+            </p>
+            <p>
+                但低空经济有一个特殊之处：<strong style="color: rgba(255,255,255,0.7);">前期投入巨大，一旦成功占据航线，收益暴增；一旦失败，没有回头路。</strong>这种“全有或全无”的结构，和<strong style="color: rgba(255,255,255,0.7);">赌球、赌场、拍卖</strong>的逻辑完全一致。
+            </p>
+
+            <!-- ===== 画布二：厂商 vs 政府 博弈 ===== -->
+            <div class="canvas-wrapper">
+                <canvas id="gameCanvas2" width="800" height="300"></canvas>
+                <div class="canvas-caption">无人机厂商（蓝）与政府（橙）的博弈 · 差值到达临界点时形成杂乱波动</div>
+            </div>
+
+            <!-- 凯利公式 -->
+            <div class="kelly-box">
+                <div class="formula">
+                    f* = (<span class="highlight">b</span> × <span class="highlight">p</span> − <span class="highlight">q</span>) / <span class="highlight">b</span>
+                </div>
+                <div class="legend">
+                    <span><span class="var">f*</span> = 最优下注比例</span>
+                    <span><span class="var">b</span> = 净赔率</span>
+                    <span><span class="var">p</span> = 胜率</span>
+                    <span><span class="var">q</span> = 败率 (1 − p)</span>
+                </div>
+            </div>
+
+            <!-- 赌球/彩票 解释 -->
+            <p>
+                举个例子：如果你去买一张彩票，<strong style="color: rgba(255,255,255,0.7);">中奖概率是 20%（p = 0.2）</strong>，<strong style="color: rgba(255,255,255,0.7);">赔率是 5 倍（b = 5）</strong>，那么凯利公式告诉你：
+            </p>
+            <div class="example-box">
+                f* = (5 × 0.2 − 0.8) / 5 = (1 − 0.8) / 5 = <strong>0.04</strong>
+            </div>
+            <p>
+                也就是说，<strong style="color: rgba(255,255,255,0.7);">你最多只应该投入 4% 的资金</strong>去买这张彩票。超过这个比例，长期来看一定会亏。
+            </p>
+            <p>
+                同样的逻辑映射到低空经济：<strong style="color: rgba(255,255,255,0.7);">在不确定的航线竞拍中，凯利公式可以帮助你计算“最优投入比例”</strong>——投入太少，抢不到航线；投入太多，一旦失败就万劫不复。
+            </p>
+
+            <div class="flow-chain">
+                <span class="step">低空经济博弈</span>
+                <span class="arrow">→</span>
+                <span class="step">拍卖逻辑</span>
+                <span class="arrow">→</span>
+                <span class="step">凯利公式</span>
+                <span class="arrow">→</span>
+                <span class="step">概率论 + 排列组合</span>
+                <span class="arrow">→</span>
+                <span class="step">大模型运行机制</span>
+            </div>
+
+            <p>
+                而<strong style="color: rgba(255,255,255,0.7);">概率论+排列组合</strong>，则是大模型运行机制的基础——算力不断推理下一个字的概率，本质上也是在“计算最优路径”。
+            </p>
+        </div>
+
+        <!-- ===== 3. 核心框架 ===== -->
+        <div class="section">
+            <h2>3. 核心框架 <span class="tag">三类变量</span></h2>
+            <p>
+                博弈论底座的完整框架，由<strong style="color: rgba(255,255,255,0.7);">三类变量</strong>构成：
+            </p>
+            <div class="card-grid">
+                <div class="card-item">
+                    <div class="label">🧑‍🤝‍🧑 人</div>
+                    <div class="value">决策主体</div>
+                    <div class="desc">博弈的参与者：企业、政府、用户</div>
+                </div>
+                <div class="card-item">
+                    <div class="label">📊 市场</div>
+                    <div class="value">资源配置场所</div>
+                    <div class="desc">博弈发生的环境：航线、供需、价格</div>
+                </div>
+                <div class="card-item">
+                    <div class="label">🔢 数理</div>
+                    <div class="value">不确定的概率机制</div>
+                    <div class="desc">博弈的底层规则：概率、统计、算法</div>
+                </div>
+            </div>
+            <div class="highlight-box">
+                <p><strong>核心洞察：</strong>博弈论不是“算计别人”，而是<strong>在不确定的环境中，做出最优决策</strong>。三类变量相互作用，构成了完整的博弈模型。</p>
+            </div>
+        </div>
+
+        <!-- ===== 4. 能做什么 ===== -->
+        <div class="section">
+            <h2>4. 能做什么 <span class="tag">应用场景</span></h2>
+            <ul>
+                <li><strong>资源分配决策：</strong>在有限航线下，计算最优的航线分配策略</li>
+                <li><strong>竞拍策略设计：</strong>在公开竞价中，计算最优出价策略（凯利公式 + 概率模型）</li>
+                <li><strong>风险管控：</strong>在“全有或全无”的博弈中，计算可承受的最大投入</li>
+                <li><strong>供需平衡分析：</strong>在供给需求都很稀缺时，判断市场的竞争白热化程度</li>
+                <li><strong>大模型推理对齐：</strong>用概率论和排列组合，理解大模型的“计算最优路径”逻辑</li>
+            </ul>
+        </div>
+
+        <!-- ===== 5. 与全栖系统的关系 ===== -->
+        <div class="section">
+            <h2>5. 与全栖系统的关系 <span class="tag">底座层</span></h2>
+            <p>
+                GameMind 是 <strong style="color: rgba(255,255,255,0.7);">EvolveMind</strong> 和 <strong style="color: rgba(255,255,255,0.7);">MoodMind</strong> 的“博弈层”。
+            </p>
+            <ul>
+                <li><strong>EvolveMind</strong> 管“认知进化”——教你怎么想</li>
+                <li><strong>GameMind</strong> 管“博弈决策”——教你怎么在竞争中做选择</li>
+                <li><strong>MoodMind</strong> 管“资产估值”——教你怎么评估不确定性资产</li>
+            </ul>
+            <div class="highlight-box">
+                <p><strong>一句话定位：</strong>EvolveMind 是大脑，GameMind 是策略，MoodMind 是算盘。</p>
+            </div>
+        </div>
+
+        <!-- ===== 底部导航 ===== -->
+        <div class="back-bottom">
+            <a href="index.html">← 返回作品集首页</a>
+            <a href="gamemind-application.html">📄 查看完整应用：低空运营总纲 →</a>
+        </div>
+
     </div>
-    <ul>
-        <li><strong>第一层：商业总目标</strong> — 稳定盈利为核心目标，所有决策不能偏离经营底线</li>
-        <li><strong>第二层：决策矛盾根源</strong> — 人脑理性滞后于情绪反应，必须依靠制度流程约束人为决策</li>
-        <li><strong>第三层：制度设计依据</strong> — 自动化运行为主，人工干预为辅，确定整体制度框架</li>
-        <li><strong>第四层：工程落地设计</strong> — 权限过滤器 + 核心内核固化 + 插件接口，落地为可执行架构</li>
-    </ul>
 
-    <h2>🔁 十一层单向业务链路</h2>
-    <p>数据单向流转，无循环跳转。所有模型、数据库、数据清洗工具均调用外部 API。</p>
-    <table>
-        <thead><tr><th>层级</th><th>名称</th><th>核心职能</th><th>低空落地应用</th></tr></thead>
-        <tbody>
-            <tr><td>第0层</td><td>元素感知层</td><td>拆解业务最小单元</td><td>拆分空域、航线、设备、订单基础信息</td></tr>
-            <tr><td>第1层</td><td>复杂度评估层</td><td>评估业务体量，分配外部算力</td><td>区分简易报备任务与多航线复合排班</td></tr>
-            <tr><td>第2层</td><td>统一编码存储层</td><td>标准化数据格式</td><td>跨区县项目数据互通复用</td></tr>
-            <tr><td>第3层</td><td>全域资产库</td><td>业务资产统一归档存储</td><td>调用云端向量数据库 API</td></tr>
-            <tr><td>第4层</td><td>环境耦合过滤层</td><td>外部信息清洗 + 虚假数据拦截</td><td>过滤不实空域信息、虚假报价</td></tr>
-            <tr><td><strong>门控</strong></td><td><strong>时序权重调节器</strong></td><td>测算资产随时间的价值衰减</td><td>评估设备老化、航线时效价值变化</td></tr>
-            <tr><td>第5层</td><td>时空约束层</td><td>绑定空域地理与时段规则</td><td>生成多条合规分段飞行航路</td></tr>
-            <tr><td>第6层</td><td>业务分类匹配层</td><td>区分长周期运维与短期临时业务</td><td>匹配不同业务的运营周期</td></tr>
-            <tr><td><strong>第7层</strong></td><td><strong>商业博弈核算层</strong></td><td><strong>多方案收益对比 + 成本分摊计算</strong></td><td><strong>输出一飞双线业务组合排班方案</strong></td></tr>
-            <tr><td>第8层</td><td>标准化插件接口</td><td>对接对应行业外协工具</td><td>接入无人机视觉巡检平台能力</td></tr>
-            <tr><td>第9层</td><td>双模型交叉校验层</td><td>依托大模型基座，四维复核</td><td>同步校验收益、合规、风险、可行性</td></tr>
-            <tr><td><strong>门控</strong></td><td><strong>稳态区间判定</strong></td><td>区分自动处理 / 人工复核业务</td><td>常规航线直接自动生成方案</td></tr>
-            <tr><td>第10层</td><td>总控调度层</td><td>资源打包、航线统筹</td><td>生成全域外勤排班总图</td></tr>
-            <tr><td><strong>门控</strong></td><td><strong>权限边界过滤器</strong></td><td>隔离系统自治与人工终审</td><td>仅大额高危项目允许人为干预</td></tr>
-            <tr><td>第11层</td><td>人机协同终审层</td><td>处理极端特殊场景</td><td>输出完整政企项目交付方案</td></tr>
-        </tbody>
-    </table>
-    <p style="font-size:13px; color:#94a3b8;">备注：所有模型、数据库、数据清洗工具均调用外部 API。本文档只展示业务架构，不包含内部量化判定模型。</p>
+    <script>
+        // ===== 鼠标跟随光晕 =====
+        const glow = document.getElementById('glow');
+        document.addEventListener('mousemove', (e) => {
+            const x = e.clientX / window.innerWidth * 100;
+            const y = e.clientY / window.innerHeight * 100;
+            glow.style.setProperty('--x', x + '%');
+            glow.style.setProperty('--y', y + '%');
+        });
 
-    <h2>🧩 核心业务创新：一飞双线</h2>
-    <p><strong>单次飞行同时承接两项业务</strong>，将空域报备、车辆出勤等固定成本共同分摊。</p>
-    <ul>
-        <li><strong>传统模式</strong>：单次飞行执行单一任务 → 固定成本重复支出 → 项目越多成本越高</li>
-        <li><strong>一飞双线模式</strong>：单次飞行执行两项业务（如政企巡检 + 文旅采风）→ 固定成本按营收比例分摊 → 项目越多边际成本越低</li>
-    </ul>
+        // ===== 画布一：需求 vs 供给 博弈 =====
+        (function() {
+            const canvas = document.getElementById('gameCanvas1');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width,
+                h = canvas.height;
+            let time = 0;
 
-    <h2>📦 阶梯化产品交付包</h2>
-    <p><strong>价值递进链路：</strong>业务诊断 → 单点优化 → 体系标准化 → 私有化部署 → 全域总包</p>
-    <ul>
-        <li><strong>基础诊断包</strong>：行业业务热力分析报告，定位成本浪费环节（客户破冰）</li>
-        <li><strong>单点优化包</strong>：针对单一业务痛点的专项整改方案，给出可落地的降本路径</li>
-        <li><strong>标准化运营包</strong>：整套 SOP 运营手册，把个人经验固化为组织制度</li>
-        <li><strong>私有化定制包</strong>：完整导入架构，本地化适配，搭建专属排班与风控体系</li>
-        <li><strong>城市级总包方案</strong>：全域统筹规划，形成长期可持续运营的低空商业体系</li>
-    </ul>
+            function draw() {
+                time += 0.02;
+                ctx.clearRect(0, 0, w, h);
 
-    <h2>🚀 落地验证结论</h2>
-    <ul>
-        <li>双线共飞模式有效分摊固定外勤成本，提升项目整体毛利率</li>
-        <li>整体架构可无缝对接大模型基座，切换业务插件即可衍生不同项目</li>
-        <li>全部业务规则可向上追溯顶层治理逻辑，架构完整闭环</li>
-        <li>在通用技术模型之上补充商业、产业、风控多层校验</li>
-        <li>总纲搭建完成后，新项目只做插件替换，适合大批量区县项目批量拓展</li>
-    </ul>
+                // 基准线
+                const baseY = h * 0.6;
+                ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+                ctx.lineWidth = 1.5;
+                ctx.setLineDash([6, 8]);
+                ctx.beginPath();
+                ctx.moveTo(0, baseY);
+                ctx.lineTo(w, baseY);
+                ctx.stroke();
+                ctx.setLineDash([]);
 
-    <div class="footer-note">
-        版本：V4.0 脱敏公开版 · 定位：低空经济全域项目顶层规划总纲
-    </div>
+                ctx.fillStyle = 'rgba(255,255,255,0.2)';
+                ctx.font = '12px sans-serif';
+                ctx.textAlign = 'right';
+                ctx.textBaseline = 'top';
+                ctx.fillText('市场 / 外部环境', w - 10, baseY + 8);
 
-</div>
+                // 需求曲线
+                const demandAmp = 50 + 20 * Math.sin(time * 0.5);
+                const demandOffset = 30 * Math.sin(time * 0.3);
+                ctx.strokeStyle = 'rgba(96, 165, 250, 0.7)';
+                ctx.lineWidth = 2.5;
+                ctx.beginPath();
+                for (let x = 0; x <= w; x += 2) {
+                    const t = x / w;
+                    const y = baseY - demandAmp * Math.sin(t * Math.PI * 2 + time * 0.8) - demandOffset * 0.5;
+                    if (x === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+                }
+                ctx.stroke();
+
+                ctx.fillStyle = 'rgba(96, 165, 250, 0.6)';
+                ctx.font = '13px sans-serif';
+                ctx.textAlign = 'left';
+                ctx.textBaseline = 'bottom';
+                const lastY = baseY - demandAmp * Math.sin(1 * Math.PI * 2 + time * 0.8) - demandOffset * 0.5;
+                ctx.fillText('需求', 10, lastY - 6);
+
+                // 供给曲线
+                const supplyAmp = 40 + 25 * Math.sin(time * 0.4 + 1.2);
+                const supplyOffset = 25 * Math.sin(time * 0.25 + 0.8);
+                ctx.strokeStyle = 'rgba(251, 146, 60, 0.7)';
+                ctx.lineWidth = 2.5;
+                ctx.beginPath();
+                for (let x = 0; x <= w; x += 2) {
+                    const t = x / w;
+                    const y = baseY + supplyAmp * Math.sin(t * Math.PI * 2 + time * 0.6 + 0.5) + supplyOffset * 0.5;
+                    if (x === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+                }
+                ctx.stroke();
+
+                ctx.fillStyle = 'rgba(251, 146, 60, 0.6)';
+                ctx.font = '13px sans-serif';
+                ctx.textAlign = 'left';
+                ctx.textBaseline = 'top';
+                const lastSupplyY = baseY + supplyAmp * Math.sin(1 * Math.PI * 2 + time * 0.6 + 0.5) + supplyOffset * 0.5;
+                ctx.fillText('供给', 10, lastSupplyY + 6);
+
+                // 博弈状态
+                const diff = Math.sin(time * 0.3);
+                let stateText = '⚖️ 逼近均衡';
+                let stateColor = 'rgba(255,255,255,0.2)';
+                if (diff > 0.5) {
+                    stateText = '📈 需求强势 · 远离均衡';
+                    stateColor = 'rgba(96, 165, 250, 0.3)';
+                } else if (diff < -0.5) {
+                    stateText = '📉 供给强势 · 远离均衡';
+                    stateColor = 'rgba(251, 146, 60, 0.3)';
+                }
+                ctx.fillStyle = stateColor;
+                ctx.font = '13px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'bottom';
+                ctx.fillText(stateText, w * 0.85, baseY - 10);
+
+                requestAnimationFrame(draw);
+            }
+            draw();
+        })();
+
+        // ===== 画布二：无人机厂商 vs 政府 博弈 =====
+        (function() {
+            const canvas = document.getElementById('gameCanvas2');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width,
+                h = canvas.height;
+            let time = 0;
+
+            function draw() {
+                time += 0.025;
+                ctx.clearRect(0, 0, w, h);
+
+                // 两条基准线
+                const baseY1 = h * 0.45;
+                const baseY2 = h * 0.75;
+
+                ctx.strokeStyle = 'rgba(96, 165, 250, 0.12)';
+                ctx.lineWidth = 1;
+                ctx.setLineDash([4, 6]);
+                ctx.beginPath();
+                ctx.moveTo(0, baseY1);
+                ctx.lineTo(w, baseY1);
+                ctx.stroke();
+
+                ctx.strokeStyle = 'rgba(251, 146, 60, 0.12)';
+                ctx.setLineDash([4, 6]);
+                ctx.beginPath();
+                ctx.moveTo(0, baseY2);
+                ctx.lineTo(w, baseY2);
+                ctx.stroke();
+                ctx.setLineDash([]);
+
+                // 厂商曲线
+                const amp1 = 35 + 15 * Math.sin(time * 0.3);
+                const offset1 = 20 * Math.sin(time * 0.4 + 0.5);
+                ctx.strokeStyle = 'rgba(96, 165, 250, 0.7)';
+                ctx.lineWidth = 2.5;
+                ctx.beginPath();
+                for (let x = 0; x <= w; x += 2) {
+                    const t = x / w;
+                    const y = baseY1 + amp1 * Math.sin(t * Math.PI * 2 * 1.5 + time * 0.9) + offset1 * 0.3;
+                    if (x === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+                }
+                ctx.stroke();
+
+                ctx.fillStyle = 'rgba(96, 165, 250, 0.6)';
+                ctx.font = '13px sans-serif';
+                ctx.textAlign = 'left';
+                ctx.textBaseline = 'bottom';
+                const lastY1 = baseY1 + amp1 * Math.sin(1 * Math.PI * 2 * 1.5 + time * 0.9) + offset1 * 0.3;
+                ctx.fillText('厂商', 10, lastY1 - 6);
+
+                // 政府曲线
+                const amp2 = 30 + 20 * Math.sin(time * 0.35 + 1.0);
+                const offset2 = 25 * Math.sin(time * 0.25 + 0.8);
+                ctx.strokeStyle = 'rgba(251, 146, 60, 0.7)';
+                ctx.lineWidth = 2.5;
+                ctx.beginPath();
+                for (let x = 0; x <= w; x += 2) {
+                    const t = x / w;
+                    const y = baseY2 + amp2 * Math.sin(t * Math.PI * 2 * 1.5 + time * 0.7 + 1.2) + offset2 * 0.3;
+                    if (x === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+                }
+                ctx.stroke();
+
+                ctx.fillStyle = 'rgba(251, 146, 60, 0.6)';
+                ctx.font = '13px sans-serif';
+                ctx.textAlign = 'left';
+                ctx.textBaseline = 'top';
+                const lastY2 = baseY2 + amp2 * Math.sin(1 * Math.PI * 2 * 1.5 + time * 0.7 + 1.2) + offset2 * 0.3;
+                ctx.fillText('政府', 10, lastY2 + 6);
+
+                // 临界点检测 + 杂乱波动
+                const diff = Math.sin(time * 0.3) * 0.7 + 0.3 * Math.sin(time * 0.7 + 0.5);
+                const threshold = 0.6;
+                const statusX = w * 0.78;
+                const statusY = h * 0.5;
+
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+
+                if (Math.abs(diff) > threshold) {
+                    ctx.fillStyle = 'rgba(255, 200, 100, 0.08)';
+                    ctx.beginPath();
+                    ctx.arc(statusX, statusY, 60, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    ctx.strokeStyle = 'rgba(255, 200, 100, 0.15)';
+                    ctx.lineWidth = 1;
+                    for (let i = 0; i < 3; i++) {
+                        const phase = time * 1.5 + i * 1.2;
+                        ctx.beginPath();
+                        for (let x = 0; x <= 80; x += 1) {
+                            const t = x / 80;
+                            const y = statusY + 20 * Math.cos(t * Math.PI * 8 + phase) + 10 * Math.cos(t * Math.PI * 12 + phase * 1.3);
+                            if (x === 0) ctx.moveTo(statusX - 40 + x, y);
+                            else ctx.lineTo(statusX - 40 + x, y);
+                        }
+                        ctx.stroke();
+                    }
+
+                    ctx.fillStyle = 'rgba(255, 200, 100, 0.4)';
+                    ctx.font = '12px sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'bottom';
+                    ctx.fillText('⚡ 临界点 · 杂乱波动', statusX, statusY - 60);
+                } else {
+                    ctx.fillStyle = 'rgba(255,255,255,0.15)';
+                    ctx.font = '12px sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'bottom';
+                    ctx.fillText('差值未达临界 · 博弈中', statusX, statusY - 10);
+                }
+
+                ctx.fillStyle = 'rgba(255,255,255,0.2)';
+                ctx.font = '11px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'top';
+                ctx.fillText('差值: ' + diff.toFixed(2), statusX, statusY + 10);
+
+                requestAnimationFrame(draw);
+            }
+            draw();
+        })();
+    </script>
+
 </body>
 </html>
