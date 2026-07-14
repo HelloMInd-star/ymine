@@ -15,14 +15,108 @@
             background: #0b0b1a;
             font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
             min-height: 100vh;
-            padding: 40px 24px;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
+            padding: 40px 24px 40px 280px;
             overflow-x: hidden;
             cursor: default;
         }
 
+        /* ===== 左侧固定检索目录 ===== */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 240px;
+            height: 100vh;
+            padding: 40px 16px 30px;
+            background: rgba(11, 11, 26, 0.92);
+            backdrop-filter: blur(12px);
+            border-right: 1px solid rgba(255, 255, 255, 0.04);
+            overflow-y: auto;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar .logo {
+            font-size: 14px;
+            font-weight: 700;
+            color: #f1f5f9;
+            margin-bottom: 6px;
+            letter-spacing: -0.3px;
+        }
+
+        .sidebar .logo span {
+            color: #a78bfa;
+        }
+
+        .sidebar .sub-logo {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.2);
+            margin-bottom: 24px;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            padding-bottom: 14px;
+        }
+
+        .sidebar .nav-item {
+            display: block;
+            padding: 8px 12px;
+            margin-bottom: 2px;
+            border-radius: 8px;
+            color: rgba(255, 255, 255, 0.35);
+            font-size: 13px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.25s ease;
+            cursor: pointer;
+            border-left: 2px solid transparent;
+        }
+
+        .sidebar .nav-item:hover {
+            background: rgba(255, 255, 255, 0.03);
+            color: rgba(255, 255, 255, 0.7);
+            border-left-color: rgba(167, 139, 250, 0.3);
+        }
+
+        .sidebar .nav-item.active {
+            color: #f1f5f9;
+            background: rgba(167, 139, 250, 0.06);
+            border-left-color: #a78bfa;
+        }
+
+        .sidebar .nav-item .num {
+            display: inline-block;
+            width: 18px;
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.15);
+            margin-right: 6px;
+        }
+
+        .sidebar .nav-divider {
+            border: none;
+            border-top: 1px solid rgba(255, 255, 255, 0.03);
+            margin: 12px 0;
+        }
+
+        .sidebar .nav-section-label {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: rgba(255, 255, 255, 0.12);
+            padding: 8px 12px 4px;
+            font-weight: 600;
+        }
+
+        .sidebar .footer-nav {
+            margin-top: auto;
+            padding-top: 16px;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.15);
+            text-align: center;
+        }
+
+        /* ===== 鼠标跟随光晕 ===== */
         #glow {
             position: fixed;
             top: 0;
@@ -107,9 +201,10 @@
             }
         }
 
+        /* ===== 头部 ===== */
         .header {
             text-align: center;
-            margin-bottom: 40px;
+            margin-bottom: 60px;
             opacity: 0;
             animation: fadeInUp 0.8s ease forwards;
         }
@@ -145,22 +240,23 @@
             margin-top: 6px;
         }
 
-        /* ===== 大板块容器 ===== */
+        /* ===== 大板块容器（间距拉大） ===== */
         .block {
             background: rgba(255, 255, 255, 0.02);
             border: 1px solid rgba(255, 255, 255, 0.06);
             border-radius: 20px;
-            padding: 32px 30px 28px;
-            margin-bottom: 36px;
+            padding: 40px 34px 36px;
+            margin-bottom: 56px;
             opacity: 0;
             animation: fadeInUp 0.6s ease forwards;
             position: relative;
+            scroll-margin-top: 20px;
         }
 
         .block::after {
             content: '';
             position: absolute;
-            bottom: -18px;
+            bottom: -28px;
             left: 10%;
             width: 80%;
             height: 1px;
@@ -179,11 +275,11 @@
             font-size: 22px;
             font-weight: 700;
             color: #f1f5f9;
-            margin-bottom: 18px;
+            margin-bottom: 22px;
             display: flex;
             align-items: center;
             gap: 12px;
-            padding-bottom: 12px;
+            padding-bottom: 14px;
             border-bottom: 2px solid rgba(255, 255, 255, 0.04);
             letter-spacing: -0.3px;
         }
@@ -198,13 +294,13 @@
             letter-spacing: 0.3px;
         }
 
-        /* ===== 小卡片（统一风格） ===== */
+        /* ===== 小卡片（间距拉大） ===== */
         .mini-card {
             background: rgba(255, 255, 255, 0.02);
             border: 1px solid rgba(255, 255, 255, 0.04);
             border-radius: 16px;
-            padding: 20px 22px 18px;
-            margin-bottom: 18px;
+            padding: 24px 26px 22px;
+            margin-bottom: 24px;
             transition: border-color 0.3s ease;
         }
 
@@ -220,7 +316,7 @@
             font-size: 17px;
             font-weight: 600;
             color: rgba(255, 255, 255, 0.75);
-            margin-bottom: 6px;
+            margin-bottom: 8px;
             display: flex;
             align-items: center;
             gap: 10px;
@@ -237,12 +333,12 @@
             color: rgba(255, 255, 255, 0.5);
             line-height: 1.8;
             font-size: 15px;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
         }
 
         .mini-card ul {
             padding-left: 20px;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
         }
 
         .mini-card li {
@@ -259,8 +355,8 @@
         .mini-card .card-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-            margin: 12px 0 0;
+            gap: 14px;
+            margin: 14px 0 0;
         }
 
         .mini-card .card-item {
@@ -304,7 +400,7 @@
             border-left: 4px solid #a78bfa;
             border-radius: 0 12px 12px 0;
             padding: 14px 18px;
-            margin: 10px 0 12px;
+            margin: 12px 0 14px;
         }
 
         .highlight-box p {
@@ -323,8 +419,8 @@
             background: rgba(255, 255, 255, 0.02);
             border: 1px solid rgba(255, 255, 255, 0.04);
             border-radius: 14px;
-            padding: 12px 16px;
-            margin: 12px 0 0;
+            padding: 14px 18px;
+            margin: 14px 0 0;
         }
 
         .flow-chain .step {
@@ -347,7 +443,7 @@
             border: 1px solid rgba(255, 255, 255, 0.04);
             border-radius: 20px;
             padding: 16px;
-            margin: 10px 0 14px;
+            margin: 12px 0 16px;
             position: relative;
         }
 
@@ -372,7 +468,7 @@
             border: 1px solid rgba(167, 139, 250, 0.08);
             border-radius: 16px;
             padding: 18px 20px;
-            margin: 10px 0 14px;
+            margin: 12px 0 16px;
             text-align: center;
         }
 
@@ -417,7 +513,7 @@
             color: rgba(255, 255, 255, 0.6);
             font-size: 15px;
             line-height: 1.7;
-            margin: 8px 0 10px;
+            margin: 10px 0 12px;
         }
 
         .example-box strong {
@@ -430,7 +526,7 @@
             border: 1px solid rgba(255, 255, 255, 0.06);
             border-radius: 16px;
             padding: 18px 20px;
-            margin: 10px 0 14px;
+            margin: 12px 0 16px;
         }
 
         .kelly-simulator .sim-title {
@@ -552,7 +648,7 @@
             border: 1px solid rgba(255, 255, 255, 0.06);
             border-radius: 16px;
             padding: 18px 20px;
-            margin: 10px 0 14px;
+            margin: 12px 0 16px;
             position: relative;
             overflow: hidden;
         }
@@ -652,7 +748,7 @@
             border: 1px solid rgba(255, 255, 255, 0.06);
             border-radius: 16px;
             padding: 18px 20px;
-            margin: 10px 0 14px;
+            margin: 12px 0 16px;
         }
 
         .pipeline .flow {
@@ -732,8 +828,8 @@
         /* ===== 底部 ===== */
         .back-bottom {
             text-align: center;
-            margin-top: 40px;
-            padding-top: 20px;
+            margin-top: 48px;
+            padding-top: 24px;
             border-top: 1px solid rgba(255, 255, 255, 0.04);
             display: flex;
             justify-content: center;
@@ -754,22 +850,39 @@
             color: rgba(255, 255, 255, 0.8);
         }
 
-        @media (max-width: 700px) {
+        /* ===== 响应式 ===== */
+        @media (max-width: 900px) {
+            body {
+                padding: 32px 20px 32px 20px;
+            }
+            .sidebar {
+                display: none;
+            }
             .container {
-                padding: 28px 20px;
+                padding: 32px 24px 28px;
+            }
+        }
+
+        @media (max-width: 700px) {
+            body {
+                padding: 24px 16px 24px 16px;
+            }
+            .container {
+                padding: 24px 16px 20px;
             }
             .header h1 {
                 font-size: 26px;
             }
             .block {
                 padding: 24px 18px 20px;
-                margin-bottom: 28px;
+                margin-bottom: 40px;
             }
             .block-title {
                 font-size: 19px;
             }
             .mini-card {
                 padding: 16px 16px 14px;
+                margin-bottom: 18px;
             }
             .mini-card .card-grid {
                 grid-template-columns: 1fr;
@@ -809,13 +922,14 @@
 
         @media (max-width: 480px) {
             .container {
-                padding: 20px 14px;
+                padding: 18px 12px 16px;
             }
             .header h1 {
                 font-size: 22px;
             }
             .block {
                 padding: 18px 14px 16px;
+                margin-bottom: 32px;
             }
             .block-title {
                 font-size: 17px;
@@ -829,11 +943,46 @@
             .threshold-visual .stats {
                 grid-template-columns: 1fr;
             }
+            .back-bottom {
+                flex-direction: column;
+                gap: 12px;
+            }
         }
     </style>
 </head>
 <body>
 
+    <!-- ===== 左侧固定检索目录 ===== -->
+    <div class="sidebar" id="sidebar">
+        <div class="logo">Game<span>Mind</span></div>
+        <div class="sub-logo">博弈论底座 · 导航</div>
+
+        <hr class="nav-divider">
+
+        <div class="nav-section-label">思考链路</div>
+        <a class="nav-item" data-target="block-chain"><span class="num">01</span> 推导过程</a>
+
+        <hr class="nav-divider">
+
+        <div class="nav-section-label">核心框架</div>
+        <a class="nav-item" data-target="block-framework"><span class="num">02</span> 三类变量</a>
+
+        <hr class="nav-divider">
+
+        <div class="nav-section-label">应用</div>
+        <a class="nav-item" data-target="block-applications"><span class="num">03</span> 能做什么</a>
+
+        <hr class="nav-divider">
+
+        <div class="nav-section-label">系统关系</div>
+        <a class="nav-item" data-target="block-relation"><span class="num">04</span> 与全栖系统的关系</a>
+
+        <div class="footer-nav">
+            <a href="index.html" style="color:rgba(255,255,255,0.2); text-decoration:none; font-size:12px;">← 返回作品集</a>
+        </div>
+    </div>
+
+    <!-- ===== 鼠标跟随光晕 ===== -->
     <div id="glow"></div>
 
     <div class="container">
@@ -846,7 +995,7 @@
         </div>
 
         <!-- ===== 大板块：思考链路 ===== -->
-        <div class="block">
+        <div class="block" id="block-chain">
             <div class="block-title">🧠 思考链路 <span class="tag">推导过程</span></div>
 
             <!-- 小卡 1：低空经济博弈 + 拍卖逻辑 -->
@@ -998,7 +1147,7 @@
                 <span class="step">大模型运行机制</span>
             </div>
 
-            <!-- ===== 推导结论（现在用 mini-card 包裹，和前面保持一致） ===== -->
+            <!-- 推导结论 -->
             <div class="mini-card" style="margin-top: 18px;">
                 <div class="step-title">💡 推导结论</div>
                 <div class="highlight-box" style="margin-top: 4px;">
@@ -1007,8 +1156,8 @@
             </div>
         </div>
 
-        <!-- ===== 大板块：核心框架（现在用 mini-card 包裹，三列并排） ===== -->
-        <div class="block">
+        <!-- ===== 大板块：核心框架 ===== -->
+        <div class="block" id="block-framework">
             <div class="block-title">📐 核心框架 <span class="tag">三类变量</span></div>
 
             <div class="mini-card">
@@ -1037,7 +1186,7 @@
         </div>
 
         <!-- ===== 大板块：能做什么 ===== -->
-        <div class="block">
+        <div class="block" id="block-applications">
             <div class="block-title">⚡ 能做什么 <span class="tag">应用场景</span></div>
             <div class="mini-card">
                 <ul>
@@ -1051,7 +1200,7 @@
         </div>
 
         <!-- ===== 大板块：与全栖系统的关系 ===== -->
-        <div class="block">
+        <div class="block" id="block-relation">
             <div class="block-title">🔗 与全栖系统的关系 <span class="tag">底座层</span></div>
             <div class="mini-card">
                 <p>GameMind 是 <strong style="color: rgba(255,255,255,0.7);">EvolveMind</strong> 和 <strong style="color: rgba(255,255,255,0.7);">MoodMind</strong> 的“博弈层”。</p>
@@ -1083,6 +1232,41 @@
             glow.style.setProperty('--x', x + '%');
             glow.style.setProperty('--y', y + '%');
         });
+
+        // ===== 侧边栏滚动联动 =====
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.dataset.target;
+                const target = document.getElementById(targetId);
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    // 更新激活状态
+                    document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+                    this.classList.add('active');
+                }
+            });
+        });
+
+        // ===== 滚动时高亮当前板块 =====
+        const blocks = document.querySelectorAll('.block');
+        const navItems = document.querySelectorAll('.nav-item');
+
+        function updateActiveNav() {
+            let currentId = null;
+            blocks.forEach(block => {
+                const rect = block.getBoundingClientRect();
+                if (rect.top <= 100) {
+                    currentId = block.id;
+                }
+            });
+            navItems.forEach(item => {
+                item.classList.toggle('active', item.dataset.target === currentId);
+            });
+        }
+
+        window.addEventListener('scroll', updateActiveNav);
+        window.addEventListener('load', updateActiveNav);
 
         // ===== 凯利公式交互器 =====
         (function() {
