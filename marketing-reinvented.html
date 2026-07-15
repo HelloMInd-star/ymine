@@ -276,7 +276,7 @@
             scroll-margin-top: 16px;
         }
 
-        /* ===== 顶部元数据 ===== */
+        /* ===== 验证元数据（新版：传统 vs 元架构） ===== */
         .meta-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -306,11 +306,21 @@
             font-weight: 500;
             color: rgba(255, 255, 255, 0.7);
             margin-top: 2px;
-            line-height: 1.4;
+            line-height: 1.5;
         }
 
         .meta-item .mv .hl {
             color: #a78bfa;
+        }
+
+        .meta-item .mv .hl-gold {
+            color: #facc15;
+        }
+
+        .meta-item .mv .sub {
+            color: rgba(255, 255, 255, 0.25);
+            font-size: 12px;
+            font-weight: 400;
         }
 
         /* ============================================================ */
@@ -1044,24 +1054,27 @@
             </div>
         </div>
 
-        <!-- ===== 验证元数据 ===== -->
+        <!-- ===== 验证元数据（新版：传统 vs 元架构） ===== -->
         <div class="section-anchor" id="section-meta"></div>
         <div class="meta-grid">
             <div class="meta-item">
-                <div class="ml">验证设计</div>
-                <div class="mv">对照组（传统MBA营销课程）<span class="hl">vs</span> 实验组（元架构实时推演）</div>
+                <div class="ml">📊 传统方法 · 估算逻辑</div>
+                <div class="mv">依赖用户调研、A/B测试、历史数据回归<br><span class="sub">需要大量样本 · 周期长 · 结果仅适用特定场景</span></div>
             </div>
             <div class="meta-item">
-                <div class="ml">验证对象</div>
-                <div class="mv"><span style="color:#a78bfa;">前额叶型（逻辑/分析/计算）</span> + <span style="color:#60a5fa;">边缘系统型（直觉/判断/模式识别）</span><br><span style="color:rgba(255,255,255,0.25);font-size:12px;">未系统学习过营销学</span></div>
+                <div class="ml">🧠 元架构 · 估算逻辑</div>
+                <div class="mv">基于 <span class="hl">前额叶（逻辑/分析/计算）</span> × <span style="color:#60a5fa;">边缘系统（直觉/判断/模式识别）</span> 协同推演<br><span class="sub">单场对话即可完成 · 结果可跨领域迁移</span></div>
             </div>
-            <div class="meta-item">
-                <div class="ml">验证方式</div>
-                <div class="mv">不打开任何教材，不查阅任何资料<br><span style="color:rgba(255,255,255,0.25);font-size:12px;">全程仅凭元架构实时推演</span></div>
+            <div class="meta-item" style="grid-column:1/-1;">
+                <div class="ml">🔁 两种认知路径的差异</div>
+                <div class="mv">
+                    <span style="color:rgba(255,255,255,0.5);">传统：</span>归纳法（从数据中找规律）<br>
+                    <span class="hl">元架构：</span>演绎法（从原理中推结论）
+                </div>
             </div>
-            <div class="meta-item">
-                <div class="ml">核心结论</div>
-                <div class="mv">元架构可在单场对话内产出与传统MBA营销课<span class="hl">同等量级</span>、但<span class="hl">底层结构更清晰</span>的认知成果</div>
+            <div class="meta-item" style="grid-column:1/-1;">
+                <div class="ml">💡 核心结论</div>
+                <div class="mv">元架构可在单场对话内产出与传统MBA营销课<span class="hl-gold">同等量级</span>、但<span class="hl">底层结构更清晰、可迁移性更强</span>的认知成果</div>
             </div>
         </div>
 
@@ -1809,7 +1822,6 @@
                 premiumVal.textContent = premium.toFixed(2);
                 elasticityVal.textContent = elasticity.toFixed(2);
 
-                // 定价公式
                 const price = cost * premium * (1 + elasticity * 0.2);
                 const roundedPrice = Math.round(price * 10) / 10;
                 const margin = ((roundedPrice - cost) / roundedPrice) * 100;
