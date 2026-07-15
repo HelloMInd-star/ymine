@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>6小时吞噬6个陌生领域 · 证据链</title>
+    <title>画圈实验 · 工程闭环思维验证</title>
     <style>
+        /* ===== 重置 & 沉浸式深色背景 ===== */
         * {
             margin: 0;
             padding: 0;
@@ -185,9 +186,10 @@
             }
         }
 
+        /* ===== 头部 ===== */
         .header {
             text-align: center;
-            margin-bottom: 28px;
+            margin-bottom: 20px;
             opacity: 0;
             animation: fadeInUp 0.8s ease forwards;
         }
@@ -223,12 +225,35 @@
             margin-top: 4px;
         }
 
-        /* ===== 锚点 ===== */
-        .section-anchor {
-            scroll-margin-top: 16px;
+        /* ===== 定位说明 ===== */
+        .positioning {
+            background: rgba(167, 139, 250, 0.04);
+            border-left: 3px solid #a78bfa;
+            border-radius: 0 12px 12px 0;
+            padding: 16px 20px;
+            margin-bottom: 28px;
+            opacity: 0;
+            animation: fadeInUp 0.6s ease 0.03s forwards;
         }
 
-        /* ===== 验证快照（四格） ===== */
+        .positioning p {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 15px;
+            line-height: 1.7;
+            margin-bottom: 0;
+        }
+
+        .positioning p strong {
+            color: #a78bfa;
+            font-weight: 600;
+        }
+
+        .positioning p .highlight {
+            color: #facc15;
+            font-weight: 600;
+        }
+
+        /* ===== 验证快照 ===== */
         .snapshot-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -276,6 +301,11 @@
             color: rgba(255, 255, 255, 0.25);
         }
 
+        /* ===== 锚点 ===== */
+        .section-anchor {
+            scroll-margin-top: 16px;
+        }
+
         /* ===== 通用板块 ===== */
         .section {
             margin-bottom: 36px;
@@ -283,11 +313,11 @@
             animation: fadeInUp 0.6s ease forwards;
         }
 
-        .section:nth-child(4) { animation-delay: 0.1s; }
-        .section:nth-child(5) { animation-delay: 0.15s; }
-        .section:nth-child(6) { animation-delay: 0.2s; }
-        .section:nth-child(7) { animation-delay: 0.25s; }
-        .section:nth-child(8) { animation-delay: 0.3s; }
+        .section:nth-child(5) { animation-delay: 0.1s; }
+        .section:nth-child(6) { animation-delay: 0.15s; }
+        .section:nth-child(7) { animation-delay: 0.2s; }
+        .section:nth-child(8) { animation-delay: 0.25s; }
+        .section:nth-child(9) { animation-delay: 0.3s; }
 
         .section h2 {
             font-size: 20px;
@@ -570,6 +600,72 @@
             transform: translateX(4px);
         }
 
+        /* ===== 乐高四步拆解法（新增） ===== */
+        .lego-method {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(250, 204, 21, 0.12);
+            border-radius: 16px;
+            padding: 24px 28px;
+            margin-bottom: 20px;
+        }
+
+        .lego-method .method-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 4px;
+            text-align: center;
+        }
+
+        .lego-method .method-title span {
+            color: #facc15;
+        }
+
+        .lego-method .method-sub {
+            text-align: center;
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.2);
+            margin-bottom: 16px;
+        }
+
+        .method-steps {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .method-step {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 10px;
+            padding: 12px 14px;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .method-step .step-num {
+            font-size: 20px;
+            font-weight: 700;
+            color: #facc15;
+            flex-shrink: 0;
+            line-height: 1.2;
+            min-width: 30px;
+        }
+
+        .method-step .step-content .step-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .method-step .step-content .step-desc {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.35);
+            line-height: 1.5;
+            margin-top: 2px;
+        }
+
         /* ===== 乐高双塔 ===== */
         .lego-tower {
             background: rgba(255, 255, 255, 0.02);
@@ -594,9 +690,9 @@
 
         .mapping-row {
             display: grid;
-            grid-template-columns: 1fr auto 1fr;
+            grid-template-columns: 1fr auto 1fr 70px;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
             padding: 8px 0;
             border-bottom: 1px solid rgba(255, 255, 255, 0.02);
             cursor: pointer;
@@ -665,6 +761,25 @@
             font-size: 12px;
         }
 
+        /* 步骤标注标签（新增） */
+        .mapping-row .step-tag {
+            font-size: 10px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.15);
+            text-align: center;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 12px;
+            padding: 2px 8px;
+            white-space: nowrap;
+        }
+
+        .mapping-row .step-tag.active-step {
+            color: #facc15;
+            border-color: rgba(250, 204, 21, 0.2);
+            background: rgba(250, 204, 21, 0.04);
+        }
+
         /* ===== 塔图卡片区 ===== */
         .tower-detail-section {
             margin-top: 16px;
@@ -716,6 +831,26 @@
             border-radius: 12px;
             margin-bottom: 6px;
             border: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        .tower-card .tower-process {
+            background: rgba(255, 255, 255, 0.02);
+            border-left: 2px solid #a78bfa;
+            padding: 6px 12px;
+            margin: 6px 0 8px 0;
+            border-radius: 0 6px 6px 0;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.4);
+            line-height: 1.6;
+        }
+
+        .tower-card .tower-process strong {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .tower-card .tower-process .step-label {
+            color: #facc15;
+            font-weight: 600;
         }
 
         .tower-card p {
@@ -847,7 +982,87 @@
             line-height: 1.6;
         }
 
-        /* ===== 延伸方向（锁住） ===== */
+        /* ===== 服务关联 ===== */
+        .service-bridge {
+            background: rgba(167, 139, 250, 0.04);
+            border: 1px solid rgba(167, 139, 250, 0.08);
+            border-radius: 16px;
+            padding: 24px 28px;
+            margin: 24px 0 16px;
+            text-align: center;
+        }
+
+        .service-bridge .bridge-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 8px;
+        }
+
+        .service-bridge .bridge-title span {
+            color: #a78bfa;
+        }
+
+        .service-bridge .bridge-desc {
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 14px;
+            line-height: 1.7;
+            margin-bottom: 14px;
+        }
+
+        .service-bridge .bridge-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+        }
+
+        .service-bridge .bridge-item {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 10px;
+            padding: 12px 14px;
+            text-align: center;
+        }
+
+        .service-bridge .bridge-item .icon {
+            font-size: 20px;
+        }
+
+        .service-bridge .bridge-item .name {
+            font-size: 13px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.6);
+            margin-top: 4px;
+        }
+
+        .service-bridge .bridge-item .price {
+            font-size: 12px;
+            color: #a78bfa;
+            font-weight: 500;
+            margin-top: 2px;
+        }
+
+        .service-bridge .bridge-link {
+            display: inline-block;
+            margin-top: 14px;
+            padding: 8px 28px;
+            background: rgba(167, 139, 250, 0.08);
+            border: 1px solid rgba(167, 139, 250, 0.12);
+            border-radius: 20px;
+            color: #a78bfa;
+            font-size: 14px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .service-bridge .bridge-link:hover {
+            background: rgba(167, 139, 250, 0.15);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(167, 139, 250, 0.1);
+        }
+
+        /* ===== 延伸方向 ===== */
         .extension-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -879,17 +1094,20 @@
             margin-top: 2px;
         }
 
-        .extension-grid .ext-item .ext-lock {
+        .extension-grid .ext-item .ext-status {
             font-size: 12px;
-            color: rgba(255, 255, 255, 0.12);
             padding: 4px 12px;
-            border: 1px solid rgba(255, 255, 255, 0.04);
             border-radius: 8px;
             background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            color: rgba(255, 255, 255, 0.12);
+            flex-shrink: 0;
         }
 
-        .extension-grid .ext-item .ext-lock .lock-icon {
-            margin-right: 4px;
+        .extension-grid .ext-item .ext-status.live {
+            color: #22c55e;
+            border-color: rgba(34, 197, 94, 0.2);
+            background: rgba(34, 197, 94, 0.04);
         }
 
         /* ===== 底部 ===== */
@@ -939,18 +1157,25 @@
             .lego-scene .scene-grid {
                 grid-template-columns: 1fr;
             }
-            .mapping-row {
+            .service-bridge .bridge-grid {
                 grid-template-columns: 1fr;
+            }
+            .method-steps {
+                grid-template-columns: 1fr;
+            }
+            .mapping-row {
+                grid-template-columns: 1fr 1fr;
                 text-align: center;
                 gap: 4px;
             }
             .mapping-row .left {
                 text-align: center;
-            }
-            .mapping-row .right {
-                text-align: center;
+                grid-column: 1;
+                grid-row: 1;
             }
             .mapping-row .center-lego {
+                grid-column: 1 / 3;
+                grid-row: 2;
                 flex-direction: row;
                 gap: 6px;
                 padding: 2px 12px;
@@ -959,6 +1184,16 @@
             }
             .mapping-row .center-lego .sub {
                 display: inline;
+            }
+            .mapping-row .right {
+                text-align: center;
+                grid-column: 2;
+                grid-row: 1;
+            }
+            .mapping-row .step-tag {
+                grid-column: 1 / 3;
+                grid-row: 3;
+                justify-self: center;
             }
         }
 
@@ -999,6 +1234,18 @@
             .radial-node .analogy {
                 font-size: 9px;
             }
+            .positioning p {
+                font-size: 14px;
+            }
+            .service-bridge {
+                padding: 18px 16px;
+            }
+            .lego-method {
+                padding: 18px 16px;
+            }
+            .lego-tower {
+                padding: 16px 14px;
+            }
         }
 
         @media (max-width: 480px) {
@@ -1036,6 +1283,25 @@
             .radial-node .label {
                 font-size: 8px;
             }
+            .service-bridge .bridge-item .name {
+                font-size: 12px;
+            }
+            .mapping-row .left {
+                font-size: 12px;
+            }
+            .mapping-row .right {
+                font-size: 12px;
+            }
+            .mapping-row .center-lego {
+                font-size: 11px;
+                padding: 2px 10px;
+            }
+            .method-step .step-content .step-label {
+                font-size: 12px;
+            }
+            .method-step .step-content .step-desc {
+                font-size: 12px;
+            }
         }
     </style>
 </head>
@@ -1045,13 +1311,15 @@
 
     <!-- ===== 右侧固定导航栏 ===== -->
     <div class="sidebar-nav">
+        <a class="nav-item" data-target="section-positioning"><span class="num">⏵</span><span class="label">定位</span></a>
         <a class="nav-item" data-target="section-snapshot"><span class="num">①</span><span class="label">验证</span></a>
         <a class="nav-item" data-target="section-mindmap"><span class="num">②</span><span class="label">辐射</span></a>
         <a class="nav-item" data-target="section-detail"><span class="num">③</span><span class="label">推导</span></a>
-        <a class="nav-item" data-target="section-tower"><span class="num">④</span><span class="label">映射</span></a>
-        <a class="nav-item" data-target="section-tower-detail"><span class="num">⑤</span><span class="label">塔图</span></a>
-        <a class="nav-item" data-target="section-lego"><span class="num">⑥</span><span class="label">降维</span></a>
-        <a class="nav-item" data-target="section-verify"><span class="num">⑦</span><span class="label">验证</span></a>
+        <a class="nav-item" data-target="section-lego-method"><span class="num">④</span><span class="label">方法</span></a>
+        <a class="nav-item" data-target="section-tower"><span class="num">⑤</span><span class="label">映射</span></a>
+        <a class="nav-item" data-target="section-tower-detail"><span class="num">⑥</span><span class="label">塔图</span></a>
+        <a class="nav-item" data-target="section-lego"><span class="num">⑦</span><span class="label">降维</span></a>
+        <a class="nav-item" data-target="section-verify"><span class="num">⑧</span><span class="label">验证</span></a>
         <div class="nav-divider"></div>
         <a class="nav-item" data-target="section-extension"><span class="num">∞</span><span class="label">延伸</span></a>
         <div class="nav-bottom">吞噬</div>
@@ -1062,9 +1330,21 @@
 
         <!-- ===== 头部 ===== -->
         <div class="header">
-            <div class="badge">⚡ 跨领域吞噬验证</div>
+            <div class="badge">⚡ 工程闭环思维 · 画圈实验</div>
             <h1>6小时吞噬6个陌生领域</h1>
-            <div class="sub">一个财务人用元架构完成的认知实验</div>
+            <div class="sub">元架构 × 画圈实验 = 可复制的跨领域认知闭环</div>
+        </div>
+
+        <!-- ===== 定位说明 ===== -->
+        <div class="section-anchor" id="section-positioning"></div>
+        <div class="positioning">
+            <p>
+                <strong>💡 这个实验想证明什么？</strong><br>
+                一个财务背景的人，用 <strong>元架构</strong> 作为工具，通过 <span class="highlight">画圈实验</span> 的推演方式，
+                在 6 小时内理解并迁移了 7 个陌生领域。<br>
+                结论是：<strong>元架构 + 画圈实验 = 可复制的工程闭环思维</strong> ——
+                任何人都可以用自己已有的知识，快速进入陌生领域、建立认知、输出判断。
+            </p>
         </div>
 
         <!-- ===== 验证快照 ===== -->
@@ -1072,7 +1352,7 @@
         <div class="snapshot-grid">
             <div class="snapshot-item">
                 <div class="label">🎯 验证目标</div>
-                <div class="value">证明元架构在多个陌生领域之间具备 <span class="highlight">可迁移性</span></div>
+                <div class="value">证明 <span class="highlight">元架构 + 画圈实验 = 可复制的工程闭环思维</span></div>
             </div>
             <div class="snapshot-item">
                 <div class="label">🧑‍💻 验证对象</div>
@@ -1130,7 +1410,7 @@
                     <div class="step">第 3 步</div>
                     <h3>电池 → CAD 装配体</h3>
                     <span class="analogy-tag">类比：电池组合 = 零件装配</span>
-                    <p>高能量 + 高功率电池通过智能管理“装配”。</p>
+                    <p>高能量 + 高功率电池通过智能管理"装配"。</p>
                     <div class="conclusion">✅ 电池突破点可能在系统架构，不只在材料化学。</div>
                     <a href="#" class="jump-btn">查看完整推导 <span class="arrow">→</span></a>
                 </div>
@@ -1174,122 +1454,215 @@
             </div>
         </div>
 
-        <!-- ===== 乐高双塔 ===== -->
+        <!-- ===== 乐高四步拆解法（新增） ===== -->
+        <div class="section-anchor" id="section-lego-method"></div>
+        <div class="lego-method">
+            <div class="method-title">🧱 <span>乐高四步拆解法</span></div>
+            <div class="method-sub">如何用元架构吞噬陌生领域 —— 把任何领域变成"已经懂的东西"</div>
+            <div class="method-steps">
+                <div class="method-step">
+                    <div class="step-num">①</div>
+                    <div class="step-content">
+                        <div class="step-label">拆零件</div>
+                        <div class="step-desc">把陌生领域拆成最小可理解的单元（基础元素、操作、规则）</div>
+                    </div>
+                </div>
+                <div class="method-step">
+                    <div class="step-num">②</div>
+                    <div class="step-content">
+                        <div class="step-label">找接口</div>
+                        <div class="step-desc">每个零件对应你已有知识体系里的哪个模块</div>
+                    </div>
+                </div>
+                <div class="method-step">
+                    <div class="step-num">③</div>
+                    <div class="step-content">
+                        <div class="step-label">重新拼装</div>
+                        <div class="step-desc">用已有知识的逻辑重新理解陌生领域的结构</div>
+                    </div>
+                </div>
+                <div class="method-step">
+                    <div class="step-num">④</div>
+                    <div class="step-content">
+                        <div class="step-label">验证运行</div>
+                        <div class="step-desc">用陌生领域自身的逻辑检验拼装是否正确</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== 乐高双塔（增加步骤标注） ===== -->
         <div class="section-anchor" id="section-tower"></div>
         <div class="lego-tower">
             <div class="tower-title">🧱 乐高双塔 · 类比映射的 AB 对照结构</div>
-            <div class="tower-sub">点击任意一行，跳转到下方对应的“塔图”详情 · 乐高是元架构的“通用翻译器”</div>
+            <div class="tower-sub">点击任意一行，跳转到下方对应的"塔图"详情 · 乐高是元架构的"通用翻译器"</div>
 
             <div class="mapping-row" data-target="tower-card-1">
                 <div class="left">CAD 制图 <span class="sub">（专业工程软件）</span></div>
                 <div class="center-lego">🧱 乐高</div>
                 <div class="right">虚拟空间里的乐高 <span class="sub">（童年积木游戏）</span></div>
+                <div class="step-tag active-step">① 拆零件</div>
             </div>
 
             <div class="mapping-row" data-target="tower-card-2">
                 <div class="left">会计科目体系 <span class="sub">（财务分类分层）</span></div>
                 <div class="center-lego">🧱 乐高</div>
                 <div class="right">CAD 图层 <span class="sub">（制图分层管理）</span></div>
+                <div class="step-tag active-step">② 找接口</div>
             </div>
 
             <div class="mapping-row" data-target="tower-card-3">
                 <div class="left">电池组合 <span class="sub">（物理储能单元）</span></div>
                 <div class="center-lego">🧱 乐高</div>
                 <div class="right">CAD 零件装配 <span class="sub">（系统集成思维）</span></div>
+                <div class="step-tag active-step">③ 重新拼装</div>
             </div>
 
             <div class="mapping-row" data-target="tower-card-4">
                 <div class="left">植物生长 <span class="sub">（时间轴上的自然演化）</span></div>
                 <div class="center-lego">🧱 乐高</div>
                 <div class="right">财务资产增值 <span class="sub">（跨期价值模型）</span></div>
+                <div class="step-tag active-step">③ 重新拼装</div>
             </div>
 
             <div class="mapping-row" data-target="tower-card-5">
                 <div class="left">运营内核 <span class="sub">（系统构建 + 资源编排）</span></div>
                 <div class="center-lego">🧱 乐高</div>
                 <div class="right">工程 PDCA 循环 <span class="sub">（计划-执行-检查-改进）</span></div>
+                <div class="step-tag active-step">③ 重新拼装</div>
             </div>
 
             <div class="mapping-row" data-target="tower-card-6">
                 <div class="left">Token 预测 <span class="sub">（大模型逐字推理）</span></div>
                 <div class="center-lego">🧱 乐高</div>
                 <div class="right">PDCA 循环 <span class="sub">（动态反馈修正）</span></div>
+                <div class="step-tag active-step">④ 验证运行</div>
             </div>
 
             <div class="mapping-row" data-target="tower-card-7">
                 <div class="left">低空 0-500 米 <span class="sub">（无人机空域）</span></div>
                 <div class="center-lego">🧱 乐高</div>
                 <div class="right">地下 0-500 米能源带 <span class="sub">（空间尺度迁移）</span></div>
+                <div class="step-tag active-step">③ 重新拼装</div>
             </div>
 
             <div style="margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.03); text-align: center; color: rgba(255,255,255,0.2); font-size: 13px;">
-                💡 乐高是元架构的“通用翻译器” —— 左边是输入，右边是输出，中间是降维/升维的枢纽。
+                💡 每一行左侧标注了该映射对应乐高四步拆解法的哪一步
             </div>
         </div>
 
-        <!-- ===== 塔图卡片区 ===== -->
+        <!-- ===== 塔图卡片区（增加拆解过程占位） ===== -->
         <div class="section-anchor" id="section-tower-detail"></div>
         <div class="tower-detail-section">
             <h2>塔图 · 每个映射的完整推导</h2>
 
             <div class="tower-card" id="tower-card-1">
-                <div class="tower-step">映射 1</div>
+                <div class="tower-step">映射 1 · ① 拆零件</div>
                 <h3>CAD 制图 → 虚拟空间里的乐高</h3>
                 <span class="tower-analogy">🧱 乐高锚点：拼装 = 装配体</span>
+                <div class="tower-process">
+                    <strong>【拆解过程】</strong><br>
+                    <span class="step-label">① 拆零件：</span>CAD 里有图层、图块、装配体、尺寸标注、约束关系……这些都是它的“零件”。<br>
+                    <span class="step-label">② 找接口：</span>图层 ≈ 会计科目分类，图块 ≈ 标准凭证模板，装配体 ≈ 合并报表。<br>
+                    <span class="step-label">③ 重新拼装：</span>用会计思维理解 CAD 的工作流程——新建图层 = 新建科目，插入图块 = 录入凭证。<br>
+                    <span class="step-label">④ 验证运行：</span>用 CAD 的一个实际操作用会计逻辑解释一遍，看是否说得通。
+                </div>
                 <p>CAD 制图的本质是在虚拟空间里组装零件，和玩乐高的逻辑完全一致。零件清单 = BOM 表，拼装步骤 = 装配体配合关系。</p>
                 <div class="tower-conclusion">✅ 任何拼过乐高的人，都已经具备理解 CAD 底层逻辑的直观经验。</div>
                 <a href="#" class="tower-jump">查看完整推导 <span class="arrow">→</span></a>
             </div>
 
             <div class="tower-card" id="tower-card-2">
-                <div class="tower-step">映射 2</div>
+                <div class="tower-step">映射 2 · ② 找接口</div>
                 <h3>会计科目体系 → CAD 图层</h3>
                 <span class="tower-analogy">🧱 乐高锚点：分层 = 分类管理</span>
+                <div class="tower-process">
+                    <strong>【拆解过程】</strong><br>
+                    <span class="step-label">① 拆零件：</span>会计科目体系分成资产、负债、权益、收入、费用五大类。<br>
+                    <span class="step-label">② 找接口：</span>这五大类 ≈ CAD 里的五个主图层，每个科目 ≈ 图层里的一个子层。<br>
+                    <span class="step-label">③ 重新拼装：</span>把 CAD 里的所有图块按图层分类，等价于把凭证按科目分类。<br>
+                    <span class="step-label">④ 验证运行：</span>用 CAD 图层管理的逻辑去解释会计科目的分层规则，看是否对应。
+                </div>
                 <p>会计科目体系按资产、负债、权益分类分层管理，和 CAD 图层的逻辑完全一致。图层 = 会计科目体系，图块 = 标准凭证模板。</p>
                 <div class="tower-conclusion">✅ CAD 就是一个可视化的会计信息系统。</div>
                 <a href="#" class="tower-jump">查看完整推导 <span class="arrow">→</span></a>
             </div>
 
             <div class="tower-card" id="tower-card-3">
-                <div class="tower-step">映射 3</div>
+                <div class="tower-step">映射 3 · ③ 重新拼装</div>
                 <h3>电池组合 → CAD 零件装配</h3>
                 <span class="tower-analogy">🧱 乐高锚点：组合 = 装配</span>
-                <p>高能量密度电池和高功率密度电池通过智能管理系统“装配”在一起，和 CAD 里把多个零件装配成一个整体完全同构。</p>
+                <div class="tower-process">
+                    <strong>【拆解过程】</strong><br>
+                    <span class="step-label">① 拆零件：</span>电池系统由电芯、BMS 管理系统、散热系统、结构件组成。<br>
+                    <span class="step-label">② 找接口：</span>这些 ≈ CAD 里的零件集合，BMS ≈ 装配体的约束关系。<br>
+                    <span class="step-label">③ 重新拼装：</span>电池系统设计 = 在系统架构层面把不同功能的零件“装配”在一起。<br>
+                    <span class="step-label">④ 验证运行：</span>用 CAD 装配体的逻辑去解释电池系统的集成逻辑，看是否自洽。
+                </div>
+                <p>高能量密度电池和高功率密度电池通过智能管理系统"装配"在一起，和 CAD 里把多个零件装配成一个整体完全同构。</p>
                 <div class="tower-conclusion">✅ 电池的突破点，不一定只在材料化学里，也可能在系统架构里。</div>
                 <a href="#" class="tower-jump">查看完整推导 <span class="arrow">→</span></a>
             </div>
 
             <div class="tower-card" id="tower-card-4">
-                <div class="tower-step">映射 4</div>
+                <div class="tower-step">映射 4 · ③ 重新拼装</div>
                 <h3>植物生长 → 财务资产增值</h3>
                 <span class="tower-analogy">🧱 乐高锚点：生长 = 时间轴上的价值变化</span>
+                <div class="tower-process">
+                    <strong>【拆解过程】</strong><br>
+                    <span class="step-label">① 拆零件：</span>园林设计 = 植物选择 + 空间布局 + 时间轴上的生长管理。<br>
+                    <span class="step-label">② 找接口：</span>植物 ≈ 资产，生长 ≈ 资产增值，养护成本 ≈ 折旧/维护费用。<br>
+                    <span class="step-label">③ 重新拼装：</span>把园林设计的“种下去只完成 30%”理解为“初始投资只完成 30%，剩下的 70% 是跨期价值增长”。<br>
+                    <span class="step-label">④ 验证运行：</span>用财务资产增值的模型去推演一个园林项目的全周期价值，看是否成立。
+                </div>
                 <p>园林设计里，种下去只完成 30%，剩下 70% 是植物在时间轴上的生长。这和财务资产增值的跨期模型完全同构。</p>
                 <div class="tower-conclusion">✅ 园林设计的本质 = 一个跨期的财务模型（初始投资 = 在建工程，植物生长 = 资产增值）。</div>
                 <a href="#" class="tower-jump">查看完整推导 <span class="arrow">→</span></a>
             </div>
 
             <div class="tower-card" id="tower-card-5">
-                <div class="tower-step">映射 5</div>
+                <div class="tower-step">映射 5 · ③ 重新拼装</div>
                 <h3>运营内核 → 工程 PDCA 循环</h3>
                 <span class="tower-analogy">🧱 乐高锚点：系统构建 = PDCA 循环</span>
+                <div class="tower-process">
+                    <strong>【拆解过程】</strong><br>
+                    <span class="step-label">① 拆零件：</span>顶尖运营 = 系统构建能力 + 资源编排能力 + 反馈闭环思维。<br>
+                    <span class="step-label">② 找接口：</span>这三个 ≈ 工程管理的计划、执行、检查、改进四个环节。<br>
+                    <span class="step-label">③ 重新拼装：</span>运营的本质就是在动态环境里做 PDCA——建系统、跑系统、看反馈、调系统。<br>
+                    <span class="step-label">④ 验证运行：</span>用一个运营决策的案例，用 PDCA 循环的框架重新拆解一遍，看是否一致。
+                </div>
                 <p>顶尖运营的内核 = 系统构建能力 + 资源编排能力 + 反馈闭环思维，和工程管理的 PDCA 循环完全同构。</p>
                 <div class="tower-conclusion">✅ 所有领域的顶尖者，学的不是那个领域的知识，而是从那个领域里提炼出一套通用操作系统。</div>
                 <a href="#" class="tower-jump">查看完整推导 <span class="arrow">→</span></a>
             </div>
 
             <div class="tower-card" id="tower-card-6">
-                <div class="tower-step">映射 6</div>
+                <div class="tower-step">映射 6 · ④ 验证运行</div>
                 <h3>Token 预测 → PDCA 循环</h3>
                 <span class="tower-analogy">🧱 乐高锚点：逐字推理 = 实时反馈修正</span>
+                <div class="tower-process">
+                    <strong>【拆解过程】</strong><br>
+                    <span class="step-label">① 拆零件：</span>大模型生成文本 = Token 序列预测，每个 Token 依赖前文。<br>
+                    <span class="step-label">② 找接口：</span>每个 Token 预测 ≈ PDCA 的一个循环——预测（Plan）、生成（Do）、对比概率（Check）、修正下一个 Token（Adjust）。<br>
+                    <span class="step-label">③ 重新拼装：</span>大模型生成一整段文本 = 连续执行了 N 次 PDCA 循环。<br>
+                    <span class="step-label">④ 验证运行：</span>用 PDCA 的逻辑去追踪大模型生成一句话的过程，看是否每一步都对应得上。
+                </div>
                 <p>大模型生成文本，是一个 Token 一个 Token 地预测下一个字，本质上就是在每一个字上做一次 PDCA。</p>
                 <div class="tower-conclusion">✅ 大模型和工程管理，在底层逻辑上完全同构——都是在动态排列组合中，通过实时反馈修正，逼近最优解。</div>
                 <a href="#" class="tower-jump">查看完整推导 <span class="arrow">→</span></a>
             </div>
 
             <div class="tower-card" id="tower-card-7">
-                <div class="tower-step">映射 7</div>
+                <div class="tower-step">映射 7 · ③ 重新拼装</div>
                 <h3>低空 0-500 米 → 地下 0-500 米能源带</h3>
                 <span class="tower-analogy">🧱 乐高锚点：空间尺度迁移</span>
+                <div class="tower-process">
+                    <strong>【拆解过程】</strong><br>
+                    <span class="step-label">① 拆零件：</span>低空经济 = 0-500 米空域的资源分配 + 无人机运营 + 监管框架。<br>
+                    <span class="step-label">② 找接口：</span>0-500 米空域 ≈ 0-500 米地下空间，无人机 ≈ 能源开采设备，空域管理 ≈ 资源权属管理。<br>
+                    <span class="step-label">③ 重新拼装：</span>把低空经济的资源配置逻辑，平移应用到地下能源储存带的资源配置逻辑。<br>
+                    <span class="step-label">④ 验证运行：</span>用低空经济的一个实际问题（如航线竞标），看能不能用地下资源的逻辑重新理解一遍。
+                </div>
                 <p>低空经济关注 0-500 米空域，对应地下 0-500 米是能源储存带。同一套空间尺度逻辑，从空中迁移到地下。</p>
                 <div class="tower-conclusion">✅ 元架构不仅能横跨学科，还能纵贯空间和时间尺度。</div>
                 <a href="#" class="tower-jump">查看完整推导 <span class="arrow">→</span></a>
@@ -1300,11 +1673,11 @@
         <div class="section-anchor" id="section-lego"></div>
         <div class="lego-scene">
             <div class="scene-title">🧱 <span>用积木降维复杂世界</span></div>
-            <div class="scene-sub">元架构如何把陌生领域变成“已经懂的东西”</div>
+            <div class="scene-sub">元架构如何把陌生领域变成"已经懂的东西"</div>
             <div class="scene-grid">
                 <div class="item">
                     <div class="tag">🧱 降维</div>
-                    <p>把 CAD 从<strong>“专业工程软件”</strong>降到<strong>“童年积木游戏”</strong>，彻底破除对陌生领域的恐惧感。</p>
+                    <p>把 CAD 从<strong>"专业工程软件"</strong>降到<strong>"童年积木游戏"</strong>，彻底破除对陌生领域的恐惧感。</p>
                 </div>
                 <div class="item">
                     <div class="tag">🧩 验证普适性</div>
@@ -1336,25 +1709,58 @@
             </div>
         </div>
 
-        <!-- ===== 延伸方向（锁住） ===== -->
+        <!-- ===== 服务关联 ===== -->
+        <div class="service-bridge">
+            <div class="bridge-title">📌 这套方法论已被封装为 <span>可交付的服务</span></div>
+            <div class="bridge-desc">
+                画圈实验验证的工程闭环思维，已经沉淀为以下标准服务产品
+            </div>
+            <div class="bridge-grid">
+                <div class="bridge-item">
+                    <div class="icon">🧪</div>
+                    <div class="name">元认知能力诊断</div>
+                    <div class="price">2000元/次</div>
+                </div>
+                <div class="bridge-item">
+                    <div class="icon">🔗</div>
+                    <div class="name">跨领域映射方案</div>
+                    <div class="price">5000元/项目</div>
+                </div>
+                <div class="bridge-item">
+                    <div class="icon">📐</div>
+                    <div class="name">快速学习框架搭建</div>
+                    <div class="price">8000元/月</div>
+                </div>
+            </div>
+            <a href="#" class="bridge-link">→ 查看完整服务全景图</a>
+        </div>
+
+        <!-- ===== 延伸方向 ===== -->
         <div class="section-anchor" id="section-extension"></div>
         <div class="section" style="margin-bottom:20px;">
             <h2>延伸方向 <span class="tag">可迁移架构</span></h2>
-            <p>同一套“跨领域吞噬”方法论，可平移到更多学科领域。以下方向正在建设中：</p>
+            <p>同一套"跨领域吞噬"方法论，可平移到更多学科领域。以下方向正在建设中：</p>
             <div class="extension-grid">
                 <div class="ext-item">
                     <div class="ext-info">
                         <div class="ext-name">🧬 生物/医学领域迁移</div>
                         <div class="ext-desc">用元架构重新理解生物系统、医学诊断逻辑</div>
                     </div>
-                    <div class="ext-lock"><span class="lock-icon">🔒</span> 待解锁</div>
+                    <div class="ext-status">🔒 待解锁</div>
                 </div>
                 <div class="ext-item">
                     <div class="ext-info">
                         <div class="ext-name">🔭 物理/天文领域迁移</div>
                         <div class="ext-desc">用元架构重新理解物理规律、天文观测模型</div>
                     </div>
-                    <div class="ext-lock"><span class="lock-icon">🔒</span> 待解锁</div>
+                    <div class="ext-status">🔒 待解锁</div>
+                </div>
+                <div class="ext-item" style="grid-column: 1 / -1; border-color: rgba(167, 139, 250, 0.1);">
+                    <div class="ext-info">
+                        <div class="ext-name" style="color: #a78bfa;">🧩 画圈实验服务线（已落地）</div>
+                        <div class="ext-desc">元认知诊断 · 跨领域映射 · 快速学习框架 —— 全部可交付</div>
+                    </div>
+                    <div class="ext-status live">✅ 已落地</div>
                 </div>
             </div>
         </div>
@@ -1379,9 +1785,11 @@
         // ===== 右侧导航栏交互 =====
         const navItems = document.querySelectorAll('.nav-item');
         const sections = [
+            document.getElementById('section-positioning'),
             document.getElementById('section-snapshot'),
             document.getElementById('section-mindmap'),
             document.getElementById('section-detail'),
+            document.getElementById('section-lego-method'),
             document.getElementById('section-tower'),
             document.getElementById('section-tower-detail'),
             document.getElementById('section-lego'),
@@ -1505,11 +1913,13 @@
                     const target = document.getElementById(node.target);
                     if (target) {
                         target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                        target.style.transition = 'border-color 0.3s';
+                        target.style.transition = 'border-color 0.3s, border-left 0.3s';
                         target.style.borderColor = '#a78bfa';
+                        target.style.borderLeft = '4px solid #facc15';
                         setTimeout(() => {
                             target.style.borderColor = '';
-                        }, 1200);
+                            target.style.borderLeft = '';
+                        }, 3000);
                     }
                 });
             });
@@ -1550,13 +1960,15 @@
                 const target = document.getElementById(targetId);
                 if (target) {
                     target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    target.style.transition = 'border-color 0.3s, box-shadow 0.3s';
+                    target.style.transition = 'border-color 0.3s, box-shadow 0.3s, border-left 0.3s';
                     target.style.borderColor = '#facc15';
+                    target.style.borderLeft = '4px solid #facc15';
                     target.style.boxShadow = '0 0 30px rgba(250, 204, 21, 0.06)';
                     setTimeout(() => {
                         target.style.borderColor = '';
+                        target.style.borderLeft = '';
                         target.style.boxShadow = '';
-                    }, 1500);
+                    }, 3000);
                 }
             });
         });
