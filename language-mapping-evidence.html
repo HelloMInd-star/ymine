@@ -1,27 +1,24 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>跨语种结构化学习验证 · 翻译器设计逻辑证据链</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>完整证据链 · 人机对话语义路由器</title>
     <style>
-        /* ===== 全局重置 ===== */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-
         body {
-            background: #0b0b1a;
+            background: #070712;
             font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
             min-height: 100vh;
             display: flex;
-            padding: 20px 20px 20px 0;
+            padding: 12px 12px 12px 0;
+            color: #f1f5f9;
             overflow-x: hidden;
         }
-
-        /* ===== 鼠标跟随光晕 ===== */
         #glow {
             position: fixed;
             top: 0;
@@ -30,865 +27,751 @@
             height: 100%;
             pointer-events: none;
             z-index: 0;
-            background: radial-gradient(600px circle at var(--x, 50%) var(--y, 50%), rgba(120, 80, 255, 0.06), transparent 80%);
-            transition: background 0.1s;
+            background: radial-gradient(600px circle at var(--x, 50%) var(--y, 50%), rgba(100, 70, 200, 0.06), transparent 75%);
+            transition: background 0.12s;
         }
-
-        /* ===== 右侧固定导航栏 ===== */
-        .sidebar-nav {
+        .sidebar {
             position: fixed;
             top: 0;
             right: 0;
-            width: 72px;
+            width: 44px;
             height: 100vh;
-            padding: 32px 0 24px;
+            padding: 12px 0;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 4px;
+            gap: 2px;
             z-index: 100;
-            background: rgba(11, 11, 26, 0.6);
+            background: rgba(7, 7, 18, 0.7);
             backdrop-filter: blur(12px);
             border-left: 1px solid rgba(255, 255, 255, 0.04);
         }
-
-        .sidebar-nav .nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            width: 44px;
-            height: 44px;
-            border-radius: 10px;
-            color: rgba(255, 255, 255, 0.12);
-            font-size: 11px;
-            font-weight: 500;
-            cursor: pointer;
+        .sidebar .dot {
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.06);
             transition: all 0.3s ease;
+            cursor: pointer;
             border: 1px solid transparent;
-            text-decoration: none;
-            font-family: 'Courier New', monospace;
+            margin: 1px 0;
+            position: relative;
         }
-
-        .sidebar-nav .nav-item:hover {
-            color: rgba(255, 255, 255, 0.5);
-            background: rgba(255, 255, 255, 0.03);
-            border-color: rgba(255, 255, 255, 0.06);
+        .sidebar .dot:hover {
+            background: rgba(167, 139, 250, 0.3);
+            transform: scale(1.4);
         }
-
-        .sidebar-nav .nav-item.active {
-            color: #a78bfa;
-            background: rgba(167, 139, 250, 0.06);
-            border-color: rgba(167, 139, 250, 0.12);
+        .sidebar .dot.active {
+            background: #a78bfa;
+            box-shadow: 0 0 10px rgba(167, 139, 250, 0.2);
+            transform: scale(1.2);
         }
-
-        .sidebar-nav .nav-item .num {
-            font-size: 10px;
-            font-weight: 600;
-            line-height: 1;
-        }
-
-        .sidebar-nav .nav-item .label {
+        .sidebar .dot .label {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
             font-size: 6px;
-            text-transform: uppercase;
-            letter-spacing: 0.3px;
-            opacity: 0.3;
-            margin-top: 1px;
-            font-family: system-ui, sans-serif;
+            color: rgba(255, 255, 255, 0.1);
+            white-space: nowrap;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            background: rgba(7, 7, 18, 0.9);
+            padding: 2px 6px;
+            border-radius: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.03);
         }
-
-        .sidebar-nav .nav-divider {
-            width: 20px;
-            height: 1px;
-            background: rgba(255, 255, 255, 0.04);
-            margin: 2px 0;
+        .sidebar .dot:hover .label {
+            opacity: 1;
         }
-
-        .sidebar-nav .nav-bottom {
+        .sidebar .line {
+            width: 1px;
+            height: 12px;
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02));
+            margin: 1px 0;
+        }
+        .sidebar .bottom-text {
             margin-top: auto;
-            font-size: 7px;
-            color: rgba(255, 255, 255, 0.04);
+            font-size: 4px;
+            color: rgba(255, 255, 255, 0.02);
             writing-mode: vertical-rl;
             letter-spacing: 2px;
             font-weight: 300;
         }
-
-        /* ===== 主内容 ===== */
-        .main-content {
+        .main {
             flex: 1;
-            max-width: 1100px;
+            max-width: 1200px;
             margin: 0 auto;
-            padding: 0 100px 32px 32px;
-            min-height: 100vh;
+            padding: 0 56px 16px 16px;
+            position: relative;
+            z-index: 1;
         }
-
         .container {
-            max-width: 1000px;
-            width: 100%;
-            background: radial-gradient(ellipse at 30% 30%, #120b24, #0b0b1a 70%, #05030a);
-            border-radius: 32px;
-            padding: 48px 44px;
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            box-shadow: 0 30px 80px rgba(40, 10, 80, 0.4);
+            background: radial-gradient(ellipse at 20% 20%, #100b22, #070712 75%, #030208);
+            border-radius: 24px;
+            padding: 24px 24px 20px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 40px 80px rgba(20, 5, 50, 0.5);
             position: relative;
             overflow: hidden;
-            z-index: 1;
-            backdrop-filter: blur(2px);
         }
-
         .container::before {
             content: '';
             position: absolute;
             top: -100px;
             right: -100px;
-            width: 400px;
-            height: 400px;
-            background: radial-gradient(circle, rgba(80, 30, 140, 0.15), transparent 70%);
+            width: 350px;
+            height: 350px;
+            background: radial-gradient(circle, rgba(100, 50, 180, 0.08), transparent 70%);
             border-radius: 50%;
             pointer-events: none;
-            animation: floatBg 12s ease-in-out infinite alternate;
+            animation: floatA 14s ease-in-out infinite alternate;
         }
-
         .container::after {
             content: '';
             position: absolute;
             bottom: -80px;
             left: -80px;
-            width: 350px;
-            height: 350px;
-            background: radial-gradient(circle, rgba(30, 60, 150, 0.1), transparent 70%);
+            width: 280px;
+            height: 280px;
+            background: radial-gradient(circle, rgba(40, 70, 180, 0.05), transparent 70%);
             border-radius: 50%;
             pointer-events: none;
-            animation: floatBg 10s ease-in-out infinite alternate-reverse;
+            animation: floatB 12s ease-in-out infinite alternate-reverse;
         }
-
-        @keyframes floatBg {
+        @keyframes floatA {
             0% {
                 transform: translate(0, 0) scale(1);
             }
             100% {
-                transform: translate(30px, -20px) scale(1.1);
+                transform: translate(20px, -20px) scale(1.08);
             }
         }
-
-        @keyframes gradientFlow {
+        @keyframes floatB {
             0% {
-                background-position: 0% 50%;
-            }
-            50% {
-                background-position: 100% 50%;
+                transform: translate(0, 0) scale(1);
             }
             100% {
-                background-position: 0% 50%;
+                transform: translate(-20px, 20px) scale(1.12);
             }
         }
-
-        /* ===== 锚点 ===== */
-        .section-anchor {
-            scroll-margin-top: 16px;
-        }
-
-        /* ===== Hero ===== */
         .hero {
             text-align: center;
-            padding-bottom: 32px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-            margin-bottom: 32px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            margin-bottom: 18px;
         }
-
-        .hero .badge {
+        .hero .tag {
             display: inline-block;
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            color: rgba(255, 255, 255, 0.3);
-            font-size: 13px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            color: rgba(255, 255, 255, 0.2);
+            font-size: 10px;
             font-weight: 600;
-            padding: 4px 16px;
+            padding: 3px 14px;
             border-radius: 20px;
-            letter-spacing: 0.3px;
-            margin-bottom: 12px;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
         }
-
         .hero h1 {
-            font-size: 32px;
+            font-size: 24px;
             font-weight: 700;
             color: #f1f5f9;
-            margin-bottom: 6px;
-            background: linear-gradient(135deg, #f1f5f9, #a78bfa, #60a5fa, #f1f5f9);
-            background-size: 300% 300%;
+            background: linear-gradient(135deg, #f1f5f9, #a78bfa, #60a5fa);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            animation: gradientFlow 6s ease-in-out infinite;
+            margin-bottom: 2px;
         }
-
-        .hero .subtitle {
-            color: #a78bfa;
-            font-size: 18px;
-            font-weight: 400;
-            margin-bottom: 12px;
-        }
-
-        .hero .description {
-            color: rgba(255, 255, 255, 0.4);
-            font-size: 15px;
-            line-height: 1.8;
-            max-width: 700px;
-            margin: 0 auto 16px auto;
-        }
-
-        .hero .description strong {
-            color: rgba(255, 255, 255, 0.7);
-        }
-
-        .hero .highlight-tag {
-            display: inline-block;
-            background: rgba(255, 255, 255, 0.02);
-            color: #facc15;
-            padding: 6px 16px;
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: 500;
-            border: 1px solid rgba(255, 255, 255, 0.04);
-        }
-
-        /* ===== 证据链步骤条 ===== */
-        .evidence-steps {
-            display: flex;
-            justify-content: space-between;
-            gap: 8px;
-            margin: 24px 0 8px 0;
-            flex-wrap: wrap;
-        }
-
-        .evidence-steps .step {
-            flex: 1;
-            min-width: 80px;
-            background: rgba(255, 255, 255, 0.02);
-            border-radius: 10px;
-            padding: 10px 12px;
-            text-align: center;
-            border: 1px solid rgba(255, 255, 255, 0.04);
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: block;
-            color: rgba(255, 255, 255, 0.3);
-        }
-
-        .evidence-steps .step:hover {
-            border-color: rgba(167, 139, 250, 0.15);
-            background: rgba(255, 255, 255, 0.03);
-            transform: translateY(-2px);
-        }
-
-        .evidence-steps .step .num {
-            color: #a78bfa;
-            font-weight: 700;
-            font-size: 14px;
-        }
-
-        .evidence-steps .step .label {
+        .hero .sub {
             color: rgba(255, 255, 255, 0.25);
-            font-size: 12px;
-            margin-top: 2px;
+            font-size: 13px;
         }
-
-        .evidence-steps .step.active {
-            border-color: #facc15;
-            background: rgba(255, 255, 255, 0.03);
+        .sec-anchor {
+            scroll-margin-top: 10px;
         }
-
-        .evidence-steps .step.active .num {
-            color: #facc15;
-        }
-
-        .evidence-steps .step.active .label {
-            color: rgba(255, 255, 255, 0.6);
-        }
-
-        /* ===== 通用标题 ===== */
         .section-title {
-            font-size: 22px;
+            font-size: 16px;
             font-weight: 600;
             color: rgba(255, 255, 255, 0.8);
-            margin-top: 40px;
-            margin-bottom: 4px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            scroll-margin-top: 20px;
-        }
-
-        .section-title .badge {
-            font-size: 12px;
-            background: rgba(255, 255, 255, 0.02);
-            color: rgba(255, 255, 255, 0.2);
-            padding: 2px 12px;
-            border-radius: 12px;
-            font-weight: 400;
-        }
-
-        .section-desc {
-            color: rgba(255, 255, 255, 0.35);
-            font-size: 14px;
-            margin-bottom: 16px;
-            border-left: 3px solid #a78bfa;
-            padding-left: 14px;
-        }
-
-        /* ===== 交互卡片 ===== */
-        .interact-card {
-            background: rgba(255, 255, 255, 0.02);
-            border-radius: 16px;
-            padding: 22px 24px;
-            margin: 14px 0 24px 0;
-            border: 1px solid rgba(255, 255, 255, 0.04);
-            transition: border-color 0.3s ease;
-        }
-
-        .interact-card:hover {
-            border-color: rgba(255, 255, 255, 0.06);
-        }
-
-        .interact-card .card-title {
-            color: rgba(255, 255, 255, 0.6);
-            font-weight: 600;
-            font-size: 16px;
-            margin-bottom: 12px;
+            margin-top: 20px;
+            margin-bottom: 2px;
             display: flex;
             align-items: center;
             gap: 8px;
-        }
-
-        .interact-row {
-            display: flex;
             flex-wrap: wrap;
-            gap: 10px;
-            align-items: center;
-            margin: 6px 0;
         }
-
-        .interact-row label {
-            color: rgba(255, 255, 255, 0.3);
-            font-size: 13px;
-            font-weight: 500;
-            min-width: 50px;
-        }
-
-        .interact-row select,
-        .interact-row input {
+        .section-title .tag-sm {
+            font-size: 9px;
             background: rgba(255, 255, 255, 0.02);
+            color: rgba(255, 255, 255, 0.15);
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-weight: 400;
+            font-family: monospace;
+        }
+        .section-desc {
+            color: rgba(255, 255, 255, 0.2);
+            font-size: 11px;
+            margin-bottom: 6px;
+            padding-left: 10px;
+            border-left: 2px solid rgba(167, 139, 250, 0.15);
+        }
+
+        /* 主交互区 */
+        .main-interact {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 16px;
+            padding: 16px 18px;
+            margin-bottom: 16px;
             border: 1px solid rgba(255, 255, 255, 0.04);
-            color: #f1f5f9;
-            padding: 6px 12px;
+        }
+        .input-row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 8px;
+        }
+        .input-row input {
+            flex: 1;
+            min-width: 180px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
             border-radius: 10px;
+            padding: 10px 14px;
+            color: #f1f5f9;
             font-size: 14px;
             outline: none;
-            transition: border 0.3s ease;
+            transition: border 0.3s;
         }
-
-        .interact-row select:focus,
-        .interact-row input:focus {
+        .input-row input:focus {
             border-color: #a78bfa;
         }
-
-        .interact-row input {
-            flex: 1;
-            min-width: 150px;
+        .input-row input::placeholder {
+            color: rgba(255, 255, 255, 0.12);
         }
-
         .btn {
             background: #a78bfa;
             border: none;
-            color: #0b0b1a;
-            padding: 6px 18px;
+            padding: 10px 22px;
             border-radius: 10px;
-            font-size: 13px;
             font-weight: 600;
+            font-size: 14px;
+            color: #0b0b1a;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.3s;
         }
-
         .btn:hover {
             background: #8b6fd9;
             transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(167, 139, 250, 0.15);
+            box-shadow: 0 8px 25px rgba(167, 139, 250, 0.2);
         }
-
-        .btn-outline {
-            background: transparent;
-            border: 1px solid rgba(167, 139, 250, 0.2);
-            color: #a78bfa;
+        .quick-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 6px;
         }
-
-        .btn-outline:hover {
-            background: rgba(167, 139, 250, 0.06);
-            border-color: #a78bfa;
-        }
-
-        .result-box {
-            background: rgba(255, 255, 255, 0.01);
-            border-radius: 12px;
-            padding: 14px 18px;
-            margin-top: 12px;
-            border-left: 3px solid #facc15;
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 15px;
-            min-height: 48px;
-            line-height: 1.6;
-        }
-
-        .result-box .highlight {
-            color: #facc15;
-            font-weight: 600;
-        }
-
-        .result-box .en {
-            color: #60a5fa;
-        }
-
-        .result-box .my {
-            color: #facc15;
-        }
-
-        /* ===== 词根派生 ===== */
-        .derivation-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            gap: 8px;
-            margin: 10px 0;
-        }
-
-        .derivation-grid .item {
-            background: rgba(255, 255, 255, 0.01);
+        .quick-actions button {
+            background: rgba(255, 255, 255, 0.02);
             border: 1px solid rgba(255, 255, 255, 0.04);
+            color: rgba(255, 255, 255, 0.25);
+            padding: 4px 12px;
+            border-radius: 16px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .quick-actions button:hover {
+            border-color: #a78bfa;
+            color: #a78bfa;
+            background: rgba(167, 139, 250, 0.05);
+        }
+
+        .result-panel {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 12px;
+            margin-top: 10px;
+        }
+        @media (max-width: 780px) {
+            .result-panel {
+                grid-template-columns: 1fr;
+            }
+        }
+        .res-card {
+            background: rgba(255, 255, 255, 0.015);
             border-radius: 10px;
             padding: 10px 12px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            color: rgba(255, 255, 255, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+        }
+        .res-card .label {
+            font-size: 9px;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.12);
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+        .res-card .value {
             font-size: 13px;
+            line-height: 1.5;
+            word-break: break-all;
         }
-
-        .derivation-grid .item:hover {
-            border-color: rgba(167, 139, 250, 0.15);
-            background: rgba(167, 139, 250, 0.03);
+        .res-card .value .hl-en {
+            color: #60a5fa;
         }
-
-        .derivation-grid .item .word {
-            font-size: 18px;
-            font-weight: 600;
-            color: #f1f5f9;
-            display: block;
+        .res-card .value .hl-my {
+            color: #facc15;
         }
-
-        .derivation-grid .item .pos {
-            font-size: 11px;
-            color: rgba(255, 255, 255, 0.2);
+        .res-card .value .hl-zh {
+            color: #a78bfa;
         }
-
-        .derivation-grid .item .meaning {
+        .res-card .value .hl-json {
+            color: #34d399;
+            font-family: monospace;
             font-size: 12px;
-            color: rgba(255, 255, 255, 0.35);
-            margin-top: 4px;
         }
 
-        /* ===== 差异切换 ===== */
-        .diff-toggle {
+        .trace-log {
+            margin-top: 12px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 10px 12px;
+            border-left: 3px solid #fbbf24;
+        }
+        .trace-log .step {
             display: flex;
-            gap: 8px;
-            margin: 10px 0;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 3px 0;
+            font-size: 12px;
+            font-family: 'Courier New', monospace;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.015);
         }
-
-        .diff-toggle .tab-btn {
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.04);
-            color: rgba(255, 255, 255, 0.3);
-            padding: 5px 14px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 13px;
-            transition: all 0.3s ease;
-        }
-
-        .diff-toggle .tab-btn.active {
-            border-color: #facc15;
-            color: #f1f5f9;
-            background: rgba(255, 255, 255, 0.02);
-        }
-
-        .diff-toggle .tab-btn:hover {
-            border-color: #a78bfa;
-        }
-
-        .diff-content {
-            background: rgba(255, 255, 255, 0.01);
-            border-radius: 12px;
-            padding: 14px 18px;
-            margin-top: 8px;
-            min-height: 60px;
-        }
-
-        .diff-content .pair {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 5px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.02);
-        }
-
-        .diff-content .pair:last-child {
+        .trace-log .step:last-child {
             border-bottom: none;
         }
-
-        .diff-content .pair .en {
+        .trace-log .step .icon {
+            width: 18px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+        .trace-log .step .msg {
+            flex: 1;
+            color: rgba(255, 255, 255, 0.5);
+        }
+        .trace-log .step .conf {
+            font-size: 11px;
+            padding: 0 8px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.02);
+            color: rgba(255, 255, 255, 0.15);
+            white-space: nowrap;
+        }
+        .trace-log .step.success .msg {
+            color: #4ade80;
+        }
+        .trace-log .step.fail .msg {
+            color: #f87171;
+        }
+        .trace-log .step.warn .msg {
+            color: #fbbf24;
+        }
+        .trace-log .step.info .msg {
+            color: #60a5fa;
+        }
+        .trace-log .step.success .conf {
+            color: #4ade80;
+        }
+        .trace-log .step.fail .conf {
+            color: #f87171;
+        }
+        .trace-log .step.warn .conf {
+            color: #fbbf24;
+        }
+        .trace-log .step.info .conf {
             color: #60a5fa;
         }
 
-        .diff-content .pair .my {
-            color: #facc15;
+        /* 证据卡片 */
+        .ev-card {
+            background: rgba(255, 255, 255, 0.015);
+            border-radius: 12px;
+            padding: 12px 14px;
+            margin: 4px 0 12px;
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            transition: border-color 0.3s;
         }
-
-        .diff-content .pair .arrow {
-            color: rgba(255, 255, 255, 0.08);
-            font-size: 18px;
+        .ev-card:hover {
+            border-color: rgba(255, 255, 255, 0.05);
         }
-
-        /* ===== 证据闭环 ===== */
-        .closure {
-            background: rgba(255, 255, 255, 0.02);
-            border-radius: 16px;
-            padding: 20px 24px;
-            margin-top: 28px;
-            border: 1px solid rgba(255, 255, 255, 0.04);
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 14px;
-        }
-
-        .closure .item {
-            padding: 12px 16px;
-            background: rgba(255, 255, 255, 0.01);
-            border-radius: 10px;
-            border-left: 3px solid #a78bfa;
-        }
-
-        .closure .item .label {
-            font-size: 11px;
-            color: rgba(255, 255, 255, 0.2);
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .closure .item .text {
-            color: rgba(255, 255, 255, 0.5);
-            font-size: 14px;
-            margin-top: 4px;
-        }
-
-        /* ===== 底部 ===== */
-        .back-bottom {
+        .ev-card .head {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-top: 32px;
-            padding-top: 20px;
-            border-top: 1px solid rgba(255, 255, 255, 0.03);
             flex-wrap: wrap;
-            gap: 12px;
+            gap: 6px;
+            margin-bottom: 6px;
         }
-
-        .back-bottom a {
-            color: rgba(255, 255, 255, 0.2);
-            text-decoration: none;
-            font-size: 14px;
-            transition: color 0.3s ease;
-        }
-
-        .back-bottom a:hover {
-            color: rgba(255, 255, 255, 0.6);
-        }
-
-        .back-bottom .meta {
-            color: rgba(255, 255, 255, 0.08);
+        .ev-card .head .title {
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.5);
             font-size: 13px;
         }
+        .ev-card .head select {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            color: #f1f5f9;
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            outline: none;
+        }
+        .ev-card .head select:focus {
+            border-color: #a78bfa;
+        }
+        .ev-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            align-items: center;
+            margin: 2px 0;
+        }
+        .ev-row label {
+            color: rgba(255, 255, 255, 0.2);
+            font-size: 10px;
+            font-weight: 500;
+            min-width: 30px;
+        }
+        .ev-row select,
+        .ev-row input {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            color: #f1f5f9;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            outline: none;
+        }
+        .ev-row select:focus,
+        .ev-row input:focus {
+            border-color: #a78bfa;
+        }
+        .btn-ghost {
+            background: transparent;
+            border: 1px solid rgba(167, 139, 250, 0.1);
+            color: #a78bfa;
+            padding: 3px 12px;
+            border-radius: 6px;
+            font-size: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-ghost:hover {
+            background: rgba(167, 139, 250, 0.04);
+            border-color: #a78bfa;
+        }
+        .res-box {
+            background: rgba(255, 255, 255, 0.01);
+            border-radius: 8px;
+            padding: 6px 10px;
+            margin-top: 4px;
+            border-left: 2px solid #facc15;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.4);
+            min-height: 28px;
+        }
+        .res-grid-mini {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 8px;
+        }
+        @media (max-width: 640px) {
+            .res-grid-mini {
+                grid-template-columns: 1fr;
+            }
+        }
+        .res-grid-mini .col {
+            background: rgba(255, 255, 255, 0.01);
+            padding: 4px 6px;
+            border-radius: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.02);
+        }
+        .res-grid-mini .col .label {
+            font-size: 8px;
+            color: rgba(255, 255, 255, 0.1);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        .res-grid-mini .col .content {
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .hl-en {
+            color: #60a5fa;
+        }
+        .hl-my {
+            color: #facc15;
+        }
+        .hl-zh {
+            color: #a78bfa;
+        }
+        .trace-mini {
+            font-size: 9px;
+            color: rgba(255, 255, 255, 0.06);
+            margin-top: 4px;
+            padding-top: 4px;
+            border-top: 1px solid rgba(255, 255, 255, 0.015);
+            font-family: monospace;
+        }
 
-        /* ===== 滚动条美化 ===== */
+        .footer {
+            margin-top: 16px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.04);
+            border-top: 1px solid rgba(255, 255, 255, 0.02);
+            padding-top: 12px;
+        }
+
+        /* 滚动条 */
         ::-webkit-scrollbar {
-            width: 4px;
+            width: 3px;
         }
         ::-webkit-scrollbar-track {
             background: transparent;
         }
         ::-webkit-scrollbar-thumb {
-            background: rgba(167, 139, 250, 0.15);
+            background: rgba(167, 139, 250, 0.1);
             border-radius: 4px;
         }
-        ::-webkit-scrollbar-thumb:hover {
-            background: rgba(167, 139, 250, 0.3);
-        }
-
-        /* ===== 响应式 ===== */
-        @media (max-width: 900px) {
+        @media (max-width: 860px) {
             body {
                 padding: 0;
-                flex-direction: column;
             }
-            .sidebar-nav {
+            .sidebar {
                 display: none;
             }
-            .main-content {
-                padding: 16px;
+            .main {
+                padding: 8px;
             }
             .container {
-                padding: 24px 16px;
+                padding: 12px 10px;
                 border-radius: 0;
             }
-            .hero h1 {
-                font-size: 24px;
-            }
-            .section-title {
-                font-size: 18px;
-            }
-            .interact-card {
-                padding: 16px;
-            }
-            .interact-row {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            .interact-row label {
-                min-width: auto;
-            }
-            .derivation-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            .closure {
+            .result-panel {
                 grid-template-columns: 1fr;
-            }
-            .evidence-steps .step {
-                min-width: 50px;
-                padding: 6px 8px;
-            }
-            .evidence-steps .step .label {
-                font-size: 10px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .container {
-                padding: 16px 12px;
-            }
-            .hero h1 {
-                font-size: 20px;
-            }
-            .hero .subtitle {
-                font-size: 15px;
-            }
-            .derivation-grid {
-                grid-template-columns: 1fr;
-            }
-            .diff-toggle {
-                flex-direction: column;
             }
         }
     </style>
 </head>
 <body>
-
-    <!-- ===== 鼠标跟随光晕 ===== -->
     <div id="glow"></div>
 
-    <!-- ===== 右侧固定导航栏 ===== -->
-    <div class="sidebar-nav">
-        <a class="nav-item" data-target="section-hero"><span class="num">①</span><span class="label">总览</span></a>
-        <a class="nav-item" data-target="section-svo"><span class="num">②</span><span class="label">语序</span></a>
-        <a class="nav-item" data-target="section-tense"><span class="num">③</span><span class="label">时态</span></a>
-        <a class="nav-item" data-target="section-derivation"><span class="num">④</span><span class="label">词缀</span></a>
-        <a class="nav-item" data-target="section-passive"><span class="num">⑤</span><span class="label">被动</span></a>
-        <a class="nav-item" data-target="section-diff"><span class="num">⑥</span><span class="label">差异</span></a>
-        <div class="nav-divider"></div>
-        <a class="nav-item" data-target="section-closure"><span class="num">∞</span><span class="label">闭环</span></a>
-        <div class="nav-bottom">语言</div>
+    <!-- 侧边导航 -->
+    <div class="sidebar" id="sidebar">
+        <div class="dot active" data-target="sec-hero"><span class="label">总览</span></div>
+        <div class="line"></div>
+        <div class="dot" data-target="sec-main"><span class="label">路由器</span></div>
+        <div class="dot" data-target="sec-svo"><span class="label">语序</span></div>
+        <div class="dot" data-target="sec-tense"><span class="label">时态</span></div>
+        <div class="dot" data-target="sec-derive"><span class="label">词缀</span></div>
+        <div class="dot" data-target="sec-passive"><span class="label">被动</span></div>
+        <div class="dot" data-target="sec-wsd"><span class="label">多义词</span></div>
+        <div class="dot" data-target="sec-culture"><span class="label">文化</span></div>
+        <div class="line"></div>
+        <div class="dot" data-target="sec-closure"><span class="label">闭环</span></div>
+        <div class="bottom-text">证据链</div>
     </div>
 
-    <!-- ===== 主内容 ===== -->
-    <div class="main-content">
-
+    <div class="main">
         <div class="container">
 
-            <!-- ===== Hero ===== -->
-            <div class="section-anchor" id="section-hero"></div>
+            <!-- ========== HERO ========== -->
+            <div class="sec-anchor" id="sec-hero"></div>
             <div class="hero">
-                <div class="badge">🧠 跨语种结构化验证</div>
-                <h1>翻译器设计逻辑 · 证据链可视化</h1>
-                <div class="subtitle">逆向拆解 Google Translate 类产品的底层规则</div>
-                <p class="description">
-                    这不是翻译工具，而是一个 <strong>「白盒证据链」</strong>——
-                    我把语言转换的每一步规则拆开、封装成交互模块，让你亲眼看到：
-                    <span style="color:#facc15;">语序 → 时态 → 词缀 → 句式 → 边界</span>
-                    是如何被元架构一一映射的。
-                </p>
-                <span class="highlight-tag">📍 Y.Mine · 第2层 · 跨语种结构化验证</span>
+                <div class="tag">🧩 完整证据链 · 白盒语义路由</div>
+                <h1>自然语言 → 结构化指令</h1>
+                <div class="sub">底座规则 · 排列组合 · 回溯验证 · 地域偏移 · 路由调度</div>
+            </div>
 
-                <!-- 证据链步骤条 -->
-                <div class="evidence-steps">
-                    <a href="#section-svo" class="step active"><span class="num">①</span><span class="label">语序规则</span></a>
-                    <a href="#section-tense" class="step"><span class="num">②</span><span class="label">时态标记</span></a>
-                    <a href="#section-derivation" class="step"><span class="num">③</span><span class="label">词缀派生</span></a>
-                    <a href="#section-passive" class="step"><span class="num">④</span><span class="label">被动句式</span></a>
-                    <a href="#section-diff" class="step"><span class="num">⑤</span><span class="label">差异边界</span></a>
+            <!-- ========== 主交互区 ========== -->
+            <div class="sec-anchor" id="sec-main"></div>
+            <div class="section-title">⚡ 智能语义路由器 <span class="tag-sm">实时解析</span></div>
+            <div class="section-desc">输入自然语言指令或句子，系统将提取结构、消歧、路由，并输出可执行的JSON指令。</div>
+
+            <div class="main-interact">
+                <div class="input-row">
+                    <input type="text" id="userInput" placeholder="例如：把客厅灯调暗 或 Saya ada kereta" value="打开3号空调">
+                    <button class="btn" onclick="processMain()">执行</button>
+                </div>
+                <div class="quick-actions">
+                    <button onclick="setMain('把客厅灯调暗')">💡 调暗灯</button>
+                    <button onclick="setMain('打开3号空调')">❄️ 开空调</button>
+                    <button onclick="setMain('Saya ada kereta')">🚗 kereta</button>
+                    <button onclick="setMain('打篮球')">🏀 打篮球</button>
+                    <button onclick="setMain('关闭所有窗户')">🪟 关窗</button>
+                </div>
+
+                <div id="mainResult" class="result-panel">
+                    <div class="res-card"><div class="label">📥 源解析</div><div class="value" id="mainSource">等待输入...</div></div>
+                    <div class="res-card"><div class="label">⚙️ 结构化指令</div><div class="value" id="mainTarget"><span style="color:rgba(255,255,255,0.1);">等待解析...</span></div></div>
+                    <div class="res-card"><div class="label">🛣️ 路由决策</div><div class="value" id="mainRoute"><span style="color:rgba(255,255,255,0.1);">等待路由...</span></div></div>
+                </div>
+
+                <div class="trace-log" id="mainTrace">
+                    <div style="color:rgba(255,255,255,0.08); font-size:12px; font-family:monospace;">⚙️ 决策回溯日志</div>
+                    <div style="color:rgba(255,255,255,0.04); font-size:11px; margin-top:2px;">输入指令后将显示逐层解析过程</div>
                 </div>
             </div>
 
-            <!-- ========================== 证据1：语序规则 ========================== -->
-            <div class="section-anchor" id="section-svo"></div>
-            <div class="section-title">① 语序规则 <span class="badge">SVO 结构一致</span></div>
-            <div class="section-desc">翻译软件的第一步：确定主谓宾语序。马来/印尼与英语同为 SVO，可直接映射。</div>
+            <!-- ========== 证据模块 ========== -->
 
-            <div class="interact-card">
-                <div class="card-title">📝 双语例句对照 · 点击切换</div>
-                <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px;">
-                    <button class="btn btn-outline" onclick="showExample('eat')">I eat rice</button>
-                    <button class="btn btn-outline" onclick="showExample('read')">She reads book</button>
-                    <button class="btn btn-outline" onclick="showExample('go')">I go shop tomorrow</button>
+            <!-- ① 语序 -->
+            <div class="sec-anchor" id="sec-svo"></div>
+            <div class="section-title">① 语序规则 <span class="tag-sm">[Base: SVO · 修饰语冲突]</span></div>
+            <div class="section-desc">验证形容词前置/后置冲突时的回溯重排。</div>
+            <div class="ev-card">
+                <div class="head">
+                    <span class="title">📌 修饰语重排</span>
+                    <select id="algo-svo"><option value="rule">规则引擎</option><option value="bert">BERT</option></select>
                 </div>
-                <div id="svo-result" class="result-box">
-                    <span style="color:rgba(255,255,255,0.2);">点击上方例句查看对照</span>
+                <div style="display:flex; gap:4px; flex-wrap:wrap; margin-bottom:4px;">
+                    <button class="btn-ghost" onclick="runSVO('red_car')">🚗 red car</button>
+                    <button class="btn-ghost" onclick="runSVO('big_house')">🏠 big house</button>
                 </div>
+                <div id="svo-res" class="res-box"><span style="color:rgba(255,255,255,0.1);">点击示例查看</span></div>
+                <div id="svo-trace" class="trace-mini">⏱️ <span id="svo-time">--</span>ms · 🎯 <span id="svo-conf">--</span></div>
             </div>
 
-            <!-- ========================== 证据2：时态标记 ========================== -->
-            <div class="section-anchor" id="section-tense"></div>
-            <div class="section-title">② 时态标记系统 <span class="badge">虚词承载时态</span></div>
-            <div class="section-desc">英语靠动词变形，马来/印尼靠独立标记词。逻辑等价于 will / already / be doing。</div>
-
-            <div class="interact-card">
-                <div class="card-title">⏱️ 时态转换器</div>
-                <div class="interact-row">
+            <!-- ② 时态 -->
+            <div class="sec-anchor" id="sec-tense"></div>
+            <div class="section-title">② 时态标记 <span class="tag-sm">[Base: 助词/屈折]</span></div>
+            <div class="section-desc">英语屈折变化 vs 马来助词映射。</div>
+            <div class="ev-card">
+                <div class="head">
+                    <span class="title">⏱️ 时态验证</span>
+                    <select id="algo-tense"><option value="rule">规则引擎</option><option value="bert">BERT</option></select>
+                </div>
+                <div class="ev-row">
                     <label>动词</label>
-                    <select id="tense-verb">
+                    <select id="t-verb">
                         <option value="makan">makan (吃)</option>
                         <option value="minum">minum (喝)</option>
-                        <option value="kerja">kerja (工作)</option>
                         <option value="tulis">tulis (写)</option>
                     </select>
                 </div>
-                <div class="interact-row">
+                <div class="ev-row">
                     <label>时态</label>
-                    <select id="tense-select">
-                        <option value="sudah">sudah — 已完成 (already)</option>
-                        <option value="sedang">sedang — 进行中 (be doing)</option>
-                        <option value="akan">akan — 将来 (will)</option>
+                    <select id="t-tense">
+                        <option value="sudah">已完成</option>
+                        <option value="sedang">进行中</option>
+                        <option value="akan">将来</option>
                     </select>
-                    <button class="btn" onclick="convertTense()">生成句子</button>
+                    <button class="btn-ghost" onclick="runTense()">验证</button>
                 </div>
-                <div id="tense-result" class="result-box">
-                    <span style="color:rgba(255,255,255,0.2);">选择动词和时态，点击生成</span>
-                </div>
+                <div id="tense-res" class="res-box"><span style="color:rgba(255,255,255,0.1);">选择动词和时态</span></div>
+                <div id="tense-trace" class="trace-mini">⏱️ <span id="tense-time">--</span>ms · 🎯 <span id="tense-conf">--</span></div>
             </div>
 
-            <!-- ========================== 证据3：词缀派生 ========================== -->
-            <div class="section-anchor" id="section-derivation"></div>
-            <div class="section-title">③ 词缀派生系统 <span class="badge">词根 → 多词性</span></div>
-            <div class="section-desc">翻译软件的核心是词库。但我们的证据链展示的是：一个词根如何通过词缀变成不同词性。</div>
-
-            <div class="interact-card">
-                <div class="card-title">🧩 词根派生器 · 点击词根查看派生链</div>
-                <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px;">
-                    <button class="btn btn-outline" onclick="showDerivation('ajar')">ajar (教)</button>
-                    <button class="btn btn-outline" onclick="showDerivation('makan')">makan (吃)</button>
-                    <button class="btn btn-outline" onclick="showDerivation('baca')">baca (读)</button>
-                    <button class="btn btn-outline" onclick="showDerivation('tulis')">tulis (写)</button>
+            <!-- ③ 词缀 -->
+            <div class="sec-anchor" id="sec-derive"></div>
+            <div class="section-title">③ 词缀派生 <span class="tag-sm">[Base: 形态学]</span></div>
+            <div class="section-desc">词根→词族派生，中文零派生对照。</div>
+            <div class="ev-card">
+                <div class="head">
+                    <span class="title">🧩 词根派生</span>
+                    <select id="algo-derive"><option value="rule">规则引擎</option><option value="bert">BERT</option></select>
                 </div>
-                <div id="derivation-result">
-                    <div style="color:rgba(255,255,255,0.2); font-size:14px;">点击词根查看派生词家族</div>
+                <div style="display:flex; gap:4px; flex-wrap:wrap; margin-bottom:4px;">
+                    <button class="btn-ghost" onclick="runDerive('ajar')">ajar (教)</button>
+                    <button class="btn-ghost" onclick="runDerive('makan')">makan (吃)</button>
+                    <button class="btn-ghost" onclick="runDerive('tulis')">tulis (写)</button>
                 </div>
+                <div id="derive-res" class="res-box"><span style="color:rgba(255,255,255,0.1);">点击词根查看</span></div>
+                <div id="derive-trace" class="trace-mini">⏱️ <span id="derive-time">--</span>ms · 🎯 <span id="derive-conf">--</span></div>
             </div>
 
-            <!-- ========================== 证据4：被动句式同源 ========================== -->
-            <div class="section-anchor" id="section-passive"></div>
-            <div class="section-title">④ 被动句式同源 <span class="badge">di- + oleh = be done + by</span></div>
-            <div class="section-desc">翻译软件处理被动语态时，马来/印尼的结构与英语完全对应。</div>
-
-            <div class="interact-card">
-                <div class="card-title">🔄 主动 → 被动转换器</div>
-                <div class="interact-row">
+            <!-- ④ 被动 -->
+            <div class="sec-anchor" id="sec-passive"></div>
+            <div class="section-title">④ 被动句式 <span class="tag-sm">[Base: 语态转换]</span></div>
+            <div class="section-desc">马来 di- + oleh 与中文“被”字句对比。</div>
+            <div class="ev-card">
+                <div class="head">
+                    <span class="title">🔄 主动→被动</span>
+                    <select id="algo-passive"><option value="rule">规则引擎</option><option value="bert">BERT</option></select>
+                </div>
+                <div class="ev-row">
                     <label>主动句</label>
-                    <select id="passive-input">
+                    <select id="p-input">
                         <option value="Saya makan nasi">Saya makan nasi (我吃米饭)</option>
                         <option value="Dia membaca buku">Dia membaca buku (她读书)</option>
                         <option value="Kami minum air">Kami minum air (我们喝水)</option>
                     </select>
-                    <button class="btn" onclick="convertPassive()">转为被动</button>
+                    <button class="btn-ghost" onclick="runPassive()">转换</button>
                 </div>
-                <div id="passive-result" class="result-box">
-                    <span style="color:rgba(255,255,255,0.2);">选择主动句，点击转换</span>
-                </div>
+                <div id="passive-res" class="res-box"><span style="color:rgba(255,255,255,0.1);">选择主动句</span></div>
+                <div id="passive-trace" class="trace-mini">⏱️ <span id="passive-time">--</span>ms · 🎯 <span id="passive-conf">--</span></div>
             </div>
 
-            <!-- ========================== 证据5：差异边界 ========================== -->
-            <div class="section-anchor" id="section-diff"></div>
-            <div class="section-title">⑤ 微小差异边界 <span class="badge">证明不是完全等同</span></div>
-            <div class="section-desc">证据链必须有边界。这些差异证明了元架构的"可迁移"而非"同一化"。</div>
-
-            <div class="interact-card">
-                <div class="card-title">🔍 差异高亮 · 切换视角</div>
-                <div class="diff-toggle">
-                    <button class="tab-btn active" onclick="switchDiff('en')">英语视角</button>
-                    <button class="tab-btn" onclick="switchDiff('my')">马来/印尼视角</button>
+            <!-- ⑤ 多义词 -->
+            <div class="sec-anchor" id="sec-wsd"></div>
+            <div class="section-title">⑤ 多义词消歧 <span class="tag-sm">[Base: 上下文]</span></div>
+            <div class="section-desc">中文“打”的极端歧义，触发深度回溯。</div>
+            <div class="ev-card">
+                <div class="head">
+                    <span class="title">🎯 中文歧义对抗</span>
+                    <select id="algo-wsd"><option value="rule">规则引擎</option><option value="bert">BERT</option><option value="llm">LLM</option></select>
                 </div>
-                <div id="diff-content" class="diff-content">
-                    <div class="pair"><span class="en">red car</span><span class="arrow">→</span><span class="my">kereta merah (车 红)</span></div>
-                    <div class="pair"><span class="en">big house</span><span class="arrow">→</span><span class="my">rumah besar (房 大)</span></div>
-                    <div class="pair"><span class="en">I eat</span><span class="arrow">→</span><span class="my">saya makan (无动词变形)</span></div>
-                    <div class="pair"><span class="en">books (复数)</span><span class="arrow">→</span><span class="my">buku-buku (重复表复数)</span></div>
+                <div style="display:flex; gap:4px; flex-wrap:wrap; margin-bottom:4px;">
+                    <button class="btn-ghost" onclick="runWSD('sport')">🏀 打篮球</button>
+                    <button class="btn-ghost" onclick="runWSD('taxi')">🚗 打车</button>
+                    <button class="btn-ghost" onclick="runWSD('hit')">👊 打人</button>
                 </div>
-                <div style="margin-top:10px; color:rgba(255,255,255,0.15); font-size:13px; border-top:1px solid rgba(255,255,255,0.02); padding-top:10px;">
-                    ⚡ 核心差异：形容词后置 · 无动词变形 · 重复表复数 · 无冠词
-                </div>
+                <div id="wsd-res" class="res-box"><span style="color:rgba(255,255,255,0.1);">点击示例查看</span></div>
+                <div id="wsd-trace" class="trace-mini">⏱️ <span id="wsd-time">--</span>ms · 🎯 <span id="wsd-conf">--</span></div>
             </div>
 
-            <!-- ========================== 证据闭环 ========================== -->
-            <div class="section-anchor" id="section-closure"></div>
-            <div class="section-title">证据闭环 <span class="badge">从现象到价值</span></div>
-            <div class="section-desc">完整验证元架构在语言层面的迁移能力。</div>
-
-            <div class="closure">
-                <div class="item">
-                    <div class="label">🔍 现象</div>
-                    <div class="text">马来/印尼与英语在句式、时态、词汇上高度相似</div>
+            <!-- ⑥ 文化适配 -->
+            <div class="sec-anchor" id="sec-culture"></div>
+            <div class="section-title">⑥ 文化适配 <span class="tag-sm">[Base: 语用规约]</span></div>
+            <div class="section-desc">文化隐喻（龙→Loong）及禁忌词处理。</div>
+            <div class="ev-card">
+                <div class="head">
+                    <span class="title">🤝 文化规约</span>
+                    <select id="algo-culture"><option value="rule">规则引擎</option><option value="llm">LLM</option></select>
                 </div>
-                <div class="item">
-                    <div class="label">⚙️ 成因</div>
-                    <div class="text">SVO语序 + 殖民借词 + 虚词模块化表意</div>
+                <div style="display:flex; gap:4px; flex-wrap:wrap; margin-bottom:4px;">
+                    <button class="btn-ghost" onclick="runCulture('dragon')">🐉 龙</button>
+                    <button class="btn-ghost" onclick="runCulture('taboo')">🚫 禁忌词</button>
                 </div>
-                <div class="item">
-                    <div class="label">🧱 边界</div>
-                    <div class="text">形容词语序相反 · 原生词缀体系独立 · 谱系不同</div>
-                </div>
-                <div class="item">
-                    <div class="label">🚀 价值</div>
-                    <div class="text">可迁移至 AI 多语言解析 / RAG 分层架构 / 多版本项目管理</div>
-                </div>
+                <div id="culture-res" class="res-box"><span style="color:rgba(255,255,255,0.1);">点击示例查看</span></div>
+                <div id="culture-trace" class="trace-mini">⏱️ <span id="culture-time">--</span>ms · 🎯 <span id="culture-conf">--</span></div>
             </div>
 
-            <!-- ========================== 底部 ========================== -->
-            <div class="back-bottom">
-                <a href="index.html">← 返回作品集首页</a>
-                <span class="meta">Y.Mine · 知识资产全景图 · 第2层</span>
+            <!-- ========== 闭环 ========== -->
+            <div class="sec-anchor" id="sec-closure"></div>
+            <div class="section-title">证据闭环 <span class="tag-sm">完整链路</span></div>
+            <div class="section-desc">从自然语言到结构化指令，经过底座规则、排列组合、回溯验证、地域偏移、路由调度。</div>
+            <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-top:6px; font-size:12px; color:rgba(255,255,255,0.2);">
+                <div style="background:rgba(255,255,255,0.01); padding:8px; border-left:2px solid #60a5fa;">📐 底座规则 (SVO/时态/词缀)</div>
+                <div style="background:rgba(255,255,255,0.01); padding:8px; border-left:2px solid #facc15;">🔄 回溯验证 (尝试→回退→重算)</div>
+                <div style="background:rgba(255,255,255,0.01); padding:8px; border-left:2px solid #4ade80;">🧭 路由调度 (规则引擎/LLM/地域偏移)</div>
+            </div>
+
+            <div class="footer">
+                <span>证据链 v4.0 · 完整语义路由器</span>
+                <span id="footerLatency">⏱️ 模拟延迟 -- ms</span>
             </div>
 
         </div>
-
     </div>
 
     <script>
-        // ===== 鼠标跟随光晕 =====
+        // ================================================================
+        // 全局：光晕
+        // ================================================================
         const glow = document.getElementById('glow');
         document.addEventListener('mousemove', (e) => {
             const x = e.clientX / window.innerWidth * 100;
@@ -897,270 +780,412 @@
             glow.style.setProperty('--y', y + '%');
         });
 
-        // ===== 右侧导航栏交互 =====
-        const navItems = document.querySelectorAll('.nav-item');
+        // ================================================================
+        // 侧边导航
+        // ================================================================
+        const dots = document.querySelectorAll('.sidebar .dot');
         const sections = [
-            document.getElementById('section-hero'),
-            document.getElementById('section-svo'),
-            document.getElementById('section-tense'),
-            document.getElementById('section-derivation'),
-            document.getElementById('section-passive'),
-            document.getElementById('section-diff'),
-            document.getElementById('section-closure')
+            document.getElementById('sec-hero'),
+            document.getElementById('sec-main'),
+            document.getElementById('sec-svo'),
+            document.getElementById('sec-tense'),
+            document.getElementById('sec-derive'),
+            document.getElementById('sec-passive'),
+            document.getElementById('sec-wsd'),
+            document.getElementById('sec-culture'),
+            document.getElementById('sec-closure')
         ];
-
-        navItems.forEach((item, index) => {
-            item.addEventListener('click', function(e) {
-                e.preventDefault();
-                const target = sections[index];
-                if (target) {
-                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }
-                navItems.forEach(el => el.classList.remove('active'));
-                this.classList.add('active');
+        dots.forEach((dot, idx) => {
+            dot.addEventListener('click', () => {
+                if (sections[idx]) sections[idx].scrollIntoView({ behavior: 'smooth', block: 'start' });
+                dots.forEach(d => d.classList.remove('active'));
+                dot.classList.add('active');
             });
         });
 
-        function updateActiveNav() {
-            let currentIndex = 0;
-            sections.forEach((section, i) => {
-                if (section) {
-                    const rect = section.getBoundingClientRect();
-                    if (rect.top <= 120) {
-                        currentIndex = i;
-                    }
-                }
-            });
-            navItems.forEach((el, i) => {
-                el.classList.toggle('active', i === currentIndex);
-            });
-        }
-
-        window.addEventListener('scroll', updateActiveNav);
-        window.addEventListener('load', updateActiveNav);
-
-        // ===== 步骤条点击高亮 =====
-        document.querySelectorAll('.evidence-steps .step').forEach(step => {
-            step.addEventListener('click', function(e) {
-                document.querySelectorAll('.evidence-steps .step').forEach(s => s.classList.remove('active'));
-                this.classList.add('active');
-            });
-        });
-
-        // ===================================================================
-        // 数据区
-        // ===================================================================
-
-        // 证据1：SVO 例句
-        const svoData = {
-            eat: {
-                en: 'I eat rice',
-                my: 'Saya makan nasi',
-                gloss: '我 吃 米饭'
+        // ================================================================
+        // 主交互处理器
+        // ================================================================
+        const scenarioMap = {
+            '把客厅灯调暗': {
+                source: '把客厅灯调暗',
+                intent: 'adjust_lighting',
+                params: { location: '客厅', action: 'dim', level: 30 },
+                instruction: JSON.stringify({ intent: 'adjust_lighting', location: '客厅', action: 'dim', level: 30 },
+                    null, 2),
+                route: '规则引擎 → 结构匹配 (置信度 97%)',
+                cost: '0.00012 元',
+                steps: [
+                    { icon: '🔍', msg: '解析动作词 "调暗" → dim', status: 'info', conf: '98%' },
+                    { icon: '🔍', msg: '提取目标 "客厅灯" → location=客厅', status: 'info', conf: '96%' },
+                    { icon: '✅', msg: '结构完整，采纳', status: 'success', conf: '最终 97%' }
+                ]
             },
-            read: {
-                en: 'She reads book',
-                my: 'Dia membaca buku',
-                gloss: '她 读 书'
+            '打开3号空调': {
+                source: '打开3号空调',
+                intent: 'control_ac',
+                params: { device_id: 'AC_03', action: 'power_on' },
+                instruction: JSON.stringify({ intent: 'control_ac', device_id: 'AC_03', action: 'power_on' }, null, 2),
+                route: '规则引擎 → 设备编号匹配 (置信度 99%)',
+                cost: '0.00009 元',
+                steps: [
+                    { icon: '🔍', msg: '识别动作 "打开" → power_on', status: 'info', conf: '99%' },
+                    { icon: '🔍', msg: '提取设备 "3号空调" → AC_03', status: 'info', conf: '100%' },
+                    { icon: '✅', msg: '指令明确', status: 'success', conf: '最终 99%' }
+                ]
             },
-            go: {
-                en: 'I go shop tomorrow',
-                my: 'Saya pergi kedai esok',
-                gloss: '我 去 商店 明天'
+            '关闭所有窗户': {
+                source: '关闭所有窗户',
+                intent: 'control_windows',
+                params: { target: 'all', action: 'close' },
+                instruction: JSON.stringify({ intent: 'control_windows', target: 'all', action: 'close' }, null, 2),
+                route: '规则引擎 → 批量指令 (置信度 95%)',
+                cost: '0.00015 元',
+                steps: [
+                    { icon: '🔍', msg: '识别 "关闭" → close', status: 'info', conf: '98%' },
+                    { icon: '🔍', msg: '识别 "所有窗户" → target=all', status: 'info', conf: '92%' },
+                    { icon: '⚠️', msg: '批量操作，需确认', status: 'warn', conf: '' },
+                    { icon: '✅', msg: '采纳批量指令', status: 'success', conf: '最终 95%' }
+                ]
+            },
+            'Saya ada kereta': {
+                source: 'Saya ada kereta (马来/印尼)',
+                intent: 'translate',
+                params: { lang_pair: 'ms-en', word: 'kereta', locale: 'MY' },
+                instruction: JSON.stringify({ translation: 'I have a car', detected_locale: 'MY' }, null, 2),
+                route: '结构验证 → 伪同源词检测 → 地域偏移 (MY)',
+                cost: '0.00120 元',
+                steps: [
+                    { icon: '🔍', msg: '结构验证: SVO正确', status: 'info', conf: '98%' },
+                    { icon: '⚠️', msg: '检测到伪同源词 "kereta" (MY=汽车, ID=火车)', status: 'warn', conf: '冲突' },
+                    { icon: '↩️', msg: '触发语义回退', status: 'warn', conf: '' },
+                    { icon: '🌐', msg: '加载地域路由 (MY) → Car', status: 'info', conf: '' },
+                    { icon: '✅', msg: '最终映射: Car', status: 'success', conf: '最终 99%' }
+                ]
+            },
+            '打篮球': {
+                source: '打篮球',
+                intent: 'translate',
+                params: { lang_pair: 'zh-en', phrase: '打篮球' },
+                instruction: JSON.stringify({ translation: 'play basketball', disambiguation: 'sport' }, null, 2),
+                route: '多义词消歧 → 上下文匹配 → 采纳 play',
+                cost: '0.00050 元',
+                steps: [
+                    { icon: '🔍', msg: '候选: "打" → hit (15%) / play (85%)', status: 'info', conf: '初始' },
+                    { icon: '🔍', msg: '上下文 "篮球" 指向运动', status: 'info', conf: '+30%' },
+                    { icon: '✅', msg: '采纳 "play"', status: 'success', conf: '最终 89%' }
+                ]
             }
         };
 
-        function showExample(key) {
+        function genericProcess(input) {
+            const words = input.split(/\s+/);
+            const hasAction = words.some(w => ['打开', '关闭', '调暗', '调亮', '启动', '停止'].includes(w));
+            const hasObject = words.some(w => ['灯', '空调', '窗户', '门', '电视'].includes(w));
+            let intent = 'unknown',
+                params = { raw: input },
+                instruction = JSON.stringify({ intent: 'unknown', raw_input: input, status: '需人工解析' }, null, 2);
+            let route = '规则引擎无法覆盖 → 触发LLM路由 (成本较高)';
+            let cost = '0.02000 元';
+            let steps = [];
+            if (hasAction && hasObject) {
+                const action = words.find(w => ['打开', '关闭', '调暗', '调亮', '启动', '停止'].includes(w));
+                const object = words.find(w => ['灯', '空调', '窗户', '门', '电视'].includes(w));
+                intent = 'control_device';
+                params = { action, device: object };
+                instruction = JSON.stringify({ intent: 'control_device', action, device: object }, null, 2);
+                route = '规则引擎部分匹配 → 回退至概率LM (置信度 72%)';
+                cost = '0.00300 元';
+                steps = [
+                    { icon: '🔍', msg: `识别动作 "${action}"`, status: 'info', conf: '90%' },
+                    { icon: '🔍', msg: `识别设备 "${object}"`, status: 'info', conf: '85%' },
+                    { icon: '⚠️', msg: '缺少位置/编号，触发回退', status: 'warn', conf: '' },
+                    { icon: '🔄', msg: '补全默认参数', status: 'warn', conf: '' },
+                    { icon: '✅', msg: `采纳: ${action} ${object}`, status: 'success', conf: '最终 72%' }
+                ];
+            } else {
+                steps = [
+                    { icon: '🔍', msg: '尝试基础结构提取', status: 'info', conf: '20%' },
+                    { icon: '❌', msg: '无法匹配任何模式', status: 'fail', conf: '低于阈值' },
+                    { icon: '↩️', msg: '触发完全回退，请求澄清', status: 'warn', conf: '' },
+                    { icon: '📞', msg: '生成澄清问题', status: 'info', conf: '' }
+                ];
+            }
+            return { source: input, intent, params, instruction, route, cost, steps };
+        }
+
+        function processMain() {
+            const input = document.getElementById('userInput').value.trim();
+            if (!input) return alert('请输入指令');
+            let data;
+            let matchedKey = null;
+            for (const key in scenarioMap) {
+                if (input.includes(key) || key.includes(input)) { matchedKey = key; break; }
+            }
+            if (matchedKey) {
+                const raw = scenarioMap[matchedKey];
+                data = { source: raw.source, intent: raw.intent, params: raw.params, instruction: raw.instruction,
+                    route: raw.route, cost: raw.cost, steps: raw.steps };
+            } else {
+                data = genericProcess(input);
+            }
+
+            document.getElementById('mainSource').innerHTML = `<div style="font-weight:500;">${data.source}</div><div style="font-size:11px; color:rgba(255,255,255,0.2);">意图: ${data.intent}</div>`;
+            document.getElementById('mainTarget').innerHTML = `<pre style="font-family:monospace; font-size:12px; margin:0; color:#34d399; white-space:pre-wrap;">${data.instruction}</pre>`;
+            document.getElementById('mainRoute').innerHTML =
+                `<div style="color:#facc15;">${data.route}</div><div style="font-size:11px; color:rgba(255,255,255,0.15);">💰 ${data.cost}</div>`;
+
+            let logHtml = `<div style="color:rgba(255,255,255,0.08); font-size:12px; font-family:monospace;">⚙️ 决策回溯日志</div>`;
+            data.steps.forEach(step => {
+                const cls = step.status || 'info';
+                logHtml +=
+                    `<div class="step ${cls}"><span class="icon">${step.icon}</span><span class="msg">${step.msg}</span>${step.conf ? `<span class="conf">${step.conf}</span>` : ''}</div>`;
+            });
+            document.getElementById('mainTrace').innerHTML = logHtml;
+
+            const latency = Math.floor(Math.random() * 30 + 10);
+            document.getElementById('footerLatency').textContent = `⏱️ 模拟延迟 ${latency} ms`;
+        }
+
+        function setMain(text) {
+            document.getElementById('userInput').value = text;
+            processMain();
+        }
+
+        document.getElementById('userInput').addEventListener('keydown', e => { if (e.key === 'Enter') processMain(); });
+
+        // ================================================================
+        // 证据模块 – 语序
+        // ================================================================
+        const svoData = {
+            red_car: {
+                en: 'red car',
+                my: 'kereta merah',
+                zh: '[名词+形容词] 后置结构',
+                steps: [
+                    { icon: '⚙️', msg: '尝试规则A (前置): "merah kereta"', status: 'attempt', conf: '12%' },
+                    { icon: '❌', msg: '马来语验证失败', status: 'fail', conf: '<60%' },
+                    { icon: '↩️', msg: '回退至名词节点', status: 'backtrack', conf: '' },
+                    { icon: '⚙️', msg: '切换规则B (后置): "kereta merah"', status: 'attempt', conf: '96%' },
+                    { icon: '✅', msg: '采纳', status: 'success', conf: '最终96%' }
+                ]
+            },
+            big_house: {
+                en: 'big house',
+                my: 'rumah besar',
+                zh: '[名词+形容词] 后置结构',
+                steps: [
+                    { icon: '⚙️', msg: '尝试规则A (前置): "besar rumah"', status: 'attempt', conf: '8%' },
+                    { icon: '❌', msg: '马来语验证失败', status: 'fail', conf: '<60%' },
+                    { icon: '↩️', msg: '回退', status: 'backtrack', conf: '' },
+                    { icon: '⚙️', msg: '切换规则B (后置): "rumah besar"', status: 'attempt', conf: '98%' },
+                    { icon: '✅', msg: '采纳', status: 'success', conf: '最终98%' }
+                ]
+            }
+        };
+
+        function runSVO(key) {
             const d = svoData[key];
             if (!d) return;
-            document.getElementById('svo-result').innerHTML = `
-                <div style="display:flex; flex-wrap:wrap; gap:16px; justify-content:space-between;">
-                    <div><span style="color:#60a5fa; font-weight:600;">英语</span><br>${d.en}</div>
-                    <div><span style="color:#facc15; font-weight:600;">马来/印尼</span><br>${d.my}</div>
-                    <div><span style="color:rgba(255,255,255,0.2);">逐词直译</span><br>${d.gloss}</div>
+            document.getElementById('svo-res').innerHTML = `
+                <div class="res-grid-mini">
+                    <div class="col"><div class="label">英语</div><div class="content hl-en">${d.en}</div></div>
+                    <div class="col"><div class="label">马来/印尼</div><div class="content hl-my">${d.my}</div></div>
+                    <div class="col"><div class="label">中文结构</div><div class="content hl-zh">${d.zh}</div></div>
                 </div>
             `;
-        }
-
-        // 证据2：时态
-        const tenseData = {
-            makan: { base: 'makan', en: 'eat' },
-            minum: { base: 'minum', en: 'drink' },
-            kerja: { base: 'kerja', en: 'work' },
-            tulis: { base: 'tulis', en: 'write' }
-        };
-
-        function convertTense() {
-            const verbKey = document.getElementById('tense-verb').value;
-            const tense = document.getElementById('tense-select').value;
-            const verb = tenseData[verbKey];
-            if (!verb) return;
-
-            const tenseMap = {
-                sudah: { label: '已完成 (already)', en: 'has/have ...ed' },
-                sedang: { label: '进行中 (be doing)', en: 'is ...ing' },
-                akan: { label: '将来 (will)', en: 'will ...' }
-            };
-
-            const tInfo = tenseMap[tense];
-            const sentence = `Dia ${tense} ${verb.base}`;
-            const english = `She ${tInfo.en} ${verb.en}`;
-
-            document.getElementById('tense-result').innerHTML = `
-                <div style="display:flex; flex-wrap:wrap; gap:16px; justify-content:space-between;">
-                    <div><span style="color:#facc15; font-weight:600;">马来/印尼</span><br>${sentence}</div>
-                    <div><span style="color:#60a5fa; font-weight:600;">英语</span><br>${english}</div>
-                    <div><span style="color:rgba(255,255,255,0.2);">标记词：<strong>${tense}</strong> → ${tInfo.label}</span></div>
-                </div>
-            `;
-        }
-
-        // 证据3：词根派生
-        const derivationData = {
-            ajar: {
-                root: 'ajar',
-                meaning: '教',
-                forms: [
-                    { word: 'ajar', pos: '词根', meaning: '教 (动词)' },
-                    { word: 'pelajar', pos: '名词', meaning: '学生' },
-                    { word: 'pengajar', pos: '名词', meaning: '老师' },
-                    { word: 'belajar', pos: '动词', meaning: '学习' },
-                    { word: 'mengajar', pos: '动词', meaning: '教导' }
-                ]
-            },
-            makan: {
-                root: 'makan',
-                meaning: '吃',
-                forms: [
-                    { word: 'makan', pos: '词根', meaning: '吃 (动词)' },
-                    { word: 'makanan', pos: '名词', meaning: '食物' },
-                    { word: 'pemakan', pos: '名词', meaning: '食客 / 消费者' },
-                    { word: 'memakan', pos: '动词', meaning: '正在吃' },
-                    { word: 'dimakan', pos: '动词被动', meaning: '被吃' }
-                ]
-            },
-            baca: {
-                root: 'baca',
-                meaning: '读',
-                forms: [
-                    { word: 'baca', pos: '词根', meaning: '读 (动词)' },
-                    { word: 'bacaan', pos: '名词', meaning: '读物 / 阅读材料' },
-                    { word: 'pembaca', pos: '名词', meaning: '读者' },
-                    { word: 'membaca', pos: '动词', meaning: '正在读' },
-                    { word: 'dibaca', pos: '动词被动', meaning: '被读' }
-                ]
-            },
-            tulis: {
-                root: 'tulis',
-                meaning: '写',
-                forms: [
-                    { word: 'tulis', pos: '词根', meaning: '写 (动词)' },
-                    { word: 'tulisan', pos: '名词', meaning: '文字 / 文章' },
-                    { word: 'penulis', pos: '名词', meaning: '作者' },
-                    { word: 'menulis', pos: '动词', meaning: '正在写' },
-                    { word: 'ditulis', pos: '动词被动', meaning: '被写' }
-                ]
-            }
-        };
-
-        function showDerivation(rootKey) {
-            const data = derivationData[rootKey];
-            if (!data) return;
-
-            let html = `<div style="margin-top:10px; color:#facc15; font-weight:600; font-size:16px;">词根：${data.root} (${data.meaning})</div>`;
-            html += `<div class="derivation-grid">`;
-
-            data.forms.forEach(f => {
-                html += `
-                    <div class="item">
-                        <span class="word">${f.word}</span>
-                        <span class="pos">${f.pos}</span>
-                        <span class="meaning">${f.meaning}</span>
-                    </div>
-                `;
+            let log = '';
+            d.steps.forEach(s => {
+                const cls = s.status || 'info';
+                log +=
+                    `<span class="${cls}" style="margin-right:8px;">${s.icon} ${s.msg} ${s.conf ? '['+s.conf+']' : ''}</span>`;
             });
-
-            html += `</div>`;
-            html += `<div style="color:rgba(255,255,255,0.12); font-size:12px; margin-top:8px;">💡 点击不同词根查看派生家族 · 证明词缀系统可独立于英语运行</div>`;
-
-            document.getElementById('derivation-result').innerHTML = html;
+            document.getElementById('svo-trace').innerHTML = `⏱️ ${Math.floor(Math.random()*6+4)}ms · 🎯 ${d.steps[d.steps.length-1].conf} · ${log}`;
+            document.getElementById('svo-time').textContent = Math.floor(Math.random() * 6 + 4);
+            document.getElementById('svo-conf').textContent = d.steps[d.steps.length - 1].conf;
         }
 
-        // 证据4：被动句式
-        const passiveData = {
-            'Saya makan nasi': {
-                active: 'Saya makan nasi',
-                active_en: 'I eat rice',
-                passive: 'Nasi dimakan oleh saya',
-                passive_en: 'The rice is eaten by me'
-            },
-            'Dia membaca buku': {
-                active: 'Dia membaca buku',
-                active_en: 'She reads book',
-                passive: 'Buku dibaca oleh dia',
-                passive_en: 'The book is read by her'
-            },
-            'Kami minum air': {
-                active: 'Kami minum air',
-                active_en: 'We drink water',
-                passive: 'Air diminum oleh kami',
-                passive_en: 'The water is drunk by us'
-            }
+        // ================================================================
+        // 时态
+        // ================================================================
+        const tenseVerbs = {
+            makan: { base: 'makan', en: 'eat', past: 'eaten', ing: 'eating' },
+            minum: { base: 'minum', en: 'drink', past: 'drunk', ing: 'drinking' },
+            tulis: { base: 'tulis', en: 'write', past: 'written', ing: 'writing' }
         };
 
-        function convertPassive() {
-            const key = document.getElementById('passive-input').value;
-            const d = passiveData[key];
-            if (!d) return;
-
-            document.getElementById('passive-result').innerHTML = `
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
-                    <div>
-                        <div style="color:#60a5fa; font-weight:600;">主动 (Active)</div>
-                        <div style="font-size:15px;">${d.active}</div>
-                        <div style="color:rgba(255,255,255,0.3); font-size:13px;">${d.active_en}</div>
-                    </div>
-                    <div>
-                        <div style="color:#facc15; font-weight:600;">被动 (Passive)</div>
-                        <div style="font-size:15px;">${d.passive}</div>
-                        <div style="color:rgba(255,255,255,0.3); font-size:13px;">${d.passive_en}</div>
-                    </div>
-                </div>
-                <div style="color:rgba(255,255,255,0.12); font-size:12px; margin-top:8px; border-top:1px solid rgba(255,255,255,0.02); padding-top:8px;">
-                    🔄 di- = be done &nbsp;·&nbsp; oleh = by &nbsp;→ 结构完全对应英语
+        function runTense() {
+            const vk = document.getElementById('t-verb').value;
+            const tk = document.getElementById('t-tense').value;
+            const v = tenseVerbs[vk];
+            if (!v) return;
+            const map = {
+                sudah: { en: 'has/have ' + v.past, zh: '已经+动词' },
+                sedang: { en: 'is ' + v.ing, zh: '正在+动词' },
+                akan: { en: 'will ' + v.en, zh: '将+动词' }
+            };
+            const info = map[tk];
+            document.getElementById('tense-res').innerHTML = `
+                <div class="res-grid-mini">
+                    <div class="col"><div class="label">英语</div><div class="content hl-en">She ${info.en}</div></div>
+                    <div class="col"><div class="label">马来/印尼</div><div class="content hl-my">Dia ${tk} ${v.base}</div></div>
+                    <div class="col"><div class="label">中文结构</div><div class="content hl-zh">${info.zh}</div></div>
                 </div>
             `;
+            const steps = [
+                { icon: '⚙️', msg: '尝试直译', status: 'attempt', conf: '45%' },
+                { icon: '❌', msg: '马来语无屈折，回退', status: 'fail', conf: '<60%' },
+                { icon: '↩️', msg: '加载时态助词', status: 'backtrack', conf: '' },
+                { icon: '✅', msg: `采纳 "Dia ${tk} ${v.base}"`, status: 'success', conf: '94%' }
+            ];
+            let log = '';
+            steps.forEach(s => {
+                const cls = s.status || 'info';
+                log +=
+                    `<span class="${cls}" style="margin-right:8px;">${s.icon} ${s.msg} ${s.conf ? '['+s.conf+']' : ''}</span>`;
+            });
+            document.getElementById('tense-trace').innerHTML =
+                `⏱️ ${Math.floor(Math.random()*6+6)}ms · 🎯 94% · ${log}`;
+            document.getElementById('tense-time').textContent = Math.floor(Math.random() * 6 + 6);
+            document.getElementById('tense-conf').textContent = '94%';
         }
 
-        // 证据5：差异切换
-        function switchDiff(view) {
-            const btns = document.querySelectorAll('.diff-toggle .tab-btn');
-            btns.forEach(b => b.classList.remove('active'));
+        // ================================================================
+        // 词缀
+        // ================================================================
+        const deriveData = {
+            ajar: { root: 'ajar', meaning: '教', forms: ['ajar', 'pelajar', 'pengajar', 'belajar', 'mengajar'],
+                zh: '中文无派生，用复合词' },
+            makan: { root: 'makan', meaning: '吃', forms: ['makan', 'makanan', 'pemakan', 'memakan', 'dimakan'],
+                zh: '零派生，独立词' },
+            tulis: { root: 'tulis', meaning: '写', forms: ['tulis', 'tulisan', 'penulis', 'menulis', 'ditulis'],
+                zh: '零派生' }
+        };
 
-            if (view === 'en') {
-                btns[0].classList.add('active');
-                document.getElementById('diff-content').innerHTML = `
-                    <div class="pair"><span class="en">red car</span><span class="arrow">→</span><span class="my">kereta merah (车 红)</span></div>
-                    <div class="pair"><span class="en">big house</span><span class="arrow">→</span><span class="my">rumah besar (房 大)</span></div>
-                    <div class="pair"><span class="en">I eat</span><span class="arrow">→</span><span class="my">saya makan (无动词变形)</span></div>
-                    <div class="pair"><span class="en">books (复数)</span><span class="arrow">→</span><span class="my">buku-buku (重复表复数)</span></div>
-                `;
-            } else {
-                btns[1].classList.add('active');
-                document.getElementById('diff-content').innerHTML = `
-                    <div class="pair"><span class="my">kereta merah (车 红)</span><span class="arrow">→</span><span class="en">red car</span></div>
-                    <div class="pair"><span class="my">rumah besar (房 大)</span><span class="arrow">→</span><span class="en">big house</span></div>
-                    <div class="pair"><span class="my">saya makan</span><span class="arrow">→</span><span class="en">I eat (动词无变形)</span></div>
-                    <div class="pair"><span class="my">buku-buku (重复表复数)</span><span class="arrow">→</span><span class="en">books</span></div>
-                `;
-            }
+        function runDerive(key) {
+            const d = deriveData[key];
+            if (!d) return;
+            document.getElementById('derive-res').innerHTML = `
+                <div class="res-grid-mini">
+                    <div class="col"><div class="label">马来派生</div><div class="content hl-my">${d.forms.join(' / ')}</div></div>
+                    <div class="col"><div class="label">英语对照</div><div class="content hl-en">${d.forms.map(f=>f).join(' / ')}</div></div>
+                    <div class="col"><div class="label">中文验证</div><div class="content hl-zh">${d.zh}</div></div>
+                </div>
+            `;
+            document.getElementById('derive-trace').innerHTML =
+                `⏱️ ${Math.floor(Math.random()*8+8)}ms · 🎯 85% · 词缀系统独立，中文零派生验证`;
+            document.getElementById('derive-time').textContent = Math.floor(Math.random() * 8 + 8);
+            document.getElementById('derive-conf').textContent = '85%';
         }
 
-        // ===== 页面加载后显示默认例句 =====
+        // ================================================================
+        // 被动
+        // ================================================================
+        const passData = {
+            'Saya makan nasi': { active: 'Saya makan nasi', passive: 'Nasi dimakan oleh saya', en: 'I eat rice',
+                en_passive: 'Rice is eaten by me', zh: '米饭被我吃了' },
+            'Dia membaca buku': { active: 'Dia membaca buku', passive: 'Buku dibaca oleh dia', en: 'She reads book',
+                en_passive: 'Book is read by her', zh: '书被她读了' },
+            'Kami minum air': { active: 'Kami minum air', passive: 'Air diminum oleh kami', en: 'We drink water',
+                en_passive: 'Water is drunk by us', zh: '水被我们喝了' }
+        };
+
+        function runPassive() {
+            const key = document.getElementById('p-input').value;
+            const d = passData[key];
+            if (!d) return;
+            document.getElementById('passive-res').innerHTML = `
+                <div class="res-grid-mini">
+                    <div class="col"><div class="label">主动</div><div class="content hl-my">${d.active}</div><div style="font-size:10px;color:rgba(255,255,255,0.2);">${d.en}</div></div>
+                    <div class="col"><div class="label">被动</div><div class="content hl-my">${d.passive}</div><div style="font-size:10px;color:rgba(255,255,255,0.2);">${d.en_passive}</div></div>
+                    <div class="col"><div class="label">中文结构</div><div class="content hl-zh">${d.zh}</div></div>
+                </div>
+            `;
+            document.getElementById('passive-trace').innerHTML =
+                `⏱️ ${Math.floor(Math.random()*8+10)}ms · 🎯 96% · di- + oleh 完全对应英语被动`;
+            document.getElementById('passive-time').textContent = Math.floor(Math.random() * 8 + 10);
+            document.getElementById('passive-conf').textContent = '96%';
+        }
+
+        // ================================================================
+        // 多义词
+        // ================================================================
+        const wsdMap = {
+            sport: { input: '打篮球', en: 'play basketball', tag: '运动类', steps: [
+                    { icon: '⚙️', msg: '候选: hit(15%)/play(85%)', status: 'attempt', conf: '初始' },
+                    { icon: '🔍', msg: '上下文 "篮球" 指向运动', status: 'info', conf: '+30%' },
+                    { icon: '✅', msg: '采纳 play', status: 'success', conf: '最终89%' }
+                ] },
+            taxi: { input: '打车', en: 'take a taxi', tag: '交通类', steps: [
+                    { icon: '⚙️', msg: '候选: hit(2%)/take(92%)', status: 'attempt', conf: '初始' },
+                    { icon: '✅', msg: '采纳 take', status: 'success', conf: '最终92%' }
+                ] },
+            hit: { input: '打人', en: 'hit someone', tag: '攻击类', steps: [
+                    { icon: '⚙️', msg: '候选: hit(88%)/play(10%)', status: 'attempt', conf: '初始' },
+                    { icon: '✅', msg: '采纳 hit', status: 'success', conf: '最终88%' }
+                ] }
+        };
+
+        function runWSD(key) {
+            const d = wsdMap[key];
+            if (!d) return;
+            document.getElementById('wsd-res').innerHTML = `
+                <div class="res-grid-mini">
+                    <div class="col"><div class="label">中文</div><div class="content hl-zh">${d.input}</div><div style="font-size:10px;color:rgba(255,255,255,0.2);">${d.tag}</div></div>
+                    <div class="col"><div class="label">英语映射</div><div class="content hl-en">${d.en}</div></div>
+                    <div class="col"><div class="label">决策</div><div class="content" style="color:#4ade80;">✅ 歧义消解</div></div>
+                </div>
+            `;
+            let log = '';
+            d.steps.forEach(s => {
+                const cls = s.status || 'info';
+                log +=
+                    `<span class="${cls}" style="margin-right:8px;">${s.icon} ${s.msg} ${s.conf ? '['+s.conf+']' : ''}</span>`;
+            });
+            document.getElementById('wsd-trace').innerHTML =
+                `⏱️ ${Math.floor(Math.random()*15+20)}ms · 🎯 ${d.steps[d.steps.length-1].conf} · ${log}`;
+            document.getElementById('wsd-time').textContent = Math.floor(Math.random() * 15 + 20);
+            document.getElementById('wsd-conf').textContent = d.steps[d.steps.length - 1].conf;
+        }
+
+        // ================================================================
+        // 文化
+        // ================================================================
+        const cultureMap = {
+            dragon: { input: '龙 (中文)', output: 'Loong (避免西方邪恶意象)', note: '文化隐喻替换' },
+            taboo: { input: '禁忌词', output: '[已过滤] 中性词', note: '敏感词规避' }
+        };
+
+        function runCulture(key) {
+            const d = cultureMap[key];
+            if (!d) return;
+            document.getElementById('culture-res').innerHTML = `
+                <div class="res-grid-mini">
+                    <div class="col"><div class="label">中文</div><div class="content hl-zh">${d.input}</div></div>
+                    <div class="col"><div class="label">适配结果</div><div class="content hl-en">${d.output}</div></div>
+                    <div class="col"><div class="label">备注</div><div class="content" style="color:rgba(255,255,255,0.3);">${d.note}</div></div>
+                </div>
+            `;
+            document.getElementById('culture-trace').innerHTML =
+                `⏱️ ${Math.floor(Math.random()*20+25)}ms · 🎯 85% · 文化规约引擎生效`;
+            document.getElementById('culture-time').textContent = Math.floor(Math.random() * 20 + 25);
+            document.getElementById('culture-conf').textContent = '85%';
+        }
+
+        // ================================================================
+        // 初始化
+        // ================================================================
         window.onload = function() {
-            showExample('eat');
+            setTimeout(() => {
+                processMain();
+                runSVO('red_car');
+                runTense();
+                runDerive('ajar');
+                runPassive();
+                runWSD('sport');
+                runCulture('dragon');
+            }, 200);
         };
     </script>
-
 </body>
 </html>
