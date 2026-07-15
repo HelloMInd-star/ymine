@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>元架构重构营销学 · 证据链</title>
     <style>
+        /* ===== 全局重置 ===== */
         * {
             margin: 0;
             padding: 0;
@@ -154,40 +155,25 @@
         }
 
         @keyframes floatBg {
-            0% {
-                transform: translate(0, 0) scale(1);
-            }
-            100% {
-                transform: translate(30px, -20px) scale(1.1);
-            }
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(30px, -20px) scale(1.1); }
         }
 
         @keyframes fadeInUp {
-            0% {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            100% {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            0% { opacity: 0; transform: translateY(30px); }
+            100% { opacity: 1; transform: translateY(0); }
         }
 
         @keyframes gradientFlow {
-            0% {
-                background-position: 0% 50%;
-            }
-            50% {
-                background-position: 100% 50%;
-            }
-            100% {
-                background-position: 0% 50%;
-            }
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
+        /* ===== 头部 ===== */
         .header {
             text-align: center;
-            margin-bottom: 28px;
+            margin-bottom: 16px;
             opacity: 0;
             animation: fadeInUp 0.8s ease forwards;
         }
@@ -223,6 +209,68 @@
             margin-top: 4px;
         }
 
+        /* ===== 价值主张 ===== */
+        .value-prop {
+            background: rgba(167, 139, 250, 0.04);
+            border-left: 3px solid #a78bfa;
+            border-radius: 0 16px 16px 0;
+            padding: 18px 24px;
+            margin-bottom: 28px;
+            opacity: 0;
+            animation: fadeInUp 0.6s ease 0.03s forwards;
+        }
+
+        .value-prop p {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 15px;
+            line-height: 1.7;
+            margin-bottom: 0;
+        }
+
+        .value-prop p strong {
+            color: #a78bfa;
+            font-weight: 600;
+        }
+
+        .value-prop p .highlight {
+            color: #facc15;
+            font-weight: 600;
+        }
+
+        /* ===== 核心结论锚点 ===== */
+        .key-takeaways {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 32px;
+            opacity: 0;
+            animation: fadeInUp 0.6s ease 0.06s forwards;
+        }
+
+        .key-takeaways .kt-item {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 12px;
+            padding: 14px 16px;
+            text-align: center;
+        }
+
+        .key-takeaways .kt-item .kt-icon {
+            font-size: 24px;
+            margin-bottom: 4px;
+        }
+
+        .key-takeaways .kt-item .kt-text {
+            font-size: 13px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.6);
+            line-height: 1.4;
+        }
+
+        .key-takeaways .kt-item .kt-text .hl {
+            color: #facc15;
+        }
+
         /* ===== 锚点 ===== */
         .section-anchor {
             scroll-margin-top: 16px;
@@ -233,9 +281,9 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 10px;
-            margin-bottom: 28px;
+            margin-bottom: 32px;
             opacity: 0;
-            animation: fadeInUp 0.6s ease 0.05s forwards;
+            animation: fadeInUp 0.6s ease 0.08s forwards;
         }
 
         .meta-item {
@@ -265,6 +313,198 @@
             color: #a78bfa;
         }
 
+        /* ============================================================ */
+        /* ===== 模拟器通用样式 ===== */
+        /* ============================================================ */
+        .simulator-section {
+            background: rgba(167, 139, 250, 0.04);
+            border: 1px solid rgba(167, 139, 250, 0.10);
+            border-radius: 16px;
+            padding: 24px 28px 22px;
+            margin-bottom: 36px;
+            opacity: 0;
+            animation: fadeInUp 0.6s ease 0.1s forwards;
+            scroll-margin-top: 20px;
+        }
+
+        .simulator-section .sim-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .simulator-section .sim-title .tag {
+            font-size: 11px;
+            font-weight: 500;
+            color: #a78bfa;
+            background: rgba(167, 139, 250, 0.12);
+            padding: 2px 12px;
+            border-radius: 20px;
+        }
+
+        .simulator-section .sim-sub {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.2);
+            margin-bottom: 16px;
+            line-height: 1.6;
+        }
+
+        .simulator-section .sim-sub .hl {
+            color: #a78bfa;
+        }
+
+        .simulator-section .sim-sub .hl-blue {
+            color: #60a5fa;
+        }
+
+        .simulator-section .sim-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .simulator-section .sim-grid .ctrl {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .simulator-section .sim-grid .ctrl label {
+            font-size: 12px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.35);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .simulator-section .sim-grid .ctrl label span {
+            color: #a78bfa;
+        }
+
+        .simulator-section .sim-grid .ctrl .sub-hint {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.08);
+        }
+
+        .simulator-section .sim-grid .ctrl input[type="range"] {
+            width: 100%;
+            accent-color: #a78bfa;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 4px;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        .simulator-section .sim-grid .ctrl input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #a78bfa;
+            cursor: pointer;
+            box-shadow: 0 0 20px rgba(167, 139, 250, 0.15);
+        }
+
+        .simulator-section .result-panel {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 12px;
+            padding: 14px 16px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            margin-bottom: 14px;
+        }
+
+        .simulator-section .result-panel .metric {
+            text-align: center;
+        }
+
+        .simulator-section .result-panel .metric .ml {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.15);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .simulator-section .result-panel .metric .mv {
+            font-size: 22px;
+            font-weight: 700;
+            color: #f1f5f9;
+            margin-top: 2px;
+        }
+
+        .simulator-section .result-panel .metric .mv .unit {
+            font-size: 14px;
+            font-weight: 400;
+            color: rgba(255, 255, 255, 0.2);
+        }
+
+        .simulator-section .result-panel .metric .mv.highlight {
+            color: #a78bfa;
+        }
+
+        .simulator-section .result-panel .metric .mv.gold {
+            color: #facc15;
+        }
+
+        .simulator-section .result-panel .metric .mv.green {
+            color: #22c55e;
+        }
+
+        .simulator-section .result-panel .metric .sub-hint {
+            font-size: 9px;
+            color: rgba(255, 255, 255, 0.08);
+        }
+
+        .simulator-section .advice-box {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 10px;
+            padding: 12px 16px;
+            border-left: 3px solid #a78bfa;
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 14px;
+            line-height: 1.7;
+            min-height: 48px;
+        }
+
+        .simulator-section .advice-box strong {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .simulator-section .advice-box .highlight {
+            color: #facc15;
+        }
+
+        .simulator-section .canvas-wrap {
+            margin-top: 14px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            padding: 10px;
+        }
+
+        .simulator-section .canvas-wrap canvas {
+            display: block;
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+        }
+
+        .simulator-section .canvas-caption {
+            text-align: center;
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.1);
+            margin-top: 6px;
+        }
+
         /* ===== 通用板块 ===== */
         .section {
             margin-bottom: 36px;
@@ -272,12 +512,12 @@
             animation: fadeInUp 0.6s ease forwards;
         }
 
-        .section:nth-child(4) { animation-delay: 0.1s; }
         .section:nth-child(5) { animation-delay: 0.15s; }
         .section:nth-child(6) { animation-delay: 0.2s; }
         .section:nth-child(7) { animation-delay: 0.25s; }
         .section:nth-child(8) { animation-delay: 0.3s; }
         .section:nth-child(9) { animation-delay: 0.35s; }
+        .section:nth-child(10) { animation-delay: 0.4s; }
 
         .section h2 {
             font-size: 20px;
@@ -367,6 +607,92 @@
             color: rgba(255, 255, 255, 0.8);
         }
 
+        .highlight-box.purple {
+            border-left-color: #a78bfa;
+        }
+
+        /* ===== 元架构映射对照表 ===== */
+        .mapping-table-wrap {
+            margin-top: 14px;
+            padding: 12px 14px;
+            background: rgba(167, 139, 250, 0.03);
+            border-radius: 10px;
+            border: 1px solid rgba(167, 139, 250, 0.06);
+        }
+
+        .mapping-table-wrap .mt-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: #a78bfa;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .mapping-table-wrap .mt-label::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, rgba(167, 139, 250, 0.15), transparent);
+        }
+
+        .mapping-table-wrap table {
+            font-size: 13px;
+        }
+
+        .mapping-table-wrap th {
+            background: rgba(167, 139, 250, 0.06);
+            color: rgba(255, 255, 255, 0.4);
+            font-weight: 600;
+            font-size: 11px;
+            padding: 6px 10px;
+            border-bottom: 1px solid rgba(167, 139, 250, 0.08);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .mapping-table-wrap td {
+            color: rgba(255, 255, 255, 0.5);
+            padding: 6px 10px;
+            font-size: 13px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+        }
+
+        .mapping-table-wrap td:first-child {
+            color: rgba(255, 255, 255, 0.6);
+            font-weight: 500;
+        }
+
+        .mapping-table-wrap td .tool {
+            color: #a78bfa;
+            font-weight: 500;
+        }
+
+        .mapping-table-wrap td .corr {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .mapping-table-wrap td .neuron {
+            color: #facc15;
+            font-weight: 400;
+        }
+
+        .mapping-table-wrap tr:last-child td {
+            border-bottom: none;
+        }
+
+        .mapping-table-wrap .mt-note {
+            margin-top: 8px;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.2);
+            font-style: italic;
+            padding-top: 6px;
+            border-top: 1px solid rgba(255, 255, 255, 0.02);
+        }
+
+        /* ===== 表格通用 ===== */
         .table-wrap {
             overflow-x: auto;
             margin: 10px 0 14px;
@@ -402,7 +728,89 @@
             color: rgba(255, 255, 255, 0.65);
         }
 
-        /* ===== 延伸方向（锁住） ===== */
+        /* ============================================================ */
+        /* ===== 基础测试说明 ===== */
+        /* ============================================================ */
+        .test-section {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 16px;
+            padding: 22px 28px 20px;
+            margin-bottom: 36px;
+            opacity: 0;
+            animation: fadeInUp 0.6s ease 0.35s forwards;
+            scroll-margin-top: 20px;
+        }
+
+        .test-section .test-title {
+            font-size: 17px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .test-section .test-title .tag {
+            font-size: 11px;
+            font-weight: 500;
+            color: #facc15;
+            background: rgba(250, 204, 21, 0.08);
+            padding: 2px 12px;
+            border-radius: 20px;
+        }
+
+        .test-section .test-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        .test-section .test-grid .test-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 12px;
+            padding: 14px 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .test-section .test-grid .test-card:hover {
+            border-color: rgba(255, 255, 255, 0.08);
+        }
+
+        .test-section .test-grid .test-card .tc-icon {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+
+        .test-section .test-grid .test-card .tc-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .test-section .test-grid .test-card .tc-desc {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.25);
+            line-height: 1.5;
+            margin-top: 4px;
+        }
+
+        .test-section .test-grid .test-card .tc-method {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.15);
+            margin-top: 6px;
+            padding-top: 6px;
+            border-top: 1px solid rgba(255, 255, 255, 0.02);
+        }
+
+        .test-section .test-grid .test-card .tc-method strong {
+            color: rgba(255, 255, 255, 0.25);
+        }
+
+        /* ===== 延伸方向 ===== */
         .extension-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -454,7 +862,7 @@
             padding-top: 16px;
             border-top: 1px solid rgba(255, 255, 255, 0.03);
             opacity: 0;
-            animation: fadeInUp 0.6s ease 0.4s forwards;
+            animation: fadeInUp 0.6s ease 0.45s forwards;
         }
 
         .back-bottom a {
@@ -482,8 +890,27 @@
             .meta-grid {
                 grid-template-columns: 1fr;
             }
+            .key-takeaways {
+                grid-template-columns: 1fr;
+            }
             .extension-grid {
                 grid-template-columns: 1fr;
+            }
+            .test-section .test-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            .mapping-table-wrap table {
+                font-size: 12px;
+            }
+            .mapping-table-wrap th,
+            .mapping-table-wrap td {
+                padding: 4px 6px;
+            }
+            .simulator-section .sim-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            .simulator-section .result-panel {
+                grid-template-columns: 1fr 1fr;
             }
         }
 
@@ -509,6 +936,34 @@
             td {
                 padding: 6px 8px;
             }
+            .value-prop p {
+                font-size: 14px;
+            }
+            .test-section .test-grid {
+                grid-template-columns: 1fr;
+            }
+            .mapping-table-wrap {
+                padding: 8px 10px;
+            }
+            .mapping-table-wrap table {
+                font-size: 11px;
+            }
+            .mapping-table-wrap th,
+            .mapping-table-wrap td {
+                padding: 3px 4px;
+            }
+            .simulator-section {
+                padding: 18px 14px 16px;
+            }
+            .simulator-section .sim-grid {
+                grid-template-columns: 1fr;
+            }
+            .simulator-section .result-panel {
+                grid-template-columns: 1fr 1fr;
+            }
+            .simulator-section .result-panel .metric .mv {
+                font-size: 18px;
+            }
         }
 
         @media (max-width: 480px) {
@@ -521,6 +976,12 @@
             .meta-item .mv {
                 font-size: 12px;
             }
+            .key-takeaways .kt-item .kt-text {
+                font-size: 12px;
+            }
+            .simulator-section .result-panel {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
@@ -530,16 +991,22 @@
 
     <!-- ===== 右侧固定导航栏 ===== -->
     <div class="sidebar-nav">
+        <a class="nav-item" data-target="section-value"><span class="num">⏵</span><span class="label">主张</span></a>
         <a class="nav-item" data-target="section-meta"><span class="num">①</span><span class="label">验证</span></a>
-        <a class="nav-item" data-target="section-layer1"><span class="num">②</span><span class="label">一</span></a>
-        <a class="nav-item" data-target="section-layer3"><span class="num">③</span><span class="label">比喻</span></a>
-        <a class="nav-item" data-target="section-layer4"><span class="num">④</span><span class="label">数学</span></a>
-        <a class="nav-item" data-target="section-layer5"><span class="num">⑤</span><span class="label">营销</span></a>
-        <a class="nav-item" data-target="section-layer6"><span class="num">⑥</span><span class="label">真相</span></a>
-        <a class="nav-item" data-target="section-output"><span class="num">⑦</span><span class="label">资产</span></a>
+        <a class="nav-item" data-target="section-simulator"><span class="num">②</span><span class="label">营销</span></a>
+        <a class="nav-item" data-target="section-pricing"><span class="num">③</span><span class="label">定价</span></a>
+        <div class="nav-divider"></div>
+        <a class="nav-item" data-target="section-layer1"><span class="num">④</span><span class="label">一</span></a>
+        <a class="nav-item" data-target="section-layer2"><span class="num">⑤</span><span class="label">推演</span></a>
+        <a class="nav-item" data-target="section-layer3"><span class="num">⑥</span><span class="label">比喻</span></a>
+        <a class="nav-item" data-target="section-layer4"><span class="num">⑦</span><span class="label">数学</span></a>
+        <a class="nav-item" data-target="section-test"><span class="num">⑧</span><span class="label">测试</span></a>
+        <a class="nav-item" data-target="section-layer5"><span class="num">⑨</span><span class="label">营销</span></a>
+        <a class="nav-item" data-target="section-layer6"><span class="num">⑩</span><span class="label">真相</span></a>
+        <a class="nav-item" data-target="section-output"><span class="num">⑪</span><span class="label">资产</span></a>
         <div class="nav-divider"></div>
         <a class="nav-item" data-target="section-extension"><span class="num">∞</span><span class="label">延伸</span></a>
-        <div class="nav-bottom">营销重构</div>
+        <div class="nav-bottom">重构</div>
     </div>
 
     <!-- ===== 主容器 ===== -->
@@ -547,9 +1014,34 @@
 
         <!-- ===== 头部 ===== -->
         <div class="header">
-            <div class="badge">🔍 跨领域吞噬验证</div>
+            <div class="badge">🧠 神经科学底座 · 营销重构</div>
             <h1>元架构重构营销学</h1>
-            <div class="sub">单场对话 · 从零推演完整营销体系</div>
+            <div class="sub">前额叶 × 边缘系统 = 营销成功率 · 完整证据链</div>
+        </div>
+
+        <!-- ===== 价值主张 ===== -->
+        <div class="section-anchor" id="section-value"></div>
+        <div class="value-prop">
+            <p>
+                <strong>💡 核心模型：</strong>营销成功率 = <span class="highlight">前额叶（逻辑/分析/计算）</span> × <span style="color:#60a5fa;">边缘系统（直觉/判断/模式识别）</span><br>
+                数字思维可学习量化，商业思维依赖经验直觉。<strong>两者不是相加，而是相乘。</strong>缺少任何一个，营销有效性趋近于零。
+            </p>
+        </div>
+
+        <!-- ===== 核心结论锚点 ===== -->
+        <div class="key-takeaways">
+            <div class="kt-item">
+                <div class="kt-icon">🔗</div>
+                <div class="kt-text">元架构连接传播与技术<br><span class="hl">同一个大脑，同时驾驭营销策略与AI架构</span></div>
+            </div>
+            <div class="kt-item">
+                <div class="kt-icon">🧠</div>
+                <div class="kt-text">“其实我脑子里都已经学会了”<br><span class="hl">学习 = 翻译已有知识</span></div>
+            </div>
+            <div class="kt-item">
+                <div class="kt-icon">📐</div>
+                <div class="kt-text">营销成功率 = 前额叶 × 边缘系统<br><span class="hl">逻辑/分析/计算 × 直觉/判断/模式识别</span></div>
+            </div>
         </div>
 
         <!-- ===== 验证元数据 ===== -->
@@ -561,7 +1053,7 @@
             </div>
             <div class="meta-item">
                 <div class="ml">验证对象</div>
-                <div class="mv">财务管理本科 + MBA背景<br><span style="color:rgba(255,255,255,0.25);font-size:12px;">未系统学习过营销学</span></div>
+                <div class="mv"><span style="color:#a78bfa;">前额叶型（逻辑/分析/计算）</span> + <span style="color:#60a5fa;">边缘系统型（直觉/判断/模式识别）</span><br><span style="color:rgba(255,255,255,0.25);font-size:12px;">未系统学习过营销学</span></div>
             </div>
             <div class="meta-item">
                 <div class="ml">验证方式</div>
@@ -573,7 +1065,129 @@
             </div>
         </div>
 
+        <!-- ============================================================ -->
+        <!-- ===== 模拟器1：营销成功率 ===== -->
+        <!-- ============================================================ -->
+        <div class="section-anchor" id="section-simulator"></div>
+        <div class="simulator-section">
+            <div class="sim-title">📈 营销成功率模拟器 <span class="tag">实时数据</span></div>
+            <div class="sim-sub">
+                <span class="hl">前额叶（逻辑/分析/计算）</span> × <span class="hl-blue">边缘系统（直觉/判断/模式识别）</span> = 营销成功率
+            </div>
+
+            <div class="sim-grid">
+                <div class="ctrl">
+                    <label>🧠 前额叶激活 <span id="digitalVal">0.70</span></label>
+                    <input type="range" id="digitalInput" min="0.1" max="1.0" step="0.01" value="0.70" />
+                    <span class="sub-hint">逻辑 · 计算 · 算法推理（可学习）</span>
+                </div>
+                <div class="ctrl">
+                    <label>🎯 边缘系统激活 <span id="businessVal">0.70</span></label>
+                    <input type="range" id="businessInput" min="0.1" max="1.0" step="0.01" value="0.70" />
+                    <span class="sub-hint">直觉 · 判断 · 模式识别（依赖经验）</span>
+                </div>
+                <div class="ctrl">
+                    <label>📊 外部复杂度 <span id="complexityVal">0.50</span></label>
+                    <input type="range" id="complexityInput" min="0.1" max="1.0" step="0.01" value="0.50" />
+                    <span class="sub-hint">渠道竞争 · 信息噪音 · 认知负荷</span>
+                </div>
+            </div>
+
+            <div class="result-panel">
+                <div class="metric">
+                    <div class="ml">📈 营销成功率</div>
+                    <div class="mv highlight" id="successRate">0.0<span class="unit">%</span></div>
+                    <span class="sub-hint">前额叶 × 边缘系统 / (1+β×0.5)</span>
+                </div>
+                <div class="metric">
+                    <div class="ml">策略贡献</div>
+                    <div class="mv" id="digitalContribution" style="color:#a78bfa;">0.0<span class="unit">%</span></div>
+                    <span class="sub-hint">可量化 · 可训练</span>
+                </div>
+                <div class="metric">
+                    <div class="ml">择时贡献</div>
+                    <div class="mv" id="businessContribution" style="color:#60a5fa;">0.0<span class="unit">%</span></div>
+                    <span class="sub-hint">依赖经验 · 情境感知</span>
+                </div>
+                <div class="metric">
+                    <div class="ml">协同状态</div>
+                    <div class="mv gold" id="riskLevel">⚖️ 均衡</div>
+                </div>
+            </div>
+
+            <div class="advice-box" id="strategyAdvice">
+                💡 <strong>策略建议：</strong>当前前额叶与边缘系统激活均衡，建议优先提升前额叶以突破外部复杂度瓶颈。
+            </div>
+
+            <div class="canvas-wrap">
+                <canvas id="simCanvas" width="800" height="200"></canvas>
+                <div class="canvas-caption">动态曲线 · 前额叶（紫）与边缘系统（蓝）协同 · 金色为营销成功率</div>
+            </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- ===== 模拟器2：定价模型 ===== -->
+        <!-- ============================================================ -->
+        <div class="section-anchor" id="section-pricing"></div>
+        <div class="simulator-section" style="border-color:rgba(250,204,21,0.15); background:rgba(250,204,21,0.02);">
+            <div class="sim-title">💰 定价模型模拟器 <span class="tag">价格生成</span></div>
+            <div class="sim-sub">
+                基于 <span class="hl">成本 × 溢价 × 弹性</span> 三层结构 · 实时生成建议定价与策略
+            </div>
+
+            <div class="sim-grid">
+                <div class="ctrl">
+                    <label>📦 基础成本 <span id="costVal">100</span></label>
+                    <input type="range" id="costInput" min="10" max="500" step="1" value="100" />
+                    <span class="sub-hint">单位成本（元）</span>
+                </div>
+                <div class="ctrl">
+                    <label>🏷️ 溢价因子 <span id="premiumVal">1.5</span></label>
+                    <input type="range" id="premiumInput" min="0.5" max="3.0" step="0.05" value="1.5" />
+                    <span class="sub-hint">品牌/认知/稀缺性溢价</span>
+                </div>
+                <div class="ctrl">
+                    <label>📉 价格弹性 <span id="elasticityVal">1.0</span></label>
+                    <input type="range" id="elasticityInput" min="0.1" max="2.0" step="0.05" value="1.0" />
+                    <span class="sub-hint">用户价格敏感度</span>
+                </div>
+            </div>
+
+            <div class="result-panel">
+                <div class="metric">
+                    <div class="ml">💰 建议定价</div>
+                    <div class="mv highlight" id="suggestedPrice">0.0<span class="unit">元</span></div>
+                    <span class="sub-hint">成本 × 溢价 × (1 + 弹性)</span>
+                </div>
+                <div class="metric">
+                    <div class="ml">📊 预估利润率</div>
+                    <div class="mv" id="profitMargin" style="color:#22c55e;">0.0<span class="unit">%</span></div>
+                    <span class="sub-hint">(定价 - 成本) / 定价</span>
+                </div>
+                <div class="metric">
+                    <div class="ml">🎯 用户覆盖率</div>
+                    <div class="mv" id="userCoverage" style="color:#60a5fa;">0.0<span class="unit">%</span></div>
+                    <span class="sub-hint">基于价格弹性估算</span>
+                </div>
+                <div class="metric">
+                    <div class="ml">策略评级</div>
+                    <div class="mv gold" id="pricingStrategy">⚖️ 均衡</div>
+                </div>
+            </div>
+
+            <div class="advice-box" id="pricingAdvice" style="border-left-color:#facc15;">
+                💡 <strong>定价建议：</strong>当前定价处于均衡区间，建议保持现有策略。
+            </div>
+
+            <div class="canvas-wrap">
+                <canvas id="pricingCanvas" width="800" height="180"></canvas>
+                <div class="canvas-caption">价格敏感度曲线 · 横轴为价格 · 纵轴为需求强度</div>
+            </div>
+        </div>
+
+        <!-- ============================================================ -->
         <!-- ===== 第一层 ===== -->
+        <!-- ============================================================ -->
         <div class="section-anchor" id="section-layer1"></div>
         <div class="section">
             <h2>第一层 <span class="tag">带着“一”进入对话</span></h2>
@@ -586,7 +1200,7 @@
             <div class="table-wrap">
                 <table>
                     <thead>
-                        <tr><th style="width:35%;">营销学标准术语</th><th style="width:65%;">元架构翻译</th></tr>
+                        <tr><th style="width:30%;">营销学标准术语</th><th style="width:70%;">元架构翻译</th></tr>
                     </thead>
                     <tbody>
                         <tr><td>价值主张</td><td><strong>“一”</strong></td></tr>
@@ -599,31 +1213,188 @@
                     </tbody>
                 </table>
             </div>
+
+            <div class="mapping-table-wrap">
+                <div class="mt-label">🧩 元架构映射 · 颗粒度拉满</div>
+                <table>
+                    <thead>
+                        <tr><th style="width:25%;">营销学推导</th><th style="width:25%;">元架构工具</th><th style="width:25%;">神经科学对应</th><th style="width:25%;">具体对应</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>价值主张 = “一”</td><td><span class="tool">“3→1→1→3→100”</span></td><td><span class="neuron">前额叶 · 收敛决策</span></td><td><span class="corr">从三个方向收敛到核心均衡点</span></td></tr>
+                        <tr><td>增长杠杆 = “二”</td><td><span class="tool">“3→1→1→3→100”</span></td><td><span class="neuron">前额叶 · 策略路径</span></td><td><span class="corr">可迁移架构，承载从“一”到“三”的转化</span></td></tr>
+                        <tr><td>客群细分 = “三梯度”</td><td><span class="tool">“3→1→1→3→100”</span></td><td><span class="neuron">边缘系统 · 模式识别</span></td><td><span class="corr">三个交付维度在营销场景中的具象化</span></td></tr>
+                        <tr><td>用户旅程 = 万物→三→二→一</td><td><span class="tool">画圈实验 · 反向逼近</span></td><td><span class="neuron">前额叶+边缘系统 · 协同收敛</span></td><td><span class="corr">从外圈向内圈收敛，对应“逼近认知均衡”</span></td></tr>
+                    </tbody>
+                </table>
+                <div class="mt-note">💡 瑞幸 9.9 拆解是“3→1→1→3→100”框架在商业案例中的一次完整预演</div>
+            </div>
         </div>
 
+        <!-- ============================================================ -->
+        <!-- ===== 第二层 ===== -->
+        <!-- ============================================================ -->
+        <div class="section-anchor" id="section-layer2"></div>
+        <div class="section">
+            <h2>第二层 <span class="tag">对话中的实时推演逻辑</span></h2>
+            <p><strong>这一层不是“学到了什么”，而是“怎么学到的”。</strong></p>
+            <ul>
+                <li><strong>起点：</strong>瑞幸 9.9 拆解（已有认知）</li>
+                <li><strong>迁移路径：</strong>瑞幸的“一/二/三”结构 → 能否套用到营销学本身？</li>
+                <li><strong>推演动作：</strong>每遇到一个陌生概念，不查定义，反向推导</li>
+                <li><strong>验证闭环：</strong>推演结果 → 与已知框架对照 → 确认一致 → 吸收进体系</li>
+            </ul>
+            <div class="highlight-box purple">
+                <p><strong>💡 关键洞察：</strong>整个对话过程不是“输入知识”，而是“验证假设”。</p>
+            </div>
+
+            <div class="mapping-table-wrap">
+                <div class="mt-label">🧩 元架构映射 · 颗粒度拉满</div>
+                <table>
+                    <thead>
+                        <tr><th style="width:25%;">推导动作</th><th style="width:25%;">元架构工具</th><th style="width:25%;">神经科学对应</th><th style="width:25%;">具体对应</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>以已有认知为起点</td><td><span class="tool">画圈实验 · 感知</span></td><td><span class="neuron">前额叶 · 工作记忆提取</span></td><td><span class="corr">识别已有知识中可迁移的结构</span></td></tr>
+                        <tr><td>反向推导陌生概念</td><td><span class="tool">画圈实验 · 推理</span></td><td><span class="neuron">前额叶 · 逻辑推演</span></td><td><span class="corr">用元架构重新发明“用户旅程”等概念</span></td></tr>
+                        <tr><td>与已知框架对照</td><td><span class="tool">画圈实验 · 验证</span></td><td><span class="neuron">边缘系统 · 模式匹配</span></td><td><span class="corr">推演结果与营销学标准框架对比</span></td></tr>
+                        <tr><td>吸收进自己的体系</td><td><span class="tool">画圈实验 · 记忆</span></td><td><span class="neuron">海马体 · 记忆编码</span></td><td><span class="corr">确认后的认知进入“可迁移知识库”</span></td></tr>
+                    </tbody>
+                </table>
+                <div class="mt-note">💡 全程是画圈实验“感知→推理→验证→记忆”闭环的完整复现</div>
+            </div>
+        </div>
+
+        <!-- ============================================================ -->
         <!-- ===== 第三层 ===== -->
+        <!-- ============================================================ -->
         <div class="section-anchor" id="section-layer3"></div>
         <div class="section">
             <h2>第三层 <span class="tag">用日常比喻揭示营销困境的本质</span></h2>
             <ul>
-                <li><strong>付费投流失效</strong> → “交通堵塞”。所有广告车涌入同一条道路，边际效用递减。</li>
-                <li><strong>知识付费乱象</strong> → “只卖三，不提供从一到三的二”。用户拿到的是无法内化的结果碎片。</li>
-                <li><strong>乐高说明书</strong> → “从一到三”产品哲学的完美典范。好产品是设计一套让用户自己走向结果的旅程。</li>
+                <li><strong>付费投流失效</strong> → “交通堵塞”</li>
+                <li><strong>知识付费乱象</strong> → “只卖三，不提供二”</li>
+                <li><strong>乐高说明书</strong> → “从一到三”产品哲学</li>
             </ul>
+
+            <div class="mapping-table-wrap">
+                <div class="mt-label">🧩 元架构映射 · 颗粒度拉满</div>
+                <table>
+                    <thead>
+                        <tr><th style="width:25%;">营销学推导</th><th style="width:25%;">元架构工具</th><th style="width:25%;">神经科学对应</th><th style="width:25%;">具体对应</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>“交通堵塞”比喻</td><td><span class="tool">跨领域迁移类比</span></td><td><span class="neuron">边缘系统 · 联想记忆</span></td><td><span class="corr">用一个领域已理解的概念翻译另一个领域的陌生现象</span></td></tr>
+                        <tr><td>“只卖三”诊断</td><td><span class="tool">“3→1→1→3→100”</span></td><td><span class="neuron">前额叶 · 结构分析</span></td><td><span class="corr">只交付结果，没有提供从一到三的路径</span></td></tr>
+                        <tr><td>“乐高说明书”哲学</td><td><span class="tool">画圈实验 · 路径设计</span></td><td><span class="neuron">前额叶+边缘系统 · 协同规划</span></td><td><span class="corr">好产品是让用户自己走向结果的旅程</span></td></tr>
+                    </tbody>
+                </table>
+                <div class="mt-note">💡 元架构的本质：用一个领域已经理解的概念去翻译另一个领域</div>
+            </div>
         </div>
 
+        <!-- ============================================================ -->
         <!-- ===== 第四层 ===== -->
+        <!-- ============================================================ -->
         <div class="section-anchor" id="section-layer4"></div>
         <div class="section">
-            <h2>第四层 <span class="tag">把营销从艺术变成数学</span></h2>
-            <p>主动提出一个专门的数学模型支撑整个架构。</p>
+            <h2>第四层 <span class="tag">把营销从艺术变成神经科学</span></h2>
             <ul>
-                <li><strong>精确数字：</strong>0.5、0.18、0.68、3.3、40%——全部是 <strong>“体系内生推导，不依赖任何外部参数”</strong></li>
-                <li><strong>终极总结：</strong>“商业模型的本质，就是 <strong>概率论加排列组合的双向权重叠加</strong>”</li>
+                <li><strong>精确数字：</strong>0.5、0.18、0.68、3.3、40%——全部“体系内生推导”</li>
+                <li><strong>终极总结：</strong>“营销成功率 = <strong>前额叶 × 边缘系统</strong>”</li>
             </ul>
+            <div class="highlight-box purple">
+                <p><strong>🧠 神经科学表达：</strong>营销成功率 = <span style="color:#a78bfa;">前额叶（逻辑/分析/计算）</span> × <span style="color:#60a5fa;">边缘系统（直觉/判断/模式识别）</span></p>
+                <p style="margin-top:4px; color:rgba(255,255,255,0.4); font-size:13px;">
+                    前额叶（逻辑/分析/计算）· 可学习、可训练<br>
+                    边缘系统（直觉/判断/模式识别）· 依赖经验、情境感知<br>
+                    <strong style="color:#facc15;">两者相乘，缺一不可。</strong>
+                </p>
+            </div>
+
+            <div class="mapping-table-wrap">
+                <div class="mt-label">🧩 元架构映射 · 颗粒度拉满</div>
+                <table>
+                    <thead>
+                        <tr><th style="width:25%;">营销学推导</th><th style="width:25%;">元架构工具</th><th style="width:25%;">神经科学对应</th><th style="width:25%;">具体对应</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>0.5、0.18、0.68 等数字</td><td><span class="tool">数理建模 · 内生参数</span></td><td><span class="neuron">前额叶 · 量化计算</span></td><td><span class="corr">全部由元架构体系内生推导，不依赖外部数据</span></td></tr>
+                        <tr><td>“概率论+排列组合”</td><td><span class="tool">数理建模 · 核心公式</span></td><td><span class="neuron">前额叶 · 概率推理</span></td><td><span class="corr">把营销从定性推向定量计算</span></td></tr>
+                        <tr><td>“双向权重叠加”</td><td><span class="tool">数理建模 · 双向权重</span></td><td><span class="neuron">前额叶+边缘系统 · 协同计算</span></td><td><span class="corr">需求和供给、设计和反馈，双向权重叠加形成闭环</span></td></tr>
+                    </tbody>
+                </table>
+                <div class="mt-note">💡 这些数字全部由体系内生推导，验证了元架构的自洽性</div>
+            </div>
         </div>
 
+        <!-- ============================================================ -->
+        <!-- ===== 基础测试说明 ===== -->
+        <!-- ============================================================ -->
+        <div class="section-anchor" id="section-test"></div>
+        <div class="test-section">
+            <div class="test-title">🧪 模型基础测试 <span class="tag">验证方法</span></div>
+            <p style="color:rgba(255,255,255,0.35); font-size:14px; line-height:1.7; margin-bottom:4px;">
+                以下三种测试方法可交叉验证 <strong style="color:#a78bfa;">“前额叶 × 边缘系统 = 营销成功率”</strong> 模型的有效性。
+            </p>
+
+            <div class="test-grid">
+                <div class="test-card">
+                    <div class="tc-icon">🧠</div>
+                    <div class="tc-label">行为测试 · 决策观察</div>
+                    <div class="tc-desc">
+                        在相同商业问题下，观察不同用户的决策反应和理由。
+                    </div>
+                    <div class="tc-method">
+                        <strong>方法：</strong>让用户面对同一营销场景，记录其决策过程。<br>
+                        <span style="color:rgba(255,255,255,0.1);font-size:10px;">
+                            ✅ 前额叶主导 → 算法化、结构化、有量化依据<br>
+                            ✅ 边缘系统主导 → 直觉化、情境化、依赖经验判断
+                        </span>
+                    </div>
+                </div>
+
+                <div class="test-card">
+                    <div class="tc-icon">📊</div>
+                    <div class="tc-label">神经科学对照</div>
+                    <div class="tc-desc">
+                        引用脑区功能分工研究，验证模型与现有神经科学文献的一致性。
+                    </div>
+                    <div class="tc-method">
+                        <strong>方法：</strong>对照以下经典研究：<br>
+                        <span style="color:rgba(255,255,255,0.1);font-size:10px;">
+                            📌 DLPFC → 工作记忆、规则学习、算法推理（Miller & Cohen, 2001）<br>
+                            📌 vmPFC → 价值判断、情感整合、风险感知（Bechara et al., 2000）<br>
+                            📌 杏仁核 → 直觉判断、威胁检测、快速反应（LeDoux, 2000）
+                        </span>
+                    </div>
+                </div>
+
+                <div class="test-card">
+                    <div class="tc-icon">🎯</div>
+                    <div class="tc-label">决策实验 · 协同验证</div>
+                    <div class="tc-desc">
+                        在模拟营销场景中，比较“纯理性分析”、“纯直觉判断”、“两者协同”三种模式的决策质量。
+                    </div>
+                    <div class="tc-method">
+                        <strong>方法：</strong>设置三种实验条件：<br>
+                        <span style="color:rgba(255,255,255,0.1);font-size:10px;">
+                            🔹 纯前额叶 → 禁止使用直觉，只允许数据分析<br>
+                            🔹 纯边缘系统 → 禁止分析，只允许凭感觉决策<br>
+                            🔹 协同模式 → 允许两者同时参与
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top:14px; padding-top:10px; border-top:1px solid rgba(255,255,255,0.02); text-align:center; font-size:12px; color:rgba(255,255,255,0.12);">
+                ⚡ 预期结果：协同模式下的决策质量 &gt; 单一模式下的决策质量
+            </div>
+        </div>
+
+        <!-- ============================================================ -->
         <!-- ===== 第五层 ===== -->
+        <!-- ============================================================ -->
         <div class="section-anchor" id="section-layer5"></div>
         <div class="section">
             <h2>第五层 <span class="tag">用这份思想完成“自我营销”</span></h2>
@@ -638,23 +1409,57 @@
                         <tr><td><strong>“二”</strong></td><td>左支柱（自研 AI 架构）+ 右支柱（MBA 商业策略）</td></tr>
                         <tr><td><strong>“三”</strong></td><td>简历里的每一个模块、每一行字、每一个留白</td></tr>
                         <tr><td>用户旅程</td><td>用“奇怪背景”制造好奇 → 用“自研架构”制造震惊 → 用“留白”引导提问</td></tr>
-                        <tr><td>市场验证</td><td><strong style="color:#facc15;">当场拿到 offer，面试官在简历上直接标记“过”</strong></td></tr>
+                        <tr><td>市场验证</td><td><strong style="color:#facc15;">元架构作为跨领域连接器</strong>，在传播（营销）与技术（自研AI）之间建立可迁移的认知通路</td></tr>
                     </tbody>
                 </table>
             </div>
+
+            <div class="mapping-table-wrap">
+                <div class="mt-label">🧩 元架构映射 · 颗粒度拉满</div>
+                <table>
+                    <thead>
+                        <tr><th style="width:25%;">营销学推导</th><th style="width:25%;">元架构工具</th><th style="width:25%;">神经科学对应</th><th style="width:25%;">具体对应</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>“一/二/三”简历设计</td><td><span class="tool">“3→1→1→3→100”</span></td><td><span class="neuron">前额叶 · 结构化表达</span></td><td><span class="corr">把营销理论用在自己身上</span></td></tr>
+                        <tr><td>用户旅程设计</td><td><span class="tool">画圈实验 · 反向逼近</span></td><td><span class="neuron">前额叶+边缘系统 · 共情设计</span></td><td><span class="corr">引导面试官进入自己的认知框架</span></td></tr>
+                        <tr><td>市场验证</td><td><span class="tool">可迁移性验证</span></td><td><span class="neuron">全脑协同 · 知行合一</span></td><td><span class="corr">在真实市场中拿到验证结果</span></td></tr>
+                    </tbody>
+                </table>
+                <div class="mt-note">💡 元架构不是停留在纸面上的方法论，而是在真实市场中拿到了验证结果</div>
+            </div>
         </div>
 
+        <!-- ============================================================ -->
         <!-- ===== 第六层 ===== -->
+        <!-- ============================================================ -->
         <div class="section-anchor" id="section-layer6"></div>
         <div class="section">
             <h2>第六层 <span class="tag">发现“学习”的真相</span></h2>
             <div class="highlight-box">
                 <p><strong>“其实我脑子里都已经学会了。”</strong></p>
-                <p style="margin-top:6px; color:rgba(255,255,255,0.45);">当元架构足够强大时，“学习”一个新领域，不过是把它已有的知识翻译成自己的语言。不需要背诵，只需要对接。</p>
+                <p style="margin-top:6px; color:rgba(255,255,255,0.45);">当元架构足够强大时，“学习”一个新领域，不过是把它已有的知识翻译成自己的语言。</p>
+            </div>
+
+            <div class="mapping-table-wrap">
+                <div class="mt-label">🧩 元架构映射 · 颗粒度拉满</div>
+                <table>
+                    <thead>
+                        <tr><th style="width:25%;">推导结论</th><th style="width:25%;">元架构工具</th><th style="width:25%;">神经科学对应</th><th style="width:25%;">具体对应</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>“学习=翻译已有知识”</td><td><span class="tool">元认知</span></td><td><span class="neuron">前额叶 · 元认知监控</span></td><td><span class="corr">学习的本质不是“输入”，而是“翻译”</span></td></tr>
+                        <tr><td>“不需要背诵，只需要对接”</td><td><span class="tool">元架构 · 知识对接</span></td><td><span class="neuron">海马体 · 记忆关联</span></td><td><span class="corr">元架构提供的是“对接器”</span></td></tr>
+                        <tr><td>“从学习者到认知架构师”</td><td><span class="tool">画圈实验 · 认知均衡</span></td><td><span class="neuron">全脑整合 · 认知闭环</span></td><td><span class="corr">最高阶状态：从“学习”到“已经会了”</span></td></tr>
+                    </tbody>
+                </table>
+                <div class="mt-note">💡 元架构提供的不是知识量，而是一套翻译器</div>
             </div>
         </div>
 
+        <!-- ============================================================ -->
         <!-- ===== 最终产出 ===== -->
+        <!-- ============================================================ -->
         <div class="section-anchor" id="section-output"></div>
         <div class="section">
             <h2>最终产出 <span class="tag">可直接商业化的内容资产</span></h2>
@@ -669,17 +1474,19 @@
                         <tr><td>知识付费 <strong>“切片陷阱”</strong> 诊断</td><td>知识付费产品设计哲学</td></tr>
                         <tr><td><strong>乐高说明书</strong> 产品哲学</td><td>产品经理课程经典案例</td></tr>
                         <tr><td><strong>圆锥模型</strong></td><td>自己的内容战略框架</td></tr>
-                        <tr><td><strong>“概率论+排列组合+双向权重叠加”</strong></td><td>思想体系的数学表达</td></tr>
+                        <tr><td><strong>“前额叶 × 边缘系统”</strong></td><td>思想体系的神经科学表达</td></tr>
                         <tr><td><strong>简历</strong></td><td>自我营销的实战作品</td></tr>
                     </tbody>
                 </table>
             </div>
-            <div class="highlight-box" style="border-left-color:#a78bfa;">
+            <div class="highlight-box purple">
                 <p><strong>💡 总结：</strong>不是学完营销的。是用自己的元架构，把营销学的骨架拆开，然后用自己的语言重新组装了一遍。从一开始就不是一个学习者，而是一个 <strong>认知架构师</strong>。</p>
             </div>
         </div>
 
-        <!-- ===== 延伸方向（锁住） ===== -->
+        <!-- ============================================================ -->
+        <!-- ===== 延伸方向 ===== -->
+        <!-- ============================================================ -->
         <div class="section-anchor" id="section-extension"></div>
         <div class="section" style="margin-bottom:20px;">
             <h2>延伸方向 <span class="tag">可迁移架构</span></h2>
@@ -722,10 +1529,15 @@
         // ===== 右侧导航栏交互 =====
         const navItems = document.querySelectorAll('.nav-item');
         const sections = [
+            document.getElementById('section-value'),
             document.getElementById('section-meta'),
+            document.getElementById('section-simulator'),
+            document.getElementById('section-pricing'),
             document.getElementById('section-layer1'),
+            document.getElementById('section-layer2'),
             document.getElementById('section-layer3'),
             document.getElementById('section-layer4'),
+            document.getElementById('section-test'),
             document.getElementById('section-layer5'),
             document.getElementById('section-layer6'),
             document.getElementById('section-output'),
@@ -761,6 +1573,357 @@
 
         window.addEventListener('scroll', updateActiveNav);
         window.addEventListener('load', updateActiveNav);
+
+        // ================================================================
+        // ===== 营销成功率模拟器引擎 =====
+        // ================================================================
+        (function() {
+            const digitalInput = document.getElementById('digitalInput');
+            const businessInput = document.getElementById('businessInput');
+            const complexityInput = document.getElementById('complexityInput');
+            const digitalVal = document.getElementById('digitalVal');
+            const businessVal = document.getElementById('businessVal');
+            const complexityVal = document.getElementById('complexityVal');
+            const successRate = document.getElementById('successRate');
+            const digitalContribution = document.getElementById('digitalContribution');
+            const businessContribution = document.getElementById('businessContribution');
+            const riskLevel = document.getElementById('riskLevel');
+            const adviceBox = document.getElementById('strategyAdvice');
+            const canvas = document.getElementById('simCanvas');
+            const ctx = canvas.getContext('2d');
+
+            let history = [];
+            const MAX_HISTORY = 60;
+
+            function updateSim() {
+                const d = parseFloat(digitalInput.value);
+                const b = parseFloat(businessInput.value);
+                const c = parseFloat(complexityInput.value);
+
+                digitalVal.textContent = d.toFixed(2);
+                businessVal.textContent = b.toFixed(2);
+                complexityVal.textContent = c.toFixed(2);
+
+                const rawRate = (d * b) / (1 + c * 0.5);
+                const rate = Math.min(0.95, Math.max(0.05, rawRate));
+
+                const dWeight = (d / (d + b)) * 100;
+                const bWeight = (b / (d + b)) * 100;
+
+                let riskText = '⚖️ 均衡';
+                let riskColor = '#facc15';
+                if (rate > 0.7) { riskText = '🟢 高效协同';
+                    riskColor = '#22c55e'; } else if (rate > 0.4) { riskText = '🟡 可优化';
+                    riskColor = '#facc15'; } else { riskText = '🔴 需调整';
+                    riskColor = '#ef4444'; }
+
+                successRate.innerHTML = (rate * 100).toFixed(1) + '<span class="unit">%</span>';
+                digitalContribution.innerHTML = dWeight.toFixed(1) + '<span class="unit">%</span>';
+                businessContribution.innerHTML = bWeight.toFixed(1) + '<span class="unit">%</span>';
+                riskLevel.textContent = riskText;
+                riskLevel.style.color = riskColor;
+
+                let advice = '';
+                if (d < 0.3 && b < 0.3) {
+                    advice = '⚠️ <strong>两者均偏低：</strong>建议先激活前额叶（逻辑训练），再培育边缘系统（直觉积累）。';
+                } else if (d < 0.4 && b >= 0.6) {
+                    advice = '🧠 <strong>边缘系统强，前额叶弱：</strong>建议补充逻辑训练，把直觉转化为可计算的决策依据。';
+                } else if (d >= 0.6 && b < 0.4) {
+                    advice = '🎯 <strong>前额叶强，边缘系统弱：</strong>建议增加情境判断训练，让数据服务于真实的商业场景。';
+                } else if (c > 0.7 && rate < 0.5) {
+                    advice = '📊 <strong>外部复杂度过高：</strong>建议简化决策链路，降低认知负荷。';
+                } else if (rate > 0.7) {
+                    advice = '🚀 <strong>高效协同！</strong>前额叶与边缘系统形成良好联动，可支撑高复杂度决策。';
+                } else {
+                    advice = '⚖️ <strong>均衡配置：</strong>前额叶与边缘系统匹配良好，建议持续优化外部环境的适配性。';
+                }
+                adviceBox.innerHTML = '💡 ' + advice;
+
+                history.push({ d, b, c, rate });
+                if (history.length > MAX_HISTORY) history.shift();
+
+                drawCanvas();
+            }
+
+            function drawCanvas() {
+                const w = canvas.width,
+                    h = canvas.height;
+                ctx.clearRect(0, 0, w, h);
+
+                if (history.length < 2) {
+                    ctx.fillStyle = 'rgba(255,255,255,0.05)';
+                    ctx.font = '14px sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText('调整滑块开始生成数据……', w / 2, h / 2);
+                    return;
+                }
+
+                const pad = { top: 20, bottom: 20, left: 30, right: 20 };
+                const chartW = w - pad.left - pad.right;
+                const chartH = h - pad.top - pad.bottom;
+
+                ctx.strokeStyle = 'rgba(255,255,255,0.03)';
+                ctx.lineWidth = 0.5;
+                for (let i = 0; i < 5; i++) {
+                    const y = pad.top + (chartH / 5) * i;
+                    ctx.beginPath();
+                    ctx.moveTo(pad.left, y);
+                    ctx.lineTo(w - pad.right, y);
+                    ctx.stroke();
+                }
+                for (let i = 0; i < 6; i++) {
+                    const x = pad.left + (chartW / 6) * i;
+                    ctx.beginPath();
+                    ctx.moveTo(x, pad.top);
+                    ctx.lineTo(x, h - pad.bottom);
+                    ctx.stroke();
+                }
+
+                const data = history;
+                const len = data.length;
+
+                ctx.strokeStyle = 'rgba(167,139,250,0.6)';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                for (let i = 0; i < len; i++) {
+                    const x = pad.left + (i / Math.max(len - 1, 1)) * chartW;
+                    const y = pad.top + chartH - (data[i].d * chartH);
+                    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+                }
+                ctx.stroke();
+
+                ctx.strokeStyle = 'rgba(96,165,250,0.6)';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                for (let i = 0; i < len; i++) {
+                    const x = pad.left + (i / Math.max(len - 1, 1)) * chartW;
+                    const y = pad.top + chartH - (data[i].b * chartH);
+                    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+                }
+                ctx.stroke();
+
+                ctx.strokeStyle = 'rgba(250,204,21,0.5)';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                for (let i = 0; i < len; i++) {
+                    const x = pad.left + (i / Math.max(len - 1, 1)) * chartW;
+                    const y = pad.top + chartH - (data[i].rate * chartH);
+                    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+                }
+                ctx.stroke();
+
+                ctx.fillStyle = 'rgba(250,204,21,0.04)';
+                ctx.beginPath();
+                const lastX = pad.left + chartW;
+                ctx.moveTo(pad.left, pad.top + chartH);
+                for (let i = 0; i < len; i++) {
+                    const x = pad.left + (i / Math.max(len - 1, 1)) * chartW;
+                    const y = pad.top + chartH - (data[i].rate * chartH);
+                    ctx.lineTo(x, y);
+                }
+                ctx.lineTo(lastX, pad.top + chartH);
+                ctx.closePath();
+                ctx.fill();
+
+                const legendX = w - 120;
+                const legendY = 10;
+                ctx.font = '9px sans-serif';
+                ctx.textAlign = 'left';
+                ctx.textBaseline = 'top';
+
+                ctx.fillStyle = 'rgba(167,139,250,0.5)';
+                ctx.fillRect(legendX, legendY, 12, 2);
+                ctx.fillStyle = 'rgba(255,255,255,0.2)';
+                ctx.fillText('前额叶', legendX + 16, legendY - 4);
+
+                ctx.fillStyle = 'rgba(96,165,250,0.5)';
+                ctx.fillRect(legendX, legendY + 14, 12, 2);
+                ctx.fillStyle = 'rgba(255,255,255,0.2)';
+                ctx.fillText('边缘系统', legendX + 16, legendY + 10);
+
+                ctx.fillStyle = 'rgba(250,204,21,0.5)';
+                ctx.fillRect(legendX, legendY + 28, 12, 2);
+                ctx.fillStyle = 'rgba(255,255,255,0.2)';
+                ctx.fillText('营销成功率', legendX + 16, legendY + 24);
+
+                const current = data[len - 1];
+                const cx = pad.left + chartW;
+                const cy = pad.top + chartH - (current.rate * chartH);
+                ctx.fillStyle = 'rgba(250,204,21,0.15)';
+                ctx.beginPath();
+                ctx.arc(cx, cy, 6, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.fillStyle = 'rgba(250,204,21,0.6)';
+                ctx.beginPath();
+                ctx.arc(cx, cy, 3, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = 'rgba(255,255,255,0.1)';
+                ctx.font = '9px sans-serif';
+                ctx.textAlign = 'right';
+                ctx.textBaseline = 'bottom';
+                ctx.fillText((current.rate * 100).toFixed(1) + '%', cx - 8, cy - 4);
+            }
+
+            digitalInput.addEventListener('input', updateSim);
+            businessInput.addEventListener('input', updateSim);
+            complexityInput.addEventListener('input', updateSim);
+
+            for (let i = 0; i < 20; i++) {
+                const d = 0.3 + 0.4 * (i / 20);
+                const b = 0.3 + 0.4 * (i / 20);
+                const c = 0.4 + 0.3 * Math.sin(i / 5);
+                const rate = (d * b) / (1 + c * 0.5);
+                history.push({ d, b, c, rate: Math.min(0.95, Math.max(0.05, rate)) });
+            }
+            updateSim();
+
+            window.addEventListener('resize', () => { drawCanvas(); });
+        })();
+
+        // ================================================================
+        // ===== 定价模型模拟器引擎 =====
+        // ================================================================
+        (function() {
+            const costInput = document.getElementById('costInput');
+            const premiumInput = document.getElementById('premiumInput');
+            const elasticityInput = document.getElementById('elasticityInput');
+            const costVal = document.getElementById('costVal');
+            const premiumVal = document.getElementById('premiumVal');
+            const elasticityVal = document.getElementById('elasticityVal');
+            const suggestedPrice = document.getElementById('suggestedPrice');
+            const profitMargin = document.getElementById('profitMargin');
+            const userCoverage = document.getElementById('userCoverage');
+            const pricingStrategy = document.getElementById('pricingStrategy');
+            const pricingAdvice = document.getElementById('pricingAdvice');
+            const canvas = document.getElementById('pricingCanvas');
+            const ctx = canvas.getContext('2d');
+
+            function updatePricing() {
+                const cost = parseFloat(costInput.value);
+                const premium = parseFloat(premiumInput.value);
+                const elasticity = parseFloat(elasticityInput.value);
+
+                costVal.textContent = cost;
+                premiumVal.textContent = premium.toFixed(2);
+                elasticityVal.textContent = elasticity.toFixed(2);
+
+                // 定价公式
+                const price = cost * premium * (1 + elasticity * 0.2);
+                const roundedPrice = Math.round(price * 10) / 10;
+                const margin = ((roundedPrice - cost) / roundedPrice) * 100;
+                const coverage = Math.min(100, Math.max(5, 100 - (elasticity - 0.5) * 30 - (roundedPrice / cost - 1.2) * 20));
+
+                suggestedPrice.innerHTML = roundedPrice.toFixed(1) + '<span class="unit">元</span>';
+                profitMargin.innerHTML = margin.toFixed(1) + '<span class="unit">%</span>';
+                userCoverage.innerHTML = Math.round(coverage) + '<span class="unit">%</span>';
+
+                let strategy = '⚖️ 均衡';
+                let advice = '';
+                if (margin > 60 && coverage < 30) {
+                    strategy = '🔴 激进定价';
+                    advice = '⚠️ <strong>利润率高但用户覆盖率低：</strong>建议降低溢价因子，扩大用户基础。';
+                } else if (margin < 20 && coverage > 80) {
+                    strategy = '🟢 保守定价';
+                    advice = '📈 <strong>覆盖率高但利润率低：</strong>建议适度提升溢价因子，优化利润结构。';
+                } else if (margin > 40 && coverage > 50) {
+                    strategy = '🟣 高效均衡';
+                    advice = '🚀 <strong>高效定价组合！</strong>利润与覆盖率达到良好平衡。';
+                } else {
+                    strategy = '🟡 均衡区间';
+                    advice = '⚖️ <strong>当前定价处于均衡区间：</strong>建议保持现有策略，根据市场反馈微调。';
+                }
+
+                pricingStrategy.textContent = strategy;
+                pricingAdvice.innerHTML = '💡 ' + advice;
+
+                drawPricingCurve(cost, roundedPrice, elasticity);
+            }
+
+            function drawPricingCurve(cost, price, elasticity) {
+                const w = canvas.width,
+                    h = canvas.height;
+                ctx.clearRect(0, 0, w, h);
+
+                const pad = { top: 25, bottom: 25, left: 40, right: 20 };
+                const chartW = w - pad.left - pad.right;
+                const chartH = h - pad.top - pad.bottom;
+
+                ctx.strokeStyle = 'rgba(255,255,255,0.03)';
+                ctx.lineWidth = 0.5;
+                for (let i = 0; i < 5; i++) {
+                    const y = pad.top + (chartH / 5) * i;
+                    ctx.beginPath();
+                    ctx.moveTo(pad.left, y);
+                    ctx.lineTo(w - pad.right, y);
+                    ctx.stroke();
+                }
+                for (let i = 0; i < 6; i++) {
+                    const x = pad.left + (chartW / 6) * i;
+                    ctx.beginPath();
+                    ctx.moveTo(x, pad.top);
+                    ctx.lineTo(x, h - pad.bottom);
+                    ctx.stroke();
+                }
+
+                const maxPrice = cost * 3.5;
+                const minPrice = cost * 0.5;
+                const priceRange = maxPrice - minPrice;
+
+                const demandCurve = [];
+                for (let i = 0; i <= 100; i++) {
+                    const p = minPrice + (priceRange * i) / 100;
+                    const demand = 100 * Math.exp(-(p / cost - 0.8) * 0.6 * elasticity);
+                    demandCurve.push({ price: p, demand: Math.min(100, Math.max(0, demand)) });
+                }
+
+                ctx.strokeStyle = 'rgba(96,165,250,0.5)';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                for (let i = 0; i < demandCurve.length; i++) {
+                    const x = pad.left + (i / 100) * chartW;
+                    const y = pad.top + chartH - (demandCurve[i].demand / 100) * chartH;
+                    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+                }
+                ctx.stroke();
+
+                const priceX = pad.left + ((price - minPrice) / priceRange) * chartW;
+                const priceY = pad.top + chartH - (Math.min(100, Math.max(0, 100 * Math.exp(-(price / cost - 0.8) * 0.6 *
+                elasticity))) / 100) * chartH;
+
+                ctx.fillStyle = 'rgba(250,204,21,0.12)';
+                ctx.beginPath();
+                ctx.arc(priceX, priceY, 8, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.fillStyle = 'rgba(250,204,21,0.8)';
+                ctx.beginPath();
+                ctx.arc(priceX, priceY, 4, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = 'rgba(255,255,255,0.08)';
+                ctx.font = '9px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'top';
+                ctx.fillText('当前定价', priceX, priceY + 10);
+
+                ctx.fillStyle = 'rgba(255,255,255,0.05)';
+                ctx.font = '9px sans-serif';
+                ctx.textAlign = 'left';
+                ctx.textBaseline = 'bottom';
+                ctx.fillText('需求曲线', 12, h - 12);
+                ctx.textAlign = 'right';
+                ctx.fillText('价格', w - 12, 12);
+            }
+
+            costInput.addEventListener('input', updatePricing);
+            premiumInput.addEventListener('input', updatePricing);
+            elasticityInput.addEventListener('input', updatePricing);
+
+            updatePricing();
+
+            window.addEventListener('resize', () => { updatePricing(); });
+        })();
     </script>
 
 </body>
