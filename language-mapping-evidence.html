@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>完整证据链 · 交互式画圈推理台</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>跨语种结构化学习验证 · 奥数翻译融合版</title>
     <style>
         /* ===== 全局重置 (保留原始风格) ===== */
         * {
@@ -21,6 +21,7 @@
             overflow-x: hidden;
         }
 
+        /* ===== 鼠标跟随光晕 ===== */
         #glow {
             position: fixed;
             top: 0;
@@ -33,6 +34,7 @@
             transition: background 0.1s;
         }
 
+        /* ===== 右侧固定导航栏 (扩充至9步) ===== */
         .sidebar-nav {
             position: fixed;
             top: 0;
@@ -112,6 +114,7 @@
             font-weight: 300;
         }
 
+        /* ===== 主内容 ===== */
         .main-content {
             flex: 1;
             max-width: 1100px;
@@ -161,20 +164,31 @@
         }
 
         @keyframes floatBg {
-            0% { transform: translate(0, 0) scale(1); }
-            100% { transform: translate(30px, -20px) scale(1.1); }
+            0% {
+                transform: translate(0, 0) scale(1);
+            }
+            100% {
+                transform: translate(30px, -20px) scale(1.1);
+            }
         }
 
         @keyframes gradientFlow {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
         }
 
         .section-anchor {
             scroll-margin-top: 16px;
         }
 
+        /* ===== Hero ===== */
         .hero {
             text-align: center;
             padding-bottom: 32px;
@@ -237,6 +251,7 @@
             border: 1px solid rgba(255, 255, 255, 0.04);
         }
 
+        /* ===== 证据链步骤条 (扩充至9步) ===== */
         .evidence-steps {
             display: flex;
             justify-content: space-between;
@@ -291,6 +306,7 @@
             color: rgba(255, 255, 255, 0.6);
         }
 
+        /* ===== 通用标题 ===== */
         .section-title {
             font-size: 22px;
             font-weight: 600;
@@ -322,6 +338,7 @@
             padding-left: 14px;
         }
 
+        /* ===== 交互卡片 ===== */
         .interact-card {
             background: rgba(255, 255, 255, 0.02);
             border-radius: 16px;
@@ -443,7 +460,57 @@
             color: #facc15;
             font-weight: 600;
         }
+        .result-box .en {
+            color: #60a5fa;
+        }
+        .result-box .my {
+            color: #facc15;
+        }
+        .result-box .zh {
+            color: #a78bfa;
+        }
 
+        /* ===== 三轨对照网格 ===== */
+        .triple-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 12px;
+        }
+
+        @media (max-width: 720px) {
+            .triple-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .triple-grid .col {
+            background: rgba(255, 255, 255, 0.01);
+            border-radius: 8px;
+            padding: 8px 10px;
+            border: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        .triple-grid .col .lang-label {
+            font-size: 9px;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.15);
+            letter-spacing: 0.5px;
+            margin-bottom: 2px;
+        }
+
+        .triple-grid .col .content {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .triple-grid .col .sub {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.2);
+            margin-top: 2px;
+            font-family: monospace;
+        }
+
+        /* ===== 回溯日志 ===== */
         .backtrack-log {
             margin-top: 12px;
             padding: 10px 14px;
@@ -493,131 +560,136 @@
             color: rgba(255, 255, 255, 0.15);
         }
 
-        .backtrack-log .bt-step.success .msg { color: #4ade80; }
-        .backtrack-log .bt-step.fail .msg { color: #f87171; }
-        .backtrack-log .bt-step.warn .msg { color: #fbbf24; }
-        .backtrack-log .bt-step.info .msg { color: #60a5fa; }
-        .backtrack-log .bt-step.success .conf { color: #4ade80; }
-        .backtrack-log .bt-step.fail .conf { color: #f87171; }
-        .backtrack-log .bt-step.warn .conf { color: #fbbf24; }
-        .backtrack-log .bt-step.info .conf { color: #60a5fa; }
+        .backtrack-log .bt-step.success .msg {
+            color: #4ade80;
+        }
+        .backtrack-log .bt-step.fail .msg {
+            color: #f87171;
+        }
+        .backtrack-log .bt-step.warn .msg {
+            color: #fbbf24;
+        }
+        .backtrack-log .bt-step.info .msg {
+            color: #60a5fa;
+        }
+        .backtrack-log .bt-step.success .conf {
+            color: #4ade80;
+        }
+        .backtrack-log .bt-step.fail .conf {
+            color: #f87171;
+        }
+        .backtrack-log .bt-step.warn .conf {
+            color: #fbbf24;
+        }
+        .backtrack-log .bt-step.info .conf {
+            color: #60a5fa;
+        }
 
-        /* ===== 画圈交互专用样式 ===== */
-        .param-row {
-            display: flex;
-            gap: 16px;
-            flex-wrap: wrap;
-            margin: 8px 0;
-            align-items: center;
+        /* ===== 词根派生 ===== */
+        .derivation-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 8px;
+            margin: 10px 0;
         }
-        .param-row label {
-            color: rgba(255, 255, 255, 0.3);
+
+        .derivation-grid .item {
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 10px;
+            padding: 10px 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: rgba(255, 255, 255, 0.4);
             font-size: 13px;
+        }
+
+        .derivation-grid .item:hover {
+            border-color: rgba(167, 139, 250, 0.15);
+            background: rgba(167, 139, 250, 0.03);
+        }
+
+        .derivation-grid .item .word {
+            font-size: 18px;
+            font-weight: 600;
+            color: #f1f5f9;
+            display: block;
+        }
+
+        .derivation-grid .item .pos {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.2);
+        }
+
+        .derivation-grid .item .meaning {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.35);
+            margin-top: 4px;
+        }
+
+        /* ===== 差异切换 ===== */
+        .diff-toggle {
             display: flex;
-            align-items: center;
-            gap: 6px;
+            gap: 8px;
+            margin: 10px 0;
         }
-        .param-row input[type="range"] {
-            width: 100px;
-            background: rgba(255, 255, 255, 0.05);
-            accent-color: #a78bfa;
-            height: 2px;
-        }
-        .param-row input[type="number"] {
-            width: 60px;
+
+        .diff-toggle .tab-btn {
             background: rgba(255, 255, 255, 0.02);
             border: 1px solid rgba(255, 255, 255, 0.04);
-            color: #f1f5f9;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-size: 13px;
-        }
-
-        .circle-visual {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 8px;
-            padding: 12px 0;
-            min-height: 80px;
-        }
-
-        .circle-visual .circle {
-            width: 54px;
-            height: 54px;
-            border-radius: 50%;
-            border: 2px solid rgba(167, 139, 250, 0.2);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-            font-weight: 600;
-            background: rgba(167, 139, 250, 0.05);
-            transition: all 0.4s ease;
             color: rgba(255, 255, 255, 0.3);
+            padding: 5px 14px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.3s ease;
         }
 
-        .circle-visual .circle.highlight {
+        .diff-toggle .tab-btn.active {
             border-color: #facc15;
-            background: rgba(250, 204, 21, 0.12);
+            color: #f1f5f9;
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .diff-toggle .tab-btn:hover {
+            border-color: #a78bfa;
+        }
+
+        .diff-content {
+            background: rgba(255, 255, 255, 0.01);
+            border-radius: 12px;
+            padding: 14px 18px;
+            margin-top: 8px;
+            min-height: 60px;
+        }
+
+        .diff-content .pair {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 5px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+        }
+
+        .diff-content .pair:last-child {
+            border-bottom: none;
+        }
+
+        .diff-content .pair .en {
+            color: #60a5fa;
+        }
+
+        .diff-content .pair .my {
             color: #facc15;
-            box-shadow: 0 0 25px rgba(250, 204, 21, 0.15);
-            transform: scale(1.08);
         }
 
-        .circle-visual .circle.fail-highlight {
-            border-color: #f87171;
-            background: rgba(248, 113, 113, 0.1);
-            color: #f87171;
-            box-shadow: 0 0 25px rgba(248, 113, 113, 0.12);
-        }
-
-        .circle-visual .circle.success-highlight {
-            border-color: #4ade80;
-            background: rgba(74, 222, 128, 0.1);
-            color: #4ade80;
-            box-shadow: 0 0 25px rgba(74, 222, 128, 0.12);
-        }
-
-        .circle-visual .arrow-conn {
-            color: rgba(255, 255, 255, 0.06);
+        .diff-content .pair .arrow {
+            color: rgba(255, 255, 255, 0.08);
             font-size: 18px;
         }
 
-        .step-controls {
-            display: flex;
-            gap: 10px;
-            margin-top: 12px;
-            flex-wrap: wrap;
-            align-items: center;
-        }
-        .step-controls button {
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            color: rgba(255, 255, 255, 0.3);
-            padding: 4px 14px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 12px;
-            transition: 0.3s;
-        }
-        .step-controls button:hover:not(:disabled) {
-            background: rgba(167, 139, 250, 0.08);
-            border-color: #a78bfa;
-            color: #a78bfa;
-        }
-        .step-controls button:disabled {
-            opacity: 0.25;
-            cursor: not-allowed;
-        }
-        .step-indicator {
-            color: rgba(255, 255, 255, 0.15);
-            font-size: 13px;
-            font-family: monospace;
-            margin-left: auto;
-        }
-
+        /* ===== 证据闭环 ===== */
         .closure {
             background: rgba(255, 255, 255, 0.02);
             border-radius: 16px;
@@ -650,6 +722,7 @@
             margin-top: 4px;
         }
 
+        /* ===== 底部 ===== */
         .back-bottom {
             display: flex;
             justify-content: space-between;
@@ -677,6 +750,7 @@
             font-size: 13px;
         }
 
+        /* ===== 滚动条美化 ===== */
         ::-webkit-scrollbar {
             width: 4px;
         }
@@ -691,6 +765,7 @@
             background: rgba(167, 139, 250, 0.3);
         }
 
+        /* ===== 响应式 ===== */
         @media (max-width: 900px) {
             body {
                 padding: 0;
@@ -722,6 +797,9 @@
             .interact-row label {
                 min-width: auto;
             }
+            .derivation-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
             .closure {
                 grid-template-columns: 1fr;
             }
@@ -732,14 +810,8 @@
             .evidence-steps .step .label {
                 font-size: 6px;
             }
-            .circle-visual .circle {
-                width: 40px;
-                height: 40px;
-                font-size: 11px;
-            }
-            .param-row {
-                flex-direction: column;
-                align-items: stretch;
+            .triple-grid {
+                grid-template-columns: 1fr;
             }
         }
 
@@ -753,29 +825,24 @@
             .hero .subtitle {
                 font-size: 15px;
             }
-            .circle-visual .circle {
-                width: 34px;
-                height: 34px;
-                font-size: 9px;
+            .derivation-grid {
+                grid-template-columns: 1fr;
             }
-            .circle-visual .arrow-conn {
-                font-size: 12px;
-            }
-            .step-controls button {
-                font-size: 10px;
-                padding: 2px 10px;
+            .diff-toggle {
+                flex-direction: column;
             }
         }
     </style>
 </head>
 <body>
 
+    <!-- ===== 鼠标跟随光晕 ===== -->
     <div id="glow"></div>
 
-    <!-- ===== 右侧导航 (9项) ===== -->
+    <!-- ===== 右侧固定导航栏 (扩充至9步) ===== -->
     <div class="sidebar-nav">
         <a class="nav-item active" data-target="section-hero"><span class="num">①</span><span class="label">总览</span></a>
-        <a class="nav-item" data-target="section-router"><span class="num">🚀</span><span class="label">路由器</span></a>
+        <a class="nav-item" data-target="section-router"><span class="num">🚀</span><span class="label">翻译器</span></a>
         <a class="nav-item" data-target="section-svo"><span class="num">②</span><span class="label">语序</span></a>
         <a class="nav-item" data-target="section-tense"><span class="num">③</span><span class="label">时态</span></a>
         <a class="nav-item" data-target="section-derivation"><span class="num">④</span><span class="label">词缀</span></a>
@@ -783,29 +850,32 @@
         <a class="nav-item" data-target="section-wsd"><span class="num">⑥</span><span class="label">多义词</span></a>
         <a class="nav-item" data-target="section-culture"><span class="num">⑦</span><span class="label">文化</span></a>
         <a class="nav-item" data-target="section-diff"><span class="num">⑧</span><span class="label">边界</span></a>
-        <a class="nav-item" data-target="section-math"><span class="num">⑨</span><span class="label">画圈</span></a>
+        <a class="nav-item" data-target="section-math"><span class="num">⑨</span><span class="label">奥数</span></a>
         <div class="nav-divider"></div>
         <a class="nav-item" data-target="section-closure"><span class="num">∞</span><span class="label">闭环</span></a>
-        <div class="nav-bottom">交互</div>
+        <div class="nav-bottom">融合</div>
     </div>
 
+    <!-- ===== 主内容 ===== -->
     <div class="main-content">
+
         <div class="container">
 
             <!-- ===== Hero ===== -->
             <div class="section-anchor" id="section-hero"></div>
             <div class="hero">
-                <div class="badge">🧠 完整证据链 + 交互式画圈</div>
-                <h1>跨语种结构化学习验证</h1>
-                <div class="subtitle">底座规则 → 回溯验证 → 地域偏移 → 交互推理</div>
+                <div class="badge">🧠 跨语种 + 奥数 · 双域翻译</div>
+                <h1>结构化学习验证 · 融合版</h1>
+                <div class="subtitle">语言结构翻译 + 奥数结构翻译</div>
                 <p class="description">
-                    融合 <strong>「语言证据链 + 算法路由 + 交互式画圈推理」</strong>。<br />
-                    从语序、时态到奥数计数，每一步都展示 <span style="color:#facc15;">尝试 → 失败 → 回退 → 重算</span> 的完整决策轨迹。
+                    在最早的语言证据链基础上，融合了 <strong>「奥数结构翻译」</strong>。<br />
+                    输入任何内容，系统会判断它是 <span style="color:#60a5fa;">自然语言</span> 还是 <span style="color:#facc15;">奥数题</span>，并用相同的证据链逻辑展示 <span style="color:#facc15;">尝试 → 验证 → 回退</span> 的过程。
                 </p>
-                <span class="highlight-tag">📍 九维证据链 · 通用白盒推理器</span>
+                <span class="highlight-tag">📍 九维证据链 · 语言+数学双域映射</span>
 
+                <!-- 证据链步骤条 (扩充至9步) -->
                 <div class="evidence-steps">
-                    <a href="#section-router" class="step active"><span class="num">🚀</span><span class="label">路由</span></a>
+                    <a href="#section-router" class="step active"><span class="num">🚀</span><span class="label">翻译器</span></a>
                     <a href="#section-svo" class="step"><span class="num">②</span><span class="label">语序</span></a>
                     <a href="#section-tense" class="step"><span class="num">③</span><span class="label">时态</span></a>
                     <a href="#section-derivation" class="step"><span class="num">④</span><span class="label">词缀</span></a>
@@ -813,32 +883,33 @@
                     <a href="#section-wsd" class="step"><span class="num">⑥</span><span class="label">多义词</span></a>
                     <a href="#section-culture" class="step"><span class="num">⑦</span><span class="label">文化</span></a>
                     <a href="#section-diff" class="step"><span class="num">⑧</span><span class="label">边界</span></a>
-                    <a href="#section-math" class="step"><span class="num">⑨</span><span class="label">画圈</span></a>
+                    <a href="#section-math" class="step"><span class="num">⑨</span><span class="label">奥数</span></a>
                 </div>
             </div>
 
             <!-- ============================================================= -->
-            <!-- 🚀 模块0：智能语义路由器 (保留) -->
+            <!-- 🚀 模块0：双域翻译器 (输入入口) -->
             <!-- ============================================================= -->
             <div class="section-anchor" id="section-router"></div>
-            <div class="section-title">🚀 智能语义路由器 <span class="badge">自然语言 → 结构化指令</span></div>
-            <div class="section-desc">输入自然语言指令或句子，系统将进行结构提取、消歧、路由，并输出可执行的JSON指令。</div>
+            <div class="section-title">🚀 双域翻译器 <span class="badge">语言 / 奥数 自动识别</span></div>
+            <div class="section-desc">输入任何内容，系统自动识别是自然语言还是奥数题，并展示对应的结构翻译。</div>
 
             <div class="interact-card">
                 <div class="card-title">
-                    ⚡ 实时解析
-                    <span style="margin-left:auto; font-size:12px; color:rgba(255,255,255,0.2);">算法: 规则引擎 / BERT / LLM 动态路由</span>
+                    ⚡ 输入内容
+                    <span style="margin-left:auto; font-size:12px; color:rgba(255,255,255,0.2);">识别域: <span id="domainIndicator">等待输入</span></span>
                 </div>
                 <div class="interact-row">
-                    <input type="text" id="routerInput" placeholder="例如：把客厅灯调暗 或 Saya ada kereta" value="打开3号空调" style="flex:1; min-width:200px;">
-                    <button class="btn" onclick="processRouter()">执行</button>
+                    <input type="text" id="routerInput" placeholder="例如：red car 或 5个人围成一圈" value="5个人围成一圈" style="flex:1; min-width:200px;">
+                    <button class="btn" onclick="processRouter()">翻译</button>
                 </div>
                 <div style="display:flex; gap:6px; flex-wrap:wrap; margin:6px 0 8px;">
-                    <button class="btn-outline" onclick="setRouter('把客厅灯调暗')">💡 调暗灯</button>
-                    <button class="btn-outline" onclick="setRouter('打开3号空调')">❄️ 开空调</button>
-                    <button class="btn-outline" onclick="setRouter('Saya ada kereta')">🚗 kereta</button>
+                    <button class="btn-outline" onclick="setRouter('red car')">🚗 red car</button>
+                    <button class="btn-outline" onclick="setRouter('big house')">🏠 big house</button>
                     <button class="btn-outline" onclick="setRouter('打篮球')">🏀 打篮球</button>
-                    <button class="btn-outline" onclick="setRouter('关闭所有窗户')">🪟 关窗</button>
+                    <button class="btn-outline" onclick="setRouter('Saya ada kereta')">🚗 kereta</button>
+                    <button class="btn-outline" onclick="setRouter('5个人围成一圈')">⭕ 圆排列</button>
+                    <button class="btn-outline" onclick="setRouter('从1到9选3个数组成三位数，能被3整除')">🔢 整除</button>
                 </div>
 
                 <div id="routerResult" style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; margin-top:6px;">
@@ -847,7 +918,7 @@
                         <div id="routerSource" style="font-size:13px; color:rgba(255,255,255,0.3);">等待输入...</div>
                     </div>
                     <div style="background:rgba(255,255,255,0.01); border-radius:8px; padding:8px 10px; border:1px solid rgba(255,255,255,0.03);">
-                        <div style="font-size:9px; color:rgba(255,255,255,0.12); text-transform:uppercase; letter-spacing:0.5px;">⚙️ 结构化指令</div>
+                        <div style="font-size:9px; color:rgba(255,255,255,0.12); text-transform:uppercase; letter-spacing:0.5px;">⚙️ 结构化翻译</div>
                         <div id="routerTarget" style="font-size:12px; color:#34d399; font-family:monospace; white-space:pre-wrap; word-break:break-all;">等待解析...</div>
                     </div>
                     <div style="background:rgba(255,255,255,0.01); border-radius:8px; padding:8px 10px; border:1px solid rgba(255,255,255,0.03);">
@@ -858,197 +929,200 @@
 
                 <div id="routerBacktrack" class="backtrack-log" style="margin-top:10px;">
                     <div class="bt-title">⚙️ 决策回溯日志</div>
-                    <div style="color:rgba(255,255,255,0.05); font-size:12px; padding:2px 0;">输入指令后将显示逐层解析过程</div>
+                    <div style="color:rgba(255,255,255,0.05); font-size:12px; padding:2px 0;">输入后将显示逐层解析过程</div>
                 </div>
             </div>
 
             <!-- ============================================================= -->
-            <!-- ② 语序 (简要) -->
+            <!-- ② 语序规则 (原始模块升级) -->
             <!-- ============================================================= -->
             <div class="section-anchor" id="section-svo"></div>
             <div class="section-title">② 语序规则 <span class="badge">SVO · 修饰语重排</span></div>
             <div class="section-desc">验证形容词前置/后置冲突时的回溯重排。</div>
+
             <div class="interact-card">
-                <div class="card-title">📌 修饰语重排</div>
-                <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px;">
-                    <button class="btn-outline" onclick="showSVO('red_car')">🚗 red car</button>
-                    <button class="btn-outline" onclick="showSVO('big_house')">🏠 big house</button>
+                <div class="card-title">
+                    📌 修饰语重排
+                    <span style="margin-left:auto; font-size:12px; color:rgba(255,255,255,0.2);" id="svoStatus">等待输入</span>
                 </div>
-                <div id="svo-result" class="result-box"><span style="color:rgba(255,255,255,0.2);">点击例句查看</span></div>
-                <div id="svo-backtrack" class="backtrack-log"><div class="bt-title">⏳ 回溯日志</div><div style="color:rgba(255,255,255,0.05); font-size:12px;">等待触发...</div></div>
+                <div id="svo-result" class="result-box">
+                    <span style="color:rgba(255,255,255,0.2);">输入内容后自动展示</span>
+                </div>
+                <div id="svo-backtrack" class="backtrack-log">
+                    <div class="bt-title">⏳ 回溯日志</div>
+                    <div style="color:rgba(255,255,255,0.05); font-size:12px;">等待触发...</div>
+                </div>
             </div>
 
             <!-- ============================================================= -->
-            <!-- ③ 时态 (简要) -->
+            <!-- ③ 时态标记 (原始模块升级) -->
             <!-- ============================================================= -->
             <div class="section-anchor" id="section-tense"></div>
-            <div class="section-title">③ 时态标记 <span class="badge">屈折 vs 助词</span></div>
+            <div class="section-title">③ 时态标记系统 <span class="badge">屈折 vs 助词</span></div>
             <div class="section-desc">英语屈折变化与马来助词系统的映射与回溯。</div>
+
             <div class="interact-card">
-                <div class="card-title">⏱️ 时态构造器</div>
-                <div class="interact-row">
-                    <label>动词</label>
-                    <select id="tense-verb">
-                        <option value="makan">makan (吃)</option>
-                        <option value="minum">minum (喝)</option>
-                        <option value="kerja">kerja (工作)</option>
-                        <option value="tulis">tulis (写)</option>
-                    </select>
+                <div class="card-title">
+                    ⏱️ 时态构造器
+                    <span style="margin-left:auto; font-size:12px; color:rgba(255,255,255,0.2);" id="tenseStatus">等待输入</span>
                 </div>
-                <div class="interact-row">
-                    <label>时态</label>
-                    <select id="tense-select">
-                        <option value="sudah">sudah — 已完成</option>
-                        <option value="sedang">sedang — 进行中</option>
-                        <option value="akan">akan — 将来</option>
-                    </select>
-                    <button class="btn" onclick="convertTense()">生成</button>
+                <div id="tense-result" class="result-box">
+                    <span style="color:rgba(255,255,255,0.2);">输入内容后自动展示</span>
                 </div>
-                <div id="tense-result" class="result-box"><span style="color:rgba(255,255,255,0.2);">选择动词和时态，点击生成</span></div>
-                <div id="tense-backtrack" class="backtrack-log"><div class="bt-title">⏳ 回溯日志</div><div style="color:rgba(255,255,255,0.05); font-size:12px;">等待触发...</div></div>
+                <div id="tense-backtrack" class="backtrack-log">
+                    <div class="bt-title">⏳ 回溯日志</div>
+                    <div style="color:rgba(255,255,255,0.05); font-size:12px;">等待触发...</div>
+                </div>
             </div>
 
             <!-- ============================================================= -->
-            <!-- ④ 词缀 (简要) -->
+            <!-- ④ 词缀派生 (原始模块升级) -->
             <!-- ============================================================= -->
             <div class="section-anchor" id="section-derivation"></div>
-            <div class="section-title">④ 词缀派生 <span class="badge">词根 → 多词性</span></div>
+            <div class="section-title">④ 词缀派生系统 <span class="badge">词根 → 多词性</span></div>
             <div class="section-desc">一个词根如何通过词缀变成不同词性，中文零派生作为验证对照。</div>
+
             <div class="interact-card">
-                <div class="card-title">🧩 词根派生器</div>
-                <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px;">
-                    <button class="btn-outline" onclick="showDerivation('ajar')">ajar (教)</button>
-                    <button class="btn-outline" onclick="showDerivation('makan')">makan (吃)</button>
-                    <button class="btn-outline" onclick="showDerivation('tulis')">tulis (写)</button>
+                <div class="card-title">
+                    🧩 词根派生器
+                    <span style="margin-left:auto; font-size:12px; color:rgba(255,255,255,0.2);" id="deriveStatus">等待输入</span>
                 </div>
-                <div id="derivation-result"><div style="color:rgba(255,255,255,0.2); font-size:14px;">点击词根查看派生词家族</div></div>
-                <div id="derive-backtrack" class="backtrack-log"><div class="bt-title">⏳ 回溯日志</div><div style="color:rgba(255,255,255,0.05); font-size:12px;">等待触发...</div></div>
+                <div id="derivation-result">
+                    <div style="color:rgba(255,255,255,0.2); font-size:14px;">输入内容后自动展示</div>
+                </div>
+                <div id="derive-backtrack" class="backtrack-log">
+                    <div class="bt-title">⏳ 回溯日志</div>
+                    <div style="color:rgba(255,255,255,0.05); font-size:12px;">等待触发...</div>
+                </div>
             </div>
 
             <!-- ============================================================= -->
-            <!-- ⑤ 被动 (简要) -->
+            <!-- ⑤ 被动句式 (原始模块升级) -->
             <!-- ============================================================= -->
             <div class="section-anchor" id="section-passive"></div>
-            <div class="section-title">⑤ 被动句式 <span class="badge">di- + oleh = be + by</span></div>
+            <div class="section-title">⑤ 被动句式同源 <span class="badge">di- + oleh = be + by</span></div>
             <div class="section-desc">被动语态在两种语言中结构完全对应，中文“被”字句作为验证。</div>
+
             <div class="interact-card">
-                <div class="card-title">🔄 主动 → 被动转换器</div>
-                <div class="interact-row">
-                    <label>主动句</label>
-                    <select id="passive-input">
-                        <option value="Saya makan nasi">Saya makan nasi (我吃米饭)</option>
-                        <option value="Dia membaca buku">Dia membaca buku (她读书)</option>
-                        <option value="Kami minum air">Kami minum air (我们喝水)</option>
-                    </select>
-                    <button class="btn" onclick="convertPassive()">转为被动</button>
+                <div class="card-title">
+                    🔄 主动 → 被动转换器
+                    <span style="margin-left:auto; font-size:12px; color:rgba(255,255,255,0.2);" id="passiveStatus">等待输入</span>
                 </div>
-                <div id="passive-result" class="result-box"><span style="color:rgba(255,255,255,0.2);">选择主动句，点击转换</span></div>
-                <div id="passive-backtrack" class="backtrack-log"><div class="bt-title">⏳ 回溯日志</div><div style="color:rgba(255,255,255,0.05); font-size:12px;">等待触发...</div></div>
+                <div id="passive-result" class="result-box">
+                    <span style="color:rgba(255,255,255,0.2);">输入内容后自动展示</span>
+                </div>
+                <div id="passive-backtrack" class="backtrack-log">
+                    <div class="bt-title">⏳ 回溯日志</div>
+                    <div style="color:rgba(255,255,255,0.05); font-size:12px;">等待触发...</div>
+                </div>
             </div>
 
             <!-- ============================================================= -->
-            <!-- ⑥ 多义词 (简要) -->
+            <!-- ⑥ 多义词消歧 (新增模块) -->
             <!-- ============================================================= -->
             <div class="section-anchor" id="section-wsd"></div>
             <div class="section-title">⑥ 多义词消歧 <span class="badge">上下文驱动</span></div>
-            <div class="section-desc">中文“打”的极端歧义，触发深度回溯。</div>
+            <div class="section-desc">中文“打”的极端歧义，触发深度回溯（hit → play / take）。</div>
+
             <div class="interact-card">
-                <div class="card-title">🎯 词义消歧 (WSD)</div>
-                <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px;">
-                    <button class="btn-outline" onclick="showWSD('sport')">🏀 打篮球</button>
-                    <button class="btn-outline" onclick="showWSD('taxi')">🚗 打车</button>
-                    <button class="btn-outline" onclick="showWSD('hit')">👊 打人</button>
+                <div class="card-title">
+                    🎯 词义消歧 (WSD)
+                    <span style="margin-left:auto; font-size:12px; color:rgba(255,255,255,0.2);" id="wsdStatus">等待输入</span>
                 </div>
-                <div id="wsd-result" class="result-box"><span style="color:rgba(255,255,255,0.2);">点击不同语境查看“打”的映射</span></div>
-                <div id="wsd-backtrack" class="backtrack-log"><div class="bt-title">⏳ 回溯日志</div><div style="color:rgba(255,255,255,0.05); font-size:12px;">等待触发...</div></div>
+                <div id="wsd-result" class="result-box">
+                    <span style="color:rgba(255,255,255,0.2);">输入内容后自动展示</span>
+                </div>
+                <div id="wsd-backtrack" class="backtrack-log">
+                    <div class="bt-title">⏳ 回溯日志</div>
+                    <div style="color:rgba(255,255,255,0.05); font-size:12px;">等待触发...</div>
+                </div>
             </div>
 
             <!-- ============================================================= -->
-            <!-- ⑦ 文化适配 (简要) -->
+            <!-- ⑦ 文化适配 (新增模块) -->
             <!-- ============================================================= -->
             <div class="section-anchor" id="section-culture"></div>
             <div class="section-title">⑦ 文化适配 <span class="badge">语用规约 · 禁忌</span></div>
-            <div class="section-desc">文化隐喻（龙→Loong）及禁忌词处理。</div>
+            <div class="section-desc">文化隐喻（龙→Loong）及禁忌词处理，确保输出符合目标社会语境。</div>
+
             <div class="interact-card">
-                <div class="card-title">🤝 文化规约引擎</div>
-                <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px;">
-                    <button class="btn-outline" onclick="showCulture('dragon')">🐉 龙 (中→英)</button>
-                    <button class="btn-outline" onclick="showCulture('taboo')">🚫 文化禁忌词</button>
+                <div class="card-title">
+                    🤝 文化规约引擎
+                    <span style="margin-left:auto; font-size:12px; color:rgba(255,255,255,0.2);" id="cultureStatus">等待输入</span>
                 </div>
-                <div id="culture-result" class="result-box"><span style="color:rgba(255,255,255,0.2);">点击查看文化适配策略</span></div>
-                <div id="culture-backtrack" class="backtrack-log"><div class="bt-title">⏳ 回溯日志</div><div style="color:rgba(255,255,255,0.05); font-size:12px;">等待触发...</div></div>
+                <div id="culture-result" class="result-box">
+                    <span style="color:rgba(255,255,255,0.2);">输入内容后自动展示</span>
+                </div>
+                <div id="culture-backtrack" class="backtrack-log">
+                    <div class="bt-title">⏳ 回溯日志</div>
+                    <div style="color:rgba(255,255,255,0.05); font-size:12px;">等待触发...</div>
+                </div>
             </div>
 
             <!-- ============================================================= -->
-            <!-- ⑧ 差异边界 · 地域防火墙 (简要) -->
+            <!-- ⑧ 差异边界 · 地域防火墙 (原始模块升级) -->
             <!-- ============================================================= -->
             <div class="section-anchor" id="section-diff"></div>
             <div class="section-title">⑧ 差异边界 · 地域防火墙 <span class="badge">伪同源词拦截</span></div>
             <div class="section-desc">结构相似但内容不同的伪同源词（kereta=汽车/火车），通过地域向量偏移拦截。</div>
-            <div class="interact-card">
-                <div class="card-title">🔍 伪同源词检测</div>
-                <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px;">
-                    <button class="btn-outline" onclick="showDiff('kereta')">🚗 kereta</button>
-                    <button class="btn-outline" onclick="showDiff('budak')">🧒 budak</button>
-                    <button class="btn-outline" onclick="showDiff('percuma')">🎁 percuma</button>
-                </div>
-                <div id="diff-result" class="result-box"><span style="color:rgba(255,255,255,0.2);">点击伪同源词查看地域拦截</span></div>
-                <div id="diff-backtrack" class="backtrack-log"><div class="bt-title">⏳ 回溯日志 (地域偏移)</div><div style="color:rgba(255,255,255,0.05); font-size:12px;">等待触发...</div></div>
-            </div>
-
-            <!-- ============================================================= -->
-            <!-- ⑨ 交互式画圈推理台 (全新升级) -->
-            <!-- ============================================================= -->
-            <div class="section-anchor" id="section-math"></div>
-            <div class="section-title">⑨ 画圈实验 · 交互推理台 <span class="badge">分步回溯 · 参数可调</span></div>
-            <div class="section-desc">调整参数，点击“下一步”观察系统如何画圈、尝试、验证、回退并最终得出结论。</div>
 
             <div class="interact-card">
                 <div class="card-title">
-                    🧮 交互式画圈解题器
-                    <span style="margin-left:auto; font-size:12px; color:rgba(255,255,255,0.2);">步骤 <span id="stepCounter">0</span> / <span id="totalSteps">0</span></span>
+                    🔍 伪同源词检测
+                    <span style="margin-left:auto; font-size:12px; color:rgba(255,255,255,0.2);" id="diffStatus">等待输入</span>
+                </div>
+                <div id="diff-result" class="result-box">
+                    <span style="color:rgba(255,255,255,0.2);">输入内容后自动展示</span>
+                </div>
+                <div id="diff-backtrack" class="backtrack-log">
+                    <div class="bt-title">⏳ 回溯日志 (地域偏移)</div>
+                    <div style="color:rgba(255,255,255,0.05); font-size:12px;">等待触发...</div>
+                </div>
+            </div>
+
+            <!-- ============================================================= -->
+            <!-- ⑨ 奥数翻译 (新增核心模块) -->
+            <!-- ============================================================= -->
+            <div class="section-anchor" id="section-math"></div>
+            <div class="section-title">⑨ 奥数翻译 <span class="badge">枚举 → 验证 → 回退</span></div>
+            <div class="section-desc">把奥数题当成另一种“语言”来翻译：先枚举所有组合，然后逐个验证条件，通过则保留，失败则回退。</div>
+
+            <div class="interact-card">
+                <div class="card-title">
+                    🧮 奥数结构翻译器
+                    <span style="margin-left:auto; font-size:12px; color:rgba(255,255,255,0.2);">步骤 <span id="mathStepCounter">0</span> / <span id="mathTotalSteps">0</span></span>
                 </div>
 
-                <!-- 参数控制 -->
-                <div class="param-row">
-                    <label>📌 题目：
-                        <select id="mathProblemSelect" onchange="resetMath()">
-                            <option value="circle">圆排列</option>
-                            <option value="divisible">能被3整除的三位数</option>
-                        </select>
-                    </label>
-                    <label id="paramLabel">👥 人数：
-                        <input type="range" id="mathParam" min="3" max="8" value="5" oninput="updateParamValue(); resetMath();">
-                        <span id="paramValueDisplay">5</span>
-                    </label>
-                    <label style="display:none;" id="digitRangeLabel">🔢 数字范围：
-                        <input type="range" id="digitRange" min="5" max="9" value="9" oninput="updateDigitRange(); resetMath();">
-                        <span id="digitRangeDisplay">9</span>
-                    </label>
+                <!-- 数字牌 -->
+                <div class="number-pool" id="numberPool" style="display:flex; gap:10px; flex-wrap:wrap; margin:12px 0; justify-content:center;">
+                    <!-- JS动态生成 1~9 -->
                 </div>
 
-                <!-- 可视化圈 -->
-                <div id="circleVisual" class="circle-visual">
-                    <span style="color:rgba(255,255,255,0.08);">调整参数后点击“重置”开始</span>
+                <!-- 当前尝试 -->
+                <div id="currentAttempt" style="color:rgba(255,255,255,0.2); text-align:center; padding:8px; background:rgba(255,255,255,0.02); border-radius:8px;">
+                    🎯 输入奥数题后自动开始
                 </div>
 
-                <!-- 结果显示 -->
-                <div id="math-result" class="result-box">
-                    <span style="color:rgba(255,255,255,0.2);">准备就绪，点击“下一步”开始推理</span>
+                <!-- 统计 -->
+                <div class="result-box" id="mathStats" style="border-left-color:#a78bfa;">
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+                        <div><span style="color:rgba(255,255,255,0.2);">📦 已尝试组合</span><br><span id="mathTried" style="font-size:20px; color:#60a5fa;">0</span></div>
+                        <div><span style="color:rgba(255,255,255,0.2);">✅ 通过验证 (保留)</span><br><span id="mathValid" style="font-size:20px; color:#4ade80;">0</span></div>
+                    </div>
                 </div>
 
                 <!-- 回溯日志 -->
-                <div id="math-backtrack" class="backtrack-log">
-                    <div class="bt-title">⏳ 画圈回溯日志</div>
-                    <div style="color:rgba(255,255,255,0.05); font-size:12px;">等待开始...</div>
+                <div id="mathBacktrack" class="backtrack-log">
+                    <div class="bt-title">⚙️ 枚举 → 验证 → 回退 日志</div>
+                    <div style="color:rgba(255,255,255,0.05); font-size:12px;">等待奥数题输入...</div>
                 </div>
 
-                <!-- 控制按钮 -->
-                <div class="step-controls">
-                    <button id="resetBtn" onclick="resetMath()">⟳ 重置</button>
-                    <button id="prevBtn" onclick="prevStep()" disabled>◀ 上一步</button>
-                    <button id="nextBtn" onclick="nextStep()">下一步 ▶</button>
-                    <span class="step-indicator" id="stepIndicator">步骤 0 / 0</span>
+                <!-- 控制 -->
+                <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-top:12px;">
+                    <button class="btn" onclick="mathNextStep()">▶ 下一步</button>
+                    <button class="btn-outline" onclick="mathReset()">⟳ 重置</button>
+                    <button class="btn-outline" onclick="mathRunAll()">⏩ 快速演示</button>
+                    <span style="color:rgba(255,255,255,0.08); font-size:12px; margin-left:auto;" id="mathStatus">就绪</span>
                 </div>
             </div>
 
@@ -1056,17 +1130,17 @@
             <!-- 证据闭环 -->
             <!-- ============================================================= -->
             <div class="section-anchor" id="section-closure"></div>
-            <div class="section-title">证据闭环 <span class="badge">从语言到数学 · 通用推理</span></div>
-            <div class="section-desc">完整验证“底座规则 + 回溯机制 + 画圈约束”在语言及数学场景的迁移能力。</div>
+            <div class="section-title">证据闭环 <span class="badge">从语言到奥数 · 通用推理</span></div>
+            <div class="section-desc">完整验证“底座规则 + 回溯机制”在语言及数学场景的迁移能力。</div>
 
             <div class="closure">
                 <div class="item">
                     <div class="label">🔍 现象</div>
-                    <div class="text">语言结构相似但存在伪同源词、多义词；数学问题需要约束剪枝与回溯验证</div>
+                    <div class="text">语言结构相似但存在伪同源词、多义词；奥数题需要枚举与条件验证</div>
                 </div>
                 <div class="item">
                     <div class="label">⚙️ 成因</div>
-                    <div class="text">SVO语序 + 词缀系统 + 画圈约束层，底层共享“尝试→验证→回退”的堆栈逻辑</div>
+                    <div class="text">SVO语序 + 词缀系统 + 枚举验证，底层共享“尝试→验证→回退”的堆栈逻辑</div>
                 </div>
                 <div class="item">
                     <div class="label">🧱 边界</div>
@@ -1078,17 +1152,19 @@
                 </div>
             </div>
 
+            <!-- ===== 底部 ===== -->
             <div class="back-bottom">
                 <a href="index.html">← 返回作品集首页</a>
-                <span class="meta">Y.Mine · 九维证据链 · 交互画圈版 v7.0</span>
+                <span class="meta">Y.Mine · 九维证据链 · 语言+奥数融合版 v8.0</span>
             </div>
 
         </div>
+
     </div>
 
     <script>
         // ================================================================
-        // 全局：光晕、导航、通用工具
+        // 全局：光晕、导航
         // ================================================================
         const glow = document.getElementById('glow');
         document.addEventListener('mousemove', (e) => {
@@ -1145,21 +1221,27 @@
             });
         });
 
-        // 通用工具：渲染回溯日志
+        // ================================================================
+        // 工具函数
+        // ================================================================
         function renderBacktrack(containerId, steps) {
             const container = document.getElementById(containerId);
             if (!container) return;
             let html = `<div class="bt-title">⚙️ 决策回溯日志</div>`;
-            steps.forEach((step) => {
-                const cls = step.status || 'info';
-                html += `
-                    <div class="bt-step ${cls}">
-                        <span class="icon">${step.icon}</span>
-                        <span class="msg">${step.msg}</span>
-                        ${step.conf ? `<span class="conf">${step.conf}</span>` : ''}
-                    </div>
-                `;
-            });
+            if (!steps || steps.length === 0) {
+                html += `<div style="color:rgba(255,255,255,0.05); font-size:12px;">等待触发...</div>`;
+            } else {
+                steps.forEach((step) => {
+                    const cls = step.status || 'info';
+                    html += `
+                        <div class="bt-step ${cls}">
+                            <span class="icon">${step.icon}</span>
+                            <span class="msg">${step.msg}</span>
+                            ${step.conf ? `<span class="conf">${step.conf}</span>` : ''}
+                        </div>
+                    `;
+                });
+            }
             container.innerHTML = html;
         }
 
@@ -1167,118 +1249,115 @@
             const el = document.getElementById(containerId);
             if (!el) return;
             el.innerHTML = `
-                <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px;">
-                    <div style="background:rgba(255,255,255,0.01); border-radius:6px; padding:6px 8px; border:1px solid rgba(255,255,255,0.02);">
-                        <div style="font-size:9px; color:rgba(255,255,255,0.12); text-transform:uppercase;">英语</div>
-                        <div style="color:#60a5fa; font-weight:500;">${en}</div>
-                    </div>
-                    <div style="background:rgba(255,255,255,0.01); border-radius:6px; padding:6px 8px; border:1px solid rgba(255,255,255,0.02);">
-                        <div style="font-size:9px; color:rgba(255,255,255,0.12); text-transform:uppercase;">马来/印尼</div>
-                        <div style="color:#facc15; font-weight:500;">${my}</div>
-                    </div>
-                    <div style="background:rgba(255,255,255,0.01); border-radius:6px; padding:6px 8px; border:1px solid rgba(255,255,255,0.02);">
-                        <div style="font-size:9px; color:rgba(255,255,255,0.12); text-transform:uppercase;">中文验证</div>
-                        <div style="color:#a78bfa; font-weight:500;">${zh}</div>
-                    </div>
+                <div class="triple-grid">
+                    <div class="col"><div class="lang-label">英语 <span style="color:rgba(255,255,255,0.1);">基准</span></div><div class="content en">${en}</div></div>
+                    <div class="col"><div class="lang-label">马来/印尼 <span style="color:rgba(255,255,255,0.1);">映射</span></div><div class="content my">${my}</div></div>
+                    <div class="col"><div class="lang-label">中文 <span style="color:rgba(255,255,255,0.1);">结构验证</span></div><div class="content zh">${zh}</div><div class="sub">[不翻译，仅解析结构]</div></div>
                 </div>
             `;
         }
 
         // ================================================================
-        // 🚀 路由器 (完整保留)
+        // 🚀 双域翻译器 (路由器)
         // ================================================================
-        const routerScenarios = {
-            '把客厅灯调暗': {
-                source: '把客厅灯调暗',
-                intent: 'adjust_lighting',
-                instruction: JSON.stringify({ intent: 'adjust_lighting', location: '客厅', action: 'dim', level: 30 }, null, 2),
-                route: '规则引擎 → 结构匹配 (置信度 97%)',
-                cost: '0.00012 元',
-                steps: [
-                    { icon: '🔍', msg: '解析动作词 "调暗" → dim', status: 'info', conf: '98%' },
-                    { icon: '🔍', msg: '提取目标 "客厅灯" → location=客厅', status: 'info', conf: '96%' },
-                    { icon: '✅', msg: '结构完整，采纳', status: 'success', conf: '最终 97%' }
-                ]
-            },
-            '打开3号空调': {
-                source: '打开3号空调',
-                intent: 'control_ac',
-                instruction: JSON.stringify({ intent: 'control_ac', device_id: 'AC_03', action: 'power_on' }, null, 2),
-                route: '规则引擎 → 设备编号匹配 (置信度 99%)',
-                cost: '0.00009 元',
-                steps: [
-                    { icon: '🔍', msg: '识别动作 "打开" → power_on', status: 'info', conf: '99%' },
-                    { icon: '🔍', msg: '提取设备 "3号空调" → AC_03', status: 'info', conf: '100%' },
-                    { icon: '✅', msg: '指令明确', status: 'success', conf: '最终 99%' }
-                ]
-            },
-            '关闭所有窗户': {
-                source: '关闭所有窗户',
-                intent: 'control_windows',
-                instruction: JSON.stringify({ intent: 'control_windows', target: 'all', action: 'close' }, null, 2),
-                route: '规则引擎 → 批量指令 (置信度 95%)',
-                cost: '0.00015 元',
-                steps: [
-                    { icon: '🔍', msg: '识别 "关闭" → close', status: 'info', conf: '98%' },
-                    { icon: '🔍', msg: '识别 "所有窗户" → target=all', status: 'info', conf: '92%' },
-                    { icon: '⚠️', msg: '批量操作，需确认', status: 'warn', conf: '' },
-                    { icon: '✅', msg: '采纳批量指令', status: 'success', conf: '最终 95%' }
-                ]
-            },
-            'Saya ada kereta': {
-                source: 'Saya ada kereta (马来/印尼)',
-                intent: 'translate',
-                instruction: JSON.stringify({ translation: 'I have a car', detected_locale: 'MY' }, null, 2),
-                route: '结构验证 → 伪同源词检测 → 地域偏移 (MY)',
-                cost: '0.00120 元',
-                steps: [
-                    { icon: '🔍', msg: '结构验证: SVO正确', status: 'info', conf: '98%' },
-                    { icon: '⚠️', msg: '检测到伪同源词 "kereta" (MY=汽车, ID=火车)', status: 'warn', conf: '冲突' },
-                    { icon: '↩️', msg: '触发语义回退', status: 'warn', conf: '' },
-                    { icon: '🌐', msg: '加载地域路由 (MY) → Car', status: 'info', conf: '' },
-                    { icon: '✅', msg: '最终映射: Car', status: 'success', conf: '最终 99%' }
-                ]
-            },
-            '打篮球': {
-                source: '打篮球',
-                intent: 'translate',
-                instruction: JSON.stringify({ translation: 'play basketball', disambiguation: 'sport' }, null, 2),
-                route: '多义词消歧 → 上下文匹配 → 采纳 play',
-                cost: '0.00050 元',
-                steps: [
-                    { icon: '🔍', msg: '候选: "打" → hit (15%) / play (85%)', status: 'info', conf: '初始' },
-                    { icon: '🔍', msg: '上下文 "篮球" 指向运动', status: 'info', conf: '+30%' },
-                    { icon: '✅', msg: '采纳 "play"', status: 'success', conf: '最终 89%' }
-                ]
-            }
-        };
-
         function processRouter() {
             const input = document.getElementById('routerInput').value.trim();
-            if (!input) { alert('请输入指令'); return; }
-            let data = null;
-            for (const key in routerScenarios) {
-                if (input.includes(key) || key.includes(input)) { data = routerScenarios[key]; break; }
+            if (!input) { alert('请输入内容'); return; }
+
+            // 检测是否为奥数题
+            const isMath = detectMath(input);
+            const domain = isMath ? '奥数' : '自然语言';
+            document.getElementById('domainIndicator').textContent = domain;
+            document.getElementById('domainIndicator').style.color = isMath ? '#facc15' : '#60a5fa';
+
+            // 解析结果
+            let source = input;
+            let target = '';
+            let route = '';
+            let steps = [];
+
+            if (isMath) {
+                const mathInfo = parseMath(input);
+                target = JSON.stringify({ type: mathInfo.type, n: mathInfo.n, question: mathInfo.question }, null, 2);
+                route = `🧮 识别为奥数题 → 跳转至奥数翻译模块 (${mathInfo.type})`;
+                steps = [
+                    { icon: '🧮', msg: `识别到奥数题: ${mathInfo.question}`, status: 'info', conf: '90%' },
+                    { icon: '↩️', msg: `参数: ${mathInfo.type === 'circle' ? '人数' : '数字范围'} = ${mathInfo.n}`, status: 'warn',
+                        conf: '' },
+                    { icon: '✅', msg: '已就绪，请查看下方奥数翻译模块', status: 'success', conf: '完成' }
+                ];
+                // 设置奥数模块
+                setupMathModule(mathInfo);
+            } else {
+                // 自然语言处理
+                const langInfo = parseLanguage(input);
+                target = JSON.stringify({ intent: 'translate', words: langInfo.words, detected: langInfo.features }, null,
+                2);
+                route = `🔤 识别为自然语言 → 路由至语言模块`;
+                steps = [
+                    { icon: '🔍', msg: `识别为自然语言，共 ${langInfo.words.length} 个词`, status: 'info', conf: '80%' },
+                    { icon: '🔍', msg: `检测到特征: ${langInfo.features.join(', ') || '无特殊标记'}`, status: 'info',
+                    conf: '70%' },
+                    { icon: '✅', msg: '已路由至语言模块', status: 'success', conf: '完成' }
+                ];
+                // 更新语言模块
+                updateLanguageModules(input, langInfo);
             }
-            if (!data) {
-                data = {
-                    source: input,
-                    intent: 'unknown',
-                    instruction: JSON.stringify({ intent: 'unknown', raw_input: input, status: '需人工解析' }, null, 2),
-                    route: '规则引擎无法覆盖 → 触发LLM路由 (成本较高)',
-                    cost: '0.02000 元',
-                    steps: [
-                        { icon: '🔍', msg: '尝试基础结构提取', status: 'info', conf: '20%' },
-                        { icon: '❌', msg: '无法匹配任何模式', status: 'fail', conf: '低于阈值' },
-                        { icon: '↩️', msg: '触发完全回退，请求澄清', status: 'warn', conf: '' },
-                        { icon: '📞', msg: '生成澄清问题', status: 'info', conf: '' }
-                    ]
-                };
+
+            // 更新路由器UI
+            document.getElementById('routerSource').innerHTML =
+                `<div style="font-weight:500;color:#f1f5f9;">${source}</div><div style="font-size:11px;color:rgba(255,255,255,0.2);">域: ${domain}</div>`;
+            document.getElementById('routerTarget').innerHTML = target;
+            document.getElementById('routerRoute').innerHTML = `<div style="color:${isMath ? '#facc15' : '#60a5fa'};">${route}</div>`;
+            renderBacktrack('routerBacktrack', steps);
+
+            // 滚动到对应模块
+            if (isMath) {
+                setTimeout(() => document.getElementById('section-math').scrollIntoView({ behavior: 'smooth',
+                    block: 'start' }), 300);
             }
-            document.getElementById('routerSource').innerHTML = `<div style="font-weight:500;color:#f1f5f9;">${data.source}</div><div style="font-size:11px;color:rgba(255,255,255,0.2);">意图: ${data.intent}</div>`;
-            document.getElementById('routerTarget').innerHTML = data.instruction;
-            document.getElementById('routerRoute').innerHTML = `<div style="color:#facc15;">${data.route}</div><div style="font-size:11px;color:rgba(255,255,255,0.15);">💰 ${data.cost}</div>`;
-            renderBacktrack('routerBacktrack', data.steps);
+        }
+
+        function detectMath(input) {
+            const text = input.toLowerCase();
+            // 圆排列
+            if (text.match(/(\d+)\s*人\s*(围成一圈|圆桌|圆排列)/)) return true;
+            // 整除
+            if (text.includes('三位数') && text.includes('整除')) return true;
+            // 排列/组合关键词
+            if (text.includes('排列') || text.includes('组合') || text.includes('选择')) {
+                const numMatch = text.match(/(\d+)/);
+                if (numMatch && parseInt(numMatch[1]) >= 2) return true;
+            }
+            return false;
+        }
+
+        function parseMath(input) {
+            const text = input.toLowerCase();
+            // 圆排列
+            const circleMatch = text.match(/(\d+)\s*人\s*(围成一圈|圆桌|圆排列)/);
+            if (circleMatch) {
+                const n = parseInt(circleMatch[1]);
+                return { type: 'circle', n: n, question: `${n} 个人围成一圈，有多少种不同的坐法？` };
+            }
+            // 整除
+            if (text.includes('三位数') && text.includes('整除')) {
+                return { type: 'divisible', n: 9, question: '从 1~9 中选 3 个不同数字组成三位数，能被 3 整除的有几个？' };
+            }
+            // 默认
+            const numMatch = text.match(/(\d+)/);
+            const n = numMatch ? parseInt(numMatch[1]) : 5;
+            return { type: 'circle', n: n, question: `${n} 个元素的排列问题` };
+        }
+
+        function parseLanguage(input) {
+            const words = input.split(/\s+/);
+            const features = [];
+            if (words.some(w => w.endsWith('ed'))) features.push('过去式');
+            if (words.some(w => w === '打')) features.push('多义词"打"');
+            if (words.some(w => w === 'kereta')) features.push('伪同源词');
+            if (words.some(w => w === '龙')) features.push('文化隐喻');
+            return { words, features };
         }
 
         function setRouter(text) {
@@ -1288,437 +1367,398 @@
         document.getElementById('routerInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') processRouter(); });
 
         // ================================================================
-        // ② 语序
+        // 语言模块更新
         // ================================================================
-        const svoData = {
-            red_car: { en: 'red car', my: 'kereta merah', zh: '[名词+形容词] 后置', steps: [
-                    { icon: '⚙️', msg: '尝试规则A (前置): "merah kereta"', status: 'info', conf: '12%' },
-                    { icon: '❌', msg: '马来语验证失败', status: 'fail', conf: '<60%' },
-                    { icon: '↩️', msg: '回退至名词节点', status: 'warn', conf: '' },
-                    { icon: '⚙️', msg: '切换规则B (后置): "kereta merah"', status: 'info', conf: '96%' },
-                    { icon: '✅', msg: '采纳', status: 'success', conf: '最终96%' }
-                ] },
-            big_house: { en: 'big house', my: 'rumah besar', zh: '[名词+形容词] 后置', steps: [
-                    { icon: '⚙️', msg: '尝试规则A (前置): "besar rumah"', status: 'info', conf: '8%' },
-                    { icon: '❌', msg: '马来语验证失败', status: 'fail', conf: '<60%' },
-                    { icon: '↩️', msg: '回退', status: 'warn', conf: '' },
-                    { icon: '⚙️', msg: '切换规则B (后置): "rumah besar"', status: 'info', conf: '98%' },
-                    { icon: '✅', msg: '采纳', status: 'success', conf: '最终98%' }
-                ] }
-        };
+        function updateLanguageModules(input, langInfo) {
+            const words = langInfo.words;
+            const features = langInfo.features;
 
-        function showSVO(key) {
-            const d = svoData[key];
-            if (!d) return;
-            renderTriple('svo-result', d.en, d.my, d.zh);
-            renderBacktrack('svo-backtrack', d.steps);
-        }
-
-        // ================================================================
-        // ③ 时态
-        // ================================================================
-        const tenseVerb = {
-            makan: { base: 'makan', en: 'eat', past: 'eaten', ing: 'eating' },
-            minum: { base: 'minum', en: 'drink', past: 'drunk', ing: 'drinking' },
-            kerja: { base: 'kerja', en: 'work', past: 'worked', ing: 'working' },
-            tulis: { base: 'tulis', en: 'write', past: 'written', ing: 'writing' }
-        };
-
-        function convertTense() {
-            const vk = document.getElementById('tense-verb').value;
-            const tk = document.getElementById('tense-select').value;
-            const v = tenseVerb[vk];
-            if (!v) return;
-            const map = {
-                sudah: { en: 'has/have ' + v.past, zh: '已经+动词 (完成)' },
-                sedang: { en: 'is ' + v.ing, zh: '正在+动词 (进行)' },
-                akan: { en: 'will ' + v.en, zh: '将+动词 (将来)' }
-            };
-            const info = map[tk];
-            renderTriple('tense-result', `She ${info.en}`, `Dia ${tk} ${v.base}`, `[时态: ${info.zh}]`);
-            const steps = [
-                { icon: '⚙️', msg: '尝试直译', status: 'info', conf: '45%' },
-                { icon: '❌', msg: '马来语无屈折，回退', status: 'fail', conf: '<60%' },
-                { icon: '↩️', msg: '加载时态助词', status: 'warn', conf: '' },
-                { icon: '✅', msg: `采纳 "Dia ${tk} ${v.base}"`, status: 'success', conf: '94%' }
-            ];
-            renderBacktrack('tense-backtrack', steps);
-        }
-
-        // ================================================================
-        // ④ 词缀
-        // ================================================================
-        const deriveData = {
-            ajar: { root: 'ajar', meaning: '教', forms: ['ajar', 'pelajar', 'pengajar', 'belajar', 'mengajar'], zh: '中文无派生，复合词' },
-            makan: { root: 'makan', meaning: '吃', forms: ['makan', 'makanan', 'pemakan', 'memakan', 'dimakan'], zh: '零派生，独立词' },
-            tulis: { root: 'tulis', meaning: '写', forms: ['tulis', 'tulisan', 'penulis', 'menulis', 'ditulis'], zh: '零派生' }
-        };
-
-        function showDerivation(key) {
-            const d = deriveData[key];
-            if (!d) return;
-            let html = `<div style="color:#facc15; font-weight:600; font-size:16px; margin-bottom:6px;">词根：${d.root} (${d.meaning})</div><div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(80px,1fr)); gap:6px;">`;
-            d.forms.forEach(f => { html += `<div style="background:rgba(255,255,255,0.02); padding:6px; border-radius:6px; text-align:center; border:1px solid rgba(255,255,255,0.03);"><span style="color:#f1f5f9;">${f}</span></div>`; });
-            html += `</div><div style="color:rgba(255,255,255,0.2); font-size:13px; margin-top:4px;">中文验证：${d.zh}</div>`;
-            document.getElementById('derivation-result').innerHTML = html;
-            const steps = [
-                { icon: '🔍', msg: `词根 ${d.root} 识别`, status: 'info', conf: '100%' },
-                { icon: '⚙️', msg: `应用词缀规则，生成 ${d.forms.length} 个派生词`, status: 'info', conf: '92%' },
-                { icon: '✅', msg: `中文零派生对照验证通过`, status: 'success', conf: '最终 90%' }
-            ];
-            renderBacktrack('derive-backtrack', steps);
-        }
-
-        // ================================================================
-        // ⑤ 被动
-        // ================================================================
-        const passData = {
-            'Saya makan nasi': { active: 'Saya makan nasi', passive: 'Nasi dimakan oleh saya', en: 'I eat rice', en_passive: 'Rice is eaten by me', zh: '米饭被我吃了' },
-            'Dia membaca buku': { active: 'Dia membaca buku', passive: 'Buku dibaca oleh dia', en: 'She reads book', en_passive: 'Book is read by her', zh: '书被她读了' },
-            'Kami minum air': { active: 'Kami minum air', passive: 'Air diminum oleh kami', en: 'We drink water', en_passive: 'Water is drunk by us', zh: '水被我们喝了' }
-        };
-
-        function convertPassive() {
-            const key = document.getElementById('passive-input').value;
-            const d = passData[key];
-            if (!d) return;
-            renderTriple('passive-result', `${d.en} → ${d.en_passive}`, `${d.active} → ${d.passive}`, d.zh);
-            const steps = [
-                { icon: '🔍', msg: '识别主动句结构', status: 'info', conf: '98%' },
-                { icon: '⚙️', msg: '应用 di- + oleh 规则', status: 'info', conf: '96%' },
-                { icon: '✅', msg: '被动结构完全对应', status: 'success', conf: '最终 96%' }
-            ];
-            renderBacktrack('passive-backtrack', steps);
-        }
-
-        // ================================================================
-        // ⑥ 多义词
-        // ================================================================
-        const wsdMap = {
-            sport: { input: '打篮球', en: 'play basketball', tag: '运动类', steps: [
-                    { icon: '⚙️', msg: '候选: hit(15%)/play(85%)', status: 'info', conf: '初始' },
-                    { icon: '🔍', msg: '上下文 "篮球" 指向运动', status: 'info', conf: '+30%' },
-                    { icon: '✅', msg: '采纳 play', status: 'success', conf: '最终89%' }
-                ] },
-            taxi: { input: '打车', en: 'take a taxi', tag: '交通类', steps: [
-                    { icon: '⚙️', msg: '候选: hit(2%)/take(92%)', status: 'info', conf: '初始' },
-                    { icon: '✅', msg: '采纳 take', status: 'success', conf: '最终92%' }
-                ] },
-            hit: { input: '打人', en: 'hit someone', tag: '攻击类', steps: [
-                    { icon: '⚙️', msg: '候选: hit(88%)/play(10%)', status: 'info', conf: '初始' },
-                    { icon: '✅', msg: '采纳 hit', status: 'success', conf: '最终88%' }
-                ] }
-        };
-
-        function showWSD(key) {
-            const d = wsdMap[key];
-            if (!d) return;
-            renderTriple('wsd-result', d.en, `[歧义消解] ${d.tag}`, d.input);
-            renderBacktrack('wsd-backtrack', d.steps);
-        }
-
-        // ================================================================
-        // ⑦ 文化
-        // ================================================================
-        const cultureMap = {
-            dragon: { input: '龙 (中文)', output: 'Loong (避免西方邪恶意象)', note: '文化隐喻替换', steps: [
-                    { icon: '🔍', msg: '检测到文化负载词 "龙"', status: 'info', conf: '90%' },
-                    { icon: '⚠️', msg: '直译 "dragon" 有邪恶意象', status: 'warn', conf: '' },
-                    { icon: '↩️', msg: '触发文化回退，查询映射表', status: 'warn', conf: '' },
-                    { icon: '✅', msg: '采纳 "Loong"', status: 'success', conf: '最终 88%' }
-                ] },
-            taboo: { input: '禁忌词', output: '[已过滤] 中性词', note: '敏感词规避', steps: [
-                    { icon: '🔍', msg: '检测到潜在禁忌词', status: 'info', conf: '85%' },
-                    { icon: '⚠️', msg: '触发敏感词过滤', status: 'warn', conf: '' },
-                    { icon: '✅', msg: '替换为中性词', status: 'success', conf: '最终 92%' }
-                ] }
-        };
-
-        function showCulture(key) {
-            const d = cultureMap[key];
-            if (!d) return;
-            renderTriple('culture-result', d.output, d.note, d.input);
-            renderBacktrack('culture-backtrack', d.steps);
-        }
-
-        // ================================================================
-        // ⑧ 差异边界 · 伪同源词
-        // ================================================================
-        const diffMap = {
-            kereta: { word: 'kereta', my: '🚗 汽车 (Malaysia)', id: '🚂 火车 (Indonesia)', zh: '伪同源词 · 地域冲突', steps: [
-                    { icon: '🔍', msg: '结构验证通过 (SVO, 名词位置正确)', status: 'info', conf: '98%' },
-                    { icon: '⚠️', msg: '检测到伪同源词 "kereta"', status: 'warn', conf: '词义冲突' },
-                    { icon: '↩️', msg: '触发语义回退', status: 'warn', conf: '' },
-                    { icon: '🌐', msg: '加载地域向量偏移 (MY → Car)', status: 'info', conf: '' },
-                    { icon: '✅', msg: '最终映射: kereta → Car', status: 'success', conf: '最终 99%' }
-                ] },
-            budak: { word: 'budak', my: '🧒 小孩 (Malaysia)', id: '⛓️ 奴隶 (Indonesia)', zh: '伪同源词 · 地域冲突', steps: [
-                    { icon: '🔍', msg: '结构验证通过', status: 'info', conf: '97%' },
-                    { icon: '⚠️', msg: '检测到伪同源词 "budak"', status: 'warn', conf: '冲突' },
-                    { icon: '↩️', msg: '触发回退', status: 'warn', conf: '' },
-                    { icon: '🌐', msg: '地域偏移 (MY → Child)', status: 'info', conf: '' },
-                    { icon: '✅', msg: '最终映射: budak → Child', status: 'success', conf: '99%' }
-                ] },
-            percuma: { word: 'percuma', my: '🎁 免费 (Malaysia)', id: '💔 徒劳 (Indonesia)', zh: '伪同源词 · 地域冲突', steps: [
-                    { icon: '🔍', msg: '结构验证通过 (形容词后置)', status: 'info', conf: '96%' },
-                    { icon: '⚠️', msg: '检测到伪同源词 "percuma"', status: 'warn', conf: '冲突' },
-                    { icon: '↩️', msg: '触发回退', status: 'warn', conf: '' },
-                    { icon: '🌐', msg: '地域偏移 (MY → Free)', status: 'info', conf: '' },
-                    { icon: '✅', msg: '最终映射: percuma → Free', status: 'success', conf: '99%' }
-                ] }
-        };
-
-        function showDiff(key) {
-            const d = diffMap[key];
-            if (!d) return;
-            renderTriple('diff-result', d.my, d.id, d.zh);
-            renderBacktrack('diff-backtrack', d.steps);
-        }
-
-        // ================================================================
-        // ⑨ 交互式画圈推理引擎
-        // ================================================================
-        // 定义两个题目的完整推理步骤（每一步包含：显示信息、圈状态更新、结果更新）
-        const problemTemplates = {
-            circle: {
-                getSteps: function(n) {
-                    return [
-                        { msg: `⭕ 画圈：定义“圆桌约束” — ${n}人围成一圈，旋转对称视为同一种`, circles: 'all', action: 'info', result: `正在分析 ${n}人圆排列...` },
-                        { msg: `⚙️ 尝试规则A (线性排列): ${n}! = ${factorial(n)} 种`, circles: 'all', action: 'attempt', result: `线性排列候选：${factorial(n)}` },
-                        { msg: `❌ 验证失败：旋转对称导致重复计数`, circles: 'all', action: 'fail', result: '旋转冲突，需回退' },
-                        { msg: `↩️ 回退至画圈节点，应用圆排列公式 (n-1)!`, circles: 'all', action: 'warn', result: `应用 (${n}-1)!` },
-                        { msg: `⚙️ 重算：(${n}-1)! = ${factorial(n-1)} 种`, circles: 'all', action: 'info', result: `计算中...` },
-                        { msg: `✅ 最终答案：${factorial(n-1)} 种`, circles: 'all', action: 'success', result: `🎉 答案：${factorial(n-1)} 种` }
-                    ];
-                }
-            },
-            divisible: {
-                getSteps: function(maxDigit) {
-                    const totalComb = comb(9, 3);
-                    // 模拟筛选过程，实际可计算
-                    const validComb = 60; // 1-9中数字和能被3整除的组合数
-                    const result = validComb * 6;
-                    return [
-                        { msg: `⭕ 画圈：约束“三位数”、“不同数字”、“能被3整除”`, circles: 'all', action: 'info', result: `数字范围 1-${maxDigit}` },
-                        { msg: `⚙️ 尝试：枚举所有组合 C(9,3)=${totalComb} 组`, circles: 'all', action: 'attempt', result: `组合数 ${totalComb}` },
-                        { msg: `🔍 验证：检查每组数字和能否被3整除`, circles: 'all', action: 'info', result: '筛选条件' },
-                        { msg: `✅ 筛选后：${validComb}组满足条件 → 每组排列 3! = 6`, circles: 'all', action: 'success', result: `有效组合 ${validComb}` },
-                        { msg: `✅ 最终答案：${result} 个`, circles: 'all', action: 'success', result: `🎉 答案：${result} 个` }
-                    ];
-                }
-            }
-        };
-
-        // 辅助函数
-        function factorial(n) { if (n <= 1) return 1; return n * factorial(n-1); }
-        function comb(n, k) { if (k > n) return 0; if (k === 0 || k === n) return 1; return comb(n-1, k-1) + comb(n-1, k); }
-
-        // 当前状态
-        let currentProblem = 'circle';
-        let currentParam = 5;
-        let currentSteps = [];
-        let currentStepIndex = -1;
-        let circlesData = [];
-
-        // DOM 元素
-        const visualEl = document.getElementById('circleVisual');
-        const resultEl = document.getElementById('math-result');
-        const logEl = document.getElementById('math-backtrack');
-        const stepCounter = document.getElementById('stepCounter');
-        const totalStepsSpan = document.getElementById('totalSteps');
-        const stepIndicator = document.getElementById('stepIndicator');
-        const prevBtn = document.getElementById('prevBtn');
-        const nextBtn = document.getElementById('nextBtn');
-        const paramSlider = document.getElementById('mathParam');
-        const paramDisplay = document.getElementById('paramValueDisplay');
-        const digitRangeSlider = document.getElementById('digitRange');
-        const digitRangeDisplay = document.getElementById('digitRangeDisplay');
-
-        // 更新参数显示
-        function updateParamValue() {
-            const val = parseInt(paramSlider.value);
-            paramDisplay.textContent = val;
-            currentParam = val;
-        }
-        function updateDigitRange() {
-            const val = parseInt(digitRangeSlider.value);
-            digitRangeDisplay.textContent = val;
-        }
-
-        // 重置推理
-        function resetMath() {
-            const problemType = document.getElementById('mathProblemSelect').value;
-            currentProblem = problemType;
-            if (problemType === 'circle') {
-                currentParam = parseInt(paramSlider.value);
-                document.getElementById('paramLabel').style.display = 'flex';
-                document.getElementById('digitRangeLabel').style.display = 'none';
+            // 语序
+            const svoSteps = [];
+            if (input.includes('red car') || input.includes('big house')) {
+                const parts = input.split(' ');
+                const adj = parts[0];
+                const noun = parts[1] || 'car';
+                renderTriple('svo-result', `${adj} ${noun}`, `${noun} ${adj === 'red' ? 'merah' : 'besar'}`, `[名词+形容词] 后置`);
+                svoSteps.push({ icon: '⚙️', msg: `尝试规则A (前置): "${adj} ${noun}"`, status: 'info', conf: '12%' });
+                svoSteps.push({ icon: '❌', msg: '马来语验证失败 (修饰语后置)', status: 'fail', conf: '<60%' });
+                svoSteps.push({ icon: '↩️', msg: '回退至名词节点', status: 'warn', conf: '' });
+                svoSteps.push({ icon: '⚙️', msg: `切换规则B (后置): "${noun} ${adj === 'red' ? 'merah' : 'besar'}"`,
+                    status: 'info', conf: '96%' });
+                svoSteps.push({ icon: '✅', msg: '采纳后置规则', status: 'success', conf: '最终96%' });
+                document.getElementById('svoStatus').textContent = '✅ 修饰语后置';
+            } else if (features.includes('多义词"打"')) {
+                renderTriple('svo-result', 'play basketball / take taxi / hit someone', '[歧义消解]', '上下文驱动');
+                svoSteps.push({ icon: '🔍', msg: '检测到多义词 "打"', status: 'info', conf: '85%' });
+                svoSteps.push({ icon: '✅', msg: '根据上下文选择映射', status: 'success', conf: '89%' });
+                document.getElementById('svoStatus').textContent = '✅ 多义词消歧';
             } else {
-                currentParam = parseInt(digitRangeSlider.value) || 9;
-                document.getElementById('paramLabel').style.display = 'none';
-                document.getElementById('digitRangeLabel').style.display = 'flex';
+                renderTriple('svo-result', input, '[待映射]', '[结构待分析]');
+                svoSteps.push({ icon: '🔍', msg: '语序分析中...', status: 'info', conf: '50%' });
+                document.getElementById('svoStatus').textContent = '⏳ 分析中';
             }
+            renderBacktrack('svo-backtrack', svoSteps);
 
-            const template = problemTemplates[problemType];
-            if (!template) return;
-            currentSteps = template.getSteps(currentParam);
-            currentStepIndex = -1;
-            updateUI();
-            renderCircles(problemType, currentParam);
-            resultEl.innerHTML = `<span style="color:rgba(255,255,255,0.2);">准备就绪，点击“下一步”开始推理</span>`;
-            logEl.innerHTML = `<div class="bt-title">⏳ 画圈回溯日志</div><div style="color:rgba(255,255,255,0.05); font-size:12px;">等待开始...</div>`;
-            updateButtons();
+            // 时态
+            const tenseSteps = [];
+            if (features.includes('过去式')) {
+                document.getElementById('tense-result').innerHTML =
+                    `<div style="color:#f1f5f9;">检测到过去式标记 (-ed) → 过去时</div>`;
+                tenseSteps.push({ icon: '🔍', msg: '检测到屈折变化 -ed', status: 'info', conf: '95%' });
+                tenseSteps.push({ icon: '✅', msg: '时态: 过去时', status: 'success', conf: '95%' });
+                document.getElementById('tenseStatus').textContent = '✅ 过去时';
+            } else {
+                document.getElementById('tense-result').innerHTML =
+                    `<div style="color:#f1f5f9;">未检测到时态标记 → 默认为一般现在时</div>`;
+                tenseSteps.push({ icon: '🔍', msg: '未检测到屈折变化', status: 'info', conf: '70%' });
+                tenseSteps.push({ icon: '✅', msg: '时态: 一般现在时', status: 'success', conf: '70%' });
+                document.getElementById('tenseStatus').textContent = '✅ 一般现在时';
+            }
+            renderBacktrack('tense-backtrack', tenseSteps);
+
+            // 词缀
+            const deriveSteps = [];
+            if (input.includes('makan')) {
+                document.getElementById('derivation-result').innerHTML = `
+                    <div style="color:#facc15; font-weight:600; font-size:16px;">词根：makan (吃)</div>
+                    <div class="derivation-grid">
+                        <div class="item"><span class="word">makan</span><span class="pos">词根</span><span class="meaning">吃</span></div>
+                        <div class="item"><span class="word">makanan</span><span class="pos">名词</span><span class="meaning">食物</span></div>
+                        <div class="item"><span class="word">pemakan</span><span class="pos">名词</span><span class="meaning">食客</span></div>
+                        <div class="item"><span class="word">memakan</span><span class="pos">动词</span><span class="meaning">正在吃</span></div>
+                        <div class="item"><span class="word">dimakan</span><span class="pos">被动</span><span class="meaning">被吃</span></div>
+                    </div>
+                    <div style="color:rgba(255,255,255,0.2); font-size:13px;">中文验证：零派生，独立词</div>
+                `;
+                deriveSteps.push({ icon: '🔍', msg: '识别词根 "makan"', status: 'info', conf: '100%' });
+                deriveSteps.push({ icon: '⚙️', msg: '应用词缀规则，生成5个派生词', status: 'info', conf: '92%' });
+                deriveSteps.push({ icon: '✅', msg: '中文零派生对照验证', status: 'success', conf: '90%' });
+                document.getElementById('deriveStatus').textContent = '✅ 词根: makan';
+            } else {
+                document.getElementById('derivation-result').innerHTML =
+                    `<div style="color:rgba(255,255,255,0.2); font-size:14px;">输入包含 "makan" 可查看词缀派生示例</div>`;
+                deriveSteps.push({ icon: '🔍', msg: '等待词根输入', status: 'info', conf: '—' });
+                document.getElementById('deriveStatus').textContent = '⏳ 等待输入';
+            }
+            renderBacktrack('derive-backtrack', deriveSteps);
+
+            // 被动
+            const passiveSteps = [];
+            if (input.includes('dimakan')) {
+                document.getElementById('passive-result').innerHTML =
+                    `<div>主动: Saya makan nasi → 被动: Nasi dimakan oleh saya</div>`;
+                passiveSteps.push({ icon: '🔍', msg: '识别被动结构 di-', status: 'info', conf: '98%' });
+                passiveSteps.push({ icon: '✅', msg: '被动: di- + oleh', status: 'success', conf: '96%' });
+                document.getElementById('passiveStatus').textContent = '✅ 被动结构';
+            } else {
+                document.getElementById('passive-result').innerHTML =
+                    `<span style="color:rgba(255,255,255,0.2);">输入包含 "dimakan" 可查看被动示例</span>`;
+                passiveSteps.push({ icon: '🔍', msg: '等待被动结构输入', status: 'info', conf: '—' });
+                document.getElementById('passiveStatus').textContent = '⏳ 等待输入';
+            }
+            renderBacktrack('passive-backtrack', passiveSteps);
+
+            // 多义词
+            const wsdSteps = [];
+            if (features.includes('多义词"打"')) {
+                document.getElementById('wsd-result').innerHTML =
+                    `<div>候选映射: "打" → hit (攻击) / play (运动) / take (交通) → 根据上下文选择</div>`;
+                wsdSteps.push({ icon: '🔍', msg: '候选: hit(15%)/play(85%)', status: 'info', conf: '初始' });
+                wsdSteps.push({ icon: '🔍', msg: '上下文匹配', status: 'info', conf: '+30%' });
+                wsdSteps.push({ icon: '✅', msg: '采纳 play/take/hit', status: 'success', conf: '89%' });
+                document.getElementById('wsdStatus').textContent = '✅ 多义词消歧';
+            } else {
+                document.getElementById('wsd-result').innerHTML =
+                    `<span style="color:rgba(255,255,255,0.2);">输入包含 "打" 可查看多义词示例</span>`;
+                wsdSteps.push({ icon: '🔍', msg: '等待多义词输入', status: 'info', conf: '—' });
+                document.getElementById('wsdStatus').textContent = '⏳ 等待输入';
+            }
+            renderBacktrack('wsd-backtrack', wsdSteps);
+
+            // 文化
+            const cultureSteps = [];
+            if (features.includes('文化隐喻')) {
+                document.getElementById('culture-result').innerHTML =
+                    `<div>文化隐喻: "龙" → 中文象征吉祥, 英文 'dragon' 负面 → 建议译作 'Loong'</div>`;
+                cultureSteps.push({ icon: '🔍', msg: '检测到文化负载词 "龙"', status: 'info', conf: '90%' });
+                cultureSteps.push({ icon: '⚠️', msg: '直译 "dragon" 有邪恶意象', status: 'warn', conf: '' });
+                cultureSteps.push({ icon: '↩️', msg: '触发文化回退', status: 'warn', conf: '' });
+                cultureSteps.push({ icon: '✅', msg: '采纳 "Loong"', status: 'success', conf: '88%' });
+                document.getElementById('cultureStatus').textContent = '✅ 文化适配';
+            } else {
+                document.getElementById('culture-result').innerHTML =
+                    `<span style="color:rgba(255,255,255,0.2);">输入包含 "龙" 可查看文化适配示例</span>`;
+                cultureSteps.push({ icon: '🔍', msg: '等待文化词输入', status: 'info', conf: '—' });
+                document.getElementById('cultureStatus').textContent = '⏳ 等待输入';
+            }
+            renderBacktrack('culture-backtrack', cultureSteps);
+
+            // 差异边界
+            const diffSteps = [];
+            if (features.includes('伪同源词')) {
+                document.getElementById('diff-result').innerHTML =
+                    `<div>伪同源词: "kereta" → 马来西亚=汽车, 印度尼西亚=火车 → 需地域偏移</div>`;
+                diffSteps.push({ icon: '🔍', msg: '结构验证通过', status: 'info', conf: '98%' });
+                diffSteps.push({ icon: '⚠️', msg: '检测到伪同源词 "kereta"', status: 'warn', conf: '冲突' });
+                diffSteps.push({ icon: '↩️', msg: '触发语义回退', status: 'warn', conf: '' });
+                diffSteps.push({ icon: '🌐', msg: '地域偏移 (MY → Car)', status: 'info', conf: '' });
+                diffSteps.push({ icon: '✅', msg: '最终映射: Car', status: 'success', conf: '99%' });
+                document.getElementById('diffStatus').textContent = '✅ 地域偏移';
+            } else {
+                document.getElementById('diff-result').innerHTML =
+                    `<span style="color:rgba(255,255,255,0.2);">输入包含 "kereta" 可查看伪同源词拦截</span>`;
+                diffSteps.push({ icon: '🔍', msg: '等待伪同源词输入', status: 'info', conf: '—' });
+                document.getElementById('diffStatus').textContent = '⏳ 等待输入';
+            }
+            renderBacktrack('diff-backtrack', diffSteps);
         }
 
-        // 渲染圆圈
-        function renderCircles(type, param) {
+        // ================================================================
+        // ⑨ 奥数翻译模块
+        // ================================================================
+        // 生成所有组合 (i<j<k)
+        const allCombos = [];
+        for (let i = 1; i <= 9; i++) {
+            for (let j = i + 1; j <= 9; j++) {
+                for (let k = j + 1; k <= 9; k++) {
+                    allCombos.push([i, j, k]);
+                }
+            }
+        }
+
+        let mathState = {
+            index: 0,
+            valid: [],
+            logs: [],
+            done: false,
+            active: false,
+            type: 'divisible',
+            n: 9
+        };
+
+        function setupMathModule(info) {
+            mathState.type = info.type;
+            mathState.n = info.n;
+            mathState.active = true;
+            mathState.index = 0;
+            mathState.valid = [];
+            mathState.logs = [];
+            mathState.done = false;
+
+            // 显示题目
+            document.getElementById('currentAttempt').innerHTML = `📐 ${info.question}`;
+
+            // 渲染数字牌
+            renderNumberPool(info.type, info.n);
+
+            // 更新统计
+            document.getElementById('mathTried').textContent = '0';
+            document.getElementById('mathValid').textContent = '0';
+            document.getElementById('mathStepCounter').textContent = '0';
+            document.getElementById('mathTotalSteps').textContent = allCombos.length;
+            document.getElementById('mathStatus').textContent = `就绪 · ${info.type === 'circle' ? '圆排列' : '整除'}`;
+
+            // 清空日志
+            document.getElementById('mathBacktrack').innerHTML = `
+                <div class="bt-title">⚙️ 枚举 → 验证 → 回退 日志</div>
+                <div style="color:rgba(255,255,255,0.05); font-size:12px;">点击"下一步"开始逐一尝试</div>
+            `;
+
+            // 重置统计框
+            document.getElementById('mathStats').innerHTML = `
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+                    <div><span style="color:rgba(255,255,255,0.2);">📦 已尝试组合</span><br><span id="mathTried" style="font-size:20px; color:#60a5fa;">0</span></div>
+                    <div><span style="color:rgba(255,255,255,0.2);">✅ 通过验证 (保留)</span><br><span id="mathValid" style="font-size:20px; color:#4ade80;">0</span></div>
+                </div>
+            `;
+        }
+
+        function renderNumberPool(type, n) {
+            const pool = document.getElementById('numberPool');
             let labels = [];
             if (type === 'circle') {
-                for (let i = 1; i <= param; i++) labels.push(String.fromCharCode(64 + i));
+                for (let i = 1; i <= n; i++) labels.push(i.toString());
             } else {
-                for (let i = 1; i <= param; i++) labels.push(i.toString());
-            }
-            circlesData = labels.map((label) => ({ label, state: 'idle' }));
-            updateCircles();
-        }
-
-        // 更新圆圈DOM
-        function updateCircles() {
-            if (circlesData.length === 0) {
-                visualEl.innerHTML = `<span style="color:rgba(255,255,255,0.08);">无数据</span>`;
-                return;
+                for (let i = 1; i <= 9; i++) labels.push(i.toString());
             }
             let html = '';
-            circlesData.forEach((c, idx) => {
-                let cls = 'circle';
-                if (c.state === 'active') cls += ' highlight';
-                else if (c.state === 'fail') cls += ' fail-highlight';
-                else if (c.state === 'success') cls += ' success-highlight';
-                html += `<div class="${cls}" style="transition-delay:${idx*0.05}s">${c.label}</div>`;
-                if (idx < circlesData.length-1) html += `<span class="arrow-conn">${idx % 2 === 0 ? '⟷' : '·'}</span>`;
+            labels.forEach(label => {
+                html += `<div class="num-card">${label}</div>`;
             });
-            visualEl.innerHTML = html;
+            pool.innerHTML = html;
         }
 
-        // 更新UI（步骤、结果、日志、按钮）
-        function updateUI() {
-            const total = currentSteps.length;
-            totalStepsSpan.textContent = total;
-            if (currentStepIndex < 0) {
-                stepCounter.textContent = '0';
-                stepIndicator.textContent = `步骤 0 / ${total}`;
-                prevBtn.disabled = true;
-                nextBtn.disabled = false;
+        function updateNumberPoolHighlight(highlight = [], fail = [], success = []) {
+            const cards = document.querySelectorAll('#numberPool .num-card');
+            const labels = [];
+            if (highlight.length) {
+                // 根据当前组合高亮
+                const allLabels = [];
+                for (let i = 1; i <= 9; i++) allLabels.push(i.toString());
+                cards.forEach((card, idx) => {
+                    const val = parseInt(card.textContent);
+                    card.className = 'num-card';
+                    if (highlight.includes(val)) card.classList.add('active');
+                    if (fail.includes(val)) card.classList.add('fail');
+                    if (success.includes(val)) card.classList.add('success');
+                });
+            }
+        }
+
+        function mathNextStep() {
+            if (!mathState.active) {
+                document.getElementById('mathStatus').textContent = '⚠️ 请先输入奥数题';
                 return;
             }
-            const idx = currentStepIndex;
-            stepCounter.textContent = idx + 1;
-            stepIndicator.textContent = `步骤 ${idx+1} / ${total}`;
-            const step = currentSteps[idx];
-            if (step) {
-                resultEl.innerHTML = `<div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
-                    <div><span style="color:rgba(255,255,255,0.3);">📝 当前推理</span><br><span style="color:#f1f5f9;">${step.msg}</span></div>
-                    <div><span style="color:rgba(255,255,255,0.3);">📊 状态</span><br><span style="color:#4ade80;">${step.result}</span></div>
-                </div>`;
-                let logHtml = `<div class="bt-title">⏳ 画圈回溯日志</div>`;
-                for (let i = 0; i <= idx; i++) {
-                    const s = currentSteps[i];
-                    const cls = s.action || 'info';
-                    logHtml += `<div class="bt-step ${cls}">
-                        <span class="icon">${s.msg.split(' ')[0]}</span>
-                        <span class="msg">${s.msg}</span>
-                        <span class="conf">${s.result}</span>
-                    </div>`;
-                }
-                logEl.innerHTML = logHtml;
+            if (mathState.done) {
+                document.getElementById('mathStatus').textContent = '✅ 已完成';
+                return;
+            }
+            if (mathState.index >= allCombos.length) {
+                mathState.done = true;
+                document.getElementById('mathStatus').textContent = '✅ 全部尝试完毕';
+                document.getElementById('currentAttempt').innerHTML =
+                    `🎉 全部完成！有效组合 ${mathState.valid.length} 个，总数 ${mathState.valid.length * 6} 个三位数`;
+                const allValid = [...new Set(mathState.valid.flat())];
+                updateNumberPoolHighlight([], [], allValid);
+                document.getElementById('mathTried').textContent = allCombos.length;
+                document.getElementById('mathValid').textContent = mathState.valid.length;
+                document.getElementById('mathStepCounter').textContent = allCombos.length;
+                return;
+            }
 
-                // 更新圈状态
-                if (step.action === 'attempt') {
-                    circlesData.forEach(c => c.state = 'active');
-                } else if (step.action === 'fail') {
-                    circlesData.forEach(c => c.state = 'fail');
-                } else if (step.action === 'success') {
-                    circlesData.forEach(c => c.state = 'success');
+            const combo = allCombos[mathState.index];
+            const sum = combo[0] + combo[1] + combo[2];
+            const isValid = (sum % 3 === 0);
+
+            // 显示当前尝试
+            updateNumberPoolHighlight(combo, [], []);
+            document.getElementById('currentAttempt').innerHTML =
+                `🔍 尝试组合：<strong style="color:#facc15;">${combo.join(' + ')}</strong> (数字和 = ${sum})`;
+
+            // 记录日志
+            let logMsg = `尝试 [${combo.join(', ')}] → 数字和 ${sum} `;
+            let logStatus = 'info';
+            let logIcon = '🔍';
+            if (isValid) {
+                mathState.valid.push(combo);
+                logMsg += `✅ 能被 3 整除！通过验证 (保留)`;
+                logStatus = 'success';
+                logIcon = '✅';
+                setTimeout(() => updateNumberPoolHighlight(combo, [], combo), 50);
+            } else {
+                logMsg += `❌ ${sum} 不能被 3 整除，回退 (丢弃)`;
+                logStatus = 'fail';
+                logIcon = '❌';
+                setTimeout(() => updateNumberPoolHighlight(combo, combo, []), 50);
+            }
+            mathState.logs.push({ msg: logMsg, status: logStatus, icon: logIcon });
+
+            mathState.index++;
+            document.getElementById('mathTried').textContent = mathState.index;
+            document.getElementById('mathValid').textContent = mathState.valid.length;
+            document.getElementById('mathStepCounter').textContent = mathState.index;
+            document.getElementById('mathStatus').textContent = `正在尝试第 ${mathState.index} 组`;
+
+            // 渲染日志
+            let logHtml = `<div class="bt-title">⚙️ 枚举 → 验证 → 回退 日志</div>`;
+            const recent = mathState.logs.slice(-6);
+            recent.forEach(log => {
+                const cls = log.status || 'info';
+                logHtml += `
+                    <div class="bt-step ${cls}">
+                        <span class="icon">${log.icon}</span>
+                        <span class="msg">${log.msg}</span>
+                    </div>
+                `;
+            });
+            document.getElementById('mathBacktrack').innerHTML = logHtml;
+        }
+
+        function mathReset() {
+            mathState.index = 0;
+            mathState.valid = [];
+            mathState.logs = [];
+            mathState.done = false;
+            updateNumberPoolHighlight([], [], []);
+            document.getElementById('currentAttempt').innerHTML = '🎯 点击"下一步"开始尝试组合';
+            document.getElementById('mathTried').textContent = '0';
+            document.getElementById('mathValid').textContent = '0';
+            document.getElementById('mathStepCounter').textContent = '0';
+            document.getElementById('mathStatus').textContent = '已重置';
+            document.getElementById('mathBacktrack').innerHTML = `
+                <div class="bt-title">⚙️ 枚举 → 验证 → 回退 日志</div>
+                <div style="color:rgba(255,255,255,0.05); font-size:12px;">已重置，点击"下一步"开始</div>
+            `;
+        }
+
+        function mathRunAll() {
+            if (!mathState.active) {
+                document.getElementById('mathStatus').textContent = '⚠️ 请先输入奥数题';
+                return;
+            }
+            mathReset();
+            for (let i = 0; i < allCombos.length; i++) {
+                const combo = allCombos[i];
+                const sum = combo[0] + combo[1] + combo[2];
+                if (sum % 3 === 0) {
+                    mathState.valid.push(combo);
+                    mathState.logs.push({
+                        msg: `尝试 [${combo.join(', ')}] → 数字和 ${sum} ✅ 通过`,
+                        status: 'success',
+                        icon: '✅'
+                    });
                 } else {
-                    // 其他状态保持idle或已设
+                    mathState.logs.push({
+                        msg: `尝试 [${combo.join(', ')}] → 数字和 ${sum} ❌ 回退`,
+                        status: 'fail',
+                        icon: '❌'
+                    });
                 }
-                updateCircles();
             }
-            updateButtons();
-        }
+            mathState.index = allCombos.length;
+            mathState.done = true;
+            const allValid = [...new Set(mathState.valid.flat())];
+            updateNumberPoolHighlight([], [], allValid);
+            document.getElementById('currentAttempt').innerHTML =
+                `🎉 全部完成！有效组合 ${mathState.valid.length} 个，总数 ${mathState.valid.length * 6} 个三位数`;
+            document.getElementById('mathTried').textContent = allCombos.length;
+            document.getElementById('mathValid').textContent = mathState.valid.length;
+            document.getElementById('mathStepCounter').textContent = allCombos.length;
+            document.getElementById('mathStatus').textContent = '✅ 快速演示完成';
 
-        function updateButtons() {
-            const total = currentSteps.length;
-            if (currentStepIndex < 0) {
-                prevBtn.disabled = true;
-                nextBtn.disabled = false;
-                return;
-            }
-            prevBtn.disabled = (currentStepIndex === 0);
-            nextBtn.disabled = (currentStepIndex >= total - 1);
-        }
-
-        function nextStep() {
-            if (currentStepIndex >= currentSteps.length - 1) return;
-            currentStepIndex++;
-            updateUI();
-        }
-
-        function prevStep() {
-            if (currentStepIndex <= 0) return;
-            currentStepIndex--;
-            updateUI();
+            // 渲染日志
+            let logHtml = `<div class="bt-title">⚙️ 枚举 → 验证 → 回退 日志</div>`;
+            const recent = mathState.logs.slice(-10);
+            recent.forEach(log => {
+                const cls = log.status || 'info';
+                logHtml += `
+                    <div class="bt-step ${cls}">
+                        <span class="icon">${log.icon}</span>
+                        <span class="msg">${log.msg}</span>
+                    </div>
+                `;
+            });
+            document.getElementById('mathBacktrack').innerHTML = logHtml;
         }
 
         // ================================================================
         // 初始化
         // ================================================================
         window.onload = function() {
-            // 设置默认值
-            document.getElementById('mathProblemSelect').value = 'circle';
-            resetMath();
-            // 默认执行第一步演示
-            setTimeout(() => { nextStep(); }, 500);
-
-            // 滑块事件
-            document.getElementById('mathParam').addEventListener('input', function() {
-                updateParamValue();
-                resetMath();
-            });
-            document.getElementById('digitRange').addEventListener('input', function() {
-                updateDigitRange();
-                resetMath();
-            });
-            document.getElementById('mathProblemSelect').addEventListener('change', resetMath);
-
-            // 加载其他模块默认数据
             setTimeout(() => {
+                // 默认加载圆排列示例
+                document.getElementById('routerInput').value = '5个人围成一圈';
                 processRouter();
-                showSVO('red_car');
-                convertTense();
-                showDerivation('ajar');
-                convertPassive();
-                showWSD('sport');
-                showCulture('dragon');
-                showDiff('kereta');
-            }, 200);
+            }, 300);
         };
 
         // 暴露全局
-        window.resetMath = resetMath;
-        window.nextStep = nextStep;
-        window.prevStep = prevStep;
-        window.updateParamValue = updateParamValue;
-        window.updateDigitRange = updateDigitRange;
         window.processRouter = processRouter;
         window.setRouter = setRouter;
-        window.showSVO = showSVO;
-        window.convertTense = convertTense;
-        window.showDerivation = showDerivation;
-        window.convertPassive = convertPassive;
-        window.showWSD = showWSD;
-        window.showCulture = showCulture;
-        window.showDiff = showDiff;
+        window.mathNextStep = mathNextStep;
+        window.mathReset = mathReset;
+        window.mathRunAll = mathRunAll;
     </script>
 
 </body>
