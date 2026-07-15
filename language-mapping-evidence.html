@@ -1,24 +1,27 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>完整证据链 · 人机对话语义路由器</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>完整证据链 · 跨语种结构化学习验证 (融合版)</title>
     <style>
+        /* ===== 全局重置 (保留原始风格) ===== */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
+
         body {
-            background: #070712;
+            background: #0b0b1a;
             font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
             min-height: 100vh;
             display: flex;
-            padding: 12px 12px 12px 0;
-            color: #f1f5f9;
+            padding: 20px 20px 20px 0;
             overflow-x: hidden;
         }
+
+        /* ===== 鼠标跟随光晕 (保留) ===== */
         #glow {
             position: fixed;
             top: 0;
@@ -27,398 +30,341 @@
             height: 100%;
             pointer-events: none;
             z-index: 0;
-            background: radial-gradient(600px circle at var(--x, 50%) var(--y, 50%), rgba(100, 70, 200, 0.06), transparent 75%);
-            transition: background 0.12s;
+            background: radial-gradient(600px circle at var(--x, 50%) var(--y, 50%), rgba(120, 80, 255, 0.06), transparent 80%);
+            transition: background 0.1s;
         }
-        .sidebar {
+
+        /* ===== 右侧固定导航栏 (扩充至8步) ===== */
+        .sidebar-nav {
             position: fixed;
             top: 0;
             right: 0;
-            width: 44px;
+            width: 72px;
             height: 100vh;
-            padding: 12px 0;
+            padding: 32px 0 24px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 2px;
+            gap: 4px;
             z-index: 100;
-            background: rgba(7, 7, 18, 0.7);
+            background: rgba(11, 11, 26, 0.6);
             backdrop-filter: blur(12px);
             border-left: 1px solid rgba(255, 255, 255, 0.04);
         }
-        .sidebar .dot {
-            width: 4px;
-            height: 4px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.06);
-            transition: all 0.3s ease;
+
+        .sidebar-nav .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            color: rgba(255, 255, 255, 0.12);
+            font-size: 11px;
+            font-weight: 500;
             cursor: pointer;
+            transition: all 0.3s ease;
             border: 1px solid transparent;
-            margin: 1px 0;
-            position: relative;
+            text-decoration: none;
+            font-family: 'Courier New', monospace;
         }
-        .sidebar .dot:hover {
-            background: rgba(167, 139, 250, 0.3);
-            transform: scale(1.4);
+
+        .sidebar-nav .nav-item:hover {
+            color: rgba(255, 255, 255, 0.5);
+            background: rgba(255, 255, 255, 0.03);
+            border-color: rgba(255, 255, 255, 0.06);
         }
-        .sidebar .dot.active {
-            background: #a78bfa;
-            box-shadow: 0 0 10px rgba(167, 139, 250, 0.2);
-            transform: scale(1.2);
+
+        .sidebar-nav .nav-item.active {
+            color: #a78bfa;
+            background: rgba(167, 139, 250, 0.06);
+            border-color: rgba(167, 139, 250, 0.12);
         }
-        .sidebar .dot .label {
-            position: absolute;
-            right: 12px;
-            top: 50%;
-            transform: translateY(-50%);
+
+        .sidebar-nav .nav-item .num {
+            font-size: 10px;
+            font-weight: 600;
+            line-height: 1;
+        }
+
+        .sidebar-nav .nav-item .label {
             font-size: 6px;
-            color: rgba(255, 255, 255, 0.1);
-            white-space: nowrap;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-            background: rgba(7, 7, 18, 0.9);
-            padding: 2px 6px;
-            border-radius: 4px;
-            border: 1px solid rgba(255, 255, 255, 0.03);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            opacity: 0.3;
+            margin-top: 1px;
+            font-family: system-ui, sans-serif;
         }
-        .sidebar .dot:hover .label {
-            opacity: 1;
+
+        .sidebar-nav .nav-divider {
+            width: 20px;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.04);
+            margin: 2px 0;
         }
-        .sidebar .line {
-            width: 1px;
-            height: 12px;
-            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02));
-            margin: 1px 0;
-        }
-        .sidebar .bottom-text {
+
+        .sidebar-nav .nav-bottom {
             margin-top: auto;
-            font-size: 4px;
-            color: rgba(255, 255, 255, 0.02);
+            font-size: 7px;
+            color: rgba(255, 255, 255, 0.04);
             writing-mode: vertical-rl;
             letter-spacing: 2px;
             font-weight: 300;
         }
-        .main {
+
+        /* ===== 主内容 ===== */
+        .main-content {
             flex: 1;
-            max-width: 1200px;
+            max-width: 1100px;
             margin: 0 auto;
-            padding: 0 56px 16px 16px;
-            position: relative;
-            z-index: 1;
+            padding: 0 100px 32px 32px;
+            min-height: 100vh;
         }
+
         .container {
-            background: radial-gradient(ellipse at 20% 20%, #100b22, #070712 75%, #030208);
-            border-radius: 24px;
-            padding: 24px 24px 20px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            box-shadow: 0 40px 80px rgba(20, 5, 50, 0.5);
+            max-width: 1000px;
+            width: 100%;
+            background: radial-gradient(ellipse at 30% 30%, #120b24, #0b0b1a 70%, #05030a);
+            border-radius: 32px;
+            padding: 48px 44px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            box-shadow: 0 30px 80px rgba(40, 10, 80, 0.4);
             position: relative;
             overflow: hidden;
+            z-index: 1;
+            backdrop-filter: blur(2px);
         }
+
         .container::before {
             content: '';
             position: absolute;
             top: -100px;
             right: -100px;
-            width: 350px;
-            height: 350px;
-            background: radial-gradient(circle, rgba(100, 50, 180, 0.08), transparent 70%);
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(80, 30, 140, 0.15), transparent 70%);
             border-radius: 50%;
             pointer-events: none;
-            animation: floatA 14s ease-in-out infinite alternate;
+            animation: floatBg 12s ease-in-out infinite alternate;
         }
+
         .container::after {
             content: '';
             position: absolute;
             bottom: -80px;
             left: -80px;
-            width: 280px;
-            height: 280px;
-            background: radial-gradient(circle, rgba(40, 70, 180, 0.05), transparent 70%);
+            width: 350px;
+            height: 350px;
+            background: radial-gradient(circle, rgba(30, 60, 150, 0.1), transparent 70%);
             border-radius: 50%;
             pointer-events: none;
-            animation: floatB 12s ease-in-out infinite alternate-reverse;
+            animation: floatBg 10s ease-in-out infinite alternate-reverse;
         }
-        @keyframes floatA {
+
+        @keyframes floatBg {
             0% {
                 transform: translate(0, 0) scale(1);
             }
             100% {
-                transform: translate(20px, -20px) scale(1.08);
+                transform: translate(30px, -20px) scale(1.1);
             }
         }
-        @keyframes floatB {
+
+        @keyframes gradientFlow {
             0% {
-                transform: translate(0, 0) scale(1);
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
             }
             100% {
-                transform: translate(-20px, 20px) scale(1.12);
+                background-position: 0% 50%;
             }
         }
+
+        .section-anchor {
+            scroll-margin-top: 16px;
+        }
+
+        /* ===== Hero ===== */
         .hero {
             text-align: center;
-            padding-bottom: 16px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
-            margin-bottom: 18px;
+            padding-bottom: 32px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            margin-bottom: 32px;
         }
-        .hero .tag {
+
+        .hero .badge {
             display: inline-block;
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            color: rgba(255, 255, 255, 0.2);
-            font-size: 10px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 13px;
             font-weight: 600;
-            padding: 3px 14px;
+            padding: 4px 16px;
             border-radius: 20px;
-            letter-spacing: 0.5px;
-            margin-bottom: 4px;
+            letter-spacing: 0.3px;
+            margin-bottom: 12px;
         }
+
         .hero h1 {
-            font-size: 24px;
+            font-size: 32px;
             font-weight: 700;
             color: #f1f5f9;
-            background: linear-gradient(135deg, #f1f5f9, #a78bfa, #60a5fa);
+            margin-bottom: 6px;
+            background: linear-gradient(135deg, #f1f5f9, #a78bfa, #60a5fa, #f1f5f9);
+            background-size: 300% 300%;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            margin-bottom: 2px;
+            animation: gradientFlow 6s ease-in-out infinite;
         }
-        .hero .sub {
-            color: rgba(255, 255, 255, 0.25);
+
+        .hero .subtitle {
+            color: #a78bfa;
+            font-size: 18px;
+            font-weight: 400;
+            margin-bottom: 12px;
+        }
+
+        .hero .description {
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 15px;
+            line-height: 1.8;
+            max-width: 700px;
+            margin: 0 auto 16px auto;
+        }
+
+        .hero .description strong {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .hero .highlight-tag {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.02);
+            color: #facc15;
+            padding: 6px 16px;
+            border-radius: 20px;
             font-size: 13px;
+            font-weight: 500;
+            border: 1px solid rgba(255, 255, 255, 0.04);
         }
-        .sec-anchor {
-            scroll-margin-top: 10px;
+
+        /* ===== 证据链步骤条 (扩充至8步) ===== */
+        .evidence-steps {
+            display: flex;
+            justify-content: space-between;
+            gap: 4px;
+            margin: 24px 0 8px 0;
+            flex-wrap: wrap;
         }
+
+        .evidence-steps .step {
+            flex: 1;
+            min-width: 60px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 10px;
+            padding: 8px 6px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: block;
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        .evidence-steps .step:hover {
+            border-color: rgba(167, 139, 250, 0.15);
+            background: rgba(255, 255, 255, 0.03);
+            transform: translateY(-2px);
+        }
+
+        .evidence-steps .step .num {
+            color: #a78bfa;
+            font-weight: 700;
+            font-size: 12px;
+        }
+
+        .evidence-steps .step .label {
+            color: rgba(255, 255, 255, 0.2);
+            font-size: 9px;
+            margin-top: 2px;
+        }
+
+        .evidence-steps .step.active {
+            border-color: #facc15;
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .evidence-steps .step.active .num {
+            color: #facc15;
+        }
+
+        .evidence-steps .step.active .label {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        /* ===== 通用标题 ===== */
         .section-title {
-            font-size: 16px;
+            font-size: 22px;
             font-weight: 600;
             color: rgba(255, 255, 255, 0.8);
-            margin-top: 20px;
-            margin-bottom: 2px;
+            margin-top: 40px;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            scroll-margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .section-title .badge {
+            font-size: 12px;
+            background: rgba(255, 255, 255, 0.02);
+            color: rgba(255, 255, 255, 0.2);
+            padding: 2px 12px;
+            border-radius: 12px;
+            font-weight: 400;
+            font-family: monospace;
+        }
+
+        .section-desc {
+            color: rgba(255, 255, 255, 0.35);
+            font-size: 14px;
+            margin-bottom: 16px;
+            border-left: 3px solid #a78bfa;
+            padding-left: 14px;
+        }
+
+        /* ===== 交互卡片 ===== */
+        .interact-card {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 16px;
+            padding: 22px 24px;
+            margin: 14px 0 24px 0;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            transition: border-color 0.3s ease;
+        }
+
+        .interact-card:hover {
+            border-color: rgba(255, 255, 255, 0.06);
+        }
+
+        .interact-card .card-title {
+            color: rgba(255, 255, 255, 0.6);
+            font-weight: 600;
+            font-size: 16px;
+            margin-bottom: 12px;
             display: flex;
             align-items: center;
             gap: 8px;
             flex-wrap: wrap;
         }
-        .section-title .tag-sm {
-            font-size: 9px;
-            background: rgba(255, 255, 255, 0.02);
-            color: rgba(255, 255, 255, 0.15);
-            padding: 2px 10px;
-            border-radius: 12px;
-            font-weight: 400;
-            font-family: monospace;
-        }
-        .section-desc {
-            color: rgba(255, 255, 255, 0.2);
-            font-size: 11px;
-            margin-bottom: 6px;
-            padding-left: 10px;
-            border-left: 2px solid rgba(167, 139, 250, 0.15);
-        }
 
-        /* 主交互区 */
-        .main-interact {
-            background: rgba(255, 255, 255, 0.02);
-            border-radius: 16px;
-            padding: 16px 18px;
-            margin-bottom: 16px;
-            border: 1px solid rgba(255, 255, 255, 0.04);
-        }
-        .input-row {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            margin-bottom: 8px;
-        }
-        .input-row input {
-            flex: 1;
-            min-width: 180px;
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            border-radius: 10px;
-            padding: 10px 14px;
-            color: #f1f5f9;
-            font-size: 14px;
-            outline: none;
-            transition: border 0.3s;
-        }
-        .input-row input:focus {
-            border-color: #a78bfa;
-        }
-        .input-row input::placeholder {
-            color: rgba(255, 255, 255, 0.12);
-        }
-        .btn {
-            background: #a78bfa;
-            border: none;
-            padding: 10px 22px;
-            border-radius: 10px;
-            font-weight: 600;
-            font-size: 14px;
-            color: #0b0b1a;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        .btn:hover {
-            background: #8b6fd9;
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(167, 139, 250, 0.2);
-        }
-        .quick-actions {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-            margin-bottom: 6px;
-        }
-        .quick-actions button {
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.04);
-            color: rgba(255, 255, 255, 0.25);
-            padding: 4px 12px;
-            border-radius: 16px;
-            font-size: 12px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        .quick-actions button:hover {
-            border-color: #a78bfa;
-            color: #a78bfa;
-            background: rgba(167, 139, 250, 0.05);
-        }
-
-        .result-panel {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 12px;
-            margin-top: 10px;
-        }
-        @media (max-width: 780px) {
-            .result-panel {
-                grid-template-columns: 1fr;
-            }
-        }
-        .res-card {
-            background: rgba(255, 255, 255, 0.015);
-            border-radius: 10px;
-            padding: 10px 12px;
-            border: 1px solid rgba(255, 255, 255, 0.03);
-        }
-        .res-card .label {
-            font-size: 9px;
-            text-transform: uppercase;
-            color: rgba(255, 255, 255, 0.12);
-            letter-spacing: 0.5px;
-            margin-bottom: 4px;
-        }
-        .res-card .value {
-            font-size: 13px;
-            line-height: 1.5;
-            word-break: break-all;
-        }
-        .res-card .value .hl-en {
-            color: #60a5fa;
-        }
-        .res-card .value .hl-my {
-            color: #facc15;
-        }
-        .res-card .value .hl-zh {
-            color: #a78bfa;
-        }
-        .res-card .value .hl-json {
-            color: #34d399;
-            font-family: monospace;
-            font-size: 12px;
-        }
-
-        .trace-log {
-            margin-top: 12px;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 10px;
-            padding: 10px 12px;
-            border-left: 3px solid #fbbf24;
-        }
-        .trace-log .step {
-            display: flex;
-            align-items: flex-start;
-            gap: 10px;
-            padding: 3px 0;
-            font-size: 12px;
-            font-family: 'Courier New', monospace;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.015);
-        }
-        .trace-log .step:last-child {
-            border-bottom: none;
-        }
-        .trace-log .step .icon {
-            width: 18px;
-            text-align: center;
-            flex-shrink: 0;
-        }
-        .trace-log .step .msg {
-            flex: 1;
-            color: rgba(255, 255, 255, 0.5);
-        }
-        .trace-log .step .conf {
-            font-size: 11px;
-            padding: 0 8px;
-            border-radius: 10px;
-            background: rgba(255, 255, 255, 0.02);
-            color: rgba(255, 255, 255, 0.15);
-            white-space: nowrap;
-        }
-        .trace-log .step.success .msg {
-            color: #4ade80;
-        }
-        .trace-log .step.fail .msg {
-            color: #f87171;
-        }
-        .trace-log .step.warn .msg {
-            color: #fbbf24;
-        }
-        .trace-log .step.info .msg {
-            color: #60a5fa;
-        }
-        .trace-log .step.success .conf {
-            color: #4ade80;
-        }
-        .trace-log .step.fail .conf {
-            color: #f87171;
-        }
-        .trace-log .step.warn .conf {
-            color: #fbbf24;
-        }
-        .trace-log .step.info .conf {
-            color: #60a5fa;
-        }
-
-        /* 证据卡片 */
-        .ev-card {
-            background: rgba(255, 255, 255, 0.015);
-            border-radius: 12px;
-            padding: 12px 14px;
-            margin: 4px 0 12px;
-            border: 1px solid rgba(255, 255, 255, 0.03);
-            transition: border-color 0.3s;
-        }
-        .ev-card:hover {
-            border-color: rgba(255, 255, 255, 0.05);
-        }
-        .ev-card .head {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 6px;
-            margin-bottom: 6px;
-        }
-        .ev-card .head .title {
-            font-weight: 600;
-            color: rgba(255, 255, 255, 0.5);
-            font-size: 13px;
-        }
-        .ev-card .head select {
+        .interact-card .card-title select {
+            margin-left: auto;
             background: rgba(255, 255, 255, 0.02);
             border: 1px solid rgba(255, 255, 255, 0.04);
             color: #f1f5f9;
@@ -427,350 +373,828 @@
             font-size: 11px;
             outline: none;
         }
-        .ev-card .head select:focus {
+
+        .interact-card .card-title select:focus {
             border-color: #a78bfa;
         }
-        .ev-row {
+
+        .interact-row {
             display: flex;
             flex-wrap: wrap;
-            gap: 6px;
+            gap: 10px;
             align-items: center;
-            margin: 2px 0;
+            margin: 6px 0;
         }
-        .ev-row label {
-            color: rgba(255, 255, 255, 0.2);
-            font-size: 10px;
+
+        .interact-row label {
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 13px;
             font-weight: 500;
-            min-width: 30px;
+            min-width: 50px;
         }
-        .ev-row select,
-        .ev-row input {
+
+        .interact-row select,
+        .interact-row input {
             background: rgba(255, 255, 255, 0.02);
             border: 1px solid rgba(255, 255, 255, 0.04);
             color: #f1f5f9;
-            padding: 3px 8px;
-            border-radius: 6px;
-            font-size: 11px;
+            padding: 6px 12px;
+            border-radius: 10px;
+            font-size: 14px;
             outline: none;
+            transition: border 0.3s ease;
         }
-        .ev-row select:focus,
-        .ev-row input:focus {
+
+        .interact-row select:focus,
+        .interact-row input:focus {
             border-color: #a78bfa;
         }
-        .btn-ghost {
-            background: transparent;
-            border: 1px solid rgba(167, 139, 250, 0.1);
-            color: #a78bfa;
-            padding: 3px 12px;
-            border-radius: 6px;
-            font-size: 10px;
+
+        .interact-row input {
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .btn {
+            background: #a78bfa;
+            border: none;
+            color: #0b0b1a;
+            padding: 6px 18px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.3s ease;
         }
-        .btn-ghost:hover {
-            background: rgba(167, 139, 250, 0.04);
+
+        .btn:hover {
+            background: #8b6fd9;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(167, 139, 250, 0.15);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid rgba(167, 139, 250, 0.2);
+            color: #a78bfa;
+        }
+
+        .btn-outline:hover {
+            background: rgba(167, 139, 250, 0.06);
             border-color: #a78bfa;
         }
-        .res-box {
+
+        .result-box {
             background: rgba(255, 255, 255, 0.01);
-            border-radius: 8px;
-            padding: 6px 10px;
-            margin-top: 4px;
-            border-left: 2px solid #facc15;
-            font-size: 12px;
-            color: rgba(255, 255, 255, 0.4);
-            min-height: 28px;
+            border-radius: 12px;
+            padding: 14px 18px;
+            margin-top: 12px;
+            border-left: 3px solid #facc15;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 15px;
+            min-height: 48px;
+            line-height: 1.6;
         }
-        .res-grid-mini {
+
+        .result-box .highlight {
+            color: #facc15;
+            font-weight: 600;
+        }
+        .result-box .en {
+            color: #60a5fa;
+        }
+        .result-box .my {
+            color: #facc15;
+        }
+        .result-box .zh {
+            color: #a78bfa;
+        }
+
+        /* ===== 三轨对照网格 ===== */
+        .triple-grid {
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
-            gap: 8px;
+            gap: 12px;
         }
-        @media (max-width: 640px) {
-            .res-grid-mini {
+
+        @media (max-width: 720px) {
+            .triple-grid {
                 grid-template-columns: 1fr;
             }
         }
-        .res-grid-mini .col {
+
+        .triple-grid .col {
             background: rgba(255, 255, 255, 0.01);
-            padding: 4px 6px;
-            border-radius: 4px;
-            border: 1px solid rgba(255, 255, 255, 0.02);
+            border-radius: 8px;
+            padding: 8px 10px;
+            border: 1px solid rgba(255, 255, 255, 0.03);
         }
-        .res-grid-mini .col .label {
-            font-size: 8px;
-            color: rgba(255, 255, 255, 0.1);
+
+        .triple-grid .col .lang-label {
+            font-size: 9px;
             text-transform: uppercase;
-            letter-spacing: 0.3px;
+            color: rgba(255, 255, 255, 0.15);
+            letter-spacing: 0.5px;
+            margin-bottom: 2px;
         }
-        .res-grid-mini .col .content {
-            font-size: 12px;
+
+        .triple-grid .col .content {
+            font-size: 14px;
             font-weight: 500;
         }
-        .hl-en {
-            color: #60a5fa;
-        }
-        .hl-my {
-            color: #facc15;
-        }
-        .hl-zh {
-            color: #a78bfa;
-        }
-        .trace-mini {
-            font-size: 9px;
-            color: rgba(255, 255, 255, 0.06);
-            margin-top: 4px;
-            padding-top: 4px;
-            border-top: 1px solid rgba(255, 255, 255, 0.015);
+
+        .triple-grid .col .sub {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.2);
+            margin-top: 2px;
             font-family: monospace;
         }
 
-        .footer {
-            margin-top: 16px;
-            display: flex;
-            justify-content: space-between;
-            font-size: 11px;
-            color: rgba(255, 255, 255, 0.04);
-            border-top: 1px solid rgba(255, 255, 255, 0.02);
-            padding-top: 12px;
+        /* ===== 回溯日志 ===== */
+        .backtrack-log {
+            margin-top: 12px;
+            padding: 10px 14px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            border-left: 3px solid #fbbf24;
+            font-family: 'Courier New', monospace;
         }
 
-        /* 滚动条 */
+        .backtrack-log .bt-title {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.1);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .backtrack-log .bt-step {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 2px 0;
+            font-size: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.015);
+        }
+
+        .backtrack-log .bt-step:last-child {
+            border-bottom: none;
+        }
+
+        .backtrack-log .bt-step .icon {
+            width: 18px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .backtrack-log .bt-step .msg {
+            flex: 1;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .backtrack-log .bt-step .conf {
+            font-size: 11px;
+            padding: 0 8px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 8px;
+            color: rgba(255, 255, 255, 0.15);
+        }
+
+        .backtrack-log .bt-step.success .msg {
+            color: #4ade80;
+        }
+        .backtrack-log .bt-step.fail .msg {
+            color: #f87171;
+        }
+        .backtrack-log .bt-step.warn .msg {
+            color: #fbbf24;
+        }
+        .backtrack-log .bt-step.info .msg {
+            color: #60a5fa;
+        }
+        .backtrack-log .bt-step.success .conf {
+            color: #4ade80;
+        }
+        .backtrack-log .bt-step.fail .conf {
+            color: #f87171;
+        }
+        .backtrack-log .bt-step.warn .conf {
+            color: #fbbf24;
+        }
+        .backtrack-log .bt-step.info .conf {
+            color: #60a5fa;
+        }
+
+        /* ===== 词根派生 ===== */
+        .derivation-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 8px;
+            margin: 10px 0;
+        }
+
+        .derivation-grid .item {
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 10px;
+            padding: 10px 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 13px;
+        }
+
+        .derivation-grid .item:hover {
+            border-color: rgba(167, 139, 250, 0.15);
+            background: rgba(167, 139, 250, 0.03);
+        }
+
+        .derivation-grid .item .word {
+            font-size: 18px;
+            font-weight: 600;
+            color: #f1f5f9;
+            display: block;
+        }
+
+        .derivation-grid .item .pos {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.2);
+        }
+
+        .derivation-grid .item .meaning {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.35);
+            margin-top: 4px;
+        }
+
+        /* ===== 差异切换 ===== */
+        .diff-toggle {
+            display: flex;
+            gap: 8px;
+            margin: 10px 0;
+        }
+
+        .diff-toggle .tab-btn {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            color: rgba(255, 255, 255, 0.3);
+            padding: 5px 14px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.3s ease;
+        }
+
+        .diff-toggle .tab-btn.active {
+            border-color: #facc15;
+            color: #f1f5f9;
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .diff-toggle .tab-btn:hover {
+            border-color: #a78bfa;
+        }
+
+        .diff-content {
+            background: rgba(255, 255, 255, 0.01);
+            border-radius: 12px;
+            padding: 14px 18px;
+            margin-top: 8px;
+            min-height: 60px;
+        }
+
+        .diff-content .pair {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 5px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+        }
+
+        .diff-content .pair:last-child {
+            border-bottom: none;
+        }
+
+        .diff-content .pair .en {
+            color: #60a5fa;
+        }
+
+        .diff-content .pair .my {
+            color: #facc15;
+        }
+
+        .diff-content .pair .arrow {
+            color: rgba(255, 255, 255, 0.08);
+            font-size: 18px;
+        }
+
+        /* ===== 证据闭环 ===== */
+        .closure {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 16px;
+            padding: 20px 24px;
+            margin-top: 28px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        .closure .item {
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.01);
+            border-radius: 10px;
+            border-left: 3px solid #a78bfa;
+        }
+
+        .closure .item .label {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.2);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .closure .item .text {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 14px;
+            margin-top: 4px;
+        }
+
+        /* ===== 底部 ===== */
+        .back-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 32px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.03);
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .back-bottom a {
+            color: rgba(255, 255, 255, 0.2);
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s ease;
+        }
+
+        .back-bottom a:hover {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .back-bottom .meta {
+            color: rgba(255, 255, 255, 0.08);
+            font-size: 13px;
+        }
+
+        /* ===== 滚动条美化 ===== */
         ::-webkit-scrollbar {
-            width: 3px;
+            width: 4px;
         }
         ::-webkit-scrollbar-track {
             background: transparent;
         }
         ::-webkit-scrollbar-thumb {
-            background: rgba(167, 139, 250, 0.1);
+            background: rgba(167, 139, 250, 0.15);
             border-radius: 4px;
         }
-        @media (max-width: 860px) {
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(167, 139, 250, 0.3);
+        }
+
+        /* ===== 响应式 ===== */
+        @media (max-width: 900px) {
             body {
                 padding: 0;
+                flex-direction: column;
             }
-            .sidebar {
+            .sidebar-nav {
                 display: none;
             }
-            .main {
-                padding: 8px;
+            .main-content {
+                padding: 16px;
             }
             .container {
-                padding: 12px 10px;
+                padding: 24px 16px;
                 border-radius: 0;
             }
-            .result-panel {
+            .hero h1 {
+                font-size: 24px;
+            }
+            .section-title {
+                font-size: 18px;
+            }
+            .interact-card {
+                padding: 16px;
+            }
+            .interact-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .interact-row label {
+                min-width: auto;
+            }
+            .derivation-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .closure {
                 grid-template-columns: 1fr;
+            }
+            .evidence-steps .step {
+                min-width: 40px;
+                padding: 4px 4px;
+            }
+            .evidence-steps .step .label {
+                font-size: 7px;
+            }
+            .triple-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 16px 12px;
+            }
+            .hero h1 {
+                font-size: 20px;
+            }
+            .hero .subtitle {
+                font-size: 15px;
+            }
+            .derivation-grid {
+                grid-template-columns: 1fr;
+            }
+            .diff-toggle {
+                flex-direction: column;
             }
         }
     </style>
 </head>
 <body>
+
+    <!-- ===== 鼠标跟随光晕 ===== -->
     <div id="glow"></div>
 
-    <!-- 侧边导航 -->
-    <div class="sidebar" id="sidebar">
-        <div class="dot active" data-target="sec-hero"><span class="label">总览</span></div>
-        <div class="line"></div>
-        <div class="dot" data-target="sec-main"><span class="label">路由器</span></div>
-        <div class="dot" data-target="sec-svo"><span class="label">语序</span></div>
-        <div class="dot" data-target="sec-tense"><span class="label">时态</span></div>
-        <div class="dot" data-target="sec-derive"><span class="label">词缀</span></div>
-        <div class="dot" data-target="sec-passive"><span class="label">被动</span></div>
-        <div class="dot" data-target="sec-wsd"><span class="label">多义词</span></div>
-        <div class="dot" data-target="sec-culture"><span class="label">文化</span></div>
-        <div class="line"></div>
-        <div class="dot" data-target="sec-closure"><span class="label">闭环</span></div>
-        <div class="bottom-text">证据链</div>
+    <!-- ===== 右侧固定导航栏 (扩充至8步) ===== -->
+    <div class="sidebar-nav">
+        <a class="nav-item active" data-target="section-hero"><span class="num">①</span><span class="label">总览</span></a>
+        <a class="nav-item" data-target="section-router"><span class="num">🚀</span><span class="label">路由器</span></a>
+        <a class="nav-item" data-target="section-svo"><span class="num">②</span><span class="label">语序</span></a>
+        <a class="nav-item" data-target="section-tense"><span class="num">③</span><span class="label">时态</span></a>
+        <a class="nav-item" data-target="section-derivation"><span class="num">④</span><span class="label">词缀</span></a>
+        <a class="nav-item" data-target="section-passive"><span class="num">⑤</span><span class="label">被动</span></a>
+        <a class="nav-item" data-target="section-wsd"><span class="num">⑥</span><span class="label">多义词</span></a>
+        <a class="nav-item" data-target="section-culture"><span class="num">⑦</span><span class="label">文化</span></a>
+        <a class="nav-item" data-target="section-diff"><span class="num">⑧</span><span class="label">边界</span></a>
+        <div class="nav-divider"></div>
+        <a class="nav-item" data-target="section-closure"><span class="num">∞</span><span class="label">闭环</span></a>
+        <div class="nav-bottom">融合版</div>
     </div>
 
-    <div class="main">
+    <!-- ===== 主内容 ===== -->
+    <div class="main-content">
+
         <div class="container">
 
-            <!-- ========== HERO ========== -->
-            <div class="sec-anchor" id="sec-hero"></div>
+            <!-- ===== Hero ===== -->
+            <div class="section-anchor" id="section-hero"></div>
             <div class="hero">
-                <div class="tag">🧩 完整证据链 · 白盒语义路由</div>
-                <h1>自然语言 → 结构化指令</h1>
-                <div class="sub">底座规则 · 排列组合 · 回溯验证 · 地域偏移 · 路由调度</div>
-            </div>
+                <div class="badge">🧠 完整证据链 · 融合升级</div>
+                <h1>跨语种结构化学习验证</h1>
+                <div class="subtitle">底座规则 → 回溯验证 → 地域偏移 → 路由调度</div>
+                <p class="description">
+                    基于你最初的设计骨架，融合了 <strong>「算法路由 · 回溯机制 · 地域防火墙 · 人机对话翻译」</strong>。<br />
+                    从语序、时态、词缀到多义词、文化适配、差异边界，每一步都展示 <span style="color:#facc15;">尝试 → 失败 → 回退 → 重算</span> 的完整决策轨迹。
+                </p>
+                <span class="highlight-tag">📍 八维证据链 · 算法工具网格 · 白盒可观测</span>
 
-            <!-- ========== 主交互区 ========== -->
-            <div class="sec-anchor" id="sec-main"></div>
-            <div class="section-title">⚡ 智能语义路由器 <span class="tag-sm">实时解析</span></div>
-            <div class="section-desc">输入自然语言指令或句子，系统将提取结构、消歧、路由，并输出可执行的JSON指令。</div>
-
-            <div class="main-interact">
-                <div class="input-row">
-                    <input type="text" id="userInput" placeholder="例如：把客厅灯调暗 或 Saya ada kereta" value="打开3号空调">
-                    <button class="btn" onclick="processMain()">执行</button>
-                </div>
-                <div class="quick-actions">
-                    <button onclick="setMain('把客厅灯调暗')">💡 调暗灯</button>
-                    <button onclick="setMain('打开3号空调')">❄️ 开空调</button>
-                    <button onclick="setMain('Saya ada kereta')">🚗 kereta</button>
-                    <button onclick="setMain('打篮球')">🏀 打篮球</button>
-                    <button onclick="setMain('关闭所有窗户')">🪟 关窗</button>
-                </div>
-
-                <div id="mainResult" class="result-panel">
-                    <div class="res-card"><div class="label">📥 源解析</div><div class="value" id="mainSource">等待输入...</div></div>
-                    <div class="res-card"><div class="label">⚙️ 结构化指令</div><div class="value" id="mainTarget"><span style="color:rgba(255,255,255,0.1);">等待解析...</span></div></div>
-                    <div class="res-card"><div class="label">🛣️ 路由决策</div><div class="value" id="mainRoute"><span style="color:rgba(255,255,255,0.1);">等待路由...</span></div></div>
-                </div>
-
-                <div class="trace-log" id="mainTrace">
-                    <div style="color:rgba(255,255,255,0.08); font-size:12px; font-family:monospace;">⚙️ 决策回溯日志</div>
-                    <div style="color:rgba(255,255,255,0.04); font-size:11px; margin-top:2px;">输入指令后将显示逐层解析过程</div>
+                <!-- 证据链步骤条 (扩充至8步) -->
+                <div class="evidence-steps">
+                    <a href="#section-router" class="step active"><span class="num">🚀</span><span class="label">路由器</span></a>
+                    <a href="#section-svo" class="step"><span class="num">②</span><span class="label">语序</span></a>
+                    <a href="#section-tense" class="step"><span class="num">③</span><span class="label">时态</span></a>
+                    <a href="#section-derivation" class="step"><span class="num">④</span><span class="label">词缀</span></a>
+                    <a href="#section-passive" class="step"><span class="num">⑤</span><span class="label">被动</span></a>
+                    <a href="#section-wsd" class="step"><span class="num">⑥</span><span class="label">多义词</span></a>
+                    <a href="#section-culture" class="step"><span class="num">⑦</span><span class="label">文化</span></a>
+                    <a href="#section-diff" class="step"><span class="num">⑧</span><span class="label">边界</span></a>
                 </div>
             </div>
 
-            <!-- ========== 证据模块 ========== -->
+            <!-- ============================================================= -->
+            <!-- 🚀 模块0：智能语义路由器 (新增核心) -->
+            <!-- ============================================================= -->
+            <div class="section-anchor" id="section-router"></div>
+            <div class="section-title">🚀 智能语义路由器 <span class="badge">自然语言 → 结构化指令</span></div>
+            <div class="section-desc">输入任意自然语言指令或句子，系统将进行结构提取、消歧、路由，并输出可执行的JSON指令。</div>
 
-            <!-- ① 语序 -->
-            <div class="sec-anchor" id="sec-svo"></div>
-            <div class="section-title">① 语序规则 <span class="tag-sm">[Base: SVO · 修饰语冲突]</span></div>
-            <div class="section-desc">验证形容词前置/后置冲突时的回溯重排。</div>
-            <div class="ev-card">
-                <div class="head">
-                    <span class="title">📌 修饰语重排</span>
-                    <select id="algo-svo"><option value="rule">规则引擎</option><option value="bert">BERT</option></select>
+            <div class="interact-card">
+                <div class="card-title">
+                    ⚡ 实时解析
+                    <span style="margin-left:auto; font-size:12px; color:rgba(255,255,255,0.2);">算法: 规则引擎 / BERT / LLM 动态路由</span>
                 </div>
-                <div style="display:flex; gap:4px; flex-wrap:wrap; margin-bottom:4px;">
-                    <button class="btn-ghost" onclick="runSVO('red_car')">🚗 red car</button>
-                    <button class="btn-ghost" onclick="runSVO('big_house')">🏠 big house</button>
+                <div class="interact-row">
+                    <input type="text" id="routerInput" placeholder="例如：把客厅灯调暗 或 Saya ada kereta" value="打开3号空调" style="flex:1; min-width:200px;">
+                    <button class="btn" onclick="processRouter()">执行</button>
                 </div>
-                <div id="svo-res" class="res-box"><span style="color:rgba(255,255,255,0.1);">点击示例查看</span></div>
-                <div id="svo-trace" class="trace-mini">⏱️ <span id="svo-time">--</span>ms · 🎯 <span id="svo-conf">--</span></div>
+                <div style="display:flex; gap:6px; flex-wrap:wrap; margin:6px 0 8px;">
+                    <button class="btn-outline" onclick="setRouter('把客厅灯调暗')">💡 调暗灯</button>
+                    <button class="btn-outline" onclick="setRouter('打开3号空调')">❄️ 开空调</button>
+                    <button class="btn-outline" onclick="setRouter('Saya ada kereta')">🚗 kereta</button>
+                    <button class="btn-outline" onclick="setRouter('打篮球')">🏀 打篮球</button>
+                    <button class="btn-outline" onclick="setRouter('关闭所有窗户')">🪟 关窗</button>
+                </div>
+
+                <div id="routerResult" style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; margin-top:6px;">
+                    <div style="background:rgba(255,255,255,0.01); border-radius:8px; padding:8px 10px; border:1px solid rgba(255,255,255,0.03);">
+                        <div style="font-size:9px; color:rgba(255,255,255,0.12); text-transform:uppercase; letter-spacing:0.5px;">📥 源解析</div>
+                        <div id="routerSource" style="font-size:13px; color:rgba(255,255,255,0.3);">等待输入...</div>
+                    </div>
+                    <div style="background:rgba(255,255,255,0.01); border-radius:8px; padding:8px 10px; border:1px solid rgba(255,255,255,0.03);">
+                        <div style="font-size:9px; color:rgba(255,255,255,0.12); text-transform:uppercase; letter-spacing:0.5px;">⚙️ 结构化指令</div>
+                        <div id="routerTarget" style="font-size:12px; color:#34d399; font-family:monospace; white-space:pre-wrap; word-break:break-all;">等待解析...</div>
+                    </div>
+                    <div style="background:rgba(255,255,255,0.01); border-radius:8px; padding:8px 10px; border:1px solid rgba(255,255,255,0.03);">
+                        <div style="font-size:9px; color:rgba(255,255,255,0.12); text-transform:uppercase; letter-spacing:0.5px;">🛣️ 路由决策</div>
+                        <div id="routerRoute" style="font-size:13px; color:rgba(255,255,255,0.3);">等待路由...</div>
+                    </div>
+                </div>
+
+                <div id="routerBacktrack" class="backtrack-log" style="margin-top:10px;">
+                    <div class="bt-title">⚙️ 决策回溯日志</div>
+                    <div style="color:rgba(255,255,255,0.05); font-size:12px; padding:2px 0;">输入指令后将显示逐层解析过程</div>
+                </div>
             </div>
 
-            <!-- ② 时态 -->
-            <div class="sec-anchor" id="sec-tense"></div>
-            <div class="section-title">② 时态标记 <span class="tag-sm">[Base: 助词/屈折]</span></div>
-            <div class="section-desc">英语屈折变化 vs 马来助词映射。</div>
-            <div class="ev-card">
-                <div class="head">
-                    <span class="title">⏱️ 时态验证</span>
-                    <select id="algo-tense"><option value="rule">规则引擎</option><option value="bert">BERT</option></select>
+            <!-- ============================================================= -->
+            <!-- ② 语序规则 (原始模块升级) -->
+            <!-- ============================================================= -->
+            <div class="section-anchor" id="section-svo"></div>
+            <div class="section-title">② 语序规则 <span class="badge">SVO · 修饰语重排</span></div>
+            <div class="section-desc">验证形容词前置/后置冲突时的回溯重排。点击例句查看三轨对照。</div>
+
+            <div class="interact-card">
+                <div class="card-title">
+                    📌 修饰语重排
+                    <select id="algo-svo">
+                        <option value="rule">规则引擎</option>
+                        <option value="bert">BERT</option>
+                        <option value="llm">LLM</option>
+                    </select>
                 </div>
-                <div class="ev-row">
+                <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px;">
+                    <button class="btn-outline" onclick="showSVO('red_car')">🚗 red car</button>
+                    <button class="btn-outline" onclick="showSVO('big_house')">🏠 big house</button>
+                </div>
+                <div id="svo-result" class="result-box">
+                    <span style="color:rgba(255,255,255,0.2);">点击例句查看对照</span>
+                </div>
+                <div id="svo-backtrack" class="backtrack-log">
+                    <div class="bt-title">⏳ 回溯日志</div>
+                    <div style="color:rgba(255,255,255,0.05); font-size:12px;">等待触发...</div>
+                </div>
+            </div>
+
+            <!-- ============================================================= -->
+            <!-- ③ 时态标记 (原始模块升级) -->
+            <!-- ============================================================= -->
+            <div class="section-anchor" id="section-tense"></div>
+            <div class="section-title">③ 时态标记系统 <span class="badge">屈折 vs 助词</span></div>
+            <div class="section-desc">英语屈折变化与马来助词系统的映射与回溯。</div>
+
+            <div class="interact-card">
+                <div class="card-title">
+                    ⏱️ 时态构造器
+                    <select id="algo-tense">
+                        <option value="rule">规则引擎</option>
+                        <option value="bert">BERT</option>
+                        <option value="llm">LLM</option>
+                    </select>
+                </div>
+                <div class="interact-row">
                     <label>动词</label>
-                    <select id="t-verb">
+                    <select id="tense-verb">
                         <option value="makan">makan (吃)</option>
                         <option value="minum">minum (喝)</option>
+                        <option value="kerja">kerja (工作)</option>
                         <option value="tulis">tulis (写)</option>
                     </select>
                 </div>
-                <div class="ev-row">
+                <div class="interact-row">
                     <label>时态</label>
-                    <select id="t-tense">
-                        <option value="sudah">已完成</option>
-                        <option value="sedang">进行中</option>
-                        <option value="akan">将来</option>
+                    <select id="tense-select">
+                        <option value="sudah">sudah — 已完成</option>
+                        <option value="sedang">sedang — 进行中</option>
+                        <option value="akan">akan — 将来</option>
                     </select>
-                    <button class="btn-ghost" onclick="runTense()">验证</button>
+                    <button class="btn" onclick="convertTense()">生成</button>
                 </div>
-                <div id="tense-res" class="res-box"><span style="color:rgba(255,255,255,0.1);">选择动词和时态</span></div>
-                <div id="tense-trace" class="trace-mini">⏱️ <span id="tense-time">--</span>ms · 🎯 <span id="tense-conf">--</span></div>
+                <div id="tense-result" class="result-box">
+                    <span style="color:rgba(255,255,255,0.2);">选择动词和时态，点击生成</span>
+                </div>
+                <div id="tense-backtrack" class="backtrack-log">
+                    <div class="bt-title">⏳ 回溯日志</div>
+                    <div style="color:rgba(255,255,255,0.05); font-size:12px;">等待触发...</div>
+                </div>
             </div>
 
-            <!-- ③ 词缀 -->
-            <div class="sec-anchor" id="sec-derive"></div>
-            <div class="section-title">③ 词缀派生 <span class="tag-sm">[Base: 形态学]</span></div>
-            <div class="section-desc">词根→词族派生，中文零派生对照。</div>
-            <div class="ev-card">
-                <div class="head">
-                    <span class="title">🧩 词根派生</span>
-                    <select id="algo-derive"><option value="rule">规则引擎</option><option value="bert">BERT</option></select>
+            <!-- ============================================================= -->
+            <!-- ④ 词缀派生 (原始模块升级) -->
+            <!-- ============================================================= -->
+            <div class="section-anchor" id="section-derivation"></div>
+            <div class="section-title">④ 词缀派生系统 <span class="badge">词根 → 多词性</span></div>
+            <div class="section-desc">一个词根如何通过词缀变成不同词性，中文零派生作为验证对照。</div>
+
+            <div class="interact-card">
+                <div class="card-title">
+                    🧩 词根派生器
+                    <select id="algo-derive">
+                        <option value="rule">规则引擎</option>
+                        <option value="bert">BERT</option>
+                        <option value="llm">LLM</option>
+                    </select>
                 </div>
-                <div style="display:flex; gap:4px; flex-wrap:wrap; margin-bottom:4px;">
-                    <button class="btn-ghost" onclick="runDerive('ajar')">ajar (教)</button>
-                    <button class="btn-ghost" onclick="runDerive('makan')">makan (吃)</button>
-                    <button class="btn-ghost" onclick="runDerive('tulis')">tulis (写)</button>
+                <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px;">
+                    <button class="btn-outline" onclick="showDerivation('ajar')">ajar (教)</button>
+                    <button class="btn-outline" onclick="showDerivation('makan')">makan (吃)</button>
+                    <button class="btn-outline" onclick="showDerivation('baca')">baca (读)</button>
+                    <button class="btn-outline" onclick="showDerivation('tulis')">tulis (写)</button>
                 </div>
-                <div id="derive-res" class="res-box"><span style="color:rgba(255,255,255,0.1);">点击词根查看</span></div>
-                <div id="derive-trace" class="trace-mini">⏱️ <span id="derive-time">--</span>ms · 🎯 <span id="derive-conf">--</span></div>
+                <div id="derivation-result">
+                    <div style="color:rgba(255,255,255,0.2); font-size:14px;">点击词根查看派生词家族</div>
+                </div>
+                <div id="derive-backtrack" class="backtrack-log">
+                    <div class="bt-title">⏳ 回溯日志</div>
+                    <div style="color:rgba(255,255,255,0.05); font-size:12px;">等待触发...</div>
+                </div>
             </div>
 
-            <!-- ④ 被动 -->
-            <div class="sec-anchor" id="sec-passive"></div>
-            <div class="section-title">④ 被动句式 <span class="tag-sm">[Base: 语态转换]</span></div>
-            <div class="section-desc">马来 di- + oleh 与中文“被”字句对比。</div>
-            <div class="ev-card">
-                <div class="head">
-                    <span class="title">🔄 主动→被动</span>
-                    <select id="algo-passive"><option value="rule">规则引擎</option><option value="bert">BERT</option></select>
+            <!-- ============================================================= -->
+            <!-- ⑤ 被动句式 (原始模块升级) -->
+            <!-- ============================================================= -->
+            <div class="section-anchor" id="section-passive"></div>
+            <div class="section-title">⑤ 被动句式同源 <span class="badge">di- + oleh = be + by</span></div>
+            <div class="section-desc">被动语态在两种语言中结构完全对应，中文“被”字句作为验证。</div>
+
+            <div class="interact-card">
+                <div class="card-title">
+                    🔄 主动 → 被动转换器
+                    <select id="algo-passive">
+                        <option value="rule">规则引擎</option>
+                        <option value="bert">BERT</option>
+                        <option value="llm">LLM</option>
+                    </select>
                 </div>
-                <div class="ev-row">
+                <div class="interact-row">
                     <label>主动句</label>
-                    <select id="p-input">
+                    <select id="passive-input">
                         <option value="Saya makan nasi">Saya makan nasi (我吃米饭)</option>
                         <option value="Dia membaca buku">Dia membaca buku (她读书)</option>
                         <option value="Kami minum air">Kami minum air (我们喝水)</option>
                     </select>
-                    <button class="btn-ghost" onclick="runPassive()">转换</button>
+                    <button class="btn" onclick="convertPassive()">转为被动</button>
                 </div>
-                <div id="passive-res" class="res-box"><span style="color:rgba(255,255,255,0.1);">选择主动句</span></div>
-                <div id="passive-trace" class="trace-mini">⏱️ <span id="passive-time">--</span>ms · 🎯 <span id="passive-conf">--</span></div>
+                <div id="passive-result" class="result-box">
+                    <span style="color:rgba(255,255,255,0.2);">选择主动句，点击转换</span>
+                </div>
+                <div id="passive-backtrack" class="backtrack-log">
+                    <div class="bt-title">⏳ 回溯日志</div>
+                    <div style="color:rgba(255,255,255,0.05); font-size:12px;">等待触发...</div>
+                </div>
             </div>
 
-            <!-- ⑤ 多义词 -->
-            <div class="sec-anchor" id="sec-wsd"></div>
-            <div class="section-title">⑤ 多义词消歧 <span class="tag-sm">[Base: 上下文]</span></div>
-            <div class="section-desc">中文“打”的极端歧义，触发深度回溯。</div>
-            <div class="ev-card">
-                <div class="head">
-                    <span class="title">🎯 中文歧义对抗</span>
-                    <select id="algo-wsd"><option value="rule">规则引擎</option><option value="bert">BERT</option><option value="llm">LLM</option></select>
+            <!-- ============================================================= -->
+            <!-- ⑥ 多义词消歧 (新增模块) -->
+            <!-- ============================================================= -->
+            <div class="section-anchor" id="section-wsd"></div>
+            <div class="section-title">⑥ 多义词消歧 <span class="badge">上下文驱动</span></div>
+            <div class="section-desc">中文“打”的极端歧义，触发深度回溯（hit → play / take）。</div>
+
+            <div class="interact-card">
+                <div class="card-title">
+                    🎯 词义消歧 (WSD)
+                    <select id="algo-wsd">
+                        <option value="rule">规则引擎</option>
+                        <option value="bert">BERT</option>
+                        <option value="llm">LLM</option>
+                    </select>
                 </div>
-                <div style="display:flex; gap:4px; flex-wrap:wrap; margin-bottom:4px;">
-                    <button class="btn-ghost" onclick="runWSD('sport')">🏀 打篮球</button>
-                    <button class="btn-ghost" onclick="runWSD('taxi')">🚗 打车</button>
-                    <button class="btn-ghost" onclick="runWSD('hit')">👊 打人</button>
+                <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px;">
+                    <button class="btn-outline" onclick="showWSD('sport')">🏀 打篮球</button>
+                    <button class="btn-outline" onclick="showWSD('taxi')">🚗 打车</button>
+                    <button class="btn-outline" onclick="showWSD('hit')">👊 打人</button>
                 </div>
-                <div id="wsd-res" class="res-box"><span style="color:rgba(255,255,255,0.1);">点击示例查看</span></div>
-                <div id="wsd-trace" class="trace-mini">⏱️ <span id="wsd-time">--</span>ms · 🎯 <span id="wsd-conf">--</span></div>
+                <div id="wsd-result" class="result-box">
+                    <span style="color:rgba(255,255,255,0.2);">点击不同语境查看“打”的映射</span>
+                </div>
+                <div id="wsd-backtrack" class="backtrack-log">
+                    <div class="bt-title">⏳ 回溯日志</div>
+                    <div style="color:rgba(255,255,255,0.05); font-size:12px;">等待触发...</div>
+                </div>
             </div>
 
-            <!-- ⑥ 文化适配 -->
-            <div class="sec-anchor" id="sec-culture"></div>
-            <div class="section-title">⑥ 文化适配 <span class="tag-sm">[Base: 语用规约]</span></div>
-            <div class="section-desc">文化隐喻（龙→Loong）及禁忌词处理。</div>
-            <div class="ev-card">
-                <div class="head">
-                    <span class="title">🤝 文化规约</span>
-                    <select id="algo-culture"><option value="rule">规则引擎</option><option value="llm">LLM</option></select>
+            <!-- ============================================================= -->
+            <!-- ⑦ 文化适配 (新增模块) -->
+            <!-- ============================================================= -->
+            <div class="section-anchor" id="section-culture"></div>
+            <div class="section-title">⑦ 文化适配 <span class="badge">语用规约 · 禁忌</span></div>
+            <div class="section-desc">文化隐喻（龙→Loong）及禁忌词处理，确保输出符合目标社会语境。</div>
+
+            <div class="interact-card">
+                <div class="card-title">
+                    🤝 文化规约引擎
+                    <select id="algo-culture">
+                        <option value="rule">规则引擎</option>
+                        <option value="bert">BERT</option>
+                        <option value="llm">LLM</option>
+                    </select>
                 </div>
-                <div style="display:flex; gap:4px; flex-wrap:wrap; margin-bottom:4px;">
-                    <button class="btn-ghost" onclick="runCulture('dragon')">🐉 龙</button>
-                    <button class="btn-ghost" onclick="runCulture('taboo')">🚫 禁忌词</button>
+                <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px;">
+                    <button class="btn-outline" onclick="showCulture('dragon')">🐉 龙 (中→英)</button>
+                    <button class="btn-outline" onclick="showCulture('taboo')">🚫 文化禁忌词</button>
                 </div>
-                <div id="culture-res" class="res-box"><span style="color:rgba(255,255,255,0.1);">点击示例查看</span></div>
-                <div id="culture-trace" class="trace-mini">⏱️ <span id="culture-time">--</span>ms · 🎯 <span id="culture-conf">--</span></div>
+                <div id="culture-result" class="result-box">
+                    <span style="color:rgba(255,255,255,0.2);">点击查看文化适配策略</span>
+                </div>
+                <div id="culture-backtrack" class="backtrack-log">
+                    <div class="bt-title">⏳ 回溯日志</div>
+                    <div style="color:rgba(255,255,255,0.05); font-size:12px;">等待触发...</div>
+                </div>
             </div>
 
-            <!-- ========== 闭环 ========== -->
-            <div class="sec-anchor" id="sec-closure"></div>
-            <div class="section-title">证据闭环 <span class="tag-sm">完整链路</span></div>
-            <div class="section-desc">从自然语言到结构化指令，经过底座规则、排列组合、回溯验证、地域偏移、路由调度。</div>
-            <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-top:6px; font-size:12px; color:rgba(255,255,255,0.2);">
-                <div style="background:rgba(255,255,255,0.01); padding:8px; border-left:2px solid #60a5fa;">📐 底座规则 (SVO/时态/词缀)</div>
-                <div style="background:rgba(255,255,255,0.01); padding:8px; border-left:2px solid #facc15;">🔄 回溯验证 (尝试→回退→重算)</div>
-                <div style="background:rgba(255,255,255,0.01); padding:8px; border-left:2px solid #4ade80;">🧭 路由调度 (规则引擎/LLM/地域偏移)</div>
+            <!-- ============================================================= -->
+            <!-- ⑧ 差异边界 (原始模块升级 + 地域偏移) -->
+            <!-- ============================================================= -->
+            <div class="section-anchor" id="section-diff"></div>
+            <div class="section-title">⑧ 差异边界 · 地域防火墙 <span class="badge">伪同源词拦截</span></div>
+            <div class="section-desc">结构相似但内容不同的伪同源词（kereta=汽车/火车），通过地域向量偏移拦截。</div>
+
+            <div class="interact-card">
+                <div class="card-title">
+                    🔍 伪同源词检测
+                    <select id="algo-diff">
+                        <option value="rule">规则引擎</option>
+                        <option value="bert">BERT</option>
+                        <option value="llm">LLM</option>
+                    </select>
+                </div>
+                <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px;">
+                    <button class="btn-outline" onclick="showDiff('kereta')">🚗 kereta (汽车/火车)</button>
+                    <button class="btn-outline" onclick="showDiff('budak')">🧒 budak (小孩/奴隶)</button>
+                    <button class="btn-outline" onclick="showDiff('percuma')">🎁 percuma (免费/徒劳)</button>
+                </div>
+                <div id="diff-result" class="result-box">
+                    <span style="color:rgba(255,255,255,0.2);">点击伪同源词查看地域拦截</span>
+                </div>
+                <div id="diff-backtrack" class="backtrack-log">
+                    <div class="bt-title">⏳ 回溯日志 (地域偏移)</div>
+                    <div style="color:rgba(255,255,255,0.05); font-size:12px;">等待触发...</div>
+                </div>
             </div>
 
-            <div class="footer">
-                <span>证据链 v4.0 · 完整语义路由器</span>
-                <span id="footerLatency">⏱️ 模拟延迟 -- ms</span>
+            <!-- ============================================================= -->
+            <!-- 证据闭环 -->
+            <!-- ============================================================= -->
+            <div class="section-anchor" id="section-closure"></div>
+            <div class="section-title">证据闭环 <span class="badge">从现象到价值</span></div>
+            <div class="section-desc">完整验证元架构在语言层面及人机对话场景的迁移能力。</div>
+
+            <div class="closure">
+                <div class="item">
+                    <div class="label">🔍 现象</div>
+                    <div class="text">语言结构高度相似，但存在伪同源词、多义词、文化禁忌等深层挑战</div>
+                </div>
+                <div class="item">
+                    <div class="label">⚙️ 成因</div>
+                    <div class="text">SVO语序 + 殖民借词 + 虚词模块化，但缺少地域语义和语用规约</div>
+                </div>
+                <div class="item">
+                    <div class="label">🧱 边界</div>
+                    <div class="text">形容词语序相反 · 词缀体系独立 · 伪同源词地域冲突 · 文化禁忌各异</div>
+                </div>
+                <div class="item">
+                    <div class="label">🚀 价值</div>
+                    <div class="text">可迁移至 AI 多语言解析 / RAG 分层架构 / 智能家居 / 企业RPA / 多版本项目管理</div>
+                </div>
+            </div>
+
+            <!-- ===== 底部 ===== -->
+            <div class="back-bottom">
+                <a href="index.html">← 返回作品集首页</a>
+                <span class="meta">Y.Mine · 完整证据链 · 八维融合版 v5.0</span>
             </div>
 
         </div>
+
     </div>
 
     <script>
         // ================================================================
-        // 全局：光晕
+        // 全局：光晕、导航
         // ================================================================
         const glow = document.getElementById('glow');
         document.addEventListener('mousemove', (e) => {
@@ -780,37 +1204,100 @@
             glow.style.setProperty('--y', y + '%');
         });
 
-        // ================================================================
-        // 侧边导航
-        // ================================================================
-        const dots = document.querySelectorAll('.sidebar .dot');
+        // 导航激活
+        const navItems = document.querySelectorAll('.sidebar-nav .nav-item');
         const sections = [
-            document.getElementById('sec-hero'),
-            document.getElementById('sec-main'),
-            document.getElementById('sec-svo'),
-            document.getElementById('sec-tense'),
-            document.getElementById('sec-derive'),
-            document.getElementById('sec-passive'),
-            document.getElementById('sec-wsd'),
-            document.getElementById('sec-culture'),
-            document.getElementById('sec-closure')
+            document.getElementById('section-hero'),
+            document.getElementById('section-router'),
+            document.getElementById('section-svo'),
+            document.getElementById('section-tense'),
+            document.getElementById('section-derivation'),
+            document.getElementById('section-passive'),
+            document.getElementById('section-wsd'),
+            document.getElementById('section-culture'),
+            document.getElementById('section-diff'),
+            document.getElementById('section-closure')
         ];
-        dots.forEach((dot, idx) => {
-            dot.addEventListener('click', () => {
-                if (sections[idx]) sections[idx].scrollIntoView({ behavior: 'smooth', block: 'start' });
-                dots.forEach(d => d.classList.remove('active'));
-                dot.classList.add('active');
+
+        navItems.forEach((item, index) => {
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = sections[index];
+                if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                navItems.forEach(el => el.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        function updateActiveNav() {
+            let currentIndex = 0;
+            sections.forEach((section, i) => {
+                if (section) {
+                    const rect = section.getBoundingClientRect();
+                    if (rect.top <= 120) currentIndex = i;
+                }
+            });
+            navItems.forEach((el, i) => {
+                el.classList.toggle('active', i === currentIndex);
+            });
+        }
+        window.addEventListener('scroll', updateActiveNav);
+        window.addEventListener('load', updateActiveNav);
+
+        // 步骤条点击
+        document.querySelectorAll('.evidence-steps .step').forEach(step => {
+            step.addEventListener('click', function() {
+                document.querySelectorAll('.evidence-steps .step').forEach(s => s.classList.remove('active'));
+                this.classList.add('active');
             });
         });
 
         // ================================================================
-        // 主交互处理器
+        // 工具函数
         // ================================================================
-        const scenarioMap = {
+        function getAlgo(selectId) {
+            const el = document.getElementById(selectId);
+            if (!el) return '规则引擎';
+            const map = { 'rule': '规则引擎', 'bert': 'BERT', 'llm': 'LLM' };
+            return map[el.value] || '规则引擎';
+        }
+
+        function renderBacktrack(containerId, steps) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            let html = `<div class="bt-title">⚙️ 决策回溯日志</div>`;
+            steps.forEach((step, idx) => {
+                const cls = step.status || 'info';
+                html += `
+                    <div class="bt-step ${cls}" style="animation: none;">
+                        <span class="icon">${step.icon}</span>
+                        <span class="msg">${step.msg}</span>
+                        ${step.conf ? `<span class="conf">${step.conf}</span>` : ''}
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        function renderTriple(containerId, en, my, zh) {
+            const el = document.getElementById(containerId);
+            if (!el) return;
+            el.innerHTML = `
+                <div class="triple-grid">
+                    <div class="col"><div class="lang-label">英语 <span style="color:rgba(255,255,255,0.1);">基准</span></div><div class="content en">${en}</div></div>
+                    <div class="col"><div class="lang-label">马来/印尼 <span style="color:rgba(255,255,255,0.1);">映射</span></div><div class="content my">${my}</div></div>
+                    <div class="col"><div class="lang-label">中文 <span style="color:rgba(255,255,255,0.1);">结构验证</span></div><div class="content zh">${zh}</div><div class="sub">[不翻译，仅解析结构]</div></div>
+                </div>
+            `;
+        }
+
+        // ================================================================
+        // 🚀 路由器
+        // ================================================================
+        const routerScenarios = {
             '把客厅灯调暗': {
                 source: '把客厅灯调暗',
                 intent: 'adjust_lighting',
-                params: { location: '客厅', action: 'dim', level: 30 },
                 instruction: JSON.stringify({ intent: 'adjust_lighting', location: '客厅', action: 'dim', level: 30 },
                     null, 2),
                 route: '规则引擎 → 结构匹配 (置信度 97%)',
@@ -824,7 +1311,6 @@
             '打开3号空调': {
                 source: '打开3号空调',
                 intent: 'control_ac',
-                params: { device_id: 'AC_03', action: 'power_on' },
                 instruction: JSON.stringify({ intent: 'control_ac', device_id: 'AC_03', action: 'power_on' }, null, 2),
                 route: '规则引擎 → 设备编号匹配 (置信度 99%)',
                 cost: '0.00009 元',
@@ -837,7 +1323,6 @@
             '关闭所有窗户': {
                 source: '关闭所有窗户',
                 intent: 'control_windows',
-                params: { target: 'all', action: 'close' },
                 instruction: JSON.stringify({ intent: 'control_windows', target: 'all', action: 'close' }, null, 2),
                 route: '规则引擎 → 批量指令 (置信度 95%)',
                 cost: '0.00015 元',
@@ -851,7 +1336,6 @@
             'Saya ada kereta': {
                 source: 'Saya ada kereta (马来/印尼)',
                 intent: 'translate',
-                params: { lang_pair: 'ms-en', word: 'kereta', locale: 'MY' },
                 instruction: JSON.stringify({ translation: 'I have a car', detected_locale: 'MY' }, null, 2),
                 route: '结构验证 → 伪同源词检测 → 地域偏移 (MY)',
                 cost: '0.00120 元',
@@ -866,7 +1350,6 @@
             '打篮球': {
                 source: '打篮球',
                 intent: 'translate',
-                params: { lang_pair: 'zh-en', phrase: '打篮球' },
                 instruction: JSON.stringify({ translation: 'play basketball', disambiguation: 'sport' }, null, 2),
                 route: '多义词消歧 → 上下文匹配 → 采纳 play',
                 cost: '0.00050 元',
@@ -878,208 +1361,137 @@
             }
         };
 
-        function genericProcess(input) {
-            const words = input.split(/\s+/);
-            const hasAction = words.some(w => ['打开', '关闭', '调暗', '调亮', '启动', '停止'].includes(w));
-            const hasObject = words.some(w => ['灯', '空调', '窗户', '门', '电视'].includes(w));
-            let intent = 'unknown',
-                params = { raw: input },
-                instruction = JSON.stringify({ intent: 'unknown', raw_input: input, status: '需人工解析' }, null, 2);
-            let route = '规则引擎无法覆盖 → 触发LLM路由 (成本较高)';
-            let cost = '0.02000 元';
-            let steps = [];
-            if (hasAction && hasObject) {
-                const action = words.find(w => ['打开', '关闭', '调暗', '调亮', '启动', '停止'].includes(w));
-                const object = words.find(w => ['灯', '空调', '窗户', '门', '电视'].includes(w));
-                intent = 'control_device';
-                params = { action, device: object };
-                instruction = JSON.stringify({ intent: 'control_device', action, device: object }, null, 2);
-                route = '规则引擎部分匹配 → 回退至概率LM (置信度 72%)';
-                cost = '0.00300 元';
-                steps = [
-                    { icon: '🔍', msg: `识别动作 "${action}"`, status: 'info', conf: '90%' },
-                    { icon: '🔍', msg: `识别设备 "${object}"`, status: 'info', conf: '85%' },
-                    { icon: '⚠️', msg: '缺少位置/编号，触发回退', status: 'warn', conf: '' },
-                    { icon: '🔄', msg: '补全默认参数', status: 'warn', conf: '' },
-                    { icon: '✅', msg: `采纳: ${action} ${object}`, status: 'success', conf: '最终 72%' }
-                ];
-            } else {
-                steps = [
-                    { icon: '🔍', msg: '尝试基础结构提取', status: 'info', conf: '20%' },
-                    { icon: '❌', msg: '无法匹配任何模式', status: 'fail', conf: '低于阈值' },
-                    { icon: '↩️', msg: '触发完全回退，请求澄清', status: 'warn', conf: '' },
-                    { icon: '📞', msg: '生成澄清问题', status: 'info', conf: '' }
-                ];
+        function processRouter() {
+            const input = document.getElementById('routerInput').value.trim();
+            if (!input) { alert('请输入指令'); return; }
+            let data = null;
+            for (const key in routerScenarios) {
+                if (input.includes(key) || key.includes(input)) { data = routerScenarios[key]; break; }
             }
-            return { source: input, intent, params, instruction, route, cost, steps };
-        }
-
-        function processMain() {
-            const input = document.getElementById('userInput').value.trim();
-            if (!input) return alert('请输入指令');
-            let data;
-            let matchedKey = null;
-            for (const key in scenarioMap) {
-                if (input.includes(key) || key.includes(input)) { matchedKey = key; break; }
-            }
-            if (matchedKey) {
-                const raw = scenarioMap[matchedKey];
-                data = { source: raw.source, intent: raw.intent, params: raw.params, instruction: raw.instruction,
-                    route: raw.route, cost: raw.cost, steps: raw.steps };
-            } else {
-                data = genericProcess(input);
+            if (!data) {
+                // 通用回退
+                data = {
+                    source: input,
+                    intent: 'unknown',
+                    instruction: JSON.stringify({ intent: 'unknown', raw_input: input, status: '需人工解析' }, null, 2),
+                    route: '规则引擎无法覆盖 → 触发LLM路由 (成本较高)',
+                    cost: '0.02000 元',
+                    steps: [
+                        { icon: '🔍', msg: '尝试基础结构提取', status: 'info', conf: '20%' },
+                        { icon: '❌', msg: '无法匹配任何模式', status: 'fail', conf: '低于阈值' },
+                        { icon: '↩️', msg: '触发完全回退，请求澄清', status: 'warn', conf: '' },
+                        { icon: '📞', msg: '生成澄清问题', status: 'info', conf: '' }
+                    ]
+                };
             }
 
-            document.getElementById('mainSource').innerHTML = `<div style="font-weight:500;">${data.source}</div><div style="font-size:11px; color:rgba(255,255,255,0.2);">意图: ${data.intent}</div>`;
-            document.getElementById('mainTarget').innerHTML = `<pre style="font-family:monospace; font-size:12px; margin:0; color:#34d399; white-space:pre-wrap;">${data.instruction}</pre>`;
-            document.getElementById('mainRoute').innerHTML =
-                `<div style="color:#facc15;">${data.route}</div><div style="font-size:11px; color:rgba(255,255,255,0.15);">💰 ${data.cost}</div>`;
+            document.getElementById('routerSource').innerHTML =
+                `<div style="font-weight:500;color:#f1f5f9;">${data.source}</div><div style="font-size:11px;color:rgba(255,255,255,0.2);">意图: ${data.intent}</div>`;
+            document.getElementById('routerTarget').innerHTML = data.instruction;
+            document.getElementById('routerRoute').innerHTML =
+                `<div style="color:#facc15;">${data.route}</div><div style="font-size:11px;color:rgba(255,255,255,0.15);">💰 ${data.cost}</div>`;
 
-            let logHtml = `<div style="color:rgba(255,255,255,0.08); font-size:12px; font-family:monospace;">⚙️ 决策回溯日志</div>`;
-            data.steps.forEach(step => {
-                const cls = step.status || 'info';
-                logHtml +=
-                    `<div class="step ${cls}"><span class="icon">${step.icon}</span><span class="msg">${step.msg}</span>${step.conf ? `<span class="conf">${step.conf}</span>` : ''}</div>`;
-            });
-            document.getElementById('mainTrace').innerHTML = logHtml;
-
-            const latency = Math.floor(Math.random() * 30 + 10);
-            document.getElementById('footerLatency').textContent = `⏱️ 模拟延迟 ${latency} ms`;
+            renderBacktrack('routerBacktrack', data.steps);
         }
 
-        function setMain(text) {
-            document.getElementById('userInput').value = text;
-            processMain();
+        function setRouter(text) {
+            document.getElementById('routerInput').value = text;
+            processRouter();
         }
-
-        document.getElementById('userInput').addEventListener('keydown', e => { if (e.key === 'Enter') processMain(); });
+        document.getElementById('routerInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') processRouter(); });
 
         // ================================================================
-        // 证据模块 – 语序
+        // ② 语序
         // ================================================================
         const svoData = {
-            red_car: {
-                en: 'red car',
-                my: 'kereta merah',
-                zh: '[名词+形容词] 后置结构',
-                steps: [
-                    { icon: '⚙️', msg: '尝试规则A (前置): "merah kereta"', status: 'attempt', conf: '12%' },
+            red_car: { en: 'red car', my: 'kereta merah', zh: '[名词+形容词] 后置', steps: [
+                    { icon: '⚙️', msg: '尝试规则A (前置): "merah kereta"', status: 'info', conf: '12%' },
                     { icon: '❌', msg: '马来语验证失败', status: 'fail', conf: '<60%' },
-                    { icon: '↩️', msg: '回退至名词节点', status: 'backtrack', conf: '' },
-                    { icon: '⚙️', msg: '切换规则B (后置): "kereta merah"', status: 'attempt', conf: '96%' },
+                    { icon: '↩️', msg: '回退至名词节点', status: 'warn', conf: '' },
+                    { icon: '⚙️', msg: '切换规则B (后置): "kereta merah"', status: 'info', conf: '96%' },
                     { icon: '✅', msg: '采纳', status: 'success', conf: '最终96%' }
-                ]
-            },
-            big_house: {
-                en: 'big house',
-                my: 'rumah besar',
-                zh: '[名词+形容词] 后置结构',
-                steps: [
-                    { icon: '⚙️', msg: '尝试规则A (前置): "besar rumah"', status: 'attempt', conf: '8%' },
+                ] },
+            big_house: { en: 'big house', my: 'rumah besar', zh: '[名词+形容词] 后置', steps: [
+                    { icon: '⚙️', msg: '尝试规则A (前置): "besar rumah"', status: 'info', conf: '8%' },
                     { icon: '❌', msg: '马来语验证失败', status: 'fail', conf: '<60%' },
-                    { icon: '↩️', msg: '回退', status: 'backtrack', conf: '' },
-                    { icon: '⚙️', msg: '切换规则B (后置): "rumah besar"', status: 'attempt', conf: '98%' },
+                    { icon: '↩️', msg: '回退', status: 'warn', conf: '' },
+                    { icon: '⚙️', msg: '切换规则B (后置): "rumah besar"', status: 'info', conf: '98%' },
                     { icon: '✅', msg: '采纳', status: 'success', conf: '最终98%' }
-                ]
-            }
+                ] }
         };
 
-        function runSVO(key) {
+        function showSVO(key) {
             const d = svoData[key];
             if (!d) return;
-            document.getElementById('svo-res').innerHTML = `
-                <div class="res-grid-mini">
-                    <div class="col"><div class="label">英语</div><div class="content hl-en">${d.en}</div></div>
-                    <div class="col"><div class="label">马来/印尼</div><div class="content hl-my">${d.my}</div></div>
-                    <div class="col"><div class="label">中文结构</div><div class="content hl-zh">${d.zh}</div></div>
-                </div>
-            `;
-            let log = '';
-            d.steps.forEach(s => {
-                const cls = s.status || 'info';
-                log +=
-                    `<span class="${cls}" style="margin-right:8px;">${s.icon} ${s.msg} ${s.conf ? '['+s.conf+']' : ''}</span>`;
-            });
-            document.getElementById('svo-trace').innerHTML = `⏱️ ${Math.floor(Math.random()*6+4)}ms · 🎯 ${d.steps[d.steps.length-1].conf} · ${log}`;
-            document.getElementById('svo-time').textContent = Math.floor(Math.random() * 6 + 4);
-            document.getElementById('svo-conf').textContent = d.steps[d.steps.length - 1].conf;
+            renderTriple('svo-result', d.en, d.my, d.zh);
+            renderBacktrack('svo-backtrack', d.steps);
         }
 
         // ================================================================
-        // 时态
+        // ③ 时态
         // ================================================================
-        const tenseVerbs = {
+        const tenseVerb = {
             makan: { base: 'makan', en: 'eat', past: 'eaten', ing: 'eating' },
             minum: { base: 'minum', en: 'drink', past: 'drunk', ing: 'drinking' },
+            kerja: { base: 'kerja', en: 'work', past: 'worked', ing: 'working' },
             tulis: { base: 'tulis', en: 'write', past: 'written', ing: 'writing' }
         };
 
-        function runTense() {
-            const vk = document.getElementById('t-verb').value;
-            const tk = document.getElementById('t-tense').value;
-            const v = tenseVerbs[vk];
+        function convertTense() {
+            const vk = document.getElementById('tense-verb').value;
+            const tk = document.getElementById('tense-select').value;
+            const v = tenseVerb[vk];
             if (!v) return;
             const map = {
-                sudah: { en: 'has/have ' + v.past, zh: '已经+动词' },
-                sedang: { en: 'is ' + v.ing, zh: '正在+动词' },
-                akan: { en: 'will ' + v.en, zh: '将+动词' }
+                sudah: { en: 'has/have ' + v.past, zh: '已经+动词 (完成)' },
+                sedang: { en: 'is ' + v.ing, zh: '正在+动词 (进行)' },
+                akan: { en: 'will ' + v.en, zh: '将+动词 (将来)' }
             };
             const info = map[tk];
-            document.getElementById('tense-res').innerHTML = `
-                <div class="res-grid-mini">
-                    <div class="col"><div class="label">英语</div><div class="content hl-en">She ${info.en}</div></div>
-                    <div class="col"><div class="label">马来/印尼</div><div class="content hl-my">Dia ${tk} ${v.base}</div></div>
-                    <div class="col"><div class="label">中文结构</div><div class="content hl-zh">${info.zh}</div></div>
-                </div>
-            `;
+            renderTriple('tense-result', `She ${info.en}`, `Dia ${tk} ${v.base}`, `[时态: ${info.zh}]`);
             const steps = [
-                { icon: '⚙️', msg: '尝试直译', status: 'attempt', conf: '45%' },
+                { icon: '⚙️', msg: '尝试直译', status: 'info', conf: '45%' },
                 { icon: '❌', msg: '马来语无屈折，回退', status: 'fail', conf: '<60%' },
-                { icon: '↩️', msg: '加载时态助词', status: 'backtrack', conf: '' },
+                { icon: '↩️', msg: '加载时态助词', status: 'warn', conf: '' },
                 { icon: '✅', msg: `采纳 "Dia ${tk} ${v.base}"`, status: 'success', conf: '94%' }
             ];
-            let log = '';
-            steps.forEach(s => {
-                const cls = s.status || 'info';
-                log +=
-                    `<span class="${cls}" style="margin-right:8px;">${s.icon} ${s.msg} ${s.conf ? '['+s.conf+']' : ''}</span>`;
-            });
-            document.getElementById('tense-trace').innerHTML =
-                `⏱️ ${Math.floor(Math.random()*6+6)}ms · 🎯 94% · ${log}`;
-            document.getElementById('tense-time').textContent = Math.floor(Math.random() * 6 + 6);
-            document.getElementById('tense-conf').textContent = '94%';
+            renderBacktrack('tense-backtrack', steps);
         }
 
         // ================================================================
-        // 词缀
+        // ④ 词缀
         // ================================================================
         const deriveData = {
             ajar: { root: 'ajar', meaning: '教', forms: ['ajar', 'pelajar', 'pengajar', 'belajar', 'mengajar'],
-                zh: '中文无派生，用复合词' },
+                zh: '中文无派生，复合词' },
             makan: { root: 'makan', meaning: '吃', forms: ['makan', 'makanan', 'pemakan', 'memakan', 'dimakan'],
                 zh: '零派生，独立词' },
-            tulis: { root: 'tulis', meaning: '写', forms: ['tulis', 'tulisan', 'penulis', 'menulis', 'ditulis'],
-                zh: '零派生' }
+            baca: { root: 'baca', meaning: '读', forms: ['baca', 'bacaan', 'pembaca', 'membaca', 'dibaca'], zh: '零派生' },
+            tulis: { root: 'tulis', meaning: '写', forms: ['tulis', 'tulisan', 'penulis', 'menulis', 'ditulis'], zh: '零派生' }
         };
 
-        function runDerive(key) {
+        function showDerivation(key) {
             const d = deriveData[key];
             if (!d) return;
-            document.getElementById('derive-res').innerHTML = `
-                <div class="res-grid-mini">
-                    <div class="col"><div class="label">马来派生</div><div class="content hl-my">${d.forms.join(' / ')}</div></div>
-                    <div class="col"><div class="label">英语对照</div><div class="content hl-en">${d.forms.map(f=>f).join(' / ')}</div></div>
-                    <div class="col"><div class="label">中文验证</div><div class="content hl-zh">${d.zh}</div></div>
-                </div>
-            `;
-            document.getElementById('derive-trace').innerHTML =
-                `⏱️ ${Math.floor(Math.random()*8+8)}ms · 🎯 85% · 词缀系统独立，中文零派生验证`;
-            document.getElementById('derive-time').textContent = Math.floor(Math.random() * 8 + 8);
-            document.getElementById('derive-conf').textContent = '85%';
+            let html = `<div style="color:#facc15; font-weight:600; font-size:16px; margin-bottom:6px;">词根：${d.root} (${d.meaning})</div>`;
+            html += `<div class="derivation-grid">`;
+            d.forms.forEach(f => {
+                html += `<div class="item"><span class="word">${f}</span><span class="pos">派生</span></div>`;
+            });
+            html += `</div>`;
+            html +=
+                `<div style="color:rgba(255,255,255,0.2); font-size:13px; margin-top:4px;">中文验证：${d.zh}</div>`;
+            document.getElementById('derivation-result').innerHTML = html;
+            const steps = [
+                { icon: '🔍', msg: `词根 ${d.root} 识别`, status: 'info', conf: '100%' },
+                { icon: '⚙️', msg: `应用词缀规则，生成 ${d.forms.length} 个派生词`, status: 'info', conf: '92%' },
+                { icon: '✅', msg: `中文零派生对照验证通过`, status: 'success', conf: '最终 90%' }
+            ];
+            renderBacktrack('derive-backtrack', steps);
         }
 
         // ================================================================
-        // 被动
+        // ⑤ 被动
         // ================================================================
         const passData = {
             'Saya makan nasi': { active: 'Saya makan nasi', passive: 'Nasi dimakan oleh saya', en: 'I eat rice',
@@ -1090,86 +1502,119 @@
                 en_passive: 'Water is drunk by us', zh: '水被我们喝了' }
         };
 
-        function runPassive() {
-            const key = document.getElementById('p-input').value;
+        function convertPassive() {
+            const key = document.getElementById('passive-input').value;
             const d = passData[key];
             if (!d) return;
-            document.getElementById('passive-res').innerHTML = `
-                <div class="res-grid-mini">
-                    <div class="col"><div class="label">主动</div><div class="content hl-my">${d.active}</div><div style="font-size:10px;color:rgba(255,255,255,0.2);">${d.en}</div></div>
-                    <div class="col"><div class="label">被动</div><div class="content hl-my">${d.passive}</div><div style="font-size:10px;color:rgba(255,255,255,0.2);">${d.en_passive}</div></div>
-                    <div class="col"><div class="label">中文结构</div><div class="content hl-zh">${d.zh}</div></div>
-                </div>
-            `;
-            document.getElementById('passive-trace').innerHTML =
-                `⏱️ ${Math.floor(Math.random()*8+10)}ms · 🎯 96% · di- + oleh 完全对应英语被动`;
-            document.getElementById('passive-time').textContent = Math.floor(Math.random() * 8 + 10);
-            document.getElementById('passive-conf').textContent = '96%';
+            renderTriple('passive-result', `${d.en} → ${d.en_passive}`, `${d.active} → ${d.passive}`, d.zh);
+            const steps = [
+                { icon: '🔍', msg: '识别主动句结构', status: 'info', conf: '98%' },
+                { icon: '⚙️', msg: '应用 di- + oleh 规则', status: 'info', conf: '96%' },
+                { icon: '✅', msg: '被动结构完全对应', status: 'success', conf: '最终 96%' }
+            ];
+            renderBacktrack('passive-backtrack', steps);
         }
 
         // ================================================================
-        // 多义词
+        // ⑥ 多义词
         // ================================================================
         const wsdMap = {
             sport: { input: '打篮球', en: 'play basketball', tag: '运动类', steps: [
-                    { icon: '⚙️', msg: '候选: hit(15%)/play(85%)', status: 'attempt', conf: '初始' },
+                    { icon: '⚙️', msg: '候选: hit(15%)/play(85%)', status: 'info', conf: '初始' },
                     { icon: '🔍', msg: '上下文 "篮球" 指向运动', status: 'info', conf: '+30%' },
                     { icon: '✅', msg: '采纳 play', status: 'success', conf: '最终89%' }
                 ] },
             taxi: { input: '打车', en: 'take a taxi', tag: '交通类', steps: [
-                    { icon: '⚙️', msg: '候选: hit(2%)/take(92%)', status: 'attempt', conf: '初始' },
+                    { icon: '⚙️', msg: '候选: hit(2%)/take(92%)', status: 'info', conf: '初始' },
                     { icon: '✅', msg: '采纳 take', status: 'success', conf: '最终92%' }
                 ] },
             hit: { input: '打人', en: 'hit someone', tag: '攻击类', steps: [
-                    { icon: '⚙️', msg: '候选: hit(88%)/play(10%)', status: 'attempt', conf: '初始' },
+                    { icon: '⚙️', msg: '候选: hit(88%)/play(10%)', status: 'info', conf: '初始' },
                     { icon: '✅', msg: '采纳 hit', status: 'success', conf: '最终88%' }
                 ] }
         };
 
-        function runWSD(key) {
+        function showWSD(key) {
             const d = wsdMap[key];
             if (!d) return;
-            document.getElementById('wsd-res').innerHTML = `
-                <div class="res-grid-mini">
-                    <div class="col"><div class="label">中文</div><div class="content hl-zh">${d.input}</div><div style="font-size:10px;color:rgba(255,255,255,0.2);">${d.tag}</div></div>
-                    <div class="col"><div class="label">英语映射</div><div class="content hl-en">${d.en}</div></div>
-                    <div class="col"><div class="label">决策</div><div class="content" style="color:#4ade80;">✅ 歧义消解</div></div>
-                </div>
-            `;
-            let log = '';
-            d.steps.forEach(s => {
-                const cls = s.status || 'info';
-                log +=
-                    `<span class="${cls}" style="margin-right:8px;">${s.icon} ${s.msg} ${s.conf ? '['+s.conf+']' : ''}</span>`;
-            });
-            document.getElementById('wsd-trace').innerHTML =
-                `⏱️ ${Math.floor(Math.random()*15+20)}ms · 🎯 ${d.steps[d.steps.length-1].conf} · ${log}`;
-            document.getElementById('wsd-time').textContent = Math.floor(Math.random() * 15 + 20);
-            document.getElementById('wsd-conf').textContent = d.steps[d.steps.length - 1].conf;
+            renderTriple('wsd-result', d.en, `[歧义消解] ${d.tag}`, d.input);
+            renderBacktrack('wsd-backtrack', d.steps);
         }
 
         // ================================================================
-        // 文化
+        // ⑦ 文化
         // ================================================================
         const cultureMap = {
-            dragon: { input: '龙 (中文)', output: 'Loong (避免西方邪恶意象)', note: '文化隐喻替换' },
-            taboo: { input: '禁忌词', output: '[已过滤] 中性词', note: '敏感词规避' }
+            dragon: { input: '龙 (中文)', output: 'Loong (避免西方邪恶意象)', note: '文化隐喻替换', steps: [
+                    { icon: '🔍', msg: '检测到文化负载词 "龙"', status: 'info', conf: '90%' },
+                    { icon: '⚠️', msg: '直译 "dragon" 有邪恶意象', status: 'warn', conf: '' },
+                    { icon: '↩️', msg: '触发文化回退，查询映射表', status: 'warn', conf: '' },
+                    { icon: '✅', msg: '采纳 "Loong"', status: 'success', conf: '最终 88%' }
+                ] },
+            taboo: { input: '禁忌词', output: '[已过滤] 中性词', note: '敏感词规避', steps: [
+                    { icon: '🔍', msg: '检测到潜在禁忌词', status: 'info', conf: '85%' },
+                    { icon: '⚠️', msg: '触发敏感词过滤', status: 'warn', conf: '' },
+                    { icon: '✅', msg: '替换为中性词', status: 'success', conf: '最终 92%' }
+                ] }
         };
 
-        function runCulture(key) {
+        function showCulture(key) {
             const d = cultureMap[key];
             if (!d) return;
-            document.getElementById('culture-res').innerHTML = `
-                <div class="res-grid-mini">
-                    <div class="col"><div class="label">中文</div><div class="content hl-zh">${d.input}</div></div>
-                    <div class="col"><div class="label">适配结果</div><div class="content hl-en">${d.output}</div></div>
-                    <div class="col"><div class="label">备注</div><div class="content" style="color:rgba(255,255,255,0.3);">${d.note}</div></div>
-                </div>
-            `;
-            document.getElementById('culture-trace').innerHTML =
-                `⏱️ ${Math.floor(Math.random()*20+25)}ms · 🎯 85% · 文化规约引擎生效`;
-            document.getElementById('culture-time').textContent = Math.floor(Math.random() * 20 + 25);
-            document.getElementById('culture-conf').textContent = '85%';
+            renderTriple('culture-result', d.output, d.note, d.input);
+            renderBacktrack('culture-backtrack', d.steps);
+        }
+
+        // ================================================================
+        // ⑧ 差异边界 · 伪同源词
+        // ================================================================
+        const diffMap = {
+            kereta: {
+                word: 'kereta',
+                my: '🚗 汽车 (Malaysia)',
+                id: '🚂 火车 (Indonesia)',
+                zh: '伪同源词 · 地域冲突',
+                steps: [
+                    { icon: '🔍', msg: '结构验证通过 (SVO, 名词位置正确)', status: 'info', conf: '98%' },
+                    { icon: '⚠️', msg: '检测到伪同源词 "kereta"', status: 'warn', conf: '词义冲突' },
+                    { icon: '↩️', msg: '触发语义回退', status: 'warn', conf: '' },
+                    { icon: '🌐', msg: '加载地域向量偏移 (MY → Car)', status: 'info', conf: '' },
+                    { icon: '✅', msg: '最终映射: kereta → Car', status: 'success', conf: '最终 99%' }
+                ]
+            },
+            budak: {
+                word: 'budak',
+                my: '🧒 小孩 (Malaysia)',
+                id: '⛓️ 奴隶 (Indonesia)',
+                zh: '伪同源词 · 地域冲突',
+                steps: [
+                    { icon: '🔍', msg: '结构验证通过', status: 'info', conf: '97%' },
+                    { icon: '⚠️', msg: '检测到伪同源词 "budak"', status: 'warn', conf: '冲突' },
+                    { icon: '↩️', msg: '触发回退', status: 'warn', conf: '' },
+                    { icon: '🌐', msg: '地域偏移 (MY → Child)', status: 'info', conf: '' },
+                    { icon: '✅', msg: '最终映射: budak → Child', status: 'success', conf: '99%' }
+                ]
+            },
+            percuma: {
+                word: 'percuma',
+                my: '🎁 免费 (Malaysia)',
+                id: '💔 徒劳 (Indonesia)',
+                zh: '伪同源词 · 地域冲突',
+                steps: [
+                    { icon: '🔍', msg: '结构验证通过 (形容词后置)', status: 'info', conf: '96%' },
+                    { icon: '⚠️', msg: '检测到伪同源词 "percuma"', status: 'warn', conf: '冲突' },
+                    { icon: '↩️', msg: '触发回退', status: 'warn', conf: '' },
+                    { icon: '🌐', msg: '地域偏移 (MY → Free)', status: 'info', conf: '' },
+                    { icon: '✅', msg: '最终映射: percuma → Free', status: 'success', conf: '99%' }
+                ]
+            }
+        };
+
+        function showDiff(key) {
+            const d = diffMap[key];
+            if (!d) return;
+            renderTriple('diff-result', d.my, d.id, d.zh);
+            renderBacktrack('diff-backtrack', d.steps);
         }
 
         // ================================================================
@@ -1177,15 +1622,17 @@
         // ================================================================
         window.onload = function() {
             setTimeout(() => {
-                processMain();
-                runSVO('red_car');
-                runTense();
-                runDerive('ajar');
-                runPassive();
-                runWSD('sport');
-                runCulture('dragon');
-            }, 200);
+                processRouter();
+                showSVO('red_car');
+                convertTense();
+                showDerivation('ajar');
+                convertPassive();
+                showWSD('sport');
+                showCulture('dragon');
+                showDiff('kereta');
+            }, 300);
         };
     </script>
+
 </body>
 </html>
