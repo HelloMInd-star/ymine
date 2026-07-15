@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>二元拆分解题器 · 第一层</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { background:#0b0b1a; font-family:system-ui, sans-serif; min-height:100vh; display:flex; justify-content:center; align-items:center; padding:20px; color:#f1f5f9; }
+        .container { max-width:800px; width:100%; background:radial-gradient(ellipse at 30% 30%, #120b24, #0b0b1a 70%); border-radius:32px; padding:32px; border:1px solid rgba(255,255,255,0.06); }
+        h2 { font-size:24px; margin-bottom:6px; background:linear-gradient(135deg,#f1f5f9,#a78bfa); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+        .sub { color:rgba(255,255,255,0.3); border-left:2px solid #a78bfa; padding-left:14px; margin-bottom:20px; }
+
+        .card { background:rgba(255,255,255,0.02); border-radius:16px; padding:20px; margin:12px 0; border:1px solid rgba(255,255,255,0.04); }
+        .btn { background:#a78bfa; border:none; color:#0b0b1a; padding:6px 18px; border-radius:10px; font-weight:600; cursor:pointer; }
+        .btn-outline { background:transparent; border:1px solid rgba(167,139,250,0.2); color:#a78bfa; padding:4px 14px; border-radius:6px; cursor:pointer; }
+
+        .result-box { background:rgba(255,255,255,0.01); border-radius:12px; padding:14px 18px; margin-top:12px; border-left:3px solid #facc15; color:rgba(255,255,255,0.6); }
+        .log-box { margin-top:12px; background:rgba(0,0,0,0.3); border-radius:10px; padding:10px 14px; border-left:3px solid #fbbf24; font-family:'Courier New', monospace; min-height:60px; }
+        .log-step { display:flex; gap:10px; padding:2px 0; font-size:12px; border-bottom:1px solid rgba(255,255,255,0.015); }
+        .log-step .msg { flex:1; color:rgba(255,255,255,0.5); }
+        .log-step.success .msg { color:#4ade80; }
+        .log-step.fail .msg { color:#f87171; }
+        .log-step.warn .msg { color:#fbbf24; }
+        .log-step.info .msg { color:#60a5fa; }
+
+        .flex-row { display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin:6px 0; }
+        input { background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.04); color:#f1f5f9; padding:4px 10px; border-radius:6px; width:60px; }
+
+        .closure { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:20px; }
+        .closure .item { padding:12px 16px; background:rgba(255,255,255,0.01); border-radius:10px; border-left:3px solid #a78bfa; }
+        .closure .item .label { font-size:11px; color:rgba(255,255,255,0.2); text-transform:uppercase; letter-spacing:0.5px; }
+        .closure .item .text { color:rgba(255,255,255,0.5); font-size:14px; margin-top:4px; }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <h2>🧩 二元拆分解题器 · 第一层</h2>
+    <div class="sub">验证“二元拆分”底座是否能跑通 —— 从鸡兔同笼开始</div>
+
+    <div class="card">
+        <div style="font-weight:600; color:#f1f5f9; margin-bottom:8px;">📐 鸡兔同笼</div>
+        <div style="color:rgba(255,255,255,0.3); font-size:14px; margin-bottom:12px;">
+            笼子里有鸡和兔，共 <input type="number" id="heads" value="10" min="1" max="50"> 个头，
+            <input type="number" id="legs" value="28" min="2" max="200"> 只脚。
+        </div>
+        <div class="flex-row">
+            <button class="btn" onclick="runBinarySplit()">▶ 运行二元拆分</button>
+            <button class="btn-outline" onclick="resetBinary()">⟳ 重置</button>
+        </div>
+
+        <div id="binaryResult" class="result-box">
+            <span style="color:rgba(255,255,255,0.2);">输入头数和脚数，点击运行</span>
+        </div>
+
+        <div id="binaryLog" class="log-box">
+            <div style="color:rgba(255,255,255,0.1); font-size:11px;">⚙️ 二元拆分 → 假设法 → 验证 日志</div>
+            <div style="color:rgba(255,255,255,0.05);">等待运行...</div>
+        </div>
+    </div>
+
+    <div class="closure">
+        <div class="item"><div class="label">🧠 双语言翻译</div><div class="text">“鸡”“兔”“头”“脚” → x + y = heads, 2x + 4y = legs</div></div>
+        <div class="item"><div class="label">✂️ 二元拆分</div><div class="text">假设全是鸡 → 计算差值 → 每换一只兔脚数+2 → 得出数量</div></div>
+    </div>
+
+    <div style="margin-top:16px; border-top:1px solid rgba(255,255,255,0.03); padding-top:12px; color:rgba(255,255,255,0.08); text-align:center; font-size:12px;">
+        ✅ 第一层已跑通 — 下一步：扩展到盈亏、浓度、工程问题
+    </div>
+
+</div>
+
+<script>
+    // ================================================================
+    // 二元拆分解题器 · 第一层
+    // 只做一件事：鸡兔同笼 → 假设法 → 验证
+    // ================================================================
+
+    function runBinarySplit() {
+        const heads = parseInt(document.getElementById('heads').value) || 10;
+        const legs = parseInt(document.getElementById('legs').value) || 28;
+
+        // ---- 1. 输入验证 ----
+        if (legs < heads * 2 || legs > heads * 4) {
+            document.getElementById('binaryResult').innerHTML =
+                `<span style="color:#f87171;">❌ 脚数不可能：${heads} 个头，最少 ${heads*2} 只脚，最多 ${heads*4} 只脚。</span>`;
+            return;
+        }
+
+        // ---- 2. 二元拆分：翻译成数学结构 ----
+        // 自然语言 → x(鸡) + y(兔) = heads, 2x + 4y = legs
+
+        // ---- 3. 假设法推理（这就是“二元拆分”的核心） ----
+        // 假设全是鸡 → 脚数 = heads * 2
+        const assumeChicken = heads * 2;
+        const diff = legs - assumeChicken; // 比实际少了多少只脚
+        const replaceCount = diff / 2; // 每把一只鸡换成一只兔，脚数+2
+
+        // ---- 4. 计算出鸡和兔的数量 ----
+        const rabbit = replaceCount;
+        const chicken = heads - rabbit;
+
+        // ---- 5. 验证 ----
+        const verifyLegs = chicken * 2 + rabbit * 4;
+
+        // ---- 6. 构建回溯日志 ----
+        const logs = [];
+        logs.push({ icon: '🔍', msg: `翻译题目：鸡+兔 = ${heads} 个头，2鸡+4兔 = ${legs} 只脚`, status: 'info' });
+        logs.push({ icon: '✂️', msg: `二元拆分：设鸡为 x，兔为 y → x + y = ${heads}, 2x + 4y = ${legs}`, status: 'info' });
+        logs.push({ icon: '🧠', msg: `假设全是鸡：脚数 = ${heads} × 2 = ${assumeChicken} 只`, status: 'info' });
+        logs.push({ icon: '📊', msg: `实际脚数 - 假设脚数 = ${legs} - ${assumeChicken} = ${diff} 只`, status: 'warn' });
+        logs.push({ icon: '🔄', msg: `每把一只鸡换成一只兔，脚数 +2 → 需换 ${diff} ÷ 2 = ${replaceCount} 只`, status: 'info' });
+        logs.push({ icon: '🐰', msg: `兔 = ${rabbit} 只，鸡 = ${heads} - ${rabbit} = ${chicken} 只`, status: 'success' });
+        logs.push({ icon: '✅', msg: `验证：${chicken} × 2 + ${rabbit} × 4 = ${verifyLegs} 只脚 ✅`, status: 'success' });
+
+        // ---- 7. 渲染结果 ----
+        document.getElementById('binaryResult').innerHTML = `
+            <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px;">
+                <div><span style="color:rgba(255,255,255,0.3);">🐔 鸡</span><br><span style="font-size:24px; font-weight:700; color:#60a5fa;">${chicken}</span><span style="color:rgba(255,255,255,0.2);"> 只</span></div>
+                <div><span style="color:rgba(255,255,255,0.3);">🐰 兔</span><br><span style="font-size:24px; font-weight:700; color:#facc15;">${rabbit}</span><span style="color:rgba(255,255,255,0.2);"> 只</span></div>
+                <div><span style="color:rgba(255,255,255,0.3);">✅ 验证</span><br><span style="font-size:16px; color:#4ade80;">${verifyLegs} 只脚</span></div>
+            </div>
+        `;
+
+        // ---- 8. 渲染日志 ----
+        let logHtml = `<div style="color:rgba(255,255,255,0.1); font-size:11px;">⚙️ 二元拆分 → 假设法 → 验证 日志</div>`;
+        logs.forEach(log => {
+            const cls = log.status || 'info';
+            logHtml += `
+                <div class="log-step ${cls}">
+                    <span style="color:rgba(255,255,255,0.1);">${log.icon}</span>
+                    <span class="msg">${log.msg}</span>
+                </div>
+            `;
+        });
+        document.getElementById('binaryLog').innerHTML = logHtml;
+    }
+
+    function resetBinary() {
+        document.getElementById('binaryResult').innerHTML = `<span style="color:rgba(255,255,255,0.2);">输入头数和脚数，点击运行</span>`;
+        document.getElementById('binaryLog').innerHTML = `
+            <div style="color:rgba(255,255,255,0.1); font-size:11px;">⚙️ 二元拆分 → 假设法 → 验证 日志</div>
+            <div style="color:rgba(255,255,255,0.05);">等待运行...</div>
+        `;
+    }
+
+    // 初始化默认运行一次，展示效果
+    window.onload = function() {
+        setTimeout(runBinarySplit, 300);
+    };
+</script>
+
+</body>
+</html>
