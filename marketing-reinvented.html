@@ -241,6 +241,51 @@
             margin-top: 4px;
         }
 
+        /* ===== 使用说明（折叠） ===== */
+        .usage-guide {
+            margin-bottom: 20px;
+            opacity: 0;
+            animation: fadeInUp 0.6s ease 0.04s forwards;
+        }
+        .usage-guide details {
+            background: rgba(167, 139, 250, 0.03);
+            border: 1px solid rgba(167, 139, 250, 0.06);
+            border-radius: 12px;
+            padding: 12px 18px;
+        }
+        .usage-guide details summary {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 13px;
+            font-weight: 500;
+            list-style: none;
+            user-select: none;
+        }
+        .usage-guide details summary::-webkit-details-marker {
+            display: none;
+        }
+        .usage-guide details summary .arrow {
+            margin-left: auto;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.1);
+        }
+        .usage-guide details .guide-body {
+            padding-top: 12px;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px 24px;
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.35);
+            line-height: 1.7;
+        }
+        .usage-guide details .guide-body strong {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
         /* ===== 价值主张 ===== */
         .value-prop {
             background: rgba(167, 139, 250, 0.04);
@@ -1025,6 +1070,11 @@
             margin-right: 4px;
         }
 
+        .extension-grid .ext-item .ext-lock.unlocked {
+            color: rgba(167, 139, 250, 0.2);
+            border-color: rgba(167, 139, 250, 0.08);
+        }
+
         /* ===== 底部 ===== */
         .back-bottom {
             text-align: center;
@@ -1084,6 +1134,9 @@
             }
             .simulator-section .result-panel {
                 grid-template-columns: 1fr 1fr;
+            }
+            .usage-guide details .guide-body {
+                grid-template-columns: 1fr;
             }
         }
 
@@ -1160,6 +1213,13 @@
             }
             .simulator-section .result-panel {
                 grid-template-columns: 1fr;
+            }
+            .usage-guide details {
+                padding: 10px 12px;
+            }
+            .usage-guide details .guide-body {
+                font-size: 12px;
+                gap: 4px 12px;
             }
         }
     </style>
@@ -1266,6 +1326,23 @@
             <div class="badge">🧠 神经科学底座 · 营销重构</div>
             <h1>元架构重构营销学</h1>
             <div class="sub">前额叶 × 边缘系统 = 营销成功率 · 完整证据链</div>
+        </div>
+
+        <!-- ===== 使用说明（折叠） ===== -->
+        <div class="usage-guide">
+            <details>
+                <summary>
+                    <span>📖</span>
+                    <span>如何使用这个页面</span>
+                    <span class="arrow">点击展开 ▼</span>
+                </summary>
+                <div class="guide-body">
+                    <div><strong>🧭 读法</strong> — 按顺序从上往下读，每一层都在前一层的基础上推进</div>
+                    <div><strong>🎛️ 交互</strong> — 营销模拟器 · 定价模拟器 · 三维评估 · 公式计算器</div>
+                    <div><strong>🔺 核心</strong> — 先看瑞幸案例建模，再看几何公理底座，最后收束到公式</div>
+                    <div><strong>📌 捷径</strong> — 左侧导航可随时跳转到任意板块</div>
+                </div>
+            </details>
         </div>
 
         <!-- ===== 价值主张 ===== -->
@@ -2245,6 +2322,13 @@
                     </div>
                     <div class="ext-lock"><span class="lock-icon">🔒</span> 待解锁</div>
                 </div>
+                <div class="ext-item" style="grid-column:1/-1; border-color:rgba(167,139,250,0.08);">
+                    <div class="ext-info">
+                        <div class="ext-name" style="color:#a78bfa;">🏗️ 工程可行性评估</div>
+                        <div class="ext-desc">用元架构重新构建工程项目的技术/经济/合规综合评估框架</div>
+                    </div>
+                    <div class="ext-lock unlocked"><span class="lock-icon">🔓</span> 已规划</div>
+                </div>
             </div>
         </div>
 
@@ -2886,16 +2970,11 @@
                 limbicVal.textContent = limbic.toFixed(2);
                 angleVal.textContent = angleDeg + '°';
 
-                // 余弦相似度：方向一致性
                 const cosTheta = Math.cos(angleRad);
-                // 欧氏距离：强度差异
                 const euclid = Math.abs(pfc - limbic);
-                // 点积距离：整体协同度
                 const dot = pfc * limbic * cosTheta;
 
-                // 综合评估值
                 const composite = cosTheta * (1 - euclid) * (1 + dot * 0.5);
-                // 模型精准度（归一化）
                 const precision = Math.min(1, Math.max(0, composite * 0.8 + 0.2));
 
                 cosineScore.textContent = cosTheta.toFixed(3);
