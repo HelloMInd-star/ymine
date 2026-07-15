@@ -16,7 +16,7 @@
             background: #0b0b1a;
             font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
             min-height: 100vh;
-            padding: 40px 24px 40px 100px;
+            padding: 20px 20px 20px 220px;
             overflow-x: hidden;
             cursor: default;
         }
@@ -33,84 +33,116 @@
             transition: background 0.1s;
         }
 
-        /* ===== 右侧固定导航栏 ===== */
-        .sidebar-nav {
+        /* ===== 左侧固定导航栏（可视化关键词索引） ===== */
+        .sidebar {
             position: fixed;
             top: 0;
-            right: 0;
-            width: 72px;
+            left: 0;
+            width: 200px;
             height: 100vh;
-            padding: 32px 0 24px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 4px;
-            z-index: 100;
-            background: rgba(11, 11, 26, 0.6);
+            padding: 28px 12px 20px;
+            background: rgba(11, 11, 26, 0.92);
             backdrop-filter: blur(12px);
-            border-left: 1px solid rgba(255, 255, 255, 0.04);
-        }
-
-        .sidebar-nav .nav-item {
+            border-right: 1px solid rgba(255, 255, 255, 0.04);
+            overflow-y: auto;
+            z-index: 100;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            width: 44px;
-            height: 44px;
-            border-radius: 10px;
-            color: rgba(255, 255, 255, 0.12);
-            font-size: 11px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            border: 1px solid transparent;
-            text-decoration: none;
-            font-family: 'Courier New', monospace;
         }
 
-        .sidebar-nav .nav-item:hover {
-            color: rgba(255, 255, 255, 0.5);
-            background: rgba(255, 255, 255, 0.03);
-            border-color: rgba(255, 255, 255, 0.06);
+        .sidebar .logo {
+            font-size: 13px;
+            font-weight: 700;
+            color: #f1f5f9;
+            margin-bottom: 2px;
+            letter-spacing: -0.3px;
+            text-align: center;
         }
-
-        .sidebar-nav .nav-item.active {
+        .sidebar .logo span {
             color: #a78bfa;
-            background: rgba(167, 139, 250, 0.06);
-            border-color: rgba(167, 139, 250, 0.12);
         }
-
-        .sidebar-nav .nav-item .num {
+        .sidebar .sub-logo {
             font-size: 10px;
-            font-weight: 600;
-            line-height: 1;
-        }
-
-        .sidebar-nav .nav-item .label {
-            font-size: 6px;
-            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.15);
+            margin-bottom: 16px;
             letter-spacing: 0.3px;
-            opacity: 0.3;
-            margin-top: 1px;
-            font-family: system-ui, sans-serif;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            padding-bottom: 12px;
         }
 
-        .sidebar-nav .nav-divider {
+        .sidebar .nav-divider {
+            border: none;
+            border-top: 1px solid rgba(255, 255, 255, 0.03);
+            margin: 6px 0;
+        }
+
+        .sidebar .nav-section-label {
+            font-size: 9px;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: rgba(255, 255, 255, 0.08);
+            padding: 6px 8px 2px;
+            font-weight: 600;
+        }
+
+        .sidebar .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 6px 10px;
+            margin-bottom: 1px;
+            border-radius: 8px;
+            color: rgba(255, 255, 255, 0.25);
+            font-size: 12px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.25s ease;
+            cursor: pointer;
+            border-left: 2px solid transparent;
+        }
+
+        .sidebar .nav-item:hover {
+            background: rgba(255, 255, 255, 0.03);
+            color: rgba(255, 255, 255, 0.6);
+            border-left-color: rgba(167, 139, 250, 0.2);
+        }
+
+        .sidebar .nav-item.active {
+            color: #f1f5f9;
+            background: rgba(167, 139, 250, 0.06);
+            border-left-color: #a78bfa;
+        }
+
+        .sidebar .nav-item .icon {
+            font-size: 14px;
             width: 20px;
-            height: 1px;
-            background: rgba(255, 255, 255, 0.04);
-            margin: 2px 0;
+            text-align: center;
+            flex-shrink: 0;
         }
 
-        .sidebar-nav .nav-bottom {
+        .sidebar .nav-item .label {
+            font-size: 12px;
+            font-weight: 500;
+            line-height: 1.2;
+        }
+
+        .sidebar .footer-nav {
             margin-top: auto;
-            font-size: 7px;
-            color: rgba(255, 255, 255, 0.04);
-            writing-mode: vertical-rl;
-            letter-spacing: 2px;
-            font-weight: 300;
+            padding-top: 12px;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.1);
+            text-align: center;
+        }
+        .sidebar .footer-nav a {
+            color: rgba(255, 255, 255, 0.15);
+            text-decoration: none;
+            font-size: 11px;
+            transition: color 0.3s ease;
+        }
+        .sidebar .footer-nav a:hover {
+            color: rgba(255, 255, 255, 0.5);
         }
 
         /* ===== 主容器 ===== */
@@ -271,12 +303,7 @@
             color: #facc15;
         }
 
-        /* ===== 锚点 ===== */
-        .section-anchor {
-            scroll-margin-top: 16px;
-        }
-
-        /* ===== 验证元数据（新版：传统 vs 元架构） ===== */
+        /* ===== 验证元数据 ===== */
         .meta-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -515,6 +542,138 @@
             margin-top: 6px;
         }
 
+        /* ============================================================ */
+        /* ===== 圆锥模型板块 ===== */
+        /* ============================================================ */
+        .cone-section {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 16px;
+            padding: 28px 32px 24px;
+            margin-bottom: 36px;
+            opacity: 0;
+            animation: fadeInUp 0.6s ease 0.15s forwards;
+            scroll-margin-top: 20px;
+        }
+
+        .cone-section .cone-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .cone-section .cone-title .tag {
+            font-size: 11px;
+            font-weight: 500;
+            color: #a78bfa;
+            background: rgba(167, 139, 250, 0.12);
+            padding: 2px 12px;
+            border-radius: 20px;
+        }
+
+        .cone-section .cone-sub {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.2);
+            margin-bottom: 18px;
+        }
+
+        .cone-section .cone-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px 24px;
+            margin-bottom: 18px;
+        }
+
+        .cone-section .cone-grid .cone-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 12px;
+            padding: 14px 16px;
+        }
+
+        .cone-section .cone-grid .cone-card .cc-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: rgba(255, 255, 255, 0.15);
+            font-weight: 600;
+        }
+
+        .cone-section .cone-grid .cone-card .cc-value {
+            font-size: 14px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.7);
+            margin-top: 2px;
+            line-height: 1.6;
+        }
+
+        .cone-section .cone-grid .cone-card .cc-value .hl {
+            color: #a78bfa;
+        }
+
+        .cone-section .cone-grid .cone-card .cc-value .gold {
+            color: #facc15;
+        }
+
+        .cone-section .cone-grid .cone-card .cc-value .green {
+            color: #22c55e;
+        }
+
+        .cone-section .cone-grid .cone-card .cc-value .sub {
+            color: rgba(255, 255, 255, 0.25);
+            font-size: 12px;
+            font-weight: 400;
+        }
+
+        .cone-section .cone-canvas-wrap {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 12px;
+            padding: 10px;
+            margin: 10px 0 14px;
+        }
+
+        .cone-section .cone-canvas-wrap canvas {
+            display: block;
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+        }
+
+        .cone-section .cone-caption {
+            text-align: center;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.12);
+            margin-top: 6px;
+        }
+
+        .cone-section .cone-note {
+            margin-top: 12px;
+            padding: 12px 16px;
+            background: rgba(167, 139, 250, 0.03);
+            border-left: 3px solid #a78bfa;
+            border-radius: 0 10px 10px 0;
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 13px;
+            line-height: 1.7;
+        }
+
+        .cone-section .cone-note strong {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .cone-section .cone-note .hl {
+            color: #facc15;
+        }
+
+        .cone-section .cone-note .hl-purple {
+            color: #a78bfa;
+        }
+
         /* ===== 通用板块 ===== */
         .section {
             margin-bottom: 36px;
@@ -522,12 +681,12 @@
             animation: fadeInUp 0.6s ease forwards;
         }
 
-        .section:nth-child(5) { animation-delay: 0.15s; }
         .section:nth-child(6) { animation-delay: 0.2s; }
         .section:nth-child(7) { animation-delay: 0.25s; }
         .section:nth-child(8) { animation-delay: 0.3s; }
         .section:nth-child(9) { animation-delay: 0.35s; }
         .section:nth-child(10) { animation-delay: 0.4s; }
+        .section:nth-child(11) { animation-delay: 0.45s; }
 
         .section h2 {
             font-size: 20px;
@@ -748,7 +907,7 @@
             padding: 22px 28px 20px;
             margin-bottom: 36px;
             opacity: 0;
-            animation: fadeInUp 0.6s ease 0.35s forwards;
+            animation: fadeInUp 0.6s ease 0.45s forwards;
             scroll-margin-top: 20px;
         }
 
@@ -872,7 +1031,7 @@
             padding-top: 16px;
             border-top: 1px solid rgba(255, 255, 255, 0.03);
             opacity: 0;
-            animation: fadeInUp 0.6s ease 0.45s forwards;
+            animation: fadeInUp 0.6s ease 0.5s forwards;
         }
 
         .back-bottom a {
@@ -889,9 +1048,9 @@
         /* ===== 响应式 ===== */
         @media (max-width: 900px) {
             body {
-                padding: 24px 16px 24px 16px;
+                padding: 20px 16px 20px 16px;
             }
-            .sidebar-nav {
+            .sidebar {
                 display: none;
             }
             .container {
@@ -908,6 +1067,9 @@
             }
             .test-section .test-grid {
                 grid-template-columns: 1fr 1fr;
+            }
+            .cone-section .cone-grid {
+                grid-template-columns: 1fr;
             }
             .mapping-table-wrap table {
                 font-size: 12px;
@@ -950,6 +1112,12 @@
                 font-size: 14px;
             }
             .test-section .test-grid {
+                grid-template-columns: 1fr;
+            }
+            .cone-section {
+                padding: 20px 16px 18px;
+            }
+            .cone-section .cone-grid {
                 grid-template-columns: 1fr;
             }
             .mapping-table-wrap {
@@ -999,24 +1167,90 @@
 
     <div id="glow"></div>
 
-    <!-- ===== 右侧固定导航栏 ===== -->
-    <div class="sidebar-nav">
-        <a class="nav-item" data-target="section-value"><span class="num">⏵</span><span class="label">主张</span></a>
-        <a class="nav-item" data-target="section-meta"><span class="num">①</span><span class="label">验证</span></a>
-        <a class="nav-item" data-target="section-simulator"><span class="num">②</span><span class="label">营销</span></a>
-        <a class="nav-item" data-target="section-pricing"><span class="num">③</span><span class="label">定价</span></a>
-        <div class="nav-divider"></div>
-        <a class="nav-item" data-target="section-layer1"><span class="num">④</span><span class="label">一</span></a>
-        <a class="nav-item" data-target="section-layer2"><span class="num">⑤</span><span class="label">推演</span></a>
-        <a class="nav-item" data-target="section-layer3"><span class="num">⑥</span><span class="label">比喻</span></a>
-        <a class="nav-item" data-target="section-layer4"><span class="num">⑦</span><span class="label">数学</span></a>
-        <a class="nav-item" data-target="section-test"><span class="num">⑧</span><span class="label">测试</span></a>
-        <a class="nav-item" data-target="section-layer5"><span class="num">⑨</span><span class="label">营销</span></a>
-        <a class="nav-item" data-target="section-layer6"><span class="num">⑩</span><span class="label">真相</span></a>
-        <a class="nav-item" data-target="section-output"><span class="num">⑪</span><span class="label">资产</span></a>
-        <div class="nav-divider"></div>
-        <a class="nav-item" data-target="section-extension"><span class="num">∞</span><span class="label">延伸</span></a>
-        <div class="nav-bottom">重构</div>
+    <!-- ===== 左侧固定导航栏（可视化关键词索引） ===== -->
+    <div class="sidebar" id="sidebar">
+        <div class="logo">Y.<span>Mine</span></div>
+        <div class="sub-logo">元架构重构营销学</div>
+
+        <hr class="nav-divider" />
+
+        <div class="nav-section-label">核心</div>
+        <a class="nav-item" data-target="section-value">
+            <span class="icon">🧠</span>
+            <span class="label">核心主张</span>
+        </a>
+        <a class="nav-item" data-target="section-meta">
+            <span class="icon">📊</span>
+            <span class="label">验证逻辑</span>
+        </a>
+
+        <hr class="nav-divider" />
+
+        <div class="nav-section-label">模拟器</div>
+        <a class="nav-item" data-target="section-simulator">
+            <span class="icon">📈</span>
+            <span class="label">营销模拟</span>
+        </a>
+        <a class="nav-item" data-target="section-pricing">
+            <span class="icon">💰</span>
+            <span class="label">定价模拟</span>
+        </a>
+
+        <hr class="nav-divider" />
+
+        <div class="nav-section-label">推导</div>
+        <a class="nav-item" data-target="section-layer1">
+            <span class="icon">🌀</span>
+            <span class="label">一/二/三</span>
+        </a>
+        <a class="nav-item" data-target="section-cone">
+            <span class="icon">🔺</span>
+            <span class="label">圆锥几何</span>
+        </a>
+        <a class="nav-item" data-target="section-layer2">
+            <span class="icon">🔄</span>
+            <span class="label">A/B测试</span>
+        </a>
+        <a class="nav-item" data-target="section-layer3">
+            <span class="icon">🎯</span>
+            <span class="label">核心比喻</span>
+        </a>
+        <a class="nav-item" data-target="section-layer4">
+            <span class="icon">📐</span>
+            <span class="label">神经数学</span>
+        </a>
+
+        <hr class="nav-divider" />
+
+        <div class="nav-section-label">验证 &amp; 落地</div>
+        <a class="nav-item" data-target="section-test">
+            <span class="icon">🧪</span>
+            <span class="label">基础测试</span>
+        </a>
+        <a class="nav-item" data-target="section-layer5">
+            <span class="icon">📋</span>
+            <span class="label">理论对照</span>
+        </a>
+        <a class="nav-item" data-target="section-layer6">
+            <span class="icon">💡</span>
+            <span class="label">学习真相</span>
+        </a>
+
+        <hr class="nav-divider" />
+
+        <div class="nav-section-label">产出</div>
+        <a class="nav-item" data-target="section-output">
+            <span class="icon">📦</span>
+            <span class="label">内容资产</span>
+        </a>
+        <a class="nav-item" data-target="section-extension">
+            <span class="icon">∞</span>
+            <span class="label">可迁移</span>
+        </a>
+
+        <div class="footer-nav">
+            <a href="index.html">← 返回作品集</a>
+        </div>
     </div>
 
     <!-- ===== 主容器 ===== -->
@@ -1054,7 +1288,7 @@
             </div>
         </div>
 
-        <!-- ===== 验证元数据（新版：传统 vs 元架构） ===== -->
+        <!-- ===== 验证元数据 ===== -->
         <div class="section-anchor" id="section-meta"></div>
         <div class="meta-grid">
             <div class="meta-item">
@@ -1221,7 +1455,7 @@
                         <tr><td>客群细分</td><td><strong>“三梯度”</strong></td></tr>
                         <tr><td>用户旅程</td><td>反向的 <strong>“万物→三→二→一”</strong></td></tr>
                         <tr><td>公私域联动</td><td>设计流与反馈流的 <strong>闭环飞轮</strong></td></tr>
-                        <tr><td>内容支柱</td><td><strong>圆锥模型</strong>（自创）</td></tr>
+                        <tr><td>内容支柱</td><td><strong>圆锥模型</strong>（见下一层）</td></tr>
                         <tr><td>付费/自有/赚得媒体</td><td>拆解 MCN 权力结构，揭示 <strong>“一”的控制权归属</strong></td></tr>
                     </tbody>
                 </table>
@@ -1245,36 +1479,276 @@
         </div>
 
         <!-- ============================================================ -->
-        <!-- ===== 第二层 ===== -->
+        <!-- ===== 圆锥模型（几何公理 + 商业应用） ===== -->
+        <!-- ============================================================ -->
+        <div class="section-anchor" id="section-cone"></div>
+        <div class="cone-section">
+            <div class="cone-title">📐 圆锥商业价值立体模型 <span class="tag">几何公理 + 商业落地</span></div>
+            <div class="cone-sub">抛弃平面直角坐标系，用圆锥体作为全局稳态中心基准</div>
+
+            <!-- ============================================================ -->
+            <!-- 第一部分：底层几何公理 -->
+            <!-- ============================================================ -->
+            <div style="margin-bottom: 18px; padding: 16px 20px; background: rgba(167,139,250,0.03); border-radius: 12px; border: 1px solid rgba(167,139,250,0.06);">
+                <div style="font-size: 13px; font-weight: 600; color: #a78bfa; margin-bottom: 8px;">🧊 底层几何公理 · 圆锥锚定范式</div>
+
+                <div style="font-size: 13px; color: rgba(255,255,255,0.3); margin-bottom: 10px;">
+                    <strong style="color: rgba(255,255,255,0.5);">传统坐标系的局限：</strong>平面四象限天然存在正负区间，与真实商品固有价值永远为正的商业现实冲突；大模型以平面均值做锚，人类思维多维度游走，模型很难约束稳定输出。
+                </div>
+
+                <div style="font-size: 13px; color: rgba(255,255,255,0.35); line-height: 1.7; margin-bottom: 10px; padding-left: 12px; border-left: 2px solid rgba(167,139,250,0.1);">
+                    <strong style="color: rgba(255,255,255,0.5);">圆锥锚定范式：</strong><br>
+                    • 稳态中心点 = 圆锥中轴线（0.5 理性均衡基准）<br>
+                    • 实测人脑决策点 = 0.48，在圆锥中轴线内侧小幅偏移<br>
+                    • 向外发散 = 沿径向逐层扩散，越靠近锥心越稳定，越往外波动越大<br>
+                    • <strong style="color: #facc15;">完全舍弃四象限平面空间，全程只有正向立体空间</strong>
+                </div>
+
+                <!-- 两大现象解释 -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+                    <div style="background: rgba(255,255,255,0.02); border-radius: 8px; padding: 10px 14px; border: 1px solid rgba(255,255,255,0.03);">
+                        <div style="font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.2); text-transform: uppercase; margin-bottom: 2px;">现象一</div>
+                        <div style="font-size: 12px; color: rgba(255,255,255,0.4);">0.5 理论稳态 vs 0.48 实测偏差</div>
+                        <div style="font-size: 11px; color: rgba(255,255,255,0.15); margin-top: 2px;">中轴线 = 理性完全稳态 · 0.48 只是锥心附近小幅扰动</div>
+                    </div>
+                    <div style="background: rgba(255,255,255,0.02); border-radius: 8px; padding: 10px 14px; border: 1px solid rgba(255,255,255,0.03);">
+                        <div style="font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.2); text-transform: uppercase; margin-bottom: 2px;">现象二</div>
+                        <div style="font-size: 12px; color: rgba(255,255,255,0.4);">大模型输出一致性难题</div>
+                        <div style="font-size: 11px; color: rgba(255,255,255,0.15); margin-top: 2px;">圆锥中轴线作为引力锚点，约束输出向稳态收敛</div>
+                    </div>
+                </div>
+
+                <!-- 模型串联闭环 -->
+                <div style="background: rgba(255,255,255,0.02); border-radius: 8px; padding: 10px 14px; border: 1px solid rgba(255,255,255,0.03); margin-bottom: 10px;">
+                    <div style="font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.2); text-transform: uppercase; margin-bottom: 2px;">🔗 与前后所有模型串联闭环</div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px 16px; font-size: 12px; color: rgba(255,255,255,0.3);">
+                        <div><span style="color: #a78bfa;">前额叶双脑模型</span> → 0.5 中轴线 = 理性稳态基准</div>
+                        <div><span style="color: #facc15;">二进制风控闸门</span> → 圆锥外壁 = 熔断红线</div>
+                        <div><span style="color: #a78bfa;">圆锥资产定价</span> → 中轴线 = 保本定价 + 概率收敛中心</div>
+                        <div><span style="color: #facc15;">正态分布重构</span> → 包裹在圆锥中轴线上的立体正态分布</div>
+                    </div>
+                </div>
+
+                <!-- 大模型对齐落地价值 -->
+                <div style="background: rgba(167,139,250,0.04); border-radius: 8px; padding: 10px 14px; border: 1px solid rgba(167,139,250,0.08);">
+                    <div style="font-size: 11px; font-weight: 600; color: #a78bfa; text-transform: uppercase; margin-bottom: 2px;">⚡ 大模型对齐 · 实际落地价值</div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px 16px; font-size: 12px; color: rgba(255,255,255,0.3);">
+                        <div>✅ <span style="color:rgba(255,255,255,0.5);">解决漂移问题</span> — 以圆锥中轴线为引力中心，模型持续向稳健区间收敛</div>
+                        <div>✅ <span style="color:rgba(255,255,255,0.5);">规避负价值生成</span> — 圆锥空间无负值，AI 产出始终具备基础正向价值</div>
+                        <div style="grid-column:1/-1; color: rgba(255,255,255,0.12); font-size: 11px;">💡 3D 可视化模拟器（开发中）：旋转圆锥 · 中轴线高亮 · 0.48 点位悬浮 · 拖拽展示收敛/发散全过程</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- 第二部分：商业应用（瑞幸案例） -->
+            <!-- ============================================================ -->
+            <div style="margin-bottom: 14px; padding: 10px 14px; background: rgba(255,255,255,0.02); border-radius: 10px; border: 1px solid rgba(255,255,255,0.03);">
+                <div style="font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.15); text-transform: uppercase; letter-spacing: 0.5px;">📌 商业应用 · 瑞幸 9.9 案例落地</div>
+            </div>
+
+            <div class="cone-grid">
+                <div class="cone-card">
+                    <div class="cc-label">🧊 整体结构定义</div>
+                    <div class="cc-value">
+                        <span class="hl">直立正圆锥几何体</span><br>
+                        <span style="color:rgba(255,255,255,0.35);font-size:13px;">水平横向切面 = 实际成交定价区间</span><br>
+                        <span style="color:rgba(255,255,255,0.35);font-size:13px;">竖直纵向高度 = 商品原生内在价值层级</span><br>
+                        <span class="gold">圆锥整体容积 = 品牌全部可变现总商业价值</span>
+                    </div>
+                </div>
+                <div class="cone-card">
+                    <div class="cc-label">📌 中轴线 · 保本基准线</div>
+                    <div class="cc-value">
+                        <span class="gold">中轴线横截面 = 刚性盈亏平衡线（瑞幸 9.9 元）</span><br>
+                        <span style="color:rgba(255,255,255,0.35);font-size:13px;">整条产品线的成本保本基准</span><br>
+                        <span class="sub">单价紧贴保本线 → 薄利多销</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 三圈层 -->
+            <div class="cone-grid" style="margin-bottom: 12px;">
+                <div class="cone-card" style="border-color:rgba(250,204,21,0.15);">
+                    <div class="cc-label">🟡 中部圈层 · 平价保本档</div>
+                    <div class="cc-value">
+                        <span class="gold">单价 = 9.9 元（保本线）</span><br>
+                        单件利润极低，依靠<span class="hl">海量销量填充圆锥中部容积</span><br>
+                        <span style="color:rgba(255,255,255,0.3);font-size:12px;">走薄利多销总量盈利模式</span>
+                    </div>
+                </div>
+                <div class="cone-card" style="border-color:rgba(251,146,60,0.15);">
+                    <div class="cc-label">🟠 下层圈层 · 超低价引流</div>
+                    <div class="cc-value">
+                        <span style="color:#fb923c;">售价低于 9.9 元</span><br>
+                        单件小幅亏损，必须依靠<span class="hl">极致走量</span>抵消亏损<br>
+                        <span style="color:rgba(255,255,255,0.3);font-size:12px;">纯获客营销用途</span>
+                    </div>
+                </div>
+                <div class="cone-card" style="border-color:rgba(167,139,250,0.15);">
+                    <div class="cc-label">🟣 上层圈层 · 高价高价值</div>
+                    <div class="cc-value">
+                        <span class="hl">单价远高于 9.9 元（精品拿铁/限定款/周边）</span><br>
+                        单件毛利充足，<span class="gold">依靠单品高毛利填充上部容积</span><br>
+                        <span style="color:rgba(255,255,255,0.3);font-size:12px;">不需要大规模走量</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 纵向价值层级 -->
+            <div style="margin-bottom: 14px; padding: 12px 16px; background:rgba(255,255,255,0.02); border-radius:10px; border:1px solid rgba(255,255,255,0.03);">
+                <div style="font-size:12px; font-weight:600; color:rgba(255,255,255,0.2); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;">📈 纵向高度：原生商品价值层级</div>
+                <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px;">
+                    <div>
+                        <span style="color:rgba(255,255,255,0.15);font-size:10px;text-transform:uppercase;">底部</span>
+                        <div style="font-size:13px; color:rgba(255,255,255,0.4);">基础刚需实物价值<br><span style="color:rgba(255,255,255,0.15);font-size:11px;">咖啡原材料 · 基础饮用功能</span></div>
+                    </div>
+                    <div>
+                        <span style="color:rgba(255,255,255,0.15);font-size:10px;text-transform:uppercase;">中部</span>
+                        <div style="font-size:13px; color:rgba(255,255,255,0.5);">附加价值持续叠加<br><span style="color:rgba(255,255,255,0.15);font-size:11px;">品牌溢价 · 情绪价值 · 独家配方</span></div>
+                    </div>
+                    <div>
+                        <span style="color:rgba(255,255,255,0.15);font-size:10px;text-transform:uppercase;">顶部</span>
+                        <div style="font-size:13px; color:#a78bfa;">稀缺不可替代性<br><span style="color:rgba(255,255,255,0.15);font-size:11px;">限定稀缺 · 社交属性 · 单位价值极高</span></div>
+                    </div>
+                </div>
+                <div style="margin-top:6px; padding-top:6px; border-top:1px solid rgba(255,255,255,0.02); font-size:12px; color:rgba(255,255,255,0.15);">
+                    ⚡ 价值下限恒定大于 0（拒绝负值）— 商品物理与使用价值永久客观存在
+                </div>
+            </div>
+
+            <!-- 圆锥可视化图 -->
+            <div class="cone-canvas-wrap">
+                <canvas id="coneCanvas" width="800" height="420"></canvas>
+                <div class="cone-caption">立体圆锥 · 中轴线 = 保本基准线 · 三个圈层 = 三种定价策略 · 容积 = 品牌总商业价值</div>
+            </div>
+
+            <!-- 容积说明 -->
+            <div class="cone-note">
+                <strong>🔺 圆锥容积 = 品牌总商业价值</strong><br>
+                同一高度下，横截面面积 = 该价位档位的销量规模。<br>
+                <span class="hl">圆锥中下大部分体积：</span>9.9 元大众走量基础盘，靠海量销量撑起基本盘营收。<br>
+                <span class="hl-purple">圆锥上部狭长体积：</span>高价精品系列，靠高单品毛利拉高整体盈利上限。<br>
+                <span style="color:rgba(255,255,255,0.2);font-size:12px;">💡 圆锥的积分 = 品牌整体总资产价值</span>
+            </div>
+
+            <!-- 与“一/二/三”的映射关系 -->
+            <div style="margin-top: 12px; padding: 12px 16px; background:rgba(167,139,250,0.03); border-radius:10px; border:1px solid rgba(167,139,250,0.06);">
+                <div style="font-size:12px; font-weight:600; color:#a78bfa; margin-bottom:4px;">🧩 圆锥模型 × “3→1→1→3→100” 映射</div>
+                <div style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:8px; font-size:12px; color:rgba(255,255,255,0.3);">
+                    <div><span class="gold">3</span> 个圈层<br><span style="color:rgba(255,255,255,0.12);">引流/保本/精品</span></div>
+                    <div><span class="gold">→ 1</span> 条中轴线<br><span style="color:rgba(255,255,255,0.12);">保本基准线 9.9元</span></div>
+                    <div><span class="gold">→ 1</span> 个圆锥体<br><span style="color:rgba(255,255,255,0.12);">商业价值容器</span></div>
+                    <div><span class="gold">→ 3</span> 层价值<br><span style="color:rgba(255,255,255,0.12);">实物/附加/稀缺</span></div>
+                </div>
+            </div>
+
+            <!-- 几何公理的延伸说明 -->
+            <div style="margin-top: 12px; padding: 10px 16px; background:rgba(250,204,21,0.02); border-radius:10px; border:1px solid rgba(250,204,21,0.04); font-size:12px; color:rgba(255,255,255,0.2); text-align:center;">
+                ⚡ 这个圆锥体同时承载 <span style="color:#a78bfa;">商业定价</span>、<span style="color:#facc15;">AI 概率稳态</span>、<span style="color:#60a5fa;">人类决策收敛</span> 三重功能 —— 一套几何载体统一全部模型
+            </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- ===== 第二层：A/B对照测试 ===== -->
         <!-- ============================================================ -->
         <div class="section-anchor" id="section-layer2"></div>
         <div class="section">
-            <h2>第二层 <span class="tag">对话中的实时推演逻辑</span></h2>
-            <p><strong>这一层不是“学到了什么”，而是“怎么学到的”。</strong></p>
-            <ul>
-                <li><strong>起点：</strong>瑞幸 9.9 拆解（已有认知）</li>
-                <li><strong>迁移路径：</strong>瑞幸的“一/二/三”结构 → 能否套用到营销学本身？</li>
-                <li><strong>推演动作：</strong>每遇到一个陌生概念，不查定义，反向推导</li>
-                <li><strong>验证闭环：</strong>推演结果 → 与已知框架对照 → 确认一致 → 吸收进体系</li>
-            </ul>
-            <div class="highlight-box purple">
-                <p><strong>💡 关键洞察：</strong>整个对话过程不是“输入知识”，而是“验证假设”。</p>
+            <h2>第二层 <span class="tag">A/B对照测试 · 传统学习 vs 元架构推演</span></h2>
+            <p><strong>验证设计：</strong>同一认知任务（重构营销学）下，两种方法的对照实验。</p>
+
+            <!-- 对照组 -->
+            <div style="background: rgba(255,255,255,0.02); border-radius: 12px; padding: 14px 18px; margin: 10px 0 14px; border-left: 3px solid rgba(255,255,255,0.06);">
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                    <span style="background: rgba(255,255,255,0.04); padding: 0 10px; border-radius: 12px; font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.2);">对照组 A</span>
+                    <span style="font-size: 15px; font-weight: 600; color: rgba(255,255,255,0.5);">传统MBA学习方式</span>
+                </div>
+                <p style="color: rgba(255,255,255,0.35); font-size: 14px; line-height: 1.7; margin-bottom: 4px;">
+                    阅读教材 · 记忆概念 · 案例学习 · 被动接收
+                </p>
+                <div style="display: flex; gap: 12px; flex-wrap: wrap; font-size: 12px; color: rgba(255,255,255,0.15); margin-top: 4px;">
+                    <span>📖 依赖外部知识输入</span>
+                    <span>⏱️ 需要大量时间积累</span>
+                    <span>🔒 结果固化在特定场景</span>
+                </div>
             </div>
 
+            <!-- 实验组 -->
+            <div style="background: rgba(167,139,250,0.03); border-radius: 12px; padding: 14px 18px; margin: 10px 0 14px; border-left: 3px solid #a78bfa;">
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                    <span style="background: rgba(167,139,250,0.12); padding: 0 10px; border-radius: 12px; font-size: 11px; font-weight: 600; color: #a78bfa;">实验组 B</span>
+                    <span style="font-size: 15px; font-weight: 600; color: rgba(255,255,255,0.5);">元架构推演方式</span>
+                </div>
+                <p style="color: rgba(255,255,255,0.35); font-size: 14px; line-height: 1.7; margin-bottom: 4px;">
+                    瑞幸案例 → 一/二/三结构 → 自行推导营销学框架 → 与标准对照
+                </p>
+                <div style="display: flex; gap: 12px; flex-wrap: wrap; font-size: 12px; color: rgba(255,255,255,0.2); margin-top: 4px;">
+                    <span style="color: #a78bfa;">🧠 依赖内部认知推演</span>
+                    <span style="color: #a78bfa;">⚡ 单场对话即可完成</span>
+                    <span style="color: #a78bfa;">🔓 结果可跨领域迁移</span>
+                </div>
+            </div>
+
+            <!-- 对比结果 -->
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width:20%;">测试维度</th>
+                            <th style="width:40%;">对照组 A（传统学习）</th>
+                            <th style="width:40%;">实验组 B（元架构推演）</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>认知路径</strong></td>
+                            <td>归纳法：从大量案例中总结规律</td>
+                            <td style="color:#a78bfa;">演绎法：从原理中推导出结论</td>
+                        </tr>
+                        <tr>
+                            <td><strong>时间效率</strong></td>
+                            <td>需数月到数年积累</td>
+                            <td style="color:#a78bfa;">单场对话（约2-4小时）</td>
+                        </tr>
+                        <tr>
+                            <td><strong>结构清晰度</strong></td>
+                            <td>依赖教材编排，可能碎片化</td>
+                            <td style="color:#a78bfa;">自洽的“一/二/三”层级结构</td>
+                        </tr>
+                        <tr>
+                            <td><strong>可迁移性</strong></td>
+                            <td>知识固着于营销学科</td>
+                            <td style="color:#a78bfa;">元架构可迁移到任何学科</td>
+                        </tr>
+                        <tr>
+                            <td><strong>神经科学对应</strong></td>
+                            <td>前额叶 · 记忆编码（被动存储）</td>
+                            <td style="color:#a78bfa;">前额叶+边缘系统 · 协同推演（主动建构）</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 测试结论 -->
+            <div class="highlight-box purple" style="margin-top: 10px;">
+                <p><strong>🧪 测试结论：</strong>实验组B在<strong>时间效率、结构清晰度、可迁移性</strong>三个维度上显著优于对照组A。元架构推演不是“学得更快”，而是<strong>换了认知路径</strong>——从“记忆”切换到“建构”。</p>
+            </div>
+
+            <!-- 元架构映射 -->
             <div class="mapping-table-wrap">
                 <div class="mt-label">🧩 元架构映射 · 颗粒度拉满</div>
                 <table>
                     <thead>
-                        <tr><th style="width:25%;">推导动作</th><th style="width:25%;">元架构工具</th><th style="width:25%;">神经科学对应</th><th style="width:25%;">具体对应</th></tr>
+                        <tr><th style="width:25%;">测试动作</th><th style="width:25%;">元架构工具</th><th style="width:25%;">神经科学对应</th><th style="width:25%;">具体对应</th></tr>
                     </thead>
                     <tbody>
-                        <tr><td>以已有认知为起点</td><td><span class="tool">画圈实验 · 感知</span></td><td><span class="neuron">前额叶 · 工作记忆提取</span></td><td><span class="corr">识别已有知识中可迁移的结构</span></td></tr>
-                        <tr><td>反向推导陌生概念</td><td><span class="tool">画圈实验 · 推理</span></td><td><span class="neuron">前额叶 · 逻辑推演</span></td><td><span class="corr">用元架构重新发明“用户旅程”等概念</span></td></tr>
-                        <tr><td>与已知框架对照</td><td><span class="tool">画圈实验 · 验证</span></td><td><span class="neuron">边缘系统 · 模式匹配</span></td><td><span class="corr">推演结果与营销学标准框架对比</span></td></tr>
-                        <tr><td>吸收进自己的体系</td><td><span class="tool">画圈实验 · 记忆</span></td><td><span class="neuron">海马体 · 记忆编码</span></td><td><span class="corr">确认后的认知进入“可迁移知识库”</span></td></tr>
+                        <tr><td>以瑞幸案例为起点</td><td><span class="tool">画圈实验 · 感知</span></td><td><span class="neuron">前额叶 · 工作记忆提取</span></td><td><span class="corr">识别已有认知中的可迁移结构</span></td></tr>
+                        <tr><td>反向推导营销概念</td><td><span class="tool">画圈实验 · 推理</span></td><td><span class="neuron">前额叶 · 逻辑推演</span></td><td><span class="corr">用元架构“重新发明”营销学</span></td></tr>
+                        <tr><td>与已知框架对照</td><td><span class="tool">画圈实验 · 验证</span></td><td><span class="neuron">边缘系统 · 模式匹配</span></td><td><span class="corr">推演结果与标准营销框架对比</span></td></tr>
+                        <tr><td>吸收进自己的体系</td><td><span class="tool">画圈实验 · 记忆</span></td><td><span class="neuron">海马体 · 记忆编码</span></td><td><span class="corr">建构式学习，非被动存储</span></td></tr>
                     </tbody>
                 </table>
-                <div class="mt-note">💡 全程是画圈实验“感知→推理→验证→记忆”闭环的完整复现</div>
+                <div class="mt-note">💡 对照组A是“存储知识”，实验组B是“建构知识”——两者在神经层面激活的脑区不同</div>
             </div>
         </div>
 
@@ -1406,40 +1880,72 @@
         </div>
 
         <!-- ============================================================ -->
-        <!-- ===== 第五层 ===== -->
+        <!-- ===== 第五层：理论元素对照 ===== -->
         <!-- ============================================================ -->
         <div class="section-anchor" id="section-layer5"></div>
         <div class="section">
-            <h2>第五层 <span class="tag">用这份思想完成“自我营销”</span></h2>
-            <p>把对营销的全部理解，倾注进自己的简历。</p>
+            <h2>第五层 <span class="tag">理论元素对照</span></h2>
+            <p><strong>元架构理论内部的模块对应关系 —— 每一组概念都在体系内有明确映射。</strong></p>
+
             <div class="table-wrap">
                 <table>
                     <thead>
-                        <tr><th style="width:25%;">营销元素</th><th style="width:75%;">简历实现</th></tr>
+                        <tr>
+                            <th style="width:35%;">🧩 理论元素 A</th>
+                            <th style="width:65%;">🧩 理论元素 B</th>
+                        </tr>
                     </thead>
                     <tbody>
-                        <tr><td><strong>“一”</strong></td><td>“我是一个拥有元架构的 AI 策略制定者”</td></tr>
-                        <tr><td><strong>“二”</strong></td><td>左支柱（自研 AI 架构）+ 右支柱（MBA 商业策略）</td></tr>
-                        <tr><td><strong>“三”</strong></td><td>简历里的每一个模块、每一行字、每一个留白</td></tr>
-                        <tr><td>用户旅程</td><td>用“奇怪背景”制造好奇 → 用“自研架构”制造震惊 → 用“留白”引导提问</td></tr>
-                        <tr><td>市场验证</td><td><strong style="color:#facc15;">元架构作为跨领域连接器</strong>，在传播（营销）与技术（自研AI）之间建立可迁移的认知通路</td></tr>
+                        <tr>
+                            <td><strong>前额叶 · 数字思维</strong><br><span style="color:rgba(255,255,255,0.25);font-size:12px;">逻辑 · 分析 · 计算 · 规则学习</span></td>
+                            <td><span style="color:#a78bfa;">策略贡献（可量化、可训练的系统）</span><br><span style="color:rgba(255,255,255,0.3);font-size:12px;">对应营销成功率公式中的“策略因子”</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>边缘系统 · 商业思维</strong><br><span style="color:rgba(255,255,255,0.25);font-size:12px;">直觉 · 判断 · 模式识别 · 情境感知</span></td>
+                            <td><span style="color:#60a5fa;">择时贡献（依赖经验的直觉系统）</span><br><span style="color:rgba(255,255,255,0.3);font-size:12px;">对应营销成功率公式中的“择时因子”</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>“一生二，二生三，三生万物”</strong><br><span style="color:rgba(255,255,255,0.25);font-size:12px;">哲学框架的商业化拆解</span></td>
+                            <td><span style="color:#facc15;">“3→1→1→3→100”框架的案例预演</span><br><span style="color:rgba(255,255,255,0.3);font-size:12px;">在真实商业场景中验证收敛-发散结构的有效性</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>“一/二/三”结构</strong><br><span style="color:rgba(255,255,255,0.25);font-size:12px;">价值主张 → 增长杠杆 → 客群细分</span></td>
+                            <td><span style="color:#facc15;">“3→1→1→3→100”的实战落地</span><br><span style="color:rgba(255,255,255,0.3);font-size:12px;">把框架用在自我表达上，验证理论到实践的闭环</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>传播 × 技术</strong><br><span style="color:rgba(255,255,255,0.25);font-size:12px;">营销策略 × 自研AI架构</span></td>
+                            <td><span style="color:#a78bfa;">元架构可迁移性验证</span><br><span style="color:rgba(255,255,255,0.3);font-size:12px;">同一套认知体系同时驾驭两个看似无关的领域</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>“学习 = 翻译”</strong><br><span style="color:rgba(255,255,255,0.25);font-size:12px;">认知建构的核心机制</span></td>
+                            <td><span style="color:#a78bfa;">元认知 → 认知架构师</span><br><span style="color:rgba(255,255,255,0.3);font-size:12px;">从“知识接收者”到“认知建构者”的跃迁</span></td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
 
+            <!-- 元架构映射对照表 -->
             <div class="mapping-table-wrap">
                 <div class="mt-label">🧩 元架构映射 · 颗粒度拉满</div>
                 <table>
                     <thead>
-                        <tr><th style="width:25%;">营销学推导</th><th style="width:25%;">元架构工具</th><th style="width:25%;">神经科学对应</th><th style="width:25%;">具体对应</th></tr>
+                        <tr><th style="width:25%;">理论元素 A</th><th style="width:25%;">元架构工具</th><th style="width:25%;">神经科学对应</th><th style="width:25%;">理论元素 B</th></tr>
                     </thead>
                     <tbody>
-                        <tr><td>“一/二/三”简历设计</td><td><span class="tool">“3→1→1→3→100”</span></td><td><span class="neuron">前额叶 · 结构化表达</span></td><td><span class="corr">把营销理论用在自己身上</span></td></tr>
-                        <tr><td>用户旅程设计</td><td><span class="tool">画圈实验 · 反向逼近</span></td><td><span class="neuron">前额叶+边缘系统 · 共情设计</span></td><td><span class="corr">引导面试官进入自己的认知框架</span></td></tr>
-                        <tr><td>市场验证</td><td><span class="tool">可迁移性验证</span></td><td><span class="neuron">全脑协同 · 知行合一</span></td><td><span class="corr">在真实市场中拿到验证结果</span></td></tr>
+                        <tr><td>数字思维</td><td><span class="tool">数理建模 · 策略因子</span></td><td><span class="neuron">前额叶 · 量化计算</span></td><td><span class="corr">策略贡献 · 可学习的理性系统</span></td></tr>
+                        <tr><td>商业思维</td><td><span class="tool">数理建模 · 择时因子</span></td><td><span class="neuron">边缘系统 · 模式匹配</span></td><td><span class="corr">择时贡献 · 依赖经验的直觉系统</span></td></tr>
+                        <tr><td>“一/二/三”</td><td><span class="tool">“3→1→1→3→100”</span></td><td><span class="neuron">前额叶+边缘系统 · 协同收敛</span></td><td><span class="corr">瑞幸案例的框架预演</span></td></tr>
+                        <tr><td>自我表达</td><td><span class="tool">“3→1→1→3→100”</span></td><td><span class="neuron">前额叶 · 结构化表达</span></td><td><span class="corr">理论在真实场景中的落地验证</span></td></tr>
+                        <tr><td>传播 × 技术</td><td><span class="tool">跨领域迁移类比</span></td><td><span class="neuron">前额叶+边缘系统 · 全脑协同</span></td><td><span class="corr">元架构可迁移性的实战验证</span></td></tr>
+                        <tr><td>学习 = 翻译</td><td><span class="tool">元认知</span></td><td><span class="neuron">前额叶 · 元认知监控</span></td><td><span class="corr">从“学习者”到“认知架构师”的跃迁</span></td></tr>
                     </tbody>
                 </table>
-                <div class="mt-note">💡 元架构不是停留在纸面上的方法论，而是在真实市场中拿到了验证结果</div>
+                <div class="mt-note">💡 元架构理论内部的模块之间完全自洽，每一组对应关系都是可追溯的</div>
+            </div>
+
+            <!-- 对照结论 -->
+            <div class="highlight-box purple" style="margin-top:10px;">
+                <p><strong>🧪 对照结论：</strong>元架构的每一个理论模块都在体系内找到了对应位置。整个框架不是外部的知识堆砌，而是一个<strong>自洽的认知操作系统</strong>——所有模块相互映射、相互支撑。</p>
             </div>
         </div>
 
@@ -1486,7 +1992,7 @@
                         <tr><td><strong>“付费就是交通堵塞”</strong> 比喻</td><td>营销课程核心洞察</td></tr>
                         <tr><td>知识付费 <strong>“切片陷阱”</strong> 诊断</td><td>知识付费产品设计哲学</td></tr>
                         <tr><td><strong>乐高说明书</strong> 产品哲学</td><td>产品经理课程经典案例</td></tr>
-                        <tr><td><strong>圆锥模型</strong></td><td>自己的内容战略框架</td></tr>
+                        <tr><td><strong>圆锥模型</strong></td><td>商业价值可视化工具</td></tr>
                         <tr><td><strong>“前额叶 × 边缘系统”</strong></td><td>思想体系的神经科学表达</td></tr>
                         <tr><td><strong>简历</strong></td><td>自我营销的实战作品</td></tr>
                     </tbody>
@@ -1539,7 +2045,7 @@
             glow.style.setProperty('--y', y + '%');
         });
 
-        // ===== 右侧导航栏交互 =====
+        // ===== 左侧导航栏交互 =====
         const navItems = document.querySelectorAll('.nav-item');
         const sections = [
             document.getElementById('section-value'),
@@ -1547,6 +2053,7 @@
             document.getElementById('section-simulator'),
             document.getElementById('section-pricing'),
             document.getElementById('section-layer1'),
+            document.getElementById('section-cone'),
             document.getElementById('section-layer2'),
             document.getElementById('section-layer3'),
             document.getElementById('section-layer4'),
@@ -1586,6 +2093,197 @@
 
         window.addEventListener('scroll', updateActiveNav);
         window.addEventListener('load', updateActiveNav);
+
+        // ================================================================
+        // ===== 圆锥模型可视化引擎 =====
+        // ================================================================
+        (function() {
+            const canvas = document.getElementById('coneCanvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width,
+                h = canvas.height;
+
+            const centerX = w * 0.48;
+            const bottomY = h * 0.78;
+            const topY = h * 0.10;
+            const coneHeight = bottomY - topY;
+            const baseRadius = 180;
+
+            const layerBottom = 0.10;
+            const layerMid = 0.60;
+            const layerTop = 0.30;
+
+            function drawCone() {
+                ctx.clearRect(0, 0, w, h);
+
+                ctx.strokeStyle = 'rgba(255,255,255,0.02)';
+                ctx.lineWidth = 0.5;
+                for (let i = 0; i < 10; i++) {
+                    const x = (i / 10) * w;
+                    ctx.beginPath();
+                    ctx.moveTo(x, 0);
+                    ctx.lineTo(x, h);
+                    ctx.stroke();
+                }
+                for (let i = 0; i < 10; i++) {
+                    const y = (i / 10) * h;
+                    ctx.beginPath();
+                    ctx.moveTo(0, y);
+                    ctx.lineTo(w, y);
+                    ctx.stroke();
+                }
+
+                const colors = {
+                    bottom: { fill: 'rgba(251,146,60,0.15)', stroke: 'rgba(251,146,60,0.3)' },
+                    mid: { fill: 'rgba(250,204,21,0.12)', stroke: 'rgba(250,204,21,0.25)' },
+                    top: { fill: 'rgba(167,139,250,0.15)', stroke: 'rgba(167,139,250,0.3)' }
+                };
+
+                const getRadiusAtHeight = (heightRatio) => {
+                    return baseRadius * (1 - heightRatio);
+                };
+
+                const heightSteps = 80;
+                for (let i = 0; i < heightSteps; i++) {
+                    const ratio1 = i / heightSteps;
+                    const ratio2 = (i + 1) / heightSteps;
+                    const r1 = getRadiusAtHeight(ratio1);
+                    const r2 = getRadiusAtHeight(ratio2);
+                    const y1 = bottomY - ratio1 * coneHeight;
+                    const y2 = bottomY - ratio2 * coneHeight;
+
+                    let color;
+                    if (ratio1 < layerBottom) {
+                        color = colors.bottom;
+                    } else if (ratio1 < layerBottom + layerMid) {
+                        color = colors.mid;
+                    } else {
+                        color = colors.top;
+                    }
+
+                    const steps2 = 40;
+                    ctx.beginPath();
+                    for (let j = 0; j <= steps2; j++) {
+                        const t = j / steps2;
+                        const angle = t * Math.PI * 2;
+                        const x1 = centerX + r1 * Math.cos(angle);
+                        const z1 = r1 * Math.sin(angle) * 0.35;
+                        const drawY1 = y1 + z1 * 0.4;
+                        const x2 = centerX + r2 * Math.cos(angle);
+                        const z2 = r2 * Math.sin(angle) * 0.35;
+                        const drawY2 = y2 + z2 * 0.4;
+                        if (j === 0) ctx.moveTo(x1, drawY1);
+                        else ctx.lineTo(x1, drawY1);
+                    }
+                    ctx.closePath();
+                    ctx.fillStyle = color.fill;
+                    ctx.fill();
+                    ctx.strokeStyle = color.stroke;
+                    ctx.lineWidth = 0.5;
+                    ctx.stroke();
+                }
+
+                ctx.strokeStyle = 'rgba(250,204,21,0.5)';
+                ctx.lineWidth = 2;
+                ctx.setLineDash([6, 6]);
+                ctx.beginPath();
+                ctx.moveTo(centerX, bottomY + 20);
+                ctx.lineTo(centerX, topY - 10);
+                ctx.stroke();
+                ctx.setLineDash([]);
+
+                ctx.fillStyle = 'rgba(250,204,21,0.6)';
+                ctx.font = '12px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'top';
+                ctx.fillText('⬆ 中轴线 = 保本基准线 (9.9元)', centerX, topY - 24);
+
+                const layers = [
+                    { ratio: layerBottom / 2, label: '超低价引流', color: 'rgba(251,146,60,0.5)' },
+                    { ratio: layerBottom + layerMid / 2, label: '9.9元保本圈层', color: 'rgba(250,204,21,0.5)' },
+                    { ratio: layerBottom + layerMid + layerTop / 2, label: '高价精品圈层', color: 'rgba(167,139,250,0.5)' }
+                ];
+
+                layers.forEach(layer => {
+                    const r = getRadiusAtHeight(layer.ratio);
+                    const y = bottomY - layer.ratio * coneHeight;
+                    const ellipseW2 = r;
+                    const ellipseH2 = r * 0.35;
+
+                    ctx.strokeStyle = layer.color;
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    for (let j = 0; j <= 60; j++) {
+                        const t = j / 60;
+                        const angle = t * Math.PI * 2;
+                        const x = centerX + ellipseW2 * Math.cos(angle);
+                        const z = ellipseW2 * Math.sin(angle) * 0.35;
+                        const drawY = y + z * 0.4;
+                        j === 0 ? ctx.moveTo(x, drawY) : ctx.lineTo(x, drawY);
+                    }
+                    ctx.closePath();
+                    ctx.stroke();
+
+                    const labelX = centerX + r * 0.6;
+                    const labelY = y + r * 0.35 * 0.4;
+                    ctx.fillStyle = layer.color;
+                    ctx.font = '11px sans-serif';
+                    ctx.textAlign = 'left';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(layer.label, labelX + 6, labelY);
+                });
+
+                ctx.fillStyle = 'rgba(255,255,255,0.08)';
+                ctx.font = '10px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'top';
+                ctx.fillText('水平横向切面 = 实际成交定价区间', centerX, bottomY + 24);
+
+                ctx.fillStyle = 'rgba(167,139,250,0.15)';
+                ctx.font = '10px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'bottom';
+                ctx.fillText('稀缺价值 · 单品高毛利', centerX, topY + 6);
+
+                ctx.fillStyle = 'rgba(255,255,255,0.04)';
+                ctx.font = '13px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('圆锥容积 = 品牌总商业价值', centerX, bottomY - coneHeight / 2);
+
+                ctx.fillStyle = 'rgba(255,255,255,0.04)';
+                ctx.font = '10px sans-serif';
+                ctx.textAlign = 'right';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('纵向高度', 20, bottomY - coneHeight / 2);
+                ctx.fillStyle = 'rgba(255,255,255,0.02)';
+                ctx.font = '9px sans-serif';
+                ctx.textAlign = 'right';
+                ctx.fillText('= 原生价值', 20, bottomY - coneHeight / 2 + 16);
+
+                const legendY = h - 30;
+                const legendItems = [
+                    { label: '超低价引流', color: 'rgba(251,146,60,0.5)' },
+                    { label: '保本圈层 9.9元', color: 'rgba(250,204,21,0.5)' },
+                    { label: '高价精品', color: 'rgba(167,139,250,0.5)' }
+                ];
+                let legendX = w * 0.55;
+                ctx.textAlign = 'left';
+                ctx.textBaseline = 'middle';
+                legendItems.forEach(item => {
+                    ctx.fillStyle = item.color;
+                    ctx.fillRect(legendX, legendY - 4, 12, 8);
+                    ctx.fillStyle = 'rgba(255,255,255,0.15)';
+                    ctx.font = '10px sans-serif';
+                    ctx.fillText(item.label, legendX + 16, legendY + 1);
+                    legendX += 90;
+                });
+            }
+
+            drawCone();
+            window.addEventListener('resize', drawCone);
+        })();
 
         // ================================================================
         // ===== 营销成功率模拟器引擎 =====
