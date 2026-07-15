@@ -3,25 +3,23 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>跨语种结构化学习验证 · 奥数翻译融合版</title>
+    <title>完整证据链 · 凯利二元结构验证</title>
     <style>
-        /* ===== 全局重置 (保留原始风格) ===== */
+        /* ===== 全局重置 ===== */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-
         body {
             background: #0b0b1a;
             font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
             min-height: 100vh;
             display: flex;
-            padding: 20px 20px 20px 0;
-            overflow-x: hidden;
+            padding: 0;
+            color: #f1f5f9;
         }
 
-        /* ===== 鼠标跟随光晕 ===== */
         #glow {
             position: fixed;
             top: 0;
@@ -34,97 +32,90 @@
             transition: background 0.1s;
         }
 
-        /* ===== 右侧固定导航栏 (扩充至9步) ===== */
-        .sidebar-nav {
+        /* ===== 左侧导航 ===== */
+        .left-nav {
             position: fixed;
             top: 0;
-            right: 0;
-            width: 72px;
+            left: 0;
+            width: 200px;
             height: 100vh;
-            padding: 32px 0 24px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 4px;
+            padding: 28px 12px 20px 16px;
+            overflow-y: auto;
+            background: rgba(11, 11, 26, 0.85);
+            backdrop-filter: blur(14px);
+            border-right: 1px solid rgba(255, 255, 255, 0.04);
             z-index: 100;
-            background: rgba(11, 11, 26, 0.6);
-            backdrop-filter: blur(12px);
-            border-left: 1px solid rgba(255, 255, 255, 0.04);
-        }
-
-        .sidebar-nav .nav-item {
             display: flex;
             flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            width: 44px;
-            height: 44px;
-            border-radius: 10px;
-            color: rgba(255, 255, 255, 0.12);
+            gap: 2px;
+        }
+        .left-nav .nav-title {
             font-size: 11px;
-            font-weight: 500;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.1);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 12px 0 4px 0;
+            padding-bottom: 4px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+        }
+        .left-nav .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 10px;
+            border-radius: 8px;
+            color: rgba(255, 255, 255, 0.2);
+            font-size: 13px;
             cursor: pointer;
             transition: all 0.3s ease;
-            border: 1px solid transparent;
             text-decoration: none;
-            font-family: 'Courier New', monospace;
+            border: 1px solid transparent;
         }
-
-        .sidebar-nav .nav-item:hover {
-            color: rgba(255, 255, 255, 0.5);
+        .left-nav .nav-item:hover {
             background: rgba(255, 255, 255, 0.03);
-            border-color: rgba(255, 255, 255, 0.06);
+            color: rgba(255, 255, 255, 0.5);
+            border-color: rgba(255, 255, 255, 0.04);
         }
-
-        .sidebar-nav .nav-item.active {
+        .left-nav .nav-item.active {
             color: #a78bfa;
             background: rgba(167, 139, 250, 0.06);
             border-color: rgba(167, 139, 250, 0.12);
         }
-
-        .sidebar-nav .nav-item .num {
-            font-size: 10px;
+        .left-nav .nav-item .num {
+            font-size: 11px;
             font-weight: 600;
-            line-height: 1;
+            min-width: 24px;
+            color: inherit;
         }
-
-        .sidebar-nav .nav-item .label {
-            font-size: 6px;
-            text-transform: uppercase;
-            letter-spacing: 0.3px;
-            opacity: 0.3;
-            margin-top: 1px;
-            font-family: system-ui, sans-serif;
+        .left-nav .nav-item .label {
+            font-size: 12px;
         }
-
-        .sidebar-nav .nav-divider {
-            width: 20px;
+        .left-nav .nav-divider {
+            margin: 4px 0;
             height: 1px;
-            background: rgba(255, 255, 255, 0.04);
-            margin: 2px 0;
+            background: rgba(255, 255, 255, 0.03);
         }
-
-        .sidebar-nav .nav-bottom {
+        .left-nav .nav-bottom {
             margin-top: auto;
-            font-size: 7px;
+            font-size: 9px;
             color: rgba(255, 255, 255, 0.04);
-            writing-mode: vertical-rl;
-            letter-spacing: 2px;
-            font-weight: 300;
+            text-align: center;
+            padding-top: 12px;
+            border-top: 1px solid rgba(255, 255, 255, 0.02);
         }
 
-        /* ===== 主内容 ===== */
         .main-content {
             flex: 1;
             max-width: 1100px;
             margin: 0 auto;
-            padding: 0 100px 32px 32px;
+            padding: 20px 40px 32px 240px;
             min-height: 100vh;
+            position: relative;
+            z-index: 1;
         }
 
         .container {
-            max-width: 1000px;
             width: 100%;
             background: radial-gradient(ellipse at 30% 30%, #120b24, #0b0b1a 70%, #05030a);
             border-radius: 32px;
@@ -133,36 +124,30 @@
             box-shadow: 0 30px 80px rgba(40, 10, 80, 0.4);
             position: relative;
             overflow: hidden;
-            z-index: 1;
-            backdrop-filter: blur(2px);
         }
-
-        .container::before {
+        .container::before,
+        .container::after {
             content: '';
             position: absolute;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: floatBg 12s ease-in-out infinite alternate;
+        }
+        .container::before {
             top: -100px;
             right: -100px;
             width: 400px;
             height: 400px;
             background: radial-gradient(circle, rgba(80, 30, 140, 0.15), transparent 70%);
-            border-radius: 50%;
-            pointer-events: none;
-            animation: floatBg 12s ease-in-out infinite alternate;
         }
-
         .container::after {
-            content: '';
-            position: absolute;
             bottom: -80px;
             left: -80px;
             width: 350px;
             height: 350px;
             background: radial-gradient(circle, rgba(30, 60, 150, 0.1), transparent 70%);
-            border-radius: 50%;
-            pointer-events: none;
-            animation: floatBg 10s ease-in-out infinite alternate-reverse;
+            animation-direction: alternate-reverse;
         }
-
         @keyframes floatBg {
             0% {
                 transform: translate(0, 0) scale(1);
@@ -172,30 +157,12 @@
             }
         }
 
-        @keyframes gradientFlow {
-            0% {
-                background-position: 0% 50%;
-            }
-            50% {
-                background-position: 100% 50%;
-            }
-            100% {
-                background-position: 0% 50%;
-            }
-        }
-
-        .section-anchor {
-            scroll-margin-top: 16px;
-        }
-
-        /* ===== Hero ===== */
         .hero {
             text-align: center;
             padding-bottom: 32px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.04);
             margin-bottom: 32px;
         }
-
         .hero .badge {
             display: inline-block;
             background: rgba(255, 255, 255, 0.04);
@@ -208,7 +175,6 @@
             letter-spacing: 0.3px;
             margin-bottom: 12px;
         }
-
         .hero h1 {
             font-size: 32px;
             font-weight: 700;
@@ -220,14 +186,23 @@
             -webkit-text-fill-color: transparent;
             animation: gradientFlow 6s ease-in-out infinite;
         }
-
+        @keyframes gradientFlow {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
         .hero .subtitle {
             color: #a78bfa;
             font-size: 18px;
             font-weight: 400;
             margin-bottom: 12px;
         }
-
         .hero .description {
             color: rgba(255, 255, 255, 0.4);
             font-size: 15px;
@@ -235,11 +210,6 @@
             max-width: 700px;
             margin: 0 auto 16px auto;
         }
-
-        .hero .description strong {
-            color: rgba(255, 255, 255, 0.7);
-        }
-
         .hero .highlight-tag {
             display: inline-block;
             background: rgba(255, 255, 255, 0.02);
@@ -251,18 +221,15 @@
             border: 1px solid rgba(255, 255, 255, 0.04);
         }
 
-        /* ===== 证据链步骤条 (扩充至9步) ===== */
         .evidence-steps {
             display: flex;
-            justify-content: space-between;
+            flex-wrap: wrap;
             gap: 4px;
             margin: 24px 0 8px 0;
-            flex-wrap: wrap;
         }
-
         .evidence-steps .step {
-            flex: 1;
-            min-width: 50px;
+            flex: 1 0 auto;
+            min-width: 44px;
             background: rgba(255, 255, 255, 0.02);
             border-radius: 10px;
             padding: 6px 4px;
@@ -273,40 +240,31 @@
             text-decoration: none;
             display: block;
             color: rgba(255, 255, 255, 0.3);
+            font-size: 10px;
         }
-
         .evidence-steps .step:hover {
             border-color: rgba(167, 139, 250, 0.15);
             background: rgba(255, 255, 255, 0.03);
             transform: translateY(-2px);
         }
-
         .evidence-steps .step .num {
             color: #a78bfa;
             font-weight: 700;
             font-size: 11px;
         }
-
         .evidence-steps .step .label {
             color: rgba(255, 255, 255, 0.2);
-            font-size: 8px;
+            font-size: 7px;
             margin-top: 2px;
         }
-
         .evidence-steps .step.active {
             border-color: #facc15;
             background: rgba(255, 255, 255, 0.03);
         }
-
         .evidence-steps .step.active .num {
             color: #facc15;
         }
 
-        .evidence-steps .step.active .label {
-            color: rgba(255, 255, 255, 0.6);
-        }
-
-        /* ===== 通用标题 ===== */
         .section-title {
             font-size: 22px;
             font-weight: 600;
@@ -316,10 +274,9 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            scroll-margin-top: 20px;
             flex-wrap: wrap;
+            scroll-margin-top: 80px;
         }
-
         .section-title .badge {
             font-size: 12px;
             background: rgba(255, 255, 255, 0.02);
@@ -329,7 +286,6 @@
             font-weight: 400;
             font-family: monospace;
         }
-
         .section-desc {
             color: rgba(255, 255, 255, 0.35);
             font-size: 14px;
@@ -337,8 +293,6 @@
             border-left: 3px solid #a78bfa;
             padding-left: 14px;
         }
-
-        /* ===== 交互卡片 ===== */
         .interact-card {
             background: rgba(255, 255, 255, 0.02);
             border-radius: 16px;
@@ -347,11 +301,9 @@
             border: 1px solid rgba(255, 255, 255, 0.04);
             transition: border-color 0.3s ease;
         }
-
         .interact-card:hover {
             border-color: rgba(255, 255, 255, 0.06);
         }
-
         .interact-card .card-title {
             color: rgba(255, 255, 255, 0.6);
             font-weight: 600;
@@ -362,59 +314,6 @@
             gap: 8px;
             flex-wrap: wrap;
         }
-
-        .interact-card .card-title select {
-            margin-left: auto;
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.04);
-            color: #f1f5f9;
-            padding: 2px 8px;
-            border-radius: 6px;
-            font-size: 11px;
-            outline: none;
-        }
-
-        .interact-card .card-title select:focus {
-            border-color: #a78bfa;
-        }
-
-        .interact-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            align-items: center;
-            margin: 6px 0;
-        }
-
-        .interact-row label {
-            color: rgba(255, 255, 255, 0.3);
-            font-size: 13px;
-            font-weight: 500;
-            min-width: 50px;
-        }
-
-        .interact-row select,
-        .interact-row input {
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.04);
-            color: #f1f5f9;
-            padding: 6px 12px;
-            border-radius: 10px;
-            font-size: 14px;
-            outline: none;
-            transition: border 0.3s ease;
-        }
-
-        .interact-row select:focus,
-        .interact-row input:focus {
-            border-color: #a78bfa;
-        }
-
-        .interact-row input {
-            flex: 1;
-            min-width: 150px;
-        }
-
         .btn {
             background: #a78bfa;
             border: none;
@@ -426,24 +325,20 @@
             cursor: pointer;
             transition: all 0.3s ease;
         }
-
         .btn:hover {
             background: #8b6fd9;
             transform: translateY(-2px);
             box-shadow: 0 8px 25px rgba(167, 139, 250, 0.15);
         }
-
         .btn-outline {
             background: transparent;
             border: 1px solid rgba(167, 139, 250, 0.2);
             color: #a78bfa;
         }
-
         .btn-outline:hover {
             background: rgba(167, 139, 250, 0.06);
             border-color: #a78bfa;
         }
-
         .result-box {
             background: rgba(255, 255, 255, 0.01);
             border-radius: 12px;
@@ -455,62 +350,6 @@
             min-height: 48px;
             line-height: 1.6;
         }
-
-        .result-box .highlight {
-            color: #facc15;
-            font-weight: 600;
-        }
-        .result-box .en {
-            color: #60a5fa;
-        }
-        .result-box .my {
-            color: #facc15;
-        }
-        .result-box .zh {
-            color: #a78bfa;
-        }
-
-        /* ===== 三轨对照网格 ===== */
-        .triple-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 12px;
-        }
-
-        @media (max-width: 720px) {
-            .triple-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .triple-grid .col {
-            background: rgba(255, 255, 255, 0.01);
-            border-radius: 8px;
-            padding: 8px 10px;
-            border: 1px solid rgba(255, 255, 255, 0.03);
-        }
-
-        .triple-grid .col .lang-label {
-            font-size: 9px;
-            text-transform: uppercase;
-            color: rgba(255, 255, 255, 0.15);
-            letter-spacing: 0.5px;
-            margin-bottom: 2px;
-        }
-
-        .triple-grid .col .content {
-            font-size: 14px;
-            font-weight: 500;
-        }
-
-        .triple-grid .col .sub {
-            font-size: 11px;
-            color: rgba(255, 255, 255, 0.2);
-            margin-top: 2px;
-            font-family: monospace;
-        }
-
-        /* ===== 回溯日志 ===== */
         .backtrack-log {
             margin-top: 12px;
             padding: 10px 14px;
@@ -519,7 +358,6 @@
             border-left: 3px solid #fbbf24;
             font-family: 'Courier New', monospace;
         }
-
         .backtrack-log .bt-title {
             font-size: 10px;
             color: rgba(255, 255, 255, 0.1);
@@ -527,7 +365,6 @@
             letter-spacing: 0.5px;
             margin-bottom: 4px;
         }
-
         .backtrack-log .bt-step {
             display: flex;
             align-items: center;
@@ -536,30 +373,13 @@
             font-size: 12px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.015);
         }
-
         .backtrack-log .bt-step:last-child {
             border-bottom: none;
         }
-
-        .backtrack-log .bt-step .icon {
-            width: 18px;
-            text-align: center;
-            flex-shrink: 0;
-        }
-
         .backtrack-log .bt-step .msg {
             flex: 1;
             color: rgba(255, 255, 255, 0.5);
         }
-
-        .backtrack-log .bt-step .conf {
-            font-size: 11px;
-            padding: 0 8px;
-            background: rgba(255, 255, 255, 0.02);
-            border-radius: 8px;
-            color: rgba(255, 255, 255, 0.15);
-        }
-
         .backtrack-log .bt-step.success .msg {
             color: #4ade80;
         }
@@ -572,124 +392,279 @@
         .backtrack-log .bt-step.info .msg {
             color: #60a5fa;
         }
-        .backtrack-log .bt-step.success .conf {
-            color: #4ade80;
-        }
-        .backtrack-log .bt-step.fail .conf {
-            color: #f87171;
-        }
-        .backtrack-log .bt-step.warn .conf {
-            color: #fbbf24;
-        }
-        .backtrack-log .bt-step.info .conf {
-            color: #60a5fa;
-        }
 
-        /* ===== 词根派生 ===== */
-        .derivation-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-            gap: 8px;
-            margin: 10px 0;
+        .flex-row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+            margin: 6px 0;
         }
-
-        .derivation-grid .item {
-            background: rgba(255, 255, 255, 0.01);
+        .flex-row input[type="text"],
+        .flex-row input[type="number"],
+        .flex-row input[type="range"] {
+            background: rgba(255, 255, 255, 0.02);
             border: 1px solid rgba(255, 255, 255, 0.04);
+            color: #f1f5f9;
+            padding: 8px 14px;
             border-radius: 10px;
-            padding: 10px 12px;
+            font-size: 14px;
+            outline: none;
+        }
+        .flex-row input[type="text"]:focus,
+        .flex-row input[type="number"]:focus,
+        .flex-row input[type="range"]:focus {
+            border-color: #a78bfa;
+        }
+        .flex-row input[type="text"] {
+            flex: 1;
+            min-width: 200px;
+        }
+        .flex-row input[type="range"] {
+            width: 150px;
+            accent-color: #a78bfa;
+        }
+
+        /* ===== 凯利映射专用样式 ===== */
+        .kelly-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 12px;
+            margin-top: 8px;
+        }
+        .kelly-card {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 10px;
+            padding: 12px 14px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
             text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            color: rgba(255, 255, 255, 0.4);
-            font-size: 13px;
+        }
+        .kelly-card .label {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.2);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .kelly-card .value {
+            font-size: 26px;
+            font-weight: 700;
+            margin-top: 4px;
+        }
+        .kelly-card .sub {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.2);
+            margin-top: 2px;
         }
 
-        .derivation-grid .item:hover {
-            border-color: rgba(167, 139, 250, 0.15);
-            background: rgba(167, 139, 250, 0.03);
+        /* ===== 其他组件 ===== */
+        .mapping-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 16px 0;
         }
-
-        .derivation-grid .item .word {
+        .mapping-card {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            padding: 16px 18px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+        .mapping-card .domain-label {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: rgba(255, 255, 255, 0.2);
+            margin-bottom: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            padding-bottom: 4px;
+        }
+        .mapping-card .example {
             font-size: 18px;
             font-weight: 600;
-            color: #f1f5f9;
-            display: block;
+            padding: 4px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .mapping-card .example .arrow {
+            color: rgba(255, 255, 255, 0.15);
+            font-weight: 300;
+        }
+        .mapping-card .desc {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.3);
+            margin-top: 4px;
+            font-family: monospace;
+        }
+        .highlight-lang-en {
+            color: #60a5fa;
+        }
+        .highlight-lang-my {
+            color: #facc15;
+        }
+        .highlight-math {
+            color: #a78bfa;
+        }
+        .highlight-equal {
+            color: #4ade80;
+            font-weight: 700;
         }
 
-        .derivation-grid .item .pos {
+        .triple-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 12px;
+        }
+        .triple-grid .col {
+            background: rgba(255, 255, 255, 0.01);
+            border-radius: 8px;
+            padding: 8px 10px;
+            border: 1px solid rgba(255, 255, 255, 0.03);
+        }
+        .triple-grid .col .lang-label {
+            font-size: 9px;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.15);
+            letter-spacing: 0.5px;
+            margin-bottom: 2px;
+        }
+        .triple-grid .col .content {
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .en {
+            color: #60a5fa;
+        }
+        .my {
+            color: #facc15;
+        }
+        .zh {
+            color: #a78bfa;
+        }
+
+        .vis-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-top: 8px;
+        }
+        .vis-card {
+            background: rgba(255, 255, 255, 0.01);
+            border-radius: 12px;
+            padding: 14px 16px;
+            border: 1px solid rgba(255, 255, 255, 0.03);
+        }
+        .vis-card .vis-title {
             font-size: 11px;
+            color: rgba(255, 255, 255, 0.2);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+        .vis-bar-container {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .vis-bar-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .vis-bar-item .label {
+            width: 30px;
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.5);
+            font-weight: 500;
+        }
+        .vis-bar-item .track {
+            flex: 1;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .vis-bar-item .bar {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.6s ease;
+            width: 0%;
+        }
+        .vis-bar-item .value {
+            min-width: 32px;
+            text-align: right;
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+        .vis-ring-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 24px;
+            flex-wrap: wrap;
+            padding: 8px 0;
+        }
+        .vis-ring {
+            position: relative;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: conic-gradient(var(--color) calc(var(--pct) * 1%), rgba(255, 255, 255, 0.05) 0%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .vis-ring .inner {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: #0b0b1a;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: 700;
+        }
+        .vis-ring .inner .sub {
+            font-size: 9px;
+            font-weight: 400;
             color: rgba(255, 255, 255, 0.2);
         }
 
-        .derivation-grid .item .meaning {
-            font-size: 12px;
-            color: rgba(255, 255, 255, 0.35);
+        .pacd-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 10px;
+            margin-top: 6px;
+        }
+        .pacd-grid .item {
+            background: rgba(255, 255, 255, 0.015);
+            border-radius: 8px;
+            padding: 10px 12px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            text-align: center;
+        }
+        .pacd-grid .item .label {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.2);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 700;
+        }
+        .pacd-grid .item .value {
+            font-size: 20px;
+            font-weight: 700;
             margin-top: 4px;
         }
-
-        /* ===== 差异切换 ===== */
-        .diff-toggle {
-            display: flex;
-            gap: 8px;
-            margin: 10px 0;
+        .pacd-grid .item .sub {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.2);
+            margin-top: 2px;
         }
 
-        .diff-toggle .tab-btn {
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.04);
-            color: rgba(255, 255, 255, 0.3);
-            padding: 5px 14px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 13px;
-            transition: all 0.3s ease;
-        }
-
-        .diff-toggle .tab-btn.active {
-            border-color: #facc15;
-            color: #f1f5f9;
-            background: rgba(255, 255, 255, 0.02);
-        }
-
-        .diff-toggle .tab-btn:hover {
-            border-color: #a78bfa;
-        }
-
-        .diff-content {
-            background: rgba(255, 255, 255, 0.01);
-            border-radius: 12px;
-            padding: 14px 18px;
-            margin-top: 8px;
-            min-height: 60px;
-        }
-
-        .diff-content .pair {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 5px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.02);
-        }
-
-        .diff-content .pair:last-child {
-            border-bottom: none;
-        }
-
-        .diff-content .pair .en {
-            color: #60a5fa;
-        }
-
-        .diff-content .pair .my {
-            color: #facc15;
-        }
-
-        .diff-content .pair .arrow {
-            color: rgba(255, 255, 255, 0.08);
-            font-size: 18px;
-        }
-
-        /* ===== 证据闭环 ===== */
         .closure {
             background: rgba(255, 255, 255, 0.02);
             border-radius: 16px;
@@ -700,14 +675,12 @@
             grid-template-columns: 1fr 1fr;
             gap: 14px;
         }
-
         .closure .item {
             padding: 12px 16px;
             background: rgba(255, 255, 255, 0.01);
             border-radius: 10px;
             border-left: 3px solid #a78bfa;
         }
-
         .closure .item .label {
             font-size: 11px;
             color: rgba(255, 255, 255, 0.2);
@@ -715,14 +688,11 @@
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
-
         .closure .item .text {
             color: rgba(255, 255, 255, 0.5);
             font-size: 14px;
             margin-top: 4px;
         }
-
-        /* ===== 底部 ===== */
         .back-bottom {
             display: flex;
             justify-content: space-between;
@@ -733,128 +703,83 @@
             flex-wrap: wrap;
             gap: 12px;
         }
-
-        .back-bottom a {
-            color: rgba(255, 255, 255, 0.2);
-            text-decoration: none;
-            font-size: 14px;
-            transition: color 0.3s ease;
-        }
-
-        .back-bottom a:hover {
-            color: rgba(255, 255, 255, 0.6);
-        }
-
         .back-bottom .meta {
             color: rgba(255, 255, 255, 0.08);
             font-size: 13px;
         }
 
-        /* ===== 滚动条美化 ===== */
-        ::-webkit-scrollbar {
-            width: 4px;
-        }
-        ::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: rgba(167, 139, 250, 0.15);
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: rgba(167, 139, 250, 0.3);
-        }
-
-        /* ===== 响应式 ===== */
-        @media (max-width: 900px) {
-            body {
-                padding: 0;
-                flex-direction: column;
+        @media (max-width: 1024px) {
+            .left-nav {
+                width: 160px;
+                padding: 16px 8px;
             }
-            .sidebar-nav {
+            .main-content {
+                padding: 16px 20px 32px 180px;
+            }
+        }
+        @media (max-width: 768px) {
+            .left-nav {
                 display: none;
             }
             .main-content {
                 padding: 16px;
             }
             .container {
-                padding: 24px 16px;
+                padding: 20px 16px;
                 border-radius: 0;
             }
-            .hero h1 {
-                font-size: 24px;
+            .kelly-grid {
+                grid-template-columns: 1fr 1fr;
             }
-            .section-title {
-                font-size: 18px;
-            }
-            .interact-card {
-                padding: 16px;
-            }
-            .interact-row {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            .interact-row label {
-                min-width: auto;
-            }
-            .derivation-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            .closure {
+            .mapping-grid,
+            .vis-grid {
                 grid-template-columns: 1fr;
             }
-            .evidence-steps .step {
-                min-width: 30px;
-                padding: 4px 2px;
-            }
-            .evidence-steps .step .label {
-                font-size: 6px;
+            .pacd-grid {
+                grid-template-columns: 1fr 1fr;
             }
             .triple-grid {
                 grid-template-columns: 1fr;
             }
-        }
-
-        @media (max-width: 480px) {
-            .container {
-                padding: 16px 12px;
-            }
-            .hero h1 {
-                font-size: 20px;
-            }
-            .hero .subtitle {
-                font-size: 15px;
-            }
-            .derivation-grid {
+            .closure {
                 grid-template-columns: 1fr;
             }
-            .diff-toggle {
-                flex-direction: column;
+        }
+        @media (max-width: 480px) {
+            .kelly-grid {
+                grid-template-columns: 1fr;
+            }
+            .pacd-grid {
+                grid-template-columns: 1fr;
             }
         }
     </style>
 </head>
 <body>
 
-    <!-- ===== 鼠标跟随光晕 ===== -->
     <div id="glow"></div>
 
-    <!-- ===== 右侧固定导航栏 (扩充至9步) ===== -->
-    <div class="sidebar-nav">
+    <!-- ===== 左侧导航 ===== -->
+    <nav class="left-nav" id="leftNav">
+        <div style="margin-bottom:8px; font-size:14px; font-weight:700; color:rgba(255,255,255,0.1);">📋 目录</div>
         <a class="nav-item active" data-target="section-hero"><span class="num">①</span><span class="label">总览</span></a>
         <a class="nav-item" data-target="section-router"><span class="num">🚀</span><span class="label">翻译器</span></a>
-        <a class="nav-item" data-target="section-svo"><span class="num">②</span><span class="label">语序</span></a>
-        <a class="nav-item" data-target="section-tense"><span class="num">③</span><span class="label">时态</span></a>
+        <div class="nav-divider"></div>
+        <a class="nav-item" data-target="section-svo"><span class="num">②</span><span class="label">语序↔线代</span></a>
+        <a class="nav-item" data-target="section-tense"><span class="num">③</span><span class="label">凯利↔年龄</span></a>
         <a class="nav-item" data-target="section-derivation"><span class="num">④</span><span class="label">词缀</span></a>
         <a class="nav-item" data-target="section-passive"><span class="num">⑤</span><span class="label">被动</span></a>
         <a class="nav-item" data-target="section-wsd"><span class="num">⑥</span><span class="label">多义词</span></a>
         <a class="nav-item" data-target="section-culture"><span class="num">⑦</span><span class="label">文化</span></a>
         <a class="nav-item" data-target="section-diff"><span class="num">⑧</span><span class="label">边界</span></a>
-        <a class="nav-item" data-target="section-math"><span class="num">⑨</span><span class="label">奥数</span></a>
         <div class="nav-divider"></div>
+        <a class="nav-item" data-target="section-chicken"><span class="num">⑨</span><span class="label">鸡兔同笼</span></a>
+        <a class="nav-item" data-target="section-pacd"><span class="num">⑩</span><span class="label">工程问题</span></a>
+        <div class="nav-divider"></div>
+        <a class="nav-item" data-target="section-math"><span class="num">⑪</span><span class="label">奥数枚举</span></a>
         <a class="nav-item" data-target="section-closure"><span class="num">∞</span><span class="label">闭环</span></a>
-        <div class="nav-bottom">融合</div>
-    </div>
+        <div class="nav-bottom">证据链 v15</div>
+    </nav>
 
     <!-- ===== 主内容 ===== -->
     <div class="main-content">
@@ -864,265 +789,336 @@
             <!-- ===== Hero ===== -->
             <div class="section-anchor" id="section-hero"></div>
             <div class="hero">
-                <div class="badge">🧠 跨语种 + 奥数 · 双域翻译</div>
-                <h1>结构化学习验证 · 融合版</h1>
-                <div class="subtitle">语言结构翻译 + 奥数结构翻译</div>
+                <div class="badge">🧠 凯利二元结构验证 · 生/死 · 赢/赔</div>
+                <h1>结构化学习验证 · 完整版</h1>
+                <div class="subtitle">时态 = 凯利公式（二元概率）推演年龄</div>
                 <p class="description">
-                    在最早的语言证据链基础上，融合了 <strong>「奥数结构翻译」</strong>。<br />
-                    输入任何内容，系统会判断它是 <span style="color:#60a5fa;">自然语言</span> 还是 <span style="color:#facc15;">奥数题</span>，并用相同的证据链逻辑展示 <span style="color:#facc15;">尝试 → 验证 → 回退</span> 的过程。
+                    凯利公式的核心是 <strong>二元结构</strong>（赢/输、生/死）。<br>
+                    通过概率 \( p \) 和赔率 \( b \) 计算最佳投入比例，同时反向推演 <strong>预期寿命</strong> 和 <strong>有效年龄</strong>。
                 </p>
-                <span class="highlight-tag">📍 九维证据链 · 语言+数学双域映射</span>
+                <span class="highlight-tag">📍 二元结构 → 概率 → 年龄 → 时态</span>
 
-                <!-- 证据链步骤条 (扩充至9步) -->
                 <div class="evidence-steps">
-                    <a href="#section-router" class="step active"><span class="num">🚀</span><span class="label">翻译器</span></a>
-                    <a href="#section-svo" class="step"><span class="num">②</span><span class="label">语序</span></a>
-                    <a href="#section-tense" class="step"><span class="num">③</span><span class="label">时态</span></a>
+                    <a href="#section-router" class="step"><span class="num">🚀</span><span class="label">翻译器</span></a>
+                    <a href="#section-svo" class="step"><span class="num">②</span><span class="label">语序线代</span></a>
+                    <a href="#section-tense" class="step active"><span class="num">③</span><span class="label">凯利年龄</span></a>
                     <a href="#section-derivation" class="step"><span class="num">④</span><span class="label">词缀</span></a>
                     <a href="#section-passive" class="step"><span class="num">⑤</span><span class="label">被动</span></a>
                     <a href="#section-wsd" class="step"><span class="num">⑥</span><span class="label">多义词</span></a>
                     <a href="#section-culture" class="step"><span class="num">⑦</span><span class="label">文化</span></a>
                     <a href="#section-diff" class="step"><span class="num">⑧</span><span class="label">边界</span></a>
-                    <a href="#section-math" class="step"><span class="num">⑨</span><span class="label">奥数</span></a>
+                    <a href="#section-chicken" class="step"><span class="num">⑨</span><span class="label">鸡兔</span></a>
+                    <a href="#section-pacd" class="step"><span class="num">⑩</span><span class="label">工程</span></a>
                 </div>
             </div>
 
             <!-- ============================================================= -->
-            <!-- 🚀 模块0：双域翻译器 (输入入口) -->
+            <!-- 🚀 双域翻译器 (简版) -->
             <!-- ============================================================= -->
             <div class="section-anchor" id="section-router"></div>
-            <div class="section-title">🚀 双域翻译器 <span class="badge">语言 / 奥数 自动识别</span></div>
-            <div class="section-desc">输入任何内容，系统自动识别是自然语言还是奥数题，并展示对应的结构翻译。</div>
-
+            <div class="section-title">🚀 双域翻译器 <span class="badge">语言 / 奥数</span></div>
+            <div class="section-desc">输入任何内容，自动识别路由。</div>
             <div class="interact-card">
                 <div class="card-title">
                     ⚡ 输入内容
-                    <span style="margin-left:auto; font-size:12px; color:rgba(255,255,255,0.2);">识别域: <span id="domainIndicator">等待输入</span></span>
+                    <span style="margin-left:auto; font-size:12px; color:rgba(255,255,255,0.2);">域: <span id="domainIndicator">等待</span></span>
                 </div>
-                <div class="interact-row">
-                    <input type="text" id="routerInput" placeholder="例如：red car 或 5个人围成一圈" value="5个人围成一圈" style="flex:1; min-width:200px;">
+                <div class="flex-row">
+                    <input type="text" id="routerInput" placeholder="例如：red car 或 鸡兔同笼" value="red car">
                     <button class="btn" onclick="processRouter()">翻译</button>
                 </div>
                 <div style="display:flex; gap:6px; flex-wrap:wrap; margin:6px 0 8px;">
                     <button class="btn-outline" onclick="setRouter('red car')">🚗 red car</button>
-                    <button class="btn-outline" onclick="setRouter('big house')">🏠 big house</button>
+                    <button class="btn-outline" onclick="setRouter('I ate rice')">🍚 I ate rice</button>
                     <button class="btn-outline" onclick="setRouter('打篮球')">🏀 打篮球</button>
-                    <button class="btn-outline" onclick="setRouter('Saya ada kereta')">🚗 kereta</button>
-                    <button class="btn-outline" onclick="setRouter('5个人围成一圈')">⭕ 圆排列</button>
-                    <button class="btn-outline" onclick="setRouter('从1到9选3个数组成三位数，能被3整除')">🔢 整除</button>
+                    <button class="btn-outline" onclick="setRouter('鸡兔同笼 10头28脚')">🐔 鸡兔</button>
                 </div>
-
                 <div id="routerResult" style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; margin-top:6px;">
                     <div style="background:rgba(255,255,255,0.01); border-radius:8px; padding:8px 10px; border:1px solid rgba(255,255,255,0.03);">
-                        <div style="font-size:9px; color:rgba(255,255,255,0.12); text-transform:uppercase; letter-spacing:0.5px;">📥 源解析</div>
-                        <div id="routerSource" style="font-size:13px; color:rgba(255,255,255,0.3);">等待输入...</div>
+                        <div style="font-size:9px; color:rgba(255,255,255,0.12);">📥 源解析</div>
+                        <div id="routerSource" style="font-size:13px; color:rgba(255,255,255,0.3);">等待...</div>
                     </div>
                     <div style="background:rgba(255,255,255,0.01); border-radius:8px; padding:8px 10px; border:1px solid rgba(255,255,255,0.03);">
-                        <div style="font-size:9px; color:rgba(255,255,255,0.12); text-transform:uppercase; letter-spacing:0.5px;">⚙️ 结构化翻译</div>
-                        <div id="routerTarget" style="font-size:12px; color:#34d399; font-family:monospace; white-space:pre-wrap; word-break:break-all;">等待解析...</div>
+                        <div style="font-size:9px; color:rgba(255,255,255,0.12);">⚙️ 结构化</div>
+                        <div id="routerTarget" style="font-size:12px; color:#34d399; font-family:monospace;">等待...</div>
                     </div>
                     <div style="background:rgba(255,255,255,0.01); border-radius:8px; padding:8px 10px; border:1px solid rgba(255,255,255,0.03);">
-                        <div style="font-size:9px; color:rgba(255,255,255,0.12); text-transform:uppercase; letter-spacing:0.5px;">🛣️ 路由决策</div>
-                        <div id="routerRoute" style="font-size:13px; color:rgba(255,255,255,0.3);">等待路由...</div>
+                        <div style="font-size:9px; color:rgba(255,255,255,0.12);">🛣️ 路由</div>
+                        <div id="routerRoute" style="font-size:13px; color:rgba(255,255,255,0.3);">等待...</div>
                     </div>
                 </div>
-
                 <div id="routerBacktrack" class="backtrack-log" style="margin-top:10px;">
                     <div class="bt-title">⚙️ 决策回溯日志</div>
-                    <div style="color:rgba(255,255,255,0.05); font-size:12px; padding:2px 0;">输入后将显示逐层解析过程</div>
+                    <div style="color:rgba(255,255,255,0.05);">等待输入...</div>
                 </div>
             </div>
 
             <!-- ============================================================= -->
-            <!-- ② 语序规则 (原始模块升级) -->
+            <!-- ② 语序规则 ↔ 线性代数 (保留) -->
             <!-- ============================================================= -->
             <div class="section-anchor" id="section-svo"></div>
-            <div class="section-title">② 语序规则 <span class="badge">SVO · 修饰语重排</span></div>
-            <div class="section-desc">验证形容词前置/后置冲突时的回溯重排。</div>
-
+            <div class="section-title">② 语序规则 ↔ 线性代数 <span class="badge">跨域映射</span></div>
+            <div class="section-desc">修饰语重排（前置/后置）等价于线性组合交换律。</div>
             <div class="interact-card">
                 <div class="card-title">
-                    📌 修饰语重排
-                    <span style="margin-left:auto; font-size:12px; color:rgba(255,255,255,0.2);" id="svoStatus">等待输入</span>
+                    🔄 语序转换翻译器
+                    <span style="margin-left:auto; font-size:12px; color:rgba(255,255,255,0.2);" id="svoStatus">点击示例</span>
                 </div>
-                <div id="svo-result" class="result-box">
-                    <span style="color:rgba(255,255,255,0.2);">输入内容后自动展示</span>
+                <div class="mapping-grid">
+                    <div class="mapping-card">
+                        <div class="domain-label">🌐 语言层</div>
+                        <div class="example"><span class="highlight-lang-en">red car</span> <span class="arrow">⇄</span> <span class="highlight-lang-my">kereta merah</span></div>
+                        <div class="desc">[Adj+N] ⇄ [N+Adj]</div>
+                    </div>
+                    <div class="mapping-card">
+                        <div class="domain-label">📐 数学层</div>
+                        <div class="example"><span class="highlight-math">2x + 4y</span> <span class="arrow">⇄</span> <span class="highlight-math">4y + 2x</span></div>
+                        <div class="desc">交换律，和不变</div>
+                    </div>
                 </div>
-                <div id="svo-backtrack" class="backtrack-log">
-                    <div class="bt-title">⏳ 回溯日志</div>
-                    <div style="color:rgba(255,255,255,0.05); font-size:12px;">等待触发...</div>
+                <div style="display:flex; gap:6px; flex-wrap:wrap; margin:6px 0;">
+                    <button class="btn-outline" onclick="showSVOMapping('red')">🚗 red car</button>
+                    <button class="btn-outline" onclick="showSVOMapping('big')">🏠 big house</button>
+                    <button class="btn-outline" onclick="showSVOMapping('math')">📐 线性组合</button>
                 </div>
+                <div id="svo-result" class="result-box"><span style="color:rgba(255,255,255,0.2);">点击示例查看映射</span></div>
+                <div id="svo-backtrack" class="backtrack-log"><div class="bt-title">⏳ 跨域回溯日志</div><div style="color:rgba(255,255,255,0.05);">等待触发...</div></div>
             </div>
 
             <!-- ============================================================= -->
-            <!-- ③ 时态标记 (原始模块升级) -->
+            <!-- ③ 凯利二元结构 → 年龄/时态 (核心升级) -->
             <!-- ============================================================= -->
             <div class="section-anchor" id="section-tense"></div>
-            <div class="section-title">③ 时态标记系统 <span class="badge">屈折 vs 助词</span></div>
-            <div class="section-desc">英语屈折变化与马来助词系统的映射与回溯。</div>
-
-            <div class="interact-card">
-                <div class="card-title">
-                    ⏱️ 时态构造器
-                    <span style="margin-left:auto; font-size:12px; color:rgba(255,255,255,0.2);" id="tenseStatus">等待输入</span>
-                </div>
-                <div id="tense-result" class="result-box">
-                    <span style="color:rgba(255,255,255,0.2);">输入内容后自动展示</span>
-                </div>
-                <div id="tense-backtrack" class="backtrack-log">
-                    <div class="bt-title">⏳ 回溯日志</div>
-                    <div style="color:rgba(255,255,255,0.05); font-size:12px;">等待触发...</div>
-                </div>
+            <div class="section-title">③ 凯利二元结构 → 年龄/时态 <span class="badge">生/死 · 赢/赔</span></div>
+            <div class="section-desc">
+                <strong>二元结构</strong>（生/死、赢/输）驱动凯利公式。<br>
+                概率 \( p \) 越高，确定性越强，对应 <strong>现在时</strong>（明确）；概率越低，越接近 <strong>将来时</strong>（不确定）。<br>
+                同时通过概率计算 <strong>预期年龄</strong>，并通过凯利比例进行 <strong>风险折扣</strong>。
             </div>
 
-            <!-- ============================================================= -->
-            <!-- ④ 词缀派生 (原始模块升级) -->
-            <!-- ============================================================= -->
-            <div class="section-anchor" id="section-derivation"></div>
-            <div class="section-title">④ 词缀派生系统 <span class="badge">词根 → 多词性</span></div>
-            <div class="section-desc">一个词根如何通过词缀变成不同词性，中文零派生作为验证对照。</div>
-
             <div class="interact-card">
                 <div class="card-title">
-                    🧩 词根派生器
-                    <span style="margin-left:auto; font-size:12px; color:rgba(255,255,255,0.2);" id="deriveStatus">等待输入</span>
-                </div>
-                <div id="derivation-result">
-                    <div style="color:rgba(255,255,255,0.2); font-size:14px;">输入内容后自动展示</div>
-                </div>
-                <div id="derive-backtrack" class="backtrack-log">
-                    <div class="bt-title">⏳ 回溯日志</div>
-                    <div style="color:rgba(255,255,255,0.05); font-size:12px;">等待触发...</div>
-                </div>
-            </div>
-
-            <!-- ============================================================= -->
-            <!-- ⑤ 被动句式 (原始模块升级) -->
-            <!-- ============================================================= -->
-            <div class="section-anchor" id="section-passive"></div>
-            <div class="section-title">⑤ 被动句式同源 <span class="badge">di- + oleh = be + by</span></div>
-            <div class="section-desc">被动语态在两种语言中结构完全对应，中文“被”字句作为验证。</div>
-
-            <div class="interact-card">
-                <div class="card-title">
-                    🔄 主动 → 被动转换器
-                    <span style="margin-left:auto; font-size:12px; color:rgba(255,255,255,0.2);" id="passiveStatus">等待输入</span>
-                </div>
-                <div id="passive-result" class="result-box">
-                    <span style="color:rgba(255,255,255,0.2);">输入内容后自动展示</span>
-                </div>
-                <div id="passive-backtrack" class="backtrack-log">
-                    <div class="bt-title">⏳ 回溯日志</div>
-                    <div style="color:rgba(255,255,255,0.05); font-size:12px;">等待触发...</div>
-                </div>
-            </div>
-
-            <!-- ============================================================= -->
-            <!-- ⑥ 多义词消歧 (新增模块) -->
-            <!-- ============================================================= -->
-            <div class="section-anchor" id="section-wsd"></div>
-            <div class="section-title">⑥ 多义词消歧 <span class="badge">上下文驱动</span></div>
-            <div class="section-desc">中文“打”的极端歧义，触发深度回溯（hit → play / take）。</div>
-
-            <div class="interact-card">
-                <div class="card-title">
-                    🎯 词义消歧 (WSD)
-                    <span style="margin-left:auto; font-size:12px; color:rgba(255,255,255,0.2);" id="wsdStatus">等待输入</span>
-                </div>
-                <div id="wsd-result" class="result-box">
-                    <span style="color:rgba(255,255,255,0.2);">输入内容后自动展示</span>
-                </div>
-                <div id="wsd-backtrack" class="backtrack-log">
-                    <div class="bt-title">⏳ 回溯日志</div>
-                    <div style="color:rgba(255,255,255,0.05); font-size:12px;">等待触发...</div>
-                </div>
-            </div>
-
-            <!-- ============================================================= -->
-            <!-- ⑦ 文化适配 (新增模块) -->
-            <!-- ============================================================= -->
-            <div class="section-anchor" id="section-culture"></div>
-            <div class="section-title">⑦ 文化适配 <span class="badge">语用规约 · 禁忌</span></div>
-            <div class="section-desc">文化隐喻（龙→Loong）及禁忌词处理，确保输出符合目标社会语境。</div>
-
-            <div class="interact-card">
-                <div class="card-title">
-                    🤝 文化规约引擎
-                    <span style="margin-left:auto; font-size:12px; color:rgba(255,255,255,0.2);" id="cultureStatus">等待输入</span>
-                </div>
-                <div id="culture-result" class="result-box">
-                    <span style="color:rgba(255,255,255,0.2);">输入内容后自动展示</span>
-                </div>
-                <div id="culture-backtrack" class="backtrack-log">
-                    <div class="bt-title">⏳ 回溯日志</div>
-                    <div style="color:rgba(255,255,255,0.05); font-size:12px;">等待触发...</div>
-                </div>
-            </div>
-
-            <!-- ============================================================= -->
-            <!-- ⑧ 差异边界 · 地域防火墙 (原始模块升级) -->
-            <!-- ============================================================= -->
-            <div class="section-anchor" id="section-diff"></div>
-            <div class="section-title">⑧ 差异边界 · 地域防火墙 <span class="badge">伪同源词拦截</span></div>
-            <div class="section-desc">结构相似但内容不同的伪同源词（kereta=汽车/火车），通过地域向量偏移拦截。</div>
-
-            <div class="interact-card">
-                <div class="card-title">
-                    🔍 伪同源词检测
-                    <span style="margin-left:auto; font-size:12px; color:rgba(255,255,255,0.2);" id="diffStatus">等待输入</span>
-                </div>
-                <div id="diff-result" class="result-box">
-                    <span style="color:rgba(255,255,255,0.2);">输入内容后自动展示</span>
-                </div>
-                <div id="diff-backtrack" class="backtrack-log">
-                    <div class="bt-title">⏳ 回溯日志 (地域偏移)</div>
-                    <div style="color:rgba(255,255,255,0.05); font-size:12px;">等待触发...</div>
-                </div>
-            </div>
-
-            <!-- ============================================================= -->
-            <!-- ⑨ 奥数翻译 (新增核心模块) -->
-            <!-- ============================================================= -->
-            <div class="section-anchor" id="section-math"></div>
-            <div class="section-title">⑨ 奥数翻译 <span class="badge">枚举 → 验证 → 回退</span></div>
-            <div class="section-desc">把奥数题当成另一种“语言”来翻译：先枚举所有组合，然后逐个验证条件，通过则保留，失败则回退。</div>
-
-            <div class="interact-card">
-                <div class="card-title">
-                    🧮 奥数结构翻译器
-                    <span style="margin-left:auto; font-size:12px; color:rgba(255,255,255,0.2);">步骤 <span id="mathStepCounter">0</span> / <span id="mathTotalSteps">0</span></span>
+                    🎲 凯利二元结构验证器
+                    <span style="margin-left:auto; font-size:12px; color:rgba(255,255,255,0.2);" id="tenseStatus">就绪</span>
                 </div>
 
-                <!-- 数字牌 -->
-                <div class="number-pool" id="numberPool" style="display:flex; gap:10px; flex-wrap:wrap; margin:12px 0; justify-content:center;">
-                    <!-- JS动态生成 1~9 -->
+                <!-- 参数控制 -->
+                <div class="flex-row">
+                    <label style="color:rgba(255,255,255,0.3);">🎯 胜率 p (生/赢)</label>
+                    <input type="range" id="probSlider" min="5" max="95" value="60" oninput="updateKellyMapping()">
+                    <span id="probDisplay" style="color:#f1f5f9; min-width:50px;">0.60</span>
+                    <label style="color:rgba(255,255,255,0.3); margin-left:12px;">💰 赔率 b (赢时获得倍数)</label>
+                    <input type="range" id="oddsSlider" min="10" max="50" value="20" step="5" oninput="updateKellyMapping()">
+                    <span id="oddsDisplay" style="color:#f1f5f9; min-width:40px;">2.0</span>
+                    <button class="btn" onclick="updateKellyMapping()">验证结构</button>
                 </div>
 
-                <!-- 当前尝试 -->
-                <div id="currentAttempt" style="color:rgba(255,255,255,0.2); text-align:center; padding:8px; background:rgba(255,255,255,0.02); border-radius:8px;">
-                    🎯 输入奥数题后自动开始
-                </div>
-
-                <!-- 统计 -->
-                <div class="result-box" id="mathStats" style="border-left-color:#a78bfa;">
-                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
-                        <div><span style="color:rgba(255,255,255,0.2);">📦 已尝试组合</span><br><span id="mathTried" style="font-size:20px; color:#60a5fa;">0</span></div>
-                        <div><span style="color:rgba(255,255,255,0.2);">✅ 通过验证 (保留)</span><br><span id="mathValid" style="font-size:20px; color:#4ade80;">0</span></div>
+                <!-- 四维映射卡片 -->
+                <div class="kelly-grid">
+                    <div class="kelly-card">
+                        <div class="label">🕰️ 时态映射</div>
+                        <div class="value" style="color:#60a5fa;" id="tenseType">现在时</div>
+                        <div class="sub" id="tenseExample">I eat (确定)</div>
                     </div>
+                    <div class="kelly-card">
+                        <div class="label">🧮 凯利比例 f*</div>
+                        <div class="value" style="color:#facc15;" id="kellyValue">20%</div>
+                        <div class="sub" id="kellyDesc">最佳下注比例</div>
+                    </div>
+                    <div class="kelly-card">
+                        <div class="label">📈 预期年龄</div>
+                        <div class="value" style="color:#a78bfa;" id="baseAge">60 岁</div>
+                        <div class="sub">概率 p × 100</div>
+                    </div>
+                    <div class="kelly-card">
+                        <div class="label">⚡ 有效年龄 (风险折扣)</div>
+                        <div class="value" style="color:#4ade80;" id="riskAge">48 岁</div>
+                        <div class="sub" id="riskDesc">风险折扣 20%</div>
+                    </div>
+                </div>
+
+                <!-- 详细结果 -->
+                <div id="tense-result" class="result-box" style="border-left-color:#a78bfa;">
+                    <span style="color:rgba(255,255,255,0.2);">调整 p 和 b，观察二元结构如何影响年龄与时态</span>
                 </div>
 
                 <!-- 回溯日志 -->
-                <div id="mathBacktrack" class="backtrack-log">
-                    <div class="bt-title">⚙️ 枚举 → 验证 → 回退 日志</div>
-                    <div style="color:rgba(255,255,255,0.05); font-size:12px;">等待奥数题输入...</div>
+                <div id="tense-backtrack" class="backtrack-log">
+                    <div class="bt-title">⏳ 凯利二元结构 → 年龄/时态 日志</div>
+                    <div style="color:rgba(255,255,255,0.05);">等待操作...</div>
                 </div>
 
-                <!-- 控制 -->
-                <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-top:12px;">
+                <!-- 底座说明 -->
+                <div style="margin-top:12px; padding-top:10px; border-top:1px solid rgba(255,255,255,0.03); display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; font-size:12px; color:rgba(255,255,255,0.15);">
+                    <div>🔴 p 低 → 将来时 (不确定) → 高风险 → 年龄折损</div>
+                    <div>🟡 p 中 → 现在时 (进行中) → 中等风险 → 年龄中等</div>
+                    <div>🟢 p 高 → 过去时 (已确定) → 低风险 → 年龄高</div>
+                </div>
+            </div>
+
+            <!-- ============================================================= -->
+            <!-- ④ 词缀派生 (简版) -->
+            <!-- ============================================================= -->
+            <div class="section-anchor" id="section-derivation"></div>
+            <div class="section-title">④ 词缀派生系统 <span class="badge">词根 → 多词性</span></div>
+            <div class="section-desc">一个词根如何通过词缀变成不同词性。</div>
+            <div class="interact-card">
+                <div class="card-title">🧩 词根派生器 <span style="margin-left:auto; font-size:12px; color:rgba(255,255,255,0.2);" id="deriveStatus">等待输入</span></div>
+                <div id="derivation-result"><div style="color:rgba(255,255,255,0.2); font-size:14px;">输入内容后自动展示</div></div>
+                <div id="derive-backtrack" class="backtrack-log"><div class="bt-title">⏳ 回溯日志</div><div style="color:rgba(255,255,255,0.05);">等待触发...</div></div>
+            </div>
+
+            <!-- ============================================================= -->
+            <!-- ⑤ 被动句式 (简版) -->
+            <!-- ============================================================= -->
+            <div class="section-anchor" id="section-passive"></div>
+            <div class="section-title">⑤ 被动句式同源 <span class="badge">di- + oleh = be + by</span></div>
+            <div class="section-desc">被动语态在两种语言中结构完全对应。</div>
+            <div class="interact-card">
+                <div class="card-title">🔄 被动转换器 <span style="margin-left:auto; font-size:12px; color:rgba(255,255,255,0.2);" id="passiveStatus">等待输入</span></div>
+                <div id="passive-result" class="result-box"><span style="color:rgba(255,255,255,0.2);">输入内容后自动展示</span></div>
+                <div id="passive-backtrack" class="backtrack-log"><div class="bt-title">⏳ 回溯日志</div><div style="color:rgba(255,255,255,0.05);">等待触发...</div></div>
+            </div>
+
+            <!-- ============================================================= -->
+            <!-- ⑥ 多义词消歧 (简版) -->
+            <!-- ============================================================= -->
+            <div class="section-anchor" id="section-wsd"></div>
+            <div class="section-title">⑥ 多义词消歧 <span class="badge">上下文驱动</span></div>
+            <div class="section-desc">中文“打”的极端歧义，触发深度回溯。</div>
+            <div class="interact-card">
+                <div class="card-title">🎯 词义消歧 <span style="margin-left:auto; font-size:12px; color:rgba(255,255,255,0.2);" id="wsdStatus">等待输入</span></div>
+                <div id="wsd-result" class="result-box"><span style="color:rgba(255,255,255,0.2);">输入内容后自动展示</span></div>
+                <div id="wsd-backtrack" class="backtrack-log"><div class="bt-title">⏳ 回溯日志</div><div style="color:rgba(255,255,255,0.05);">等待触发...</div></div>
+            </div>
+
+            <!-- ============================================================= -->
+            <!-- ⑦ 文化适配 (简版) -->
+            <!-- ============================================================= -->
+            <div class="section-anchor" id="section-culture"></div>
+            <div class="section-title">⑦ 文化适配 <span class="badge">语用规约</span></div>
+            <div class="section-desc">文化隐喻（龙→Loong）及禁忌词处理。</div>
+            <div class="interact-card">
+                <div class="card-title">🤝 文化规约引擎 <span style="margin-left:auto; font-size:12px; color:rgba(255,255,255,0.2);" id="cultureStatus">等待输入</span></div>
+                <div id="culture-result" class="result-box"><span style="color:rgba(255,255,255,0.2);">输入内容后自动展示</span></div>
+                <div id="culture-backtrack" class="backtrack-log"><div class="bt-title">⏳ 回溯日志</div><div style="color:rgba(255,255,255,0.05);">等待触发...</div></div>
+            </div>
+
+            <!-- ============================================================= -->
+            <!-- ⑧ 差异边界 (简版) -->
+            <!-- ============================================================= -->
+            <div class="section-anchor" id="section-diff"></div>
+            <div class="section-title">⑧ 差异边界 · 地域防火墙 <span class="badge">伪同源词</span></div>
+            <div class="section-desc">结构相似但内容不同的伪同源词拦截。</div>
+            <div class="interact-card">
+                <div class="card-title">🔍 伪同源词检测 <span style="margin-left:auto; font-size:12px; color:rgba(255,255,255,0.2);" id="diffStatus">等待输入</span></div>
+                <div id="diff-result" class="result-box"><span style="color:rgba(255,255,255,0.2);">输入内容后自动展示</span></div>
+                <div id="diff-backtrack" class="backtrack-log"><div class="bt-title">⏳ 回溯日志 (地域偏移)</div><div style="color:rgba(255,255,255,0.05);">等待触发...</div></div>
+            </div>
+
+            <!-- ============================================================= -->
+            <!-- ⑨ 鸡兔同笼 (带可视化) -->
+            <!-- ============================================================= -->
+            <div class="section-anchor" id="section-chicken"></div>
+            <div class="section-title">🐔 ⑨ 鸡兔同笼 <span class="badge">二元拆分</span></div>
+            <div class="section-desc">调整头数和脚数，系统自动推理并展示环形图与条形图。</div>
+            <div class="interact-card">
+                <div class="card-title">🧮 二元拆分解题器</div>
+                <div class="flex-row">
+                    <label style="color:rgba(255,255,255,0.3);">头数</label>
+                    <input type="number" id="chickenHeads" value="10" min="1" max="50" style="width:60px;">
+                    <label style="color:rgba(255,255,255,0.3); margin-left:8px;">脚数</label>
+                    <input type="number" id="chickenLegs" value="28" min="2" max="200" style="width:60px;">
+                    <button class="btn" onclick="runChicken()">运行</button>
+                    <button class="btn-outline" onclick="resetChicken()">重置</button>
+                </div>
+                <div class="vis-grid">
+                    <div class="vis-card">
+                        <div class="vis-title">🐔 鸡 vs 🐰 兔 数量</div>
+                        <div class="vis-bar-container">
+                            <div class="vis-bar-item"><span class="label">🐔</span><div class="track"><div class="bar" style="background:#60a5fa;" id="chickenBar"></div></div><span class="value" id="chickenBarVal">0</span></div>
+                            <div class="vis-bar-item"><span class="label">🐰</span><div class="track"><div class="bar" style="background:#facc15;" id="rabbitBar"></div></div><span class="value" id="rabbitBarVal">0</span></div>
+                        </div>
+                    </div>
+                    <div class="vis-card">
+                        <div class="vis-title">📊 占比环形图</div>
+                        <div class="vis-ring-container">
+                            <div class="vis-ring" style="--color:#60a5fa; --pct:50;" id="chickenRing"><div class="inner"><span id="ringChickenPct">50%</span><span class="sub">鸡</span></div></div>
+                            <div class="vis-ring" style="--color:#facc15; --pct:50;" id="rabbitRing"><div class="inner"><span id="ringRabbitPct">50%</span><span class="sub">兔</span></div></div>
+                        </div>
+                    </div>
+                </div>
+                <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-top:6px;">
+                    <div style="background:rgba(255,255,255,0.01); border-radius:8px; padding:8px; text-align:center;"><span style="color:rgba(255,255,255,0.2);">🐔 鸡</span><br><span id="cCount" style="font-size:24px; color:#60a5fa;">--</span></div>
+                    <div style="background:rgba(255,255,255,0.01); border-radius:8px; padding:8px; text-align:center;"><span style="color:rgba(255,255,255,0.2);">🐰 兔</span><br><span id="rCount" style="font-size:24px; color:#facc15;">--</span></div>
+                    <div style="background:rgba(255,255,255,0.01); border-radius:8px; padding:8px; text-align:center;"><span style="color:rgba(255,255,255,0.2);">✅ 验证</span><br><span id="vCount" style="font-size:24px; color:#4ade80;">--</span></div>
+                </div>
+                <div id="chickenLog" class="backtrack-log" style="margin-top:8px;"><div class="bt-title">⚙️ 二元拆分日志</div><div style="color:rgba(255,255,255,0.05);">点击运行...</div></div>
+            </div>
+
+            <!-- ============================================================= -->
+            <!-- ⑩ 工程问题 (带可视化) -->
+            <!-- ============================================================= -->
+            <div class="section-anchor" id="section-pacd"></div>
+            <div class="section-title">🏗️ ⑩ 工程问题 <span class="badge">PACD</span></div>
+            <div class="section-desc">输入工程问题，系统翻译为PACD结构，并显示效率对比条形图。</div>
+            <div class="interact-card">
+                <div class="card-title">🧮 工程问题翻译器</div>
+                <div class="flex-row">
+                    <input type="text" id="pacdInput" placeholder="例如：甲单独做需5天，乙单独做需10天" value="甲单独做需5天，乙单独做需10天，合作需几天？">
+                    <button class="btn" onclick="runPACD()">翻译为PACD</button>
+                    <button class="btn-outline" onclick="resetPACD()">重置</button>
+                </div>
+                <div style="display:flex; gap:6px; flex-wrap:wrap; margin:6px 0;">
+                    <button class="btn-outline" onclick="setPACD('甲单独做需5天，乙单独做需10天，合作需几天？')">📐 合作</button>
+                    <button class="btn-outline" onclick="setPACD('甲做需3天，乙做需6天，丙做需9天')">👷 三人</button>
+                </div>
+                <div class="pacd-grid">
+                    <div class="item"><div class="label">P (总量)</div><div class="value" style="color:#60a5fa;" id="pacdP">--</div><div class="sub">总量</div></div>
+                    <div class="item"><div class="label">A (效率1)</div><div class="value" style="color:#facc15;" id="pacdA">--</div><div class="sub">主体1</div></div>
+                    <div class="item"><div class="label">C (效率2)</div><div class="value" style="color:#a78bfa;" id="pacdC">--</div><div class="sub">主体2</div></div>
+                    <div class="item"><div class="label">D (结果)</div><div class="value" style="color:#4ade80;" id="pacdD">--</div><div class="sub">目标</div></div>
+                </div>
+                <div class="vis-grid">
+                    <div class="vis-card">
+                        <div class="vis-title">⚡ 效率对比</div>
+                        <div class="vis-bar-container">
+                            <div class="vis-bar-item"><span class="label">甲</span><div class="track"><div class="bar" style="background:#facc15;" id="eff1Bar"></div></div><span class="value" id="eff1Val">0</span></div>
+                            <div class="vis-bar-item"><span class="label">乙</span><div class="track"><div class="bar" style="background:#a78bfa;" id="eff2Bar"></div></div><span class="value" id="eff2Val">0</span></div>
+                            <div class="vis-bar-item"><span class="label">合</span><div class="track"><div class="bar" style="background:#4ade80;" id="effSumBar"></div></div><span class="value" id="effSumVal">0</span></div>
+                        </div>
+                    </div>
+                    <div class="vis-card">
+                        <div class="vis-title">🎯 结果</div>
+                        <div style="text-align:center; padding:10px 0;">
+                            <div style="font-size:36px; font-weight:700; color:#4ade80;" id="resultDisplay">--</div>
+                            <div style="color:rgba(255,255,255,0.2);" id="resultLabel">等待</div>
+                        </div>
+                    </div>
+                </div>
+                <div id="pacdLog" class="backtrack-log"><div class="bt-title">⚙️ PACD日志</div><div style="color:rgba(255,255,255,0.05);">等待输入...</div></div>
+            </div>
+
+            <!-- ============================================================= -->
+            <!-- ⑪ 奥数枚举验证 (简版) -->
+            <!-- ============================================================= -->
+            <div class="section-anchor" id="section-math"></div>
+            <div class="section-title">⑪ 奥数翻译 <span class="badge">枚举验证</span></div>
+            <div class="section-desc">枚举所有组合，验证条件，通过则保留。</div>
+            <div class="interact-card">
+                <div class="card-title">🧮 枚举验证器 <span style="margin-left:auto; font-size:12px; color:rgba(255,255,255,0.2);">步骤 <span id="mathStepCounter">0</span></span></div>
+                <div id="numberPool" style="display:flex; gap:10px; flex-wrap:wrap; margin:12px 0; justify-content:center;"></div>
+                <div id="currentAttempt" style="color:rgba(255,255,255,0.2); text-align:center; padding:8px; background:rgba(255,255,255,0.02); border-radius:8px;">🎯 点击下一步</div>
+                <div class="result-box" style="border-left-color:#a78bfa; display:flex; gap:20px;">
+                    <div><span style="color:rgba(255,255,255,0.2);">📦 已尝试</span><br><span id="mathTried" style="font-size:20px; color:#60a5fa;">0</span></div>
+                    <div><span style="color:rgba(255,255,255,0.2);">✅ 保留</span><br><span id="mathValid" style="font-size:20px; color:#4ade80;">0</span></div>
+                </div>
+                <div id="mathBacktrack" class="backtrack-log"><div class="bt-title">⚙️ 枚举日志</div><div style="color:rgba(255,255,255,0.05);">等待...</div></div>
+                <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:12px;">
                     <button class="btn" onclick="mathNextStep()">▶ 下一步</button>
-                    <button class="btn-outline" onclick="mathReset()">⟳ 重置</button>
-                    <button class="btn-outline" onclick="mathRunAll()">⏩ 快速演示</button>
-                    <span style="color:rgba(255,255,255,0.08); font-size:12px; margin-left:auto;" id="mathStatus">就绪</span>
+                    <button class="btn-outline" onclick="mathReset()">重置</button>
+                    <button class="btn-outline" onclick="mathRunAll()">⏩ 快速</button>
+                    <span style="color:rgba(255,255,255,0.08); margin-left:auto;" id="mathStatus">就绪</span>
                 </div>
             </div>
 
@@ -1130,42 +1126,29 @@
             <!-- 证据闭环 -->
             <!-- ============================================================= -->
             <div class="section-anchor" id="section-closure"></div>
-            <div class="section-title">证据闭环 <span class="badge">从语言到奥数 · 通用推理</span></div>
-            <div class="section-desc">完整验证“底座规则 + 回溯机制”在语言及数学场景的迁移能力。</div>
-
+            <div class="section-title">证据闭环 <span class="badge">凯利二元结构 = 年龄/时态</span></div>
+            <div class="section-desc">二元概率结构（赢/输、生/死）通过凯利公式映射到年龄和时态，验证了结构迁移的通用性。</div>
             <div class="closure">
-                <div class="item">
-                    <div class="label">🔍 现象</div>
-                    <div class="text">语言结构相似但存在伪同源词、多义词；奥数题需要枚举与条件验证</div>
-                </div>
-                <div class="item">
-                    <div class="label">⚙️ 成因</div>
-                    <div class="text">SVO语序 + 词缀系统 + 枚举验证，底层共享“尝试→验证→回退”的堆栈逻辑</div>
-                </div>
-                <div class="item">
-                    <div class="label">🧱 边界</div>
-                    <div class="text">形容词语序相反 · 词缀体系独立 · 伪同源词地域冲突 · 奥数状态空间爆炸</div>
-                </div>
-                <div class="item">
-                    <div class="label">🚀 价值</div>
-                    <div class="text">可迁移至 AI 多语言解析 / 智能家居 / 企业RPA / 奥数解题 / 组合优化 / 通用推理引擎</div>
-                </div>
+                <div class="item"><div class="label">🎲 凯利公式</div><div class="text">\( f^* = (bp - q)/b \) 用于最佳投入比例</div></div>
+                <div class="item"><div class="label">📈 预期年龄</div><div class="text">\( 年龄_{基础} = p \times 100 \)（生/死的概率推演）</div></div>
+                <div class="item"><div class="label">⚡ 有效年龄</div><div class="text">\( 年龄_{有效} = 年龄_{基础} \times (1 - f^* \times 0.5) \)（风险折扣）</div></div>
+                <div class="item"><div class="label">🕰️ 时态映射</div><div class="text">p 高 → 过去/现在时（确定）；p 低 → 将来时（不确定）</div></div>
             </div>
 
-            <!-- ===== 底部 ===== -->
             <div class="back-bottom">
-                <a href="index.html">← 返回作品集首页</a>
-                <span class="meta">Y.Mine · 九维证据链 · 语言+奥数融合版 v8.0</span>
+                <span class="meta">Y.Mine · 凯利二元结构 · v15.0</span>
             </div>
 
         </div>
-
     </div>
 
     <script>
         // ================================================================
-        // 全局：光晕、导航
+        // 光晕、导航、路由器、语序线代、鸡兔、工程、枚举 (保留)
+        // 此处包含所有之前的功能，并新增凯利映射逻辑
         // ================================================================
+
+        // 光晕
         const glow = document.getElementById('glow');
         document.addEventListener('mousemove', (e) => {
             const x = e.clientX / window.innerWidth * 100;
@@ -1174,7 +1157,8 @@
             glow.style.setProperty('--y', y + '%');
         });
 
-        const navItems = document.querySelectorAll('.sidebar-nav .nav-item');
+        // 导航高亮
+        const navItems = document.querySelectorAll('.left-nav .nav-item');
         const sections = [
             document.getElementById('section-hero'),
             document.getElementById('section-router'),
@@ -1185,10 +1169,11 @@
             document.getElementById('section-wsd'),
             document.getElementById('section-culture'),
             document.getElementById('section-diff'),
+            document.getElementById('section-chicken'),
+            document.getElementById('section-pacd'),
             document.getElementById('section-math'),
             document.getElementById('section-closure')
         ];
-
         navItems.forEach((item, index) => {
             item.addEventListener('click', function(e) {
                 e.preventDefault();
@@ -1199,7 +1184,7 @@
             });
         });
 
-        function updateActiveNav() {
+        function updateNav() {
             let currentIndex = 0;
             sections.forEach((section, i) => {
                 if (section) {
@@ -1211,153 +1196,22 @@
                 el.classList.toggle('active', i === currentIndex);
             });
         }
-        window.addEventListener('scroll', updateActiveNav);
-        window.addEventListener('load', updateActiveNav);
+        window.addEventListener('scroll', updateNav);
+        window.addEventListener('load', updateNav);
 
-        document.querySelectorAll('.evidence-steps .step').forEach(step => {
-            step.addEventListener('click', function() {
-                document.querySelectorAll('.evidence-steps .step').forEach(s => s.classList.remove('active'));
-                this.classList.add('active');
-            });
-        });
-
-        // ================================================================
-        // 工具函数
-        // ================================================================
-        function renderBacktrack(containerId, steps) {
-            const container = document.getElementById(containerId);
-            if (!container) return;
-            let html = `<div class="bt-title">⚙️ 决策回溯日志</div>`;
-            if (!steps || steps.length === 0) {
-                html += `<div style="color:rgba(255,255,255,0.05); font-size:12px;">等待触发...</div>`;
-            } else {
-                steps.forEach((step) => {
-                    const cls = step.status || 'info';
-                    html += `
-                        <div class="bt-step ${cls}">
-                            <span class="icon">${step.icon}</span>
-                            <span class="msg">${step.msg}</span>
-                            ${step.conf ? `<span class="conf">${step.conf}</span>` : ''}
-                        </div>
-                    `;
-                });
-            }
-            container.innerHTML = html;
-        }
-
-        function renderTriple(containerId, en, my, zh) {
-            const el = document.getElementById(containerId);
-            if (!el) return;
-            el.innerHTML = `
-                <div class="triple-grid">
-                    <div class="col"><div class="lang-label">英语 <span style="color:rgba(255,255,255,0.1);">基准</span></div><div class="content en">${en}</div></div>
-                    <div class="col"><div class="lang-label">马来/印尼 <span style="color:rgba(255,255,255,0.1);">映射</span></div><div class="content my">${my}</div></div>
-                    <div class="col"><div class="lang-label">中文 <span style="color:rgba(255,255,255,0.1);">结构验证</span></div><div class="content zh">${zh}</div><div class="sub">[不翻译，仅解析结构]</div></div>
-                </div>
-            `;
-        }
-
-        // ================================================================
-        // 🚀 双域翻译器 (路由器)
-        // ================================================================
+        // ---------- 路由器 ----------
         function processRouter() {
             const input = document.getElementById('routerInput').value.trim();
-            if (!input) { alert('请输入内容'); return; }
-
-            // 检测是否为奥数题
-            const isMath = detectMath(input);
-            const domain = isMath ? '奥数' : '自然语言';
-            document.getElementById('domainIndicator').textContent = domain;
+            if (!input) return alert('请输入');
+            const isMath = input.includes('鸡兔') || input.includes('头') || input.includes('脚');
+            document.getElementById('domainIndicator').textContent = isMath ? '奥数' : '语言';
             document.getElementById('domainIndicator').style.color = isMath ? '#facc15' : '#60a5fa';
-
-            // 解析结果
-            let source = input;
-            let target = '';
-            let route = '';
-            let steps = [];
-
-            if (isMath) {
-                const mathInfo = parseMath(input);
-                target = JSON.stringify({ type: mathInfo.type, n: mathInfo.n, question: mathInfo.question }, null, 2);
-                route = `🧮 识别为奥数题 → 跳转至奥数翻译模块 (${mathInfo.type})`;
-                steps = [
-                    { icon: '🧮', msg: `识别到奥数题: ${mathInfo.question}`, status: 'info', conf: '90%' },
-                    { icon: '↩️', msg: `参数: ${mathInfo.type === 'circle' ? '人数' : '数字范围'} = ${mathInfo.n}`, status: 'warn',
-                        conf: '' },
-                    { icon: '✅', msg: '已就绪，请查看下方奥数翻译模块', status: 'success', conf: '完成' }
-                ];
-                // 设置奥数模块
-                setupMathModule(mathInfo);
-            } else {
-                // 自然语言处理
-                const langInfo = parseLanguage(input);
-                target = JSON.stringify({ intent: 'translate', words: langInfo.words, detected: langInfo.features }, null,
-                2);
-                route = `🔤 识别为自然语言 → 路由至语言模块`;
-                steps = [
-                    { icon: '🔍', msg: `识别为自然语言，共 ${langInfo.words.length} 个词`, status: 'info', conf: '80%' },
-                    { icon: '🔍', msg: `检测到特征: ${langInfo.features.join(', ') || '无特殊标记'}`, status: 'info',
-                    conf: '70%' },
-                    { icon: '✅', msg: '已路由至语言模块', status: 'success', conf: '完成' }
-                ];
-                // 更新语言模块
-                updateLanguageModules(input, langInfo);
-            }
-
-            // 更新路由器UI
             document.getElementById('routerSource').innerHTML =
-                `<div style="font-weight:500;color:#f1f5f9;">${source}</div><div style="font-size:11px;color:rgba(255,255,255,0.2);">域: ${domain}</div>`;
-            document.getElementById('routerTarget').innerHTML = target;
-            document.getElementById('routerRoute').innerHTML = `<div style="color:${isMath ? '#facc15' : '#60a5fa'};">${route}</div>`;
-            renderBacktrack('routerBacktrack', steps);
-
-            // 滚动到对应模块
-            if (isMath) {
-                setTimeout(() => document.getElementById('section-math').scrollIntoView({ behavior: 'smooth',
-                    block: 'start' }), 300);
-            }
-        }
-
-        function detectMath(input) {
-            const text = input.toLowerCase();
-            // 圆排列
-            if (text.match(/(\d+)\s*人\s*(围成一圈|圆桌|圆排列)/)) return true;
-            // 整除
-            if (text.includes('三位数') && text.includes('整除')) return true;
-            // 排列/组合关键词
-            if (text.includes('排列') || text.includes('组合') || text.includes('选择')) {
-                const numMatch = text.match(/(\d+)/);
-                if (numMatch && parseInt(numMatch[1]) >= 2) return true;
-            }
-            return false;
-        }
-
-        function parseMath(input) {
-            const text = input.toLowerCase();
-            // 圆排列
-            const circleMatch = text.match(/(\d+)\s*人\s*(围成一圈|圆桌|圆排列)/);
-            if (circleMatch) {
-                const n = parseInt(circleMatch[1]);
-                return { type: 'circle', n: n, question: `${n} 个人围成一圈，有多少种不同的坐法？` };
-            }
-            // 整除
-            if (text.includes('三位数') && text.includes('整除')) {
-                return { type: 'divisible', n: 9, question: '从 1~9 中选 3 个不同数字组成三位数，能被 3 整除的有几个？' };
-            }
-            // 默认
-            const numMatch = text.match(/(\d+)/);
-            const n = numMatch ? parseInt(numMatch[1]) : 5;
-            return { type: 'circle', n: n, question: `${n} 个元素的排列问题` };
-        }
-
-        function parseLanguage(input) {
-            const words = input.split(/\s+/);
-            const features = [];
-            if (words.some(w => w.endsWith('ed'))) features.push('过去式');
-            if (words.some(w => w === '打')) features.push('多义词"打"');
-            if (words.some(w => w === 'kereta')) features.push('伪同源词');
-            if (words.some(w => w === '龙')) features.push('文化隐喻');
-            return { words, features };
+                `<div style="font-weight:500;color:#f1f5f9;">${input}</div><div style="font-size:11px;color:rgba(255,255,255,0.2);">域: ${isMath?'奥数':'语言'}</div>`;
+            document.getElementById('routerTarget').innerHTML = JSON.stringify({ words: input.split(/\s+/) }, null, 2);
+            document.getElementById('routerRoute').innerHTML = `<div style="color:${isMath?'#facc15':'#60a5fa'};">已路由</div>`;
+            document.getElementById('routerBacktrack').innerHTML =
+                `<div class="bt-title">⚙️ 决策</div><div class="bt-step success"><span class="msg">✅ 识别完成</span></div>`;
         }
 
         function setRouter(text) {
@@ -1366,259 +1220,293 @@
         }
         document.getElementById('routerInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') processRouter(); });
 
-        // ================================================================
-        // 语言模块更新
-        // ================================================================
-        function updateLanguageModules(input, langInfo) {
-            const words = langInfo.words;
-            const features = langInfo.features;
-
-            // 语序
-            const svoSteps = [];
-            if (input.includes('red car') || input.includes('big house')) {
-                const parts = input.split(' ');
-                const adj = parts[0];
-                const noun = parts[1] || 'car';
-                renderTriple('svo-result', `${adj} ${noun}`, `${noun} ${adj === 'red' ? 'merah' : 'besar'}`, `[名词+形容词] 后置`);
-                svoSteps.push({ icon: '⚙️', msg: `尝试规则A (前置): "${adj} ${noun}"`, status: 'info', conf: '12%' });
-                svoSteps.push({ icon: '❌', msg: '马来语验证失败 (修饰语后置)', status: 'fail', conf: '<60%' });
-                svoSteps.push({ icon: '↩️', msg: '回退至名词节点', status: 'warn', conf: '' });
-                svoSteps.push({ icon: '⚙️', msg: `切换规则B (后置): "${noun} ${adj === 'red' ? 'merah' : 'besar'}"`,
-                    status: 'info', conf: '96%' });
-                svoSteps.push({ icon: '✅', msg: '采纳后置规则', status: 'success', conf: '最终96%' });
-                document.getElementById('svoStatus').textContent = '✅ 修饰语后置';
-            } else if (features.includes('多义词"打"')) {
-                renderTriple('svo-result', 'play basketball / take taxi / hit someone', '[歧义消解]', '上下文驱动');
-                svoSteps.push({ icon: '🔍', msg: '检测到多义词 "打"', status: 'info', conf: '85%' });
-                svoSteps.push({ icon: '✅', msg: '根据上下文选择映射', status: 'success', conf: '89%' });
-                document.getElementById('svoStatus').textContent = '✅ 多义词消歧';
+        // ---------- ② 语序 ↔ 线代 ----------
+        function showSVOMapping(type) {
+            const resultBox = document.getElementById('svo-result');
+            const logBox = document.getElementById('svo-backtrack');
+            if (type === 'red') {
+                resultBox.innerHTML =
+                    `<div class="mapping-grid" style="margin-top:0;"><div class="mapping-card"><div class="domain-label">🌐 语言</div><div class="example"><span class="highlight-lang-en">red car</span> <span class="arrow">→</span> <span class="highlight-lang-my">kereta merah</span></div><div class="desc">Adj后置</div></div><div class="mapping-card"><div class="domain-label">📐 数学</div><div class="example"><span class="highlight-math">2x+4y</span> <span class="arrow">⇄</span> <span class="highlight-math">4y+2x</span></div><div class="desc">交换律</div></div></div>`;
+                logBox.innerHTML =
+                    `<div class="bt-title">⏳ 日志</div><div class="bt-step success"><span class="msg">✅ red car ≅ kereta merah ≅ 2x+4y ≅ 4y+2x</span></div>`;
+                document.getElementById('svoStatus').textContent = 'red car';
+            } else if (type === 'big') {
+                resultBox.innerHTML =
+                    `<div class="mapping-grid"><div class="mapping-card"><div class="domain-label">🌐 语言</div><div class="example"><span class="highlight-lang-en">big house</span> <span class="arrow">→</span> <span class="highlight-lang-my">rumah besar</span></div></div><div class="mapping-card"><div class="domain-label">📐 数学</div><div class="example"><span class="highlight-math">3a+5b</span> <span class="arrow">⇄</span> <span class="highlight-math">5b+3a</span></div></div></div>`;
+                logBox.innerHTML =
+                    `<div class="bt-title">⏳ 日志</div><div class="bt-step success"><span class="msg">✅ 映射成功</span></div>`;
+                document.getElementById('svoStatus').textContent = 'big house';
             } else {
-                renderTriple('svo-result', input, '[待映射]', '[结构待分析]');
-                svoSteps.push({ icon: '🔍', msg: '语序分析中...', status: 'info', conf: '50%' });
-                document.getElementById('svoStatus').textContent = '⏳ 分析中';
-            }
-            renderBacktrack('svo-backtrack', svoSteps);
-
-            // 时态
-            const tenseSteps = [];
-            if (features.includes('过去式')) {
-                document.getElementById('tense-result').innerHTML =
-                    `<div style="color:#f1f5f9;">检测到过去式标记 (-ed) → 过去时</div>`;
-                tenseSteps.push({ icon: '🔍', msg: '检测到屈折变化 -ed', status: 'info', conf: '95%' });
-                tenseSteps.push({ icon: '✅', msg: '时态: 过去时', status: 'success', conf: '95%' });
-                document.getElementById('tenseStatus').textContent = '✅ 过去时';
-            } else {
-                document.getElementById('tense-result').innerHTML =
-                    `<div style="color:#f1f5f9;">未检测到时态标记 → 默认为一般现在时</div>`;
-                tenseSteps.push({ icon: '🔍', msg: '未检测到屈折变化', status: 'info', conf: '70%' });
-                tenseSteps.push({ icon: '✅', msg: '时态: 一般现在时', status: 'success', conf: '70%' });
-                document.getElementById('tenseStatus').textContent = '✅ 一般现在时';
-            }
-            renderBacktrack('tense-backtrack', tenseSteps);
-
-            // 词缀
-            const deriveSteps = [];
-            if (input.includes('makan')) {
-                document.getElementById('derivation-result').innerHTML = `
-                    <div style="color:#facc15; font-weight:600; font-size:16px;">词根：makan (吃)</div>
-                    <div class="derivation-grid">
-                        <div class="item"><span class="word">makan</span><span class="pos">词根</span><span class="meaning">吃</span></div>
-                        <div class="item"><span class="word">makanan</span><span class="pos">名词</span><span class="meaning">食物</span></div>
-                        <div class="item"><span class="word">pemakan</span><span class="pos">名词</span><span class="meaning">食客</span></div>
-                        <div class="item"><span class="word">memakan</span><span class="pos">动词</span><span class="meaning">正在吃</span></div>
-                        <div class="item"><span class="word">dimakan</span><span class="pos">被动</span><span class="meaning">被吃</span></div>
-                    </div>
-                    <div style="color:rgba(255,255,255,0.2); font-size:13px;">中文验证：零派生，独立词</div>
-                `;
-                deriveSteps.push({ icon: '🔍', msg: '识别词根 "makan"', status: 'info', conf: '100%' });
-                deriveSteps.push({ icon: '⚙️', msg: '应用词缀规则，生成5个派生词', status: 'info', conf: '92%' });
-                deriveSteps.push({ icon: '✅', msg: '中文零派生对照验证', status: 'success', conf: '90%' });
-                document.getElementById('deriveStatus').textContent = '✅ 词根: makan';
-            } else {
-                document.getElementById('derivation-result').innerHTML =
-                    `<div style="color:rgba(255,255,255,0.2); font-size:14px;">输入包含 "makan" 可查看词缀派生示例</div>`;
-                deriveSteps.push({ icon: '🔍', msg: '等待词根输入', status: 'info', conf: '—' });
-                document.getElementById('deriveStatus').textContent = '⏳ 等待输入';
-            }
-            renderBacktrack('derive-backtrack', deriveSteps);
-
-            // 被动
-            const passiveSteps = [];
-            if (input.includes('dimakan')) {
-                document.getElementById('passive-result').innerHTML =
-                    `<div>主动: Saya makan nasi → 被动: Nasi dimakan oleh saya</div>`;
-                passiveSteps.push({ icon: '🔍', msg: '识别被动结构 di-', status: 'info', conf: '98%' });
-                passiveSteps.push({ icon: '✅', msg: '被动: di- + oleh', status: 'success', conf: '96%' });
-                document.getElementById('passiveStatus').textContent = '✅ 被动结构';
-            } else {
-                document.getElementById('passive-result').innerHTML =
-                    `<span style="color:rgba(255,255,255,0.2);">输入包含 "dimakan" 可查看被动示例</span>`;
-                passiveSteps.push({ icon: '🔍', msg: '等待被动结构输入', status: 'info', conf: '—' });
-                document.getElementById('passiveStatus').textContent = '⏳ 等待输入';
-            }
-            renderBacktrack('passive-backtrack', passiveSteps);
-
-            // 多义词
-            const wsdSteps = [];
-            if (features.includes('多义词"打"')) {
-                document.getElementById('wsd-result').innerHTML =
-                    `<div>候选映射: "打" → hit (攻击) / play (运动) / take (交通) → 根据上下文选择</div>`;
-                wsdSteps.push({ icon: '🔍', msg: '候选: hit(15%)/play(85%)', status: 'info', conf: '初始' });
-                wsdSteps.push({ icon: '🔍', msg: '上下文匹配', status: 'info', conf: '+30%' });
-                wsdSteps.push({ icon: '✅', msg: '采纳 play/take/hit', status: 'success', conf: '89%' });
-                document.getElementById('wsdStatus').textContent = '✅ 多义词消歧';
-            } else {
-                document.getElementById('wsd-result').innerHTML =
-                    `<span style="color:rgba(255,255,255,0.2);">输入包含 "打" 可查看多义词示例</span>`;
-                wsdSteps.push({ icon: '🔍', msg: '等待多义词输入', status: 'info', conf: '—' });
-                document.getElementById('wsdStatus').textContent = '⏳ 等待输入';
-            }
-            renderBacktrack('wsd-backtrack', wsdSteps);
-
-            // 文化
-            const cultureSteps = [];
-            if (features.includes('文化隐喻')) {
-                document.getElementById('culture-result').innerHTML =
-                    `<div>文化隐喻: "龙" → 中文象征吉祥, 英文 'dragon' 负面 → 建议译作 'Loong'</div>`;
-                cultureSteps.push({ icon: '🔍', msg: '检测到文化负载词 "龙"', status: 'info', conf: '90%' });
-                cultureSteps.push({ icon: '⚠️', msg: '直译 "dragon" 有邪恶意象', status: 'warn', conf: '' });
-                cultureSteps.push({ icon: '↩️', msg: '触发文化回退', status: 'warn', conf: '' });
-                cultureSteps.push({ icon: '✅', msg: '采纳 "Loong"', status: 'success', conf: '88%' });
-                document.getElementById('cultureStatus').textContent = '✅ 文化适配';
-            } else {
-                document.getElementById('culture-result').innerHTML =
-                    `<span style="color:rgba(255,255,255,0.2);">输入包含 "龙" 可查看文化适配示例</span>`;
-                cultureSteps.push({ icon: '🔍', msg: '等待文化词输入', status: 'info', conf: '—' });
-                document.getElementById('cultureStatus').textContent = '⏳ 等待输入';
-            }
-            renderBacktrack('culture-backtrack', cultureSteps);
-
-            // 差异边界
-            const diffSteps = [];
-            if (features.includes('伪同源词')) {
-                document.getElementById('diff-result').innerHTML =
-                    `<div>伪同源词: "kereta" → 马来西亚=汽车, 印度尼西亚=火车 → 需地域偏移</div>`;
-                diffSteps.push({ icon: '🔍', msg: '结构验证通过', status: 'info', conf: '98%' });
-                diffSteps.push({ icon: '⚠️', msg: '检测到伪同源词 "kereta"', status: 'warn', conf: '冲突' });
-                diffSteps.push({ icon: '↩️', msg: '触发语义回退', status: 'warn', conf: '' });
-                diffSteps.push({ icon: '🌐', msg: '地域偏移 (MY → Car)', status: 'info', conf: '' });
-                diffSteps.push({ icon: '✅', msg: '最终映射: Car', status: 'success', conf: '99%' });
-                document.getElementById('diffStatus').textContent = '✅ 地域偏移';
-            } else {
-                document.getElementById('diff-result').innerHTML =
-                    `<span style="color:rgba(255,255,255,0.2);">输入包含 "kereta" 可查看伪同源词拦截</span>`;
-                diffSteps.push({ icon: '🔍', msg: '等待伪同源词输入', status: 'info', conf: '—' });
-                document.getElementById('diffStatus').textContent = '⏳ 等待输入';
-            }
-            renderBacktrack('diff-backtrack', diffSteps);
-        }
-
-        // ================================================================
-        // ⑨ 奥数翻译模块
-        // ================================================================
-        // 生成所有组合 (i<j<k)
-        const allCombos = [];
-        for (let i = 1; i <= 9; i++) {
-            for (let j = i + 1; j <= 9; j++) {
-                for (let k = j + 1; k <= 9; k++) {
-                    allCombos.push([i, j, k]);
-                }
+                resultBox.innerHTML =
+                    `<div class="mapping-grid"><div class="mapping-card"><div class="domain-label">📐 线性组合</div><div class="example"><span class="highlight-math">2x+4y</span> <span class="arrow">=</span> <span class="highlight-math">4y+2x</span></div></div><div class="mapping-card"><div class="domain-label">🌐 语言类比</div><div class="example"><span class="highlight-lang-en">red car</span> <span class="arrow">≅</span> <span class="highlight-lang-my">kereta merah</span></div></div></div>`;
+                logBox.innerHTML =
+                    `<div class="bt-title">⏳ 日志</div><div class="bt-step success"><span class="msg">✅ 语言重排 = 线性交换律</span></div>`;
+                document.getElementById('svoStatus').textContent = '线性代数';
             }
         }
 
-        let mathState = {
-            index: 0,
-            valid: [],
-            logs: [],
-            done: false,
-            active: false,
-            type: 'divisible',
-            n: 9
-        };
+        // ---------- ③ 凯利二元结构 → 年龄/时态 (核心) ----------
+        function updateKellyMapping() {
+            // 读取参数
+            const p = parseInt(document.getElementById('probSlider').value) / 100;
+            const b = parseInt(document.getElementById('oddsSlider').value) / 10; // b 范围 1.0 ~ 5.0
+            document.getElementById('probDisplay').textContent = p.toFixed(2);
+            document.getElementById('oddsDisplay').textContent = b.toFixed(1);
 
-        function setupMathModule(info) {
-            mathState.type = info.type;
-            mathState.n = info.n;
-            mathState.active = true;
-            mathState.index = 0;
-            mathState.valid = [];
-            mathState.logs = [];
-            mathState.done = false;
+            // 1. 凯利公式计算 (二元结构：赢/输)
+            const q = 1 - p;
+            let f_star = (b * p - q) / b;
+            // 如果 f_star < 0，则不宜下注，设为0
+            f_star = Math.max(0, f_star);
+            const fPercent = f_star * 100;
 
-            // 显示题目
-            document.getElementById('currentAttempt').innerHTML = `📐 ${info.question}`;
+            // 2. 预期年龄 (概率 p × 100)
+            const baseAge = p * 100;
 
-            // 渲染数字牌
-            renderNumberPool(info.type, info.n);
+            // 3. 有效年龄 (风险折扣: 用凯利比例折损)
+            // f_star 越高，风险越大，年龄折损越多
+            const riskDiscount = f_star * 0.5; // 最大折扣 50%
+            const riskAge = baseAge * (1 - riskDiscount);
 
-            // 更新统计
-            document.getElementById('mathTried').textContent = '0';
-            document.getElementById('mathValid').textContent = '0';
-            document.getElementById('mathStepCounter').textContent = '0';
-            document.getElementById('mathTotalSteps').textContent = allCombos.length;
-            document.getElementById('mathStatus').textContent = `就绪 · ${info.type === 'circle' ? '圆排列' : '整除'}`;
+            // 4. 时态映射 (基于概率 p)
+            let tense, tenseEn, tenseMy, color;
+            if (p >= 0.8) {
+                tense = '过去时 / 完成时';
+                tenseEn = 'I ate / I have eaten';
+                tenseMy = 'saya sudah makan';
+                color = '#4ade80';
+            } else if (p >= 0.4) {
+                tense = '现在时 / 进行时';
+                tenseEn = 'I eat / I am eating';
+                tenseMy = 'saya makan / sedang makan';
+                color = '#facc15';
+            } else {
+                tense = '将来时 / 推测';
+                tenseEn = 'I will eat / I might eat';
+                tenseMy = 'saya akan makan';
+                color = '#f87171';
+            }
 
-            // 清空日志
-            document.getElementById('mathBacktrack').innerHTML = `
-                <div class="bt-title">⚙️ 枚举 → 验证 → 回退 日志</div>
-                <div style="color:rgba(255,255,255,0.05); font-size:12px;">点击"下一步"开始逐一尝试</div>
-            `;
+            // 更新 DOM
+            document.getElementById('tenseType').textContent = tense;
+            document.getElementById('tenseType').style.color = color;
+            document.getElementById('tenseExample').textContent = `${tenseEn} (${p >= 0.8 ? '确定' : p >= 0.4 ? '进行' : '不确定'})`;
 
-            // 重置统计框
-            document.getElementById('mathStats').innerHTML = `
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
-                    <div><span style="color:rgba(255,255,255,0.2);">📦 已尝试组合</span><br><span id="mathTried" style="font-size:20px; color:#60a5fa;">0</span></div>
-                    <div><span style="color:rgba(255,255,255,0.2);">✅ 通过验证 (保留)</span><br><span id="mathValid" style="font-size:20px; color:#4ade80;">0</span></div>
+            document.getElementById('kellyValue').textContent = fPercent.toFixed(1) + '%';
+            document.getElementById('kellyDesc').textContent = f_star > 0 ? `最佳下注 ${fPercent.toFixed(1)}%` : '不宜下注';
+
+            document.getElementById('baseAge').textContent = Math.round(baseAge) + ' 岁';
+            document.getElementById('riskAge').textContent = Math.round(riskAge) + ' 岁';
+            document.getElementById('riskDesc').textContent = `风险折扣 ${(riskDiscount * 100).toFixed(0)}%`;
+
+            // 详细结果框
+            document.getElementById('tense-result').innerHTML = `
+                <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px;">
+                    <div><span style="color:rgba(255,255,255,0.2);">📐 凯利公式</span><br><span style="color:#f1f5f9;">f* = (${b.toFixed(1)}×${p.toFixed(2)} - ${q.toFixed(2)}) / ${b.toFixed(1)} = ${fPercent.toFixed(1)}%</span></div>
+                    <div><span style="color:rgba(255,255,255,0.2);">📈 预期年龄</span><br><span style="color:#a78bfa;">${Math.round(baseAge)} 岁</span></div>
+                    <div><span style="color:rgba(255,255,255,0.2);">⚡ 有效年龄</span><br><span style="color:#4ade80;">${Math.round(riskAge)} 岁</span></div>
                 </div>
+                <div style="margin-top:6px; color:rgba(255,255,255,0.15); font-size:12px;">💡 二元结构（生/死）→ 概率 p → 年龄推演 → 时态映射</div>
             `;
+
+            // 回溯日志
+            const logs = [
+                { icon: '🎲', msg: `二元结构：生/赢 (p=${p.toFixed(2)})，死/输 (q=${q.toFixed(2)})，赔率 b=${b.toFixed(1)}`,
+                status: 'info' },
+                { icon: '🧮', msg: `凯利公式：f* = (${b.toFixed(1)}×${p.toFixed(2)} - ${q.toFixed(2)}) / ${b.toFixed(1)} = ${fPercent.toFixed(1)}%`,
+                    status: 'info' },
+                { icon: '📈', msg: `预期年龄 = ${p.toFixed(2)} × 100 = ${Math.round(baseAge)} 岁`, status: 'info' },
+                { icon: '⚡', msg: `风险折扣 ${(riskDiscount*100).toFixed(0)}% → 有效年龄 ${Math.round(riskAge)} 岁`,
+                    status: 'warn' },
+                { icon: '🕰️', msg: `时态映射：${tense} (${p >= 0.8 ? '确定' : p >= 0.4 ? '进行' : '不确定'})`, status: 'success' }
+            ];
+            let html = `<div class="bt-title">⏳ 凯利二元结构 → 年龄/时态 日志</div>`;
+            logs.forEach(l => {
+                const cls = l.status || 'info';
+                html += `<div class="bt-step ${cls}"><span class="msg">${l.icon} ${l.msg}</span></div>`;
+            });
+            document.getElementById('tense-backtrack').innerHTML = html;
+            document.getElementById('tenseStatus').textContent = `p=${p.toFixed(2)}, b=${b.toFixed(1)}`;
         }
 
-        function renderNumberPool(type, n) {
-            const pool = document.getElementById('numberPool');
-            let labels = [];
-            if (type === 'circle') {
-                for (let i = 1; i <= n; i++) labels.push(i.toString());
-            } else {
-                for (let i = 1; i <= 9; i++) labels.push(i.toString());
+        // ---------- 鸡兔同笼 ----------
+        function runChicken() {
+            const heads = parseInt(document.getElementById('chickenHeads').value) || 10;
+            const legs = parseInt(document.getElementById('chickenLegs').value) || 28;
+            if (legs < heads * 2 || legs > heads * 4) {
+                document.getElementById('cCount').textContent = '❌';
+                document.getElementById('rCount').textContent = '❌';
+                document.getElementById('vCount').textContent = '❌';
+                document.getElementById('chickenBar').style.width = '0%';
+                document.getElementById('rabbitBar').style.width = '0%';
+                document.getElementById('chickenBarVal').textContent = '0';
+                document.getElementById('rabbitBarVal').textContent = '0';
+                document.getElementById('ringChickenPct').textContent = '0%';
+                document.getElementById('ringRabbitPct').textContent = '0%';
+                document.getElementById('chickenRing').style.setProperty('--pct', 0);
+                document.getElementById('rabbitRing').style.setProperty('--pct', 0);
+                document.getElementById('chickenLog').innerHTML =
+                    `<div class="bt-title">⚙️ 日志</div><div style="color:#f87171;">❌ 数据不合法</div>`;
+                return;
             }
-            let html = '';
-            labels.forEach(label => {
-                html += `<div class="num-card">${label}</div>`;
+            const assume = heads * 2;
+            const diff = legs - assume;
+            const rabbit = diff / 2;
+            const chicken = heads - rabbit;
+            document.getElementById('cCount').textContent = chicken;
+            document.getElementById('rCount').textContent = rabbit;
+            document.getElementById('vCount').textContent = `${chicken*2 + rabbit*4} ✅`;
+            const total = heads;
+            const pctChicken = (chicken / total) * 100;
+            const pctRabbit = (rabbit / total) * 100;
+            document.getElementById('chickenBar').style.width = pctChicken + '%';
+            document.getElementById('rabbitBar').style.width = pctRabbit + '%';
+            document.getElementById('chickenBarVal').textContent = chicken;
+            document.getElementById('rabbitBarVal').textContent = rabbit;
+            document.getElementById('ringChickenPct').textContent = Math.round(pctChicken) + '%';
+            document.getElementById('ringRabbitPct').textContent = Math.round(pctRabbit) + '%';
+            document.getElementById('chickenRing').style.setProperty('--pct', pctChicken);
+            document.getElementById('rabbitRing').style.setProperty('--pct', pctRabbit);
+            const logs = [
+                { icon: '🔍', msg: `翻译：鸡+兔=${heads}，2鸡+4兔=${legs}`, status: 'info' },
+                { icon: '🧠', msg: `假设全是鸡：脚数=${heads}×2=${assume}`, status: 'info' },
+                { icon: '📊', msg: `差值：${legs}-${assume}=${diff}`, status: 'warn' },
+                { icon: '🔄', msg: `每换一只兔+2脚 → 换 ${diff/2} 只`, status: 'info' },
+                { icon: '✅', msg: `鸡 ${chicken} 只，兔 ${rabbit} 只`, status: 'success' }
+            ];
+            let html = `<div class="bt-title">⚙️ 日志</div>`;
+            logs.forEach(l => {
+                const cls = l.status || 'info';
+                html += `<div class="bt-step ${cls}"><span class="msg">${l.icon} ${l.msg}</span></div>`;
             });
+            document.getElementById('chickenLog').innerHTML = html;
+        }
+
+        function resetChicken() {
+            document.getElementById('cCount').textContent = '--';
+            document.getElementById('rCount').textContent = '--';
+            document.getElementById('vCount').textContent = '--';
+            document.getElementById('chickenBar').style.width = '0%';
+            document.getElementById('rabbitBar').style.width = '0%';
+            document.getElementById('chickenBarVal').textContent = '0';
+            document.getElementById('rabbitBarVal').textContent = '0';
+            document.getElementById('ringChickenPct').textContent = '0%';
+            document.getElementById('ringRabbitPct').textContent = '0%';
+            document.getElementById('chickenRing').style.setProperty('--pct', 0);
+            document.getElementById('rabbitRing').style.setProperty('--pct', 0);
+            document.getElementById('chickenLog').innerHTML =
+                `<div class="bt-title">⚙️ 日志</div><div style="color:rgba(255,255,255,0.05);">点击运行...</div>`;
+        }
+
+        // ---------- 工程问题 PACD ----------
+        function runPACD() {
+            const input = document.getElementById('pacdInput').value.trim();
+            if (!input) { alert('请输入'); return; }
+            const numbers = input.match(/(\d+)/g);
+            if (!numbers || numbers.length < 2) {
+                document.getElementById('pacdLog').innerHTML =
+                    `<div class="bt-title">⚙️ PACD日志</div><div style="color:#f87171;">❌ 无法提取数据</div>`;
+                return;
+            }
+            const t1 = parseInt(numbers[0]);
+            const t2 = parseInt(numbers[1]);
+            const total = 1;
+            const eff1 = 1 / t1;
+            const eff2 = 1 / t2;
+            let result = '';
+            const isCoop = input.includes('合作') || input.includes('一起');
+            if (isCoop) {
+                const time = total / (eff1 + eff2);
+                result = `${time.toFixed(2)} 天`;
+            } else {
+                result = `甲=${eff1.toFixed(2)}, 乙=${eff2.toFixed(2)}`;
+            }
+            document.getElementById('pacdP').textContent = total;
+            document.getElementById('pacdA').textContent = `${eff1.toFixed(2)} (${t1}天)`;
+            document.getElementById('pacdC').textContent = `${eff2.toFixed(2)} (${t2}天)`;
+            document.getElementById('pacdD').textContent = result;
+            const maxEff = Math.max(eff1, eff2, eff1 + eff2);
+            document.getElementById('eff1Bar').style.width = (eff1 / maxEff * 100) + '%';
+            document.getElementById('eff2Bar').style.width = (eff2 / maxEff * 100) + '%';
+            document.getElementById('effSumBar').style.width = ((eff1 + eff2) / maxEff * 100) + '%';
+            document.getElementById('eff1Val').textContent = eff1.toFixed(2);
+            document.getElementById('eff2Val').textContent = eff2.toFixed(2);
+            document.getElementById('effSumVal').textContent = (eff1 + eff2).toFixed(2);
+            document.getElementById('resultDisplay').textContent = result;
+            document.getElementById('resultLabel').textContent = isCoop ? '合作时间 (天)' : '效率';
+            const logs = [
+                { icon: '📖', msg: `语序：主语(甲/乙) → 主体`, status: 'info' },
+                { icon: '🔢', msg: `数据：甲 ${t1} 天，乙 ${t2} 天`, status: 'info' },
+                { icon: '⚙️', msg: `效率：甲 ${eff1.toFixed(2)}，乙 ${eff2.toFixed(2)}`, status: 'info' },
+                { icon: '✅', msg: `结果：${result}`, status: 'success' }
+            ];
+            let html = `<div class="bt-title">⚙️ PACD日志</div>`;
+            logs.forEach(l => {
+                const cls = l.status || 'info';
+                html += `<div class="bt-step ${cls}"><span class="msg">${l.icon} ${l.msg}</span></div>`;
+            });
+            document.getElementById('pacdLog').innerHTML = html;
+        }
+
+        function resetPACD() {
+            ['pacdP', 'pacdA', 'pacdC', 'pacdD'].forEach(id => document.getElementById(id).textContent = '--');
+            ['eff1Bar', 'eff2Bar', 'effSumBar'].forEach(id => document.getElementById(id).style.width = '0%');
+            ['eff1Val', 'eff2Val', 'effSumVal'].forEach(id => document.getElementById(id).textContent = '0');
+            document.getElementById('resultDisplay').textContent = '--';
+            document.getElementById('resultLabel').textContent = '等待';
+            document.getElementById('pacdLog').innerHTML =
+                `<div class="bt-title">⚙️ PACD日志</div><div style="color:rgba(255,255,255,0.05);">等待输入...</div>`;
+        }
+
+        function setPACD(text) {
+            document.getElementById('pacdInput').value = text;
+            runPACD();
+        }
+
+        // ---------- 奥数枚举 ----------
+        const allCombos = [];
+        for (let i = 1; i <= 9; i++)
+            for (let j = i + 1; j <= 9; j++)
+                for (let k = j + 1; k <= 9; k++) allCombos.push([i, j, k]);
+
+        let mathState = { index: 0, valid: [], logs: [], done: false, active: false };
+
+        function renderNumberPool() {
+            const pool = document.getElementById('numberPool');
+            let html = '';
+            for (let i = 1; i <= 9; i++) html += `<div class="num-card">${i}</div>`;
             pool.innerHTML = html;
         }
 
         function updateNumberPoolHighlight(highlight = [], fail = [], success = []) {
-            const cards = document.querySelectorAll('#numberPool .num-card');
-            const labels = [];
-            if (highlight.length) {
-                // 根据当前组合高亮
-                const allLabels = [];
-                for (let i = 1; i <= 9; i++) allLabels.push(i.toString());
-                cards.forEach((card, idx) => {
-                    const val = parseInt(card.textContent);
-                    card.className = 'num-card';
-                    if (highlight.includes(val)) card.classList.add('active');
-                    if (fail.includes(val)) card.classList.add('fail');
-                    if (success.includes(val)) card.classList.add('success');
-                });
-            }
+            document.querySelectorAll('#numberPool .num-card').forEach((card) => {
+                const val = parseInt(card.textContent);
+                card.className = 'num-card';
+                if (highlight.includes(val)) card.classList.add('active');
+                if (fail.includes(val)) card.classList.add('fail');
+                if (success.includes(val)) card.classList.add('success');
+            });
         }
 
         function mathNextStep() {
             if (!mathState.active) {
-                document.getElementById('mathStatus').textContent = '⚠️ 请先输入奥数题';
-                return;
+                mathState.active = true;
+                mathState.index = 0;
+                mathState.valid = [];
+                mathState.logs = [];
+                mathState.done = false;
+                renderNumberPool();
+                document.getElementById('mathTried').textContent = '0';
+                document.getElementById('mathValid').textContent = '0';
+                document.getElementById('mathStepCounter').textContent = '0';
+                document.getElementById('mathStatus').textContent = '开始';
             }
-            if (mathState.done) {
-                document.getElementById('mathStatus').textContent = '✅ 已完成';
-                return;
-            }
+            if (mathState.done) { document.getElementById('mathStatus').textContent = '✅ 完成'; return; }
             if (mathState.index >= allCombos.length) {
                 mathState.done = true;
-                document.getElementById('mathStatus').textContent = '✅ 全部尝试完毕';
+                document.getElementById('mathStatus').textContent = '✅ 完成';
                 document.getElementById('currentAttempt').innerHTML =
-                    `🎉 全部完成！有效组合 ${mathState.valid.length} 个，总数 ${mathState.valid.length * 6} 个三位数`;
+                    `🎉 完成！有效组合 ${mathState.valid.length} 个`;
                 const allValid = [...new Set(mathState.valid.flat())];
                 updateNumberPoolHighlight([], [], allValid);
                 document.getElementById('mathTried').textContent = allCombos.length;
@@ -1626,53 +1514,37 @@
                 document.getElementById('mathStepCounter').textContent = allCombos.length;
                 return;
             }
-
             const combo = allCombos[mathState.index];
             const sum = combo[0] + combo[1] + combo[2];
             const isValid = (sum % 3 === 0);
-
-            // 显示当前尝试
             updateNumberPoolHighlight(combo, [], []);
             document.getElementById('currentAttempt').innerHTML =
-                `🔍 尝试组合：<strong style="color:#facc15;">${combo.join(' + ')}</strong> (数字和 = ${sum})`;
-
-            // 记录日志
-            let logMsg = `尝试 [${combo.join(', ')}] → 数字和 ${sum} `;
+                `🔍 尝试：<strong style="color:#facc15;">${combo.join(' + ')}</strong> (和=${sum})`;
+            let logMsg = `[${combo.join(', ')}] → 和=${sum} `;
             let logStatus = 'info';
-            let logIcon = '🔍';
             if (isValid) {
                 mathState.valid.push(combo);
-                logMsg += `✅ 能被 3 整除！通过验证 (保留)`;
+                logMsg += `✅ 保留`;
                 logStatus = 'success';
-                logIcon = '✅';
                 setTimeout(() => updateNumberPoolHighlight(combo, [], combo), 50);
             } else {
-                logMsg += `❌ ${sum} 不能被 3 整除，回退 (丢弃)`;
+                logMsg += `❌ 回退`;
                 logStatus = 'fail';
-                logIcon = '❌';
                 setTimeout(() => updateNumberPoolHighlight(combo, combo, []), 50);
             }
-            mathState.logs.push({ msg: logMsg, status: logStatus, icon: logIcon });
-
+            mathState.logs.push({ msg: logMsg, status: logStatus });
             mathState.index++;
             document.getElementById('mathTried').textContent = mathState.index;
             document.getElementById('mathValid').textContent = mathState.valid.length;
             document.getElementById('mathStepCounter').textContent = mathState.index;
-            document.getElementById('mathStatus').textContent = `正在尝试第 ${mathState.index} 组`;
-
-            // 渲染日志
-            let logHtml = `<div class="bt-title">⚙️ 枚举 → 验证 → 回退 日志</div>`;
+            document.getElementById('mathStatus').textContent = `第 ${mathState.index} 组`;
+            let html = `<div class="bt-title">⚙️ 枚举日志</div>`;
             const recent = mathState.logs.slice(-6);
             recent.forEach(log => {
                 const cls = log.status || 'info';
-                logHtml += `
-                    <div class="bt-step ${cls}">
-                        <span class="icon">${log.icon}</span>
-                        <span class="msg">${log.msg}</span>
-                    </div>
-                `;
+                html += `<div class="bt-step ${cls}"><span class="msg">${log.msg}</span></div>`;
             });
-            document.getElementById('mathBacktrack').innerHTML = logHtml;
+            document.getElementById('mathBacktrack').innerHTML = html;
         }
 
         function mathReset() {
@@ -1680,66 +1552,48 @@
             mathState.valid = [];
             mathState.logs = [];
             mathState.done = false;
+            mathState.active = false;
             updateNumberPoolHighlight([], [], []);
-            document.getElementById('currentAttempt').innerHTML = '🎯 点击"下一步"开始尝试组合';
+            document.getElementById('currentAttempt').innerHTML = '🎯 点击下一步';
             document.getElementById('mathTried').textContent = '0';
             document.getElementById('mathValid').textContent = '0';
             document.getElementById('mathStepCounter').textContent = '0';
             document.getElementById('mathStatus').textContent = '已重置';
-            document.getElementById('mathBacktrack').innerHTML = `
-                <div class="bt-title">⚙️ 枚举 → 验证 → 回退 日志</div>
-                <div style="color:rgba(255,255,255,0.05); font-size:12px;">已重置，点击"下一步"开始</div>
-            `;
+            document.getElementById('mathBacktrack').innerHTML =
+                `<div class="bt-title">⚙️ 枚举日志</div><div style="color:rgba(255,255,255,0.05);">等待...</div>`;
         }
 
         function mathRunAll() {
-            if (!mathState.active) {
-                document.getElementById('mathStatus').textContent = '⚠️ 请先输入奥数题';
-                return;
-            }
             mathReset();
-            for (let i = 0; i < allCombos.length; i++) {
+            mathState.active = true;
+            const total = allCombos.length;
+            for (let i = 0; i < total; i++) {
                 const combo = allCombos[i];
                 const sum = combo[0] + combo[1] + combo[2];
                 if (sum % 3 === 0) {
                     mathState.valid.push(combo);
-                    mathState.logs.push({
-                        msg: `尝试 [${combo.join(', ')}] → 数字和 ${sum} ✅ 通过`,
-                        status: 'success',
-                        icon: '✅'
-                    });
+                    mathState.logs.push({ msg: `[${combo.join(', ')}] ✅ 保留`, status: 'success' });
                 } else {
-                    mathState.logs.push({
-                        msg: `尝试 [${combo.join(', ')}] → 数字和 ${sum} ❌ 回退`,
-                        status: 'fail',
-                        icon: '❌'
-                    });
+                    mathState.logs.push({ msg: `[${combo.join(', ')}] ❌ 回退`, status: 'fail' });
                 }
             }
-            mathState.index = allCombos.length;
+            mathState.index = total;
             mathState.done = true;
             const allValid = [...new Set(mathState.valid.flat())];
             updateNumberPoolHighlight([], [], allValid);
             document.getElementById('currentAttempt').innerHTML =
-                `🎉 全部完成！有效组合 ${mathState.valid.length} 个，总数 ${mathState.valid.length * 6} 个三位数`;
-            document.getElementById('mathTried').textContent = allCombos.length;
+                `🎉 完成！有效组合 ${mathState.valid.length} 个`;
+            document.getElementById('mathTried').textContent = total;
             document.getElementById('mathValid').textContent = mathState.valid.length;
-            document.getElementById('mathStepCounter').textContent = allCombos.length;
-            document.getElementById('mathStatus').textContent = '✅ 快速演示完成';
-
-            // 渲染日志
-            let logHtml = `<div class="bt-title">⚙️ 枚举 → 验证 → 回退 日志</div>`;
+            document.getElementById('mathStepCounter').textContent = total;
+            document.getElementById('mathStatus').textContent = '✅ 快速完成';
+            let html = `<div class="bt-title">⚙️ 枚举日志</div>`;
             const recent = mathState.logs.slice(-10);
             recent.forEach(log => {
                 const cls = log.status || 'info';
-                logHtml += `
-                    <div class="bt-step ${cls}">
-                        <span class="icon">${log.icon}</span>
-                        <span class="msg">${log.msg}</span>
-                    </div>
-                `;
+                html += `<div class="bt-step ${cls}"><span class="msg">${log.msg}</span></div>`;
             });
-            document.getElementById('mathBacktrack').innerHTML = logHtml;
+            document.getElementById('mathBacktrack').innerHTML = html;
         }
 
         // ================================================================
@@ -1747,15 +1601,29 @@
         // ================================================================
         window.onload = function() {
             setTimeout(() => {
-                // 默认加载圆排列示例
-                document.getElementById('routerInput').value = '5个人围成一圈';
                 processRouter();
+                showSVOMapping('red');
+                updateKellyMapping(); // 凯利映射初始化
+                runChicken();
+                runPACD();
+                renderNumberPool();
+                document.getElementById('mathTried').textContent = '0';
+                document.getElementById('mathValid').textContent = '0';
+                document.getElementById('mathStepCounter').textContent = '0';
+                document.getElementById('mathStatus').textContent = '就绪';
             }, 300);
         };
 
         // 暴露全局
         window.processRouter = processRouter;
         window.setRouter = setRouter;
+        window.showSVOMapping = showSVOMapping;
+        window.updateKellyMapping = updateKellyMapping;
+        window.runChicken = runChicken;
+        window.resetChicken = resetChicken;
+        window.runPACD = runPACD;
+        window.resetPACD = resetPACD;
+        window.setPACD = setPACD;
         window.mathNextStep = mathNextStep;
         window.mathReset = mathReset;
         window.mathRunAll = mathRunAll;
