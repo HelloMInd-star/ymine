@@ -1,1311 +1,1731 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Y.Mine · 价值金字塔</title>
-  <style>
-    /* ===== 重置 & 沉浸式深色背景 ===== */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Y.Mine · 价值金字塔</title>
+    <style>
+        /* ===== 重置 & 沉浸式深色背景 ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    body {
-      background: #0b0b1a;
-      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      padding: 40px 20px 40px 260px;
-      overflow-x: hidden;
-      cursor: default;
-    }
+        body {
+            background: #0b0b1a;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            padding: 40px 20px 40px 260px;
+            overflow-x: hidden;
+            cursor: default;
+        }
 
-    /* ===== 左侧固定检索目录 ===== */
-    .sidebar {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 240px;
-      height: 100vh;
-      padding: 40px 16px 30px;
-      background: rgba(11, 11, 26, 0.92);
-      backdrop-filter: blur(12px);
-      border-right: 1px solid rgba(255, 255, 255, 0.04);
-      overflow-y: auto;
-      z-index: 100;
-      display: flex;
-      flex-direction: column;
-    }
+        /* ===== 左侧固定检索目录 ===== */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 240px;
+            height: 100vh;
+            padding: 40px 16px 30px;
+            background: rgba(11, 11, 26, 0.92);
+            backdrop-filter: blur(12px);
+            border-right: 1px solid rgba(255, 255, 255, 0.04);
+            overflow-y: auto;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+        }
 
-    .sidebar .logo {
-      font-size: 14px;
-      font-weight: 700;
-      color: #f1f5f9;
-      margin-bottom: 6px;
-      letter-spacing: -0.3px;
-    }
+        .sidebar .logo {
+            font-size: 14px;
+            font-weight: 700;
+            color: #f1f5f9;
+            margin-bottom: 6px;
+            letter-spacing: -0.3px;
+        }
+        .sidebar .logo span {
+            color: #a78bfa;
+        }
+        .sidebar .sub-logo {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.2);
+            margin-bottom: 24px;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            padding-bottom: 14px;
+        }
+        .sidebar .nav-item {
+            display: block;
+            padding: 8px 12px;
+            margin-bottom: 2px;
+            border-radius: 8px;
+            color: rgba(255, 255, 255, 0.35);
+            font-size: 13px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.25s ease;
+            cursor: pointer;
+            border-left: 2px solid transparent;
+        }
+        .sidebar .nav-item:hover {
+            background: rgba(255, 255, 255, 0.03);
+            color: rgba(255, 255, 255, 0.7);
+            border-left-color: rgba(167, 139, 250, 0.3);
+        }
+        .sidebar .nav-item.active {
+            color: #f1f5f9;
+            background: rgba(167, 139, 250, 0.06);
+            border-left-color: #a78bfa;
+        }
+        .sidebar .nav-item .num {
+            display: inline-block;
+            width: 18px;
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.15);
+            margin-right: 6px;
+        }
+        .sidebar .nav-divider {
+            border: none;
+            border-top: 1px solid rgba(255, 255, 255, 0.03);
+            margin: 12px 0;
+        }
+        .sidebar .nav-section-label {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: rgba(255, 255, 255, 0.12);
+            padding: 8px 12px 4px;
+            font-weight: 600;
+        }
+        .sidebar .footer-nav {
+            margin-top: auto;
+            padding-top: 16px;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.15);
+            text-align: center;
+        }
+        .sidebar .footer-nav a {
+            color: rgba(255, 255, 255, 0.2);
+            text-decoration: none;
+            font-size: 12px;
+            transition: color 0.3s ease;
+        }
+        .sidebar .footer-nav a:hover {
+            color: rgba(255, 255, 255, 0.6);
+        }
 
-    .sidebar .logo span {
-      color: #a78bfa;
-    }
+        /* ===== 鼠标跟随光晕 ===== */
+        #glow {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            background: radial-gradient(600px circle at var(--x, 50%) var(--y, 50%), rgba(120, 80, 255, 0.06), transparent 80%);
+            transition: background 0.1s;
+        }
 
-    .sidebar .sub-logo {
-      font-size: 11px;
-      color: rgba(255, 255, 255, 0.2);
-      margin-bottom: 24px;
-      letter-spacing: 0.5px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-      padding-bottom: 14px;
-    }
+        .container {
+            max-width: 1100px;
+            width: 100%;
+            background: radial-gradient(ellipse at 30% 30%, #120b24, #0b0b1a 70%, #05030a);
+            border-radius: 32px;
+            padding: 48px 44px 44px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            box-shadow: 0 30px 80px rgba(40, 10, 80, 0.4);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+            backdrop-filter: blur(2px);
+        }
 
-    .sidebar .nav-item {
-      display: block;
-      padding: 8px 12px;
-      margin-bottom: 2px;
-      border-radius: 8px;
-      color: rgba(255, 255, 255, 0.35);
-      font-size: 13px;
-      font-weight: 500;
-      text-decoration: none;
-      transition: all 0.25s ease;
-      cursor: pointer;
-      border-left: 2px solid transparent;
-    }
+        .container::before {
+            content: '';
+            position: absolute;
+            top: -100px;
+            right: -100px;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(80, 30, 140, 0.15), transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: floatBg 12s ease-in-out infinite alternate;
+        }
+        .container::after {
+            content: '';
+            position: absolute;
+            bottom: -80px;
+            left: -80px;
+            width: 350px;
+            height: 350px;
+            background: radial-gradient(circle, rgba(30, 60, 150, 0.1), transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: floatBg 10s ease-in-out infinite alternate-reverse;
+        }
 
-    .sidebar .nav-item:hover {
-      background: rgba(255, 255, 255, 0.03);
-      color: rgba(255, 255, 255, 0.7);
-      border-left-color: rgba(167, 139, 250, 0.3);
-    }
+        @keyframes floatBg {
+            0% {
+                transform: translate(0, 0) scale(1);
+            }
+            100% {
+                transform: translate(30px, -20px) scale(1.1);
+            }
+        }
 
-    .sidebar .nav-item.active {
-      color: #f1f5f9;
-      background: rgba(167, 139, 250, 0.06);
-      border-left-color: #a78bfa;
-    }
+        @keyframes fadeInUp {
+            0% {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
 
-    .sidebar .nav-item .num {
-      display: inline-block;
-      width: 18px;
-      font-size: 11px;
-      color: rgba(255, 255, 255, 0.15);
-      margin-right: 6px;
-    }
+        /* ===== 标题 ===== */
+        .page-header {
+            text-align: center;
+            margin-bottom: 40px;
+            opacity: 0;
+            animation: fadeInUp 0.8s ease forwards;
+        }
+        .page-header h1 {
+            font-size: 34px;
+            font-weight: 700;
+            color: #f1f5f9;
+            letter-spacing: 1px;
+            background: linear-gradient(135deg, #f1f5f9, #a78bfa, #60a5fa, #f1f5f9);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradientFlow 6s ease-in-out infinite;
+        }
+        .page-header .sub {
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 15px;
+            margin-top: 6px;
+            letter-spacing: 2px;
+        }
 
-    .sidebar .nav-divider {
-      border: none;
-      border-top: 1px solid rgba(255, 255, 255, 0.03);
-      margin: 12px 0;
-    }
+        @keyframes gradientFlow {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
 
-    .sidebar .nav-section-label {
-      font-size: 10px;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      color: rgba(255, 255, 255, 0.12);
-      padding: 8px 12px 4px;
-      font-weight: 600;
-    }
+        /* ===== 核心心法 ===== */
+        .core-mind {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(250, 204, 21, 0.15);
+            border-radius: 20px;
+            padding: 32px 34px;
+            margin-bottom: 40px;
+            box-shadow: 0 0 40px rgba(250, 204, 21, 0.04);
+            opacity: 0;
+            animation: fadeInUp 0.6s ease 0.05s forwards;
+            scroll-margin-top: 20px;
+        }
+        .core-mind .mind-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #facc15;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            text-align: center;
+            margin-bottom: 18px;
+        }
+        .mind-flow {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            gap: 4px 8px;
+            margin-bottom: 20px;
+        }
+        .mind-node {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 12px;
+            padding: 10px 18px;
+            text-align: center;
+            min-width: 60px;
+            transition: border-color 0.3s;
+        }
+        .mind-node .label {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.4);
+        }
+        .mind-node .value {
+            font-size: 22px;
+            font-weight: 700;
+            color: #f1f5f9;
+        }
+        .mind-node .sub {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.3);
+            font-weight: 400;
+        }
+        .mind-node.highlight-node {
+            border-color: #facc15;
+            background: rgba(250, 204, 21, 0.06);
+        }
+        .mind-arrow {
+            color: rgba(255, 255, 255, 0.2);
+            font-size: 20px;
+            font-weight: 300;
+        }
 
-    .sidebar .footer-nav {
-      margin-top: auto;
-      padding-top: 16px;
-      border-top: 1px solid rgba(255, 255, 255, 0.04);
-      font-size: 12px;
-      color: rgba(255, 255, 255, 0.15);
-      text-align: center;
-    }
+        .mind-desc-row {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px 30px;
+            padding: 10px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            margin-bottom: 14px;
+        }
+        .mind-desc-row .item {
+            text-align: center;
+        }
+        .mind-desc-row .item .num {
+            font-size: 18px;
+            font-weight: 700;
+            color: #facc15;
+        }
+        .mind-desc-row .item .txt {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.4);
+            margin-top: 2px;
+        }
 
-    .sidebar .footer-nav a {
-      color: rgba(255, 255, 255, 0.2);
-      text-decoration: none;
-      font-size: 12px;
-      transition: color 0.3s ease;
-    }
+        .mind-table-wrap {
+            margin: 16px 0 0 0;
+            overflow-x: auto;
+        }
+        .mind-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+        .mind-table th {
+            background: rgba(255, 255, 255, 0.03);
+            color: rgba(255, 255, 255, 0.4);
+            font-weight: 600;
+            padding: 10px 14px;
+            text-align: left;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.06);
+            font-size: 12px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+        .mind-table td {
+            padding: 10px 14px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            color: rgba(255, 255, 255, 0.7);
+        }
+        .mind-table tr:last-child td {
+            border-bottom: none;
+        }
+        .tag {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+        .tag-need {
+            background: rgba(59, 130, 246, 0.2);
+            color: #3b82f6;
+        }
+        .tag-none {
+            background: rgba(250, 204, 21, 0.15);
+            color: #facc15;
+        }
+        .tag-mid {
+            background: rgba(167, 139, 250, 0.2);
+            color: #a78bfa;
+        }
 
-    .sidebar .footer-nav a:hover {
-      color: rgba(255, 255, 255, 0.6);
-    }
+        /* ===== 金字塔主体 ===== */
+        .pyramid {
+            display: flex;
+            flex-direction: column-reverse;
+            align-items: center;
+            gap: 6px;
+            margin: 20px 0 10px 0;
+        }
 
-    /* ===== 鼠标跟随光晕 ===== */
-    #glow {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      z-index: 0;
-      background: radial-gradient(600px circle at var(--x, 50%) var(--y, 50%), rgba(120, 80, 255, 0.06), transparent 80%);
-      transition: background 0.1s;
-    }
+        .pyramid-layer {
+            width: 100%;
+            padding: 18px 24px;
+            border-radius: 14px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            border: 1px solid transparent;
+            background: rgba(255, 255, 255, 0.02);
+            position: relative;
+            opacity: 0;
+            animation: fadeInUp 0.6s ease forwards;
+        }
+        .pyramid-layer:nth-child(1) {
+            animation-delay: 0.08s;
+        }
+        .pyramid-layer:nth-child(2) {
+            animation-delay: 0.12s;
+        }
+        .pyramid-layer:nth-child(3) {
+            animation-delay: 0.16s;
+        }
+        .pyramid-layer:nth-child(4) {
+            animation-delay: 0.20s;
+        }
+        .pyramid-layer:nth-child(5) {
+            animation-delay: 0.24s;
+        }
+        .pyramid-layer:nth-child(6) {
+            animation-delay: 0.28s;
+        }
 
-    .container {
-      max-width: 1100px;
-      width: 100%;
-      background: radial-gradient(ellipse at 30% 30%, #120b24, #0b0b1a 70%, #05030a);
-      border-radius: 32px;
-      padding: 48px 44px 44px;
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      box-shadow: 0 30px 80px rgba(40, 10, 80, 0.4);
-      position: relative;
-      overflow: hidden;
-      z-index: 1;
-      backdrop-filter: blur(2px);
-    }
+        .pyramid-layer[data-level="0"] {
+            max-width: 96%;
+            border-color: rgba(59, 130, 246, 0.3);
+            background: rgba(59, 130, 246, 0.05);
+        }
+        .pyramid-layer[data-level="1"] {
+            max-width: 86%;
+            border-color: rgba(79, 140, 247, 0.3);
+            background: rgba(79, 140, 247, 0.05);
+        }
+        .pyramid-layer[data-level="2"] {
+            max-width: 76%;
+            border-color: rgba(139, 92, 246, 0.3);
+            background: rgba(139, 92, 246, 0.05);
+        }
+        .pyramid-layer[data-level="3"] {
+            max-width: 66%;
+            border-color: rgba(167, 139, 250, 0.3);
+            background: rgba(167, 139, 250, 0.05);
+        }
+        .pyramid-layer[data-level="4"] {
+            max-width: 56%;
+            border-color: rgba(250, 204, 21, 0.15);
+            background: rgba(250, 204, 21, 0.03);
+        }
+        .pyramid-layer[data-level="5"] {
+            max-width: 46%;
+            border-color: rgba(251, 191, 36, 0.15);
+            background: rgba(251, 191, 36, 0.03);
+        }
 
-    /* ===== 星云背景动画 ===== */
-    .container::before {
-      content: '';
-      position: absolute;
-      top: -100px;
-      right: -100px;
-      width: 400px;
-      height: 400px;
-      background: radial-gradient(circle, rgba(80, 30, 140, 0.15), transparent 70%);
-      border-radius: 50%;
-      pointer-events: none;
-      animation: floatBg 12s ease-in-out infinite alternate;
-    }
+        .pyramid-layer:hover {
+            transform: scale(1.02);
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+        .pyramid-layer.active {
+            border-color: #facc15 !important;
+            background: rgba(250, 204, 21, 0.12) !important;
+            box-shadow: 0 0 40px rgba(250, 204, 21, 0.15);
+            transform: scale(1.02);
+        }
 
-    .container::after {
-      content: '';
-      position: absolute;
-      bottom: -80px;
-      left: -80px;
-      width: 350px;
-      height: 350px;
-      background: radial-gradient(circle, rgba(30, 60, 150, 0.1), transparent 70%);
-      border-radius: 50%;
-      pointer-events: none;
-      animation: floatBg 10s ease-in-out infinite alternate-reverse;
-    }
+        .pyramid-layer .level-tag {
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            color: rgba(255, 255, 255, 0.3);
+            text-transform: uppercase;
+        }
+        .pyramid-layer .level-name {
+            font-size: 20px;
+            font-weight: 700;
+            color: #f1f5f9;
+            margin: 2px 0;
+        }
+        .pyramid-layer .level-desc {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.4);
+            letter-spacing: 0.3px;
+        }
+        .pyramid-layer .click-hint {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.15);
+            margin-top: 6px;
+        }
 
-    @keyframes floatBg {
-      0% { transform: translate(0, 0) scale(1); }
-      100% { transform: translate(30px, -20px) scale(1.1); }
-    }
+        /* ===== 技术底座 ===== */
+        .tech-base {
+            max-width: 96%;
+            width: 100%;
+            margin: 0 auto 10px auto;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 16px;
+            padding: 20px 24px;
+            text-align: center;
+            opacity: 0;
+            animation: fadeInUp 0.6s ease 0.04s forwards;
+        }
+        .tech-base .tech-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.3);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+        .tech-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px 40px;
+        }
+        .tech-item {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .tech-item .icon {
+            font-size: 18px;
+        }
+        .tech-item .label {
+            color: rgba(255, 255, 255, 0.3);
+            font-weight: 300;
+        }
+        .tech-item .value {
+            color: #f1f5f9;
+            font-weight: 500;
+        }
 
-    /* ===== 全局入场动画 ===== */
-    @keyframes fadeInUp {
-      0% { opacity: 0; transform: translateY(30px); }
-      100% { opacity: 1; transform: translateY(0); }
-    }
+        /* ===== 结论文案 ===== */
+        .conclusion {
+            max-width: 86%;
+            width: 100%;
+            margin: 6px auto 20px auto;
+            padding: 14px 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            text-align: center;
+            color: #facc15;
+            font-size: 15px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            line-height: 1.6;
+            opacity: 0;
+            animation: fadeInUp 0.6s ease 0.1s forwards;
+        }
+        .conclusion span {
+            color: rgba(255, 255, 255, 0.4);
+            font-weight: 400;
+        }
 
-    .page-header {
-      text-align: center;
-      margin-bottom: 40px;
-      opacity: 0;
-      animation: fadeInUp 0.8s ease forwards;
-    }
+        /* ===== 底部详细列表（改为折叠区块） ===== */
+        .overview-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #f1f5f9;
+            margin: 56px 0 20px 0;
+            text-align: center;
+            letter-spacing: 0.5px;
+            opacity: 0;
+            animation: fadeInUp 0.6s ease 0.12s forwards;
+        }
+        .overview-title span {
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 14px;
+            font-weight: 400;
+            display: block;
+            margin-top: 4px;
+        }
 
-    .page-header h1 {
-      font-size: 34px;
-      font-weight: 700;
-      color: #f1f5f9;
-      letter-spacing: 1px;
-      background: linear-gradient(135deg, #f1f5f9, #a78bfa, #60a5fa, #f1f5f9);
-      background-size: 300% 300%;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      animation: gradientFlow 6s ease-in-out infinite;
-    }
+        .layer-block {
+            margin-bottom: 16px;
+            scroll-margin-top: 20px;
+            padding: 0;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            transition: all 0.4s ease;
+            opacity: 0;
+            animation: fadeInUp 0.6s ease forwards;
+            overflow: hidden;
+        }
+        .layer-block:nth-child(1) {
+            animation-delay: 0.14s;
+        }
+        .layer-block:nth-child(2) {
+            animation-delay: 0.18s;
+        }
+        .layer-block:nth-child(3) {
+            animation-delay: 0.22s;
+        }
+        .layer-block:nth-child(4) {
+            animation-delay: 0.26s;
+        }
+        .layer-block:nth-child(5) {
+            animation-delay: 0.30s;
+        }
+        .layer-block:nth-child(6) {
+            animation-delay: 0.34s;
+        }
 
-    .page-header .sub {
-      color: rgba(255, 255, 255, 0.4);
-      font-size: 15px;
-      margin-top: 6px;
-      letter-spacing: 2px;
-    }
+        .layer-block.highlight {
+            border-color: #facc15;
+            background: rgba(250, 204, 21, 0.06);
+            box-shadow: 0 0 30px rgba(250, 204, 21, 0.05);
+        }
 
-    @keyframes gradientFlow {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
+        .layer-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 18px 24px;
+            cursor: pointer;
+            user-select: none;
+            transition: background 0.3s ease;
+            gap: 12px;
+        }
+        .layer-header:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+        .layer-header .layer-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #f1f5f9;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .layer-header .layer-title .badge {
+            font-size: 12px;
+            background: rgba(255, 255, 255, 0.04);
+            color: rgba(255, 255, 255, 0.4);
+            padding: 2px 14px;
+            border-radius: 20px;
+            font-weight: 400;
+        }
+        .layer-header .toggle-icon {
+            font-size: 18px;
+            color: rgba(255, 255, 255, 0.2);
+            transition: transform 0.4s ease;
+            flex-shrink: 0;
+        }
+        .layer-header .toggle-icon.open {
+            transform: rotate(180deg);
+        }
 
-    /* ===== 核心心法 ===== */
-    .core-mind {
-      background: rgba(255, 255, 255, 0.02);
-      border: 1px solid rgba(250, 204, 21, 0.15);
-      border-radius: 20px;
-      padding: 32px 34px;
-      margin-bottom: 40px;
-      box-shadow: 0 0 40px rgba(250, 204, 21, 0.04);
-      opacity: 0;
-      animation: fadeInUp 0.6s ease 0.05s forwards;
-      scroll-margin-top: 20px;
-    }
+        .layer-body {
+            padding: 0 24px 24px 24px;
+            display: none;
+        }
+        .layer-body.open {
+            display: block;
+            animation: fadeInUp 0.3s ease forwards;
+        }
 
-    .core-mind .mind-title {
-      font-size: 13px;
-      font-weight: 600;
-      color: #facc15;
-      letter-spacing: 3px;
-      text-transform: uppercase;
-      text-align: center;
-      margin-bottom: 18px;
-    }
+        .layer-body .layer-desc {
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 13px;
+            margin: 0 0 12px 0;
+        }
 
-    .mind-flow {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: center;
-      gap: 4px 8px;
-      margin-bottom: 20px;
-    }
+        .layer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            gap: 8px;
+        }
+        .layer-item {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 10px;
+            padding: 8px 10px;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 13px;
+            transition: all 0.3s ease;
+        }
+        .layer-item:hover {
+            border-color: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.03);
+        }
+        .layer-item.highlight-item {
+            border-color: rgba(250, 204, 21, 0.2);
+            background: rgba(250, 204, 21, 0.04);
+        }
+        .layer-item.connect-item {
+            border-color: rgba(167, 139, 250, 0.2);
+            background: rgba(167, 139, 250, 0.04);
+        }
+        .layer-item.mind-item {
+            border-color: rgba(52, 211, 153, 0.2);
+            background: rgba(52, 211, 153, 0.03);
+        }
 
-    .mind-node {
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      border-radius: 12px;
-      padding: 10px 18px;
-      text-align: center;
-      min-width: 60px;
-      transition: border-color 0.3s;
-    }
+        /* ===== 过渡文案 ===== */
+        .transition-bridge {
+            margin: 40px 0 24px 0;
+            padding: 20px 28px;
+            background: rgba(167, 139, 250, 0.04);
+            border-left: 4px solid #a78bfa;
+            border-radius: 0 16px 16px 0;
+            text-align: center;
+            opacity: 0;
+            animation: fadeInUp 0.6s ease 0.35s forwards;
+        }
+        .transition-bridge p {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 15px;
+            line-height: 1.7;
+            margin-bottom: 0;
+        }
+        .transition-bridge strong {
+            color: #a78bfa;
+            font-weight: 600;
+        }
+        .transition-bridge .highlight {
+            color: #facc15;
+            font-weight: 600;
+        }
 
-    .mind-node .label {
-      font-size: 11px;
-      color: rgba(255, 255, 255, 0.4);
-    }
-    .mind-node .value {
-      font-size: 22px;
-      font-weight: 700;
-      color: #f1f5f9;
-    }
-    .mind-node .sub {
-      font-size: 11px;
-      color: rgba(255, 255, 255, 0.3);
-      font-weight: 400;
-    }
-    .mind-node.highlight-node {
-      border-color: #facc15;
-      background: rgba(250, 204, 21, 0.06);
-    }
-    .mind-arrow {
-      color: rgba(255, 255, 255, 0.2);
-      font-size: 20px;
-      font-weight: 300;
-    }
+        /* ===== 工程落地循环 ===== */
+        .engineering-loop {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(52, 211, 153, 0.15);
+            border-radius: 20px;
+            padding: 32px 34px;
+            margin-top: 0;
+            box-shadow: 0 0 40px rgba(52, 211, 153, 0.04);
+            opacity: 0;
+            animation: fadeInUp 0.6s ease 0.4s forwards;
+            scroll-margin-top: 20px;
+        }
+        .engineering-loop .eng-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #34d399;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            text-align: center;
+            margin-bottom: 16px;
+        }
+        .eng-flow {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            gap: 8px 14px;
+        }
+        .eng-node {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 12px;
+            padding: 12px 20px;
+            text-align: center;
+            min-width: 80px;
+        }
+        .eng-node .icon {
+            font-size: 22px;
+        }
+        .eng-node .label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #f1f5f9;
+            margin-top: 4px;
+        }
+        .eng-node .sub {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.3);
+        }
+        .eng-node.highlight-eng {
+            border-color: rgba(52, 211, 153, 0.2);
+            background: rgba(52, 211, 153, 0.04);
+        }
+        .eng-arrow {
+            color: rgba(255, 255, 255, 0.15);
+            font-size: 22px;
+            font-weight: 300;
+        }
+        .eng-closing {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 13px;
+            margin-top: 16px;
+            padding-top: 14px;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+        }
+        .eng-closing strong {
+            color: #34d399;
+        }
+        .eng-closing .highlight {
+            color: #facc15;
+            font-weight: 600;
+        }
 
-    .mind-desc-row {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 12px 30px;
-      padding: 10px 0;
-      border-top: 1px solid rgba(255, 255, 255, 0.04);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-      margin-bottom: 14px;
-    }
+        /* ===== 返回顶部按钮 ===== */
+        .back-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: rgba(167, 139, 250, 0.12);
+            border: 1px solid rgba(167, 139, 250, 0.15);
+            color: #a78bfa;
+            font-size: 22px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 50;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(8px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+        .back-to-top:hover {
+            background: rgba(167, 139, 250, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(167, 139, 250, 0.15);
+        }
+        .back-to-top.visible {
+            display: flex;
+        }
 
-    .mind-desc-row .item {
-      text-align: center;
-    }
-    .mind-desc-row .item .num {
-      font-size: 18px;
-      font-weight: 700;
-      color: #facc15;
-    }
-    .mind-desc-row .item .txt {
-      font-size: 13px;
-      color: rgba(255, 255, 255, 0.4);
-      margin-top: 2px;
-    }
+        /* ===== 返回链接 ===== */
+        .back-home {
+            margin-top: 44px;
+            text-align: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+            padding-top: 24px;
+            opacity: 0;
+            animation: fadeInUp 0.6s ease 0.42s forwards;
+        }
+        .back-home a {
+            color: rgba(255, 255, 255, 0.3);
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s ease;
+        }
+        .back-home a:hover {
+            color: rgba(255, 255, 255, 0.8);
+        }
 
-    .mind-table-wrap {
-      margin: 16px 0 0 0;
-      overflow-x: auto;
-    }
+        /* ============================================================ */
+        /* ===== 浮层（Modal）样式 ===== */
+        /* ============================================================ */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+            z-index: 999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            animation: fadeIn 0.3s ease;
+        }
+        .modal-overlay.open {
+            display: flex;
+        }
 
-    .mind-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 13px;
-      color: rgba(255, 255, 255, 0.8);
-    }
-    .mind-table th {
-      background: rgba(255, 255, 255, 0.03);
-      color: rgba(255, 255, 255, 0.4);
-      font-weight: 600;
-      padding: 10px 14px;
-      text-align: left;
-      border-bottom: 2px solid rgba(255, 255, 255, 0.06);
-      font-size: 12px;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-    }
-    .mind-table td {
-      padding: 10px 14px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-      color: rgba(255, 255, 255, 0.7);
-    }
-    .mind-table tr:last-child td {
-      border-bottom: none;
-    }
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
 
-    .tag {
-      display: inline-block;
-      padding: 2px 10px;
-      border-radius: 12px;
-      font-size: 11px;
-      font-weight: 500;
-    }
-    .tag-need {
-      background: rgba(59, 130, 246, 0.2);
-      color: #3b82f6;
-    }
-    .tag-none {
-      background: rgba(250, 204, 21, 0.15);
-      color: #facc15;
-    }
-    .tag-mid {
-      background: rgba(167, 139, 250, 0.2);
-      color: #a78bfa;
-    }
+        .modal-box {
+            background: #120b24;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 24px;
+            padding: 40px 44px;
+            max-width: 640px;
+            width: 100%;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: 0 40px 100px rgba(0, 0, 0, 0.6);
+            position: relative;
+        }
 
-    /* ===== 金字塔主体 ===== */
-    .pyramid {
-      display: flex;
-      flex-direction: column-reverse;
-      align-items: center;
-      gap: 6px;
-      margin: 20px 0 10px 0;
-    }
+        .modal-box::-webkit-scrollbar {
+            width: 4px;
+        }
+        .modal-box::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .modal-box::-webkit-scrollbar-thumb {
+            background: rgba(167, 139, 250, 0.3);
+            border-radius: 4px;
+        }
 
-    .pyramid-layer {
-      width: 100%;
-      padding: 18px 24px;
-      border-radius: 14px;
-      text-align: center;
-      cursor: pointer;
-      transition: all 0.4s ease;
-      border: 1px solid transparent;
-      background: rgba(255, 255, 255, 0.02);
-      position: relative;
-      opacity: 0;
-      animation: fadeInUp 0.6s ease forwards;
-    }
+        .modal-close {
+            position: absolute;
+            top: 16px;
+            right: 20px;
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.2);
+            font-size: 28px;
+            cursor: pointer;
+            transition: color 0.3s ease;
+            line-height: 1;
+            padding: 4px 8px;
+        }
+        .modal-close:hover {
+            color: rgba(255, 255, 255, 0.6);
+        }
 
-    .pyramid-layer:nth-child(1) { animation-delay: 0.08s; }
-    .pyramid-layer:nth-child(2) { animation-delay: 0.12s; }
-    .pyramid-layer:nth-child(3) { animation-delay: 0.16s; }
-    .pyramid-layer:nth-child(4) { animation-delay: 0.20s; }
-    .pyramid-layer:nth-child(5) { animation-delay: 0.24s; }
-    .pyramid-layer:nth-child(6) { animation-delay: 0.28s; }
+        .modal-icon {
+            font-size: 48px;
+            margin-bottom: 8px;
+        }
+        .modal-title {
+            font-size: 26px;
+            font-weight: 700;
+            color: #f1f5f9;
+            margin-bottom: 4px;
+        }
+        .modal-sub {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.3);
+            margin-bottom: 20px;
+            font-weight: 400;
+        }
 
-    .pyramid-layer[data-level="0"] { max-width: 96%; border-color: rgba(59, 130, 246, 0.3); background: rgba(59, 130, 246, 0.05); }
-    .pyramid-layer[data-level="1"] { max-width: 86%; border-color: rgba(79, 140, 247, 0.3); background: rgba(79, 140, 247, 0.05); }
-    .pyramid-layer[data-level="2"] { max-width: 76%; border-color: rgba(139, 92, 246, 0.3); background: rgba(139, 92, 246, 0.05); }
-    .pyramid-layer[data-level="3"] { max-width: 66%; border-color: rgba(167, 139, 250, 0.3); background: rgba(167, 139, 250, 0.05); }
-    .pyramid-layer[data-level="4"] { max-width: 56%; border-color: rgba(250, 204, 21, 0.15); background: rgba(250, 204, 21, 0.03); }
-    .pyramid-layer[data-level="5"] { max-width: 46%; border-color: rgba(251, 191, 36, 0.15); background: rgba(251, 191, 36, 0.03); }
+        .modal-divider {
+            border: none;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+            margin: 16px 0;
+        }
 
-    .pyramid-layer:hover {
-      transform: scale(1.02);
-      box-shadow: 0 0 30px rgba(255, 255, 255, 0.05);
-      border-color: rgba(255, 255, 255, 0.1);
-    }
+        .modal-data-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+        .modal-data-item {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 10px;
+            padding: 10px 14px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        .modal-data-item:hover {
+            background: rgba(255, 255, 255, 0.04);
+            border-color: rgba(255, 255, 255, 0.08);
+        }
+        .modal-data-item .item-label {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.2);
+            display: block;
+            margin-bottom: 2px;
+        }
+        .modal-data-item .item-value {
+            font-weight: 500;
+            color: #f1f5f9;
+        }
 
-    .pyramid-layer.active {
-      border-color: #facc15 !important;
-      background: rgba(250, 204, 21, 0.12) !important;
-      box-shadow: 0 0 40px rgba(250, 204, 21, 0.15);
-      transform: scale(1.02);
-    }
+        .modal-footer {
+            margin-top: 20px;
+            padding-top: 16px;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+            text-align: center;
+            color: rgba(255, 255, 255, 0.2);
+            font-size: 12px;
+        }
 
-    .pyramid-layer .level-tag {
-      font-size: 12px;
-      font-weight: 600;
-      letter-spacing: 1px;
-      color: rgba(255, 255, 255, 0.3);
-      text-transform: uppercase;
-    }
-    .pyramid-layer .level-name {
-      font-size: 20px;
-      font-weight: 700;
-      color: #f1f5f9;
-      margin: 2px 0;
-    }
-    .pyramid-layer .level-desc {
-      font-size: 13px;
-      color: rgba(255, 255, 255, 0.4);
-      letter-spacing: 0.3px;
-    }
-    .pyramid-layer .click-hint {
-      font-size: 11px;
-      color: rgba(255, 255, 255, 0.15);
-      margin-top: 6px;
-    }
+        /* ===== 响应式 ===== */
+        @media (max-width: 900px) {
+            body {
+                padding: 32px 20px 32px 20px;
+            }
+            .sidebar {
+                display: none;
+            }
+            .container {
+                padding: 32px 24px 28px;
+            }
+            .modal-box {
+                padding: 28px 20px;
+                margin: 10px;
+            }
+            .modal-data-grid {
+                grid-template-columns: 1fr;
+            }
+        }
 
-    /* ===== 技术底座 ===== */
-    .tech-base {
-      max-width: 96%;
-      width: 100%;
-      margin: 0 auto 10px auto;
-      background: rgba(255, 255, 255, 0.02);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      border-radius: 16px;
-      padding: 20px 24px;
-      text-align: center;
-      opacity: 0;
-      animation: fadeInUp 0.6s ease 0.04s forwards;
-    }
+        @media (max-width: 700px) {
+            body {
+                padding: 24px 16px 24px 16px;
+            }
+            .container {
+                padding: 24px 16px 20px;
+            }
+            .pyramid-layer .level-name {
+                font-size: 16px;
+            }
+            .pyramid-layer {
+                padding: 14px 16px;
+            }
+            .page-header h1 {
+                font-size: 26px;
+            }
+            .core-mind {
+                padding: 20px 18px;
+            }
+            .layer-header {
+                padding: 14px 16px;
+            }
+            .layer-body {
+                padding: 0 16px 16px 16px;
+            }
+            .engineering-loop {
+                padding: 20px 18px;
+            }
+            .transition-bridge {
+                padding: 16px 18px;
+            }
+            .back-to-top {
+                bottom: 20px;
+                right: 20px;
+                width: 42px;
+                height: 42px;
+                font-size: 18px;
+            }
+            .modal-title {
+                font-size: 22px;
+            }
+            .modal-box {
+                padding: 24px 16px;
+            }
+            .modal-data-grid {
+                grid-template-columns: 1fr;
+            }
+            .tech-grid {
+                flex-direction: column;
+                align-items: center;
+                gap: 10px;
+            }
+            .conclusion {
+                font-size: 13px;
+                padding: 12px 14px;
+            }
+            .mind-table th,
+            .mind-table td {
+                padding: 6px 8px;
+                font-size: 12px;
+            }
+            .eng-node {
+                min-width: 60px;
+                padding: 8px 12px;
+            }
+            .eng-node .icon {
+                font-size: 18px;
+            }
+            .eng-node .label {
+                font-size: 12px;
+            }
+            .mind-desc-row {
+                gap: 8px 16px;
+            }
+            .mind-desc-row .item .num {
+                font-size: 15px;
+            }
+            .mind-desc-row .item .txt {
+                font-size: 12px;
+            }
+        }
 
-    .tech-base .tech-title {
-      font-size: 13px;
-      font-weight: 600;
-      color: rgba(255, 255, 255, 0.3);
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      margin-bottom: 12px;
-    }
-    .tech-grid {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 20px 40px;
-    }
-    .tech-item {
-      color: rgba(255, 255, 255, 0.7);
-      font-size: 14px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .tech-item .icon { font-size: 18px; }
-    .tech-item .label { color: rgba(255, 255, 255, 0.3); font-weight: 300; }
-    .tech-item .value { color: #f1f5f9; font-weight: 500; }
-
-    /* ===== 结论文案 ===== */
-    .conclusion {
-      max-width: 86%;
-      width: 100%;
-      margin: 6px auto 20px auto;
-      padding: 14px 20px;
-      border-top: 1px solid rgba(255, 255, 255, 0.04);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-      text-align: center;
-      color: #facc15;
-      font-size: 15px;
-      font-weight: 500;
-      letter-spacing: 0.5px;
-      line-height: 1.6;
-      opacity: 0;
-      animation: fadeInUp 0.6s ease 0.1s forwards;
-    }
-    .conclusion span {
-      color: rgba(255, 255, 255, 0.4);
-      font-weight: 400;
-    }
-
-    /* ===== 底部详细列表 ===== */
-    .overview-title {
-      font-size: 24px;
-      font-weight: 700;
-      color: #f1f5f9;
-      margin: 56px 0 20px 0;
-      text-align: center;
-      letter-spacing: 0.5px;
-      opacity: 0;
-      animation: fadeInUp 0.6s ease 0.12s forwards;
-    }
-    .overview-title span {
-      color: rgba(255, 255, 255, 0.3);
-      font-size: 14px;
-      font-weight: 400;
-      display: block;
-      margin-top: 4px;
-    }
-
-    .layer-block {
-      margin-bottom: 36px;
-      scroll-margin-top: 20px;
-      padding: 20px 24px;
-      background: rgba(255, 255, 255, 0.02);
-      border-radius: 16px;
-      border-left: 4px solid rgba(59, 130, 246, 0.3);
-      transition: all 0.4s ease;
-      opacity: 0;
-      animation: fadeInUp 0.6s ease forwards;
-    }
-    .layer-block:nth-child(1) { animation-delay: 0.14s; }
-    .layer-block:nth-child(2) { animation-delay: 0.18s; }
-    .layer-block:nth-child(3) { animation-delay: 0.22s; }
-    .layer-block:nth-child(4) { animation-delay: 0.26s; }
-    .layer-block:nth-child(5) { animation-delay: 0.30s; }
-    .layer-block:nth-child(6) { animation-delay: 0.34s; }
-
-    .layer-block.highlight {
-      border-left-color: #facc15;
-      background: rgba(250, 204, 21, 0.06);
-      box-shadow: 0 0 30px rgba(250, 204, 21, 0.05);
-    }
-
-    .layer-block .layer-title {
-      font-size: 18px;
-      font-weight: 700;
-      color: #f1f5f9;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-    .layer-block .layer-title .badge {
-      font-size: 12px;
-      background: rgba(255, 255, 255, 0.04);
-      color: rgba(255, 255, 255, 0.4);
-      padding: 2px 14px;
-      border-radius: 20px;
-      font-weight: 400;
-    }
-    .layer-block .layer-desc {
-      color: rgba(255, 255, 255, 0.4);
-      font-size: 13px;
-      margin: 4px 0 10px 0;
-    }
-
-    .layer-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-      gap: 8px;
-    }
-    .layer-item {
-      background: rgba(255, 255, 255, 0.02);
-      border: 1px solid rgba(255, 255, 255, 0.04);
-      border-radius: 10px;
-      padding: 8px 10px;
-      text-align: center;
-      color: rgba(255, 255, 255, 0.7);
-      font-size: 13px;
-      transition: all 0.3s ease;
-    }
-    .layer-item:hover {
-      border-color: rgba(255, 255, 255, 0.1);
-      background: rgba(255, 255, 255, 0.03);
-    }
-    .layer-item.highlight-item {
-      border-color: rgba(250, 204, 21, 0.2);
-      background: rgba(250, 204, 21, 0.04);
-    }
-    .layer-item.connect-item {
-      border-color: rgba(167, 139, 250, 0.2);
-      background: rgba(167, 139, 250, 0.04);
-    }
-    .layer-item.mind-item {
-      border-color: rgba(52, 211, 153, 0.2);
-      background: rgba(52, 211, 153, 0.03);
-    }
-
-    /* ===== 流程图 ===== */
-    .flowchart {
-      background: rgba(255, 255, 255, 0.02);
-      border: 1px solid rgba(255, 255, 255, 0.04);
-      border-radius: 16px;
-      padding: 20px 24px;
-      margin-bottom: 20px;
-      text-align: center;
-    }
-    .flowchart .flow-title {
-      font-size: 13px;
-      font-weight: 600;
-      color: rgba(255, 255, 255, 0.3);
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      margin-bottom: 16px;
-    }
-    .flow-row {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: center;
-      gap: 8px 4px;
-    }
-    .flow-node {
-      background: rgba(255, 255, 255, 0.02);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      border-radius: 12px;
-      padding: 10px 16px;
-      min-width: 100px;
-      text-align: center;
-    }
-    .flow-node .node-label {
-      font-size: 12px;
-      color: rgba(255, 255, 255, 0.3);
-      font-weight: 400;
-    }
-    .flow-node .node-value {
-      font-size: 15px;
-      font-weight: 600;
-      color: #f1f5f9;
-      margin-top: 2px;
-    }
-    .flow-node.hard { border-color: rgba(250, 204, 21, 0.2); }
-    .flow-node.connect { border-color: rgba(167, 139, 250, 0.2); }
-    .flow-node.soft { border-color: rgba(59, 130, 246, 0.2); }
-    .flow-node.model { border-color: rgba(52, 211, 153, 0.2); background: rgba(52, 211, 153, 0.03); }
-    .flow-node.lever { border-color: rgba(244, 114, 182, 0.2); background: rgba(244, 114, 182, 0.03); }
-    .flow-node.stable { border-color: rgba(250, 204, 21, 0.25); background: rgba(250, 204, 21, 0.05); }
-    .flow-arrow {
-      color: rgba(255, 255, 255, 0.15);
-      font-size: 20px;
-      font-weight: 300;
-      padding: 0 2px;
-    }
-    .flow-branch {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: center;
-      gap: 8px 4px;
-      margin-top: 6px;
-    }
-    .flow-branch .flow-arrow { font-size: 16px; }
-    .flow-divider {
-      width: 100%;
-      border-top: 1px dashed rgba(255, 255, 255, 0.04);
-      margin: 6px 0;
-    }
-
-    /* ===== 工程落地循环 ===== */
-    .engineering-loop {
-      background: rgba(255, 255, 255, 0.02);
-      border: 1px solid rgba(52, 211, 153, 0.15);
-      border-radius: 20px;
-      padding: 32px 34px;
-      margin-top: 44px;
-      box-shadow: 0 0 40px rgba(52, 211, 153, 0.04);
-      opacity: 0;
-      animation: fadeInUp 0.6s ease 0.36s forwards;
-      scroll-margin-top: 20px;
-    }
-
-    .engineering-loop .eng-title {
-      font-size: 13px;
-      font-weight: 600;
-      color: #34d399;
-      letter-spacing: 3px;
-      text-transform: uppercase;
-      text-align: center;
-      margin-bottom: 16px;
-    }
-    .eng-flow {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: center;
-      gap: 8px 14px;
-    }
-    .eng-node {
-      background: rgba(255, 255, 255, 0.02);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      border-radius: 12px;
-      padding: 12px 20px;
-      text-align: center;
-      min-width: 80px;
-    }
-    .eng-node .icon { font-size: 22px; }
-    .eng-node .label {
-      font-size: 13px;
-      font-weight: 600;
-      color: #f1f5f9;
-      margin-top: 4px;
-    }
-    .eng-node .sub {
-      font-size: 11px;
-      color: rgba(255, 255, 255, 0.3);
-    }
-    .eng-node.highlight-eng {
-      border-color: rgba(52, 211, 153, 0.2);
-      background: rgba(52, 211, 153, 0.04);
-    }
-    .eng-arrow {
-      color: rgba(255, 255, 255, 0.15);
-      font-size: 22px;
-      font-weight: 300;
-    }
-    .eng-closing {
-      text-align: center;
-      color: rgba(255, 255, 255, 0.4);
-      font-size: 13px;
-      margin-top: 16px;
-      padding-top: 14px;
-      border-top: 1px solid rgba(255, 255, 255, 0.04);
-    }
-    .eng-closing strong { color: #34d399; }
-    .eng-closing .highlight { color: #facc15; font-weight: 600; }
-
-    /* ===== 返回链接 ===== */
-    .back-home {
-      margin-top: 44px;
-      text-align: center;
-      border-top: 1px solid rgba(255, 255, 255, 0.04);
-      padding-top: 24px;
-      opacity: 0;
-      animation: fadeInUp 0.6s ease 0.4s forwards;
-    }
-    .back-home a {
-      color: rgba(255, 255, 255, 0.3);
-      text-decoration: none;
-      font-size: 14px;
-      transition: color 0.3s ease;
-    }
-    .back-home a:hover {
-      color: rgba(255, 255, 255, 0.8);
-    }
-
-    /* ===== 响应式 ===== */
-    @media (max-width: 900px) {
-      body {
-        padding: 32px 20px 32px 20px;
-      }
-      .sidebar {
-        display: none;
-      }
-      .container {
-        padding: 32px 24px 28px;
-      }
-    }
-
-    @media (max-width: 700px) {
-      body {
-        padding: 24px 16px 24px 16px;
-      }
-      .container { padding: 24px 16px 20px; }
-      .pyramid-layer .level-name { font-size: 16px; }
-      .pyramid-layer { padding: 14px 16px; }
-      .layer-grid { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); }
-      .page-header h1 { font-size: 26px; }
-      .tech-grid { flex-direction: column; align-items: center; gap: 10px; }
-      .conclusion { font-size: 13px; padding: 12px 14px; }
-      .flow-node { min-width: 70px; padding: 6px 10px; }
-      .flow-node .node-value { font-size: 13px; }
-      .flow-arrow { font-size: 16px; }
-      .mind-node { padding: 6px 12px; min-width: 50px; }
-      .mind-node .value { font-size: 18px; }
-      .mind-table th, .mind-table td { padding: 6px 8px; font-size: 12px; }
-      .eng-node { min-width: 60px; padding: 8px 12px; }
-      .eng-node .icon { font-size: 18px; }
-      .eng-node .label { font-size: 12px; }
-      .core-mind { padding: 20px 18px; }
-      .layer-block { padding: 16px 16px; }
-      .engineering-loop { padding: 20px 18px; }
-    }
-  </style>
+        @media (max-width: 480px) {
+            .layer-header .layer-title {
+                font-size: 15px;
+            }
+            .layer-header .layer-title .badge {
+                font-size: 10px;
+            }
+            .modal-title {
+                font-size: 19px;
+            }
+            .modal-icon {
+                font-size: 36px;
+            }
+        }
+    </style>
 </head>
 <body>
 
-  <!-- ===== 左侧固定检索目录 ===== -->
-  <div class="sidebar" id="sidebar">
-    <div class="logo">Y.<span>Mine</span></div>
-    <div class="sub-logo">价值金字塔 · 导航</div>
+    <!-- ===== 鼠标跟随光晕 ===== -->
+    <div id="glow"></div>
 
-    <hr class="nav-divider">
-
-    <div class="nav-section-label">核心</div>
-    <a class="nav-item" data-target="core-mind"><span class="num">01</span> 核心心法</a>
-
-    <hr class="nav-divider">
-
-    <div class="nav-section-label">金字塔</div>
-    <a class="nav-item" data-target="layer-0"><span class="num">02</span> 第0层 · 底层认知</a>
-    <a class="nav-item" data-target="layer-1"><span class="num">03</span> 第1层 · 思维框架</a>
-    <a class="nav-item" data-target="layer-2"><span class="num">04</span> 第2层 · 迁移能力</a>
-    <a class="nav-item" data-target="layer-3"><span class="num">05</span> 第3层 · 产品封装</a>
-    <a class="nav-item" data-target="layer-4"><span class="num">06</span> 第4层 · 价值表达</a>
-    <a class="nav-item" data-target="layer-5"><span class="num">07</span> 第5层 · 系统底座</a>
-
-    <hr class="nav-divider">
-
-    <div class="nav-section-label">闭环</div>
-    <a class="nav-item" data-target="engineering-loop"><span class="num">08</span> 工程落地循环</a>
-
-    <div class="footer-nav">
-      <a href="index.html">← 返回作品集</a>
+    <!-- ===== 左侧固定检索目录 ===== -->
+    <div class="sidebar" id="sidebar">
+        <div class="logo">Y.<span>Mine</span></div>
+        <div class="sub-logo">价值金字塔 · 导航</div>
+        <hr class="nav-divider">
+        <div class="nav-section-label">核心</div>
+        <a class="nav-item" data-target="core-mind"><span class="num">01</span> 核心心法</a>
+        <hr class="nav-divider">
+        <div class="nav-section-label">金字塔</div>
+        <a class="nav-item" data-target="layer-0"><span class="num">02</span> ⚛️ 底层认知</a>
+        <a class="nav-item" data-target="layer-1"><span class="num">03</span> 🧩 思维框架</a>
+        <a class="nav-item" data-target="layer-2"><span class="num">04</span> 🚀 迁移能力</a>
+        <a class="nav-item" data-target="layer-3"><span class="num">05</span> 📦 产品封装</a>
+        <a class="nav-item" data-target="layer-4"><span class="num">06</span> 📢 价值表达</a>
+        <a class="nav-item" data-target="layer-5"><span class="num">07</span> 🧠 系统底座</a>
+        <hr class="nav-divider">
+        <div class="nav-section-label">闭环</div>
+        <a class="nav-item" data-target="engineering-loop"><span class="num">08</span> 工程落地循环</a>
+        <div class="footer-nav">
+            <a href="index.html">← 返回作品集</a>
+        </div>
     </div>
-  </div>
 
-  <!-- ===== 鼠标跟随光晕 ===== -->
-  <div id="glow"></div>
+    <!-- ===== 返回顶部按钮 ===== -->
+    <button class="back-to-top" id="backToTop" aria-label="回到顶部">↑</button>
 
-  <div class="container">
+    <div class="container">
 
-    <!-- ===== 标题 ===== -->
-    <div class="page-header">
-      <h1>🧠 Y.Mine · 价值金字塔</h1>
-      <div class="sub">从底层认知到系统底座 · 产品经理能力登顶路径</div>
+        <!-- ===== 标题 ===== -->
+        <div class="page-header">
+            <h1>🧠 Y.Mine · 价值金字塔</h1>
+            <div class="sub">从底层认知到系统底座 · 产品经理能力登顶路径</div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- ===== 核心心法 ===== -->
+        <!-- ============================================================ -->
+        <div class="core-mind" id="core-mind">
+            <div class="mind-title">⚛️ 核心心法 · 产品设计闭环</div>
+
+            <div class="mind-flow">
+                <div class="mind-node highlight-node">
+                    <div class="label">用户视角</div>
+                    <div class="value">3</div>
+                    <div class="sub">三个方向</div>
+                </div>
+                <span class="mind-arrow">→</span>
+                <div class="mind-node highlight-node">
+                    <div class="label">收敛</div>
+                    <div class="value">1</div>
+                    <div class="sub">核心需求</div>
+                </div>
+                <span class="mind-arrow">→</span>
+                <div class="mind-node highlight-node">
+                    <div class="label">设计</div>
+                    <div class="value">1</div>
+                    <div class="sub">架构</div>
+                </div>
+                <span class="mind-arrow">→</span>
+                <div class="mind-node">
+                    <div class="label">变现</div>
+                    <div class="value">3</div>
+                    <div class="sub">盈利维度</div>
+                </div>
+                <span class="mind-arrow">→</span>
+                <div class="mind-node">
+                    <div class="label">覆盖</div>
+                    <div class="value">100</div>
+                    <div class="sub">场景延展</div>
+                </div>
+            </div>
+
+            <div class="mind-desc-row">
+                <div class="item"><div class="num">3 → 1</div><div class="txt">收敛 · 回归本心</div></div>
+                <div class="item"><div class="num">1 → 1</div><div class="txt">设计 · 架构骨架</div></div>
+                <div class="item"><div class="num">1 → 3</div><div class="txt">变现 · 定价盈利交付</div></div>
+                <div class="item"><div class="num">3 → 100</div><div class="txt">延展 · 无限场景</div></div>
+            </div>
+
+            <div class="mind-table-wrap">
+                <table class="mind-table">
+                    <thead>
+                        <tr>
+                            <th>用户状态</th>
+                            <th>产品动作</th>
+                            <th>核心目标</th>
+                            <th>对应能力层</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="tag tag-need">需要</span></td>
+                            <td>提升服务体验</td>
+                            <td>优化 · 迭代</td>
+                            <td>底层认知 + 思维框架</td>
+                        </tr>
+                        <tr>
+                            <td><span class="tag tag-none">不需要</span></td>
+                            <td>创造需要</td>
+                            <td>定义 · 破局</td>
+                            <td>迁移能力 + 产品封装</td>
+                        </tr>
+                        <tr>
+                            <td><span class="tag tag-mid">中间地带</span></td>
+                            <td>传播 + 营销</td>
+                            <td>品牌 · 认知</td>
+                            <td>价值表达</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- ===== 金字塔（点击→弹出浮层展示数据资产） ===== -->
+        <!-- ============================================================ -->
+        <div class="pyramid">
+
+            <!-- 技术底座 -->
+            <div class="tech-base">
+                <div class="tech-title">⬇ 技术底座 · 开源 + 大模型</div>
+                <div class="tech-grid">
+                    <span class="tech-item">
+                        <span class="icon">📦</span>
+                        <span class="label">开源平台</span>
+                        <span class="value">Milvus · GitHub · 跨领域项目</span>
+                    </span>
+                    <span class="tech-item">
+                        <span class="icon">🧠</span>
+                        <span class="label">大模型平台</span>
+                        <span class="value">私有AI引擎 · 11层推理架构 · 多场景适配</span>
+                    </span>
+                </div>
+            </div>
+
+            <!-- 金字塔层：每个 data-level 对应浮层数据 -->
+            <div class="pyramid-layer" data-level="0" onclick="openModal(0)">
+                <div class="level-tag">第 0 层</div>
+                <div class="level-name">⚛️ 底层认知</div>
+                <div class="level-desc">硬技能 · 连接层 · 软技能 · 商业心法</div>
+                <div class="click-hint">点击查看数据资产 ↗</div>
+            </div>
+            <div class="pyramid-layer" data-level="1" onclick="openModal(1)">
+                <div class="level-tag">第 1 层</div>
+                <div class="level-name">🧩 思维框架</div>
+                <div class="level-desc">拆解 · 建模 · 方法论</div>
+                <div class="click-hint">点击查看数据资产 ↗</div>
+            </div>
+            <div class="pyramid-layer" data-level="2" onclick="openModal(2)">
+                <div class="level-tag">第 2 层</div>
+                <div class="level-name">🚀 迁移能力</div>
+                <div class="level-desc">跨领域 · 快速入局</div>
+                <div class="click-hint">点击查看数据资产 ↗</div>
+            </div>
+            <div class="pyramid-layer" data-level="3" onclick="openModal(3)">
+                <div class="level-tag">第 3 层</div>
+                <div class="level-name">📦 产品封装</div>
+                <div class="level-desc">商业方案 · 可交付</div>
+                <div class="click-hint">点击查看数据资产 ↗</div>
+            </div>
+            <div class="pyramid-layer" data-level="4" onclick="openModal(4)">
+                <div class="level-tag">第 4 层</div>
+                <div class="level-name">📢 价值表达</div>
+                <div class="level-desc">品牌 · 叙事 · 传播</div>
+                <div class="click-hint">点击查看数据资产 ↗</div>
+            </div>
+            <div class="pyramid-layer" data-level="5" onclick="openModal(5)">
+                <div class="level-tag">第 5 层</div>
+                <div class="level-name">🧠 系统底座</div>
+                <div class="level-desc">AI引擎 · 资产化 · 平台化</div>
+                <div class="click-hint">点击查看数据资产 ↗</div>
+            </div>
+        </div>
+
+        <!-- 结论文案 -->
+        <div class="conclusion">
+            ⛰️ 从开源 + 大模型平台挖起，先创造产品，再从底层技术往上走，
+            <span>产品经理的成长路径才会真正走得顺。</span>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- ===== 知识体系总览（保留折叠详情，与浮层互为补充） ===== -->
+        <!-- ============================================================ -->
+        <div class="overview-title">
+            📖 知识体系总览
+            <span>点击每一层标题可展开/折叠 · 点击金字塔层弹出数据资产浮层</span>
+        </div>
+
+        <!-- 第0层（含Tab） -->
+        <div class="layer-block" id="layer-0">
+            <div class="layer-header" onclick="toggleLayer(this)">
+                <div class="layer-title">⚛️ 第0层 · 底层认知 <span class="badge">硬技能 → 连接层 → 软技能 → 商业心法</span></div>
+                <span class="toggle-icon open">▾</span>
+            </div>
+            <div class="layer-body open" id="layer-body-0">
+                <div class="layer-desc">产品经理的底层基石：从平台怎么搭（硬），到算力怎么用（连接），到怎么思考（软），再到怎么稳住（心法）</div>
+                <div class="layer-grid">
+                    <div class="layer-item highlight-item">熵值模型</div>
+                    <div class="layer-item highlight-item">概率论</div>
+                    <div class="layer-item highlight-item">0.5/0.68阈值</div>
+                    <div class="layer-item highlight-item">权重叠加</div>
+                    <div class="layer-item highlight-item">商业数学表达</div>
+                    <div class="layer-item highlight-item">凯利公式</div>
+                    <div class="layer-item highlight-item">交互判定系统</div>
+                    <div class="layer-item highlight-item">势能场理论</div>
+                    <div class="layer-item highlight-item">判定证据链</div>
+                    <div class="layer-item highlight-item">正态风控</div>
+                    <div class="layer-item highlight-item">财务建模</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 第1层 -->
+        <div class="layer-block" id="layer-1">
+            <div class="layer-header" onclick="toggleLayer(this)">
+                <div class="layer-title">🧩 第1层 · 思维框架 <span class="badge">10项</span></div>
+                <span class="toggle-icon">▾</span>
+            </div>
+            <div class="layer-body" id="layer-body-1">
+                <div class="layer-desc">拆解 · 建模 · 方法论 —— 产品经理的核心思维工具</div>
+                <div class="layer-grid">
+                    <div class="layer-item">元架构定义</div>
+                    <div class="layer-item">两个底层模型</div>
+                    <div class="layer-item">定价双版本</div>
+                    <div class="layer-item">反向倒推</div>
+                    <div class="layer-item">四项核心洞察</div>
+                    <div class="layer-item">博主成长模型</div>
+                    <div class="layer-item">国学四维框架</div>
+                    <div class="layer-item">十一维估值</div>
+                    <div class="layer-item">元架构可迁移</div>
+                    <div class="layer-item">3→1→3路径</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 第2层 -->
+        <div class="layer-block" id="layer-2">
+            <div class="layer-header" onclick="toggleLayer(this)">
+                <div class="layer-title">🚀 第2层 · 迁移能力 <span class="badge">15项</span></div>
+                <span class="toggle-icon">▾</span>
+            </div>
+            <div class="layer-body" id="layer-body-2">
+                <div class="layer-desc">跨领域 · 快速入局 —— 产品经理的广度验证</div>
+                <div class="layer-grid">
+                    <div class="layer-item">财务→CAD</div>
+                    <div class="layer-item">CAD→乐高</div>
+                    <div class="layer-item">电池系统</div>
+                    <div class="layer-item">园林→财务</div>
+                    <div class="layer-item">运营→工程</div>
+                    <div class="layer-item">大模型原理</div>
+                    <div class="layer-item">地质学</div>
+                    <div class="layer-item">营销学吞噬</div>
+                    <div class="layer-item">金融市场</div>
+                    <div class="layer-item">公司治理</div>
+                    <div class="layer-item">瑞幸9.9拆解</div>
+                    <div class="layer-item">低空经济适配</div>
+                    <div class="layer-item">头条双态估值</div>
+                    <div class="layer-item">应急管理适配</div>
+                    <div class="layer-item">空地一体构想</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 第3层 -->
+        <div class="layer-block" id="layer-3">
+            <div class="layer-header" onclick="toggleLayer(this)">
+                <div class="layer-title">📦 第3层 · 产品封装 <span class="badge">5组</span></div>
+                <span class="toggle-icon">▾</span>
+            </div>
+            <div class="layer-body" id="layer-body-3">
+                <div class="layer-desc">商业方案 · 可交付 —— 产品经理的落地能力</div>
+                <div class="layer-grid">
+                    <div class="layer-item">MCN/文娱AI</div>
+                    <div class="layer-item">低空经济方案</div>
+                    <div class="layer-item">商业认知资产</div>
+                    <div class="layer-item">个人能力评估</div>
+                    <div class="layer-item">商业化与竞品</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 第4层 -->
+        <div class="layer-block" id="layer-4">
+            <div class="layer-header" onclick="toggleLayer(this)">
+                <div class="layer-title">📢 第4层 · 价值表达 <span class="badge">8项</span></div>
+                <span class="toggle-icon">▾</span>
+            </div>
+            <div class="layer-body" id="layer-body-4">
+                <div class="layer-desc">品牌 · 叙事 · 传播 —— 产品经理的影响力构建</div>
+                <div class="layer-grid">
+                    <div class="layer-item">品牌定义</div>
+                    <div class="layer-item">Y.Mine</div>
+                    <div class="layer-item">GitHub</div>
+                    <div class="layer-item">知识库</div>
+                    <div class="layer-item">产品说明书</div>
+                    <div class="layer-item">README</div>
+                    <div class="layer-item">飞书知识库</div>
+                    <div class="layer-item">网页/首页导航</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 第5层 -->
+        <div class="layer-block" id="layer-5">
+            <div class="layer-header" onclick="toggleLayer(this)">
+                <div class="layer-title">🧠 第5层 · 系统底座 <span class="badge">3+1</span></div>
+                <span class="toggle-icon">▾</span>
+            </div>
+            <div class="layer-body" id="layer-body-5">
+                <div class="layer-desc">AI引擎 · 资产化 · 平台化 —— 产品经理的终极封装与交付</div>
+                <div class="layer-grid">
+                    <div class="layer-item">127项资产分类</div>
+                    <div class="layer-item">向量库联动设计</div>
+                    <div class="layer-item">Milvus搭建构想</div>
+                    <div class="layer-item" style="border-color:rgba(250,204,21,0.2); background:rgba(250,204,21,0.04);">🧩 11层底层架构</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== 过渡文案 ===== -->
+        <div class="transition-bridge">
+            <p>
+                ⛰️ 以上六层构成了产品经理的完整能力金字塔。<br>
+                当 <strong>系统底座（第5层）</strong> 搭建完成后，进入 <span class="highlight">工程落地循环</span> ——
+                技术实现 → 商业验证 → 场景验证 → 运维调试，四者联动，持续迭代。
+            </p>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- ===== 工程落地循环 ===== -->
+        <!-- ============================================================ -->
+        <div class="engineering-loop" id="engineering-loop">
+            <div class="eng-title">⚙️ 工程落地循环</div>
+            <div class="eng-flow">
+                <div class="eng-node highlight-eng">
+                    <div class="icon">⚙️</div>
+                    <div class="label">技术实现</div>
+                    <div class="sub">架构落地 · 系统部署</div>
+                </div>
+                <span class="eng-arrow">→</span>
+                <div class="eng-node highlight-eng">
+                    <div class="icon">📊</div>
+                    <div class="label">商业验证</div>
+                    <div class="sub">ROI · 市场反馈</div>
+                </div>
+                <span class="eng-arrow">→</span>
+                <div class="eng-node highlight-eng">
+                    <div class="icon">🎯</div>
+                    <div class="label">场景验证</div>
+                    <div class="sub">真实环境 · 用户测试</div>
+                </div>
+                <span class="eng-arrow">→</span>
+                <div class="eng-node highlight-eng">
+                    <div class="icon">🔧</div>
+                    <div class="label">运维调试</div>
+                    <div class="sub">监控 · 调优 · 迭代</div>
+                </div>
+            </div>
+            <div class="eng-closing">
+                🔄 技术 + 商业 + 场景 + 运维 四者联动，形成工程闭环
+                <br>
+                <span style="color:rgba(255,255,255,0.3); font-size:12px;">每循环一轮，系统稳定性 <strong class="highlight">指数级上升</strong></span>
+            </div>
+        </div>
+
+        <!-- ===== 返回链接 ===== -->
+        <div class="back-home">
+            <a href="index.html">← 返回作品集首页</a>
+        </div>
+
     </div>
 
     <!-- ============================================================ -->
-    <!-- ===== 核心心法 ===== -->
+    <!-- ===== 浮层（Modal） ===== -->
     <!-- ============================================================ -->
-    <div class="core-mind" id="core-mind">
-      <div class="mind-title">⚛️ 核心心法 · 产品设计闭环</div>
-
-      <div class="mind-flow">
-        <div class="mind-node highlight-node">
-          <div class="label">用户视角</div>
-          <div class="value">3</div>
-          <div class="sub">三个方向</div>
+    <div class="modal-overlay" id="dataModal" onclick="closeModalOutside(event)">
+        <div class="modal-box">
+            <button class="modal-close" onclick="closeModal()">✕</button>
+            <div class="modal-icon" id="modalIcon">⚛️</div>
+            <div class="modal-title" id="modalTitle">第0层 · 底层认知</div>
+            <div class="modal-sub" id="modalSub">点击任意数据项可展开详情（演示版）</div>
+            <hr class="modal-divider">
+            <div class="modal-data-grid" id="modalDataGrid">
+                <!-- 由 JavaScript 动态渲染 -->
+            </div>
+            <div class="modal-footer">📌 每个表情符号背后，都是一组可调用的数据资产</div>
         </div>
-        <span class="mind-arrow">→</span>
-        <div class="mind-node highlight-node">
-          <div class="label">收敛</div>
-          <div class="value">1</div>
-          <div class="sub">核心需求</div>
-        </div>
-        <span class="mind-arrow">→</span>
-        <div class="mind-node highlight-node">
-          <div class="label">设计</div>
-          <div class="value">1</div>
-          <div class="sub">架构</div>
-        </div>
-        <span class="mind-arrow">→</span>
-        <div class="mind-node">
-          <div class="label">变现</div>
-          <div class="value">3</div>
-          <div class="sub">盈利维度</div>
-        </div>
-        <span class="mind-arrow">→</span>
-        <div class="mind-node">
-          <div class="label">覆盖</div>
-          <div class="value">100</div>
-          <div class="sub">场景延展</div>
-        </div>
-      </div>
-
-      <div class="mind-desc-row">
-        <div class="item"><div class="num">3 → 1</div><div class="txt">收敛 · 回归本心</div></div>
-        <div class="item"><div class="num">1 → 1</div><div class="txt">设计 · 架构骨架</div></div>
-        <div class="item"><div class="num">1 → 3</div><div class="txt">变现 · 定价盈利交付</div></div>
-        <div class="item"><div class="num">3 → 100</div><div class="txt">延展 · 无限场景</div></div>
-      </div>
-
-      <div class="mind-table-wrap">
-        <table class="mind-table">
-          <thead>
-            <tr>
-              <th>用户状态</th>
-              <th>产品动作</th>
-              <th>核心目标</th>
-              <th>对应能力层</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><span class="tag tag-need">需要</span></td>
-              <td>提升服务体验</td>
-              <td>优化 · 迭代</td>
-              <td>底层认知 + 思维框架</td>
-            </tr>
-            <tr>
-              <td><span class="tag tag-none">不需要</span></td>
-              <td>创造需要</td>
-              <td>定义 · 破局</td>
-              <td>迁移能力 + 产品封装</td>
-            </tr>
-            <tr>
-              <td><span class="tag tag-mid">中间地带</span></td>
-              <td>传播 + 营销</td>
-              <td>品牌 · 认知</td>
-              <td>价值表达</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
     </div>
 
-    <!-- ============================================================ -->
-    <!-- ===== 金字塔 ===== -->
-    <!-- ============================================================ -->
-    <div class="pyramid">
+    <script>
+        // ============================================================ //
+        // ===== 数据资产映射表 ===== //
+        // ============================================================ //
+        const layerData = [{
+            level: 0,
+            icon: '⚛️',
+            title: '第0层 · 底层认知',
+            sub: '硬技能 → 连接层 → 软技能 → 商业心法',
+            items: [
+                '熵值模型',
+                '概率论',
+                '0.5/0.68阈值',
+                '权重叠加',
+                '商业数学表达',
+                '凯利公式',
+                '交互判定系统',
+                '势能场理论',
+                '判定证据链',
+                '正态风控',
+                '财务建模'
+            ]
+        }, {
+            level: 1,
+            icon: '🧩',
+            title: '第1层 · 思维框架',
+            sub: '拆解 · 建模 · 方法论',
+            items: [
+                '元架构定义',
+                '两个底层模型',
+                '定价双版本',
+                '反向倒推',
+                '四项核心洞察',
+                '博主成长模型',
+                '国学四维框架',
+                '十一维估值',
+                '元架构可迁移',
+                '3→1→3路径'
+            ]
+        }, {
+            level: 2,
+            icon: '🚀',
+            title: '第2层 · 迁移能力',
+            sub: '跨领域 · 快速入局',
+            items: [
+                '财务→CAD',
+                'CAD→乐高',
+                '电池系统',
+                '园林→财务',
+                '运营→工程',
+                '大模型原理',
+                '地质学',
+                '营销学吞噬',
+                '金融市场',
+                '公司治理',
+                '瑞幸9.9拆解',
+                '低空经济适配',
+                '头条双态估值',
+                '应急管理适配',
+                '空地一体构想'
+            ]
+        }, {
+            level: 3,
+            icon: '📦',
+            title: '第3层 · 产品封装',
+            sub: '商业方案 · 可交付',
+            items: [
+                'MCN/文娱AI方案',
+                '低空经济方案',
+                '商业认知资产',
+                '个人能力评估',
+                '商业化与竞品分析'
+            ]
+        }, {
+            level: 4,
+            icon: '📢',
+            title: '第4层 · 价值表达',
+            sub: '品牌 · 叙事 · 传播',
+            items: [
+                '品牌定义',
+                'Y.Mine',
+                'GitHub',
+                '知识库',
+                '产品说明书',
+                'README',
+                '飞书知识库',
+                '网页/首页导航'
+            ]
+        }, {
+            level: 5,
+            icon: '🧠',
+            title: '第5层 · 系统底座',
+            sub: 'AI引擎 · 资产化 · 平台化',
+            items: [
+                '127项资产分类',
+                '向量库联动设计',
+                'Milvus搭建构想',
+                '11层底层架构'
+            ]
+        }];
 
-      <!-- 技术底座 -->
-      <div class="tech-base">
-        <div class="tech-title">⬇ 技术底座 · 开源 + 大模型</div>
-        <div class="tech-grid">
-          <span class="tech-item">
-            <span class="icon">📦</span>
-            <span class="label">开源平台</span>
-            <span class="value">Milvus · GitHub · 跨领域项目</span>
-          </span>
-          <span class="tech-item">
-            <span class="icon">🧠</span>
-            <span class="label">大模型平台</span>
-            <span class="value">私有AI引擎 · 11层推理架构 · 多场景适配</span>
-          </span>
-        </div>
-      </div>
+        // ============================================================ //
+        // ===== 浮层控制 ===== //
+        // ============================================================ //
+        function openModal(level) {
+            const data = layerData[level];
+            if (!data) return;
 
-      <!-- 金字塔层 -->
-      <div class="pyramid-layer" data-level="0" id="pyramid-0" onclick="scrollToLayer(0)">
-        <div class="level-tag">第 0 层</div>
-        <div class="level-name">⚛️ 底层认知</div>
-        <div class="level-desc">硬技能 · 连接层 · 软技能 · 商业心法</div>
-        <div class="click-hint">点击查看详情 ↓</div>
-      </div>
-      <div class="pyramid-layer" data-level="1" id="pyramid-1" onclick="scrollToLayer(1)">
-        <div class="level-tag">第 1 层</div>
-        <div class="level-name">🧩 思维框架</div>
-        <div class="level-desc">拆解 · 建模 · 方法论</div>
-        <div class="click-hint">点击查看详情 ↓</div>
-      </div>
-      <div class="pyramid-layer" data-level="2" id="pyramid-2" onclick="scrollToLayer(2)">
-        <div class="level-tag">第 2 层</div>
-        <div class="level-name">🚀 迁移能力</div>
-        <div class="level-desc">跨领域 · 快速入局</div>
-        <div class="click-hint">点击查看详情 ↓</div>
-      </div>
-      <div class="pyramid-layer" data-level="3" id="pyramid-3" onclick="scrollToLayer(3)">
-        <div class="level-tag">第 3 层</div>
-        <div class="level-name">📦 产品封装</div>
-        <div class="level-desc">商业方案 · 可交付</div>
-        <div class="click-hint">点击查看详情 ↓</div>
-      </div>
-      <div class="pyramid-layer" data-level="4" id="pyramid-4" onclick="scrollToLayer(4)">
-        <div class="level-tag">第 4 层</div>
-        <div class="level-name">📢 价值表达</div>
-        <div class="level-desc">品牌 · 叙事 · 传播</div>
-        <div class="click-hint">点击查看详情 ↓</div>
-      </div>
-      <div class="pyramid-layer" data-level="5" id="pyramid-5" onclick="scrollToLayer(5)">
-        <div class="level-tag">第 5 层</div>
-        <div class="level-name">🧠 系统底座</div>
-        <div class="level-desc">AI引擎 · 资产化 · 平台化</div>
-        <div class="click-hint">点击查看详情 ↓</div>
-      </div>
-    </div>
+            // 填充内容
+            document.getElementById('modalIcon').textContent = data.icon;
+            document.getElementById('modalTitle').textContent = data.title;
+            document.getElementById('modalSub').textContent = data.sub;
 
-    <!-- 结论文案 -->
-    <div class="conclusion">
-      ⛰️ 从开源 + 大模型平台挖起，先创造产品，再从底层技术往上走，
-      <span>产品经理的成长路径才会真正走得顺。</span>
-    </div>
+            const grid = document.getElementById('modalDataGrid');
+            grid.innerHTML = '';
+            data.items.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'modal-data-item';
+                div.innerHTML = `
+                    <span class="item-label">数据资产</span>
+                    <span class="item-value">${item}</span>
+                `;
+                // 点击单个数据项可弹出提示（演示交互）
+                div.style.cursor = 'pointer';
+                div.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    alert(`📌 ${item}\n\n（此处可展开详细说明、案例或文档链接）`);
+                });
+                grid.appendChild(div);
+            });
 
-    <!-- ============================================================ -->
-    <!-- ===== 知识体系总览 ===== -->
-    <!-- ============================================================ -->
-    <div class="overview-title">
-      📖 知识体系总览
-      <span>点击金字塔每一层，自动滚动到对应层级</span>
-    </div>
+            // 显示浮层
+            document.getElementById('dataModal').classList.add('open');
+            document.body.style.overflow = 'hidden';
 
-    <!-- 第0层 -->
-    <div class="layer-block" id="layer-0">
-      <div class="layer-title">⚛️ 第0层 · 底层认知 <span class="badge">硬技能 → 连接层 → 软技能 → 商业心法</span></div>
-      <div class="layer-desc">产品经理的底层基石：从平台怎么搭（硬），到算力怎么用（连接），到怎么思考（软），再到怎么稳住（心法）</div>
-
-      <div class="flowchart">
-        <div class="flow-title">⬇ 商业思维模型生成路径</div>
-        <div class="flow-row">
-          <div class="flow-node hard"><div class="node-label">🔧 硬技能</div><div class="node-value">平台演进</div></div>
-          <span class="flow-arrow">→</span>
-          <div class="flow-node connect"><div class="node-label">⚡ 连接层</div><div class="node-value">算力+Token</div></div>
-          <span class="flow-arrow">→</span>
-          <div class="flow-node soft"><div class="node-label">🧠 软技能</div><div class="node-value">结构化思维</div></div>
-          <span class="flow-arrow">→</span>
-          <div class="flow-node model"><div class="node-label">📊 商业模型</div><div class="node-value">商业判断力</div></div>
-        </div>
-        <div class="flow-divider"></div>
-        <div class="flow-branch">
-          <span style="color:rgba(255,255,255,0.3); font-size:13px;">稳定杠杆</span>
-          <span class="flow-arrow">⇢</span>
-          <div class="flow-node lever"><div class="node-label">💰 金融工具</div><div class="node-value">杠杆1</div></div>
-          <span style="color:rgba(255,255,255,0.15); font-size:16px; padding:0 4px;">+</span>
-          <div class="flow-node lever"><div class="node-label">🧘 商业心法</div><div class="node-value">博弈论×国学</div></div>
-          <span class="flow-arrow">→</span>
-          <div class="flow-node stable"><div class="node-label">⚖️ 稳定底座</div><div class="node-value">商业思维稳态</div></div>
-        </div>
-      </div>
-
-      <div style="margin:12px 0 6px 0; color:#facc15; font-size:14px; font-weight:600;">🔧 硬技能 · 平台演进路径</div>
-      <div class="layer-grid" style="margin-bottom:12px;">
-        <div class="layer-item highlight-item">IaaS</div>
-        <div class="layer-item highlight-item">PaaS</div>
-        <div class="layer-item highlight-item">SaaS</div>
-        <div class="layer-item highlight-item">私有化部署</div>
-      </div>
-
-      <div style="margin:12px 0 6px 0; color:#a78bfa; font-size:14px; font-weight:600;">⚡ 连接层 · 算力 + Token → 推理</div>
-      <div class="layer-grid" style="margin-bottom:12px;">
-        <div class="layer-item connect-item">算力（GPU/CPU）</div>
-        <div class="layer-item connect-item">Token 调度</div>
-        <div class="layer-item connect-item">推理引擎</div>
-      </div>
-
-      <div style="margin:12px 0 6px 0; color:#3b82f6; font-size:14px; font-weight:600;">🧠 软技能 · 结构化思维</div>
-      <div class="layer-grid" style="margin-bottom:12px;">
-        <div class="layer-item">熵值模型</div>
-        <div class="layer-item">概率论</div>
-        <div class="layer-item">0.5/0.68阈值</div>
-        <div class="layer-item">权重叠加</div>
-        <div class="layer-item">商业数学表达</div>
-        <div class="layer-item">凯利公式</div>
-        <div class="layer-item">交互判定系统</div>
-        <div class="layer-item">势能场理论</div>
-        <div class="layer-item">判定证据链</div>
-        <div class="layer-item">正态风控</div>
-        <div class="layer-item">财务建模</div>
-      </div>
-
-      <div style="margin:12px 0 6px 0; color:#34d399; font-size:14px; font-weight:600;">🧘 商业心法 · 博弈论 × 国学五家</div>
-      <div class="layer-grid">
-        <div class="layer-item mind-item">博弈论</div>
-        <div class="layer-item mind-item">道家 · 顺势</div>
-        <div class="layer-item mind-item">阴阳家 · 平衡</div>
-        <div class="layer-item mind-item">法家 · 规则</div>
-        <div class="layer-item mind-item">纵横家 · 合纵</div>
-        <div class="layer-item mind-item">儒家 · 修己</div>
-      </div>
-    </div>
-
-    <!-- 第1层 -->
-    <div class="layer-block" id="layer-1">
-      <div class="layer-title">🧩 第1层 · 思维框架 <span class="badge">10项</span></div>
-      <div class="layer-desc">拆解 · 建模 · 方法论 —— 产品经理的核心思维工具</div>
-      <div class="layer-grid">
-        <div class="layer-item">元架构定义</div>
-        <div class="layer-item">两个底层模型</div>
-        <div class="layer-item">定价双版本</div>
-        <div class="layer-item">反向倒推</div>
-        <div class="layer-item">四项核心洞察</div>
-        <div class="layer-item">博主成长模型</div>
-        <div class="layer-item">国学四维框架</div>
-        <div class="layer-item">十一维估值</div>
-        <div class="layer-item">元架构可迁移</div>
-        <div class="layer-item">3→1→3路径</div>
-      </div>
-    </div>
-
-    <!-- 第2层 -->
-    <div class="layer-block" id="layer-2">
-      <div class="layer-title">🚀 第2层 · 迁移能力 <span class="badge">15项</span></div>
-      <div class="layer-desc">跨领域 · 快速入局 —— 产品经理的广度验证</div>
-      <div class="layer-grid">
-        <div class="layer-item">财务→CAD</div>
-        <div class="layer-item">CAD→乐高</div>
-        <div class="layer-item">电池系统</div>
-        <div class="layer-item">园林→财务</div>
-        <div class="layer-item">运营→工程</div>
-        <div class="layer-item">大模型原理</div>
-        <div class="layer-item">地质学</div>
-        <div class="layer-item">营销学吞噬</div>
-        <div class="layer-item">金融市场</div>
-        <div class="layer-item">公司治理</div>
-        <div class="layer-item">瑞幸9.9拆解</div>
-        <div class="layer-item">低空经济适配</div>
-        <div class="layer-item">头条双态估值</div>
-        <div class="layer-item">应急管理适配</div>
-        <div class="layer-item">空地一体构想</div>
-      </div>
-    </div>
-
-    <!-- 第3层 -->
-    <div class="layer-block" id="layer-3">
-      <div class="layer-title">📦 第3层 · 产品封装 <span class="badge">5组</span></div>
-      <div class="layer-desc">商业方案 · 可交付 —— 产品经理的落地能力</div>
-      <div class="layer-grid">
-        <div class="layer-item">MCN/文娱AI</div>
-        <div class="layer-item">低空经济方案</div>
-        <div class="layer-item">商业认知资产</div>
-        <div class="layer-item">个人能力评估</div>
-        <div class="layer-item">商业化与竞品</div>
-      </div>
-    </div>
-
-    <!-- 第4层 -->
-    <div class="layer-block" id="layer-4">
-      <div class="layer-title">📢 第4层 · 价值表达 <span class="badge">8项</span></div>
-      <div class="layer-desc">品牌 · 叙事 · 传播 —— 产品经理的影响力构建</div>
-      <div class="layer-grid">
-        <div class="layer-item">品牌定义</div>
-        <div class="layer-item">Y.Mine</div>
-        <div class="layer-item">GitHub</div>
-        <div class="layer-item">知识库</div>
-        <div class="layer-item">产品说明书</div>
-        <div class="layer-item">README</div>
-        <div class="layer-item">飞书知识库</div>
-        <div class="layer-item">网页/首页导航</div>
-      </div>
-    </div>
-
-    <!-- 第5层 -->
-    <div class="layer-block" id="layer-5">
-      <div class="layer-title">🧠 第5层 · 系统底座 <span class="badge">3+1</span></div>
-      <div class="layer-desc">AI引擎 · 资产化 · 平台化 —— 产品经理的终极封装与交付</div>
-      <div class="layer-grid">
-        <div class="layer-item">127项资产分类</div>
-        <div class="layer-item">向量库联动设计</div>
-        <div class="layer-item">Milvus搭建构想</div>
-        <div class="layer-item" style="border-color:rgba(250,204,21,0.2); background:rgba(250,204,21,0.04);">🧩 11层底层架构</div>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- ===== 工程落地循环 ===== -->
-    <!-- ============================================================ -->
-    <div class="engineering-loop" id="engineering-loop">
-      <div class="eng-title">⚙️ 工程落地循环</div>
-      <div class="eng-flow">
-        <div class="eng-node highlight-eng">
-          <div class="icon">⚙️</div>
-          <div class="label">技术实现</div>
-          <div class="sub">架构落地 · 系统部署</div>
-        </div>
-        <span class="eng-arrow">→</span>
-        <div class="eng-node highlight-eng">
-          <div class="icon">📊</div>
-          <div class="label">商业验证</div>
-          <div class="sub">ROI · 市场反馈</div>
-        </div>
-        <span class="eng-arrow">→</span>
-        <div class="eng-node highlight-eng">
-          <div class="icon">🎯</div>
-          <div class="label">场景验证</div>
-          <div class="sub">真实环境 · 用户测试</div>
-        </div>
-        <span class="eng-arrow">→</span>
-        <div class="eng-node highlight-eng">
-          <div class="icon">🔧</div>
-          <div class="label">运维调试</div>
-          <div class="sub">监控 · 调优 · 迭代</div>
-        </div>
-      </div>
-      <div class="eng-closing">
-        🔄 技术 + 商业 + 场景 + 运维 四者联动，形成工程闭环
-        <br>
-        <span style="color:rgba(255,255,255,0.3); font-size:12px;">每循环一轮，系统稳定性 <strong class="highlight">指数级上升</strong></span>
-      </div>
-    </div>
-
-    <!-- ===== 返回链接 ===== -->
-    <div class="back-home">
-      <a href="index.html">← 返回作品集首页</a>
-    </div>
-
-  </div>
-
-  <script>
-    // ===== 鼠标跟随光晕 =====
-    const glow = document.getElementById('glow');
-    document.addEventListener('mousemove', (e) => {
-      const x = e.clientX / window.innerWidth * 100;
-      const y = e.clientY / window.innerHeight * 100;
-      glow.style.setProperty('--x', x + '%');
-      glow.style.setProperty('--y', y + '%');
-    });
-
-    // ===== 侧边栏滚动联动 =====
-    document.querySelectorAll('.nav-item').forEach(item => {
-      item.addEventListener('click', function(e) {
-        e.preventDefault();
-        const targetId = this.dataset.target;
-        const target = document.getElementById(targetId);
-        if (target) {
-          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-          this.classList.add('active');
+            // 高亮对应的金字塔层
+            document.querySelectorAll('.pyramid-layer').forEach(el => el.classList.remove('active'));
+            const targetLayer = document.querySelector(`.pyramid-layer[data-level="${level}"]`);
+            if (targetLayer) targetLayer.classList.add('active');
         }
-      });
-    });
 
-    // ===== 滚动时高亮当前板块 =====
-    const blocks = document.querySelectorAll('.core-mind, .layer-block, .engineering-loop');
-    const navItems = document.querySelectorAll('.nav-item');
-
-    function updateActiveNav() {
-      let currentId = null;
-      blocks.forEach(block => {
-        const rect = block.getBoundingClientRect();
-        if (rect.top <= 120) {
-          currentId = block.id;
+        function closeModal() {
+            document.getElementById('dataModal').classList.remove('open');
+            document.body.style.overflow = '';
+            // 移除金字塔高亮
+            document.querySelectorAll('.pyramid-layer').forEach(el => el.classList.remove('active'));
         }
-      });
-      navItems.forEach(item => {
-        item.classList.toggle('active', item.dataset.target === currentId);
-      });
-    }
 
-    window.addEventListener('scroll', updateActiveNav);
-    window.addEventListener('load', updateActiveNav);
-
-    // ===== 点击金字塔层滚动到对应内容 =====
-    function scrollToLayer(level) {
-      const target = document.getElementById('layer-' + level);
-      if (!target) return;
-      document.querySelectorAll('.layer-block').forEach(el => el.classList.remove('highlight'));
-      target.classList.add('highlight');
-      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      setTimeout(() => target.classList.remove('highlight'), 3000);
-
-      // 同时更新侧边栏高亮
-      const targetNav = document.querySelector(`.nav-item[data-target="layer-${level}"]`);
-      if (targetNav) {
-        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-        targetNav.classList.add('active');
-      }
-    }
-
-    // ===== 滚动时高亮对应的金字塔层 =====
-    function updateActiveLayer() {
-      const blocks = document.querySelectorAll('.layer-block');
-      const pyramidLayers = document.querySelectorAll('.pyramid-layer');
-      pyramidLayers.forEach(l => l.classList.remove('active'));
-
-      let activeLevel = -1;
-      blocks.forEach((block, index) => {
-        const rect = block.getBoundingClientRect();
-        if (rect.top < 200) {
-          activeLevel = index;
+        function closeModalOutside(event) {
+            if (event.target === document.getElementById('dataModal')) {
+                closeModal();
+            }
         }
-      });
 
-      if (activeLevel === -1) {
-        const firstBlock = document.querySelector('.layer-block');
-        if (firstBlock && firstBlock.getBoundingClientRect().top < 0) {
-          const lastBlock = blocks[blocks.length - 1];
-          if (lastBlock && lastBlock.getBoundingClientRect().top < window.innerHeight) {
-            const lastLevel = blocks.length - 1;
-            const targetPyramid = document.querySelector(`.pyramid-layer[data-level="${lastLevel}"]`);
-            if (targetPyramid) targetPyramid.classList.add('active');
-          }
-          return;
+        // ESC 键关闭浮层
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeModal();
+        });
+
+        // ============================================================ //
+        // ===== 折叠展开 ===== //
+        // ============================================================ //
+        function toggleLayer(headerEl) {
+            const body = headerEl.nextElementSibling;
+            const icon = headerEl.querySelector('.toggle-icon');
+            if (!body || !icon) return;
+
+            const isOpen = body.classList.contains('open');
+            if (isOpen) {
+                body.classList.remove('open');
+                icon.classList.remove('open');
+            } else {
+                body.classList.add('open');
+                icon.classList.add('open');
+            }
         }
-        const firstPyramid = document.querySelector('.pyramid-layer[data-level="0"]');
-        if (firstPyramid) firstPyramid.classList.add('active');
-        return;
-      }
 
-      const targetPyramid = document.querySelector(`.pyramid-layer[data-level="${activeLevel}"]`);
-      if (targetPyramid) targetPyramid.classList.add('active');
-    }
+        // ============================================================ //
+        // ===== 鼠标跟随光晕 ===== //
+        // ============================================================ //
+        const glow = document.getElementById('glow');
+        document.addEventListener('mousemove', (e) => {
+            const x = e.clientX / window.innerWidth * 100;
+            const y = e.clientY / window.innerHeight * 100;
+            glow.style.setProperty('--x', x + '%');
+            glow.style.setProperty('--y', y + '%');
+        });
 
-    let scrollTimeout;
-    window.addEventListener('scroll', function() {
-      if (scrollTimeout) return;
-      scrollTimeout = setTimeout(() => {
-        updateActiveLayer();
-        scrollTimeout = null;
-      }, 80);
-    });
+        // ============================================================ //
+        // ===== 侧边栏滚动联动 ===== //
+        // ============================================================ //
+        const navItems = document.querySelectorAll('.nav-item');
+        const blocks = document.querySelectorAll('.core-mind, .layer-block, .engineering-loop');
 
-    window.addEventListener('load', function() {
-      const firstPyramid = document.querySelector('.pyramid-layer[data-level="0"]');
-      if (firstPyramid) firstPyramid.classList.add('active');
-      const firstBlock = document.getElementById('layer-0');
-      if (firstBlock) {
-        firstBlock.classList.add('highlight');
-        setTimeout(() => firstBlock.classList.remove('highlight'), 2500);
-      }
-      setTimeout(updateActiveLayer, 300);
-      setTimeout(updateActiveNav, 300);
-    });
-  </script>
+        function updateActiveNav() {
+            let currentId = null;
+            blocks.forEach(block => {
+                const rect = block.getBoundingClientRect();
+                if (rect.top <= 120) {
+                    currentId = block.id;
+                }
+            });
+            navItems.forEach(item => {
+                item.classList.toggle('active', item.dataset.target === currentId);
+            });
+        }
+
+        window.addEventListener('scroll', updateActiveNav);
+        window.addEventListener('load', updateActiveNav);
+
+        // ============================================================ //
+        // ===== 返回顶部按钮 ===== //
+        // ============================================================ //
+        const backBtn = document.getElementById('backToTop');
+        window.addEventListener('scroll', function() {
+            if (window.scrollY > 600) {
+                backBtn.classList.add('visible');
+            } else {
+                backBtn.classList.remove('visible');
+            }
+        });
+        backBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+        // ============================================================ //
+        // ===== 初始化：默认展开第0层 ===== //
+        // ============================================================ //
+        document.addEventListener('DOMContentLoaded', function() {
+            const layer0Body = document.getElementById('layer-body-0');
+            const layer0Icon = document.querySelector('#layer-0 .toggle-icon');
+            if (layer0Body) {
+                layer0Body.classList.add('open');
+                if (layer0Icon) layer0Icon.classList.add('open');
+            }
+            // 其他层默认折叠
+            for (let i = 1; i <= 5; i++) {
+                const body = document.getElementById('layer-body-' + i);
+                const icon = document.querySelector(`#layer-${i} .toggle-icon`);
+                if (body) {
+                    body.classList.remove('open');
+                    if (icon) icon.classList.remove('open');
+                }
+            }
+            // 默认高亮第0层金字塔
+            const firstPyramid = document.querySelector('.pyramid-layer[data-level="0"]');
+            if (firstPyramid) firstPyramid.classList.add('active');
+            setTimeout(updateActiveNav, 300);
+        });
+    </script>
 
 </body>
 </html>
