@@ -1,87 +1,3810 @@
-<!-- ============================================================ -->
-<!-- ===== 【新增】算法工作流 + Token 流对比 ===== -->
-<!-- ============================================================ -->
-<div class="section-anchor" id="section-workflow"></div>
-<div class="workflow-section">
-    <div class="wf-header">
-        <span class="wf-icon">⚙️</span>
-        <span class="wf-title">算法工作流 · <span>数学 → 经济 → AI</span></span>
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>画圈实验 · 认知方法论</title>
+    <style>
+        /* ===== 重置 & 沉浸式深色背景 ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0b0b1a;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            min-height: 100vh;
+            padding: 24px 20px 24px 100px;
+            overflow-x: hidden;
+        }
+
+        #glow {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            background: radial-gradient(600px circle at var(--x, 50%) var(--y, 50%), rgba(120, 80, 255, 0.06), transparent 80%);
+            transition: background 0.1s;
+        }
+
+        /* ===== 左侧固定索引 ===== */
+        .sidebar-index {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 72px;
+            height: 100vh;
+            padding: 32px 0 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            z-index: 100;
+            background: rgba(11, 11, 26, 0.6);
+            backdrop-filter: blur(12px);
+            border-right: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        .sidebar-index .idx-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            color: rgba(255, 255, 255, 0.15);
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            border: 1px solid transparent;
+            position: relative;
+            font-family: 'Courier New', monospace;
+        }
+
+        .sidebar-index .idx-item:hover {
+            color: rgba(255, 255, 255, 0.6);
+            background: rgba(255, 255, 255, 0.03);
+            border-color: rgba(255, 255, 255, 0.06);
+        }
+
+        .sidebar-index .idx-item.active {
+            color: #a78bfa;
+            background: rgba(167, 139, 250, 0.06);
+            border-color: rgba(167, 139, 250, 0.12);
+        }
+
+        .sidebar-index .idx-item .label {
+            font-size: 7px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            opacity: 0.3;
+            margin-top: 1px;
+            font-family: system-ui, sans-serif;
+        }
+
+        .sidebar-index .idx-item .num {
+            font-size: 11px;
+            font-weight: 600;
+            line-height: 1;
+        }
+
+        .sidebar-index .idx-divider {
+            width: 20px;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.04);
+            margin: 2px 0;
+        }
+
+        .sidebar-index .idx-bottom {
+            margin-top: auto;
+            font-size: 8px;
+            color: rgba(255, 255, 255, 0.06);
+            writing-mode: vertical-rl;
+            letter-spacing: 2px;
+            font-weight: 300;
+        }
+
+        /* ===== 主容器 ===== */
+        .page-wrapper {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: radial-gradient(ellipse at 30% 30%, #120b24, #0b0b1a 70%, #05030a);
+            border-radius: 32px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            box-shadow: 0 30px 80px rgba(40, 10, 80, 0.4);
+            overflow: hidden;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ===== 通用标题 ===== */
+        .section-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: #f1f5f9;
+            padding: 24px 40px 8px;
+            letter-spacing: -0.3px;
+        }
+
+        .section-title span {
+            color: #a78bfa;
+        }
+
+        .section-sub {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.25);
+            padding: 0 40px 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        .section-anchor {
+            scroll-margin-top: 16px;
+        }
+
+        /* ===== Hero 区域 ===== */
+        .hero-section {
+            padding: 28px 40px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        .hero-section .hero-badge {
+            display: inline-block;
+            font-size: 10px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            padding: 2px 14px;
+            border-radius: 14px;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+
+        .hero-section .hero-title {
+            font-size: 30px;
+            font-weight: 700;
+            color: #f1f5f9;
+            letter-spacing: -0.5px;
+        }
+
+        .hero-section .hero-title span {
+            color: #a78bfa;
+        }
+
+        .hero-section .hero-origin {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.3);
+            margin: 4px 0 6px;
+            padding: 8px 16px;
+            background: rgba(167, 139, 250, 0.04);
+            border-left: 3px solid rgba(167, 139, 250, 0.15);
+            border-radius: 0 8px 8px 0;
+            line-height: 1.6;
+            max-width: 780px;
+        }
+
+        .hero-section .hero-origin strong {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .hero-section .hero-origin .hl {
+            color: #a78bfa;
+            font-weight: 500;
+        }
+
+        .hero-section .hero-quick {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .hero-section .hero-quick .hq-item {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 10px;
+            padding: 8px 12px;
+            text-align: center;
+        }
+
+        .hero-section .hero-quick .hq-item .hq-num {
+            font-size: 20px;
+            font-weight: 700;
+            color: #a78bfa;
+            line-height: 1.2;
+        }
+
+        .hero-section .hero-quick .hq-item .hq-label {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.2);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .hero-section .hero-quick .hq-item .hq-desc {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.15);
+            margin-top: 2px;
+        }
+
+        /* ===== 第一层：映射对照 ===== */
+        .mapping-header {
+            padding: 28px 40px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        .mapping-header .map-grid {
+            display: grid;
+            grid-template-columns: 1fr 30px 1fr;
+            gap: 0;
+            align-items: stretch;
+        }
+
+        .mapping-header .map-grid .col-label {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: rgba(255, 255, 255, 0.15);
+            padding: 0 0 10px 0;
+            font-weight: 600;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            grid-column: span 3;
+        }
+
+        .mapping-header .map-grid .col-label .hl {
+            color: #a78bfa;
+        }
+
+        .mapping-header .map-grid .col-left {
+            padding-right: 12px;
+        }
+        .mapping-header .map-grid .col-right {
+            padding-left: 12px;
+        }
+        .mapping-header .map-grid .col-center {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255, 255, 255, 0.04);
+            font-size: 14px;
+            font-weight: 300;
+            gap: 14px;
+        }
+        .mapping-header .map-grid .col-center .line {
+            width: 1px;
+            flex: 1;
+            background: rgba(255, 255, 255, 0.04);
+            min-height: 20px;
+        }
+        .mapping-header .map-grid .col-center .dot {
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background: rgba(167, 139, 250, 0.15);
+        }
+
+        .mapping-row {
+            display: grid;
+            grid-template-columns: 1fr 30px 1fr;
+            gap: 0;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+            align-items: center;
+        }
+        .mapping-row:last-child {
+            border-bottom: none;
+        }
+
+        .mapping-row .left {
+            padding-right: 12px;
+            text-align: right;
+        }
+        .mapping-row .left .l-icon {
+            font-size: 14px;
+            display: inline-block;
+            margin-right: 6px;
+        }
+        .mapping-row .left .l-text {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.5);
+            line-height: 1.4;
+        }
+        .mapping-row .left .l-text strong {
+            color: rgba(255, 255, 255, 0.75);
+        }
+        .mapping-row .left .l-text .accent {
+            color: #a78bfa;
+        }
+
+        .mapping-row .center-connector {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255, 255, 255, 0.04);
+            font-size: 12px;
+            font-weight: 300;
+        }
+        .mapping-row .center-connector .num-tag {
+            font-size: 9px;
+            color: rgba(167, 139, 250, 0.15);
+            font-weight: 600;
+        }
+
+        .mapping-row .right {
+            padding-left: 12px;
+        }
+        .mapping-row .right .r-icon {
+            font-size: 14px;
+            display: inline-block;
+            margin-right: 6px;
+        }
+        .mapping-row .right .r-text {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.5);
+            line-height: 1.4;
+        }
+        .mapping-row .right .r-text strong {
+            color: rgba(255, 255, 255, 0.75);
+        }
+        .mapping-row .right .r-text .accent-orange {
+            color: #fbbf24;
+        }
+
+        /* ===== 第二层：核心路径 ===== */
+        .core-section {
+            padding: 28px 40px 24px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        .core-section .path-flow-compact {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: baseline;
+            gap: 4px 8px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 14px;
+            padding: 16px 24px;
+            margin-bottom: 14px;
+            font-size: 15px;
+            color: rgba(255, 255, 255, 0.5);
+            line-height: 1.8;
+        }
+
+        .core-section .path-flow-compact .num {
+            font-weight: 700;
+            color: #a78bfa;
+            font-size: 18px;
+        }
+        .core-section .path-flow-compact .num.highlight {
+            color: #facc15;
+        }
+        .core-section .path-flow-compact .arrow {
+            color: rgba(255, 255, 255, 0.08);
+            font-weight: 300;
+            margin: 0 2px;
+        }
+        .core-section .path-flow-compact .desc {
+            color: rgba(255, 255, 255, 0.35);
+            font-weight: 400;
+        }
+        .core-section .path-flow-compact .desc .hl {
+            color: #a78bfa;
+            font-weight: 500;
+        }
+
+        .core-section .path-econ {
+            margin-top: 12px;
+            background: rgba(167, 139, 250, 0.03);
+            border-left: 3px solid #a78bfa;
+            border-radius: 0 10px 10px 0;
+            padding: 12px 16px;
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.5);
+            line-height: 1.7;
+        }
+        .core-section .path-econ strong {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        /* ===== AB测试验证入口 ===== */
+        .ab-trigger-section {
+            padding: 12px 40px 18px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            background: rgba(167, 139, 250, 0.02);
+        }
+
+        .ab-trigger-section .ab-row {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+
+        .ab-trigger-section .ab-row .ab-label {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.15);
+            letter-spacing: 0.5px;
+        }
+
+        .ab-trigger-section .ab-row .ab-label .hl {
+            color: #a78bfa;
+        }
+
+        .ab-trigger-section .ab-row .ab-btn {
+            background: rgba(167, 139, 250, 0.06);
+            border: 1px solid rgba(167, 139, 250, 0.08);
+            border-radius: 20px;
+            padding: 4px 18px;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        .ab-trigger-section .ab-row .ab-btn:hover {
+            background: rgba(167, 139, 250, 0.12);
+            border-color: rgba(167, 139, 250, 0.15);
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .ab-trigger-section .ab-row .ab-btn.active {
+            background: rgba(167, 139, 250, 0.12);
+            border-color: rgba(167, 139, 250, 0.2);
+            color: #a78bfa;
+        }
+
+        .ab-trigger-section .ab-row .ab-status {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.08);
+        }
+
+        .ab-trigger-section .ab-row .ab-status .dot {
+            display: inline-block;
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: #22c55e;
+            opacity: 0.3;
+            margin-right: 4px;
+        }
+
+        .ab-panel {
+            display: none;
+            margin-top: 12px;
+            padding: 14px 18px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 12px;
+        }
+
+        .ab-panel.visible {
+            display: block;
+        }
+
+        .ab-panel .ab-panel-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.4);
+            margin-bottom: 6px;
+        }
+
+        .ab-panel .ab-panel-title span {
+            color: #a78bfa;
+        }
+
+        .ab-panel .ab-panel-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .ab-panel .ab-panel-grid .ab-stat {
+            background: rgba(255, 255, 255, 0.01);
+            border-radius: 8px;
+            padding: 8px 12px;
+            border: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        .ab-panel .ab-panel-grid .ab-stat .ab-stat-label {
+            font-size: 9px;
+            color: rgba(255, 255, 255, 0.12);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .ab-panel .ab-panel-grid .ab-stat .ab-stat-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.5);
+            margin-top: 2px;
+        }
+
+        .ab-panel .ab-panel-grid .ab-stat .ab-stat-value.highlight {
+            color: #a78bfa;
+        }
+
+        .ab-panel .ab-panel-conclusion {
+            margin-top: 10px;
+            padding: 8px 12px;
+            background: rgba(167, 139, 250, 0.04);
+            border-left: 2px solid rgba(167, 139, 250, 0.15);
+            border-radius: 0 6px 6px 0;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        .ab-panel .ab-panel-conclusion strong {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .ab-panel .ab-panel-conclusion .hl {
+            color: #a78bfa;
+        }
+
+        /* ===== 认知画圈 ===== */
+        .cognition-loop-section {
+            padding: 24px 40px 28px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            background: rgba(167, 139, 250, 0.02);
+        }
+
+        .cognition-loop-section .loop-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .cognition-loop-section .loop-header .loop-icon {
+            font-size: 24px;
+        }
+
+        .cognition-loop-section .loop-header .loop-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .cognition-loop-section .loop-header .loop-title span {
+            color: #a78bfa;
+        }
+
+        .cognition-loop-section .loop-core {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 16px;
+        }
+
+        .cognition-loop-section .loop-core .loop-visual {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 14px;
+            padding: 18px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .cognition-loop-section .loop-core .loop-visual .cycle-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            width: 100%;
+            margin: 4px 0;
+        }
+
+        .cognition-loop-section .loop-core .loop-visual .cycle-node {
+            background: rgba(167, 139, 250, 0.06);
+            border: 1px solid rgba(167, 139, 250, 0.08);
+            border-radius: 12px;
+            padding: 10px 16px;
+            text-align: center;
+            min-width: 80px;
+        }
+
+        .cognition-loop-section .loop-core .loop-visual .cycle-node .cn-icon {
+            font-size: 20px;
+            display: block;
+        }
+
+        .cognition-loop-section .loop-core .loop-visual .cycle-node .cn-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.5);
+            margin-top: 2px;
+        }
+
+        .cognition-loop-section .loop-core .loop-visual .cycle-node .cn-desc {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.15);
+            margin-top: 1px;
+        }
+
+        .cognition-loop-section .loop-core .loop-visual .cycle-arrow {
+            color: rgba(255, 255, 255, 0.08);
+            font-size: 18px;
+        }
+
+        .cognition-loop-section .loop-core .loop-visual .cycle-loop-label {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.12);
+            margin-top: 6px;
+            letter-spacing: 1px;
+        }
+
+        .cognition-loop-section .loop-core .loop-explain {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .cognition-loop-section .loop-core .loop-explain .explain-item {
+            background: rgba(255, 255, 255, 0.01);
+            border-radius: 10px;
+            padding: 10px 14px;
+            border-left: 2px solid rgba(167, 139, 250, 0.1);
+        }
+
+        .cognition-loop-section .loop-core .loop-explain .explain-item .ei-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .cognition-loop-section .loop-core .loop-explain .explain-item .ei-text {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.35);
+            line-height: 1.6;
+            margin-top: 2px;
+        }
+
+        .cognition-loop-section .loop-core .loop-explain .explain-item .ei-text .hl {
+            color: #a78bfa;
+        }
+
+        .cognition-loop-section .loop-core .loop-explain .explain-item .ei-text .hl-gold {
+            color: #facc15;
+        }
+
+        .cognition-loop-section .loop-bottom {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-top: 4px;
+        }
+
+        .cognition-loop-section .loop-bottom .path-item {
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 10px;
+            padding: 10px 14px;
+            text-align: center;
+        }
+
+        .cognition-loop-section .loop-bottom .path-item .pi-icon {
+            font-size: 18px;
+        }
+
+        .cognition-loop-section .loop-bottom .path-item .pi-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.4);
+            margin-top: 2px;
+        }
+
+        .cognition-loop-section .loop-bottom .path-item .pi-desc {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.15);
+            margin-top: 1px;
+        }
+
+        .cognition-loop-section .loop-conclusion {
+            margin-top: 14px;
+            padding: 10px 16px;
+            background: rgba(167, 139, 250, 0.04);
+            border-radius: 10px;
+            border: 1px solid rgba(167, 139, 250, 0.06);
+            text-align: center;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.4);
+            line-height: 1.7;
+        }
+
+        .cognition-loop-section .loop-conclusion strong {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .cognition-loop-section .loop-conclusion .hl {
+            color: #a78bfa;
+            font-weight: 500;
+        }
+
+        /* ============================================================ */
+        /* ===== 【新增】算法工作流 + Token 流对比 ===== */
+        /* ============================================================ */
+        .workflow-section {
+            padding: 24px 40px 28px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        .workflow-section .wf-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .workflow-section .wf-header .wf-icon {
+            font-size: 24px;
+        }
+
+        .workflow-section .wf-header .wf-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .workflow-section .wf-header .wf-title span {
+            color: #a78bfa;
+        }
+
+        .workflow-section .wf-flow {
+            display: flex;
+            align-items: stretch;
+            gap: 6px;
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 14px;
+            padding: 16px 20px;
+            margin-bottom: 12px;
+        }
+
+        .workflow-section .wf-flow .wf-node {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 10px;
+            padding: 12px 14px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            transition: all 0.3s ease;
+        }
+
+        .workflow-section .wf-flow .wf-node:hover {
+            background: rgba(167, 139, 250, 0.04);
+            border-color: rgba(167, 139, 250, 0.08);
+        }
+
+        .workflow-section .wf-flow .wf-node .wn-icon {
+            font-size: 22px;
+        }
+
+        .workflow-section .wf-flow .wf-node .wn-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.5);
+            margin-top: 2px;
+        }
+
+        .workflow-section .wf-flow .wf-node .wn-desc {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.15);
+            margin-top: 2px;
+            line-height: 1.4;
+        }
+
+        .workflow-section .wf-flow .wf-node .wn-example {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.08);
+            margin-top: 4px;
+            font-family: monospace;
+        }
+
+        .workflow-section .wf-flow .wf-arrow {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255, 255, 255, 0.04);
+            font-size: 18px;
+            padding: 0 4px;
+            min-width: 30px;
+        }
+
+        .workflow-section .wf-flow .wf-arrow .wa-label {
+            font-size: 7px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: rgba(255, 255, 255, 0.04);
+            margin-top: 2px;
+        }
+
+        .workflow-section .wf-summary {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .workflow-section .wf-summary .ws-item {
+            background: rgba(255, 255, 255, 0.01);
+            border-radius: 8px;
+            padding: 8px 12px;
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            text-align: center;
+        }
+
+        .workflow-section .wf-summary .ws-item .ws-label {
+            font-size: 9px;
+            color: rgba(255, 255, 255, 0.12);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .workflow-section .wf-summary .ws-item .ws-value {
+            font-size: 13px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.3);
+            margin-top: 2px;
+        }
+
+        .workflow-section .wf-summary .ws-item .ws-value .hl {
+            color: #a78bfa;
+        }
+
+        /* ===== Token 流对比样式 ===== */
+        .token-flow-section {
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        .token-flow-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+        }
+
+        .token-flow-header .tf-icon {
+            font-size: 22px;
+        }
+
+        .token-flow-header .tf-title {
+            font-size: 17px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .token-flow-header .tf-title span {
+            color: #a78bfa;
+        }
+
+        .token-flow-header .tf-badge {
+            font-size: 9px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            padding: 2px 12px;
+            border-radius: 12px;
+            margin-left: auto;
+        }
+
+        .token-flow-canvas-wrap {
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 14px;
+            padding: 4px;
+            overflow: hidden;
+        }
+
+        .token-flow-canvas-wrap canvas {
+            display: block;
+            width: 100%;
+            height: auto;
+            background: rgba(255, 255, 255, 0.01);
+            border-radius: 10px;
+        }
+
+        .token-flow-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 12px;
+            flex-wrap: wrap;
+        }
+
+        .token-flow-controls .tf-btn {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 16px;
+            padding: 4px 16px;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        .token-flow-controls .tf-btn:hover {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .token-flow-controls .tf-btn.primary {
+            background: rgba(167, 139, 250, 0.08);
+            border-color: rgba(167, 139, 250, 0.08);
+            color: #a78bfa;
+        }
+
+        .token-flow-controls .tf-btn.primary:hover {
+            background: rgba(167, 139, 250, 0.15);
+            border-color: rgba(167, 139, 250, 0.15);
+        }
+
+        .token-flow-controls .tf-status {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.1);
+            min-width: 60px;
+        }
+
+        .token-flow-controls .tf-speed-label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.12);
+            margin-left: auto;
+        }
+
+        .token-flow-controls .tf-speed-label input[type="range"] {
+            width: 80px;
+            height: 3px;
+            accent-color: #a78bfa;
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 4px;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        .token-flow-controls .tf-speed-label input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #a78bfa;
+            cursor: pointer;
+        }
+
+        .token-flow-controls .tf-speed-label #tfSpeedDisplay {
+            min-width: 30px;
+            color: rgba(255, 255, 255, 0.3);
+            font-weight: 500;
+        }
+
+        .token-flow-conclusion {
+            margin-top: 12px;
+            padding: 10px 16px;
+            background: rgba(167, 139, 250, 0.03);
+            border: 1px solid rgba(167, 139, 250, 0.04);
+            border-radius: 10px;
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.35);
+            line-height: 1.7;
+            text-align: center;
+        }
+
+        .token-flow-conclusion strong {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .token-flow-conclusion .hl {
+            color: #a78bfa;
+            font-weight: 500;
+        }
+
+        /* ===== 静/动圈区分 ===== */
+        .circle-duality {
+            padding: 20px 40px 18px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            background: rgba(167, 139, 250, 0.03);
+        }
+
+        .circle-duality .duality-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.5);
+            margin-bottom: 8px;
+            letter-spacing: 0.3px;
+        }
+
+        .circle-duality .duality-title span {
+            color: #a78bfa;
+        }
+
+        .circle-duality .duality-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .circle-duality .duality-grid .card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 12px;
+            padding: 14px 18px;
+        }
+
+        .circle-duality .duality-grid .card .card-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.6);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .circle-duality .duality-grid .card .card-title .badge-static {
+            background: rgba(167, 139, 250, 0.12);
+            color: #a78bfa;
+            font-size: 9px;
+            padding: 1px 10px;
+            border-radius: 12px;
+            font-weight: 500;
+        }
+
+        .circle-duality .duality-grid .card .card-title .badge-dynamic {
+            background: rgba(250, 204, 21, 0.12);
+            color: #facc15;
+            font-size: 9px;
+            padding: 1px 10px;
+            border-radius: 12px;
+            font-weight: 500;
+        }
+
+        .circle-duality .duality-grid .card p {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.35);
+            line-height: 1.6;
+            margin-top: 4px;
+        }
+
+        .circle-duality .duality-grid .card p strong {
+            color: rgba(255, 255, 255, 0.55);
+        }
+
+        /* ===== 第三层：三个模式 ===== */
+        .mode-block {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        }
+        .mode-block:last-of-type {
+            border-bottom: none;
+        }
+
+        .mode-block .mode-label {
+            padding: 16px 40px 4px;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: rgba(255, 255, 255, 0.12);
+            font-weight: 600;
+        }
+        .mode-block .mode-label .hl {
+            color: #a78bfa;
+        }
+
+        .mode-split {
+            display: flex;
+            gap: 0;
+            padding: 0 0 8px 0;
+        }
+
+        .mode-split .theory {
+            width: 40%;
+            padding: 14px 24px 16px 32px;
+            border-right: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        .mode-split .theory .th-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #f1f5f9;
+            margin-bottom: 2px;
+        }
+        .mode-split .theory .th-sub {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.2);
+            margin-bottom: 10px;
+        }
+
+        .mode-split .theory .dim-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2px 16px;
+            margin-bottom: 6px;
+        }
+
+        .mode-split .theory .dim-grid .dim-item {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.35);
+            line-height: 1.6;
+            padding: 2px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+        }
+
+        .mode-split .theory .dim-grid .dim-item .hl {
+            color: #a78bfa;
+            font-weight: 500;
+        }
+
+        .mode-split .theory .dim-grid .dim-item .dim-empty {
+            color: rgba(255, 255, 255, 0.06);
+        }
+
+        .mode-split .theory .th-conclusion {
+            margin-top: 10px;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.4);
+            border-top: 1px solid rgba(255, 255, 255, 0.03);
+            padding-top: 10px;
+            line-height: 1.6;
+        }
+
+        .mode-split .theory .th-conclusion strong {
+            color: rgba(255, 255, 255, 0.55);
+        }
+        .mode-split .theory .th-conclusion .hl {
+            color: #a78bfa;
+            font-weight: 600;
+        }
+
+        .mode-split .demo {
+            width: 60%;
+            padding: 14px 32px 16px 24px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .mode-split .demo .demo-label {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: rgba(255, 255, 255, 0.08);
+            margin-bottom: 6px;
+            text-align: center;
+        }
+
+        .mode-split .demo .canvas-wrap {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 16px;
+            padding: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            margin-bottom: 10px;
+            position: relative;
+            width: 100%;
+            aspect-ratio: 16 / 7;
+            overflow: hidden;
+        }
+
+        .mode-split .demo .canvas-wrap canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 12px;
+            object-fit: contain;
+        }
+
+        .mode-split .demo .controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px 14px;
+            margin-bottom: 8px;
+        }
+
+        .mode-split .demo .controls .ctrl {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .mode-split .demo .controls .ctrl label {
+            font-size: 11px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.3);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .mode-split .demo .controls .ctrl label span {
+            color: #a78bfa;
+            font-weight: 600;
+        }
+
+        .mode-split .demo .controls input[type="range"] {
+            width: 100%;
+            accent-color: #a78bfa;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 4px;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        .mode-split .demo .controls input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #a78bfa;
+            cursor: pointer;
+        }
+
+        .mode-split .demo .feedback {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 6px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 12px;
+            padding: 10px 14px;
+            margin-bottom: 8px;
+        }
+
+        .mode-split .demo .feedback .fb {
+            display: flex;
+            flex-direction: column;
+        }
+        .mode-split .demo .feedback .fb .lbl {
+            color: rgba(255, 255, 255, 0.15);
+            font-size: 9px;
+        }
+        .mode-split .demo .feedback .fb .val {
+            font-weight: 600;
+            color: #f1f5f9;
+            font-size: 14px;
+            margin-top: 1px;
+        }
+        .mode-split .demo .feedback .fb .val.highlight {
+            color: #a78bfa;
+        }
+
+        .mode-split .demo .actions {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        .mode-split .demo .actions button {
+            padding: 5px 16px;
+            border: none;
+            border-radius: 16px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.04);
+            color: rgba(255, 255, 255, 0.35);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        .mode-split .demo .actions button.primary {
+            background: rgba(167, 139, 250, 0.12);
+            color: #a78bfa;
+            border-color: rgba(167, 139, 250, 0.12);
+        }
+
+        .mode-split .demo .actions button.primary:hover {
+            background: rgba(167, 139, 250, 0.22);
+            transform: translateY(-2px);
+        }
+
+        .mode-split .demo .actions button:hover {
+            background: rgba(255, 255, 255, 0.06);
+            color: #f1f5f9;
+            transform: translateY(-2px);
+        }
+
+        /* ===== 延伸方向 ===== */
+        .extension-section {
+            padding: 32px 40px 28px;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        .extension-section .ext-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.6);
+            text-align: center;
+            margin-bottom: 4px;
+        }
+
+        .extension-section .ext-title span {
+            color: #a78bfa;
+        }
+
+        .extension-section .ext-sub {
+            text-align: center;
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.2);
+            margin-bottom: 16px;
+        }
+
+        .extension-section .priority-path {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px 24px;
+            margin-bottom: 18px;
+            padding: 12px 20px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        .extension-section .priority-path .pp-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.25);
+        }
+
+        .extension-section .priority-path .pp-item .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .extension-section .priority-path .pp-item .dot.green {
+            background: #22c55e;
+        }
+        .extension-section .priority-path .pp-item .dot.yellow {
+            background: #facc15;
+        }
+        .extension-section .priority-path .pp-item .dot.purple {
+            background: #a78bfa;
+        }
+
+        .extension-section .priority-path .pp-item .tag {
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.4);
+        }
+        .extension-section .priority-path .pp-item .desc {
+            color: rgba(255, 255, 255, 0.15);
+        }
+
+        .extension-section .ext-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px 14px;
+            margin-bottom: 16px;
+        }
+
+        .extension-section .ext-grid .tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 30px;
+            padding: 8px 20px;
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.4);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .extension-section .ext-grid .tag:hover {
+            background: rgba(167, 139, 250, 0.06);
+            border-color: rgba(167, 139, 250, 0.15);
+            color: rgba(255, 255, 255, 0.7);
+            transform: translateY(-2px);
+        }
+
+        .extension-section .ext-grid .tag .hl {
+            color: #a78bfa;
+        }
+        .extension-section .ext-grid .tag .lock {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.1);
+        }
+
+        .extension-section .ext-grid .tag.priority-green {
+            border-color: rgba(34, 197, 94, 0.15);
+            background: rgba(34, 197, 94, 0.04);
+        }
+
+        .extension-section .ext-grid .tag.priority-green .hl {
+            color: #22c55e;
+        }
+
+        .extension-section .ext-grid .tag.priority-yellow {
+            border-color: rgba(250, 204, 21, 0.12);
+            background: rgba(250, 204, 21, 0.03);
+        }
+
+        .extension-section .ext-grid .tag.priority-yellow .hl {
+            color: #facc15;
+        }
+
+        .extension-section .ext-grid .tag.priority-purple {
+            border-color: rgba(167, 139, 250, 0.12);
+            background: rgba(167, 139, 250, 0.03);
+        }
+
+        .extension-section .ext-grid .tag.priority-purple .hl {
+            color: #a78bfa;
+        }
+
+        .extension-section .ext-grid .tag .priority-badge {
+            font-size: 9px;
+            font-weight: 600;
+            padding: 1px 8px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.04);
+            color: rgba(255, 255, 255, 0.15);
+        }
+
+        .extension-section .ext-grid .tag.priority-green .priority-badge {
+            background: rgba(34, 197, 94, 0.1);
+            color: #22c55e;
+        }
+
+        .extension-section .ext-grid .tag.priority-yellow .priority-badge {
+            background: rgba(250, 204, 21, 0.1);
+            color: #facc15;
+        }
+
+        .extension-section .ext-grid .tag.priority-purple .priority-badge {
+            background: rgba(167, 139, 250, 0.1);
+            color: #a78bfa;
+        }
+
+        .extension-section .ext-footer {
+            text-align: center;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.1);
+            border-top: 1px solid rgba(255, 255, 255, 0.02);
+            padding-top: 14px;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .extension-section .ext-footer .infinity {
+            color: #a78bfa;
+            font-size: 16px;
+        }
+
+        .extension-section .ext-footer .private-note {
+            color: rgba(255, 255, 255, 0.08);
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .extension-section .ext-footer .private-note .dot {
+            display: inline-block;
+            width: 4px;
+            height: 4px;
+            background: #22c55e;
+            border-radius: 50%;
+            opacity: 0.3;
+        }
+
+        /* ===== 底部细节说明 ===== */
+        .detail-notes {
+            padding: 28px 40px 32px;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+            background: rgba(255, 255, 255, 0.01);
+        }
+
+        .detail-notes .notes-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.4);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .detail-notes .notes-title span {
+            color: rgba(255, 255, 255, 0.1);
+            font-weight: 400;
+            font-size: 12px;
+        }
+
+        .detail-notes .notes-scroll {
+            max-height: 240px;
+            overflow-y: auto;
+            padding-right: 8px;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255, 255, 255, 0.04) transparent;
+        }
+
+        .detail-notes .notes-scroll::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .detail-notes .notes-scroll::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .detail-notes .notes-scroll::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 4px;
+        }
+
+        .detail-notes .notes-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px 24px;
+        }
+
+        .detail-notes .notes-grid .note-item {
+            padding: 10px 14px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 10px;
+            border-left: 2px solid rgba(167, 139, 250, 0.1);
+        }
+
+        .detail-notes .notes-grid .note-item .note-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.3);
+            margin-bottom: 2px;
+        }
+
+        .detail-notes .notes-grid .note-item .note-label .icon {
+            margin-right: 4px;
+        }
+
+        .detail-notes .notes-grid .note-item .note-text {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.35);
+            line-height: 1.6;
+        }
+
+        .detail-notes .notes-grid .note-item .note-text code {
+            background: rgba(255, 255, 255, 0.04);
+            padding: 1px 6px;
+            border-radius: 4px;
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.4);
+            font-family: monospace;
+        }
+
+        .detail-notes .notes-grid .note-item .note-text .hl {
+            color: #a78bfa;
+        }
+
+        /* ===== 底部 ===== */
+        .back-bottom {
+            text-align: center;
+            padding: 20px 0 24px;
+            border-top: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        .back-bottom a {
+            color: rgba(255, 255, 255, 0.15);
+            text-decoration: none;
+            font-size: 13px;
+            transition: color 0.3s ease;
+        }
+
+        .back-bottom a:hover {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* ===== 响应式 ===== */
+        @media (max-width: 1024px) {
+            .hero-section .hero-quick {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .cognition-loop-section .loop-core {
+                grid-template-columns: 1fr;
+            }
+            .cognition-loop-section .loop-bottom {
+                grid-template-columns: 1fr 1fr 1fr;
+            }
+            .workflow-section .wf-flow {
+                flex-direction: column;
+                gap: 6px;
+            }
+            .workflow-section .wf-flow .wf-arrow {
+                transform: rotate(90deg);
+                padding: 2px 0;
+                min-width: auto;
+                min-height: 20px;
+            }
+            .workflow-section .wf-summary {
+                grid-template-columns: 1fr;
+            }
+            .mode-split .theory {
+                width: 42%;
+                padding: 12px 18px 14px 20px;
+            }
+            .mode-split .demo {
+                width: 58%;
+                padding: 12px 18px 14px 16px;
+            }
+            .mode-split .theory .dim-grid {
+                grid-template-columns: 1fr;
+                gap: 1px;
+            }
+            .circle-duality .duality-grid {
+                grid-template-columns: 1fr;
+            }
+            .detail-notes .notes-grid {
+                grid-template-columns: 1fr;
+            }
+            .ab-panel .ab-panel-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 900px) {
+            body {
+                padding: 20px 16px 20px 16px;
+            }
+            .sidebar-index {
+                display: none;
+            }
+            .mapping-header .map-grid {
+                grid-template-columns: 1fr;
+                gap: 0;
+            }
+            .mapping-header .map-grid .col-label {
+                grid-column: span 1;
+            }
+            .mapping-header .map-grid .col-center {
+                display: none;
+            }
+            .mapping-row {
+                grid-template-columns: 1fr;
+                gap: 2px;
+                padding: 12px 0;
+            }
+            .mapping-row .left {
+                text-align: left;
+                padding-right: 0;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+                padding-bottom: 4px;
+            }
+            .mapping-row .right {
+                padding-left: 0;
+            }
+            .mapping-row .center-connector {
+                display: none;
+            }
+            .mapping-row .left .l-icon {
+                margin-right: 4px;
+            }
+            .mapping-row .right .r-icon {
+                margin-right: 4px;
+            }
+            .section-title {
+                padding: 20px 28px 6px;
+                font-size: 19px;
+            }
+            .section-sub {
+                padding: 0 28px 12px;
+            }
+            .mapping-header {
+                padding: 20px 28px 16px;
+            }
+            .core-section {
+                padding: 20px 28px 18px;
+            }
+            .ab-trigger-section {
+                padding: 10px 28px 14px;
+            }
+            .circle-duality {
+                padding: 16px 28px 14px;
+            }
+            .cognition-loop-section {
+                padding: 18px 28px 22px;
+            }
+            .cognition-loop-section .loop-bottom {
+                grid-template-columns: 1fr;
+            }
+            .workflow-section {
+                padding: 18px 28px 22px;
+            }
+            .workflow-section .wf-flow {
+                flex-direction: column;
+                gap: 4px;
+            }
+            .workflow-section .wf-flow .wf-arrow {
+                transform: rotate(90deg);
+                padding: 2px 0;
+                min-height: 16px;
+            }
+            .mode-block .mode-label {
+                padding: 12px 28px 4px;
+            }
+            .mode-split {
+                flex-direction: column;
+            }
+            .mode-split .theory {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+                padding: 12px 28px 14px;
+            }
+            .mode-split .theory .dim-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            .mode-split .demo {
+                width: 100%;
+                padding: 14px 28px 18px;
+            }
+            .mode-split .demo .controls {
+                grid-template-columns: 1fr 1fr;
+            }
+            .mode-split .demo .feedback {
+                grid-template-columns: 1fr 1fr;
+            }
+            .extension-section {
+                padding: 24px 28px 20px;
+            }
+            .extension-section .ext-grid {
+                gap: 8px 10px;
+            }
+            .extension-section .ext-grid .tag {
+                font-size: 12px;
+                padding: 6px 14px;
+            }
+            .core-section .path-flow-compact {
+                font-size: 14px;
+                padding: 14px 18px;
+            }
+            .detail-notes {
+                padding: 20px 28px 24px;
+            }
+            .detail-notes .notes-grid {
+                grid-template-columns: 1fr;
+            }
+            .extension-section .priority-path {
+                flex-direction: column;
+                align-items: center;
+                gap: 6px;
+            }
+            .hero-section {
+                padding: 20px 28px 14px;
+            }
+            .hero-section .hero-title {
+                font-size: 24px;
+            }
+            .hero-section .hero-origin {
+                font-size: 13px;
+                padding: 6px 12px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 12px 10px;
+            }
+            .page-wrapper {
+                border-radius: 20px;
+            }
+            .section-title {
+                padding: 16px 18px 4px;
+                font-size: 17px;
+            }
+            .section-sub {
+                padding: 0 18px 10px;
+                font-size: 12px;
+            }
+            .mapping-header {
+                padding: 14px 16px 12px;
+            }
+            .mapping-row .left .l-text {
+                font-size: 12px;
+            }
+            .mapping-row .right .r-text {
+                font-size: 12px;
+            }
+            .core-section {
+                padding: 16px 18px 14px;
+            }
+            .core-section .path-flow-compact {
+                font-size: 13px;
+                padding: 12px 14px;
+                gap: 2px 6px;
+            }
+            .core-section .path-flow-compact .num {
+                font-size: 16px;
+            }
+            .ab-trigger-section {
+                padding: 8px 18px 10px;
+            }
+            .ab-trigger-section .ab-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 6px;
+            }
+            .circle-duality {
+                padding: 14px 18px 12px;
+            }
+            .circle-duality .duality-title {
+                font-size: 13px;
+            }
+            .circle-duality .duality-grid .card .card-title {
+                font-size: 12px;
+            }
+            .circle-duality .duality-grid .card p {
+                font-size: 12px;
+            }
+            .cognition-loop-section {
+                padding: 14px 18px 18px;
+            }
+            .cognition-loop-section .loop-header .loop-title {
+                font-size: 15px;
+            }
+            .cognition-loop-section .loop-core .loop-visual .cycle-row {
+                flex-wrap: wrap;
+                gap: 6px;
+            }
+            .cognition-loop-section .loop-core .loop-visual .cycle-node {
+                min-width: 60px;
+                padding: 6px 10px;
+            }
+            .cognition-loop-section .loop-bottom {
+                grid-template-columns: 1fr;
+            }
+            .workflow-section {
+                padding: 14px 18px 18px;
+            }
+            .workflow-section .wf-header .wf-title {
+                font-size: 15px;
+            }
+            .workflow-section .wf-flow {
+                flex-direction: column;
+                gap: 4px;
+                padding: 12px 14px;
+            }
+            .workflow-section .wf-flow .wf-arrow {
+                transform: rotate(90deg);
+                padding: 2px 0;
+                min-height: 14px;
+            }
+            .workflow-section .wf-flow .wf-node .wn-label {
+                font-size: 12px;
+            }
+            .workflow-section .wf-summary {
+                grid-template-columns: 1fr;
+            }
+            .mode-block .mode-label {
+                padding: 10px 18px 4px;
+                font-size: 10px;
+            }
+            .mode-split .theory {
+                padding: 10px 18px 12px;
+            }
+            .mode-split .theory .th-title {
+                font-size: 14px;
+            }
+            .mode-split .theory .dim-grid {
+                grid-template-columns: 1fr;
+                gap: 1px;
+            }
+            .mode-split .theory .dim-grid .dim-item {
+                font-size: 11px;
+            }
+            .mode-split .demo {
+                padding: 12px 14px 16px;
+            }
+            .mode-split .demo .controls {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+            .mode-split .demo .feedback {
+                grid-template-columns: 1fr 1fr;
+                gap: 4px;
+                padding: 8px 10px;
+            }
+            .mode-split .demo .feedback .fb .val {
+                font-size: 12px;
+            }
+            .extension-section {
+                padding: 18px 16px 16px;
+            }
+            .extension-section .ext-title {
+                font-size: 15px;
+            }
+            .extension-section .ext-grid {
+                gap: 6px 8px;
+            }
+            .extension-section .ext-grid .tag {
+                font-size: 11px;
+                padding: 5px 12px;
+            }
+            .extension-section .ext-footer {
+                flex-direction: column;
+                gap: 8px;
+            }
+            .mode-split .demo .canvas-wrap {
+                aspect-ratio: 16 / 8;
+            }
+            .mapping-row .center-connector .num-tag {
+                display: none;
+            }
+            .detail-notes {
+                padding: 16px 16px 18px;
+            }
+            .detail-notes .notes-title {
+                font-size: 13px;
+            }
+            .detail-notes .notes-grid .note-item .note-text {
+                font-size: 11px;
+            }
+            .extension-section .priority-path .pp-item {
+                font-size: 11px;
+            }
+            .hero-section .hero-quick {
+                grid-template-columns: 1fr 1fr;
+                gap: 6px;
+            }
+            .hero-section .hero-quick .hq-item .hq-num {
+                font-size: 16px;
+            }
+            .token-flow-header .tf-badge {
+                margin-left: 0;
+            }
+            .token-flow-controls .tf-speed-label {
+                margin-left: 0;
+                width: 100%;
+                justify-content: flex-start;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .mode-split .demo .feedback {
+                grid-template-columns: 1fr;
+            }
+            .mode-split .demo .actions {
+                flex-wrap: wrap;
+            }
+            .mode-split .demo .actions button {
+                padding: 4px 12px;
+                font-size: 11px;
+            }
+            .extension-section .ext-grid .tag {
+                font-size: 10px;
+                padding: 4px 10px;
+            }
+            .detail-notes .notes-scroll {
+                max-height: 180px;
+            }
+            .hero-section .hero-quick {
+                grid-template-columns: 1fr 1fr;
+            }
+            .cognition-loop-section .loop-core .loop-visual .cycle-node {
+                min-width: 50px;
+                padding: 4px 8px;
+            }
+            .cognition-loop-section .loop-core .loop-visual .cycle-node .cn-icon {
+                font-size: 16px;
+            }
+            .cognition-loop-section .loop-core .loop-visual .cycle-node .cn-label {
+                font-size: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== 鼠标跟随光晕 ===== -->
+    <div id="glow"></div>
+
+    <!-- ===== 左侧固定索引 ===== -->
+    <div class="sidebar-index" id="sidebarIndex">
+        <a class="idx-item active" data-target="section-hero"><span class="num">①</span><span class="label">起源</span></a>
+        <a class="idx-item" data-target="section-mapping"><span class="num">②</span><span class="label">映射</span></a>
+        <a class="idx-item" data-target="section-core"><span class="num">③</span><span class="label">路径</span></a>
+        <div class="idx-divider"></div>
+        <a class="idx-item" data-target="section-cognition"><span class="num">④</span><span class="label">认知</span></a>
+        <a class="idx-item" data-target="section-workflow"><span class="num">⑤</span><span class="label">工作流</span></a>
+        <a class="idx-item" data-target="section-duality"><span class="num">⑥</span><span class="label">静/动</span></a>
+        <a class="idx-item" data-target="section-math"><span class="num">⑦</span><span class="label">数学</span></a>
+        <a class="idx-item" data-target="section-econ"><span class="num">⑧</span><span class="label">经济</span></a>
+        <a class="idx-item" data-target="section-ai"><span class="num">⑨</span><span class="label">AI</span></a>
+        <div class="idx-divider"></div>
+        <a class="idx-item" data-target="section-extension"><span class="num">∞</span><span class="label">延伸</span></a>
+        <a class="idx-item" data-target="section-notes"><span class="num">ⓘ</span><span class="label">说明</span></a>
+        <div class="idx-bottom">画圈实验</div>
     </div>
 
-    <!-- 静态工作流说明 -->
-    <div class="wf-flow">
-        <div class="wf-node">
-            <div class="wn-icon">📐</div>
-            <div class="wn-label">数学模式</div>
-            <div class="wn-desc">静态圈 · 确定性问题</div>
-            <div class="wn-example">鸡兔同笼 · 线性方程组</div>
+    <!-- ===== 主容器 ===== -->
+    <div class="page-wrapper">
+
+        <!-- ============================================================ -->
+        <!-- ===== Hero 区域 ===== -->
+        <!-- ============================================================ -->
+        <div class="section-anchor" id="section-hero"></div>
+        <div class="hero-section">
+            <div class="hero-badge">🧠 认知方法论 · 脑神经科学底层</div>
+            <div class="hero-title">画圈实验 · <span>从脑神经到商业决策</span></div>
+            <div class="hero-origin">
+                <strong>🧬 脑神经科学溯源：</strong>
+                画圈实验最初来源于<strong>认知神经科学中的"运动-认知耦合"研究</strong>——手部画圈动作激活小脑与运动皮层，通过<strong>时序控制</strong>建立"预期-反馈"闭环。
+                实验中，<span class="hl">半径、速度、方向</span>三个变量对应 <span class="hl">供给、需求、政策</span>，
+                每一次扰动都是<strong>系统重调</strong>的过程。这一底层逻辑已在 <span class="hl">鸡兔同笼</span>、
+                <span class="hl">供需均衡</span>、<span class="hl">AI反馈回路</span> 三个领域完成映射验证。
+            </div>
+            <div class="hero-quick">
+                <div class="hq-item">
+                    <div class="hq-num">①</div>
+                    <div class="hq-label">是什么</div>
+                    <div class="hq-desc">圈 = 运动-认知耦合</div>
+                </div>
+                <div class="hq-item">
+                    <div class="hq-num">②</div>
+                    <div class="hq-label">怎么来</div>
+                    <div class="hq-desc">脑神经科学 · 预期-反馈闭环</div>
+                </div>
+                <div class="hq-item">
+                    <div class="hq-num">③</div>
+                    <div class="hq-label">做什么</div>
+                    <div class="hq-desc">数学 · 经济 · AI 映射</div>
+                </div>
+                <div class="hq-item">
+                    <div class="hq-num">④</div>
+                    <div class="hq-label">验证在哪</div>
+                    <div class="hq-desc">三个模式 · 可交互演示</div>
+                </div>
+            </div>
         </div>
-        <div class="wf-arrow">
-            <span>→</span>
-            <span class="wa-label">变量松弛</span>
+
+        <!-- ============================================================ -->
+        <!-- ===== 第一层：映射对照 ===== -->
+        <!-- ============================================================ -->
+        <div class="section-anchor" id="section-mapping"></div>
+        <div class="section-title">🧠 画圈实验 · <span>3→1→1→3→100</span></div>
+        <div class="section-sub">认知方法论 · 原生思路 vs 科学对照 · 一一对应</div>
+        <div class="mapping-header">
+            <div class="map-grid">
+                <div class="col-label">🧠 原生思路 <span class="hl">· 你的推导</span></div>
+                <div class="col-center"></div>
+                <div class="col-label" style="border-left:1px solid rgba(255,255,255,0.04);">🔬 科学对照 <span class="hl">· 领域映射</span></div>
+                <div class="col-left" style="grid-row:2;">
+                    <div class="mapping-row" style="border-bottom:none; padding:6px 0;">
+                        <div class="left" style="padding-right:0;">
+                            <span class="l-icon">💡</span>
+                            <span class="l-text"><strong>从体感出发</strong> — 甩手时发现"手在画圈"</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-center" style="grid-row:2; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:0 4px;">
+                    <span style="color:rgba(167,139,250,0.12); font-size:10px; font-weight:600;">①</span>
+                </div>
+                <div class="col-right" style="grid-row:2; border-left:1px solid rgba(255,255,255,0.04);">
+                    <div class="mapping-row" style="border-bottom:none; padding:6px 0;">
+                        <div class="right" style="padding-left:0;">
+                            <span class="r-icon">🧪</span>
+                            <span class="r-text"><strong>认知科学 · 奖励学习</strong> — 儿童通过画圈获得反馈</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-left" style="grid-row:3;">
+                    <div class="mapping-row" style="border-bottom:none; padding:6px 0;">
+                        <div class="left" style="padding-right:0;">
+                            <span class="l-icon">🔁</span>
+                            <span class="l-text"><strong>闭环学习</strong> — <span class="accent">3→1→1→3→100</span> 框架</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-center" style="grid-row:3; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:0 4px;">
+                    <span style="color:rgba(167,139,250,0.12); font-size:10px; font-weight:600;">②</span>
+                </div>
+                <div class="col-right" style="grid-row:3; border-left:1px solid rgba(255,255,255,0.04);">
+                    <div class="mapping-row" style="border-bottom:none; padding:6px 0;">
+                        <div class="right" style="padding-left:0;">
+                            <span class="r-icon">📚</span>
+                            <span class="r-text"><strong>心理学 · 概念圈</strong> — 圆圈表示概念之间的关系</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-left" style="grid-row:4;">
+                    <div class="mapping-row" style="border-bottom:none; padding:6px 0;">
+                        <div class="left" style="padding-right:0;">
+                            <span class="l-icon">🎯</span>
+                            <span class="l-text"><strong>认知框架训练</strong> — 用"圈"拆解任何陌生问题</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-center" style="grid-row:4; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:0 4px;">
+                    <span style="color:rgba(167,139,250,0.12); font-size:10px; font-weight:600;">③</span>
+                </div>
+                <div class="col-right" style="grid-row:4; border-left:1px solid rgba(255,255,255,0.04);">
+                    <div class="mapping-row" style="border-bottom:none; padding:6px 0;">
+                        <div class="right" style="padding-left:0;">
+                            <span class="r-icon">🏥</span>
+                            <span class="r-text"><strong>医学 · 画钟测试</strong> — 反过来"训练"认知能力</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-left" style="grid-row:5;">
+                    <div class="mapping-row" style="border-bottom:none; padding:6px 0;">
+                        <div class="left" style="padding-right:0;">
+                            <span class="l-icon">🧩</span>
+                            <span class="l-text"><strong>可迁移设计</strong> — 同一个圈切换不同模式</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-center" style="grid-row:5; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:0 4px;">
+                    <span style="color:rgba(167,139,250,0.12); font-size:10px; font-weight:600;">④</span>
+                </div>
+                <div class="col-right" style="grid-row:5; border-left:1px solid rgba(255,255,255,0.04);">
+                    <div class="mapping-row" style="border-bottom:none; padding:6px 0;">
+                        <div class="right" style="padding-left:0;">
+                            <span class="r-icon">⚡</span>
+                            <span class="r-text"><strong>神经科学 · 时序控制</strong> — 通过速度控制训练认知节奏</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="wf-node">
-            <div class="wn-icon">📈</div>
-            <div class="wn-label">经济模式</div>
-            <div class="wn-desc">动态圈 · 系统演化</div>
-            <div class="wn-example">供需博弈 · 均衡偏移</div>
+
+        <!-- ============================================================ -->
+        <!-- ===== 第二层：核心路径 ===== -->
+        <!-- ============================================================ -->
+        <div class="section-anchor" id="section-core"></div>
+        <div class="section-title" style="border-top:1px solid rgba(255,255,255,0.04); padding-top:20px;">⚡ 核心路径 · <span>经济学应用</span></div>
+        <div class="section-sub">方法论骨架 · 先在经济/商业领域落地</div>
+        <div class="core-section">
+            <div class="path-flow-compact">
+                <span class="num">3</span>
+                <span class="desc">个方向 <span class="hl">（需求 / 供给 / 政策）</span></span>
+                <span class="arrow">→</span>
+                <span class="num">1</span>
+                <span class="desc">个核心 <span class="hl">（均衡点）</span></span>
+                <span class="arrow">→</span>
+                <span class="num">1</span>
+                <span class="desc">个可迁移架构 <span class="hl">（圈）</span></span>
+                <span class="arrow">→</span>
+                <span class="num highlight">3</span>
+                <span class="desc">个交付维度 <span class="hl">（理论 / 实验 / 验证）</span></span>
+                <span class="arrow">→</span>
+                <span class="num">100</span>
+                <span class="desc">个延展方向 <span class="hl">（数学 · 经济 · AI · ...）</span></span>
+            </div>
+            <div class="path-econ">
+                <strong>💡 经济学应用：</strong>画圈实验的底层逻辑是"供给需求均衡"——需求在垂直方向波动，供给在水平方向波动，政策决定圆心的偏移。每一次逼近均衡，都是博弈双方达成暂时妥协；每一次远离均衡，都是博弈重新启动。这就是商业系统的<strong>动态循环</strong>。
+            </div>
         </div>
-        <div class="wf-arrow">
-            <span>→</span>
-            <span class="wa-label">反馈闭环</span>
+
+        <!-- ============================================================ -->
+        <!-- ===== AB测试验证入口 ===== -->
+        <!-- ============================================================ -->
+        <div class="section-anchor" id="section-ab"></div>
+        <div class="ab-trigger-section">
+            <div class="ab-row">
+                <span class="ab-label">🔬 <span class="hl">验证层</span> · AB测试</span>
+                <button class="ab-btn" id="abToggleBtn">▶ 展示验证入口</button>
+                <span class="ab-status"><span class="dot"></span> 核心算法不公开</span>
+            </div>
+            <div class="ab-panel" id="abPanel">
+                <div class="ab-panel-title">📊 AB测试 · <span>画圈实验有效性验证</span></div>
+                <div class="ab-panel-grid">
+                    <div class="ab-stat">
+                        <div class="ab-stat-label">🧊 A组 · 静态圈（控制组）</div>
+                        <div class="ab-stat-value">n=30 · 318.2 ± 43.7 ms</div>
+                    </div>
+                    <div class="ab-stat">
+                        <div class="ab-stat-label">🌀 B组 · 动态圈（实验组）</div>
+                        <div class="ab-stat-value highlight">n=30 · 276.5 ± 38.2 ms</div>
+                    </div>
+                </div>
+                <div class="ab-panel-conclusion">
+                    <strong>📈 检验结果：</strong> t = 2.41 · p = 0.019 · Cohen's d = 0.62<br>
+                    <span class="hl">✅ 动态圈训练显著降低了反应时（p &lt; 0.05），效应量为中等偏上。</span>
+                </div>
+                <div style="margin-top:6px; font-size:10px; color:rgba(255,255,255,0.06); text-align:right;">
+                    核心计算逻辑已锁 · 仅展示验证结论
+                </div>
+            </div>
         </div>
-        <div class="wf-node">
-            <div class="wn-icon">🤖</div>
-            <div class="wn-label">AI模式</div>
-            <div class="wn-desc">反馈回路 · 持续逼近</div>
-            <div class="wn-example">输入 → 输出 → 反馈</div>
+
+        <!-- ============================================================ -->
+        <!-- ===== 认知画圈 ===== -->
+        <!-- ============================================================ -->
+        <div class="section-anchor" id="section-cognition"></div>
+        <div class="cognition-loop-section">
+            <div class="loop-header">
+                <span class="loop-icon">🧠</span>
+                <span class="loop-title">认知画圈 · <span>学习-运用-忘记</span> 循环</span>
+            </div>
+            <div class="loop-core">
+                <div class="loop-visual">
+                    <div class="cycle-row">
+                        <div class="cycle-node">
+                            <span class="cn-icon">📖</span>
+                            <span class="cn-label">学习</span>
+                            <span class="cn-desc">输入新信息</span>
+                        </div>
+                        <span class="cycle-arrow">→</span>
+                        <div class="cycle-node">
+                            <span class="cn-icon">⚡</span>
+                            <span class="cn-label">运用</span>
+                            <span class="cn-desc">调用已学结构</span>
+                        </div>
+                        <span class="cycle-arrow">→</span>
+                        <div class="cycle-node">
+                            <span class="cn-icon">💤</span>
+                            <span class="cn-label">忘记</span>
+                            <span class="cn-desc">上下文重置</span>
+                        </div>
+                    </div>
+                    <div style="display:flex; justify-content:center; margin-top:6px;">
+                        <span class="cycle-arrow" style="font-size:14px;">↑</span>
+                        <span style="font-size:11px; color:rgba(255,255,255,0.08); margin:0 6px;">循环画圈</span>
+                        <span class="cycle-arrow" style="font-size:14px;">↓</span>
+                    </div>
+                    <div class="cycle-loop-label">🔁 每次交互 = 一次完整的认知循环</div>
+                </div>
+                <div class="loop-explain">
+                    <div class="explain-item">
+                        <div class="ei-label">🧩 和算法一样</div>
+                        <div class="ei-text">
+                            每次交互 → 上下文重置 → 需要 <span class="hl">LongChain 记忆</span> → 重新构建认知结构。<br>
+                            人类通过 <span class="hl-gold">「学习 → 运用 → 忘记 → 再学习」</span> 画圈，
+                            算法通过 <span class="hl">「向量 → 检索 → 生成」</span> 画圈。
+                        </div>
+                    </div>
+                    <div class="explain-item">
+                        <div class="ei-label">🎯 三个认知路径</div>
+                        <div class="ei-text">
+                            <span class="hl">🌐 语言学结构</span> 词根→词缀→新词 &nbsp;·&nbsp;
+                            <span class="hl-gold">🧮 奥数思维</span> 假设→验证→回退 &nbsp;·&nbsp;
+                            <span class="hl">📐 数学推演</span> 结构→变量→解
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="loop-bottom">
+                <div class="path-item">
+                    <div class="pi-icon">🌐</div>
+                    <div class="pi-label">语言学结构</div>
+                    <div class="pi-desc">词根→词缀→新词</div>
+                </div>
+                <div class="path-item">
+                    <div class="pi-icon">🧮</div>
+                    <div class="pi-label">奥数思维</div>
+                    <div class="pi-desc">假设→验证→回退</div>
+                </div>
+                <div class="path-item">
+                    <div class="pi-icon">📐</div>
+                    <div class="pi-label">数学推演</div>
+                    <div class="pi-desc">结构→变量→解</div>
+                </div>
+            </div>
+            <div class="loop-conclusion">
+                💡 <strong>目标：</strong>让大脑记住结构，让数学能够再推演。<br>
+                <span style="font-size:12px; color:rgba(255,255,255,0.15);">— 学习是输入，运用是调用，忘记是重置，循环是进化 —</span>
+            </div>
         </div>
+
+        <!-- ============================================================ -->
+        <!-- ===== 【算法工作流 + Token 流对比】 ===== -->
+        <!-- ============================================================ -->
+        <div class="section-anchor" id="section-workflow"></div>
+        <div class="workflow-section">
+            <div class="wf-header">
+                <span class="wf-icon">⚙️</span>
+                <span class="wf-title">算法工作流 · <span>数学 → 经济 → AI</span></span>
+            </div>
+
+            <!-- 静态工作流说明 -->
+            <div class="wf-flow">
+                <div class="wf-node">
+                    <div class="wn-icon">📐</div>
+                    <div class="wn-label">数学模式</div>
+                    <div class="wn-desc">静态圈 · 确定性问题</div>
+                    <div class="wn-example">鸡兔同笼 · 线性方程组</div>
+                </div>
+                <div class="wf-arrow">
+                    <span>→</span>
+                    <span class="wa-label">变量松弛</span>
+                </div>
+                <div class="wf-node">
+                    <div class="wn-icon">📈</div>
+                    <div class="wn-label">经济模式</div>
+                    <div class="wn-desc">动态圈 · 系统演化</div>
+                    <div class="wn-example">供需博弈 · 均衡偏移</div>
+                </div>
+                <div class="wf-arrow">
+                    <span>→</span>
+                    <span class="wa-label">反馈闭环</span>
+                </div>
+                <div class="wf-node">
+                    <div class="wn-icon">🤖</div>
+                    <div class="wn-label">AI模式</div>
+                    <div class="wn-desc">反馈回路 · 持续逼近</div>
+                    <div class="wn-example">输入 → 输出 → 反馈</div>
+                </div>
+            </div>
+
+            <div class="wf-summary">
+                <div class="ws-item">
+                    <div class="ws-label">从</div>
+                    <div class="ws-value">静态 <span class="hl">→</span> 动态</div>
+                </div>
+                <div class="ws-item">
+                    <div class="ws-label">从</div>
+                    <div class="ws-value">确定 <span class="hl">→</span> 不确定</div>
+                </div>
+                <div class="ws-item">
+                    <div class="ws-label">从</div>
+                    <div class="ws-value">求解 <span class="hl">→</span> 演化</div>
+                </div>
+            </div>
+
+            <!-- Token 流对比 -->
+            <div class="token-flow-section">
+                <div class="token-flow-header">
+                    <span class="tf-icon">🧩</span>
+                    <span class="tf-title">Token 流对比 · <span>算法 vs 语言</span></span>
+                    <span class="tf-badge">横向逐层叠加</span>
+                </div>
+
+                <div class="token-flow-canvas-wrap">
+                    <canvas id="tokenFlowCanvas" width="1000" height="420"></canvas>
+                </div>
+
+                <div class="token-flow-controls">
+                    <button class="tf-btn primary" id="tfPlayBtn">⏸️ 暂停</button>
+                    <button class="tf-btn" id="tfResetBtn">🔄 重置</button>
+                    <span class="tf-status" id="tfStatus">▶ 运行中</span>
+                    <span class="tf-speed-label">
+                        速度
+                        <input type="range" id="tfSpeedInput" min="0.2" max="3.0" step="0.1" value="1.0">
+                        <span id="tfSpeedDisplay">1.0x</span>
+                    </span>
+                </div>
+
+                <div class="token-flow-conclusion">
+                    💡 <strong>对照结论：</strong>算法和语言在底层是同一个结构 ——
+                    <span class="hl">token 逐层叠加 / 单词逐个积累</span>，每走一步都是一个“认知单元”的叠加。
+                    <span style="font-size:12px; color:rgba(255,255,255,0.1); display:block; margin-top:2px;">
+                        算法：数学 token → 经济 token → AI token &nbsp;·&nbsp; 语言：词根 → 词缀 → 新词
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- ===== 静/动圈区分 ===== -->
+        <!-- ============================================================ -->
+        <div class="section-anchor" id="section-duality"></div>
+        <div class="circle-duality">
+            <div class="duality-title">⚡ 画圈模型的两种底层状态 · <span>静态 vs 动态</span></div>
+            <div class="duality-grid">
+                <div class="card">
+                    <div class="card-title">
+                        <span>🧊 静态圈</span>
+                        <span class="badge-static">数学 · 逻辑求解</span>
+                    </div>
+                    <p>圈<strong>静止不动</strong>，用于求解<strong>确定性问题</strong>。<br>圆心固定，半径固定，唯一变量是角度。<br>对应模式：<strong>数学</strong>（鸡兔同笼）</p>
+                </div>
+                <div class="card">
+                    <div class="card-title">
+                        <span>🌀 动态圈</span>
+                        <span class="badge-dynamic">系统演化 · 博弈</span>
+                    </div>
+                    <p>圈<strong>持续运动</strong>，用于模拟<strong>动态系统</strong>。<br>圆心偏移、半径变化、角度转动、速度可控。<br>对应模式：<strong>经济 · AI</strong></p>
+                </div>
+            </div>
+            <div style="margin-top:10px; padding-top:8px; border-top:1px solid rgba(255,255,255,0.03); font-size:12px; color:rgba(255,255,255,0.2); text-align:center;">
+                ⚡ 静态是动态的特例（速度 = 0），动态是静态的扩展（速度 &gt; 0）
+            </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- ===== 第三层：三个模式 ===== -->
+        <!-- ============================================================ -->
+        <div class="section-title" style="border-top:1px solid rgba(255,255,255,0.04); padding-top:20px;">📐 模式映射 · <span>理论 ↔ 实验</span></div>
+        <div class="section-sub">每个模式独立对照 · 统一维度框架</div>
+
+        <!-- 数学 -->
+        <div class="mode-block section-anchor" id="section-math">
+            <div class="mode-label">📐 <span class="hl">数学模式</span> · 静态平衡 <span style="color:rgba(255,255,255,0.08); font-weight:400; text-transform:none; letter-spacing:0;">｜圈静止 · 求方程解</span></div>
+            <div class="mode-split">
+                <div class="theory">
+                    <div class="th-title">鸡兔同笼 · 两个变量互相约束</div>
+                    <div class="th-sub">确定性方程组 · 唯一解</div>
+                    <div class="dim-grid">
+                        <div class="dim-item"><span class="hl">需求</span> → 鸡的数量</div>
+                        <div class="dim-item"><span class="hl">供给</span> → 兔的数量</div>
+                        <div class="dim-item"><span class="hl">弹性</span> → 头数约束</div>
+                        <div class="dim-item"><span class="hl">政策</span> → 腿数约束</div>
+                        <div class="dim-item" style="border-bottom:none; color:rgba(255,255,255,0.06);">—</div>
+                    </div>
+                    <div class="th-conclusion"><strong>结论：</strong>画圈实验是<span class="hl">线性方程组的可视化</span>——两个变量在圈上找到唯一解。</div>
+                </div>
+                <div class="demo">
+                    <div class="demo-label">⚡ 数学演示 · 方程求解</div>
+                    <div class="canvas-wrap">
+                        <canvas id="canvasMath" width="800" height="400"></canvas>
+                    </div>
+                    <div class="controls" style="grid-template-columns:1fr 1fr;">
+                        <div class="ctrl">
+                            <label>头数 <span id="mathHeads">10</span></label>
+                            <input type="range" id="mathHeadsInput" min="5" max="20" step="1" value="10">
+                        </div>
+                        <div class="ctrl">
+                            <label>腿数 <span id="mathLegs">28</span></label>
+                            <input type="range" id="mathLegsInput" min="10" max="40" step="1" value="28">
+                        </div>
+                    </div>
+                    <div class="feedback" style="grid-template-columns:1fr 1fr;">
+                        <div class="fb"><span class="lbl">鸡</span><span class="val highlight" id="mathChicken">6</span></div>
+                        <div class="fb"><span class="lbl">兔</span><span class="val highlight" id="mathRabbit">4</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 经济 -->
+        <div class="mode-block section-anchor" id="section-econ">
+            <div class="mode-label">📈 <span class="hl">经济模式</span> · 动态波动 <span style="color:rgba(255,255,255,0.08); font-weight:400; text-transform:none; letter-spacing:0;">｜圈转动 · 动态均衡 + 外部冲击</span></div>
+            <div class="mode-split">
+                <div class="theory">
+                    <div class="th-title">供给需求 · 市场在圈上运行</div>
+                    <div class="th-sub">动态博弈 · 均衡持续偏移</div>
+                    <div class="dim-grid">
+                        <div class="dim-item"><span class="hl">需求</span> → 垂直方向（消费者）</div>
+                        <div class="dim-item"><span class="hl">供给</span> → 水平方向（生产者）</div>
+                        <div class="dim-item"><span class="hl">弹性</span> → 圈的半径（波动幅度）</div>
+                        <div class="dim-item"><span class="hl">政策</span> → 圆心偏移（政府干预）</div>
+                        <div class="dim-item"><span class="hl">速度</span> → 转动快慢（市场节奏）</div>
+                    </div>
+                    <div class="th-conclusion"><strong>结论：</strong>市场运行就像一个圈——<span class="hl">需求</span>和<span class="hl">供给</span>不断博弈，围绕均衡点转动。<br>外部冲击（扰动）会<strong>瞬移圆心</strong>，模拟黑天鹅事件。</div>
+                </div>
+                <div class="demo">
+                    <div class="demo-label">⚡ 经济演示 · 供需博弈 + 外部扰动</div>
+                    <div class="canvas-wrap">
+                        <canvas id="canvasEcon" width="800" height="400"></canvas>
+                    </div>
+                    <div class="controls">
+                        <div class="ctrl">
+                            <label>弹性 <span id="econElastic">1.0</span></label>
+                            <input type="range" id="econElasticInput" min="0.2" max="2.0" step="0.05" value="1.0">
+                        </div>
+                        <div class="ctrl">
+                            <label>政策 <span id="econPolicy">0</span></label>
+                            <input type="range" id="econPolicyInput" min="-30" max="30" step="1" value="0">
+                        </div>
+                        <div class="ctrl">
+                            <label>速度 <span id="econSpeed">1.0</span></label>
+                            <input type="range" id="econSpeedInput" min="0.0" max="2.0" step="0.1" value="1.0">
+                        </div>
+                        <div class="ctrl" style="grid-column:1/-1;">
+                            <label>⚡ 外部扰动 <span id="econShock">0</span></label>
+                            <input type="range" id="econShockInput" min="0" max="100" step="1" value="0">
+                        </div>
+                    </div>
+                    <div class="feedback">
+                        <div class="fb"><span class="lbl">需求</span><span class="val highlight" id="econDemand">50%</span></div>
+                        <div class="fb"><span class="lbl">供给</span><span class="val highlight" id="econSupply">50%</span></div>
+                        <div class="fb"><span class="lbl">状态</span><span class="val" id="econState">⚖️ 均衡</span></div>
+                        <div class="fb"><span class="lbl">角度</span><span class="val" id="econAngle">0°</span></div>
+                    </div>
+                    <div class="actions">
+                        <button class="primary" id="econToggle">⏸️ 暂停</button>
+                        <button id="econReset">🔄 重置</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI -->
+        <div class="mode-block section-anchor" id="section-ai">
+            <div class="mode-label">🤖 <span class="hl">AI模式</span> · 反馈循环 <span style="color:rgba(255,255,255,0.08); font-weight:400; text-transform:none; letter-spacing:0;">｜圈闪烁 · 输入→输出→反馈</span></div>
+            <div class="mode-split">
+                <div class="theory">
+                    <div class="th-title">人机交互 · 信息输入→输出</div>
+                    <div class="th-sub">反馈回路 · 持续逼近</div>
+                    <div class="dim-grid">
+                        <div class="dim-item"><span class="hl">需求</span> → 用户输入（提示词）</div>
+                        <div class="dim-item"><span class="hl">供给</span> → AI输出（生成内容）</div>
+                        <div class="dim-item"><span class="hl">弹性</span> → 上下文长度</div>
+                        <div class="dim-item"><span class="hl">政策</span> → 系统指令</div>
+                        <div class="dim-item"><span class="hl">速度</span> → 推理速度（Token生成）</div>
+                    </div>
+                    <div class="th-conclusion"><strong>结论：</strong>AI的每一次推理都是在<span class="hl">需求</span>和<span class="hl">供给</span>之间寻找均衡——输入决定输出，反馈修正下一次输入。</div>
+                </div>
+                <div class="demo">
+                    <div class="demo-label">⚡ AI演示 · 反馈回路</div>
+                    <div class="canvas-wrap">
+                        <canvas id="canvasAI" width="800" height="400"></canvas>
+                    </div>
+                    <div class="feedback" style="grid-template-columns:1fr 1fr 1fr;">
+                        <div class="fb"><span class="lbl">输入</span><span class="val highlight" id="aiInput">提示词</span></div>
+                        <div class="fb"><span class="lbl">输出</span><span class="val highlight" id="aiOutput">等待输入…</span></div>
+                        <div class="fb"><span class="lbl">状态</span><span class="val" id="aiState">⚡ 推理中</span></div>
+                    </div>
+                    <div class="actions">
+                        <button class="primary" id="aiTrigger">▶️ 触发推理</button>
+                        <button id="aiReset">🔄 重置</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- ===== 延伸方向 ===== -->
+        <!-- ============================================================ -->
+        <div class="section-anchor" id="section-extension"></div>
+        <div class="extension-section">
+            <div class="ext-title">∞ 画圈模型的 <span>延伸方向</span></div>
+            <div class="ext-sub">按优先级分组 · 已落地 → 中期扩展 → 长期探索</div>
+            <div class="priority-path">
+                <div class="pp-item"><span class="dot green"></span><span class="tag">近期落地</span><span class="desc">1-3个月</span></div>
+                <div class="pp-item"><span class="dot yellow"></span><span class="tag">中期扩展</span><span class="desc">3-12个月</span></div>
+                <div class="pp-item"><span class="dot purple"></span><span class="tag">长期探索</span><span class="desc">12个月+</span></div>
+            </div>
+            <div class="ext-grid">
+                <a href="#" class="tag priority-green">
+                    <span class="hl">🧩 跨领域吞噬</span>
+                    <span class="priority-badge">✓ 已落地</span>
+                </a>
+                <a href="#" class="tag priority-green">
+                    <span class="hl">🛩️ 低空经济运营</span>
+                    <span class="priority-badge">近期</span>
+                </a>
+                <a href="#" class="tag priority-green">
+                    <span class="hl">📊 MCN资产估值</span>
+                    <span class="priority-badge">近期</span>
+                </a>
+                <a href="#" class="tag priority-yellow">
+                    <span class="hl">🧠 大模型联动</span>
+                    <span class="priority-badge">中期</span>
+                </a>
+                <a href="#" class="tag priority-yellow">
+                    <span class="hl">💰 金融测算系统</span>
+                    <span class="priority-badge">中期</span>
+                </a>
+                <a href="#" class="tag priority-yellow">
+                    <span class="hl">🤖 AI技术底座</span>
+                    <span class="priority-badge">中期</span>
+                </a>
+                <a href="#" class="tag priority-yellow">
+                    <span class="hl">☁️ 云平台部署</span>
+                    <span class="priority-badge">中期</span>
+                </a>
+                <a href="#" class="tag priority-yellow">
+                    <span class="hl">📚 教育认知训练</span>
+                    <span class="priority-badge">中期</span>
+                </a>
+                <a href="#" class="tag priority-purple">
+                    <span class="hl">🏥 医疗诊断辅助</span>
+                    <span class="priority-badge">长期</span>
+                </a>
+                <a href="#" class="tag priority-purple">
+                    <span class="hl">⚙️ 工程决策系统</span>
+                    <span class="priority-badge">长期</span>
+                </a>
+                <a href="#" class="tag priority-purple">
+                    <span class="hl">🌍 地理空间分析</span>
+                    <span class="priority-badge">长期</span>
+                </a>
+                <a href="#" class="tag priority-purple">
+                    <span class="hl">🎯 博弈策略设计</span>
+                    <span class="priority-badge">长期</span>
+                </a>
+                <a href="#" class="tag priority-purple">
+                    <span class="hl">🧩 认知科学实验</span>
+                    <span class="priority-badge">长期</span>
+                </a>
+            </div>
+            <div class="ext-footer">
+                <span>版本 <span class="infinity">v1.0</span> · 封顶</span>
+                <span class="private-note"><span class="dot"></span> 私有化部署 · 内容不公开</span>
+                <span><span class="infinity">∞</span> 可扩展标签列表</span>
+            </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- ===== 底部细节说明 ===== -->
+        <!-- ============================================================ -->
+        <div class="section-anchor" id="section-notes"></div>
+        <div class="detail-notes">
+            <div class="notes-title">📖 画圈实验 · 细节说明 <span>｜滚动查看完整内容</span></div>
+            <div class="notes-scroll">
+                <div class="notes-grid">
+
+                    <div class="note-item">
+                        <div class="note-label"><span class="icon">🧬</span> 脑神经科学底层</div>
+                        <div class="note-text">
+                            <span class="hl">画圈实验源于运动-认知耦合研究。</span><br>
+                            手部画圈动作激活小脑与运动皮层，通过时序控制建立"预期-反馈"闭环。<br><br>
+                            <strong style="color:rgba(255,255,255,0.5);">核心机制：</strong><br>
+                            ① 半径 → 供给（可调节范围）<br>
+                            ② 速度 → 需求（节奏与强度）<br>
+                            ③ 方向 → 政策（外部干预）<br><br>
+                            <span style="color:rgba(255,255,255,0.15);">每一次扰动都是系统重调的过程。</span>
+                        </div>
+                    </div>
+
+                    <div class="note-item">
+                        <div class="note-label"><span class="icon">🧠</span> 认知画圈循环</div>
+                        <div class="note-text">
+                            <span class="hl">学习 → 运用 → 忘记 → 再学习</span><br>
+                            人的记忆通过 <strong>循环画圈</strong> 完成认知迭代。<br>
+                            每次交互都是一次完整的认知循环。<br><br>
+                            <span style="color:rgba(255,255,255,0.15);">类比算法：向量 → 检索 → 生成 → 重新检索</span>
+                        </div>
+                    </div>
+
+                    <div class="note-item">
+                        <div class="note-label"><span class="icon">⚙️</span> 算法工作流</div>
+                        <div class="note-text">
+                            <span class="hl">数学模式（静态）</span> → 确定性问题求解<br>
+                            <span class="hl">经济模式（动态）</span> → 系统演化与博弈<br>
+                            <span class="hl">AI模式（反馈）</span> → 持续逼近与优化<br><br>
+                            <span style="color:rgba(255,255,255,0.15);">三个模式构成从"求解"到"演化"的完整路径。</span>
+                        </div>
+                    </div>
+
+                    <div class="note-item">
+                        <div class="note-label"><span class="icon">🧊</span> 静态圈 vs 动态圈</div>
+                        <div class="note-text">
+                            <strong style="color:rgba(255,255,255,0.5);">静态圈</strong>（数学模式）<br>
+                            圈静止不动，用于求解确定性问题。<br>
+                            对应：<span class="hl">鸡兔同笼</span><br><br>
+                            <strong style="color:rgba(255,255,255,0.5);">动态圈</strong>（经济 / AI模式）<br>
+                            圈持续运动，用于模拟动态系统。<br>
+                            对应：<span class="hl">供需博弈 · 反馈回路</span><br><br>
+                            <code>静态是动态的特例（速度 = 0）</code>
+                        </div>
+                    </div>
+
+                    <div class="note-item">
+                        <div class="note-label"><span class="icon">⚡</span> 外部冲击机制</div>
+                        <div class="note-text">
+                            经济模式中增加了 <span class="hl">「外部扰动」</span> 滑块。<br>
+                            扰动值 0-100，模拟 <strong>黑天鹅事件</strong> 或 <strong>政策突变</strong>。<br>
+                            扰动会瞬间改变圆心位置，并在画布上以 <span class="hl">冲击波环</span> 显示。<br><br>
+                            <code>冲击强度 = 扰动值 × 0.4</code>
+                        </div>
+                    </div>
+
+                    <div class="note-item">
+                        <div class="note-label"><span class="icon">📐</span> 三个模式的维度映射</div>
+                        <div class="note-text">
+                            统一使用 <span class="hl">5个维度</span> 描述每个模式：<br>
+                            <strong>需求</strong> · <strong>供给</strong> · <strong>弹性</strong> · <strong>政策</strong> · <strong>速度</strong><br><br>
+                            数学：鸡 · 兔 · 头数 · 腿数 · —<br>
+                            经济：消费者 · 生产者 · 波动 · 政府 · 节奏<br>
+                            AI：用户输入 · AI输出 · 上下文 · 指令 · Token速度
+                        </div>
+                    </div>
+
+                    <div class="note-item" style="grid-column:1/-1;">
+                        <div class="note-label"><span class="icon">🧠</span> 模型边界与使用场景</div>
+                        <div class="note-text" style="font-size:12px; color:rgba(255,255,255,0.3);">
+                            画圈实验适用于 <span class="hl">任何需要"建立认知框架"的场景</span>。<br><br>
+                            ✅ <strong>适合：</strong>跨领域学习、陌生问题拆解、认知训练、逻辑建模<br>
+                            ⚠️ <strong>边界：</strong>不适用于精确数值计算、实时控制、替代专业领域知识<br><br>
+                            <span style="color:rgba(255,255,255,0.15);">画圈实验提供的是"思考的脚手架"，不是"答案本身"。</span>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== 底部 ===== -->
+        <div class="back-bottom">
+            <a href="index.html">← 返回作品集首页</a>
+        </div>
+
     </div>
 
-    <div class="wf-summary">
-        <div class="ws-item">
-            <div class="ws-label">从</div>
-            <div class="ws-value">静态 <span class="hl">→</span> 动态</div>
-        </div>
-        <div class="ws-item">
-            <div class="ws-label">从</div>
-            <div class="ws-value">确定 <span class="hl">→</span> 不确定</div>
-        </div>
-        <div class="ws-item">
-            <div class="ws-label">从</div>
-            <div class="ws-value">求解 <span class="hl">→</span> 演化</div>
-        </div>
-    </div>
+    <script>
+        // ===== 鼠标光晕 =====
+        const glow = document.getElementById('glow');
+        document.addEventListener('mousemove', (e) => {
+            const x = e.clientX / window.innerWidth * 100;
+            const y = e.clientY / window.innerHeight * 100;
+            glow.style.setProperty('--x', x + '%');
+            glow.style.setProperty('--y', y + '%');
+        });
 
-    <!-- ===== Token 流对比（动态 Canvas） ===== -->
-    <div class="token-flow-section">
-        <div class="token-flow-header">
-            <span class="tf-icon">🧩</span>
-            <span class="tf-title">Token 流对比 · <span>算法 vs 语言</span></span>
-            <span class="tf-badge">横向逐层叠加</span>
-        </div>
+        // ===== 左侧索引交互 =====
+        const indexItems = document.querySelectorAll('.idx-item');
+        const sections = [
+            document.getElementById('section-hero'),
+            document.getElementById('section-mapping'),
+            document.getElementById('section-core'),
+            document.getElementById('section-cognition'),
+            document.getElementById('section-workflow'),
+            document.getElementById('section-duality'),
+            document.getElementById('section-math'),
+            document.getElementById('section-econ'),
+            document.getElementById('section-ai'),
+            document.getElementById('section-extension'),
+            document.getElementById('section-notes')
+        ];
 
-        <div class="token-flow-canvas-wrap">
-            <canvas id="tokenFlowCanvas" width="1000" height="420"></canvas>
-        </div>
+        indexItems.forEach((item, index) => {
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = sections[index];
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+                indexItems.forEach(el => el.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
 
-        <div class="token-flow-controls">
-            <button class="tf-btn primary" id="tfPlayBtn">⏸️ 暂停</button>
-            <button class="tf-btn" id="tfResetBtn">🔄 重置</button>
-            <span class="tf-status" id="tfStatus">▶ 运行中</span>
-            <span class="tf-speed-label">
-                速度
-                <input type="range" id="tfSpeedInput" min="0.2" max="3.0" step="0.1" value="1.0">
-                <span id="tfSpeedDisplay">1.0x</span>
-            </span>
-        </div>
+        function updateActiveIndex() {
+            let currentIndex = 0;
+            sections.forEach((section, i) => {
+                if (section) {
+                    const rect = section.getBoundingClientRect();
+                    if (rect.top <= 120) {
+                        currentIndex = i;
+                    }
+                }
+            });
+            indexItems.forEach((el, i) => {
+                el.classList.toggle('active', i === currentIndex);
+            });
+        }
 
-        <div class="token-flow-conclusion">
-            💡 <strong>对照结论：</strong>算法和语言在底层是同一个结构 ——
-            <span class="hl">token 逐层叠加 / 单词逐个积累</span>，每走一步都是一个“认知单元”的叠加。
-            <span style="font-size:12px; color:rgba(255,255,255,0.1); display:block; margin-top:2px;">
-                算法：数学 token → 经济 token → AI token &nbsp;·&nbsp; 语言：词根 → 词缀 → 新词
-            </span>
-        </div>
-    </div>
-</div>
+        window.addEventListener('scroll', updateActiveIndex);
+        window.addEventListener('load', updateActiveIndex);
+
+        // ===== AB测试入口控制 =====
+        const abToggleBtn = document.getElementById('abToggleBtn');
+        const abPanel = document.getElementById('abPanel');
+        let abVisible = false;
+
+        abToggleBtn.addEventListener('click', function() {
+            abVisible = !abVisible;
+            abPanel.classList.toggle('visible', abVisible);
+            this.textContent = abVisible ? '▼ 收起验证入口' : '▶ 展示验证入口';
+            this.classList.toggle('active', abVisible);
+        });
+
+        // ============================================================ //
+        // ===== Token 流对比 · 横向逐层叠加动画 ===== //
+        // ============================================================ //
+        (function() {
+            const canvas = document.getElementById('tokenFlowCanvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+
+            // ---- 尺寸 ----
+            const W = 1000,
+                H = 420;
+            canvas.width = W;
+            canvas.height = H;
+
+            // ---- 节点定义 ----
+            const nodes = [
+                { id: 'math', label: '数学', sub: '模式', x: 160, y: 110, color: '#a78bfa', tokens: [] },
+                { id: 'econ', label: '经济', sub: '模式', x: 430, y: 110, color: '#facc15', tokens: [] },
+                { id: 'ai', label: 'AI', sub: '模式', x: 700, y: 110, color: '#60a5fa', tokens: [] },
+                { id: 'root', label: '词根', sub: '', x: 160, y: 290, color: '#4ade80', tokens: [] },
+                { id: 'affix', label: '词缀', sub: '', x: 430, y: 290, color: '#facc15', tokens: [] },
+                { id: 'word', label: '新词', sub: '', x: 700, y: 290, color: '#a78bfa', tokens: [] },
+            ];
+
+            // ---- Token 池 ----
+            const algoTokens = ['变量', '约束', '解', '供需', '均衡', '博弈', '输入', '输出', '反馈', '迭代'];
+            const langTokens = ['词', '根', '词', '缀', '新', '词', '学', '习', '记', '忆'];
+
+            // ---- 状态 ----
+            let running = true;
+            let speed = 1.0;
+            let animId = null;
+            let time = 0;
+            let tokenParticles = [];
+            let collectedTokens = { math: [], econ: [], ai: [], root: [], affix: [], word: [] };
+            let phase = 0;
+            let phaseProgress = 0;
+            let emittedCount = 0;
+            const MAX_TOKENS_PER_NODE = 5;
+            let resetRequested = false;
+
+            // ---- 生成 Token 粒子 ----
+            function emitToken(targetNodeId, text, type) {
+                const node = nodes.find(n => n.id === targetNodeId);
+                if (!node) return;
+                const startX = 40;
+                const startY = node.y + (Math.random() - 0.5) * 20;
+                const endX = node.x;
+                const endY = node.y + (Math.random() - 0.5) * 16;
+                const color = node.color;
+                tokenParticles.push({
+                    x: startX,
+                    y: startY,
+                    startX: startX,
+                    startY: startY,
+                    endX: endX,
+                    endY: endY,
+                    progress: 0,
+                    text: text,
+                    type: type || 'algo',
+                    color: color,
+                    targetId: targetNodeId,
+                    life: 1,
+                    size: 14 + Math.random() * 4,
+                    phase: phase,
+                });
+            }
+
+            // ---- 重置 ----
+            function resetTokenFlow() {
+                tokenParticles = [];
+                collectedTokens = { math: [], econ: [], ai: [], root: [], affix: [], word: [] };
+                phase = 0;
+                phaseProgress = 0;
+                emittedCount = 0;
+                time = 0;
+                running = true;
+                const playBtn = document.getElementById('tfPlayBtn');
+                if (playBtn) { playBtn.textContent = '⏸️ 暂停';
+                    playBtn.classList.add('primary'); }
+                const status = document.getElementById('tfStatus');
+                if (status) status.textContent = '▶ 运行中';
+                resetRequested = false;
+            }
+
+            // ---- 绘制 ----
+            function drawTokenFlow() {
+                ctx.clearRect(0, 0, W, H);
+
+                ctx.fillStyle = 'rgba(255,255,255,0.01)';
+                ctx.fillRect(0, 0, W, H);
+
+                ctx.strokeStyle = 'rgba(255,255,255,0.03)';
+                ctx.lineWidth = 1;
+                ctx.setLineDash([6, 8]);
+                ctx.beginPath();
+                ctx.moveTo(20, 200);
+                ctx.lineTo(W - 20, 200);
+                ctx.stroke();
+                ctx.setLineDash([]);
+
+                ctx.fillStyle = 'rgba(255,255,255,0.04)';
+                ctx.font = '9px sans-serif';
+                ctx.textAlign = 'left';
+                ctx.textBaseline = 'bottom';
+                ctx.fillText('⚙️ 算法工作流', 24, 190);
+                ctx.textBaseline = 'top';
+                ctx.fillText('🌐 语言学习', 24, 204);
+
+                nodes.forEach((node, idx) => {
+                    const isAlgo = idx < 3;
+                    const yOffset = isAlgo ? 0 : 0;
+
+                    const grad = ctx.createRadialGradient(node.x, node.y + yOffset, 2, node.x, node.y + yOffset,
+                    40);
+                    grad.addColorStop(0, node.color + '08');
+                    grad.addColorStop(1, 'transparent');
+                    ctx.fillStyle = grad;
+                    ctx.beginPath();
+                    ctx.arc(node.x, node.y + yOffset, 40, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    ctx.strokeStyle = node.color + '20';
+                    ctx.lineWidth = 1.5;
+                    ctx.fillStyle = 'rgba(255,255,255,0.02)';
+                    ctx.beginPath();
+                    ctx.arc(node.x, node.y + yOffset, 30, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.stroke();
+
+                    ctx.strokeStyle = node.color + '10';
+                    ctx.lineWidth = 1;
+                    ctx.beginPath();
+                    ctx.arc(node.x, node.y + yOffset, 20, 0, Math.PI * 2);
+                    ctx.stroke();
+
+                    ctx.fillStyle = node.color;
+                    ctx.font = '13px sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'bottom';
+                    ctx.fillText(node.label, node.x, (node.y + yOffset) - 32);
+
+                    ctx.fillStyle = 'rgba(255,255,255,0.1)';
+                    ctx.font = '9px sans-serif';
+                    ctx.textBaseline = 'top';
+                    ctx.fillText(node.sub, node.x, (node.y + yOffset) + 12);
+
+                    const tokens = collectedTokens[node.id] || [];
+                    const total = tokens.length;
+                    const maxShow = Math.min(total, MAX_TOKENS_PER_NODE);
+                    for (let i = 0; i < maxShow; i++) {
+                        const offsetX = (i - (maxShow - 1) / 2) * 9;
+                        const offsetY = -8 - i * 4;
+                        const alpha = 0.1 + 0.08 * (i / maxShow);
+                        ctx.fillStyle = node.color + Math.round(alpha * 255).toString(16).padStart(2, '0');
+                        ctx.font = (10 + i * 0.3) + 'px monospace';
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillText('◆', node.x + offsetX, (node.y + yOffset) + offsetY + 2);
+                        ctx.fillStyle = 'rgba(255,255,255,0.04)';
+                        ctx.font = '7px monospace';
+                        ctx.textBaseline = 'bottom';
+                        ctx.fillText((i + 1), node.x + offsetX, (node.y + yOffset) + offsetY + 4);
+                    }
+
+                    if (total > 0) {
+                        ctx.fillStyle = 'rgba(255,255,255,0.06)';
+                        ctx.font = '8px sans-serif';
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'top';
+                        ctx.fillText(total + ' token', node.x, (node.y + yOffset) + 28);
+                    }
+                });
+
+                const groups = [
+                    ['math', 'econ'],
+                    ['econ', 'ai'],
+                    ['root', 'affix'],
+                    ['affix', 'word']
+                ];
+                groups.forEach(([fromId, toId]) => {
+                    const fromNode = nodes.find(n => n.id === fromId);
+                    const toNode = nodes.find(n => n.id === toId);
+                    if (!fromNode || !toNode) return;
+                    const yOffset1 = fromNode.y < 200 ? 0 : 0;
+                    const yOffset2 = toNode.y < 200 ? 0 : 0;
+
+                    ctx.strokeStyle = 'rgba(255,255,255,0.03)';
+                    ctx.lineWidth = 1;
+                    ctx.setLineDash([4, 6]);
+                    ctx.beginPath();
+                    ctx.moveTo(fromNode.x + 32, fromNode.y + yOffset1);
+                    ctx.lineTo(toNode.x - 32, toNode.y + yOffset2);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+
+                    const angle = Math.atan2(toNode.y + yOffset2 - (fromNode.y + yOffset1), toNode.x - 32 - (fromNode
+                        .x + 32));
+                    const ax = (fromNode.x + 32 + toNode.x - 32) / 2;
+                    const ay = (fromNode.y + yOffset1 + toNode.y + yOffset2) / 2;
+                    ctx.fillStyle = 'rgba(255,255,255,0.04)';
+                    ctx.font = '12px sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText('→', ax, ay);
+
+                    const labels = ['', '变量松弛', '', '词缀连接'];
+                    const labelIdx = groups.indexOf([fromId, toId]);
+                    ctx.fillStyle = 'rgba(255,255,255,0.03)';
+                    ctx.font = '7px sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'top';
+                    ctx.fillText(labels[labelIdx] || '', (fromNode.x + toNode.x) / 2, Math.min(fromNode.y, toNode
+                    .y) + 34);
+                });
+
+                tokenParticles.forEach(p => {
+                    const alpha = p.life * 0.9;
+                    const size = p.size * (0.6 + 0.4 * p.progress);
+                    const px = p.startX + (p.endX - p.startX) * p.progress;
+                    const py = p.startY + (p.endY - p.startY) * p.progress + 2 * Math.sin(p.progress * 6 + time);
+
+                    const grad = ctx.createRadialGradient(px, py, 2, px, py, size * 1.5);
+                    grad.addColorStop(0, p.color + Math.round(60 * alpha).toString(16).padStart(2, '0'));
+                    grad.addColorStop(1, 'transparent');
+                    ctx.fillStyle = grad;
+                    ctx.beginPath();
+                    ctx.arc(px, py, size * 1.5, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    ctx.fillStyle = p.color + Math.round(200 * alpha).toString(16).padStart(2, '0');
+                    ctx.font = 'bold ' + Math.round(size * 0.7) + 'px monospace';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    const displayText = p.text.length > 4 ? p.text.slice(0, 3) + '.' : p.text;
+                    ctx.fillText('◆', px, py + 1);
+
+                    ctx.fillStyle = 'rgba(255,255,255,' + (0.5 * alpha) + ')';
+                    ctx.font = (size * 0.5) + 'px sans-serif';
+                    ctx.fillText(p.text, px, py - 14);
+                });
+
+                ctx.fillStyle = 'rgba(255,255,255,0.03)';
+                ctx.font = '8px sans-serif';
+                ctx.textAlign = 'right';
+                ctx.textBaseline = 'top';
+                ctx.fillText('🟣 算法 token  ·  🟢 语言 token', W - 16, 8);
+                ctx.fillText('从左到右逐层叠加', W - 16, 20);
+
+                const totalPhases = 3;
+                ctx.fillStyle = 'rgba(255,255,255,0.04)';
+                ctx.font = '8px sans-serif';
+                ctx.textAlign = 'left';
+                ctx.textBaseline = 'top';
+                const progressText = `阶段 ${Math.min(phase + 1, totalPhases)}/${totalPhases} · token ${emittedCount}`;
+                ctx.fillText(progressText, 16, 8);
+            }
+
+            // ---- 更新逻辑 ----
+            function updateTokenFlow(dt) {
+                if (!running || resetRequested) return;
+                const speedFactor = speed * 1.2;
+                time += dt * speedFactor;
+
+                const emitInterval = 1.2 / (0.8 + speed * 0.4);
+                if (Math.random() < dt * speedFactor * 0.8) {
+                    const targetMap = [
+                        { algo: 'math', lang: 'root', textAlgo: '变量', textLang: '词' },
+                        { algo: 'econ', lang: 'affix', textAlgo: '供需', textLang: '根' },
+                        { algo: 'ai', lang: 'word', textAlgo: '反馈', textLang: '新' },
+                    ];
+                    const idx = Math.min(phase, 2);
+                    const targets = targetMap[idx] || targetMap[0];
+                    const isAlgo = Math.random() < 0.5;
+                    const targetId = isAlgo ? targets.algo : targets.lang;
+                    const text = isAlgo ? targets.textAlgo : targets.textLang;
+                    const type = isAlgo ? 'algo' : 'lang';
+                    const node = nodes.find(n => n.id === targetId);
+                    if (node && (collectedTokens[targetId] || []).length < MAX_TOKENS_PER_NODE) {
+                        emitToken(targetId, text, type);
+                        emittedCount++;
+                    }
+                }
+
+                tokenParticles.forEach(p => {
+                    p.progress += dt * speedFactor * 0.7;
+                    if (p.progress >= 1) {
+                        p.progress = 1;
+                        p.life -= dt * 0.5 * speedFactor;
+                    }
+                });
+
+                const toRemove = [];
+                tokenParticles.forEach((p, idx) => {
+                    if (p.progress >= 1 && p.life <= 0.2) {
+                        const node = nodes.find(n => n.id === p.targetId);
+                        if (node && (collectedTokens[p.targetId] || []).length < MAX_TOKENS_PER_NODE) {
+                            collectedTokens[p.targetId] = collectedTokens[p.targetId] || [];
+                            if (!collectedTokens[p.targetId].includes(p.text)) {
+                                collectedTokens[p.targetId].push(p.text);
+                            }
+                        }
+                        toRemove.push(idx);
+                    }
+                });
+                toRemove.sort((a, b) => b - a).forEach(idx => {
+                    tokenParticles.splice(idx, 1);
+                });
+
+                const phaseMap = [
+                    { algo: 'math', lang: 'root' },
+                    { algo: 'econ', lang: 'affix' },
+                    { algo: 'ai', lang: 'word' },
+                ];
+                const current = phaseMap[Math.min(phase, 2)];
+                const algoCollected = (collectedTokens[current.algo] || []).length;
+                const langCollected = (collectedTokens[current.lang] || []).length;
+                const threshold = 3 + phase * 2;
+
+                if (algoCollected >= 3 && langCollected >= 3 && phase < 2) {
+                    phase++;
+                    phaseProgress = 0;
+                    tokenParticles = tokenParticles.filter(p => p.phase >= phase);
+                }
+
+                const allFull = nodes.every(n => (collectedTokens[n.id] || []).length >= MAX_TOKENS_PER_NODE);
+                if (allFull && tokenParticles.length === 0) {
+                    running = false;
+                    const playBtn = document.getElementById('tfPlayBtn');
+                    if (playBtn) { playBtn.textContent = '▶️ 继续';
+                        playBtn.classList.remove('primary'); }
+                    const status = document.getElementById('tfStatus');
+                    if (status) status.textContent = '✅ 已完成';
+                }
+            }
+
+            // ---- 动画循环 ----
+            let lastTime = 0;
+
+            function animateTokenFlow(timestamp) {
+                const dt = lastTime ? Math.min((timestamp - lastTime) / 1000, 0.05) : 0.016;
+                lastTime = timestamp;
+
+                if (!resetRequested) {
+                    updateTokenFlow(dt);
+                }
+                drawTokenFlow();
+                animId = requestAnimationFrame(animateTokenFlow);
+            }
+
+            // ---- 控制按钮 ----
+            const playBtn = document.getElementById('tfPlayBtn');
+            const resetBtn = document.getElementById('tfResetBtn');
+            const speedInput = document.getElementById('tfSpeedInput');
+            const speedDisplay = document.getElementById('tfSpeedDisplay');
+            const status = document.getElementById('tfStatus');
+
+            if (playBtn) {
+                playBtn.addEventListener('click', function() {
+                    running = !running;
+                    this.textContent = running ? '⏸️ 暂停' : '▶️ 继续';
+                    this.classList.toggle('primary', running);
+                    if (status) status.textContent = running ? '▶ 运行中' : '⏸ 已暂停';
+                });
+            }
+
+            if (resetBtn) {
+                resetBtn.addEventListener('click', function() {
+                    resetRequested = true;
+                    setTimeout(() => {
+                        resetTokenFlow();
+                        resetRequested = false;
+                        if (status) status.textContent = '▶ 运行中';
+                        const playBtn2 = document.getElementById('tfPlayBtn');
+                        if (playBtn2) { playBtn2.textContent = '⏸️ 暂停';
+                            playBtn2.classList.add('primary'); }
+                    }, 100);
+                });
+            }
+
+            if (speedInput && speedDisplay) {
+                speedInput.addEventListener('input', function() {
+                    speed = parseFloat(this.value);
+                    speedDisplay.textContent = speed.toFixed(1) + 'x';
+                });
+            }
+
+            function resizeTokenCanvas() {
+                const wrap = canvas.parentElement;
+                if (!wrap) return;
+                const rect = wrap.getBoundingClientRect();
+                const containerWidth = rect.width || 800;
+                canvas.style.width = '100%';
+                canvas.style.height = 'auto';
+            }
+
+            window.addEventListener('resize', resizeTokenCanvas);
+
+            // ---- 启动 ----
+            setTimeout(() => {
+                for (let i = 0; i < 3; i++) {
+                    setTimeout(() => {
+                        if (!resetRequested) {
+                            const targets = [
+                                { algo: 'math', lang: 'root', textAlgo: '变量', textLang: '词' },
+                                { algo: 'econ', lang: 'affix', textAlgo: '供需', textLang: '根' },
+                                { algo: 'ai', lang: 'word', textAlgo: '反馈', textLang: '新' },
+                            ];
+                            const t = targets[i % 3];
+                            const isAlgo = i % 2 === 0;
+                            const targetId = isAlgo ? t.algo : t.lang;
+                            const text = isAlgo ? t.textAlgo : t.textLang;
+                            const node = nodes.find(n => n.id === targetId);
+                            if (node && (collectedTokens[targetId] || []).length < MAX_TOKENS_PER_NODE) {
+                                emitToken(targetId, text, isAlgo ? 'algo' : 'lang');
+                                emittedCount++;
+                                collectedTokens[targetId] = collectedTokens[targetId] || [];
+                                if (!collectedTokens[targetId].includes(text)) {
+                                    collectedTokens[targetId].push(text);
+                                }
+                            }
+                        }
+                    }, i * 400);
+                }
+                setTimeout(() => {
+                    if (!resetRequested && phase === 0) {
+                        phase = 1;
+                    }
+                }, 2000);
+                setTimeout(() => {
+                    if (!resetRequested && phase === 1) {
+                        phase = 2;
+                    }
+                }, 4000);
+            }, 300);
+
+            animateTokenFlow(0);
+            resizeTokenCanvas();
+
+            window.resetTokenFlow = resetTokenFlow;
+        })();
+
+        // ============================================================ //
+        // ===== 数学模式 ===== //
+        // ============================================================ //
+        (function() {
+            const canvas = document.getElementById('canvasMath');
+            const ctx = canvas.getContext('2d');
+            const headsInput = document.getElementById('mathHeadsInput');
+            const legsInput = document.getElementById('mathLegsInput');
+            const headsDisplay = document.getElementById('mathHeads');
+            const legsDisplay = document.getElementById('mathLegs');
+            const chickenDisplay = document.getElementById('mathChicken');
+            const rabbitDisplay = document.getElementById('mathRabbit');
+
+            function drawMath() {
+                const heads = parseInt(headsInput.value);
+                const legs = parseInt(legsInput.value);
+                headsDisplay.textContent = heads;
+                legsDisplay.textContent = legs;
+
+                let chicken = 0,
+                    rabbit = 0;
+                for (let c = 0; c <= heads; c++) {
+                    const r = heads - c;
+                    if (2 * c + 4 * r === legs) { chicken = c;
+                        rabbit = r; break; }
+                }
+
+                chickenDisplay.textContent = chicken;
+                rabbitDisplay.textContent = rabbit;
+
+                const w = canvas.width,
+                    h = canvas.height;
+                const cx = w / 2,
+                    cy = h / 2;
+                const radius = Math.min(w, h) * 0.28;
+
+                ctx.clearRect(0, 0, w, h);
+
+                ctx.strokeStyle = 'rgba(255,255,255,0.03)';
+                ctx.lineWidth = 1;
+                for (let i = 0; i <= 10; i++) {
+                    const x = (i / 10) * w,
+                        y = (i / 10) * h;
+                    ctx.beginPath();
+                    ctx.moveTo(x, 0);
+                    ctx.lineTo(x, h);
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.moveTo(0, y);
+                    ctx.lineTo(w, y);
+                    ctx.stroke();
+                }
+
+                ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+                ctx.lineWidth = 1;
+                ctx.setLineDash([4, 4]);
+                ctx.beginPath();
+                ctx.moveTo(0, cy);
+                ctx.lineTo(w, cy);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(cx, 0);
+                ctx.lineTo(cx, h);
+                ctx.stroke();
+                ctx.setLineDash([]);
+
+                ctx.fillStyle = 'rgba(255,255,255,0.08)';
+                ctx.font = '10px sans-serif';
+                ctx.textAlign = 'left';
+                ctx.textBaseline = 'top';
+                ctx.fillText('头数', w - 30, 6);
+                ctx.textAlign = 'right';
+                ctx.textBaseline = 'bottom';
+                ctx.fillText('腿数', 6, h - 4);
+
+                ctx.fillStyle = 'rgba(255,255,255,0.06)';
+                ctx.font = '11px monospace';
+                ctx.textAlign = 'left';
+                ctx.textBaseline = 'bottom';
+                ctx.fillText(`x + y = ${heads}`, 12, 22);
+                ctx.fillText(`2x + 4y = ${legs}`, 12, 38);
+
+                ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+                ctx.lineWidth = 1.5;
+                ctx.beginPath();
+                for (let t = 0; t <= Math.PI * 2; t += 0.02) {
+                    const dx = Math.cos(t) * radius,
+                        dy = Math.sin(t) * radius;
+                    if (t === 0) ctx.moveTo(cx + dx, cy + dy);
+                    else ctx.lineTo(cx + dx, cy + dy);
+                }
+                ctx.stroke();
+
+                const ratio = heads > 0 ? chicken / heads : 0.5;
+                const angle = ratio * Math.PI * 2;
+                const px = cx + Math.cos(angle) * radius,
+                    py = cy + Math.sin(angle) * radius;
+
+                ctx.strokeStyle = 'rgba(167,139,250,0.08)';
+                ctx.lineWidth = 1;
+                ctx.setLineDash([2, 4]);
+                ctx.beginPath();
+                ctx.moveTo(px, cy);
+                ctx.lineTo(px, py);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(cx, py);
+                ctx.lineTo(px, py);
+                ctx.stroke();
+                ctx.setLineDash([]);
+
+                ctx.fillStyle = '#a78bfa';
+                ctx.shadowColor = 'rgba(167,139,250,0.2)';
+                ctx.shadowBlur = 14;
+                ctx.beginPath();
+                ctx.arc(px, py, 8, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.shadowBlur = 0;
+
+                ctx.fillStyle = 'rgba(255,255,255,0.15)';
+                ctx.font = '10px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'top';
+                ctx.fillText('解', px, py + 10);
+
+                ctx.fillStyle = 'rgba(255,255,255,0.06)';
+                ctx.font = '9px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'bottom';
+                ctx.fillText(`鸡=${chicken}`, px, py - 10);
+
+                ctx.fillStyle = 'rgba(255,255,255,0.06)';
+                ctx.font = '10px sans-serif';
+                ctx.textAlign = 'right';
+                ctx.textBaseline = 'top';
+                ctx.fillText(`鸡=${chicken}  兔=${rabbit}`, w - 10, 6);
+            }
+
+            headsInput.addEventListener('input', drawMath);
+            legsInput.addEventListener('input', drawMath);
+            drawMath();
+
+            window.addEventListener('resize', drawMath);
+        })();
+
+        // ============================================================ //
+        // ===== 经济模式 ===== //
+        // ============================================================ //
+        (function() {
+            const canvas = document.getElementById('canvasEcon');
+            const ctx = canvas.getContext('2d');
+            const elasticInput = document.getElementById('econElasticInput');
+            const policyInput = document.getElementById('econPolicyInput');
+            const speedInput = document.getElementById('econSpeedInput');
+            const shockInput = document.getElementById('econShockInput');
+            const elasticDisplay = document.getElementById('econElastic');
+            const policyDisplay = document.getElementById('econPolicy');
+            const speedDisplay = document.getElementById('econSpeed');
+            const shockDisplay = document.getElementById('econShock');
+            const demandDisplay = document.getElementById('econDemand');
+            const supplyDisplay = document.getElementById('econSupply');
+            const stateDisplay = document.getElementById('econState');
+            const angleDisplay = document.getElementById('econAngle');
+            const toggleBtn = document.getElementById('econToggle');
+            const resetBtn = document.getElementById('econReset');
+
+            let angle = 0,
+                running = true,
+                animId = null,
+                shockPulse = 0;
+            let shockOffsetX = 0,
+                shockOffsetY = 0;
+            const w = canvas.width,
+                h = canvas.height;
+            const cx = w / 2,
+                cy = h / 2;
+
+            function drawEcon() {
+                const elastic = parseFloat(elasticInput.value);
+                const policy = parseFloat(policyInput.value);
+                const speed = parseFloat(speedInput.value);
+                const shock = parseFloat(shockInput.value);
+
+                elasticDisplay.textContent = elastic.toFixed(1);
+                policyDisplay.textContent = policy;
+                speedDisplay.textContent = speed.toFixed(1);
+                shockDisplay.textContent = shock;
+
+                const shockFactor = shock / 100;
+                const targetShockX = shockFactor * 40 * (Math.random() > 0.5 ? 1 : -1);
+                const targetShockY = shockFactor * 40 * (Math.random() > 0.5 ? 1 : -1);
+                shockOffsetX += (targetShockX - shockOffsetX) * 0.06;
+                shockOffsetY += (targetShockY - shockOffsetY) * 0.06;
+                if (shock < 1) { shockOffsetX *= 0.95;
+                    shockOffsetY *= 0.95; }
+
+                const radius = Math.min(w, h) * 0.25 * elastic;
+                const offsetY = policy * 0.3 + shockOffsetY;
+                const offsetX = shockOffsetX * 0.3;
+                const demand = Math.sin(angle) * radius + offsetY;
+                const supply = Math.cos(angle) * radius + offsetX;
+
+                const maxOffset = Math.min(w, h) * 0.25 * 2.0 + 20;
+                const demandPct = Math.round(((demand + maxOffset) / (maxOffset * 2)) * 100);
+                const supplyPct = Math.round(((supply + maxOffset) / (maxOffset * 2)) * 100);
+                demandDisplay.textContent = Math.min(100, Math.max(0, demandPct)) + '%';
+                supplyDisplay.textContent = Math.min(100, Math.max(0, supplyPct)) + '%';
+
+                let state = '⚖️ 均衡';
+                if (Math.abs(shockOffsetX) > 10 || Math.abs(shockOffsetY) > 10) state = '💥 外部冲击中';
+                else if (demandPct > supplyPct + 8) state = '📈 供不应求';
+                else if (supplyPct > demandPct + 8) state = '📉 供过于求';
+                stateDisplay.textContent = state;
+                angleDisplay.textContent = Math.round((angle * 180 / Math.PI) % 360) + '°';
+
+                ctx.clearRect(0, 0, w, h);
+
+                ctx.strokeStyle = 'rgba(255,255,255,0.03)';
+                ctx.lineWidth = 1;
+                for (let i = 0; i <= 10; i++) {
+                    const x = (i / 10) * w,
+                        y = (i / 10) * h;
+                    ctx.beginPath();
+                    ctx.moveTo(x, 0);
+                    ctx.lineTo(x, h);
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.moveTo(0, y);
+                    ctx.lineTo(w, y);
+                    ctx.stroke();
+                }
+
+                ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+                ctx.lineWidth = 1;
+                ctx.setLineDash([4, 4]);
+                ctx.beginPath();
+                ctx.moveTo(0, cy + offsetY);
+                ctx.lineTo(w, cy + offsetY);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(cx + offsetX, 0);
+                ctx.lineTo(cx + offsetX, h);
+                ctx.stroke();
+                ctx.setLineDash([]);
+
+                if (Math.abs(shockOffsetX) > 2 || Math.abs(shockOffsetY) > 2) {
+                    shockPulse += 0.04;
+                    const shockRadius = 30 + 20 * Math.sin(shockPulse * 3);
+                    ctx.strokeStyle = `rgba(250,204,21,${0.1 + 0.05 * Math.sin(shockPulse * 2)})`;
+                    ctx.lineWidth = 1.5;
+                    ctx.setLineDash([3, 6]);
+                    ctx.beginPath();
+                    ctx.arc(cx + shockOffsetX * 0.5, cy + shockOffsetY * 0.5, shockRadius, 0, Math.PI * 2);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+                    ctx.fillStyle = `rgba(250,204,21,${0.04 + 0.02 * Math.sin(shockPulse * 2)})`;
+                    ctx.beginPath();
+                    ctx.arc(cx + shockOffsetX * 0.5, cy + shockOffsetY * 0.5, shockRadius * 0.6, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+
+                ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+                ctx.lineWidth = 1.5;
+                ctx.beginPath();
+                for (let t = 0; t <= Math.PI * 2; t += 0.02) {
+                    const dx = Math.cos(t) * radius,
+                        dy = Math.sin(t) * radius;
+                    if (t === 0) ctx.moveTo(cx + dx + offsetX, cy + dy + offsetY);
+                    else ctx.lineTo(cx + dx + offsetX, cy + dy + offsetY);
+                }
+                ctx.stroke();
+
+                const dX = cx + offsetX,
+                    dY = cy + demand + offsetY;
+                ctx.fillStyle = '#a78bfa';
+                ctx.shadowColor = 'rgba(167,139,250,0.2)';
+                ctx.shadowBlur = 14;
+                ctx.beginPath();
+                ctx.arc(dX, dY, 8, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.shadowBlur = 0;
+                ctx.fillStyle = 'rgba(255,255,255,0.25)';
+                ctx.font = '10px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'bottom';
+                ctx.fillText('需求', dX, dY - 10);
+
+                const sX = cx + supply + offsetX,
+                    sY = cy + offsetY;
+                ctx.fillStyle = '#60a5fa';
+                ctx.shadowColor = 'rgba(96,165,250,0.2)';
+                ctx.shadowBlur = 14;
+                ctx.beginPath();
+                ctx.arc(sX, sY, 8, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.shadowBlur = 0;
+                ctx.fillStyle = 'rgba(255,255,255,0.25)';
+                ctx.font = '10px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'bottom';
+                ctx.fillText('供给', sX, sY - 10);
+
+                ctx.fillStyle = 'rgba(255,255,255,0.08)';
+                ctx.beginPath();
+                ctx.arc(cx + offsetX, cy + offsetY, 4, 0, Math.PI * 2);
+                ctx.fill();
+
+                if (shock > 5) {
+                    ctx.fillStyle = `rgba(250,204,21,${0.3 + 0.2 * (shock / 100)})`;
+                    ctx.font = '11px sans-serif';
+                    ctx.textAlign = 'left';
+                    ctx.textBaseline = 'top';
+                    ctx.fillText(`⚡ 扰动 ${Math.round(shock)}%`, 12, 12);
+                }
+            }
+
+            function animateEcon() {
+                if (running) {
+                    const speed = parseFloat(speedInput.value);
+                    angle += 0.02 * speed;
+                    if (angle > Math.PI * 2) angle -= Math.PI * 2;
+                }
+                drawEcon();
+                animId = requestAnimationFrame(animateEcon);
+            }
+
+            elasticInput.addEventListener('input', drawEcon);
+            policyInput.addEventListener('input', drawEcon);
+            speedInput.addEventListener('input', drawEcon);
+            shockInput.addEventListener('input', drawEcon);
+
+            toggleBtn.addEventListener('click', function() {
+                running = !running;
+                this.textContent = running ? '⏸️ 暂停' : '▶️ 运行';
+            });
+
+            resetBtn.addEventListener('click', function() {
+                angle = 0;
+                elasticInput.value = '1.0';
+                policyInput.value = '0';
+                speedInput.value = '1.0';
+                shockInput.value = '0';
+                shockOffsetX = 0;
+                shockOffsetY = 0;
+                running = true;
+                toggleBtn.textContent = '⏸️ 暂停';
+                drawEcon();
+            });
+
+            animateEcon();
+            window.addEventListener('beforeunload', () => cancelAnimationFrame(animId));
+            window.addEventListener('resize', drawEcon);
+        })();
+
+        // ============================================================ //
+        // ===== AI模式 ===== //
+        // ============================================================ //
+        (function() {
+            const canvas = document.getElementById('canvasAI');
+            const ctx = canvas.getContext('2d');
+            const aiInput = document.getElementById('aiInput');
+            const aiOutput = document.getElementById('aiOutput');
+            const aiState = document.getElementById('aiState');
+            const triggerBtn = document.getElementById('aiTrigger');
+            const resetBtn = document.getElementById('aiReset');
+
+            let angle = 0,
+                animId = null,
+                flashing = false,
+                pulse = 0,
+                tokenParticles = [];
+            const w = canvas.width,
+                h = canvas.height;
+            const cx = w / 2,
+                cy = h / 2;
+            const prompts = ['你好，世界', '解释量子力学', '写一首诗', '推荐一本书', '什么是认知？', '未来会怎样？'];
+            let idx = 0;
+            let outputText = '等待输入…';
+            let isGenerating = false;
+
+            function drawAI() {
+                const radius = Math.min(w, h) * 0.22 + 12 * Math.sin(pulse);
+                const offsetY = 8 * Math.sin(pulse * 0.7);
+                ctx.clearRect(0, 0, w, h);
+
+                ctx.strokeStyle = 'rgba(255,255,255,0.03)';
+                ctx.lineWidth = 1;
+                for (let i = 0; i <= 10; i++) {
+                    const x = (i / 10) * w,
+                        y = (i / 10) * h;
+                    ctx.beginPath();
+                    ctx.moveTo(x, 0);
+                    ctx.lineTo(x, h);
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.moveTo(0, y);
+                    ctx.lineTo(w, y);
+                    ctx.stroke();
+                }
+
+                ctx.strokeStyle = 'rgba(255,255,255,0.03)';
+                ctx.lineWidth = 1;
+                ctx.setLineDash([3, 3]);
+                ctx.beginPath();
+                ctx.moveTo(0, cy);
+                ctx.lineTo(w, cy);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(cx, 0);
+                ctx.lineTo(cx, h);
+                ctx.stroke();
+                ctx.setLineDash([]);
+
+                const alpha = 0.06 + 0.04 * Math.sin(pulse * 1.5);
+                ctx.strokeStyle = flashing ? `rgba(167,139,250,${alpha + 0.06})` : 'rgba(255,255,255,0.04)';
+                ctx.lineWidth = flashing ? 2 : 1.5;
+                ctx.beginPath();
+                for (let t = 0; t <= Math.PI * 2; t += 0.02) {
+                    const dx = Math.cos(t) * radius,
+                        dy = Math.sin(t) * radius + offsetY;
+                    if (t === 0) ctx.moveTo(cx + dx, cy + dy);
+                    else ctx.lineTo(cx + dx, cy + dy);
+                }
+                ctx.stroke();
+
+                const inX = cx,
+                    inY = cy - radius * 0.55 + offsetY;
+                ctx.fillStyle = '#a78bfa';
+                ctx.shadowColor = 'rgba(167,139,250,0.12)';
+                ctx.shadowBlur = 12;
+                ctx.beginPath();
+                ctx.arc(inX, inY, 7, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.shadowBlur = 0;
+                ctx.fillStyle = 'rgba(255,255,255,0.2)';
+                ctx.font = '9px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'bottom';
+                ctx.fillText('输入', inX, inY - 9);
+
+                const outX = cx + radius * 0.45,
+                    outY = cy + radius * 0.45 + offsetY;
+                ctx.fillStyle = '#60a5fa';
+                ctx.shadowColor = 'rgba(96,165,250,0.12)';
+                ctx.shadowBlur = 12;
+                ctx.beginPath();
+                ctx.arc(outX, outY, 7, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.shadowBlur = 0;
+                ctx.fillStyle = 'rgba(255,255,255,0.2)';
+                ctx.font = '9px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'bottom';
+                ctx.fillText('输出', outX, outY - 9);
+
+                ctx.strokeStyle = flashing ? 'rgba(167,139,250,0.08)' : 'rgba(255,255,255,0.02)';
+                ctx.lineWidth = 1;
+                ctx.setLineDash([4, 6]);
+                ctx.beginPath();
+                ctx.moveTo(inX, inY);
+                ctx.lineTo(outX, outY);
+                ctx.stroke();
+                ctx.setLineDash([]);
+
+                ctx.strokeStyle = flashing ? 'rgba(167,139,250,0.04)' : 'rgba(255,255,255,0.015)';
+                ctx.lineWidth = 1;
+                ctx.setLineDash([2, 6]);
+                ctx.beginPath();
+                ctx.moveTo(outX, outY);
+                ctx.quadraticCurveTo(cx + radius * 0.8, cy - radius * 0.8, inX, inY);
+                ctx.stroke();
+                ctx.setLineDash([]);
+
+                ctx.fillStyle = 'rgba(255,255,255,0.03)';
+                ctx.font = '8px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'bottom';
+                ctx.fillText('反馈', cx + radius * 0.6, cy - radius * 0.55);
+
+                if (isGenerating) {
+                    tokenParticles.push({ x: inX, y: inY, life: 1, speed: 0.02 + Math.random() * 0.02 });
+                    tokenParticles = tokenParticles.filter(p => p.life > 0);
+                    tokenParticles.forEach(p => {
+                        const targetX = outX + (Math.random() - 0.5) * 30;
+                        const targetY = outY + (Math.random() - 0.5) * 30;
+                        p.x += (targetX - p.x) * p.speed;
+                        p.y += (targetY - p.y) * p.speed;
+                        p.life -= 0.004;
+                        ctx.fillStyle = `rgba(167,139,250,${p.life * 0.3})`;
+                        ctx.beginPath();
+                        ctx.arc(p.x, p.y, 2 * p.life, 0, Math.PI * 2);
+                        ctx.fill();
+                    });
+                    if (tokenParticles.length > 30) tokenParticles = tokenParticles.slice(-30);
+                }
+
+                ctx.fillStyle = 'rgba(255,255,255,0.03)';
+                ctx.font = '9px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('AI 推理', cx, cy);
+
+                ctx.fillStyle = 'rgba(255,255,255,0.04)';
+                ctx.font = '8px sans-serif';
+                ctx.textAlign = 'left';
+                ctx.textBaseline = 'top';
+                ctx.fillText(`输出: ${outputText.substring(0, 12)}${outputText.length > 12 ? '...' : ''}`, 12, 12);
+
+                pulse += 0.03;
+            }
+
+            function animateAI() {
+                drawAI();
+                animId = requestAnimationFrame(animateAI);
+            }
+
+            triggerBtn.addEventListener('click', function() {
+                if (isGenerating) return;
+                isGenerating = true;
+                flashing = true;
+                aiState.textContent = '⚡ 推理中';
+                aiState.style.color = '#a78bfa';
+                const prompt = prompts[idx % prompts.length];
+                aiInput.textContent = prompt;
+                idx++;
+                outputText = '生成中...';
+                aiOutput.textContent = outputText;
+                tokenParticles = [];
+
+                setTimeout(() => {
+                    const outputs = [
+                        '你好！今天天气不错。',
+                        '量子力学非常复杂...但很有趣！',
+                        '夜色温柔，星光不语。',
+                        '《认知觉醒》是一本好书。',
+                        '认知是感知世界的方式。',
+                        '未来属于会思考的人。'
+                    ];
+                    outputText = outputs[(idx - 1) % outputs.length];
+                    aiOutput.textContent = outputText;
+                    aiState.textContent = '✅ 已生成';
+                    aiState.style.color = 'rgba(255,255,255,0.3)';
+                    flashing = false;
+                    isGenerating = false;
+                }, 1200 + Math.random() * 400);
+            });
+
+            resetBtn.addEventListener('click', function() {
+                aiInput.textContent = '提示词';
+                outputText = '等待输入…';
+                aiOutput.textContent = outputText;
+                aiState.textContent = '⚡ 推理中';
+                aiState.style.color = 'rgba(255,255,255,0.2)';
+                flashing = false;
+                isGenerating = false;
+                tokenParticles = [];
+            });
+
+            animateAI();
+            window.addEventListener('beforeunload', () => cancelAnimationFrame(animId));
+            window.addEventListener('resize', drawAI);
+        })();
+    </script>
+
+</body>
+</html>
