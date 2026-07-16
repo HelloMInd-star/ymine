@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>低空经济 · 底层操作系统</title>
     <style>
+        /* ===== 全局重置 ===== */
         * {
             margin: 0;
             padding: 0;
@@ -15,9 +16,12 @@
             background: #0b0b1a;
             font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
             min-height: 100vh;
-            padding: 20px 20px 20px 240px;
+            padding: 20px;
             overflow-x: hidden;
             color: #f1f5f9;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
         #glow {
@@ -28,94 +32,10 @@
             height: 100%;
             pointer-events: none;
             z-index: 0;
-            background: radial-gradient(600px circle at var(--x, 50%) var(--y, 50%), rgba(120, 80, 255, 0.05), transparent 80%);
+            background: radial-gradient(600px circle at var(--x, 50%) var(--y, 50%), rgba(120, 80, 255, 0.06), transparent 80%);
             transition: background 0.1s;
         }
 
-        /* ===== 左侧导航 ===== */
-        .sidebar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 220px;
-            height: 100vh;
-            padding: 40px 16px 28px;
-            background: rgba(11, 11, 26, 0.92);
-            backdrop-filter: blur(12px);
-            border-right: 1px solid rgba(255, 255, 255, 0.04);
-            overflow-y: auto;
-            z-index: 100;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .sidebar .logo {
-            font-size: 14px;
-            font-weight: 700;
-            color: #f1f5f9;
-            margin-bottom: 4px;
-            letter-spacing: -0.3px;
-        }
-        .sidebar .logo span {
-            color: #a78bfa;
-        }
-        .sidebar .sub-logo {
-            font-size: 11px;
-            color: rgba(255, 255, 255, 0.15);
-            margin-bottom: 24px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-            padding-bottom: 12px;
-        }
-
-        .sidebar .nav-item {
-            display: block;
-            padding: 6px 12px;
-            margin-bottom: 1px;
-            border-radius: 8px;
-            color: rgba(255, 255, 255, 0.25);
-            font-size: 12px;
-            font-weight: 500;
-            text-decoration: none;
-            transition: all 0.2s ease;
-            cursor: pointer;
-            border-left: 2px solid transparent;
-        }
-        .sidebar .nav-item:hover {
-            background: rgba(255, 255, 255, 0.03);
-            color: rgba(255, 255, 255, 0.6);
-        }
-        .sidebar .nav-item.active {
-            color: #f1f5f9;
-            background: rgba(167, 139, 250, 0.06);
-            border-left-color: #a78bfa;
-        }
-        .sidebar .nav-item .num {
-            display: inline-block;
-            width: 18px;
-            font-size: 10px;
-            color: rgba(255, 255, 255, 0.1);
-            margin-right: 6px;
-        }
-
-        .sidebar .footer-nav {
-            margin-top: auto;
-            padding-top: 14px;
-            border-top: 1px solid rgba(255, 255, 255, 0.04);
-            font-size: 11px;
-            color: rgba(255, 255, 255, 0.08);
-            text-align: center;
-        }
-        .sidebar .footer-nav a {
-            color: rgba(255, 255, 255, 0.12);
-            text-decoration: none;
-            font-size: 11px;
-            transition: color 0.3s ease;
-        }
-        .sidebar .footer-nav a:hover {
-            color: rgba(255, 255, 255, 0.4);
-        }
-
-        /* ===== 主容器 ===== */
         .container {
             max-width: 1100px;
             width: 100%;
@@ -136,7 +56,7 @@
             right: -100px;
             width: 400px;
             height: 400px;
-            background: radial-gradient(circle, rgba(80, 30, 140, 0.1), transparent 70%);
+            background: radial-gradient(circle, rgba(80, 30, 140, 0.15), transparent 70%);
             border-radius: 50%;
             pointer-events: none;
             animation: floatBg 12s ease-in-out infinite alternate;
@@ -148,7 +68,7 @@
             left: -80px;
             width: 350px;
             height: 350px;
-            background: radial-gradient(circle, rgba(30, 60, 150, 0.08), transparent 70%);
+            background: radial-gradient(circle, rgba(30, 60, 150, 0.1), transparent 70%);
             border-radius: 50%;
             pointer-events: none;
             animation: floatBg 10s ease-in-out infinite alternate-reverse;
@@ -221,6 +141,22 @@
             color: rgba(255, 255, 255, 0.25);
             font-weight: 300;
             margin-top: 2px;
+        }
+
+        .back-link {
+            text-align: center;
+            margin-top: 24px;
+            padding-top: 14px;
+            border-top: 1px solid rgba(255, 255, 255, 0.03);
+        }
+        .back-link a {
+            color: rgba(255, 255, 255, 0.2);
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s ease;
+        }
+        .back-link a:hover {
+            color: rgba(255, 255, 255, 0.5);
         }
 
         /* ===== 架构概览 ===== */
@@ -445,35 +381,20 @@
             color: #a78bfa;
         }
 
-        /* ===== 底部 ===== */
-        .back-bottom {
-            text-align: center;
-            margin-top: 24px;
-            padding-top: 14px;
-            border-top: 1px solid rgba(255, 255, 255, 0.03);
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            flex-wrap: wrap;
-            opacity: 0;
-            animation: fadeInUp 0.6s ease 0.3s forwards;
-        }
-        .back-bottom a {
-            color: rgba(255, 255, 255, 0.1);
-            text-decoration: none;
-            font-size: 12px;
-            transition: color 0.3s ease;
-        }
-        .back-bottom a:hover {
-            color: rgba(255, 255, 255, 0.4);
-        }
-
-        /* ============================================================ */
         /* ===== 响应式 ===== */
-        /* ============================================================ */
-        @media (max-width: 1024px) {
+        @media (max-width: 900px) {
+            body {
+                padding: 12px;
+            }
+            .container {
+                padding: 20px 16px 16px;
+                border-radius: 16px;
+            }
+            .header h1 {
+                font-size: 24px;
+            }
             .arch-overview {
-                grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+                grid-template-columns: 1fr 1fr 1fr;
             }
             .mini-grid-3 {
                 grid-template-columns: 1fr 1fr;
@@ -485,28 +406,6 @@
                 grid-template-columns: 1fr 1fr;
             }
             .mini-mapping .mm-grid {
-                grid-template-columns: 1fr 1fr;
-            }
-        }
-
-        @media (max-width: 900px) {
-            body {
-                padding: 0;
-            }
-            .sidebar {
-                display: none;
-            }
-            .container {
-                padding: 20px 16px 16px;
-                border-radius: 0;
-            }
-            .header h1 {
-                font-size: 24px;
-            }
-            .arch-overview {
-                grid-template-columns: 1fr 1fr 1fr;
-            }
-            .mini-stats {
                 grid-template-columns: 1fr 1fr;
             }
         }
@@ -537,10 +436,6 @@
             .mini-mapping .mm-grid {
                 grid-template-columns: 1fr;
             }
-            .back-bottom {
-                flex-direction: column;
-                gap: 4px;
-            }
         }
     </style>
 </head>
@@ -548,21 +443,6 @@
 
     <div id="glow"></div>
 
-    <!-- ===== 左侧导航 ===== -->
-    <div class="sidebar" id="sidebar">
-        <div class="logo">低空<span>OS</span></div>
-        <div class="sub-logo">底层操作系统</div>
-        <a class="nav-item active" data-target="panel-game"><span class="num">01</span> 博弈底座</a>
-        <a class="nav-item" data-target="panel-lowair"><span class="num">02</span> 低空经济</a>
-        <a class="nav-item" data-target="panel-actuary"><span class="num">03</span> 精算映射</a>
-        <a class="nav-item" data-target="panel-logistics"><span class="num">04</span> 物流底座</a>
-        <a class="nav-item" data-target="panel-compute"><span class="num">05</span> 算力底座</a>
-        <div class="footer-nav">
-            <a href="index.html">← 返回作品集</a>
-        </div>
-    </div>
-
-    <!-- ===== 主容器 ===== -->
     <div class="container">
 
         <!-- ===== 头部 ===== -->
@@ -597,34 +477,28 @@
         </div>
 
         <!-- ============================================================ -->
-        <!-- ===== 内容区域 ===== -->
+        <!-- ===== 内容区域（五大模块占位） ===== -->
         <!-- ============================================================ -->
         <div class="content-area" id="contentArea">
 
-            <!-- ========================================================== -->
-            <!-- 模块1：博弈底座 -->
-            <!-- ========================================================== -->
+            <!-- ====== 模块1：博弈底座 ====== -->
             <div class="module-panel active" id="panel-game">
                 <div class="module-title">🧠 博弈底座 · <span>画圈实验</span></div>
                 <div class="module-sub">需求 → 供给 → 政策 · 动态均衡框架</div>
-
                 <div class="mini-grid-3">
                     <div class="card"><div class="icon">📐</div><div class="label">凯利公式</div><div class="value" id="gameKelly">f* = 0%</div><div class="desc">最优投入比例</div></div>
                     <div class="card"><div class="icon">⚖️</div><div class="label">二八管控</div><div class="value" id="gameRatio">80% / 20%</div><div class="desc">自动 / 人工</div></div>
                     <div class="card"><div class="icon">🔄</div><div class="label">三圈演化</div><div class="value" id="gamePhase">研发 → 应用 → 经济</div><div class="desc">收束 → 放大 → 放大</div></div>
                 </div>
-
                 <div class="mini-canvas-wrap">
                     <canvas id="canvasGame" width="800" height="200"></canvas>
                 </div>
-
                 <div class="mini-controls">
                     <div class="ctrl"><label>胜率 p <span id="gameP">0.50</span></label><input type="range" id="gamePInput" min="0.01" max="0.99" step="0.01" value="0.50" /></div>
                     <div class="ctrl"><label>赔率 b <span id="gameB">2.00</span></label><input type="range" id="gameBInput" min="0.50" max="10.0" step="0.10" value="2.00" /></div>
                     <div class="ctrl"><label>演化 <span id="gameTimeLabel">0.00</span></label><input type="range" id="gameTimeInput" min="0" max="100" step="1" value="0" /></div>
                     <div class="ctrl"><label>协调度 <span id="gameSyncLabel">50%</span></label><input type="range" id="gameSyncInput" min="0" max="100" step="1" value="50" /></div>
                 </div>
-
                 <div class="mini-mapping">
                     <div class="mm-title">🔗 核心映射</div>
                     <div class="mm-grid">
@@ -638,30 +512,24 @@
                 </div>
             </div>
 
-            <!-- ========================================================== -->
-            <!-- 模块2：低空经济 -->
-            <!-- ========================================================== -->
+            <!-- ====== 模块2：低空经济 ====== -->
             <div class="module-panel" id="panel-lowair">
                 <div class="module-title">🚁 低空经济 · <span>三方博弈</span></div>
                 <div class="module-sub">政府 · 用户 · 厂商 · 动态均衡</div>
-
                 <div class="mini-grid-3">
                     <div class="card"><div class="icon">🏛️</div><div class="label">政府</div><div class="value" style="color:#a78bfa;">斜率 0.5</div><div class="desc">规则制定者</div></div>
                     <div class="card"><div class="icon">🧑‍🤝‍🧑</div><div class="label">用户</div><div class="value" style="color:#facc15;">0.5 – 1.0</div><div class="desc">购买 / 投资</div></div>
                     <div class="card"><div class="icon">🏭</div><div class="label">厂商</div><div class="value" style="color:#34d399;">0 – 0.5</div><div class="desc">研发 · 报废 · 能耗</div></div>
                 </div>
-
                 <div class="mini-canvas-wrap">
                     <canvas id="canvasLowair" width="800" height="200"></canvas>
                 </div>
-
                 <div class="mini-controls">
                     <div class="ctrl"><label>用户购买力 <span id="lowUser">0.50</span></label><input type="range" id="lowUserInput" min="0.0" max="1.0" step="0.01" value="0.50" /></div>
                     <div class="ctrl"><label>厂商研发 <span id="lowRnd">0.50</span></label><input type="range" id="lowRndInput" min="0.0" max="1.0" step="0.01" value="0.50" /></div>
                     <div class="ctrl"><label>政府监管 <span id="lowGov">0.50</span></label><input type="range" id="lowGovInput" min="0.0" max="1.0" step="0.01" value="0.50" /></div>
                     <div class="ctrl"><label>市场热度 <span id="lowHeat">0.50</span></label><input type="range" id="lowHeatInput" min="0.0" max="1.0" step="0.01" value="0.50" /></div>
                 </div>
-
                 <div class="mini-stats">
                     <div class="s-card"><div class="s-label">均衡状态</div><div class="s-value" style="color:#22c55e;" id="lowState">⚖️ 稳态</div><div class="s-sub" id="lowStateSub">三方协调</div></div>
                     <div class="s-card"><div class="s-label">凯利比率</div><div class="s-value" style="color:#a78bfa;" id="lowKelly">35%</div><div class="s-sub">最优投入</div></div>
@@ -670,30 +538,24 @@
                 </div>
             </div>
 
-            <!-- ========================================================== -->
-            <!-- 模块3：精算映射 -->
-            <!-- ========================================================== -->
+            <!-- ====== 模块3：精算映射 ====== -->
             <div class="module-panel" id="panel-actuary">
                 <div class="module-title">📐 精算映射 · <span>保险 ↔ 博弈量化</span></div>
                 <div class="module-sub">保费 · 赔付率 · 准备金 · 退保率 · 投资收益</div>
-
                 <div class="mini-grid-3">
                     <div class="card"><div class="icon">💰</div><div class="label">保费</div><div class="value" style="color:#a78bfa;">↔ 研发成本</div><div class="desc">进入市场的固定投入</div></div>
                     <div class="card"><div class="icon">📊</div><div class="label">赔付率</div><div class="value" style="color:#facc15;">↔ 报废率</div><div class="desc">投入的损耗比例</div></div>
                     <div class="card"><div class="icon">🏛️</div><div class="label">准备金</div><div class="value" style="color:#34d399;">↔ 政府资源</div><div class="desc">安全垫 · 规则制定</div></div>
                 </div>
-
                 <div class="mini-canvas-wrap">
                     <canvas id="canvasActuary" width="800" height="200"></canvas>
                 </div>
-
                 <div class="mini-controls">
                     <div class="ctrl"><label>退保率 <span id="actLapse">5.2%</span></label><input type="range" id="actLapseInput" min="0" max="20" step="0.1" value="5.2" /></div>
                     <div class="ctrl"><label>收益率 <span id="actRoi">4.5%</span></label><input type="range" id="actRoiInput" min="0" max="10" step="0.1" value="4.5" /></div>
                     <div class="ctrl"><label>赔付率 <span id="actLoss">65%</span></label><input type="range" id="actLossInput" min="40" max="80" step="0.5" value="65" /></div>
                     <div class="ctrl"><label>精算感应 <span id="actSync">50%</span></label><input type="range" id="actSyncInput" min="0" max="100" step="1" value="50" /></div>
                 </div>
-
                 <div class="mini-stats">
                     <div class="s-card"><div class="s-label">财务杠杆</div><div class="s-value" style="color:#facc15;" id="actLeverage">8.65</div><div class="s-sub">1/退保率 × 收益率</div></div>
                     <div class="s-card"><div class="s-label">保单寿命</div><div class="s-value" style="color:#34d399;" id="actLife">19.2年</div><div class="s-sub">= 1 / 退保率</div></div>
@@ -702,30 +564,24 @@
                 </div>
             </div>
 
-            <!-- ========================================================== -->
-            <!-- 模块4：物流底座 -->
-            <!-- ========================================================== -->
+            <!-- ====== 模块4：物流底座 ====== -->
             <div class="module-panel" id="panel-logistics">
                 <div class="module-title">🏗️ 物流底座 · <span>运力网络调度</span></div>
                 <div class="module-sub">运力 · 订单 · 成本 · 时效 · 风险 · 调度</div>
-
                 <div class="mini-grid-3">
                     <div class="card"><div class="icon">🚁</div><div class="label">运力规模</div><div class="value" id="logFleet">47</div><div class="desc">可用节点</div></div>
                     <div class="card"><div class="icon">📦</div><div class="label">履约率</div><div class="value" style="color:#a78bfa;" id="logFulfill">98.1%</div><div class="desc">24h滚动</div></div>
                     <div class="card"><div class="icon">⏱️</div><div class="label">平均时效</div><div class="value" style="color:#22d3ee;" id="logTime">28min</div><div class="desc">配送承诺</div></div>
                 </div>
-
                 <div class="mini-canvas-wrap">
                     <canvas id="canvasLogistics" width="800" height="200"></canvas>
                 </div>
-
                 <div class="mini-controls">
                     <div class="ctrl"><label>运力 <span id="logFleetLabel">47</span></label><input type="range" id="logFleetInput" min="20" max="80" step="1" value="47" /></div>
                     <div class="ctrl"><label>订单密度 <span id="logOrderLabel">2.3k</span></label><input type="range" id="logOrderInput" min="0.5" max="4.0" step="0.1" value="2.3" /></div>
                     <div class="ctrl"><label>时效压力 <span id="logTimeLabel">1.00</span></label><input type="range" id="logTimeInput" min="0.5" max="2.0" step="0.05" value="1.0" /></div>
                     <div class="ctrl"><label>风险等级 <span id="logRiskLabel">50%</span></label><input type="range" id="logRiskInput" min="0" max="100" step="1" value="50" /></div>
                 </div>
-
                 <div class="mini-mapping">
                     <div class="mm-title">🔗 博弈映射 · 物流 ↔ 低空经济</div>
                     <div class="mm-grid">
@@ -739,30 +595,24 @@
                 </div>
             </div>
 
-            <!-- ========================================================== -->
-            <!-- 模块5：算力底座 -->
-            <!-- ========================================================== -->
+            <!-- ====== 模块5：算力底座 ====== -->
             <div class="module-panel" id="panel-compute">
                 <div class="module-title">⚡ 算力底座 · <span>任务调度模型</span></div>
                 <div class="module-sub">CPU/GPU · 任务编排 · 算力成本 · 延迟 · 风险 · 弹性</div>
-
                 <div class="mini-grid-3">
                     <div class="card"><div class="icon">🖥️</div><div class="label">算力规模</div><div class="value" id="compCluster">128</div><div class="desc">核心节点</div></div>
                     <div class="card"><div class="icon">📋</div><div class="label">成功率</div><div class="value" style="color:#a78bfa;" id="compSuccess">99.2%</div><div class="desc">24h滚动</div></div>
                     <div class="card"><div class="icon">⏱️</div><div class="label">平均延迟</div><div class="value" style="color:#22d3ee;" id="compLatency">42ms</div><div class="desc">响应承诺</div></div>
                 </div>
-
                 <div class="mini-canvas-wrap">
                     <canvas id="canvasCompute" width="800" height="200"></canvas>
                 </div>
-
                 <div class="mini-controls">
                     <div class="ctrl"><label>算力 <span id="compClusterLabel">128</span></label><input type="range" id="compClusterInput" min="60" max="200" step="1" value="128" /></div>
                     <div class="ctrl"><label>任务密度 <span id="compTaskLabel">4.7k</span></label><input type="range" id="compTaskInput" min="1.0" max="8.0" step="0.1" value="4.7" /></div>
                     <div class="ctrl"><label>延迟压力 <span id="compLatencyLabel">1.00</span></label><input type="range" id="compLatencyInput" min="0.5" max="2.0" step="0.05" value="1.0" /></div>
                     <div class="ctrl"><label>故障风险 <span id="compFaultLabel">50%</span></label><input type="range" id="compFaultInput" min="0" max="100" step="1" value="50" /></div>
                 </div>
-
                 <div class="mini-mapping">
                     <div class="mm-title">🔗 博弈映射 · 算力 ↔ 物流 ↔ 低空经济</div>
                     <div class="mm-grid">
@@ -781,10 +631,9 @@
 
         </div>
 
-        <!-- ===== 底部 ===== -->
-        <div class="back-bottom">
+        <!-- ===== 返回作品集 ===== -->
+        <div class="back-link">
             <a href="index.html">← 返回作品集首页</a>
-            <span style="color:rgba(255,255,255,0.04); font-size:11px;">v1.0 · 五大模块完整整合</span>
         </div>
 
     </div>
@@ -802,7 +651,7 @@
         });
 
         // ================================================================
-        // ===== 导航切换（修复：切换时强制重绘Canvas） =====
+        // ===== 导航切换 =====
         // ================================================================
         const archItems = document.querySelectorAll('.arch-item');
         const panels = {
@@ -813,9 +662,6 @@
             compute: document.getElementById('panel-compute')
         };
 
-        // 存储所有canvas的绘制函数
-        const drawFunctions = {};
-
         archItems.forEach(item => {
             item.addEventListener('click', function() {
                 const target = this.dataset.panel;
@@ -825,78 +671,14 @@
                     const panel = panels[key];
                     const isActive = key === target.replace('panel-', '');
                     panel.classList.toggle('active', isActive);
-                    if (isActive) {
-                        // 延迟执行重绘，确保DOM渲染完成
-                        setTimeout(() => {
-                            // 触发对应canvas的重绘
-                            const canvasId = 'canvas' + key.charAt(0).toUpperCase() + key.slice(1);
-                            // 对于特殊名称映射
-                            let realCanvasId = canvasId;
-                            if (key === 'game') realCanvasId = 'canvasGame';
-                            else if (key === 'lowair') realCanvasId = 'canvasLowair';
-                            else if (key === 'actuary') realCanvasId = 'canvasActuary';
-                            else if (key === 'logistics') realCanvasId = 'canvasLogistics';
-                            else if (key === 'compute') realCanvasId = 'canvasCompute';
-                            const canvas = document.getElementById(realCanvasId);
-                            if (canvas && drawFunctions[realCanvasId]) {
-                                drawFunctions[realCanvasId]();
-                            }
-                            // 也触发resize事件以确保尺寸正确
-                            window.dispatchEvent(new Event('resize'));
-                        }, 50);
-                    }
                 });
             });
         });
 
-        // 侧边导航联动
-        const navItems = document.querySelectorAll('.nav-item');
-        const panelMap = {
-            'panel-game': document.getElementById('panel-game'),
-            'panel-lowair': document.getElementById('panel-lowair'),
-            'panel-actuary': document.getElementById('panel-actuary'),
-            'panel-logistics': document.getElementById('panel-logistics'),
-            'panel-compute': document.getElementById('panel-compute')
-        };
-
-        navItems.forEach(item => {
-            item.addEventListener('click', function(e) {
-                e.preventDefault();
-                const targetId = this.dataset.target;
-                const targetPanel = panelMap[targetId];
-                if (targetPanel) {
-                    navItems.forEach(el => el.classList.remove('active'));
-                    this.classList.add('active');
-                    Object.keys(panels).forEach(key => {
-                        const panel = panels[key];
-                        const isActive = panel === targetPanel;
-                        panel.classList.toggle('active', isActive);
-                        if (isActive) {
-                            setTimeout(() => {
-                                const canvasId = 'canvas' + key.charAt(0).toUpperCase() + key.slice(
-                                1);
-                                let realCanvasId = canvasId;
-                                if (key === 'game') realCanvasId = 'canvasGame';
-                                else if (key === 'lowair') realCanvasId = 'canvasLowair';
-                                else if (key === 'actuary') realCanvasId = 'canvasActuary';
-                                else if (key === 'logistics') realCanvasId = 'canvasLogistics';
-                                else if (key === 'compute') realCanvasId = 'canvasCompute';
-                                const canvas = document.getElementById(realCanvasId);
-                                if (canvas && drawFunctions[realCanvasId]) {
-                                    drawFunctions[realCanvasId]();
-                                }
-                                window.dispatchEvent(new Event('resize'));
-                            }, 50);
-                        }
-                    });
-                    archItems.forEach(el => el.classList.toggle('active', el.dataset.panel === targetId));
-                }
-            });
-        });
-
         // ================================================================
-        // ===== 博弈底座 Canvas =====
+        // ===== 所有 Canvas 绘制函数（占位，保留交互） =====
         // ================================================================
+        // 博弈底座 Canvas
         (function() {
             const canvas = document.getElementById('canvasGame');
             if (!canvas) return;
@@ -905,7 +687,6 @@
                 h = 200;
             canvas.width = w;
             canvas.height = h;
-
             const pInput = document.getElementById('gamePInput');
             const bInput = document.getElementById('gameBInput');
             const timeInput = document.getElementById('gameTimeInput');
@@ -918,7 +699,6 @@
             const ratioDisplay = document.getElementById('gameRatio');
 
             let phase = 0,
-                running = true,
                 animId = null;
 
             function draw() {
@@ -942,7 +722,6 @@
 
                 ctx.clearRect(0, 0, w, h);
 
-                // 网格
                 ctx.strokeStyle = 'rgba(255,255,255,0.02)';
                 ctx.lineWidth = 0.5;
                 for (let i = 0; i <= 10; i++) { const x = (i / 10) * w;
@@ -956,7 +735,6 @@
                     ctx.lineTo(w, y);
                     ctx.stroke(); }
 
-                // 三个圈
                 const cx = w / 2,
                     cy = h / 2 + 10;
                 const r1 = 50 + 20 * (1 - time) * 0.8;
@@ -994,7 +772,6 @@
                     ctx.fillText('r=' + Math.round(r), x, cy + yOff + r + 2);
                 });
 
-                // 连接线
                 ctx.strokeStyle = 'rgba(167,139,250,0.04)';
                 ctx.lineWidth = 1;
                 ctx.setLineDash([3, 5]);
@@ -1008,7 +785,6 @@
                 ctx.stroke();
                 ctx.setLineDash([]);
 
-                // 协调环
                 const syncR = 80 + 30 * sync;
                 ctx.strokeStyle = 'rgba(167,139,250,0.04)';
                 ctx.lineWidth = 1;
@@ -1023,7 +799,6 @@
                 ctx.textBaseline = 'bottom';
                 ctx.fillText('协调边界 ' + Math.round(sync * 100) + '%', cx + syncR - 4, cy - 2);
 
-                // 进度
                 const px = time * w;
                 ctx.strokeStyle = 'rgba(167,139,250,0.06)';
                 ctx.lineWidth = 1;
@@ -1039,7 +814,6 @@
                 ctx.textBaseline = 'top';
                 ctx.fillText('⏳ ' + Math.round(time * 100) + '%', px, 4);
 
-                // 图例
                 const ly = h - 12;
                 const items = [
                     ['●', '#a78bfa', '研发收束'],
@@ -1057,25 +831,17 @@
                     lx += 68;
                 });
 
-                if (running) phase += 0.01;
                 animId = requestAnimationFrame(draw);
             }
 
             document.querySelectorAll('#panel-game .mini-controls input').forEach(el => {
                 el.addEventListener('input', draw);
             });
-
-            // 保存绘制函数以便切换时调用
-            drawFunctions['canvasGame'] = draw;
-
             draw();
-
             window.addEventListener('beforeunload', () => { if (animId) cancelAnimationFrame(animId); });
         })();
 
-        // ================================================================
-        // ===== 低空经济 Canvas =====
-        // ================================================================
+        // 低空经济 Canvas（简化版，保留交互）
         (function() {
             const canvas = document.getElementById('canvasLowair');
             if (!canvas) return;
@@ -1143,7 +909,6 @@
 
                 ctx.clearRect(0, 0, w, h);
 
-                // 网格
                 ctx.strokeStyle = 'rgba(255,255,255,0.02)';
                 ctx.lineWidth = 0.5;
                 for (let i = 0; i <= 10; i++) { const x = (i / 10) * w;
@@ -1161,7 +926,6 @@
                     cy = h / 2 + 10;
                 const baseR = 60 + 20 * heat;
 
-                // 三个参与方
                 const actors = [
                     { label: '🏛️ 政府', color: '#a78bfa', angle: 0, radius: baseR * 0.85, fixed: 0.5 },
                     { label: '🧑‍🤝‍🧑 用户', color: '#facc15', angle: 2.1, radius: baseR * 0.85 + 30 * user,
@@ -1223,7 +987,6 @@
                 ctx.textBaseline = 'top';
                 ctx.fillText('⚖️ 均衡点', cx, cy + 6);
 
-                // 图例
                 const ly = h - 12;
                 ctx.font = '8px sans-serif';
                 ctx.textBaseline = 'bottom';
@@ -1248,17 +1011,11 @@
             document.querySelectorAll('#panel-lowair .mini-controls input').forEach(el => {
                 el.addEventListener('input', draw);
             });
-
-            drawFunctions['canvasLowair'] = draw;
-
             draw();
-
             window.addEventListener('beforeunload', () => { if (animId) cancelAnimationFrame(animId); });
         })();
 
-        // ================================================================
-        // ===== 精算映射 Canvas =====
-        // ================================================================
+        // 精算映射 Canvas（简化占位）
         (function() {
             const canvas = document.getElementById('canvasActuary');
             if (!canvas) return;
@@ -1306,7 +1063,6 @@
 
                 ctx.clearRect(0, 0, w, h);
 
-                // 网格
                 ctx.strokeStyle = 'rgba(255,255,255,0.02)';
                 ctx.lineWidth = 0.5;
                 for (let i = 0; i <= 10; i++) { const x = (i / 10) * w;
@@ -1323,8 +1079,6 @@
                 const cx = w / 2,
                     cy = h / 2 + 10;
                 const baseR = 50 + 20 * value * 0.5;
-
-                // 圆柱体
                 const hOff = 20 + 10 * value * 0.3;
                 ctx.strokeStyle = 'rgba(34,211,238,0.1)';
                 ctx.lineWidth = 1;
@@ -1359,14 +1113,12 @@
                 ctx.beginPath();
                 ctx.arc(cx, cy, 4, 0, Math.PI * 2);
                 ctx.fill();
-
                 ctx.fillStyle = 'rgba(34,211,238,0.06)';
                 ctx.font = '7px sans-serif';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'top';
                 ctx.fillText('保险价值', cx, cy + 6);
 
-                // 精算师画圈
                 const ax = 100,
                     ay = 60 + 20 * Math.sin(phase * 0.8);
                 const ar = 20 + 10 * sync * 0.5;
@@ -1394,7 +1146,6 @@
                 ctx.textBaseline = 'bottom';
                 ctx.fillText('🧠 精算师', ax, ay - ar - 2);
 
-                // 感应连线
                 const sAlpha = 0.04 + 0.04 * sync;
                 ctx.strokeStyle = 'rgba(167,139,250,' + sAlpha + ')';
                 ctx.lineWidth = 1 + sync * 1.5;
@@ -1405,15 +1156,14 @@
                 ctx.stroke();
                 ctx.setLineDash([]);
 
-                // 五个参与方（简化）
-                const actors = [
+                const actors2 = [
                     { color: '#facc15', label: '投保人', angle: 0.5 },
                     { color: '#34d399', label: '再保', angle: 1.8 },
                     { color: '#fb923c', label: '资本', angle: 3.0 },
                     { color: '#f472b6', label: '监管', angle: 4.2 },
                     { color: '#ef4444', label: '中介', angle: 5.5 }
                 ];
-                actors.forEach((a, i) => {
+                actors2.forEach((a, i) => {
                     const ang = a.angle + phase * 0.2;
                     const r = baseR * 0.8 + 20 * Math.sin(phase * 0.3 + i);
                     const px = cx + r * 0.9 * Math.cos(ang);
@@ -1432,17 +1182,16 @@
                     ctx.fillText(a.label, px, py - 4);
                 });
 
-                // 图例
                 const ly = h - 12;
                 ctx.font = '7px sans-serif';
                 ctx.textBaseline = 'bottom';
-                const items = [
+                const items2 = [
                     ['●', '#22d3ee', '价值'],
-                    ['●', '#167,139,250', '精算师'],
+                    ['●', '#a78bfa', '精算师'],
                     ['●', '#facc15', '投保人']
                 ];
                 let lx = 20;
-                items.forEach(([dot, color, label]) => {
+                items2.forEach(([dot, color, label]) => {
                     ctx.fillStyle = color + '0.2)';
                     ctx.fillText(dot, lx, ly);
                     ctx.fillStyle = 'rgba(255,255,255,0.06)';
@@ -1457,17 +1206,11 @@
             document.querySelectorAll('#panel-actuary .mini-controls input').forEach(el => {
                 el.addEventListener('input', draw);
             });
-
-            drawFunctions['canvasActuary'] = draw;
-
             draw();
-
             window.addEventListener('beforeunload', () => { if (animId) cancelAnimationFrame(animId); });
         })();
 
-        // ================================================================
-        // ===== 物流底座 Canvas =====
-        // ================================================================
+        // 物流底座 Canvas（简化占位）
         (function() {
             const canvas = document.getElementById('canvasLogistics');
             if (!canvas) return;
@@ -1513,7 +1256,6 @@
 
                 ctx.clearRect(0, 0, w, h);
 
-                // 网格
                 ctx.strokeStyle = 'rgba(255,255,255,0.02)';
                 ctx.lineWidth = 0.5;
                 for (let i = 0; i <= 10; i++) { const x = (i / 10) * w;
@@ -1529,8 +1271,6 @@
 
                 const cx = w / 2,
                     cy = h / 2 + 10;
-
-                // 节点
                 const numNodes = Math.min(60, fleet + 20);
                 const nodes = [];
                 for (let i = 0; i < numNodes; i++) {
@@ -1541,7 +1281,6 @@
                     });
                 }
 
-                // 连接
                 const hubs = nodes.filter(n => n.isHub);
                 const others = nodes.filter(n => !n.isHub);
                 hubs.forEach(hub => {
@@ -1558,7 +1297,6 @@
                     });
                 });
 
-                // 绘制节点
                 nodes.forEach((node, i) => {
                     const isHub = node.isHub;
                     const r = isHub ? 6 : 3 + 2 * (order / 2.5);
@@ -1590,7 +1328,6 @@
                     }
                 });
 
-                // 订单热点
                 const hotCount = Math.round(order * 1.5);
                 for (let i = 0; i < hotCount; i++) {
                     const ang = phase * 0.5 + i * 1.2;
@@ -1607,7 +1344,6 @@
                     ctx.shadowBlur = 0;
                 }
 
-                // 路径流
                 const flowCount = Math.round(order * 0.8);
                 for (let i = 0; i < flowCount; i++) {
                     const t = (i / flowCount + phase * 0.15) % 1;
@@ -1624,7 +1360,6 @@
                     }
                 }
 
-                // 风险光晕
                 if (risk > 0.2) {
                     const rAlpha = 0.01 + risk * 0.03;
                     const grad = ctx.createRadialGradient(cx, cy, 20, cx, cy, 200 * risk);
@@ -1636,7 +1371,6 @@
                     ctx.fill();
                 }
 
-                // 图例
                 const ly = h - 12;
                 ctx.font = '7px sans-serif';
                 ctx.textBaseline = 'bottom';
@@ -1662,17 +1396,11 @@
             document.querySelectorAll('#panel-logistics .mini-controls input').forEach(el => {
                 el.addEventListener('input', draw);
             });
-
-            drawFunctions['canvasLogistics'] = draw;
-
             draw();
-
             window.addEventListener('beforeunload', () => { if (animId) cancelAnimationFrame(animId); });
         })();
 
-        // ================================================================
-        // ===== 算力底座 Canvas =====
-        // ================================================================
+        // 算力底座 Canvas（简化占位）
         (function() {
             const canvas = document.getElementById('canvasCompute');
             if (!canvas) return;
@@ -1718,7 +1446,6 @@
 
                 ctx.clearRect(0, 0, w, h);
 
-                // 网格
                 ctx.strokeStyle = 'rgba(255,255,255,0.02)';
                 ctx.lineWidth = 0.5;
                 for (let i = 0; i <= 10; i++) { const x = (i / 10) * w;
@@ -1734,8 +1461,6 @@
 
                 const cx = w / 2,
                     cy = h / 2 + 10;
-
-                // 节点（算力集群）
                 const numNodes = Math.min(80, cluster + 30);
                 const nodes = [];
                 for (let i = 0; i < numNodes; i++) {
@@ -1793,7 +1518,6 @@
                     }
                 });
 
-                // 任务热点
                 const hotCount = Math.round(task * 1.2);
                 for (let i = 0; i < hotCount; i++) {
                     const ang = phase * 0.5 + i * 1.2;
@@ -1810,7 +1534,6 @@
                     ctx.shadowBlur = 0;
                 }
 
-                // 计算流
                 const flowCount = Math.round(task * 0.7);
                 for (let i = 0; i < flowCount; i++) {
                     const t = (i / flowCount + phase * 0.15) % 1;
@@ -1827,7 +1550,6 @@
                     }
                 }
 
-                // 故障光晕
                 if (fault > 0.15) {
                     const rAlpha = 0.01 + fault * 0.03;
                     const grad = ctx.createRadialGradient(cx, cy, 20, cx, cy, 200 * fault);
@@ -1839,7 +1561,6 @@
                     ctx.fill();
                 }
 
-                // 图例
                 const ly = h - 12;
                 ctx.font = '7px sans-serif';
                 ctx.textBaseline = 'bottom';
@@ -1865,22 +1586,9 @@
             document.querySelectorAll('#panel-compute .mini-controls input').forEach(el => {
                 el.addEventListener('input', draw);
             });
-
-            drawFunctions['canvasCompute'] = draw;
-
             draw();
-
             window.addEventListener('beforeunload', () => { if (animId) cancelAnimationFrame(animId); });
         })();
-
-        // ================================================================
-        // ===== 主动触发初始绘制 =====
-        // ================================================================
-        setTimeout(() => {
-            Object.keys(drawFunctions).forEach(key => {
-                drawFunctions[key]();
-            });
-        }, 200);
     </script>
 
 </body>
