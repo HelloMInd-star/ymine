@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>商业知识学习证据链 · 可视化</title>
+    <title>商业知识学习证据链 · 交互版</title>
     <style>
+        /* ===== 复用之前的基础样式 ===== */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-
         body {
             background: #0b0b1a;
             font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
@@ -18,7 +18,6 @@
             padding: 24px 20px 24px 110px;
             overflow-x: hidden;
         }
-
         #glow {
             position: fixed;
             top: 0;
@@ -30,8 +29,7 @@
             background: radial-gradient(600px circle at var(--x, 50%) var(--y, 50%), rgba(120, 80, 255, 0.06), transparent 80%);
             transition: background 0.1s;
         }
-
-        /* ===== 左侧固定导航（含量化信息） ===== */
+        /* ===== 左侧导航 ===== */
         .side-nav {
             position: fixed;
             top: 0;
@@ -49,7 +47,6 @@
             backdrop-filter: blur(12px);
             border-right: 1px solid rgba(255, 255, 255, 0.04);
         }
-
         .side-nav .nav-item {
             display: flex;
             flex-direction: column;
@@ -65,26 +62,22 @@
             text-decoration: none;
             gap: 1px;
         }
-
         .side-nav .nav-item:hover {
             color: rgba(255, 255, 255, 0.5);
             background: rgba(255, 255, 255, 0.03);
             border-color: rgba(255, 255, 255, 0.06);
         }
-
         .side-nav .nav-item.active {
             color: #a78bfa;
             background: rgba(167, 139, 250, 0.06);
             border-color: rgba(167, 139, 250, 0.12);
         }
-
         .side-nav .nav-item .num {
             font-size: 14px;
             font-weight: 600;
             line-height: 1.2;
             font-family: 'Courier New', monospace;
         }
-
         .side-nav .nav-item .label {
             font-size: 8px;
             text-transform: uppercase;
@@ -92,20 +85,12 @@
             opacity: 0.4;
             font-family: system-ui, sans-serif;
         }
-
-        .side-nav .nav-item .count {
-            font-size: 7px;
-            color: rgba(255, 255, 255, 0.1);
-            letter-spacing: 0.2px;
-        }
-
         .side-nav .nav-divider {
             width: 24px;
             height: 1px;
             background: rgba(255, 255, 255, 0.04);
             margin: 2px 0;
         }
-
         .side-nav .nav-bottom {
             margin-top: auto;
             font-size: 7px;
@@ -129,15 +114,46 @@
             z-index: 1;
             overflow: hidden;
         }
+        .container::before {
+            content: '';
+            position: absolute;
+            top: -100px;
+            right: -100px;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(80, 30, 140, 0.15), transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: floatBg 12s ease-in-out infinite alternate;
+        }
+        .container::after {
+            content: '';
+            position: absolute;
+            bottom: -80px;
+            left: -80px;
+            width: 350px;
+            height: 350px;
+            background: radial-gradient(circle, rgba(30, 60, 150, 0.1), transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: floatBg 10s ease-in-out infinite alternate-reverse;
+        }
+        @keyframes floatBg {
+            0% {
+                transform: translate(0, 0) scale(1);
+            }
+            100% {
+                transform: translate(30px, -20px) scale(1.1);
+            }
+        }
 
         /* ===== 头部 ===== */
         .header {
             text-align: center;
-            margin-bottom: 40px;
+            margin-bottom: 32px;
             opacity: 0;
             animation: fadeInUp 0.8s ease forwards;
         }
-
         .header h1 {
             font-size: 30px;
             font-weight: 700;
@@ -149,7 +165,6 @@
             -webkit-text-fill-color: transparent;
             animation: gradientFlow 6s ease-in-out infinite;
         }
-
         .header .sub {
             font-size: 15px;
             color: rgba(255, 255, 255, 0.3);
@@ -157,7 +172,6 @@
             border-bottom: 1px solid rgba(255, 255, 255, 0.04);
             padding-bottom: 16px;
         }
-
         @keyframes fadeInUp {
             0% {
                 opacity: 0;
@@ -168,7 +182,6 @@
                 transform: translateY(0);
             }
         }
-
         @keyframes gradientFlow {
             0% {
                 background-position: 0% 50%;
@@ -181,7 +194,431 @@
             }
         }
 
-        /* ===== 阶段徽章导航（顶部辅助） ===== */
+        /* ============================================================ */
+        /* ===== 颗粒度化推导区域（交互版） ===== */
+        /* ============================================================ */
+        .granular-section {
+            background: rgba(167, 139, 250, 0.03);
+            border: 1px solid rgba(167, 139, 250, 0.08);
+            border-radius: 20px;
+            padding: 28px 30px 20px;
+            margin-bottom: 32px;
+            opacity: 0;
+            animation: fadeInUp 0.6s ease 0.05s forwards;
+        }
+        .granular-section .g-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #f1f5f9;
+            margin-bottom: 2px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .granular-section .g-title .tag {
+            font-size: 11px;
+            font-weight: 500;
+            color: #a78bfa;
+            background: rgba(167, 139, 250, 0.12);
+            padding: 2px 14px;
+            border-radius: 20px;
+        }
+        .granular-section .g-sub {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.25);
+            margin-bottom: 18px;
+            padding-bottom: 14px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        /* ===== 交互式映射塔 ===== */
+        .tower-section {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr auto 1fr;
+            gap: 8px 12px;
+            align-items: stretch;
+            margin-bottom: 20px;
+            padding-bottom: 18px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        }
+        @media (max-width: 700px) {
+            .tower-section {
+                grid-template-columns: 1fr;
+                gap: 6px;
+                text-align: center;
+            }
+            .tower-section .tower-arrow {
+                display: none;
+            }
+        }
+
+        .tower-item {
+            background: rgba(255, 255, 255, 0.01);
+            border-radius: 12px;
+            padding: 12px 14px;
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            transition: all 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            cursor: pointer;
+            position: relative;
+            user-select: none;
+        }
+        .tower-item:hover {
+            transform: translateY(-3px) scale(1.02);
+            border-color: rgba(255, 255, 255, 0.12);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+        }
+        .tower-item .t-level {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.2);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 2px;
+            transition: color 0.3s;
+        }
+        .tower-item .t-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #f1f5f9;
+            transition: color 0.3s;
+        }
+        .tower-item .t-example {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.35);
+            margin-top: 2px;
+            transition: color 0.3s;
+        }
+        .tower-item .t-desc {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.2);
+            margin-top: 2px;
+            transition: color 0.3s;
+        }
+        .tower-item .t-hover-detail {
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+            transition: all 0.4s ease;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.15);
+            margin-top: 0;
+            padding-top: 0;
+            border-top: none;
+        }
+        .tower-item:hover .t-hover-detail {
+            max-height: 60px;
+            opacity: 1;
+            margin-top: 6px;
+            padding-top: 6px;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        .tower-item.highlight-layer {
+            background: rgba(167, 139, 250, 0.04);
+            border-color: rgba(167, 139, 250, 0.08);
+        }
+        .tower-item.highlight-layer .t-name {
+            color: #a78bfa;
+        }
+        .tower-item.highlight-layer:hover {
+            border-color: rgba(167, 139, 250, 0.3);
+            box-shadow: 0 8px 30px rgba(167, 139, 250, 0.06);
+        }
+
+        .tower-item.gold-layer {
+            background: rgba(250, 204, 21, 0.03);
+            border-color: rgba(250, 204, 21, 0.08);
+        }
+        .tower-item.gold-layer .t-name {
+            color: #facc15;
+        }
+        .tower-item.gold-layer:hover {
+            border-color: rgba(250, 204, 21, 0.25);
+            box-shadow: 0 8px 30px rgba(250, 204, 21, 0.06);
+        }
+
+        .tower-arrow {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255, 255, 255, 0.06);
+            font-size: 12px;
+            letter-spacing: 2px;
+            font-weight: 300;
+            padding: 0 2px;
+            animation: pulseArrow 2.5s ease-in-out infinite;
+        }
+        .tower-arrow .arrow-line {
+            font-size: 18px;
+            line-height: 1.2;
+        }
+        .tower-arrow .arrow-label {
+            font-size: 9px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: rgba(255, 255, 255, 0.08);
+        }
+        @keyframes pulseArrow {
+            0%,
+            100% {
+                opacity: 0.6;
+            }
+            50% {
+                opacity: 1;
+            }
+        }
+
+        /* ===== 交互式推导节点 ===== */
+        .derive-node {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 14px;
+            padding: 18px 20px;
+            margin-bottom: 14px;
+            transition: all 0.3s ease;
+            cursor: default;
+        }
+        .derive-node:hover {
+            border-color: rgba(255, 255, 255, 0.08);
+        }
+        .derive-node .dn-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+        .derive-node .dn-header .dn-icon {
+            font-size: 20px;
+        }
+        .derive-node .dn-header .dn-label {
+            font-size: 15px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        .derive-node .dn-header .dn-badge {
+            font-size: 10px;
+            font-weight: 500;
+            padding: 2px 12px;
+            border-radius: 20px;
+            background: rgba(250, 204, 21, 0.08);
+            color: #facc15;
+            border: 1px solid rgba(250, 204, 21, 0.08);
+        }
+        .derive-node .dn-header .dn-badge.blue {
+            background: rgba(96, 165, 250, 0.08);
+            color: #60a5fa;
+            border-color: rgba(96, 165, 250, 0.08);
+        }
+        .derive-node .dn-header .dn-badge.green {
+            background: rgba(52, 211, 153, 0.08);
+            color: #34d399;
+            border-color: rgba(52, 211, 153, 0.08);
+        }
+        .derive-node .dn-header .dn-toggle {
+            margin-left: auto;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.15);
+            cursor: pointer;
+            padding: 4px 10px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            transition: all 0.3s;
+            background: transparent;
+            font-family: inherit;
+        }
+        .derive-node .dn-header .dn-toggle:hover {
+            color: rgba(255, 255, 255, 0.4);
+            border-color: rgba(255, 255, 255, 0.08);
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .derive-node .dn-step {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 4px 0;
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.45);
+            line-height: 1.6;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.015);
+            max-height: 200px;
+            overflow: hidden;
+            transition: all 0.4s ease;
+        }
+        .derive-node .dn-step:last-child {
+            border-bottom: none;
+        }
+        .derive-node .dn-step.collapsed {
+            max-height: 0 !important;
+            padding: 0 !important;
+            opacity: 0;
+            border-bottom: none;
+            margin: 0;
+        }
+        .derive-node .dn-step .step-tag {
+            font-size: 11px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.15);
+            min-width: 44px;
+            flex-shrink: 0;
+            font-family: 'Courier New', monospace;
+            transition: color 0.3s;
+        }
+        .derive-node .dn-step .step-tag.highlight {
+            color: #a78bfa;
+        }
+        .derive-node .dn-step .step-content {
+            flex: 1;
+        }
+        .derive-node .dn-step .step-content .hl {
+            color: #facc15;
+            font-weight: 500;
+        }
+        .derive-node .dn-step .step-content .hl-blue {
+            color: #60a5fa;
+            font-weight: 500;
+        }
+        .derive-node .dn-step .step-content .hl-green {
+            color: #34d399;
+            font-weight: 500;
+        }
+        .derive-node .dn-step .step-content .code-block {
+            display: block;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 8px;
+            padding: 6px 12px;
+            margin-top: 4px;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.35);
+            font-family: 'Courier New', monospace;
+            transition: all 0.3s;
+        }
+        .derive-node .dn-step .step-content .code-block:hover {
+            background: rgba(255, 255, 255, 0.03);
+            border-color: rgba(255, 255, 255, 0.08);
+        }
+
+        .derive-node .dn-conclusion {
+            margin-top: 10px;
+            padding: 10px 14px;
+            background: rgba(167, 139, 250, 0.04);
+            border-left: 3px solid #a78bfa;
+            border-radius: 0 8px 8px 0;
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.6);
+            line-height: 1.6;
+            transition: all 0.3s ease;
+        }
+        .derive-node .dn-conclusion:hover {
+            background: rgba(167, 139, 250, 0.06);
+        }
+        .derive-node .dn-conclusion strong {
+            color: rgba(255, 255, 255, 0.8);
+        }
+        .derive-node .dn-conclusion .hl {
+            color: #facc15;
+        }
+        .derive-node .dn-migrate {
+            margin-top: 8px;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.2);
+            padding: 6px 12px;
+            background: rgba(255, 255, 255, 0.01);
+            border-radius: 8px;
+            border: 1px dashed rgba(255, 255, 255, 0.04);
+            transition: all 0.3s;
+        }
+        .derive-node .dn-migrate:hover {
+            border-color: rgba(255, 255, 255, 0.08);
+            color: rgba(255, 255, 255, 0.3);
+        }
+        .derive-node .dn-migrate strong {
+            color: rgba(255, 255, 255, 0.35);
+        }
+
+        /* ===== 利润公式卡片（交互增强） ===== */
+        .formula-compare {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 14px;
+            padding-top: 14px;
+            border-top: 1px solid rgba(255, 255, 255, 0.03);
+        }
+        @media (max-width: 600px) {
+            .formula-compare {
+                grid-template-columns: 1fr;
+            }
+        }
+        .formula-card {
+            background: rgba(255, 255, 255, 0.01);
+            border-radius: 10px;
+            padding: 10px 14px;
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            text-align: center;
+            transition: all 0.4s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        .formula-card:hover {
+            transform: translateY(-3px);
+            border-color: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+        .formula-card .f-label {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.15);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: color 0.3s;
+        }
+        .formula-card .f-value {
+            font-size: 16px;
+            font-weight: 600;
+            margin-top: 2px;
+            transition: all 0.3s;
+        }
+        .formula-card .f-desc {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.12);
+            margin-top: 2px;
+            transition: color 0.3s;
+        }
+        .formula-card .f-detail {
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+            transition: all 0.4s ease;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.2);
+            margin-top: 0;
+            padding-top: 0;
+            border-top: none;
+        }
+        .formula-card:hover .f-detail {
+            max-height: 80px;
+            opacity: 1;
+            margin-top: 6px;
+            padding-top: 6px;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+        }
+        .formula-card .f-value.green {
+            color: #34d399;
+        }
+        .formula-card .f-value.red {
+            color: #f87171;
+        }
+        .formula-card .f-value .unit {
+            font-size: 12px;
+            font-weight: 400;
+            color: rgba(255, 255, 255, 0.15);
+        }
+
+        /* ===== 阶段性徽章 ===== */
         .stages {
             display: flex;
             flex-wrap: wrap;
@@ -191,7 +628,6 @@
             opacity: 0;
             animation: fadeInUp 0.6s ease 0.1s forwards;
         }
-
         .stage-badge {
             display: flex;
             align-items: center;
@@ -206,12 +642,10 @@
             transition: all 0.3s ease;
             cursor: pointer;
         }
-
         .stage-badge:hover {
             border-color: rgba(167, 139, 250, 0.1);
             color: rgba(255, 255, 255, 0.7);
         }
-
         .stage-badge .num {
             background: rgba(167, 139, 250, 0.1);
             color: #a78bfa;
@@ -225,12 +659,10 @@
             font-weight: 700;
             flex-shrink: 0;
         }
-
         .stage-arrow {
             color: rgba(255, 255, 255, 0.06);
             font-size: 16px;
         }
-
         @media (max-width: 640px) {
             .stage-arrow {
                 display: none;
@@ -245,14 +677,13 @@
             }
         }
 
-        /* ===== 五层卡片 ===== */
+        /* ===== 后面的五层卡片（保持原样） ===== */
         .phase-grid {
             display: flex;
             flex-direction: column;
             gap: 24px;
             margin-top: 8px;
         }
-
         .phase {
             background: rgba(255, 255, 255, 0.02);
             border-radius: 18px;
@@ -263,7 +694,6 @@
             animation: fadeInUp 0.6s ease forwards;
             scroll-margin-top: 20px;
         }
-
         .phase:nth-child(1) {
             animation-delay: 0.15s;
         }
@@ -279,11 +709,9 @@
         .phase:nth-child(5) {
             animation-delay: 0.35s;
         }
-
         .phase:hover {
             border-color: rgba(255, 255, 255, 0.06);
         }
-
         .phase-header {
             display: flex;
             align-items: center;
@@ -291,7 +719,6 @@
             margin-bottom: 10px;
             flex-wrap: wrap;
         }
-
         .phase-tag {
             font-size: 11px;
             font-weight: 600;
@@ -303,13 +730,11 @@
             border: 1px solid rgba(167, 139, 250, 0.06);
             flex-shrink: 0;
         }
-
         .phase-title {
             font-size: 18px;
             font-weight: 600;
             color: #f1f5f9;
         }
-
         .phase-desc {
             font-size: 13px;
             color: rgba(255, 255, 255, 0.35);
@@ -317,19 +742,12 @@
             line-height: 1.7;
             padding-left: 4px;
         }
-
-        .phase-desc strong {
-            color: rgba(255, 255, 255, 0.6);
-        }
-
-        /* ===== 节点列表（颗粒度拆分） ===== */
         .node-list {
             display: flex;
             flex-direction: column;
             gap: 4px;
             padding-left: 4px;
         }
-
         .node-item {
             display: flex;
             align-items: flex-start;
@@ -340,11 +758,9 @@
             padding: 6px 0;
             border-bottom: 1px solid rgba(255, 255, 255, 0.02);
         }
-
         .node-item:last-child {
             border-bottom: none;
         }
-
         .node-bullet {
             color: #a78bfa;
             font-weight: 700;
@@ -354,12 +770,10 @@
             text-align: center;
             margin-top: 1px;
         }
-
         .node-highlight {
             color: #facc15;
             font-weight: 500;
         }
-
         .node-detail {
             display: block;
             font-size: 12px;
@@ -368,8 +782,6 @@
             padding-left: 10px;
             border-left: 2px solid rgba(255, 255, 255, 0.03);
         }
-
-        /* ===== 动态数据组件 ===== */
         .interactive-block {
             margin-top: 12px;
             padding: 14px 16px;
@@ -377,7 +789,6 @@
             border-radius: 12px;
             border: 1px solid rgba(255, 255, 255, 0.04);
         }
-
         .interactive-block .int-label {
             font-size: 11px;
             color: rgba(255, 255, 255, 0.2);
@@ -385,13 +796,11 @@
             letter-spacing: 0.5px;
             margin-bottom: 8px;
         }
-
         .interactive-block .slider-row {
             display: flex;
             align-items: center;
             gap: 12px;
         }
-
         .interactive-block .slider-row input[type="range"] {
             flex: 1;
             accent-color: #a78bfa;
@@ -401,7 +810,6 @@
             -webkit-appearance: none;
             appearance: none;
         }
-
         .interactive-block .slider-row input[type="range"]::-webkit-slider-thumb {
             -webkit-appearance: none;
             appearance: none;
@@ -411,7 +819,6 @@
             background: #a78bfa;
             cursor: pointer;
         }
-
         .interactive-block .slider-row .val {
             font-size: 14px;
             font-weight: 600;
@@ -419,20 +826,17 @@
             min-width: 40px;
             text-align: center;
         }
-
         .interactive-block .slider-row .label {
             font-size: 12px;
             color: rgba(255, 255, 255, 0.3);
             min-width: 50px;
         }
-
         .interactive-block .result-row {
             display: flex;
             gap: 16px;
             margin-top: 8px;
             flex-wrap: wrap;
         }
-
         .interactive-block .result-row .tag {
             background: rgba(167, 139, 250, 0.04);
             border: 1px solid rgba(167, 139, 250, 0.06);
@@ -441,13 +845,10 @@
             font-size: 12px;
             color: rgba(255, 255, 255, 0.4);
         }
-
         .interactive-block .result-row .tag .hl {
             color: #a78bfa;
             font-weight: 600;
         }
-
-        /* ===== 锁住占位 ===== */
         .lock-placeholder {
             display: inline-flex;
             align-items: center;
@@ -459,12 +860,6 @@
             border-radius: 20px;
             cursor: default;
         }
-
-        .lock-placeholder .lock {
-            color: rgba(255, 255, 255, 0.1);
-        }
-
-        /* ===== 底部总览图 ===== */
         .overview {
             margin-top: 36px;
             background: rgba(255, 255, 255, 0.02);
@@ -475,7 +870,6 @@
             animation: fadeInUp 0.6s ease 0.4s forwards;
             scroll-margin-top: 20px;
         }
-
         .overview h3 {
             font-size: 17px;
             color: rgba(255, 255, 255, 0.6);
@@ -483,7 +877,6 @@
             text-align: center;
             letter-spacing: 0.5px;
         }
-
         .overview-flow {
             display: flex;
             flex-wrap: wrap;
@@ -493,7 +886,6 @@
             font-size: 13px;
             color: rgba(255, 255, 255, 0.5);
         }
-
         .overview-flow .step {
             background: rgba(255, 255, 255, 0.02);
             padding: 6px 16px;
@@ -502,22 +894,18 @@
             white-space: nowrap;
             transition: all 0.3s ease;
         }
-
         .overview-flow .step:hover {
             border-color: rgba(167, 139, 250, 0.1);
         }
-
         .overview-flow .step.highlight {
             border-color: #a78bfa;
             background: rgba(167, 139, 250, 0.04);
             color: #a78bfa;
         }
-
         .overview-flow .arrow {
             color: rgba(255, 255, 255, 0.06);
             font-size: 16px;
         }
-
         .overview-tag {
             text-align: center;
             margin-top: 16px;
@@ -526,38 +914,31 @@
             border-top: 1px solid rgba(255, 255, 255, 0.03);
             padding-top: 14px;
         }
-
         .overview-tag span {
             background: rgba(255, 255, 255, 0.02);
             padding: 3px 12px;
             border-radius: 16px;
             border: 1px solid rgba(255, 255, 255, 0.03);
         }
-
         .overview-tag .highlight {
             color: #facc15;
         }
-
-        /* ===== 返回链接 ===== */
         .back-link {
             text-align: center;
             margin-top: 32px;
             padding-top: 18px;
             border-top: 1px solid rgba(255, 255, 255, 0.03);
         }
-
         .back-link a {
             color: rgba(255, 255, 255, 0.15);
             text-decoration: none;
             font-size: 13px;
             transition: color 0.3s ease;
         }
-
         .back-link a:hover {
             color: rgba(255, 255, 255, 0.4);
         }
 
-        /* ===== 响应式 ===== */
         @media (max-width: 900px) {
             body {
                 padding: 20px 16px 20px 16px;
@@ -569,7 +950,6 @@
                 padding: 24px 20px 20px;
             }
         }
-
         @media (max-width: 600px) {
             body {
                 padding: 12px 10px;
@@ -601,6 +981,19 @@
             .interactive-block {
                 padding: 10px 12px;
             }
+            .granular-section {
+                padding: 18px 14px 14px;
+            }
+            .derive-node {
+                padding: 14px 12px;
+            }
+            .derive-node .dn-step {
+                font-size: 12px;
+                flex-wrap: wrap;
+            }
+            .derive-node .dn-step .step-tag {
+                min-width: 36px;
+            }
         }
     </style>
 </head>
@@ -608,30 +1001,35 @@
 
     <div id="glow"></div>
 
-    <!-- ===== 左侧固定导航（含量化） ===== -->
+    <!-- ===== 左侧导航 ===== -->
     <nav class="side-nav" id="sideNav">
-        <div class="nav-item active" data-target="phase-1">
+        <div class="nav-item active" data-target="granular-section">
             <span class="num">①</span>
+            <span class="label">映射塔</span>
+            <span class="count">交互</span>
+        </div>
+        <div class="nav-item" data-target="phase-1">
+            <span class="num">②</span>
             <span class="label">现象</span>
             <span class="count">3项</span>
         </div>
         <div class="nav-item" data-target="phase-2">
-            <span class="num">②</span>
+            <span class="num">③</span>
             <span class="label">规律</span>
             <span class="count">3项</span>
         </div>
         <div class="nav-item" data-target="phase-3">
-            <span class="num">③</span>
+            <span class="num">④</span>
             <span class="label">模型</span>
             <span class="count">6项</span>
         </div>
         <div class="nav-item" data-target="phase-4">
-            <span class="num">④</span>
+            <span class="num">⑤</span>
             <span class="label">验证</span>
             <span class="count">4项</span>
         </div>
         <div class="nav-item" data-target="phase-5">
-            <span class="num">⑤</span>
+            <span class="num">⑥</span>
             <span class="label">总控</span>
             <span class="count">4项</span>
         </div>
@@ -649,7 +1047,194 @@
         <!-- ===== 头部 ===== -->
         <div class="header">
             <h1>商业知识学习证据链</h1>
-            <div class="sub">从现象观察到总控平台 · 完整推演路径</div>
+            <div class="sub">商品 · 情绪 · 商业模式 · 完整推演路径</div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- ===== 颗粒度化推导（交互版） ===== -->
+        <!-- ============================================================ -->
+        <div class="granular-section" id="granular-section">
+            <div class="g-title">
+                🧩 映射塔 · 商品 → 情绪 → 商业模式
+                <span class="tag">悬停 / 点击探索</span>
+            </div>
+            <div class="g-sub">商业的本质是：把情绪装进商品，然后用系统化的方式规模化售卖</div>
+
+            <!-- ===== 交互式映射塔 ===== -->
+            <div class="tower-section">
+                <!-- 第1层：商品 -->
+                <div class="tower-item">
+                    <div class="t-level">第 1 层 · 载体</div>
+                    <div class="t-name">📦 商品</div>
+                    <div class="t-example">☕ 咖啡 / 🎙️ 陪伴时间</div>
+                    <div class="t-desc">情绪的物理/服务载体</div>
+                    <div class="t-hover-detail">标品：边际成本递减 · 非标品：边际成本递增</div>
+                </div>
+                <div class="tower-arrow">
+                    <span class="arrow-label">映射</span>
+                    <span class="arrow-line">⬇</span>
+                </div>
+                <!-- 第2层：情绪 -->
+                <div class="tower-item highlight-layer">
+                    <div class="t-level">第 2 层 · 内核</div>
+                    <div class="t-name">💭 情绪</div>
+                    <div class="t-example">提神的满足 / 被理解的安慰</div>
+                    <div class="t-desc">商品真正售卖的东西</div>
+                    <div class="t-hover-detail">情绪满足 = 高复购 · 情绪安慰 = 低复购</div>
+                </div>
+                <div class="tower-arrow">
+                    <span class="arrow-label">形成</span>
+                    <span class="arrow-line">⬇</span>
+                </div>
+                <!-- 第3层：商业模式 -->
+                <div class="tower-item gold-layer">
+                    <div class="t-level">第 3 层 · 系统</div>
+                    <div class="t-name">⚙️ 商业模式</div>
+                    <div class="t-example">标品规模化 / 非标品无法规模化</div>
+                    <div class="t-desc">情绪 × 商品的系统化结果</div>
+                    <div class="t-hover-detail">9.9 = 目录 · 99 = 说明书 · 999 = 指挥</div>
+                </div>
+            </div>
+
+            <!-- ===== 瑞幸 9.9 推导（交互折叠） ===== -->
+            <div class="derive-node">
+                <div class="dn-header">
+                    <span class="dn-icon">☕</span>
+                    <span class="dn-label">瑞幸 9.9 · 标品定价的底层逻辑</span>
+                    <span class="dn-badge green">标品</span>
+                    <button class="dn-toggle" onclick="toggleSteps(this)">展开全部</button>
+                </div>
+
+                <div class="dn-step" data-step="0">
+                    <span class="step-tag highlight">输入</span>
+                    <span class="step-content">瑞幸长期推出 9.9 元促销活动，且持续盈利</span>
+                </div>
+                <div class="dn-step" data-step="1">
+                    <span class="step-tag highlight">假设</span>
+                    <span class="step-content">9.9 元定价不是“亏本引流”，而是 <span class="hl">“标品定价”的自然结果</span></span>
+                </div>
+                <div class="dn-step" data-step="2">
+                    <span class="step-tag highlight">验证</span>
+                    <span class="step-content">
+                        ① 杯均成本拆解：原材料 2.5 + 人工 2 + 房租分摊 1.5 ≈ <span class="hl">6 元</span> → 每杯利润 <span class="hl-blue">3 元</span><br>
+                        ② 单店日均销量 300 杯 → 日利润 <span class="hl-blue">900 元</span><br>
+                        ③ 规模效应：门店数增加，供应链成本边际递减
+                        <span class="code-block">杯均成本 = 6 元 → 定价 9.9 元 → 单杯利润 3.9 元 → 规模 × 利润 = 稳定盈利</span>
+                    </span>
+                </div>
+                <div class="dn-step" data-step="3">
+                    <span class="step-tag highlight">结论</span>
+                    <span class="step-content">9.9 元是 <span class="hl">“可复制的标品”定价</span>，本身可盈利</span>
+                </div>
+                <div class="dn-step" data-step="4">
+                    <span class="step-tag highlight">迁移</span>
+                    <span class="step-content">所有 <span class="hl-blue">标品</span>（餐饮零售、快消品、数字内容）适用同一逻辑</span>
+                </div>
+
+                <div class="dn-conclusion">
+                    <strong>✅ 结论：</strong>瑞幸 9.9 是 <span class="hl">“目录价”</span>——入口即盈利，销量放大利润。
+                </div>
+            </div>
+
+            <!-- ===== 情感博主 9.9 推导（交互折叠） ===== -->
+            <div class="derive-node">
+                <div class="dn-header">
+                    <span class="dn-icon">🎙️</span>
+                    <span class="dn-label">情感博主 9.9 · 非标品定价的底层逻辑</span>
+                    <span class="dn-badge blue">非标品</span>
+                    <button class="dn-toggle" onclick="toggleSteps(this)">展开全部</button>
+                </div>
+
+                <div class="dn-step" data-step="0">
+                    <span class="step-tag highlight">输入</span>
+                    <span class="step-content">情感博主推出 9.9 元付费内容，规模越大亏损越大</span>
+                </div>
+                <div class="dn-step" data-step="1">
+                    <span class="step-tag highlight">假设</span>
+                    <span class="step-content">9.9 元对 <span class="hl">“非标品”</span> 定价过低，无法覆盖隐含成本</span>
+                </div>
+                <div class="dn-step" data-step="2">
+                    <span class="step-tag highlight">验证</span>
+                    <span class="step-content">
+                        ① 博主时间成本：录制 10 分钟 + 准备 2 小时 → 隐含成本约 <span class="hl">200 元</span><br>
+                        ② 定价 9.9 元 → 边际利润 = <span class="hl-blue">9.9 - 200 = -190.1 元</span> / 单<br>
+                        ③ 销量增加 → 亏损线性扩大，<span class="hl">无法通过规模效应降本</span>
+                        <span class="code-block">隐含时间成本 = 200 元 → 单份收入 9.9 元 → 每卖一份亏损 190.1 元 → 规模越大亏损越大</span>
+                    </span>
+                </div>
+                <div class="dn-step" data-step="3">
+                    <span class="step-tag highlight">结论</span>
+                    <span class="step-content">9.9 元对 <span class="hl">“非标品”</span> 是 <span class="hl">“认知税”</span>，本身不可盈利</span>
+                </div>
+                <div class="dn-step" data-step="4">
+                    <span class="step-tag highlight">迁移</span>
+                    <span class="step-content">所有 <span class="hl-blue">非标品</span>（个人咨询、情感陪伴、定制服务）适用同一逻辑</span>
+                </div>
+
+                <div class="dn-conclusion">
+                    <strong>✅ 结论：</strong>情感博主 9.9 是 <span class="hl">“入口价”</span>——入口即亏损，规模放大亏损。
+                </div>
+            </div>
+
+            <!-- ===== AB 对照结论 ===== -->
+            <div class="derive-node" style="border-color:rgba(250,204,21,0.12);">
+                <div class="dn-header">
+                    <span class="dn-icon">⚖️</span>
+                    <span class="dn-label">AB 对照结论 · 产品结构决定定价</span>
+                    <span class="dn-badge">核心洞察</span>
+                    <button class="dn-toggle" onclick="toggleSteps(this)">展开全部</button>
+                </div>
+
+                <div class="dn-step" data-step="0">
+                    <span class="step-tag highlight">输入</span>
+                    <span class="step-content">两个 9.9，一个盈利，一个亏损</span>
+                </div>
+                <div class="dn-step" data-step="1">
+                    <span class="step-tag highlight">假设</span>
+                    <span class="step-content">差异不在定价本身，而在 <span class="hl">“产品类型”的底层结构</span></span>
+                </div>
+                <div class="dn-step" data-step="2">
+                    <span class="step-tag highlight">验证</span>
+                    <span class="step-content">
+                        标品 → 边际成本递减 → 可规模化 → 9.9 盈利<br>
+                        非标品 → 边际成本递增 → 不可规模化 → 9.9 亏损
+                        <span class="code-block">产品结构决定定价是否成立 · 9.9 是一个“检验结构的分水岭”</span>
+                    </span>
+                </div>
+                <div class="dn-step" data-step="3">
+                    <span class="step-tag highlight">结论</span>
+                    <span class="step-content">产品结构决定定价是否成立，<span class="hl">9.9 是一个检验结构的分水岭</span></span>
+                </div>
+                <div class="dn-step" data-step="4">
+                    <span class="step-tag highlight">迁移</span>
+                    <span class="step-content">任何定价决策前，先确认 <span class="hl-blue">“产品属性是标品还是非标品”</span></span>
+                </div>
+
+                <div class="dn-conclusion">
+                    <strong>💡 核心规律：</strong>商业模式 = <span class="hl">概率论</span> × <span class="hl-blue">排列组合</span><br>
+                    标品 = 高概率 × 可复制组合 &nbsp;·&nbsp; 非标品 = 低概率 × 不可复制组合
+                </div>
+
+                <div class="dn-migrate">
+                    <strong>↗ 迁移延伸：</strong>情绪的本质是商品，现有商业都很成熟，创业家就是在里面找 <span class="hl">结构</span>。
+                </div>
+            </div>
+
+            <!-- ===== 利润公式对比（交互增强） ===== -->
+            <div class="formula-compare">
+                <div class="formula-card">
+                    <div class="f-label">✅ 标品 9.9 利润公式</div>
+                    <div class="f-value green">9.9 − 6 = <span style="color:#34d399;">+3.9</span> <span class="unit">元/杯</span></div>
+                    <div class="f-desc">边际利润为正 · 规模越大越赚</div>
+                    <div class="f-detail">📊 单店日利润 ≈ 300 × 3.9 = 1,170 元</div>
+                </div>
+                <div class="formula-card">
+                    <div class="f-label">❌ 非标品 9.9 利润公式</div>
+                    <div class="f-value red">9.9 − 200 = <span style="color:#f87171;">−190.1</span> <span class="unit">元/单</span></div>
+                    <div class="f-desc">边际利润为负 · 规模越大越亏</div>
+                    <div class="f-detail">📊 100 单亏损 ≈ 19,010 元 · 线性扩大</div>
+                </div>
+            </div>
         </div>
 
         <!-- ===== 阶段徽章导航 ===== -->
@@ -665,10 +1250,10 @@
             <div class="stage-badge"><span class="num">5</span> 总控层</div>
         </div>
 
-        <!-- ===== 五层卡片 ===== -->
+        <!-- ===== 五层卡片（保留原样） ===== -->
         <div class="phase-grid">
 
-            <!-- ===== 阶段1：现象层 ===== -->
+            <!-- 阶段1：现象层 -->
             <div class="phase" id="phase-1">
                 <div class="phase-header">
                     <span class="phase-tag">第一阶段</span>
@@ -677,7 +1262,6 @@
                 <div class="phase-desc">
                     从两个“9.9”的不同命运切入，用 AB 对照剥离表象，锁定核心差异。
                 </div>
-
                 <div class="node-list">
                     <div class="node-item">
                         <span class="node-bullet">A</span>
@@ -701,8 +1285,6 @@
                         </span>
                     </div>
                 </div>
-
-                <!-- 动态数据组件 -->
                 <div class="interactive-block">
                     <div class="int-label">📊 AB 对照模拟 · 标品 vs 非标品</div>
                     <div class="slider-row">
@@ -718,7 +1300,7 @@
                 </div>
             </div>
 
-            <!-- ===== 阶段2：规律层 ===== -->
+            <!-- 阶段2：规律层 -->
             <div class="phase" id="phase-2">
                 <div class="phase-header">
                     <span class="phase-tag">第二阶段</span>
@@ -727,7 +1309,6 @@
                 <div class="phase-desc">
                     从 AB 对照中剥离本质，发现商业阶段的迁移规律。
                 </div>
-
                 <div class="node-list">
                     <div class="node-item">
                         <span class="node-bullet">·</span>
@@ -751,7 +1332,6 @@
                         </span>
                     </div>
                 </div>
-
                 <div class="interactive-block">
                     <div class="int-label">🔁 认知差时代 · 套利窗口模拟</div>
                     <div class="slider-row">
@@ -766,7 +1346,7 @@
                 </div>
             </div>
 
-            <!-- ===== 阶段3：模型层 ===== -->
+            <!-- 阶段3：模型层 -->
             <div class="phase" id="phase-3">
                 <div class="phase-header">
                     <span class="phase-tag">第三阶段</span>
@@ -775,7 +1355,6 @@
                 <div class="phase-desc">
                     把规律固化为可复用的结构化系统。
                 </div>
-
                 <div class="node-list">
                     <div class="node-item">
                         <span class="node-bullet">·</span>
@@ -820,7 +1399,6 @@
                         </span>
                     </div>
                 </div>
-
                 <div class="interactive-block">
                     <div class="int-label">🧩 定价模型推演 · 9.9 → 99 → 999</div>
                     <div class="slider-row">
@@ -836,7 +1414,7 @@
                 </div>
             </div>
 
-            <!-- ===== 阶段4：验证层 ===== -->
+            <!-- 阶段4：验证层 -->
             <div class="phase" id="phase-4">
                 <div class="phase-header">
                     <span class="phase-tag">第四阶段</span>
@@ -845,7 +1423,6 @@
                 <div class="phase-desc">
                     把同一套结构平移到多个陌生领域，验证其普适性。
                 </div>
-
                 <div class="node-list">
                     <div class="node-item">
                         <span class="node-bullet">·</span>
@@ -876,7 +1453,6 @@
                         </span>
                     </div>
                 </div>
-
                 <div class="interactive-block">
                     <div class="int-label">🔄 跨域迁移验证 · 选择领域</div>
                     <div class="result-row">
@@ -892,7 +1468,7 @@
                 </div>
             </div>
 
-            <!-- ===== 阶段5：总控层 ===== -->
+            <!-- 阶段5：总控层 -->
             <div class="phase" id="phase-5">
                 <div class="phase-header">
                     <span class="phase-tag">第五阶段</span>
@@ -901,7 +1477,6 @@
                 <div class="phase-desc">
                     验证完成后的闭环——用新语言重新回答最初的问题。
                 </div>
-
                 <div class="node-list">
                     <div class="node-item">
                         <span class="node-bullet">·</span>
@@ -932,7 +1507,6 @@
                         </span>
                     </div>
                 </div>
-
                 <div class="interactive-block">
                     <div class="int-label">🏁 总控台 · 闭环状态</div>
                     <div class="result-row">
@@ -990,12 +1564,11 @@
             glow.style.setProperty('--y', y + '%');
         });
 
-        // ===== 左侧导航交互 =====
+        // ===== 左侧导航 =====
         const navItems = document.querySelectorAll('.nav-item');
-        const targetIds = ['phase-1', 'phase-2', 'phase-3', 'phase-4', 'phase-5', 'overview'];
+        const targetIds = ['granular-section', 'phase-1', 'phase-2', 'phase-3', 'phase-4', 'phase-5', 'overview'];
         const sections = targetIds.map(id => document.getElementById(id));
 
-        // 点击导航项
         navItems.forEach((item, index) => {
             item.addEventListener('click', function(e) {
                 e.preventDefault();
@@ -1008,7 +1581,6 @@
             });
         });
 
-        // 滚动时高亮当前
         function updateActiveNav() {
             let currentIndex = 0;
             sections.forEach((section, i) => {
@@ -1023,9 +1595,42 @@
                 el.classList.toggle('active', i === currentIndex);
             });
         }
-
         window.addEventListener('scroll', updateActiveNav);
         window.addEventListener('load', updateActiveNav);
+
+        // ===== 交互式推导步骤折叠/展开 =====
+        function toggleSteps(btn) {
+            const node = btn.closest('.derive-node');
+            const steps = node.querySelectorAll('.dn-step');
+            const isCollapsed = steps[0]?.classList.contains('collapsed') || false;
+
+            steps.forEach(step => {
+                // 保留第一个步骤始终可见
+                if (step.dataset.step === '0') {
+                    step.classList.remove('collapsed');
+                    return;
+                }
+                if (isCollapsed) {
+                    step.classList.remove('collapsed');
+                } else {
+                    step.classList.add('collapsed');
+                }
+            });
+
+            btn.textContent = isCollapsed ? '折叠' : '展开全部';
+        }
+
+        // ===== 默认加载时折叠除第一步外的所有步骤 =====
+        document.querySelectorAll('.derive-node').forEach(node => {
+            const steps = node.querySelectorAll('.dn-step');
+            steps.forEach((step, index) => {
+                if (index > 0) {
+                    step.classList.add('collapsed');
+                }
+            });
+            const btn = node.querySelector('.dn-toggle');
+            if (btn) btn.textContent = '展开全部';
+        });
 
         // ===== 动态数据：AB 对照 =====
         (function() {
