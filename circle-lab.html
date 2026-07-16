@@ -737,7 +737,7 @@
         }
 
         /* ============================================================ */
-        /* ===== 【新增】算法工作流 + Token 流对比 ===== */
+        /* ===== 算法工作流 + Token 流对比 ===== */
         /* ============================================================ */
         .workflow-section {
             padding: 24px 40px 28px;
@@ -1092,7 +1092,9 @@
             color: rgba(255, 255, 255, 0.55);
         }
 
-        /* ===== 第三层：三个模式 ===== */
+        /* ============================================================ */
+        /* ===== 第三层：三个模式（数学已更新为线性函数） ===== */
+        /* ============================================================ */
         .mode-block {
             border-bottom: 1px solid rgba(255, 255, 255, 0.04);
         }
@@ -1986,6 +1988,9 @@
                 width: 100%;
                 justify-content: flex-start;
             }
+            .mode-split .demo .controls {
+                grid-template-columns: 1fr 1fr;
+            }
         }
 
         @media (max-width: 400px) {
@@ -2018,6 +2023,9 @@
             }
             .cognition-loop-section .loop-core .loop-visual .cycle-node .cn-label {
                 font-size: 10px;
+            }
+            .mode-split .demo .controls {
+                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -2316,7 +2324,7 @@
         </div>
 
         <!-- ============================================================ -->
-        <!-- ===== 【算法工作流 + Token 流对比】 ===== -->
+        <!-- ===== 算法工作流 + Token 流对比 ===== -->
         <!-- ============================================================ -->
         <div class="section-anchor" id="section-workflow"></div>
         <div class="workflow-section">
@@ -2436,9 +2444,11 @@
         <div class="section-title" style="border-top:1px solid rgba(255,255,255,0.04); padding-top:20px;">📐 模式映射 · <span>理论 ↔ 实验</span></div>
         <div class="section-sub">每个模式独立对照 · 统一维度框架</div>
 
-        <!-- 数学 -->
+        <!-- ============================================================ -->
+        <!-- ===== 数学模式 (已更新为线性函数可视化) ===== -->
+        <!-- ============================================================ -->
         <div class="mode-block section-anchor" id="section-math">
-            <div class="mode-label">📐 <span class="hl">数学模式</span> · 静态平衡 <span style="color:rgba(255,255,255,0.08); font-weight:400; text-transform:none; letter-spacing:0;">｜圈静止 · 求方程解</span></div>
+            <div class="mode-label">📐 <span class="hl">数学模式</span> · 静态平衡 <span style="color:rgba(255,255,255,0.08); font-weight:400; text-transform:none; letter-spacing:0;">｜圈静止 · 线性函数交点</span></div>
             <div class="mode-split">
                 <div class="theory">
                     <div class="th-title">鸡兔同笼 · 两个变量互相约束</div>
@@ -2453,11 +2463,11 @@
                     <div class="th-conclusion"><strong>结论：</strong>画圈实验是<span class="hl">线性方程组的可视化</span>——两个变量在圈上找到唯一解。</div>
                 </div>
                 <div class="demo">
-                    <div class="demo-label">⚡ 数学演示 · 方程求解</div>
+                    <div class="demo-label">⚡ 数学演示 · 线性函数交点</div>
                     <div class="canvas-wrap">
                         <canvas id="canvasMath" width="800" height="400"></canvas>
                     </div>
-                    <div class="controls" style="grid-template-columns:1fr 1fr;">
+                    <div class="controls" style="grid-template-columns:1fr 1fr 1fr;">
                         <div class="ctrl">
                             <label>头数 <span id="mathHeads">10</span></label>
                             <input type="range" id="mathHeadsInput" min="5" max="20" step="1" value="10">
@@ -2466,10 +2476,15 @@
                             <label>腿数 <span id="mathLegs">28</span></label>
                             <input type="range" id="mathLegsInput" min="10" max="40" step="1" value="28">
                         </div>
+                        <div class="ctrl" style="display:flex; align-items:center; gap:6px; justify-content:center; border-left:1px solid rgba(255,255,255,0.04); padding-left:12px;">
+                            <span style="font-size:11px; color:rgba(255,255,255,0.15);">交点：</span>
+                            <span style="font-size:16px; font-weight:700; color:#a78bfa;" id="mathIntersection">(6,4)</span>
+                        </div>
                     </div>
-                    <div class="feedback" style="grid-template-columns:1fr 1fr;">
-                        <div class="fb"><span class="lbl">鸡</span><span class="val highlight" id="mathChicken">6</span></div>
-                        <div class="fb"><span class="lbl">兔</span><span class="val highlight" id="mathRabbit">4</span></div>
+                    <div class="feedback" style="grid-template-columns:1fr 1fr 1fr;">
+                        <div class="fb"><span class="lbl">🐔 鸡</span><span class="val highlight" id="mathChicken">6</span></div>
+                        <div class="fb"><span class="lbl">🐰 兔</span><span class="val highlight" id="mathRabbit">4</span></div>
+                        <div class="fb"><span class="lbl">✅ 验证</span><span class="val" style="color:#4ade80;" id="mathVerify">✅</span></div>
                     </div>
                 </div>
             </div>
@@ -2808,13 +2823,11 @@
             if (!canvas) return;
             const ctx = canvas.getContext('2d');
 
-            // ---- 尺寸 ----
             const W = 1000,
                 H = 420;
             canvas.width = W;
             canvas.height = H;
 
-            // ---- 节点定义 ----
             const nodes = [
                 { id: 'math', label: '数学', sub: '模式', x: 160, y: 110, color: '#a78bfa', tokens: [] },
                 { id: 'econ', label: '经济', sub: '模式', x: 430, y: 110, color: '#facc15', tokens: [] },
@@ -2824,11 +2837,6 @@
                 { id: 'word', label: '新词', sub: '', x: 700, y: 290, color: '#a78bfa', tokens: [] },
             ];
 
-            // ---- Token 池 ----
-            const algoTokens = ['变量', '约束', '解', '供需', '均衡', '博弈', '输入', '输出', '反馈', '迭代'];
-            const langTokens = ['词', '根', '词', '缀', '新', '词', '学', '习', '记', '忆'];
-
-            // ---- 状态 ----
             let running = true;
             let speed = 1.0;
             let animId = null;
@@ -2841,7 +2849,6 @@
             const MAX_TOKENS_PER_NODE = 5;
             let resetRequested = false;
 
-            // ---- 生成 Token 粒子 ----
             function emitToken(targetNodeId, text, type) {
                 const node = nodes.find(n => n.id === targetNodeId);
                 if (!node) return;
@@ -2868,7 +2875,6 @@
                 });
             }
 
-            // ---- 重置 ----
             function resetTokenFlow() {
                 tokenParticles = [];
                 collectedTokens = { math: [], econ: [], ai: [], root: [], affix: [], word: [] };
@@ -2885,7 +2891,6 @@
                 resetRequested = false;
             }
 
-            // ---- 绘制 ----
             function drawTokenFlow() {
                 ctx.clearRect(0, 0, W, H);
 
@@ -2996,8 +3001,6 @@
                     ctx.stroke();
                     ctx.setLineDash([]);
 
-                    const angle = Math.atan2(toNode.y + yOffset2 - (fromNode.y + yOffset1), toNode.x - 32 - (fromNode
-                        .x + 32));
                     const ax = (fromNode.x + 32 + toNode.x - 32) / 2;
                     const ay = (fromNode.y + yOffset1 + toNode.y + yOffset2) / 2;
                     ctx.fillStyle = 'rgba(255,255,255,0.04)';
@@ -3034,7 +3037,6 @@
                     ctx.font = 'bold ' + Math.round(size * 0.7) + 'px monospace';
                     ctx.textAlign = 'center';
                     ctx.textBaseline = 'middle';
-                    const displayText = p.text.length > 4 ? p.text.slice(0, 3) + '.' : p.text;
                     ctx.fillText('◆', px, py + 1);
 
                     ctx.fillStyle = 'rgba(255,255,255,' + (0.5 * alpha) + ')';
@@ -3058,13 +3060,11 @@
                 ctx.fillText(progressText, 16, 8);
             }
 
-            // ---- 更新逻辑 ----
             function updateTokenFlow(dt) {
                 if (!running || resetRequested) return;
                 const speedFactor = speed * 1.2;
                 time += dt * speedFactor;
 
-                const emitInterval = 1.2 / (0.8 + speed * 0.4);
                 if (Math.random() < dt * speedFactor * 0.8) {
                     const targetMap = [
                         { algo: 'math', lang: 'root', textAlgo: '变量', textLang: '词' },
@@ -3136,7 +3136,6 @@
                 }
             }
 
-            // ---- 动画循环 ----
             let lastTime = 0;
 
             function animateTokenFlow(timestamp) {
@@ -3150,7 +3149,6 @@
                 animId = requestAnimationFrame(animateTokenFlow);
             }
 
-            // ---- 控制按钮 ----
             const playBtn = document.getElementById('tfPlayBtn');
             const resetBtn = document.getElementById('tfResetBtn');
             const speedInput = document.getElementById('tfSpeedInput');
@@ -3198,7 +3196,6 @@
 
             window.addEventListener('resize', resizeTokenCanvas);
 
-            // ---- 启动 ----
             setTimeout(() => {
                 for (let i = 0; i < 3; i++) {
                     setTimeout(() => {
@@ -3243,21 +3240,25 @@
         })();
 
         // ============================================================ //
-        // ===== 数学模式 ===== //
+        // ===== 数学模式 · 线性函数可视化 (已更新) ===== //
         // ============================================================ //
         (function() {
             const canvas = document.getElementById('canvasMath');
+            if (!canvas) return;
             const ctx = canvas.getContext('2d');
+
             const headsInput = document.getElementById('mathHeadsInput');
             const legsInput = document.getElementById('mathLegsInput');
             const headsDisplay = document.getElementById('mathHeads');
             const legsDisplay = document.getElementById('mathLegs');
             const chickenDisplay = document.getElementById('mathChicken');
             const rabbitDisplay = document.getElementById('mathRabbit');
+            const verifyDisplay = document.getElementById('mathVerify');
+            const intersectionDisplay = document.getElementById('mathIntersection');
 
             function drawMath() {
-                const heads = parseInt(headsInput.value);
-                const legs = parseInt(legsInput.value);
+                const heads = parseInt(headsInput.value) || 10;
+                const legs = parseInt(legsInput.value) || 28;
                 headsDisplay.textContent = heads;
                 legsDisplay.textContent = legs;
 
@@ -3271,113 +3272,179 @@
 
                 chickenDisplay.textContent = chicken;
                 rabbitDisplay.textContent = rabbit;
+                intersectionDisplay.textContent = `(${chicken}, ${rabbit})`;
+
+                const valid = (chicken + rabbit === heads) && (2 * chicken + 4 * rabbit === legs);
+                verifyDisplay.textContent = valid ? '✅' : '❌';
 
                 const w = canvas.width,
                     h = canvas.height;
-                const cx = w / 2,
-                    cy = h / 2;
-                const radius = Math.min(w, h) * 0.28;
+                const pad = { top: 24, bottom: 32, left: 40, right: 24 };
+                const plotW = w - pad.left - pad.right;
+                const plotH = h - pad.top - pad.bottom;
+
+                const maxVal = Math.max(heads, Math.ceil(legs / 2)) + 1;
+                const xRange = heads + 2;
+                const yRange = Math.max(heads, Math.ceil(legs / 2)) + 2;
 
                 ctx.clearRect(0, 0, w, h);
 
-                ctx.strokeStyle = 'rgba(255,255,255,0.03)';
+                ctx.strokeStyle = 'rgba(255,255,255,0.02)';
                 ctx.lineWidth = 1;
-                for (let i = 0; i <= 10; i++) {
-                    const x = (i / 10) * w,
-                        y = (i / 10) * h;
+                const xStep = xRange > 10 ? Math.ceil(xRange / 10) : 1;
+                const yStep = yRange > 10 ? Math.ceil(yRange / 10) : 1;
+                for (let x = 0; x <= xRange; x += xStep) {
+                    const px = pad.left + (x / xRange) * plotW;
                     ctx.beginPath();
-                    ctx.moveTo(x, 0);
-                    ctx.lineTo(x, h);
+                    ctx.moveTo(px, pad.top);
+                    ctx.lineTo(px, pad.top + plotH);
                     ctx.stroke();
+                }
+                for (let y = 0; y <= yRange; y += yStep) {
+                    const py = pad.top + plotH - (y / yRange) * plotH;
                     ctx.beginPath();
-                    ctx.moveTo(0, y);
-                    ctx.lineTo(w, y);
+                    ctx.moveTo(pad.left, py);
+                    ctx.lineTo(pad.left + plotW, py);
                     ctx.stroke();
                 }
 
-                ctx.strokeStyle = 'rgba(255,255,255,0.05)';
-                ctx.lineWidth = 1;
-                ctx.setLineDash([4, 4]);
-                ctx.beginPath();
-                ctx.moveTo(0, cy);
-                ctx.lineTo(w, cy);
-                ctx.stroke();
-                ctx.beginPath();
-                ctx.moveTo(cx, 0);
-                ctx.lineTo(cx, h);
-                ctx.stroke();
-                ctx.setLineDash([]);
-
-                ctx.fillStyle = 'rgba(255,255,255,0.08)';
-                ctx.font = '10px sans-serif';
-                ctx.textAlign = 'left';
-                ctx.textBaseline = 'top';
-                ctx.fillText('头数', w - 30, 6);
-                ctx.textAlign = 'right';
-                ctx.textBaseline = 'bottom';
-                ctx.fillText('腿数', 6, h - 4);
-
-                ctx.fillStyle = 'rgba(255,255,255,0.06)';
-                ctx.font = '11px monospace';
-                ctx.textAlign = 'left';
-                ctx.textBaseline = 'bottom';
-                ctx.fillText(`x + y = ${heads}`, 12, 22);
-                ctx.fillText(`2x + 4y = ${legs}`, 12, 38);
-
-                ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+                ctx.strokeStyle = 'rgba(255,255,255,0.06)';
                 ctx.lineWidth = 1.5;
                 ctx.beginPath();
-                for (let t = 0; t <= Math.PI * 2; t += 0.02) {
-                    const dx = Math.cos(t) * radius,
-                        dy = Math.sin(t) * radius;
-                    if (t === 0) ctx.moveTo(cx + dx, cy + dy);
-                    else ctx.lineTo(cx + dx, cy + dy);
+                ctx.moveTo(pad.left, pad.top + plotH);
+                ctx.lineTo(pad.left + plotW, pad.top + plotH);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(pad.left, pad.top);
+                ctx.lineTo(pad.left, pad.top + plotH);
+                ctx.stroke();
+
+                ctx.fillStyle = 'rgba(255,255,255,0.08)';
+                ctx.font = '9px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'top';
+                ctx.fillText('鸡 (x)', pad.left + plotW / 2, pad.top + plotH + 6);
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'bottom';
+                ctx.fillText('兔 (y)', pad.left - 12, pad.top + plotH / 2 + 4);
+
+                ctx.fillStyle = 'rgba(255,255,255,0.04)';
+                ctx.font = '7px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'top';
+                for (let x = 0; x <= xRange; x += xStep) {
+                    const px = pad.left + (x / xRange) * plotW;
+                    ctx.fillText(x, px, pad.top + plotH + 2);
+                }
+                ctx.textAlign = 'right';
+                ctx.textBaseline = 'middle';
+                for (let y = 0; y <= yRange; y += yStep) {
+                    const py = pad.top + plotH - (y / yRange) * plotH;
+                    ctx.fillText(y, pad.left - 4, py);
+                }
+
+                ctx.lineWidth = 2;
+
+                ctx.strokeStyle = 'rgba(60, 180, 255, 0.6)';
+                ctx.beginPath();
+                for (let px = 0; px <= heads; px++) {
+                    const py = heads - px;
+                    const canvasX = pad.left + (px / xRange) * plotW;
+                    const canvasY = pad.top + plotH - (py / yRange) * plotH;
+                    if (px === 0) ctx.moveTo(canvasX, canvasY);
+                    else ctx.lineTo(canvasX, canvasY);
                 }
                 ctx.stroke();
+                ctx.fillStyle = 'rgba(60, 180, 255, 0.2)';
+                ctx.font = '9px sans-serif';
+                ctx.textAlign = 'left';
+                ctx.textBaseline = 'bottom';
+                const lbl1X = pad.left + (heads * 0.75 / xRange) * plotW;
+                const lbl1Y = pad.top + plotH - ((heads - heads * 0.75) / yRange) * plotH;
+                ctx.fillText('x + y = ' + heads, lbl1X, lbl1Y - 4);
 
-                const ratio = heads > 0 ? chicken / heads : 0.5;
-                const angle = ratio * Math.PI * 2;
-                const px = cx + Math.cos(angle) * radius,
-                    py = cy + Math.sin(angle) * radius;
-
-                ctx.strokeStyle = 'rgba(167,139,250,0.08)';
-                ctx.lineWidth = 1;
-                ctx.setLineDash([2, 4]);
+                ctx.strokeStyle = 'rgba(250, 204, 21, 0.6)';
                 ctx.beginPath();
-                ctx.moveTo(px, cy);
-                ctx.lineTo(px, py);
+                const maxX2 = Math.min(heads, legs / 2);
+                for (let px = 0; px <= maxX2; px += 0.5) {
+                    const py = (legs - 2 * px) / 4;
+                    if (py < 0 || py > yRange) continue;
+                    const canvasX = pad.left + (px / xRange) * plotW;
+                    const canvasY = pad.top + plotH - (py / yRange) * plotH;
+                    if (px === 0) ctx.moveTo(canvasX, canvasY);
+                    else ctx.lineTo(canvasX, canvasY);
+                }
                 ctx.stroke();
+                ctx.fillStyle = 'rgba(250, 204, 21, 0.2)';
+                ctx.font = '9px sans-serif';
+                ctx.textAlign = 'right';
+                ctx.textBaseline = 'top';
+                const lbl2X = pad.left + (maxX2 * 0.6 / xRange) * plotW;
+                const lbl2Y = pad.top + plotH - (((legs - 2 * maxX2 * 0.6) / 4) / yRange) * plotH;
+                ctx.fillText('2x + 4y = ' + legs, lbl2X, lbl2Y + 2);
+
+                const intersectX = pad.left + (chicken / xRange) * plotW;
+                const intersectY = pad.top + plotH - (rabbit / yRange) * plotH;
+
+                const grad = ctx.createRadialGradient(intersectX, intersectY, 2, intersectX, intersectY, 24);
+                grad.addColorStop(0, 'rgba(167, 139, 250, 0.15)');
+                grad.addColorStop(1, 'transparent');
+                ctx.fillStyle = grad;
                 ctx.beginPath();
-                ctx.moveTo(cx, py);
-                ctx.lineTo(px, py);
+                ctx.arc(intersectX, intersectY, 24, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.strokeStyle = 'rgba(167, 139, 250, 0.3)';
+                ctx.lineWidth = 2;
+                ctx.setLineDash([3, 4]);
+                ctx.beginPath();
+                ctx.arc(intersectX, intersectY, 12, 0, Math.PI * 2);
                 ctx.stroke();
                 ctx.setLineDash([]);
 
                 ctx.fillStyle = '#a78bfa';
-                ctx.shadowColor = 'rgba(167,139,250,0.2)';
-                ctx.shadowBlur = 14;
+                ctx.shadowColor = 'rgba(167, 139, 250, 0.3)';
+                ctx.shadowBlur = 16;
                 ctx.beginPath();
-                ctx.arc(px, py, 8, 0, Math.PI * 2);
+                ctx.arc(intersectX, intersectY, 8, 0, Math.PI * 2);
                 ctx.fill();
                 ctx.shadowBlur = 0;
 
-                ctx.fillStyle = 'rgba(255,255,255,0.15)';
-                ctx.font = '10px sans-serif';
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'top';
-                ctx.fillText('解', px, py + 10);
-
-                ctx.fillStyle = 'rgba(255,255,255,0.06)';
-                ctx.font = '9px sans-serif';
-                ctx.textAlign = 'center';
+                ctx.fillStyle = 'rgba(255,255,255,0.5)';
+                ctx.font = '11px sans-serif';
+                ctx.textAlign = 'left';
                 ctx.textBaseline = 'bottom';
-                ctx.fillText(`鸡=${chicken}`, px, py - 10);
+                ctx.fillText(`(${chicken}, ${rabbit})`, intersectX + 12, intersectY - 4);
 
-                ctx.fillStyle = 'rgba(255,255,255,0.06)';
-                ctx.font = '10px sans-serif';
+                if (valid && chicken >= 0 && rabbit >= 0 && chicken <= heads && rabbit <= heads) {
+                    ctx.strokeStyle = 'rgba(167, 139, 250, 0.06)';
+                    ctx.lineWidth = 1;
+                    ctx.setLineDash([2, 4]);
+                    ctx.beginPath();
+                    ctx.moveTo(intersectX, pad.top + plotH);
+                    ctx.lineTo(intersectX, intersectY);
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.moveTo(pad.left, intersectY);
+                    ctx.lineTo(intersectX, intersectY);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+
+                    ctx.fillStyle = 'rgba(167, 139, 250, 0.04)';
+                    ctx.font = '7px sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'top';
+                    ctx.fillText('x=' + chicken, intersectX, pad.top + plotH + 2);
+                    ctx.textAlign = 'right';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText('y=' + rabbit, pad.left - 6, intersectY);
+                }
+
+                ctx.fillStyle = 'rgba(255,255,255,0.02)';
+                ctx.font = '8px sans-serif';
                 ctx.textAlign = 'right';
                 ctx.textBaseline = 'top';
-                ctx.fillText(`鸡=${chicken}  兔=${rabbit}`, w - 10, 6);
+                ctx.fillText('交点 = 唯一解', w - 12, 6);
             }
 
             headsInput.addEventListener('input', drawMath);
