@@ -2511,6 +2511,260 @@
             .brain-model-section { padding: 16px 18px 18px; }
             .bm-results { grid-template-columns: 1fr 1fr; }
         }
+
+        /* ============================================================ */
+        /* ===== 供需扰动建模 · 蓝海/红海对照 ===== */
+        /* ============================================================ */
+        .market-model-section {
+            padding: 24px 40px 28px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        }
+        .market-model-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+        .market-model-header .mm-icon { font-size: 24px; }
+        .market-model-header .mm-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        .market-model-header .mm-title span { color: #38bdf8; }
+        .market-model-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 14px;
+            overflow: hidden;
+        }
+        .mm-panel {
+            padding: 20px 24px;
+            border-right: 1px solid rgba(255, 255, 255, 0.04);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .mm-panel:last-child { border-right: none; }
+        .mm-panel .mm-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: rgba(255, 255, 255, 0.2);
+            margin-bottom: 12px;
+        }
+        .mm-canvas-wrap {
+            position: relative;
+            width: 100%;
+            max-width: 300px;
+            aspect-ratio: 1 / 1;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            padding: 4px;
+            margin-bottom: 12px;
+        }
+        .mm-canvas-wrap canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            border-radius: 12px;
+            background: rgba(0, 0, 0, 0.2);
+            object-fit: contain;
+        }
+        .mm-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            width: 100%;
+            max-width: 260px;
+            margin-bottom: 10px;
+        }
+        .mm-controls .mm-ctrl {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        .mm-controls .mm-ctrl label {
+            font-size: 11px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.3);
+            display: flex;
+            justify-content: space-between;
+        }
+        .mm-controls .mm-ctrl label span { color: #38bdf8; }
+        .mm-controls input[type="range"] {
+            width: 100%;
+            accent-color: #38bdf8;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 4px;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+        .mm-controls input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 12px; height: 12px;
+            border-radius: 50%;
+            background: #38bdf8;
+            cursor: pointer;
+        }
+        .mm-actions {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin-bottom: 6px;
+        }
+        .mm-actions button {
+            padding: 5px 16px;
+            border: none;
+            border-radius: 16px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.04);
+            color: rgba(255, 255, 255, 0.35);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+        }
+        .mm-actions button.primary {
+            background: rgba(56, 189, 248, 0.12);
+            color: #38bdf8;
+            border-color: rgba(56, 189, 248, 0.12);
+        }
+        .mm-actions button:hover {
+            background: rgba(255, 255, 255, 0.06);
+            color: #f1f5f9;
+            transform: translateY(-2px);
+        }
+        .mm-results {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+            width: 100%;
+            max-width: 260px;
+            margin-top: 4px;
+        }
+        .mm-results .mm-res {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+            padding: 6px 4px;
+            text-align: center;
+        }
+        .mm-results .mm-res .mm-res-label {
+            font-size: 8px;
+            color: rgba(255, 255, 255, 0.2);
+            text-transform: uppercase;
+        }
+        .mm-results .mm-res .mm-res-val {
+            font-size: 12px;
+            font-weight: 700;
+            color: #f1f5f9;
+            margin-top: 1px;
+        }
+        .mm-results .mm-res .mm-res-val.green { color: #4ade80; }
+        .mm-results .mm-res .mm-res-val.yellow { color: #facc15; }
+        .mm-results .mm-res .mm-res-val.red { color: #f87171; }
+        .mm-results .mm-res .mm-res-val.cyan { color: #38bdf8; }
+        .mm-indicator {
+            margin-top: 8px;
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 12px;
+        }
+        .mm-indicator .dot {
+            width: 6px; height: 6px; border-radius: 50%;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        .mm-indicator.blue {
+            color: rgba(56, 189, 248, 0.6);
+            background: rgba(56, 189, 248, 0.05);
+        }
+        .mm-indicator.blue .dot { background: #38bdf8; }
+        .mm-indicator.red {
+            color: rgba(248, 113, 113, 0.6);
+            background: rgba(248, 113, 113, 0.05);
+        }
+        .mm-indicator.red .dot { background: #f87171; }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.3); }
+        }
+        .market-compare {
+            margin-top: 16px;
+            padding: 16px 20px;
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 12px;
+        }
+        .market-compare-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.3);
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .market-compare-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+        }
+        .market-compare-item {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 10px;
+            padding: 10px 12px;
+            text-align: center;
+        }
+        .market-compare-item .mci-icon { font-size: 16px; }
+        .market-compare-item .mci-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.4);
+            margin-top: 3px;
+        }
+        .market-compare-item .mci-diff {
+            font-size: 14px;
+            font-weight: 700;
+            margin-top: 2px;
+        }
+        .market-compare-item .mci-diff.improve { color: #4ade80; }
+        .market-compare-item .mci-diff.worse { color: #f87171; }
+        .market-compare-item .mci-desc {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.15);
+            margin-top: 2px;
+        }
+        .market-insight {
+            margin-top: 14px;
+            padding: 12px 16px;
+            background: rgba(56, 189, 248, 0.04);
+            border-left: 3px solid rgba(56, 189, 248, 0.2);
+            border-radius: 0 8px 8px 0;
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.4);
+            line-height: 1.7;
+        }
+        .market-insight strong { color: rgba(255, 255, 255, 0.6); }
+        .market-insight .hl { color: #38bdf8; font-weight: 500; }
+        @media (max-width: 900px) {
+            .market-model-grid { grid-template-columns: 1fr; }
+            .mm-panel { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.04); }
+            .mm-panel:last-child { border-bottom: none; }
+            .market-compare-grid { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 600px) {
+            .market-model-section { padding: 16px 18px 18px; }
+            .mm-results { grid-template-columns: 1fr 1fr; }
+        }
     </style>
 </head>
 <body>
@@ -2557,6 +2811,7 @@
         <a class="idx-item" data-target="section-cognition"><span class="num">④</span><span class="label">认知</span></a>
         <a class="idx-item" data-target="section-motor"><span class="num">🧪</span><span class="label">实验</span></a>
         <a class="idx-item" data-target="section-model"><span class="num">📊</span><span class="label">建模</span></a>
+        <a class="idx-item" data-target="section-market"><span class="num">🌊</span><span class="label">供需</span></a>
         <a class="idx-item" data-target="section-workflow"><span class="num">⑤</span><span class="label">工作流</span></a>
         <a class="idx-item" data-target="section-duality"><span class="num">⑥</span><span class="label">静/动</span></a>
         <a class="idx-item" data-target="section-math"><span class="num">⑦</span><span class="label">数学</span></a>
@@ -3049,6 +3304,129 @@
         </div>
 
         <!-- ============================================================ -->
+        <!-- ===== 供需扰动建模 · 蓝海/红海对照 ===== -->
+        <!-- ============================================================ -->
+        <div class="section-anchor" id="section-market"></div>
+        <div class="market-model-section">
+            <div class="market-model-header">
+                <span class="mm-icon">🌊</span>
+                <span class="mm-title">供需扰动建模 · <span>蓝海 vs 红海</span></span>
+            </div>
+            <div class="market-model-grid">
+                <div class="mm-panel">
+                    <div class="mm-label">🌊 蓝海市场（低扰动）</div>
+                    <div class="mm-canvas-wrap">
+                        <canvas id="marketCanvasBlue" width="300" height="300"></canvas>
+                    </div>
+                    <div class="mm-controls">
+                        <div class="mm-ctrl">
+                            <label>需求波动 <span id="blueDemand">10%</span></label>
+                            <input type="range" id="blueDemandInput" min="0" max="100" value="10">
+                        </div>
+                        <div class="mm-ctrl">
+                            <label>供给弹性 <span id="blueSupply">60%</span></label>
+                            <input type="range" id="blueSupplyInput" min="0" max="100" value="60">
+                        </div>
+                        <div class="mm-ctrl">
+                            <label>外部冲击 <span id="blueShock">5%</span></label>
+                            <input type="range" id="blueShockInput" min="0" max="100" value="5">
+                        </div>
+                    </div>
+                    <div class="mm-actions">
+                        <button class="primary" id="blueRunBtn">▶ 运行</button>
+                        <button id="blueResetBtn">🔄 重置</button>
+                    </div>
+                    <div class="mm-results">
+                        <div class="mm-res">
+                            <div class="mm-res-label">均衡稳定性</div>
+                            <div class="mm-res-val green" id="blueStability">—</div>
+                        </div>
+                        <div class="mm-res">
+                            <div class="mm-res-label">价格波动</div>
+                            <div class="mm-res-val" id="blueVolatility">—</div>
+                        </div>
+                        <div class="mm-res">
+                            <div class="mm-res-label">利润空间</div>
+                            <div class="mm-res-val" id="blueProfit">—</div>
+                        </div>
+                    </div>
+                    <div class="mm-indicator blue">
+                        <span class="dot"></span> 蓝海 · 低竞争高利润
+                    </div>
+                </div>
+                <div class="mm-panel">
+                    <div class="mm-label">🔥 红海市场（高扰动）</div>
+                    <div class="mm-canvas-wrap">
+                        <canvas id="marketCanvasRed" width="300" height="300"></canvas>
+                    </div>
+                    <div class="mm-controls">
+                        <div class="mm-ctrl">
+                            <label>需求波动 <span id="redDemand">70%</span></label>
+                            <input type="range" id="redDemandInput" min="0" max="100" value="70">
+                        </div>
+                        <div class="mm-ctrl">
+                            <label>供给弹性 <span id="redSupply">30%</span></label>
+                            <input type="range" id="redSupplyInput" min="0" max="100" value="30">
+                        </div>
+                        <div class="mm-ctrl">
+                            <label>外部冲击 <span id="redShock">60%</span></label>
+                            <input type="range" id="redShockInput" min="0" max="100" value="60">
+                        </div>
+                    </div>
+                    <div class="mm-actions">
+                        <button class="primary" id="redRunBtn">▶ 运行</button>
+                        <button id="redResetBtn">🔄 重置</button>
+                    </div>
+                    <div class="mm-results">
+                        <div class="mm-res">
+                            <div class="mm-res-label">均衡稳定性</div>
+                            <div class="mm-res-val red" id="redStability">—</div>
+                        </div>
+                        <div class="mm-res">
+                            <div class="mm-res-label">价格波动</div>
+                            <div class="mm-res-val" id="redVolatility">—</div>
+                        </div>
+                        <div class="mm-res">
+                            <div class="mm-res-label">利润空间</div>
+                            <div class="mm-res-val" id="redProfit">—</div>
+                        </div>
+                    </div>
+                    <div class="mm-indicator red">
+                        <span class="dot"></span> 红海 · 高竞争低利润
+                    </div>
+                </div>
+            </div>
+            <div class="market-compare">
+                <div class="market-compare-title">📊 蓝海 vs 红海 · 关键差异</div>
+                <div class="market-compare-grid">
+                    <div class="market-compare-item">
+                        <div class="mci-icon">⚖️</div>
+                        <div class="mci-label">均衡稳定性</div>
+                        <div class="mci-diff improve" id="mktDiffStability">+45%</div>
+                        <div class="mci-desc">蓝海更稳定</div>
+                    </div>
+                    <div class="market-compare-item">
+                        <div class="mci-icon">📈</div>
+                        <div class="mci-label">波动幅度</div>
+                        <div class="mci-diff worse" id="mktDiffVolatility">-60%</div>
+                        <div class="mci-desc">红海波动更大</div>
+                    </div>
+                    <div class="market-compare-item">
+                        <div class="mci-icon">💰</div>
+                        <div class="mci-label">利润空间</div>
+                        <div class="mci-diff improve" id="mktDiffProfit">+3x</div>
+                        <div class="mci-desc">蓝海利润率更高</div>
+                    </div>
+                </div>
+            </div>
+            <div class="market-insight">
+                💡 <strong>核心洞察：</strong>画圈实验的<span class="hl">半径波动 = 供需博弈</span>，<span class="hl">外部冲击 = 竞争强度</span>。
+                低干扰环境下，圆度高、半径稳定 → <strong>蓝海市场</strong>：利润空间大、竞争少、战略可预测。
+                高干扰环境下，圆度低、半径剧烈震荡 → <strong>红海市场</strong>：利润微薄、价格战频发、需要持续快速调整。
+            </div>
+        </div>
+
+        <!-- ============================================================ -->
         <!-- ===== 算法工作流 + Token 流对比 ===== -->
         <!-- ============================================================ -->
         <div class="section-anchor" id="section-workflow"></div>
@@ -3491,6 +3869,7 @@
             document.getElementById('section-cognition'),
             document.getElementById('section-motor'),
             document.getElementById('section-model'),
+            document.getElementById('section-market'),
             document.getElementById('section-workflow'),
             document.getElementById('section-duality'),
             document.getElementById('section-math'),
@@ -5252,6 +5631,323 @@
 
             drawModelBase(ctxIdeal);
             drawModelBase(ctxReal);
+        })();
+
+        // ============================================================ //
+        // ===== 供需扰动建模 · 蓝海/红海对照 ===== //
+        // ============================================================ //
+        (function() {
+            const canvasBlue = document.getElementById('marketCanvasBlue');
+            const canvasRed = document.getElementById('marketCanvasRed');
+            if (!canvasBlue || !canvasRed) return;
+
+            const ctxBlue = canvasBlue.getContext('2d');
+            const ctxRed = canvasRed.getContext('2d');
+
+            const dpr = window.devicePixelRatio || 1;
+            const size = 300;
+            [canvasBlue, canvasRed].forEach(c => {
+                c.width = size * dpr;
+                c.height = size * dpr;
+                c.getContext('2d').scale(dpr, dpr);
+            });
+
+            const cx = size / 2;
+            const cy = size / 2;
+            const baseRadius = 80;
+
+            let blueRunning = false;
+            let redRunning = false;
+            let blueAnimId = null;
+            let redAnimId = null;
+
+            let bluePoints = [];
+            let redPoints = [];
+
+            let blueParams = { demand: 0.1, supply: 0.6, shock: 0.05 };
+            let redParams = { demand: 0.7, supply: 0.3, shock: 0.6 };
+
+            let blueAngle = 0;
+            let blueRadius = baseRadius;
+            let blueDemandPhase = 0;
+            let blueShockTimer = 0;
+            let blueShockAmount = 0;
+
+            let redAngle = 0;
+            let redRadius = baseRadius;
+            let redDemandPhase = 0;
+            let redShockTimer = 0;
+            let redShockAmount = 0;
+
+            function drawMarketBase(ctx) {
+                ctx.clearRect(0, 0, size, size);
+                ctx.strokeStyle = 'rgba(255,255,255,0.02)';
+                ctx.lineWidth = 1;
+                for (let i = 0; i <= 6; i++) {
+                    const x = (i / 6) * size;
+                    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, size); ctx.stroke();
+                    const y = (i / 6) * size;
+                    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(size, y); ctx.stroke();
+                }
+                ctx.strokeStyle = 'rgba(56, 189, 248, 0.15)';
+                ctx.lineWidth = 2;
+                ctx.setLineDash([6, 6]);
+                ctx.beginPath();
+                ctx.arc(cx, cy, baseRadius, 0, Math.PI * 2);
+                ctx.stroke();
+                ctx.setLineDash([]);
+                ctx.fillStyle = 'rgba(56, 189, 248, 0.3)';
+                ctx.beginPath();
+                ctx.arc(cx, cy, 3, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.strokeStyle = 'rgba(56, 189, 248, 0.06)';
+                ctx.lineWidth = 1;
+                ctx.setLineDash([2, 4]);
+                ctx.beginPath();
+                ctx.arc(cx, cy, baseRadius * 1.15, 0, Math.PI * 2);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.arc(cx, cy, baseRadius * 0.85, 0, Math.PI * 2);
+                ctx.stroke();
+                ctx.setLineDash([]);
+            }
+
+            function drawMarketTrajectory(ctx, points, color) {
+                if (points.length < 2) return;
+
+                const n = points.length;
+                for (let i = 1; i < n; i++) {
+                    const alpha = 0.2 + 0.5 * (i / n);
+                    ctx.strokeStyle = color.replace('ALPHA', alpha.toFixed(2));
+                    ctx.lineWidth = 2;
+                    ctx.lineCap = 'round';
+                    ctx.beginPath();
+                    ctx.moveTo(points[i - 1].x, points[i - 1].y);
+                    ctx.lineTo(points[i].x, points[i].y);
+                    ctx.stroke();
+                }
+
+                if (n > 0) {
+                    ctx.fillStyle = color.includes('56') ? '#38bdf8' : '#f87171';
+                    ctx.beginPath();
+                    ctx.arc(points[n - 1].x, points[n - 1].y, 4, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+
+            function calcMarketMetrics(pts) {
+                if (pts.length < 10) return { stability: 0, volatility: 0, profit: 0 };
+                const dists = pts.map(p => {
+                    const dx = p.x - cx;
+                    const dy = p.y - cy;
+                    return Math.sqrt(dx * dx + dy * dy);
+                });
+                const mean = dists.reduce((a, b) => a + b, 0) / dists.length;
+                const variance = dists.reduce((sum, d) => sum + (d - mean) * (d - mean), 0) / dists.length;
+                const std = Math.sqrt(variance);
+
+                const stability = Math.max(0, 1 - std / (baseRadius * 0.5));
+                const volatility = std;
+                const profit = Math.max(0, (mean - baseRadius * 0.6) / (baseRadius * 0.8));
+
+                return { stability, volatility, profit };
+            }
+
+            function updateMarketResults(prefix, points) {
+                const m = calcMarketMetrics(points);
+                const elStab = document.getElementById(prefix + 'Stability');
+                const elVol = document.getElementById(prefix + 'Volatility');
+                const elProf = document.getElementById(prefix + 'Profit');
+
+                elStab.textContent = (m.stability * 100).toFixed(0) + '%';
+                elVol.textContent = m.volatility.toFixed(1);
+                elProf.textContent = (m.profit * 100).toFixed(0) + '%';
+
+                [elStab, elVol, elProf].forEach(el => el.classList.remove('green', 'yellow', 'red', 'cyan'));
+                elStab.classList.add(m.stability >= 0.7 ? 'green' : (m.stability >= 0.4 ? 'yellow' : 'red'));
+                elVol.classList.add(m.volatility < 10 ? 'green' : (m.volatility < 20 ? 'yellow' : 'red'));
+                elProf.classList.add(m.profit >= 0.6 ? 'green' : (m.profit >= 0.3 ? 'yellow' : 'red'));
+            }
+
+            function updateMarketCompare() {
+                const blueM = calcMarketMetrics(bluePoints);
+                const redM = calcMarketMetrics(redPoints);
+
+                const stabDiff = ((blueM.stability - redM.stability) / Math.max(blueM.stability, 0.01) * 100).toFixed(0);
+                const volDiff = ((redM.volatility - blueM.volatility) / Math.max(redM.volatility, 0.01) * 100).toFixed(0);
+                const profitRatio = redM.profit > 0 ? (blueM.profit / redM.profit).toFixed(1) : '∞';
+
+                const elStab = document.getElementById('mktDiffStability');
+                const elVol = document.getElementById('mktDiffVolatility');
+                const elProf = document.getElementById('mktDiffProfit');
+
+                elStab.textContent = '+' + stabDiff + '%';
+                elVol.textContent = '+' + volDiff + '%';
+                elProf.textContent = profitRatio + 'x';
+
+                elStab.className = 'mci-diff ' + (stabDiff >= 0 ? 'improve' : 'worse');
+                elVol.className = 'mci-diff ' + (volDiff >= 0 ? 'worse' : 'improve');
+                elProf.className = 'mci-diff improve';
+            }
+
+            function animateBlue() {
+                if (!blueRunning) return;
+                blueAngle += 0.025;
+                blueDemandPhase += 0.03;
+
+                const demandWave = Math.sin(blueDemandPhase) * baseRadius * blueParams.demand * 0.3;
+
+                blueShockTimer++;
+                if (blueShockTimer > 80 && Math.random() < blueParams.shock * 0.2) {
+                    blueShockAmount = (Math.random() - 0.5) * baseRadius * blueParams.shock;
+                    blueShockTimer = 0;
+                }
+                blueShockAmount *= 0.95;
+
+                const targetRadius = baseRadius + demandWave + blueShockAmount;
+                blueRadius += (targetRadius - blueRadius) * (0.05 + blueParams.supply * 0.15);
+
+                const x = cx + blueRadius * Math.cos(blueAngle);
+                const y = cy + blueRadius * Math.sin(blueAngle);
+
+                bluePoints.push({ x, y });
+                if (bluePoints.length > 180) bluePoints.shift();
+
+                drawMarketBase(ctxBlue);
+                drawMarketTrajectory(ctxBlue, bluePoints, 'rgba(56, 189, 248, ALPHA)');
+
+                if (bluePoints.length > 20) {
+                    updateMarketResults('blue', bluePoints);
+                    if (redPoints.length > 20) updateMarketCompare();
+                }
+
+                blueAnimId = requestAnimationFrame(animateBlue);
+            }
+
+            function animateRed() {
+                if (!redRunning) return;
+                redAngle += 0.028;
+                redDemandPhase += 0.05;
+
+                const demandWave = Math.sin(redDemandPhase) * baseRadius * redParams.demand * 0.5
+                    + Math.sin(redDemandPhase * 2.3) * baseRadius * redParams.demand * 0.25;
+
+                redShockTimer++;
+                if (redShockTimer > 25 && Math.random() < redParams.shock * 0.4) {
+                    redShockAmount = (Math.random() - 0.5) * baseRadius * redParams.shock * 1.5;
+                    redShockTimer = 0;
+                }
+                redShockAmount *= 0.92;
+
+                const targetRadius = baseRadius + demandWave + redShockAmount + Math.sin(redDemandPhase * 0.7) * 10;
+                redRadius += (targetRadius - redRadius) * (0.03 + redParams.supply * 0.1);
+
+                const x = cx + redRadius * Math.cos(redAngle);
+                const y = cy + redRadius * Math.sin(redAngle);
+
+                redPoints.push({ x, y });
+                if (redPoints.length > 180) redPoints.shift();
+
+                drawMarketBase(ctxRed);
+                drawMarketTrajectory(ctxRed, redPoints, 'rgba(248, 113, 113, ALPHA)');
+
+                if (redPoints.length > 20) {
+                    updateMarketResults('red', redPoints);
+                    if (bluePoints.length > 20) updateMarketCompare();
+                }
+
+                redAnimId = requestAnimationFrame(animateRed);
+            }
+
+            function resetMarket(type) {
+                if (type === 'blue') {
+                    blueRunning = false;
+                    cancelAnimationFrame(blueAnimId);
+                    bluePoints = [];
+                    blueAngle = 0;
+                    blueRadius = baseRadius;
+                    blueDemandPhase = 0;
+                    blueShockTimer = 0;
+                    blueShockAmount = 0;
+                    document.getElementById('blueRunBtn').textContent = '▶ 运行';
+                    ['blueStability', 'blueVolatility', 'blueProfit'].forEach(id => {
+                        const el = document.getElementById(id);
+                        el.textContent = '—';
+                        el.classList.remove('green', 'yellow', 'red', 'cyan');
+                    });
+                    drawMarketBase(ctxBlue);
+                } else {
+                    redRunning = false;
+                    cancelAnimationFrame(redAnimId);
+                    redPoints = [];
+                    redAngle = 0;
+                    redRadius = baseRadius;
+                    redDemandPhase = 0;
+                    redShockTimer = 0;
+                    redShockAmount = 0;
+                    document.getElementById('redRunBtn').textContent = '▶ 运行';
+                    ['redStability', 'redVolatility', 'redProfit'].forEach(id => {
+                        const el = document.getElementById(id);
+                        el.textContent = '—';
+                        el.classList.remove('green', 'yellow', 'red', 'cyan');
+                    });
+                    drawMarketBase(ctxRed);
+                }
+                updateMarketCompare();
+            }
+
+            document.getElementById('blueRunBtn').addEventListener('click', function() {
+                blueRunning = !blueRunning;
+                this.textContent = blueRunning ? '⏸️ 暂停' : '▶ 运行';
+                if (blueRunning) animateBlue();
+                else cancelAnimationFrame(blueAnimId);
+            });
+
+            document.getElementById('redRunBtn').addEventListener('click', function() {
+                redRunning = !redRunning;
+                this.textContent = redRunning ? '⏸️ 暂停' : '▶ 运行';
+                if (redRunning) animateRed();
+                else cancelAnimationFrame(redAnimId);
+            });
+
+            document.getElementById('blueResetBtn').addEventListener('click', () => resetMarket('blue'));
+            document.getElementById('redResetBtn').addEventListener('click', () => resetMarket('red'));
+
+            document.getElementById('blueDemandInput').addEventListener('input', function(e) {
+                const v = parseInt(e.target.value);
+                blueParams.demand = v / 100;
+                document.getElementById('blueDemand').textContent = v + '%';
+            });
+            document.getElementById('blueSupplyInput').addEventListener('input', function(e) {
+                const v = parseInt(e.target.value);
+                blueParams.supply = v / 100;
+                document.getElementById('blueSupply').textContent = v + '%';
+            });
+            document.getElementById('blueShockInput').addEventListener('input', function(e) {
+                const v = parseInt(e.target.value);
+                blueParams.shock = v / 100;
+                document.getElementById('blueShock').textContent = v + '%';
+            });
+
+            document.getElementById('redDemandInput').addEventListener('input', function(e) {
+                const v = parseInt(e.target.value);
+                redParams.demand = v / 100;
+                document.getElementById('redDemand').textContent = v + '%';
+            });
+            document.getElementById('redSupplyInput').addEventListener('input', function(e) {
+                const v = parseInt(e.target.value);
+                redParams.supply = v / 100;
+                document.getElementById('redSupply').textContent = v + '%';
+            });
+            document.getElementById('redShockInput').addEventListener('input', function(e) {
+                const v = parseInt(e.target.value);
+                redParams.shock = v / 100;
+                document.getElementById('redShock').textContent = v + '%';
+            });
+
+            drawMarketBase(ctxBlue);
+            drawMarketBase(ctxRed);
         })();
     </script>
 
