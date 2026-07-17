@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Y.Mine · 案例库 · 16 案例向量矩阵</title>
+    <title>Y.Mine · 案例库 · 21 案例向量矩阵</title>
     <style>
         /* ===== 全局重置 ===== */
         * {
@@ -1055,17 +1055,17 @@
 
             <!-- ===== 头部 ===== -->
             <div class="header">
-                <div class="badge">✦ 案例库 · 16 案例向量矩阵</div>
-                <h1>案例库 · 16 案例向量矩阵</h1>
-                <div class="sub">瑞幸 × 隐形冠军 × AI 行业 · 余弦相似度匹配</div>
+                <div class="badge">✦ 案例库 · 21 案例向量矩阵</div>
+                <h1>案例库 · 21 案例向量矩阵</h1>
+                <div class="sub">瑞幸 × 隐形冠军 × AI 行业 × 三流分发 · 余弦相似度匹配</div>
             </div>
 
             <!-- ===== 板块 1 · 案例卡片矩阵 ===== -->
-            <div class="section-label">📋 板块 1 · 案例卡片矩阵（16 案例 · 4 列网格）</div>
+            <div class="section-label">📋 板块 1 · 案例卡片矩阵（21 案例 · 4 列网格）</div>
             <div class="case-grid" id="caseGrid"></div>
 
             <!-- ===== 板块 2 · 案例对比表 ===== -->
-            <div class="section-label">📊 板块 2 · 案例对比表（16 行 · 10 列指标）</div>
+            <div class="section-label">📊 板块 2 · 案例对比表（21 行 · 10 列指标）</div>
             <div class="table-wrap">
                 <table class="cmp-table" id="cmpTable">
                     <thead>
@@ -1129,11 +1129,11 @@
                 </div>
 
                 <div class="match-results">
-                    <h3>🏆 Top 3 最匹配案例 <span class="hint">余弦相似度</span></h3>
+                    <h3>🏆 Top 3 最匹配案例 <span class="hint">余弦相似度 · 21 案例</span></h3>
                     <div class="top-matches" id="topMatches"></div>
 
                     <div class="full-rank-list">
-                        <div class="fr-title">完整相似度排行（16 案例）</div>
+                        <div class="fr-title">完整相似度排行（21 案例）</div>
                         <div class="fr-bars" id="fullRank"></div>
                     </div>
                 </div>
@@ -1158,7 +1158,7 @@
                 </div>
                 <div class="footer-status">
                     <span class="dot"></span>
-                    <span>案例库运行中 · v1.2<span class="bus-status" id="busStatus">○ 总线待写入</span></span>
+                    <span>案例库运行中 · v1.3<span class="bus-status" id="busStatus">○ 总线待写入</span></span>
                 </div>
             </div>
 
@@ -1204,7 +1204,18 @@
             { id: 'CASE_015', name: 'AWS H100 算力', type: 'AI 算力头部', typeKey: 'ai-compute',
               vector: [0.45, 1.5, 1.2, 0.30, 0.4, 0.5], C: 0.62, pe: 30 },
             { id: 'CASE_016', name: 'Lambda H100 算力', type: 'AI 算力裸金属', typeKey: 'ai-compute',
-              vector: [0.15, 0.8, 0.9, 0.20, 0.4, 0.2], C: 0.40, pe: 14 }
+              vector: [0.15, 0.8, 0.9, 0.20, 0.4, 0.2], C: 0.40, pe: 14 },
+            // 三流分发（5 个）
+            { id: 'CASE_017', name: '泡泡玛特 IP 盲盒', type: '信息分发·IP溢价', typeKey: 'info-ip',
+              vector: [0.42, 0.6, 1.4, 0.25, 0.6, 0.5], C: 0.62, pe: 32 },
+            { id: 'CASE_018', name: '漫威 IP 宇宙', type: '信息分发·IP生态', typeKey: 'info-eco',
+              vector: [0.50, 0.8, 1.6, 0.30, 0.5, 0.6], C: 0.68, pe: 40 },
+            { id: 'CASE_019', name: '抖音/TikTok 算法', type: '流量分发·算法推荐', typeKey: 'traffic-algo',
+              vector: [0.55, 1.8, 1.7, 0.45, 0.7, 0.5], C: 0.70, pe: 42 },
+            { id: 'CASE_020', name: '小红书种草', type: '流量分发·决策闭环', typeKey: 'traffic-decide',
+              vector: [0.35, 1.0, 1.3, 0.30, 0.5, 0.4], C: 0.56, pe: 25 },
+            { id: 'CASE_021', name: '博客/自有阵地', type: '流量分发·深度自有', typeKey: 'traffic-owned',
+              vector: [0.25, 0.5, 1.1, 0.18, 0.4, 0.3], C: 0.48, pe: 20 }
         ];
 
         // ============================================================
@@ -1218,7 +1229,12 @@
             'ai-flagship':     { color: '#fb923c', bg: 'rgba(251, 146, 60, 0.08)', border: 'rgba(251, 146, 60, 0.3)', glow: 'rgba(251, 146, 60, 0.4)' },
             'ai-value':        { color: '#eab308', bg: 'rgba(234, 179, 8, 0.08)',  border: 'rgba(234, 179, 8, 0.3)',  glow: 'rgba(234, 179, 8, 0.4)'  },
             'ai-compute':      { color: '#06b6d4', bg: 'rgba(6, 182, 212, 0.08)',  border: 'rgba(6, 182, 212, 0.3)',  glow: 'rgba(6, 182, 212, 0.4)'  },
-            'ai-mainstream':   { color: '#ec4899', bg: 'rgba(236, 72, 153, 0.08)', border: 'rgba(236, 72, 153, 0.3)', glow: 'rgba(236, 72, 153, 0.4)' }
+            'ai-mainstream':   { color: '#ec4899', bg: 'rgba(236, 72, 153, 0.08)', border: 'rgba(236, 72, 153, 0.3)', glow: 'rgba(236, 72, 153, 0.4)' },
+            'info-ip':         { color: '#f472b6', bg: 'rgba(244, 114, 182, 0.08)', border: 'rgba(244, 114, 182, 0.3)', glow: 'rgba(244, 114, 182, 0.4)' },
+            'info-eco':        { color: '#a78bfa', bg: 'rgba(167, 139, 250, 0.08)', border: 'rgba(167, 139, 250, 0.3)', glow: 'rgba(167, 139, 250, 0.4)' },
+            'traffic-algo':    { color: '#22d3ee', bg: 'rgba(34, 211, 238, 0.08)', border: 'rgba(34, 211, 238, 0.3)', glow: 'rgba(34, 211, 238, 0.4)' },
+            'traffic-decide':  { color: '#34d399', bg: 'rgba(52, 211, 153, 0.08)', border: 'rgba(52, 211, 153, 0.3)', glow: 'rgba(52, 211, 153, 0.4)' },
+            'traffic-owned':   { color: '#fbbf24', bg: 'rgba(251, 191, 36, 0.08)', border: 'rgba(251, 191, 36, 0.3)', glow: 'rgba(251, 191, 36, 0.4)' }
         };
 
         const VEC_LABELS = ['f*', 'L', 'SR', 'mdd', 'dim', 'oc'];
