@@ -2065,6 +2065,222 @@
         }
 
         /* ============================================================ */
+        /* ===== 市场预判设问 · 创始人认知起点 ===== */
+        /* ============================================================ */
+        .judgment-section {
+            padding: 28px 40px 32px;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            background: linear-gradient(180deg, rgba(167, 139, 250, 0.03), transparent);
+        }
+        .js-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+        .js-header .js-icon { font-size: 24px; }
+        .js-header .js-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        .js-header .js-title span { color: #a78bfa; }
+        .js-sub {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.35);
+            margin-bottom: 22px;
+            line-height: 1.7;
+        }
+        .js-sub strong { color: rgba(255, 255, 255, 0.6); font-weight: 600; }
+        .js-question { margin-bottom: 22px; }
+        .js-q-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 14px;
+        }
+        .js-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        .js-option {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 14px;
+            padding: 24px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .js-option::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 50% 0%, rgba(167, 139, 250, 0.1), transparent 60%);
+            opacity: 0;
+            transition: opacity 0.25s ease;
+        }
+        .js-option:hover {
+            border-color: rgba(167, 139, 250, 0.3);
+            transform: translateY(-2px);
+            background: rgba(167, 139, 250, 0.04);
+        }
+        .js-option:hover::before { opacity: 1; }
+        .js-option.selected {
+            border-color: rgba(96, 165, 250, 0.6);
+            background: rgba(96, 165, 250, 0.08);
+            box-shadow: 0 0 30px rgba(96, 165, 250, 0.1);
+        }
+        .js-option.selected.red {
+            border-color: rgba(248, 113, 113, 0.6);
+            background: rgba(248, 113, 113, 0.08);
+            box-shadow: 0 0 30px rgba(248, 113, 113, 0.1);
+        }
+        .jo-emoji {
+            font-size: 40px;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+        }
+        .jo-label {
+            font-size: 16px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.75);
+            margin-bottom: 6px;
+            position: relative;
+            z-index: 1;
+        }
+        .jo-desc {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.25);
+            line-height: 1.5;
+            position: relative;
+            z-index: 1;
+        }
+        .js-confidence {
+            background: rgba(255, 255, 255, 0.015);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 12px;
+            padding: 20px 24px;
+            margin-bottom: 20px;
+        }
+        .js-c-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.55);
+            margin-bottom: 14px;
+        }
+        .js-c-slider-wrap { position: relative; }
+        .js-c-slider {
+            width: 100%;
+            height: 4px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 2px;
+            outline: none;
+            cursor: pointer;
+        }
+        .js-c-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #a78bfa, #60a5fa);
+            cursor: pointer;
+            box-shadow: 0 0 12px rgba(167, 139, 250, 0.4);
+            transition: transform 0.15s ease;
+        }
+        .js-c-slider::-webkit-slider-thumb:hover { transform: scale(1.15); }
+        .js-c-slider::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #a78bfa, #60a5fa);
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 0 12px rgba(167, 139, 250, 0.4);
+        }
+        .js-c-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.2);
+        }
+        .js-c-labels span:nth-child(2) {
+            font-size: 14px;
+            font-weight: 600;
+            color: #a78bfa;
+        }
+        .js-result {
+            display: flex;
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+        .jr-card {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 10px;
+            padding: 14px 16px;
+        }
+        .jr-card.jr-hint {
+            flex: 1.5;
+            background: rgba(96, 165, 250, 0.04);
+            border-color: rgba(96, 165, 250, 0.12);
+        }
+        .jr-label {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: rgba(255, 255, 255, 0.2);
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+        .jr-value {
+            font-size: 16px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.75);
+        }
+        .jr-desc {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.35);
+            line-height: 1.6;
+        }
+        .js-actions { text-align: center; }
+        .js-actions button {
+            padding: 12px 28px;
+            border-radius: 24px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(255, 255, 255, 0.03);
+            color: rgba(255, 255, 255, 0.4);
+            transition: all 0.25s ease;
+        }
+        .js-actions button.primary {
+            background: linear-gradient(135deg, #a78bfa, #60a5fa);
+            color: #fff;
+            border: none;
+            box-shadow: 0 4px 20px rgba(167, 139, 250, 0.3);
+        }
+        .js-actions button:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+        .js-actions button.primary:not(:disabled):hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 24px rgba(167, 139, 250, 0.45);
+        }
+
         /* ===== 真实画圈实验 · 运动-认知耦合采集 ===== */
         /* ============================================================ */
         .motor-lab-section {
@@ -2912,6 +3128,19 @@
             color: rgba(255, 255, 255, 0.3);
             white-space: nowrap;
         }
+        .match-radar-labels .rl-5.rl-pos1 {
+            top: 28%;
+            right: 8px;
+        }
+        .match-radar-labels .rl-5.rl-pos2 {
+            bottom: 28%;
+            right: 8px;
+        }
+        .match-radar-labels .rl-5.rl-pos3 {
+            top: 50%;
+            left: 10px;
+            transform: translateY(-50%);
+        }
         .match-factors {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -3322,6 +3551,67 @@
         </div>
 
         <!-- ============================================================ -->
+        <!-- ===== 市场预判设问 · 创始人认知起点 ===== -->
+        <!-- ============================================================ -->
+        <div class="section-anchor" id="section-judgment"></div>
+        <div class="judgment-section">
+            <div class="js-header">
+                <span class="js-icon">🧭</span>
+                <span class="js-title">市场预判 · <span>你的第一判断</span></span>
+            </div>
+            <div class="js-sub">
+                在开始实验之前，先凭直觉给出一个判断——这将作为你的<strong>认知基准线</strong>，后面我们用模拟结果来验证。
+            </div>
+
+            <div class="js-question">
+                <div class="js-q-title">你当前的赛道 / 正在做的项目，你认为它处于：</div>
+                <div class="js-options">
+                    <div class="js-option" data-judgment="blue">
+                        <div class="jo-emoji">🌊</div>
+                        <div class="jo-label">蓝海市场</div>
+                        <div class="jo-desc">竞争少 · 需求未被满足 · 高增长</div>
+                    </div>
+                    <div class="js-option" data-judgment="red">
+                        <div class="jo-emoji">🔥</div>
+                        <div class="jo-label">红海市场</div>
+                        <div class="jo-desc">竞争激烈 · 需求饱和 · 价格战</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="js-confidence" id="jsConfidenceBlock" style="display:none;">
+                <div class="js-c-title">你对这个判断的信心有多高？</div>
+                <div class="js-c-slider-wrap">
+                    <input type="range" min="0" max="100" value="50" id="jsConfidenceSlider" class="js-c-slider">
+                    <div class="js-c-labels">
+                        <span>不确定</span>
+                        <span id="jsConfidenceVal">50%</span>
+                        <span>非常确定</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="js-result" id="jsResult" style="display:none;">
+                <div class="jr-card">
+                    <div class="jr-label">你的预判</div>
+                    <div class="jr-value" id="jrJudgment">—</div>
+                </div>
+                <div class="jr-card">
+                    <div class="jr-label">信心指数</div>
+                    <div class="jr-value" id="jrConfidence">—</div>
+                </div>
+                <div class="jr-card jr-hint">
+                    <div class="jr-label">认知校准</div>
+                    <div class="jr-desc">后面的供需模拟会给出数据验证，看看你的直觉和客观数据差多少。</div>
+                </div>
+            </div>
+
+            <div class="js-actions">
+                <button class="primary" id="jsNextBtn" disabled>👇 开始画圈实验</button>
+            </div>
+        </div>
+
+        <!-- ============================================================ -->
         <!-- ===== 真实画圈实验 · 运动-认知耦合采集 ===== -->
         <!-- ============================================================ -->
         <div class="section-anchor" id="section-motor"></div>
@@ -3691,16 +3981,16 @@
                             <circle cx="100" cy="100" r="50" class="match-radar-bg"/>
                             <circle cx="100" cy="100" r="70" class="match-radar-bg"/>
                             <line x1="100" y1="30" x2="100" y2="170" class="match-radar-axis"/>
-                            <line x1="30" y1="100" x2="170" y2="100" class="match-radar-axis"/>
-                            <line x1="52" y1="52" x2="148" y2="148" class="match-radar-axis"/>
-                            <line x1="148" y1="52" x2="52" y2="148" class="match-radar-axis"/>
-                            <polygon id="radarPolygon" class="match-radar-polygon" points="100,30 100,30 100,30 100,30 100,30 100,30"/>
+                            <line x1="34" y1="56" x2="166" y2="144" class="match-radar-axis"/>
+                            <line x1="34" y1="144" x2="166" y2="56" class="match-radar-axis"/>
+                            <polygon id="radarPolygon" class="match-radar-polygon" points="100,30 100,30 100,30 100,30 100,30"/>
                         </svg>
                         <div class="match-radar-labels">
                             <div class="rl-item" style="top:10px; left:50%; transform:translateX(-50%);">创始人能力</div>
-                            <div class="rl-item" style="top:50%; right:10px; transform:translateY(-50%);">决策质量</div>
+                            <div class="rl-item rl-5 rl-pos1">决策质量</div>
+                            <div class="rl-item rl-5 rl-pos2">认知准确度</div>
                             <div class="rl-item" style="bottom:10px; left:50%; transform:translateX(-50%);">市场适配</div>
-                            <div class="rl-item" style="top:50%; left:10px; transform:translateY(-50%);">执行效率</div>
+                            <div class="rl-item rl-5 rl-pos3">执行效率</div>
                         </div>
                     </div>
                     <div class="match-factors">
@@ -3724,11 +4014,16 @@
                             <div class="mf-bar"><div class="mf-bar-fill" id="mfExecution"></div></div>
                             <div class="mf-value" id="mfExecutionVal">—</div>
                         </div>
+                        <div class="mf-item">
+                            <div class="mf-label">🎯 认知准确度</div>
+                            <div class="mf-bar"><div class="mf-bar-fill" id="mfAwareness"></div></div>
+                            <div class="mf-value" id="mfAwarenessVal">—</div>
+                        </div>
                     </div>
                 </div>
             </div>
             <div class="match-insight">
-                💡 <strong>核心洞察：</strong>匹配率综合评估创始人能力、决策质量与市场适配度。
+                💡 <strong>核心洞察：</strong>匹配率综合评估<span class="hl">创始人能力、决策质量、市场适配、认知准确度、执行效率</span>五大维度。
                 <span class="hl">高匹配（>75%）</span>：创始人特质与商业模型高度契合，成功概率显著提升；
                 <span class="hl">中等匹配（50-75%）</span>：存在改进空间，建议针对性优化短板；
                 <span class="hl">低匹配（<50%）</span>：需重新审视战略方向或团队配置。
@@ -5289,6 +5584,84 @@
         })();
 
         // ============================================================ //
+        // ===== 市场预判设问 · 创始人认知起点 ===== //
+        // ============================================================ //
+        (function() {
+            const options = document.querySelectorAll('.js-option');
+            const confidenceBlock = document.getElementById('jsConfidenceBlock');
+            const confidenceSlider = document.getElementById('jsConfidenceSlider');
+            const confidenceVal = document.getElementById('jsConfidenceVal');
+            const resultBlock = document.getElementById('jsResult');
+            const jrJudgment = document.getElementById('jrJudgment');
+            const jrConfidence = document.getElementById('jrConfidence');
+            const nextBtn = document.getElementById('jsNextBtn');
+
+            if (!options.length) return;
+
+            let selectedJudgment = null;
+            let confidence = 50;
+
+            options.forEach(opt => {
+                opt.addEventListener('click', function() {
+                    const type = this.getAttribute('data-judgment');
+                    selectedJudgment = type;
+
+                    options.forEach(o => {
+                        o.classList.remove('selected', 'red');
+                    });
+                    this.classList.add('selected');
+                    if (type === 'red') this.classList.add('red');
+
+                    confidenceBlock.style.display = 'block';
+                    resultBlock.style.display = 'flex';
+                    updateResult();
+                    checkNext();
+                    saveJudgment();
+                });
+            });
+
+            confidenceSlider.addEventListener('input', function(e) {
+                confidence = parseInt(e.target.value);
+                confidenceVal.textContent = confidence + '%';
+                updateResult();
+                saveJudgment();
+            });
+
+            function updateResult() {
+                if (!selectedJudgment) return;
+                jrJudgment.textContent = selectedJudgment === 'blue' ? '🌊 蓝海市场' : '🔥 红海市场';
+                jrJudgment.style.color = selectedJudgment === 'blue' ? '#60a5fa' : '#f87171';
+                jrConfidence.textContent = confidence + '%';
+            }
+
+            function checkNext() {
+                if (selectedJudgment) {
+                    nextBtn.disabled = false;
+                }
+            }
+
+            function saveJudgment() {
+                if (!selectedJudgment) return;
+                window.circleLabData = window.circleLabData || {};
+                window.circleLabData.judgment = {
+                    type: selectedJudgment,
+                    confidence: confidence / 100,
+                    hasData: true
+                };
+                if (typeof window.updateCircleLabMatch === 'function') {
+                    window.updateCircleLabMatch();
+                }
+            }
+
+            nextBtn.addEventListener('click', function() {
+                const target = document.getElementById('section-motor');
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        })();
+
+        // ============================================================ //
         // ===== 真实画圈实验 · 运动-认知耦合采集 ===== //
         // ============================================================ //
         (function() {
@@ -6130,6 +6503,31 @@
                         window.circleLabData.market.redProfit = m.profit;
                     }
                     window.circleLabData.market.hasData = true;
+
+                    // 对比用户预判与模拟结果，计算市场认知准确度
+                    const judgment = window.circleLabData.judgment;
+                    if (judgment && judgment.hasData &&
+                        window.circleLabData.market.blueStability > 0 &&
+                        window.circleLabData.market.redStability > 0) {
+                        const mk = window.circleLabData.market;
+                        const blueScore = mk.blueProfit * 0.6 + mk.blueStability * 0.4;
+                        const redScore = mk.redProfit * 0.6 + mk.redStability * 0.4;
+                        const gap = Math.abs(blueScore - redScore) / Math.max(blueScore, redScore, 0.01);
+
+                        let correct = false;
+                        if (judgment.type === 'blue' && blueScore > redScore) correct = true;
+                        if (judgment.type === 'red' && redScore > blueScore) correct = true;
+
+                        const confidence = judgment.confidence;
+                        let accuracyScore;
+                        if (correct) {
+                            accuracyScore = 50 + 50 * (0.5 + confidence * 0.5) * Math.min(1, gap * 2);
+                        } else {
+                            accuracyScore = Math.max(0, 50 - 40 * (0.5 + confidence * 0.5) * Math.min(1, gap * 2));
+                        }
+
+                        window.circleLabData.market.judgmentAccuracy = Math.min(100, accuracyScore) / 100;
+                    }
                 }
             }
 
@@ -6243,7 +6641,7 @@
                     // 彻底归零共享状态，避免匹配度沿用旧值
                     window.circleLabData = window.circleLabData || {};
                     window.circleLabData.market = Object.assign({}, window.circleLabData.market, {
-                        blueStability: 0, blueVolatility: 0, blueProfit: 0, hasData: false
+                        blueStability: 0, blueVolatility: 0, blueProfit: 0, hasData: false, judgmentAccuracy: undefined
                     });
                 } else {
                     redRunning = false;
@@ -6264,7 +6662,7 @@
                     // 彻底归零共享状态，避免匹配度沿用旧值
                     window.circleLabData = window.circleLabData || {};
                     window.circleLabData.market = Object.assign({}, window.circleLabData.market, {
-                        redStability: 0, redVolatility: 0, redProfit: 0, hasData: false
+                        redStability: 0, redVolatility: 0, redProfit: 0, hasData: false, judgmentAccuracy: undefined
                     });
                 }
                 updateMarketCompare();
@@ -6345,6 +6743,8 @@
             const mfMarketVal = document.getElementById('mfMarketVal');
             const mfExecution = document.getElementById('mfExecution');
             const mfExecutionVal = document.getElementById('mfExecutionVal');
+            const mfAwareness = document.getElementById('mfAwareness');
+            const mfAwarenessVal = document.getElementById('mfAwarenessVal');
 
             if (!matchValue) return;
 
@@ -6379,6 +6779,7 @@
                 const motor = data.motor || { hasData: false };
                 const model = data.model || { hasData: false };
                 const market = data.market || { hasData: false };
+                const judgment = data.judgment || { hasData: false };
 
                 let founderScore = 0;
                 if (motor.hasData) {
@@ -6420,11 +6821,21 @@
                     executionScore = 45;
                 }
 
+                let awarenessScore = 0;
+                if (market.judgmentAccuracy !== undefined && market.hasData && judgment.hasData) {
+                    awarenessScore = market.judgmentAccuracy * 100;
+                } else if (judgment.hasData) {
+                    awarenessScore = 55;
+                } else {
+                    awarenessScore = 40;
+                }
+
                 const totalScore = Math.round(
-                    founderScore * 0.35 +
-                    decisionScore * 0.30 +
-                    marketScore * 0.25 +
-                    executionScore * 0.10
+                    founderScore * 0.28 +
+                    decisionScore * 0.22 +
+                    marketScore * 0.18 +
+                    executionScore * 0.12 +
+                    awarenessScore * 0.20
                 );
 
                 const colorClass = getColorClass(totalScore);
@@ -6443,14 +6854,22 @@
                 const r = 70;
                 const fs = Math.min(100, founderScore) / 100;
                 const ds = Math.min(100, decisionScore) / 100;
+                const as = Math.min(100, awarenessScore) / 100;
                 const ms = Math.min(100, marketScore) / 100;
                 const es = Math.min(100, executionScore) / 100;
 
-                const p1 = `100,${100 - r * fs}`;
-                const p2 = `${100 + r * ds},100`;
-                const p3 = `100,${100 + r * ms}`;
-                const p4 = `${100 - r * es},100`;
-                radarPolygon.setAttribute('points', `${p1} ${p2} ${p3} ${p4}`);
+                const angleStep = (2 * Math.PI) / 5;
+                const startAngle = -Math.PI / 2;
+                const p1 = polarPoint(100, 100, r * fs, startAngle);
+                const p2 = polarPoint(100, 100, r * ds, startAngle + angleStep);
+                const p3 = polarPoint(100, 100, r * as, startAngle + angleStep * 2);
+                const p4 = polarPoint(100, 100, r * ms, startAngle + angleStep * 3);
+                const p5 = polarPoint(100, 100, r * es, startAngle + angleStep * 4);
+                radarPolygon.setAttribute('points', `${p1} ${p2} ${p3} ${p4} ${p5}`);
+
+                function polarPoint(cx, cy, radius, angle) {
+                    return `${cx + radius * Math.cos(angle)},${cy + radius * Math.sin(angle)}`;
+                }
 
                 function updateFactor(el, val, labelEl) {
                     const v = Math.round(Math.min(100, val));
@@ -6463,6 +6882,7 @@
                 updateFactor(mfDecision, decisionScore, mfDecisionVal);
                 updateFactor(mfMarket, marketScore, mfMarketVal);
                 updateFactor(mfExecution, executionScore, mfExecutionVal);
+                updateFactor(mfAwareness, awarenessScore, mfAwarenessVal);
             }
 
             // 暴露给重置按钮调用，确保重置后立即重新计算而非等待 500ms 轮询
