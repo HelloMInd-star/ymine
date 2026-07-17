@@ -5571,6 +5571,11 @@
                 [mmCircularity, mmRadial, mmSpeedCV, mmTime].forEach(el => el.classList.remove('good','warn','bad'));
                 hint.textContent = '按住鼠标或手指，沿虚线画一圈';
                 hint.classList.remove('hidden');
+                // 彻底归零共享状态，避免匹配度沿用旧值
+                window.circleLabData = window.circleLabData || {};
+                window.circleLabData.motor = { circularity: 0, radialError: 0, speedCV: 0, duration: 0, hasData: false };
+                // 立即触发匹配度重新计算
+                if (typeof window.updateCircleLabMatch === 'function') window.updateCircleLabMatch();
                 redraw();
             });
 
@@ -5901,6 +5906,11 @@
                     el.textContent = '—';
                     el.classList.remove('green', 'yellow', 'red');
                 });
+                // 彻底归零共享状态，避免匹配度沿用旧值
+                window.circleLabData = window.circleLabData || {};
+                window.circleLabData.model = { idealCirc: 0, realCirc: 0, idealConv: 0, realConv: 0, hasData: false };
+                // 立即触发匹配度重新计算
+                if (typeof window.updateCircleLabMatch === 'function') window.updateCircleLabMatch();
                 drawModelBase(ctxIdeal);
                 updateCompare();
             });
@@ -5927,6 +5937,11 @@
                     el.textContent = '—';
                     el.classList.remove('green', 'yellow', 'red');
                 });
+                // 彻底归零共享状态，避免匹配度沿用旧值
+                window.circleLabData = window.circleLabData || {};
+                window.circleLabData.model = { idealCirc: 0, realCirc: 0, idealConv: 0, realConv: 0, hasData: false };
+                // 立即触发匹配度重新计算
+                if (typeof window.updateCircleLabMatch === 'function') window.updateCircleLabMatch();
                 drawModelBase(ctxReal);
                 updateCompare();
             });
@@ -6225,6 +6240,11 @@
                         el.classList.remove('green', 'yellow', 'red', 'cyan');
                     });
                     drawMarketBase(ctxBlue);
+                    // 彻底归零共享状态，避免匹配度沿用旧值
+                    window.circleLabData = window.circleLabData || {};
+                    window.circleLabData.market = Object.assign({}, window.circleLabData.market, {
+                        blueStability: 0, blueVolatility: 0, blueProfit: 0, hasData: false
+                    });
                 } else {
                     redRunning = false;
                     cancelAnimationFrame(redAnimId);
@@ -6241,8 +6261,15 @@
                         el.classList.remove('green', 'yellow', 'red', 'cyan');
                     });
                     drawMarketBase(ctxRed);
+                    // 彻底归零共享状态，避免匹配度沿用旧值
+                    window.circleLabData = window.circleLabData || {};
+                    window.circleLabData.market = Object.assign({}, window.circleLabData.market, {
+                        redStability: 0, redVolatility: 0, redProfit: 0, hasData: false
+                    });
                 }
                 updateMarketCompare();
+                // 立即触发匹配度重新计算
+                if (typeof window.updateCircleLabMatch === 'function') window.updateCircleLabMatch();
             }
 
             document.getElementById('blueRunBtn').addEventListener('click', function() {
@@ -6438,6 +6465,10 @@
                 updateFactor(mfExecution, executionScore, mfExecutionVal);
             }
 
+            // 暴露给重置按钮调用，确保重置后立即重新计算而非等待 500ms 轮询
+            window.updateCircleLabMatch = updateMatch;
+            // 立即执行一次初始化
+            updateMatch();
             setInterval(updateMatch, 500);
         })();
     </script>
