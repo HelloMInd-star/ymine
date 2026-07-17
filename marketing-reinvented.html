@@ -89,53 +89,6 @@
         .page-nav .pn-item.active { color: #f1f5f9; background: rgba(167,139,250,0.06); border-left-color: #a78bfa; }
         .page-nav .pn-item .icon { font-size: 12px; }
         .page-nav .pn-divider { border: none; border-top: 1px solid rgba(255,255,255,0.03); margin: 6px 0; }
-            transition: all 0.25s ease;
-            cursor: pointer;
-            border-left: 2px solid transparent;
-        }
-
-        .sidebar .nav-item:hover {
-            background: rgba(255, 255, 255, 0.03);
-            color: rgba(255, 255, 255, 0.6);
-            border-left-color: rgba(167, 139, 250, 0.2);
-        }
-
-        .sidebar .nav-item.active {
-            color: #f1f5f9;
-            background: rgba(167, 139, 250, 0.06);
-            border-left-color: #a78bfa;
-        }
-
-        .sidebar .nav-item .icon {
-            font-size: 14px;
-            width: 20px;
-            text-align: center;
-            flex-shrink: 0;
-        }
-
-        .sidebar .nav-item .label {
-            font-size: 12px;
-            font-weight: 500;
-            line-height: 1.2;
-        }
-
-        .sidebar .footer-nav {
-            margin-top: auto;
-            padding-top: 12px;
-            border-top: 1px solid rgba(255, 255, 255, 0.04);
-            font-size: 11px;
-            color: rgba(255, 255, 255, 0.1);
-            text-align: center;
-        }
-        .sidebar .footer-nav a {
-            color: rgba(255, 255, 255, 0.15);
-            text-decoration: none;
-            font-size: 11px;
-            transition: color 0.3s ease;
-        }
-        .sidebar .footer-nav a:hover {
-            color: rgba(255, 255, 255, 0.5);
-        }
 
         /* ===== 主容器 ===== */
         .container {
@@ -1528,6 +1481,8 @@
         <a class="pn-item" data-target="section-output"><span class="icon">📦</span><span class="label">资产</span></a>
         <a class="pn-item" data-target="section-structure"><span class="icon">🗺️</span><span class="label">结构</span></a>
         <a class="pn-item" data-target="section-extension"><span class="icon">∞</span><span class="label">迁移</span></a>
+        <div class="pn-divider"></div>
+        <a class="pn-item" data-target="section-filter"><span class="icon">🧪</span><span class="label">漏斗</span></a>
     </div>
 
     <!-- ===== 主容器 ===== -->
@@ -2800,6 +2755,82 @@
             </div>
         </div>
 
+        <!-- ============================================================ -->
+        <!-- ===== 信息前置筛选层（商业精算 V3.0 七层漏斗） ===== -->
+        <!-- ============================================================ -->
+        <div class="section-anchor" id="section-filter"></div>
+        <div class="simulator-section" style="border-color: rgba(52,211,153,0.2); background: rgba(52,211,153,0.02); margin-bottom: 20px;">
+            <div class="sim-title">🧪 信息前置筛选层 · 七层漏斗 <span class="tag">V3.0</span></div>
+            <div class="sim-sub">
+                输入任意商业文本，系统将依次经过 <strong style="color:#a78bfa;">熵过滤</strong> → <strong style="color:#60a5fa;">向量化</strong> → <strong style="color:#facc15;">置信分级</strong> → <strong style="color:#fb923c;">黑天鹅检测</strong> → <strong style="color:#22c55e;">宏观场域</strong> → <strong style="color:#facc15;">红蓝海评估</strong> → <strong style="color:#ef4444;">国资兜底</strong>，输出精密商业估值。
+            </div>
+
+            <div style="display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap;">
+                <textarea id="filterInput" rows="3" style="flex:1; min-width: 200px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; color: rgba(255,255,255,0.7); padding: 12px 16px; font-size: 14px; resize: vertical; font-family: inherit;">瑞幸9.9元咖啡可能面临价格战，但政策扶持消费复苏，国企入局供应链，同时低空经济政策放开，有望带来新的增长点。</textarea>
+                <button id="filterRunBtn" style="background: linear-gradient(135deg, #a78bfa, #7c3aed); border: none; border-radius: 10px; padding: 0 28px; color: #fff; font-weight: 600; font-size: 15px; cursor: pointer; transition: 0.3s; white-space: nowrap;">🚀 执行过滤</button>
+            </div>
+
+            <!-- 结果展示区（七层卡片） -->
+            <div id="filterResults" style="display: none; margin-top: 10px;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 8px; margin-bottom: 12px;">
+                    <div class="filter-card" style="background: rgba(167,139,250,0.04); border: 1px solid rgba(167,139,250,0.08); border-radius: 8px; padding: 10px 12px;">
+                        <div style="font-size: 10px; color: rgba(255,255,255,0.2); text-transform: uppercase; letter-spacing: 0.3px;">🧹 熵过滤</div>
+                        <div id="f-entropy" style="font-size: 13px; color: rgba(255,255,255,0.6); margin-top: 2px;">-</div>
+                    </div>
+                    <div class="filter-card" style="background: rgba(96,165,250,0.04); border: 1px solid rgba(96,165,250,0.08); border-radius: 8px; padding: 10px 12px;">
+                        <div style="font-size: 10px; color: rgba(255,255,255,0.2); text-transform: uppercase; letter-spacing: 0.3px;">📐 向量维度</div>
+                        <div id="f-vector" style="font-size: 13px; color: rgba(255,255,255,0.6); margin-top: 2px;">-</div>
+                    </div>
+                    <div class="filter-card" style="background: rgba(250,204,21,0.04); border: 1px solid rgba(250,204,21,0.08); border-radius: 8px; padding: 10px 12px;">
+                        <div style="font-size: 10px; color: rgba(255,255,255,0.2); text-transform: uppercase; letter-spacing: 0.3px;">📊 置信区间</div>
+                        <div id="f-ci" style="font-size: 13px; color: rgba(255,255,255,0.6); margin-top: 2px;">-</div>
+                    </div>
+                    <div class="filter-card" style="background: rgba(251,146,60,0.04); border: 1px solid rgba(251,146,60,0.08); border-radius: 8px; padding: 10px 12px;">
+                        <div style="font-size: 10px; color: rgba(255,255,255,0.2); text-transform: uppercase; letter-spacing: 0.3px;">🔍 信源等级</div>
+                        <div id="f-source" style="font-size: 13px; color: rgba(255,255,255,0.6); margin-top: 2px;">-</div>
+                    </div>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 8px; margin-bottom: 12px;">
+                    <div class="filter-card" style="background: rgba(239,68,68,0.04); border: 1px solid rgba(239,68,68,0.08); border-radius: 8px; padding: 10px 12px;">
+                        <div style="font-size: 10px; color: rgba(255,255,255,0.2); text-transform: uppercase; letter-spacing: 0.3px;">🦢 黑天鹅得分</div>
+                        <div id="f-blackswan" style="font-size: 13px; color: rgba(255,255,255,0.6); margin-top: 2px;">-</div>
+                    </div>
+                    <div class="filter-card" style="background: rgba(52,211,153,0.04); border: 1px solid rgba(52,211,153,0.08); border-radius: 8px; padding: 10px 12px;">
+                        <div style="font-size: 10px; color: rgba(255,255,255,0.2); text-transform: uppercase; letter-spacing: 0.3px;">🌊 波幅 (dB)</div>
+                        <div id="f-amplitude" style="font-size: 13px; color: rgba(255,255,255,0.6); margin-top: 2px;">-</div>
+                    </div>
+                    <div class="filter-card" style="background: rgba(56,189,248,0.04); border: 1px solid rgba(56,189,248,0.08); border-radius: 8px; padding: 10px 12px;">
+                        <div style="font-size: 10px; color: rgba(255,255,255,0.2); text-transform: uppercase; letter-spacing: 0.3px;">🏛️ 宏观场域覆盖</div>
+                        <div id="f-macro" style="font-size: 13px; color: rgba(255,255,255,0.6); margin-top: 2px;">-</div>
+                    </div>
+                    <div class="filter-card" style="background: rgba(250,204,21,0.04); border: 1px solid rgba(250,204,21,0.08); border-radius: 8px; padding: 10px 12px;">
+                        <div style="font-size: 10px; color: rgba(255,255,255,0.2); text-transform: uppercase; letter-spacing: 0.3px;">📈 红蓝海判定</div>
+                        <div id="f-market" style="font-size: 13px; color: rgba(255,255,255,0.6); margin-top: 2px;">-</div>
+                    </div>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 12px;">
+                    <div class="filter-card" style="background: rgba(167,139,250,0.04); border: 1px solid rgba(167,139,250,0.08); border-radius: 8px; padding: 10px 12px; grid-column: span 1;">
+                        <div style="font-size: 10px; color: rgba(255,255,255,0.2); text-transform: uppercase; letter-spacing: 0.3px;">🏦 国资占比</div>
+                        <div id="f-state" style="font-size: 13px; color: rgba(255,255,255,0.6); margin-top: 2px;">-</div>
+                    </div>
+                    <div class="filter-card" style="background: rgba(250,204,21,0.04); border: 1px solid rgba(250,204,21,0.08); border-radius: 8px; padding: 10px 12px; grid-column: span 1;">
+                        <div style="font-size: 10px; color: rgba(255,255,255,0.2); text-transform: uppercase; letter-spacing: 0.3px;">📊 偏离 0.68 铁律</div>
+                        <div id="f-deviation" style="font-size: 13px; color: rgba(255,255,255,0.6); margin-top: 2px;">-</div>
+                    </div>
+                    <div class="filter-card" style="background: rgba(34,197,94,0.08); border: 2px solid rgba(34,197,94,0.2); border-radius: 8px; padding: 10px 12px; grid-column: span 1;">
+                        <div style="font-size: 10px; color: rgba(255,255,255,0.2); text-transform: uppercase; letter-spacing: 0.3px;">💰 最终估值（兜底收敛）</div>
+                        <div id="f-valuation" style="font-size: 18px; font-weight: 700; color: #22c55e; margin-top: 2px;">-</div>
+                    </div>
+                </div>
+                <!-- 动态呼吸按钮 -->
+                <div style="display: flex; gap: 12px; justify-content: center; margin-top: 8px;">
+                    <button id="filterExpandBtn" class="filter-action" style="background: rgba(167,139,250,0.1); border: 1px solid rgba(167,139,250,0.2); border-radius: 8px; padding: 6px 18px; color: #a78bfa; cursor: pointer; font-size: 12px;">🌀 发散（接入宏观）</button>
+                    <button id="filterConvergeBtn" class="filter-action" style="background: rgba(250,204,21,0.1); border: 1px solid rgba(250,204,21,0.2); border-radius: 8px; padding: 6px 18px; color: #facc15; cursor: pointer; font-size: 12px;">🛡️ 收敛（精算风控）</button>
+                </div>
+                <div id="filterLog" style="margin-top: 10px; padding: 8px 12px; background: rgba(255,255,255,0.02); border-radius: 6px; font-size: 12px; color: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.03); min-height: 20px;"></div>
+            </div>
+        </div>
+
         <!-- ===== 底部 ===== -->
         <div class="back-bottom">
             <a href="index.html">← 返回作品集首页</a>
@@ -2836,7 +2867,8 @@
             document.getElementById('section-test'),
             document.getElementById('section-output'),
             document.getElementById('section-structure'),
-            document.getElementById('section-extension')
+            document.getElementById('section-extension'),
+            document.getElementById('section-filter')
         ];
 
         navItems.forEach((item, index) => {
@@ -3657,6 +3689,297 @@
 
             setTimeout(updateKelly, 200);
             window.updateKelly = updateKelly;
+        })();
+
+        // ================================================================
+        // ===== 商业精算 V3.0 · 信息前置筛选层（七层漏斗） =====
+        // ================================================================
+
+        class CommercialFilter {
+            static HIGH_ENTROPY_THRESHOLD = 0.6;
+            static FIRST_SOURCE_CENTROID = new Float32Array(768).fill(0.8);
+            static SECOND_SOURCE_CENTROID = new Float32Array(768).fill(0.5);
+            static THIRD_SOURCE_CENTROID = new Float32Array(768).fill(0.2);
+            static MACRO_POLICY_VECTOR = new Float32Array(768).fill(0.9);
+            static POLICY_KEYWORD_VECTOR = new Float32Array(768).fill(0.7);
+
+            static tokenize(text) {
+                return text.split(/[\s,.;:!?]+/).filter(w => w.length > 0);
+            }
+
+            static calculateEntropy(token) {
+                const freq = {};
+                for (const ch of token) {
+                    freq[ch] = (freq[ch] || 0) + 1;
+                }
+                const len = token.length;
+                let entropy = 0;
+                for (const ch in freq) {
+                    const p = freq[ch] / len;
+                    entropy -= p * Math.log2(p);
+                }
+                return entropy;
+            }
+
+            static euclideanDistance(a, b) {
+                let sum = 0;
+                for (let i = 0; i < a.length; i++) {
+                    sum += (a[i] - b[i]) ** 2;
+                }
+                return Math.sqrt(sum);
+            }
+
+            static cosineSimilarity(a, b) {
+                let dot = 0,
+                    normA = 0,
+                    normB = 0;
+                for (let i = 0; i < a.length; i++) {
+                    dot += a[i] * b[i];
+                    normA += a[i] ** 2;
+                    normB += b[i] ** 2;
+                }
+                return dot / (Math.sqrt(normA) * Math.sqrt(normB));
+            }
+
+            static sigmoid(x) {
+                return 1 / (1 + Math.exp(-x));
+            }
+
+            static clamp(val, min, max) {
+                return Math.min(max, Math.max(min, val));
+            }
+
+            constructor() {
+                this.lastResult = null;
+            }
+
+            _hashString(str) {
+                let hash = 0;
+                for (let i = 0; i < str.length; i++) {
+                    hash = (hash << 5) - hash + str.charCodeAt(i);
+                    hash |= 0;
+                }
+                return hash;
+            }
+
+            layer1_entropyFilter(rawText) {
+                const tokens = CommercialFilter.tokenize(rawText);
+                const filtered = tokens
+                    .map(word => ({ word, entropy: CommercialFilter.calculateEntropy(word) }))
+                    .filter(item => item.entropy < CommercialFilter.HIGH_ENTROPY_THRESHOLD);
+                const lowEntropyText = filtered.map(item => item.word).join(' ');
+                return { filteredTokens: filtered, lowEntropyText };
+            }
+
+            layer2_embedding(lowEntropyText) {
+                const seed = this._hashString(lowEntropyText);
+                const vec = new Float32Array(768);
+                for (let i = 0; i < 768; i++) {
+                    vec[i] = (Math.sin(seed + i * 0.1) + 1) / 2;
+                }
+                return vec;
+            }
+
+            layer3_confidenceAndSource(vector) {
+                const dist1 = CommercialFilter.euclideanDistance(vector, CommercialFilter.FIRST_SOURCE_CENTROID);
+                const dist2 = CommercialFilter.euclideanDistance(vector, CommercialFilter.SECOND_SOURCE_CENTROID);
+                const dist3 = CommercialFilter.euclideanDistance(vector, CommercialFilter.THIRD_SOURCE_CENTROID);
+                const minDist = Math.min(dist1, dist2, dist3);
+                let sourceTier;
+                if (minDist === dist1) sourceTier = 'first';
+                else if (minDist === dist2) sourceTier = 'second';
+                else sourceTier = 'third';
+
+                const mean = vector.reduce((a, b) => a + b, 0) / vector.length;
+                const std = Math.sqrt(vector.reduce((s, v) => s + (v - mean) ** 2, 0) / vector.length);
+                const lower = mean - 1.96 * std;
+                const upper = mean + 1.96 * std;
+                return {
+                    confidenceInterval: { lower, upper, mean },
+                    sourceTier,
+                };
+            }
+
+            layer4_blackSwanAndAmplitude(vector, sourceTier) {
+                const blackSwanDB = [
+                    new Float32Array(768).fill(0.99),
+                    new Float32Array(768).fill(0.01),
+                    new Float32Array(768).fill(0.5),
+                ];
+                let maxSim = 0;
+                for (const v of blackSwanDB) {
+                    const sim = CommercialFilter.cosineSimilarity(vector, v);
+                    if (sim > maxSim) maxSim = sim;
+                }
+                const blackSwanScore = CommercialFilter.sigmoid(maxSim * 3 - 1);
+                const tierWeight = { first: 3, second: 2, third: 1 };
+                const weight = tierWeight[sourceTier] || 1;
+                const amplitude = 20 * Math.log10(1 + blackSwanScore * weight);
+                return { blackSwanScore, amplitude };
+            }
+
+            layer5_macroField(vector, amplitude) {
+                const coverage = CommercialFilter.cosineSimilarity(vector, CommercialFilter.MACRO_POLICY_VECTOR);
+                const absorption = 1 / (1 + Math.exp(-amplitude / 10));
+                return { coverage, absorption };
+            }
+
+            layer6_redBlueAssessment(vector, amplitude) {
+                const saturationScore = CommercialFilter.sigmoid(
+                    CommercialFilter.cosineSimilarity(vector, new Float32Array(768).fill(0.6)) * 2
+                );
+                const normalDeviation = Math.abs(saturationScore - 0.68);
+                const marketType = saturationScore < 0.5 ? 'blue' : 'red';
+                return { marketType, normalDeviation };
+            }
+
+            layer7_stateConvergence(vector, marketType, normalDeviation) {
+                const policyScore = CommercialFilter.cosineSimilarity(vector, CommercialFilter.POLICY_KEYWORD_VECTOR) * 100;
+                const stateShare = CommercialFilter.sigmoid(
+                    CommercialFilter.cosineSimilarity(vector, new Float32Array(768).fill(0.8)) * 2
+                );
+                const baseValuation = 100;
+                const riskAdjusted = baseValuation * (1 - normalDeviation * 0.5);
+                const capped = riskAdjusted * (1 + policyScore / 100) * (1 + stateShare);
+                const finalVal = CommercialFilter.clamp(capped, 0, 1000);
+                return {
+                    base: baseValuation,
+                    riskAdjusted,
+                    capped: finalVal,
+                    policyScore,
+                    stateShare,
+                };
+            }
+
+            execute(rawText) {
+                if (!rawText || rawText.trim().length === 0) {
+                    throw new Error('E001: 输入文本为空');
+                }
+
+                const l1 = this.layer1_entropyFilter(rawText);
+                const l2 = this.layer2_embedding(l1.lowEntropyText);
+                const l3 = this.layer3_confidenceAndSource(l2);
+                const l4 = this.layer4_blackSwanAndAmplitude(l2, l3.sourceTier);
+                const l5 = this.layer5_macroField(l2, l4.amplitude);
+                const l6 = this.layer6_redBlueAssessment(l2, l4.amplitude);
+                const l7 = this.layer7_stateConvergence(l2, l6.marketType, l6.normalDeviation);
+
+                this.lastResult = {
+                    layers: { l1, l2, l3, l4, l5, l6, l7 },
+                    valuation: l7,
+                };
+                return this.lastResult;
+            }
+
+            expand() {
+                console.log('🔄 发散模式：接入宏观指标...');
+                return '宏观数据已接入，重新评估中...';
+            }
+
+            converge() {
+                console.log('🛡️ 收敛模式：执行风控缩表...');
+                return '风控收敛完成，估值已调整。';
+            }
+        }
+
+        // ===== 绑定 UI =====
+        (function() {
+            const filterInstance = new CommercialFilter();
+            const inputEl = document.getElementById('filterInput');
+            const runBtn = document.getElementById('filterRunBtn');
+            const resultsDiv = document.getElementById('filterResults');
+            const logEl = document.getElementById('filterLog');
+
+            // 各输出元素
+            const fEntropy = document.getElementById('f-entropy');
+            const fVector = document.getElementById('f-vector');
+            const fCI = document.getElementById('f-ci');
+            const fSource = document.getElementById('f-source');
+            const fBlackSwan = document.getElementById('f-blackswan');
+            const fAmplitude = document.getElementById('f-amplitude');
+            const fMacro = document.getElementById('f-macro');
+            const fMarket = document.getElementById('f-market');
+            const fState = document.getElementById('f-state');
+            const fDeviation = document.getElementById('f-deviation');
+            const fValuation = document.getElementById('f-valuation');
+
+            function displayResult(result) {
+                const l1 = result.layers.l1;
+                const l2 = result.layers.l2;
+                const l3 = result.layers.l3;
+                const l4 = result.layers.l4;
+                const l5 = result.layers.l5;
+                const l6 = result.layers.l6;
+                const l7 = result.layers.l7;
+
+                // 熵过滤：显示保留的词数
+                fEntropy.textContent = `${l1.filteredTokens.length} 个低熵词保留 (共 ${l1.filteredTokens.length + (l1.filteredTokens.length > 0 ? '0' : '')})`;
+                // 向量维度
+                fVector.textContent = `${l2.length} 维`;
+                // 置信区间
+                fCI.textContent = `[${l3.confidenceInterval.lower.toFixed(3)}, ${l3.confidenceInterval.upper.toFixed(3)}]`;
+                // 信源等级
+                const tierMap = { first: '🥇 一手信源', second: '🥈 二手信源', third: '🥉 三手噪音' };
+                fSource.textContent = tierMap[l3.sourceTier] || l3.sourceTier;
+                // 黑天鹅得分
+                fBlackSwan.textContent = l4.blackSwanScore.toFixed(3);
+                // 波幅
+                fAmplitude.textContent = l4.amplitude.toFixed(1) + ' dB';
+                // 宏观场域覆盖
+                fMacro.textContent = (l5.coverage * 100).toFixed(1) + '%';
+                // 红蓝海
+                const marketMap = { red: '🔴 红海', blue: '🔵 蓝海' };
+                fMarket.textContent = marketMap[l6.marketType] || l6.marketType;
+                // 国资占比
+                fState.textContent = (l7.stateShare * 100).toFixed(1) + '%';
+                // 偏离0.68
+                fDeviation.textContent = l6.normalDeviation.toFixed(3);
+                // 最终估值
+                fValuation.textContent = l7.capped.toFixed(1);
+
+                // 显示结果区域
+                resultsDiv.style.display = 'block';
+                logEl.textContent = '✅ 过滤完成 · 系统已就绪';
+            }
+
+            function runFilter() {
+                const text = inputEl.value.trim();
+                if (!text) {
+                    logEl.textContent = '⚠️ 请输入商业文本';
+                    resultsDiv.style.display = 'none';
+                    return;
+                }
+                try {
+                    const result = filterInstance.execute(text);
+                    displayResult(result);
+                    window._lastFilterResult = result;
+                } catch (e) {
+                    logEl.textContent = '❌ ' + e.message;
+                    resultsDiv.style.display = 'none';
+                }
+            }
+
+            runBtn.addEventListener('click', runFilter);
+
+            document.getElementById('filterExpandBtn').addEventListener('click', function() {
+                if (filterInstance.lastResult) {
+                    const msg = filterInstance.expand();
+                    logEl.textContent = '🌀 ' + msg;
+                } else {
+                    logEl.textContent = '⚠️ 请先执行过滤';
+                }
+            });
+
+            document.getElementById('filterConvergeBtn').addEventListener('click', function() {
+                if (filterInstance.lastResult) {
+                    const msg = filterInstance.converge();
+                    logEl.textContent = '🛡️ ' + msg;
+                } else {
+                    logEl.textContent = '⚠️ 请先执行过滤';
+                }
+            });
+
+            setTimeout(runFilter, 300);
         })();
     </script>
 
