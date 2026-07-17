@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>元架构重构资本定价 · 证据链</title>
+    <title>金融估值模拟器 · 风险向量精算</title>
     <style>
         /* ===== 全局重置 ===== */
         * {
@@ -578,6 +578,67 @@
             color: rgba(255, 255, 255, 0.1);
             margin-top: 6px;
         }
+
+        /* ===== 漏斗状态条 ===== */
+        .funnel-status-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(167, 139, 250, 0.06);
+            border: 1px solid rgba(167, 139, 250, 0.15);
+            border-radius: 12px;
+            padding: 12px 20px;
+            margin-bottom: 20px;
+            opacity: 0;
+            animation: fadeInUp 0.6s ease 0.02s forwards;
+        }
+        .funnel-status-bar.active {
+            border-color: rgba(167, 139, 250, 0.3);
+            background: rgba(167, 139, 250, 0.08);
+        }
+        .fsb-left { display: flex; align-items: center; gap: 10px; }
+        .fsb-icon { font-size: 18px; }
+        .fsb-text { font-size: 13px; color: rgba(255,255,255,0.5); font-weight: 500; }
+        .fsb-right { display: flex; align-items: center; gap: 10px; }
+        .fsb-tag { font-size: 11px; color: rgba(255,255,255,0.3); background: rgba(255,255,255,0.03); padding: 3px 10px; border-radius: 20px; font-weight: 500; }
+        .fsb-tag.active { color: #a78bfa; background: rgba(167,139,250,0.12); }
+        .fsb-toggle {
+            background: rgba(167, 139, 250, 0.1);
+            border: 1px solid rgba(167, 139, 250, 0.2);
+            color: #a78bfa;
+            font-size: 11px;
+            padding: 4px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .fsb-toggle:hover { background: rgba(167,139,250,0.2); }
+
+        /* ===== 精算流程总览 ===== */
+        .flow-overview {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.04);
+            border-radius: 16px;
+            padding: 20px 24px;
+            margin-bottom: 20px;
+            opacity: 0;
+            animation: fadeInUp 0.6s ease 0.03s forwards;
+        }
+        .fo-title { font-size: 14px; font-weight: 600; color: rgba(255,255,255,0.5); margin-bottom: 14px; }
+        .fo-steps { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+        .fo-step {
+            flex: 1;
+            text-align: center;
+            padding: 12px 8px;
+            background: rgba(167,139,250,0.04);
+            border-radius: 10px;
+            border: 1px solid rgba(167,139,250,0.08);
+        }
+        .fo-step-icon { font-size: 22px; margin-bottom: 4px; }
+        .fo-step-name { font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.6); margin-bottom: 2px; }
+        .fo-step-desc { font-size: 10px; color: rgba(255,255,255,0.2); }
+        .fo-arrow { font-size: 18px; color: rgba(255,255,255,0.15); flex-shrink: 0; }
 
         /* ============================================================ */
         /* ===== 圆锥模型板块 ===== */
@@ -1506,27 +1567,25 @@
 
     <!-- ===== 页面内导航 ===== -->
     <div class="page-nav" id="sidebar">
-        <div class="pn-label">重构</div>
-        <a class="pn-item" data-target="section-value"><span class="icon">🧠</span><span class="label">主张</span></a>
-        <a class="pn-item" data-target="section-meta"><span class="icon">📊</span><span class="label">逻辑</span></a>
+        <div class="pn-label">📥 输入层</div>
+        <a class="pn-item" data-target="section-riskvector"><span class="icon">📊</span><span class="label">风险向量</span></a>
+        <a class="pn-item" data-target="section-pricing"><span class="icon">💰</span><span class="label">定价模型</span></a>
         <div class="pn-divider"></div>
-        <a class="pn-item" data-target="section-simulator"><span class="icon">📈</span><span class="label">营销</span></a>
-        <a class="pn-item" data-target="section-pricing"><span class="icon">💰</span><span class="label">定价</span></a>
-        <div class="pn-divider"></div>
+        <div class="pn-label">🧠 推导层</div>
         <a class="pn-item" data-target="section-layer1"><span class="icon">🌀</span><span class="label">一/二/三</span></a>
-        <a class="pn-item" data-target="section-cone"><span class="icon">🔺</span><span class="label">圆锥</span></a>
+        <a class="pn-item" data-target="section-cone"><span class="icon">🔺</span><span class="label">圆锥浓度</span></a>
         <a class="pn-item" data-target="section-layer2"><span class="icon">🔄</span><span class="label">A/B</span></a>
         <a class="pn-item" data-target="section-layer3"><span class="icon">🎯</span><span class="label">比喻</span></a>
         <a class="pn-item" data-target="section-layer4"><span class="icon">📐</span><span class="label">三维</span></a>
         <a class="pn-item" data-target="section-layer5"><span class="icon">📋</span><span class="label">理论</span></a>
         <a class="pn-item" data-target="section-layer6"><span class="icon">💡</span><span class="label">真相</span></a>
-        <a class="pn-item" data-target="section-layer7"><span class="icon">📐</span><span class="label">公式</span></a>
-        <a class="pn-item" data-target="section-layer8"><span class="icon">📊</span><span class="label">凯利</span></a>
         <div class="pn-divider"></div>
-        <a class="pn-item" data-target="section-test"><span class="icon">🧪</span><span class="label">测试</span></a>
+        <div class="pn-label">📤 输出层</div>
+        <a class="pn-item" data-target="section-layer7"><span class="icon">📐</span><span class="label">CAPM公式</span></a>
+        <a class="pn-item" data-target="section-layer8"><span class="icon">📊</span><span class="label">凯利验证</span></a>
+        <a class="pn-item" data-target="section-fuserisk"><span class="icon">⚠️</span><span class="label">风控熔断</span></a>
         <div class="pn-divider"></div>
-        <a class="pn-item" data-target="section-output"><span class="icon">📦</span><span class="label">资产</span></a>
-        <a class="pn-item" data-target="section-structure"><span class="icon">🗺️</span><span class="label">结构</span></a>
+        <a class="pn-item" data-target="section-structure"><span class="icon">🗺️</span><span class="label">系统总览</span></a>
         <a class="pn-item" data-target="section-extension"><span class="icon">∞</span><span class="label">迁移</span></a>
     </div>
 
@@ -1557,30 +1616,72 @@
             </details>
         </div>
 
+        <!-- ===== 漏斗接管状态条 ===== -->
+        <div class="funnel-status-bar" id="funnelStatusBar">
+            <div class="fsb-left">
+                <span class="fsb-icon">🔭</span>
+                <span class="fsb-text" id="funnelStatusText">等待数据输入</span>
+            </div>
+            <div class="fsb-right">
+                <span class="fsb-tag" id="funnelModeTag">手动模式</span>
+                <button class="fsb-toggle" id="funnelToggleBtn">切换接管</button>
+            </div>
+        </div>
+
+        <!-- ===== 精算流程总览 ===== -->
+        <div class="flow-overview">
+            <div class="fo-title">🧭 精算流程总览</div>
+            <div class="fo-steps">
+                <div class="fo-step">
+                    <div class="fo-step-icon">📥</div>
+                    <div class="fo-step-name">输入层</div>
+                    <div class="fo-step-desc">风险向量 + 定价模型</div>
+                </div>
+                <div class="fo-arrow">→</div>
+                <div class="fo-step">
+                    <div class="fo-step-icon">🧪</div>
+                    <div class="fo-step-name">浓度精算</div>
+                    <div class="fo-step-desc">圆锥体 · 0.68稳态</div>
+                </div>
+                <div class="fo-arrow">→</div>
+                <div class="fo-step">
+                    <div class="fo-step-icon">🧠</div>
+                    <div class="fo-step-name">推导层</div>
+                    <div class="fo-step-desc">8层递进推理</div>
+                </div>
+                <div class="fo-arrow">→</div>
+                <div class="fo-step">
+                    <div class="fo-step-icon">📤</div>
+                    <div class="fo-step-name">输出层</div>
+                    <div class="fo-step-desc">CAPM · 凯利 · 熔断</div>
+                </div>
+            </div>
+        </div>
+
         <!-- ===== 价值主张 ===== -->
         <div class="section-anchor" id="section-value"></div>
         <div class="value-prop">
             <p>
                 <strong>💡 核心模型：</strong>资本定价 = <span class="highlight">无风险利率 Rf</span> + <span style="color:#a78bfa;">风险溢价 Rp</span> × <span style="color:#60a5fa;">β系数</span><br>
-                无风险利率由大盘（国债收益率）+ 政策（央行基准）联动确定。<br>
-                风险溢价 = 三维评估值（前额叶 × 边缘系统协同）。<br>
-                β系数 = 欧氏距离（前额叶与边缘系统的强度差异）。
+                浓度约束：<span class="highlight">C = m × ρ₀ / V(h)</span>（溶质质量 × 信源密度 / 市场容积）<br>
+                稳态铁律：<span style="color:#facc15;">0.48 保本 / 0.50 中轴 / 0.68 熔断</span><br>
+                风险向量：6维空间 → 向量模长 × 余弦相似度 = 组合风险收益率
             </p>
         </div>
 
         <!-- ===== 核心结论锚点 ===== -->
         <div class="key-takeaways">
             <div class="kt-item">
-                <div class="kt-icon">🔗</div>
-                <div class="kt-text">元架构连接传播与技术<br><span class="hl">同一个大脑，同时驾驭营销策略与AI架构</span></div>
+                <div class="kt-icon">🧪</div>
+                <div class="kt-text">圆锥浓度模型<br><span class="hl">市场份额 = 溶质密度 / 容积</span></div>
             </div>
             <div class="kt-item">
-                <div class="kt-icon">🧠</div>
-                <div class="kt-text">“其实我脑子里都已经学会了”<br><span class="hl">学习 = 翻译已有知识</span></div>
+                <div class="kt-icon">📊</div>
+                <div class="kt-text">6维风险向量<br><span class="hl">向量模长 × 方向相似度</span></div>
             </div>
             <div class="kt-item">
-                <div class="kt-icon">📐</div>
-                <div class="kt-text">资本定价 = Rf + Rp × β<br><span class="hl">无风险利率 + 风险溢价 × 贝塔</span></div>
+                <div class="kt-icon">⚠️</div>
+                <div class="kt-text">0.68 风控铁律<br><span class="hl">正态稳态边界</span></div>
             </div>
         </div>
 
@@ -1588,83 +1689,95 @@
         <div class="section-anchor" id="section-meta"></div>
         <div class="meta-grid">
             <div class="meta-item">
-                <div class="ml">📊 传统方法 · 估算逻辑</div>
-                <div class="mv">依赖用户调研、A/B测试、历史数据回归<br><span class="sub">需要大量样本 · 周期长 · 结果仅适用特定场景</span></div>
+                <div class="ml">📊 传统估值 · 估算逻辑</div>
+                <div class="mv">依赖财报、PE/PB倍数、DCF现金流折现<br><span class="sub">需要历史数据 · 静态滞后 · 难以评估早期项目</span></div>
             </div>
             <div class="meta-item">
-                <div class="ml">🧠 元架构 · 估算逻辑</div>
-                <div class="mv">基于 <span class="hl">前额叶（逻辑/分析/计算）</span> × <span style="color:#60a5fa;">边缘系统（直觉/判断/模式识别）</span> 协同推演<br><span class="sub">单场对话即可完成 · 结果可跨领域迁移</span></div>
+                <div class="ml">🧠 风险向量 · 估算逻辑</div>
+                <div class="mv">基于 <span class="hl">6维风险向量</span> × <span style="color:#60a5fa;">圆锥浓度模型</span> 精算<br><span class="sub">实时动态计算 · 物理化学级精度</span></div>
             </div>
             <div class="meta-item" style="grid-column:1/-1;">
-                <div class="ml">🔁 两种认知路径的差异</div>
+                <div class="ml">🔁 两种估值路径的差异</div>
                 <div class="mv">
-                    <span style="color:rgba(255,255,255,0.5);">传统：</span>归纳法（从数据中找规律）<br>
-                    <span class="hl">元架构：</span>演绎法（从原理中推结论）
+                    <span style="color:rgba(255,255,255,0.5);">传统：</span>归纳法（从历史数据找规律）<br>
+                    <span class="hl">风险向量：</span>演绎法（从第一性原理推估值）
                 </div>
             </div>
             <div class="meta-item" style="grid-column:1/-1;">
                 <div class="ml">💡 核心结论</div>
-                <div class="mv">元架构可在单场对话内产出与传统MBA营销课<span class="hl-gold">同等量级</span>、但<span class="hl">底层结构更清晰、可迁移性更强</span>的认知成果</div>
+                <div class="mv">风险向量精算可在分钟级产出与传统估值模型<span class="hl-gold">同等精度</span>、但<span class="hl">动态性更强、可跨领域迁移</span>的估值结果</div>
             </div>
         </div>
 
         <!-- ============================================================ -->
-        <!-- ===== 模拟器1：营销成功率 ===== -->
+        <!-- ===== 模拟器1：6维风险向量空间 ===== -->
         <!-- ============================================================ -->
-        <div class="section-anchor" id="section-simulator"></div>
+        <div class="section-anchor" id="section-riskvector"></div>
         <div class="simulator-section">
-            <div class="sim-title">📈 营销成功率模拟器 <span class="tag">实时数据</span></div>
+            <div class="sim-title">📊 6维风险向量空间 <span class="tag">输入层</span></div>
             <div class="sim-sub">
-                <span class="hl">前额叶（逻辑/分析/计算）</span> × <span class="hl-blue">边缘系统（直觉/判断/模式识别）</span> = 风险溢价基准
+                <span class="hl">凯利比率</span> × <span class="hl-blue">财务杠杆</span> × <span style="color:#facc15;">夏普比率</span> × 最大回撤 × 边际递减 × 机会成本
+                <br>向量模长 × 最优向量余弦相似度 = 组合风险收益率
             </div>
 
             <div class="sim-grid">
                 <div class="ctrl">
-                    <label>🧠 前额叶激活 <span id="digitalVal">0.70</span></label>
-                    <input type="range" id="digitalInput" min="0.1" max="1.0" step="0.01" value="0.70" />
-                    <span class="sub-hint">逻辑 · 计算 · 算法推理（可学习）</span>
+                    <label>🎯 凯利比率 f* <span id="kellyVal">0.50</span></label>
+                    <input type="range" id="kellyInput" min="0.05" max="0.80" step="0.01" value="0.50" />
+                    <span class="sub-hint">最优仓位比例</span>
                 </div>
                 <div class="ctrl">
-                    <label>🎯 边缘系统激活 <span id="businessVal">0.70</span></label>
-                    <input type="range" id="businessInput" min="0.1" max="1.0" step="0.01" value="0.70" />
-                    <span class="sub-hint">直觉 · 判断 · 模式识别（依赖经验）</span>
+                    <label>💹 财务杠杆 L <span id="leverageVal">2.0</span>x</label>
+                    <input type="range" id="leverageInput" min="0.5" max="4.0" step="0.1" value="2.0" />
+                    <span class="sub-hint">资本放大倍数</span>
                 </div>
                 <div class="ctrl">
-                    <label>📊 外部复杂度 <span id="complexityVal">0.50</span></label>
-                    <input type="range" id="complexityInput" min="0.1" max="1.0" step="0.01" value="0.50" />
-                    <span class="sub-hint">渠道竞争 · 信息噪音 · 认知负荷</span>
+                    <label>📈 夏普比率 SR <span id="sharpeVal">2.5</span></label>
+                    <input type="range" id="sharpeInput" min="0.2" max="4.0" step="0.1" value="2.5" />
+                    <span class="sub-hint">风险调整后收益</span>
+                </div>
+                <div class="ctrl">
+                    <label>📉 最大回撤 MDD <span id="mddVal">0.25</span></label>
+                    <input type="range" id="mddInput" min="0.05" max="0.60" step="0.01" value="0.25" />
+                    <span class="sub-hint">容忍的最大亏损</span>
+                </div>
+                <div class="ctrl">
+                    <label>📉 边际递减 DIM <span id="dimVal">0.50</span></label>
+                    <input type="range" id="dimInput" min="0.10" max="0.90" step="0.01" value="0.50" />
+                    <span class="sub-hint">规模扩张后的效率衰减</span>
+                </div>
+                <div class="ctrl">
+                    <label>⚖️ 机会成本 OC <span id="ocVal">0.30</span></label>
+                    <input type="range" id="ocInput" min="0.05" max="0.70" step="0.01" value="0.30" />
+                    <span class="sub-hint">选择此方案的机会损失</span>
                 </div>
             </div>
 
             <div class="result-panel">
                 <div class="metric">
-                    <div class="ml">📈 风险溢价基准</div>
-                    <div class="mv highlight" id="successRate">0.0<span class="unit">%</span></div>
-                    <span class="sub-hint">前额叶 × 边缘系统 / (1+β×0.5)</span>
+                    <div class="ml">向量模长</div>
+                    <div class="mv" id="vecMagnitude">—</div>
+                    <div class="sub-hint">||V|| 整体强度</div>
                 </div>
                 <div class="metric">
-                    <div class="ml">策略贡献</div>
-                    <div class="mv" id="digitalContribution" style="color:#a78bfa;">0.0<span class="unit">%</span></div>
-                    <span class="sub-hint">可量化 · 可训练</span>
+                    <div class="ml">余弦相似度</div>
+                    <div class="mv highlight" id="vecCosine">—</div>
+                    <div class="sub-hint">与最优向量方向</div>
                 </div>
                 <div class="metric">
-                    <div class="ml">择时贡献</div>
-                    <div class="mv" id="businessContribution" style="color:#60a5fa;">0.0<span class="unit">%</span></div>
-                    <span class="sub-hint">依赖经验 · 情境感知</span>
+                    <div class="ml">组合风险收益率</div>
+                    <div class="mv gold" id="vecReturn">—</div>
+                    <div class="sub-hint">模长 × 余弦</div>
                 </div>
                 <div class="metric">
-                    <div class="ml">协同状态</div>
-                    <div class="mv gold" id="riskLevel">⚖️ 均衡</div>
+                    <div class="ml">风险溢价 Rp</div>
+                    <div class="mv green" id="vecRp">—</div>
+                    <div class="sub-hint">注入 CAPM</div>
                 </div>
             </div>
 
-            <div class="advice-box" id="strategyAdvice">
-                💡 <strong>策略建议：</strong>当前前额叶与边缘系统激活均衡，建议优先提升前额叶以突破外部复杂度瓶颈。
-            </div>
-
-            <div class="canvas-wrap">
-                <canvas id="simCanvas" width="800" height="200"></canvas>
-                <div class="canvas-caption">动态曲线 · 前额叶（紫）与边缘系统（蓝）协同 · 金色为风险溢价基准</div>
+            <div class="advice-box" id="vecAdvice">
+                调整参数查看风险向量组合效果
             </div>
         </div>
 
@@ -1779,8 +1892,8 @@
         <!-- ============================================================ -->
         <div class="section-anchor" id="section-cone"></div>
         <div class="cone-section">
-            <div class="cone-title">📐 圆锥商业价值立体模型 <span class="tag">资本定价 · 商业应用 · 几何公理</span></div>
-            <div class="cone-sub">从资本定价锚点出发，到商业落地，再到几何底座支撑</div>
+            <div class="cone-title">🧪 圆锥浓度模型 · 0.68稳态铁律 <span class="tag">浓度精算</span></div>
+            <div class="cone-sub">C = m × ρ₀ / V(h) · 溶质质量 × 信源密度 / 市场容积 · 0.68熔断边界</div>
 
             <!-- ============================================================ -->
             <!-- 第一部分：资本定价模型（宽度优化版） -->
@@ -1900,10 +2013,41 @@
                 </div>
             </div>
 
+            <!-- 浓度精算控制面板 -->
+            <div style="margin-bottom: 16px; padding: 16px 20px; background: rgba(167,139,250,0.04); border-radius: 12px; border: 1px solid rgba(167,139,250,0.08);">
+                <div style="font-size: 13px; font-weight: 600; color: #a78bfa; margin-bottom: 12px;">🎛️ 浓度精算控制台</div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 12px;">
+                    <div>
+                        <div style="font-size: 10px; color: rgba(255,255,255,0.15); margin-bottom: 4px;">📏 赛道高度 h</div>
+                        <div style="font-size: 20px; font-weight: 700; color: #f1f5f9; margin-bottom: 6px;" id="coneHVal">0.50</div>
+                        <input type="range" id="coneHInput" min="0.2" max="0.9" step="0.01" value="0.50" style="width:100%; accent-color:#a78bfa; height:3px; background:rgba(255,255,255,0.06); border-radius:4px; -webkit-appearance:none; appearance:none;" />
+                        <div style="font-size: 9px; color: rgba(255,255,255,0.08); margin-top: 2px;">市场容积位置</div>
+                    </div>
+                    <div>
+                        <div style="font-size: 10px; color: rgba(255,255,255,0.15); margin-bottom: 4px;">🔬 单位密度 ρ₀</div>
+                        <div style="font-size: 20px; font-weight: 700; color: #60a5fa; margin-bottom: 6px;" id="coneRhoVal">1.00</div>
+                        <div style="font-size: 9px; color: rgba(255,255,255,0.08); margin-top: 2px;">信源密度（漏斗L3）</div>
+                    </div>
+                    <div>
+                        <div style="font-size: 10px; color: rgba(255,255,255,0.15); margin-bottom: 4px;">⚖️ 溶质质量 m</div>
+                        <div style="font-size: 20px; font-weight: 700; color: #facc15; margin-bottom: 6px;" id="coneMVal">0.65</div>
+                        <div style="font-size: 9px; color: rgba(255,255,255,0.08); margin-top: 2px;">向量模长（6维风险）</div>
+                    </div>
+                    <div>
+                        <div style="font-size: 10px; color: rgba(255,255,255,0.15); margin-bottom: 4px;">🧪 浓度 C</div>
+                        <div style="font-size: 20px; font-weight: 700; color: #22c55e; margin-bottom: 6px;" id="coneCVal">—</div>
+                        <div id="coneRiskStatus" style="font-size: 11px; padding: 2px 8px; border-radius: 10px; display: inline-block; background: rgba(34,197,94,0.1); color: #22c55e;">稳态区间</div>
+                    </div>
+                </div>
+                <div style="margin-top: 10px; font-size: 11px; color: rgba(255,255,255,0.12); text-align: center;">
+                    浓度公式：C = m × ρ₀ / V(h) &nbsp;|&nbsp; 稳态铁律：0.48保本 / 0.50中轴 / 0.68熔断
+                </div>
+            </div>
+
             <!-- 圆锥可视化图 -->
             <div class="cone-canvas-wrap">
                 <canvas id="coneCanvas" width="800" height="420"></canvas>
-                <div class="cone-caption">立体圆锥 · 中轴线 = 无风险利率基准 · 三个圈层 = 三种定价策略 · 容积 = 品牌总商业价值</div>
+                <div class="cone-caption">立体圆锥 · 浓度球 = h高度处的溶质浓度 · 0.68 = 风控熔断线</div>
             </div>
 
             <!-- 容积说明 -->
@@ -2351,7 +2495,7 @@
         <!-- ============================================================ -->
         <div class="section-anchor" id="section-layer7"></div>
         <div class="section">
-            <h2>第七层 <span class="tag">资本定价公式 · 三维收束</span></h2>
+            <h2>📐 第七层：资本定价公式 CAPM <span class="tag">输出层</span></h2>
             <p><strong>前面六层的推导成果，被收敛到一个可量化的公式中。</strong></p>
 
             <div style="background: rgba(167,139,250,0.04); border: 1px solid rgba(167,139,250,0.08); border-radius: 12px; padding: 18px 22px; text-align: center; margin: 12px 0 16px;">
@@ -2395,7 +2539,22 @@
 
             <!-- 交互式计算器 -->
             <div style="background: rgba(255,255,255,0.02); border-radius: 10px; padding: 16px 18px; border: 1px solid rgba(255,255,255,0.04);">
-                <div style="font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.4); margin-bottom: 10px;">🎛️ 三维调节 · 实时计算资本定价</div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <div style="font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.4);">🎛️ 三维调节 · 实时计算资本定价</div>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span id="capmModeLabel" style="font-size: 11px; color: rgba(255,255,255,0.3);">手动模式</span>
+                        <button id="capmModeToggle" style="font-size: 11px; padding: 4px 10px; background: rgba(167,139,250,0.1); border: 1px solid rgba(167,139,250,0.2); border-radius: 6px; color: #a78bfa; cursor: pointer;">切换漏斗接管</button>
+                    </div>
+                </div>
+
+                <!-- 漏斗接管状态条 -->
+                <div id="funnelStatusBar" style="display: none; background: rgba(167,139,250,0.06); border: 1px solid rgba(167,139,250,0.15); border-radius: 8px; padding: 8px 12px; margin-bottom: 12px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; font-size: 11px;">
+                        <span style="color: #a78bfa;">🔭 漏斗接管中</span>
+                        <span id="funnelStatusInfo" style="color: rgba(255,255,255,0.4);">—</span>
+                    </div>
+                </div>
+
                 <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px 20px;">
                     <div>
                         <label style="color: rgba(255,255,255,0.25); font-size: 12px; display: flex; justify-content: space-between;">
@@ -2420,7 +2579,7 @@
                     </div>
                 </div>
 
-                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 10px; margin-top: 14px; background: rgba(255,255,255,0.02); border-radius: 8px; padding: 12px 14px; border: 1px solid rgba(255,255,255,0.03);">
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr 1fr; gap: 10px; margin-top: 14px; background: rgba(255,255,255,0.02); border-radius: 8px; padding: 12px 14px; border: 1px solid rgba(255,255,255,0.03);">
                     <div style="text-align: center;">
                         <div style="font-size: 9px; color: rgba(255,255,255,0.1); text-transform: uppercase; letter-spacing: 0.3px;">无风险 Rf</div>
                         <div style="font-size: 18px; font-weight: 700; color: #a78bfa;" id="theoryContribution">0.00</div>
@@ -2434,7 +2593,11 @@
                         <div style="font-size: 18px; font-weight: 700; color: #facc15;" id="practiceContribution">0.00</div>
                     </div>
                     <div style="text-align: center; border-left: 1px solid rgba(255,255,255,0.04); padding-left: 10px;">
-                        <div style="font-size: 9px; color: rgba(255,255,255,0.1); text-transform: uppercase; letter-spacing: 0.3px;">资本定价</div>
+                        <div style="font-size: 9px; color: rgba(255,255,255,0.1); text-transform: uppercase; letter-spacing: 0.3px;">浓度修正</div>
+                        <div style="font-size: 18px; font-weight: 700; color: #f472b6;" id="concentrationFactor">1.00x</div>
+                    </div>
+                    <div style="text-align: center; border-left: 1px solid rgba(255,255,255,0.04); padding-left: 10px;">
+                        <div style="font-size: 9px; color: rgba(255,255,255,0.1); text-transform: uppercase; letter-spacing: 0.3px;">最终资本定价</div>
                         <div style="font-size: 20px; font-weight: 700; color: #22c55e;" id="totalSuccess">0.0%</div>
                     </div>
                 </div>
@@ -2533,6 +2696,45 @@
             </div>
             <div style="margin-top: 8px; font-size: 12px; color: rgba(255,255,255,0.08); text-align: center; border-top: 1px solid rgba(255,255,255,0.02); padding-top: 8px;">
                 💡 凯利公式 f* = (b×p − q) / b · 联动第七层风险溢价自动更新
+            </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- ===== 风控熔断 · 0.68铁律 ===== -->
+        <!-- ============================================================ -->
+        <div class="section-anchor" id="section-fuserisk"></div>
+        <div class="simulator-section" style="border-color:rgba(248,113,113,0.15); background:rgba(248,113,113,0.02);">
+            <div class="sim-title">⚠️ 风控熔断 · 0.68铁律 <span class="tag">最终防线</span></div>
+            <div class="sim-sub">
+                三条红线：<span style="color:#22c55e;">0.48 保本线</span> / 
+                <span style="color:#facc15;">0.50 中轴线</span> / 
+                <span style="color:#f87171;">0.68 熔断线</span>
+                <br>基于正态分布 1σ 单侧临界值 = 0.68，浓度超过此值必然扩散回落
+            </div>
+            <div class="result-panel">
+                <div class="metric">
+                    <div class="ml">当前浓度 C</div>
+                    <div class="mv" id="riskConc">—</div>
+                    <div class="sub-hint">圆锥浓度模型</div>
+                </div>
+                <div class="metric">
+                    <div class="ml">风险指数</div>
+                    <div class="mv" id="riskIndex">—</div>
+                    <div class="sub-hint">β × 振幅</div>
+                </div>
+                <div class="metric">
+                    <div class="ml">熔断状态</div>
+                    <div class="mv" id="riskStatus">—</div>
+                    <div class="sub-hint">安全/警告/熔断</div>
+                </div>
+                <div class="metric">
+                    <div class="ml">建议仓位</div>
+                    <div class="mv" id="riskPosition">—</div>
+                    <div class="sub-hint">熔断后强制降仓</div>
+                </div>
+            </div>
+            <div class="advice-box" id="riskAdvice">
+                等待数据计算...
             </div>
         </div>
 
@@ -2820,9 +3022,7 @@
         // ===== 左侧导航栏交互 =====
         const navItems = document.querySelectorAll('.pn-item');
         const sections = [
-            document.getElementById('section-value'),
-            document.getElementById('section-meta'),
-            document.getElementById('section-simulator'),
+            document.getElementById('section-riskvector'),
             document.getElementById('section-pricing'),
             document.getElementById('section-layer1'),
             document.getElementById('section-cone'),
@@ -2833,8 +3033,7 @@
             document.getElementById('section-layer6'),
             document.getElementById('section-layer7'),
             document.getElementById('section-layer8'),
-            document.getElementById('section-test'),
-            document.getElementById('section-output'),
+            document.getElementById('section-fuserisk'),
             document.getElementById('section-structure'),
             document.getElementById('section-extension')
         ];
@@ -2942,6 +3141,48 @@
             const layerMid = 0.60;
             const layerTop = 0.30;
 
+            let coneH = 0.50;
+            let coneRho = 1.00;
+            let coneM = 0.65;
+
+            const coneHInput = document.getElementById('coneHInput');
+            const coneHVal = document.getElementById('coneHVal');
+            const coneRhoVal = document.getElementById('coneRhoVal');
+            const coneMVal = document.getElementById('coneMVal');
+            const coneCVal = document.getElementById('coneCVal');
+            const coneRiskStatus = document.getElementById('coneRiskStatus');
+
+            function calculateConcentration() {
+                const r = baseRadius * (1 - coneH);
+                const volume = (1/3) * Math.PI * r * r * (coneHeight * coneH);
+                const normVolume = volume / ( (1/3) * Math.PI * baseRadius * baseRadius * coneHeight );
+                const C = (coneM * coneRho) / Math.max(normVolume, 0.01);
+                return C;
+            }
+
+            function updateConcentrationDisplay() {
+                const C = calculateConcentration();
+                coneCVal.textContent = C.toFixed(2);
+
+                if (C >= 0.68) {
+                    coneRiskStatus.textContent = '⚠️ 熔断风险';
+                    coneRiskStatus.style.background = 'rgba(239,68,68,0.1)';
+                    coneRiskStatus.style.color = '#ef4444';
+                } else if (C >= 0.50) {
+                    coneRiskStatus.textContent = '🟡 接近稳态';
+                    coneRiskStatus.style.background = 'rgba(250,204,21,0.1)';
+                    coneRiskStatus.style.color = '#facc15';
+                } else if (C >= 0.48) {
+                    coneRiskStatus.textContent = '✅ 稳态区间';
+                    coneRiskStatus.style.background = 'rgba(34,197,94,0.1)';
+                    coneRiskStatus.style.color = '#22c55e';
+                } else {
+                    coneRiskStatus.textContent = '🔵 保本以下';
+                    coneRiskStatus.style.background = 'rgba(96,165,250,0.1)';
+                    coneRiskStatus.style.color = '#60a5fa';
+                }
+            }
+
             function drawCone() {
                 ctx.clearRect(0, 0, w, h);
 
@@ -3025,7 +3266,7 @@
                 ctx.font = '12px sans-serif';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'top';
-                ctx.fillText('⬆ 中轴线 = 无风险利率基准', centerX, topY - 24);
+                ctx.fillText('⬆ 中轴线 = 稳态中轴', centerX, topY - 24);
 
                 const layers = [
                     { ratio: layerBottom / 2, label: '超低价引流', color: 'rgba(251,146,60,0.5)' },
@@ -3062,6 +3303,62 @@
                     ctx.fillText(layer.label, labelX + 6, labelY);
                 });
 
+                const C = calculateConcentration();
+                const hRatio = coneH;
+                const rAtH = getRadiusAtHeight(hRatio);
+                const yAtH = bottomY - hRatio * coneHeight;
+
+                let ballColor, ballGlow;
+                if (C >= 0.68) {
+                    ballColor = 'rgba(239,68,68,0.6)';
+                    ballGlow = 'rgba(239,68,68,0.3)';
+                } else if (C >= 0.50) {
+                    ballColor = 'rgba(250,204,21,0.6)';
+                    ballGlow = 'rgba(250,204,21,0.3)';
+                } else {
+                    ballColor = 'rgba(34,197,94,0.6)';
+                    ballGlow = 'rgba(34,197,94,0.3)';
+                }
+
+                const ballRadius = Math.min(rAtH * 0.6, 40 + C * 30);
+                const gradient = ctx.createRadialGradient(centerX, yAtH, 0, centerX, yAtH, ballRadius * 1.5);
+                gradient.addColorStop(0, ballColor);
+                gradient.addColorStop(0.5, ballGlow);
+                gradient.addColorStop(1, 'rgba(0,0,0,0)');
+                ctx.fillStyle = gradient;
+                ctx.beginPath();
+                ctx.ellipse(centerX, yAtH, ballRadius * 1.5, ballRadius * 0.8, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = ballColor;
+                ctx.beginPath();
+                ctx.ellipse(centerX, yAtH, ballRadius * 0.6, ballRadius * 0.3, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.strokeStyle = 'rgba(239,68,68,0.6)';
+                ctx.lineWidth = 2;
+                ctx.setLineDash([4, 4]);
+                const r68 = getRadiusAtHeight(0.68);
+                const y68 = bottomY - 0.68 * coneHeight;
+                ctx.beginPath();
+                for (let j = 0; j <= 60; j++) {
+                    const t = j / 60;
+                    const angle = t * Math.PI * 2;
+                    const x = centerX + r68 * Math.cos(angle);
+                    const z = r68 * Math.sin(angle) * 0.35;
+                    const drawY = y68 + z * 0.4;
+                    j === 0 ? ctx.moveTo(x, drawY) : ctx.lineTo(x, drawY);
+                }
+                ctx.closePath();
+                ctx.stroke();
+                ctx.setLineDash([]);
+
+                ctx.fillStyle = 'rgba(239,68,68,0.7)';
+                ctx.font = '10px sans-serif';
+                ctx.textAlign = 'left';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('⚠ 0.68 熔断线', centerX + r68 * 0.6 + 4, y68);
+
                 ctx.fillStyle = 'rgba(255,255,255,0.08)';
                 ctx.font = '10px sans-serif';
                 ctx.textAlign = 'center';
@@ -3078,7 +3375,7 @@
                 ctx.font = '13px sans-serif';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
-                ctx.fillText('圆锥容积 = 品牌总商业价值（多维复合体）', centerX, bottomY - coneHeight / 2);
+                ctx.fillText('圆锥容积 = 市场总容量 V(h)', centerX, bottomY - coneHeight / 2);
 
                 ctx.fillStyle = 'rgba(255,255,255,0.04)';
                 ctx.font = '10px sans-serif';
@@ -3088,13 +3385,13 @@
                 ctx.fillStyle = 'rgba(255,255,255,0.02)';
                 ctx.font = '9px sans-serif';
                 ctx.textAlign = 'right';
-                ctx.fillText('= 原生价值', 20, bottomY - coneHeight / 2 + 16);
+                ctx.fillText('= 赛道层级', 20, bottomY - coneHeight / 2 + 16);
 
                 const legendY = h - 30;
                 const legendItems = [
-                    { label: '超低价引流', color: 'rgba(251,146,60,0.5)' },
-                    { label: '保本圈层', color: 'rgba(250,204,21,0.5)' },
-                    { label: '高价精品', color: 'rgba(167,139,250,0.5)' }
+                    { label: '浓度球 C', color: ballColor },
+                    { label: '0.68熔断', color: 'rgba(239,68,68,0.6)' },
+                    { label: '稳态中轴', color: 'rgba(250,204,21,0.5)' }
                 ];
                 let legendX = w * 0.55;
                 ctx.textAlign = 'left';
@@ -3105,10 +3402,20 @@
                     ctx.fillStyle = 'rgba(255,255,255,0.15)';
                     ctx.font = '10px sans-serif';
                     ctx.fillText(item.label, legendX + 16, legendY + 1);
-                    legendX += 90;
+                    legendX += 80;
                 });
             }
 
+            if (coneHInput) {
+                coneHInput.addEventListener('input', function() {
+                    coneH = parseFloat(this.value);
+                    coneHVal.textContent = coneH.toFixed(2);
+                    updateConcentrationDisplay();
+                    drawCone();
+                });
+            }
+
+            updateConcentrationDisplay();
             drawCone();
             window.addEventListener('resize', drawCone);
         })();
@@ -3565,29 +3872,26 @@
                 const funnel = getFunnelOverride();
 
                 if (funnel) {
-                    // 漏斗接管：覆盖滑块值
                     theory   = funnel.Rf;
                     ai       = funnel.Rp;
                     practice = funnel.beta;
 
-                    // 同步滑块视觉位置（让用户看到被覆盖后的值）
                     theoryInput.value   = Math.min(parseFloat(theoryInput.max),   Math.max(parseFloat(theoryInput.min),   theory));
                     aiInput.value       = Math.min(parseFloat(aiInput.max),       Math.max(parseFloat(aiInput.min),       ai));
                     practiceInput.value = Math.min(parseFloat(practiceInput.max), Math.max(parseFloat(practiceInput.min),   practice));
 
-                    // 显示漏斗接管提示
-                    const banner = ensureBanner();
-                    if (banner) {
-                        banner.style.display = 'block';
-                        banner.innerHTML = `🔭 漏斗接管中 · ${funnel.domain} · ${funnel.marketType} · ${new Date(funnel.timestamp).toLocaleTimeString()}`;
+                    const funnelStatusBar = document.getElementById('funnelStatusBar');
+                    const funnelStatusInfo = document.getElementById('funnelStatusInfo');
+                    if (funnelStatusBar) funnelStatusBar.style.display = 'block';
+                    if (funnelStatusInfo) {
+                        funnelStatusInfo.textContent = `${funnel.domain || '—'} · ${funnel.marketType || '—'} · ${new Date(funnel.timestamp).toLocaleTimeString()}`;
                     }
                 } else {
-                    // 手动模式：读滑块
                     theory   = parseFloat(theoryInput.value);
                     ai       = parseFloat(aiInput.value);
                     practice = parseFloat(practiceInput.value);
-                    const banner = ensureBanner();
-                    if (banner) banner.style.display = 'none';
+                    const funnelStatusBar = document.getElementById('funnelStatusBar');
+                    if (funnelStatusBar) funnelStatusBar.style.display = 'none';
                 }
 
                 theoryVal.textContent = theory.toFixed(2);
@@ -3598,10 +3902,22 @@
                 aiContribution.textContent = ai.toFixed(2) + '%';
                 practiceContribution.textContent = practice.toFixed(2) + '%';
 
-                // 计算基础成功值
-                let success = theory + ai * practice;
+                let baseSuccess = theory + ai * practice;
 
-                // L7 国家意志兜底收敛
+                let concentration = 0.50;
+                if (typeof window.getConcentration === 'function') {
+                    concentration = window.getConcentration();
+                }
+                const concentrationFactor = concentration / 0.50;
+                const clampedFactor = Math.min(2.0, Math.max(0.2, concentrationFactor));
+
+                const concentrationFactorEl = document.getElementById('concentrationFactor');
+                if (concentrationFactorEl) {
+                    concentrationFactorEl.textContent = clampedFactor.toFixed(2) + 'x';
+                }
+
+                let success = baseSuccess * clampedFactor;
+
                 if (funnel && funnel.L7_finalClip && funnel.L7_finalClip < 1.0) {
                     success = success * funnel.L7_finalClip;
                 }
@@ -3724,6 +4040,368 @@
             setTimeout(updateKelly, 200);
             window.updateKelly = updateKelly;
         })();
+
+        // ================================================================
+        // ===== 6维风险向量计算引擎 =====
+        // ================================================================
+        (function() {
+            const kellyInput = document.getElementById('kellyInput');
+            const leverageInput = document.getElementById('leverageInput');
+            const sharpeInput = document.getElementById('sharpeInput');
+            const mddInput = document.getElementById('mddInput');
+            const dimInput = document.getElementById('dimInput');
+            const ocInput = document.getElementById('ocInput');
+
+            const kellyVal = document.getElementById('kellyVal');
+            const leverageVal = document.getElementById('leverageVal');
+            const sharpeVal = document.getElementById('sharpeVal');
+            const mddVal = document.getElementById('mddVal');
+            const dimVal = document.getElementById('dimVal');
+            const ocVal = document.getElementById('ocVal');
+
+            const vecMagnitude = document.getElementById('vecMagnitude');
+            const vecCosine = document.getElementById('vecCosine');
+            const vecReturn = document.getElementById('vecReturn');
+            const vecRp = document.getElementById('vecRp');
+            const vecAdvice = document.getElementById('vecAdvice');
+
+            const V_opt = [0.65, 3.0, 3.5, 0.30, 0.75, 0.40];
+
+            function calcVectorMag(v) {
+                return Math.sqrt(v[0]*v[0] + v[1]*v[1] + v[2]*v[2] + v[3]*v[3] + v[4]*v[4] + v[5]*v[5]);
+            }
+
+            function calcDot(a, b) {
+                return a[0]*b[0] + a[1]*b[1] + a[2]*b[2] + a[3]*b[3] + a[4]*b[4] + a[5]*b[5];
+            }
+
+            function updateRiskVector() {
+                const f_star = parseFloat(kellyInput.value);
+                const L = parseFloat(leverageInput.value);
+                const SR = parseFloat(sharpeInput.value);
+                const mdd = parseFloat(mddInput.value);
+                const dim = parseFloat(dimInput.value);
+                const oc = parseFloat(ocInput.value);
+
+                kellyVal.textContent = f_star.toFixed(2);
+                leverageVal.textContent = L.toFixed(1);
+                sharpeVal.textContent = SR.toFixed(1);
+                mddVal.textContent = mdd.toFixed(2);
+                dimVal.textContent = dim.toFixed(2);
+                ocVal.textContent = oc.toFixed(2);
+
+                const V = [f_star, L, SR, mdd, dim, oc];
+
+                const magV = calcVectorMag(V);
+                const magOpt = calcVectorMag(V_opt);
+                const dotProd = calcDot(V, V_opt);
+                const cosTheta = dotProd / (magV * magOpt);
+
+                const scaledReturn = magV * cosTheta * 0.05;
+                const Rp = scaledReturn * 100;
+
+                vecMagnitude.textContent = magV.toFixed(3);
+                vecCosine.textContent = cosTheta.toFixed(3);
+                vecReturn.textContent = (scaledReturn * 100).toFixed(2) + '%';
+                vecRp.textContent = Rp.toFixed(2) + '%';
+
+                window.vectorMagnitude = magV;
+                window.vectorRp = Rp;
+
+                let advice = '';
+                let adviceColor = '#22c55e';
+
+                if (cosTheta > 0.95) {
+                    advice = '🚀 <strong>最优向量对齐！</strong>风险收益结构接近理论最优，建议全力推进。';
+                    adviceColor = '#22c55e';
+                } else if (cosTheta > 0.85) {
+                    advice = '✅ <strong>向量方向良好。</strong>整体结构健康，可适度调整个别维度优化收益。';
+                    adviceColor = '#22c55e';
+                } else if (cosTheta > 0.70) {
+                    advice = '⚖️ <strong>中性区间。</strong>建议调整杠杆或夏普比率以提升组合效率。';
+                    adviceColor = '#facc15';
+                } else {
+                    advice = '⚠️ <strong>向量偏离较大。</strong>风险收益结构不合理，建议重新审视参数配置。';
+                    adviceColor = '#f87171';
+                }
+
+                vecAdvice.innerHTML = '💡 ' + advice;
+                vecAdvice.style.borderLeftColor = adviceColor;
+
+                if (typeof updateConeFromVector === 'function') {
+                    updateConeFromVector(magV);
+                }
+
+                if (typeof window.updateFormula === 'function') {
+                    window.updateFormula();
+                }
+
+                if (typeof updateRiskFuse === 'function') {
+                    updateRiskFuse();
+                }
+            }
+
+            if (kellyInput) {
+                kellyInput.addEventListener('input', updateRiskVector);
+                leverageInput.addEventListener('input', updateRiskVector);
+                sharpeInput.addEventListener('input', updateRiskVector);
+                mddInput.addEventListener('input', updateRiskVector);
+                dimInput.addEventListener('input', updateRiskVector);
+                ocInput.addEventListener('input', updateRiskVector);
+                updateRiskVector();
+            }
+
+            window.updateRiskVector = updateRiskVector;
+        })();
+
+        // ================================================================
+        // ===== 圆锥浓度计算引擎（增强版） =====
+        // ================================================================
+        (function() {
+            const coneHInput = document.getElementById('coneHInput');
+            const coneHVal = document.getElementById('coneHVal');
+            const coneRhoVal = document.getElementById('coneRhoVal');
+            const coneMVal = document.getElementById('coneMVal');
+            const coneCVal = document.getElementById('coneCVal');
+            const coneRiskStatus = document.getElementById('coneRiskStatus');
+
+            window.updateConeFromVector = function(magV) {
+                if (coneMVal) {
+                    coneMVal.textContent = magV.toFixed(2);
+                }
+            };
+
+            window.getConcentration = function() {
+                const coneCValEl = document.getElementById('coneCVal');
+                if (coneCValEl) {
+                    const text = coneCValEl.textContent;
+                    const parsed = parseFloat(text);
+                    if (!isNaN(parsed)) return parsed;
+                }
+                return 0.50;
+            };
+
+            function updateRiskFuseDisplay() {
+                const riskConc = document.getElementById('riskConc');
+                const riskIndex = document.getElementById('riskIndex');
+                const riskStatus = document.getElementById('riskStatus');
+                const riskPosition = document.getElementById('riskPosition');
+                const riskAdvice = document.getElementById('riskAdvice');
+
+                if (!riskConc) return;
+
+                const C = window.getConcentration();
+                const practiceInput = document.getElementById('practiceInput');
+                let beta = 1.0;
+                if (practiceInput) beta = parseFloat(practiceInput.value);
+
+                const riskIdx = beta * Math.abs(C - 0.50) * 5;
+
+                riskConc.textContent = C.toFixed(3);
+
+                if (riskIndex) riskIndex.textContent = riskIdx.toFixed(2);
+
+                let status = '';
+                let statusColor = '#22c55e';
+                let position = '';
+                let advice = '';
+
+                if (C > 0.68) {
+                    status = '🔴 熔断';
+                    statusColor = '#f87171';
+                    position = '0%';
+                    advice = '🚫 <strong>浓度超过0.68熔断线！</strong>基于正态分布1σ临界值，浓度必然扩散回落。立即停止新增资源，等待自然回落至安全区间。';
+                } else if (C >= 0.50) {
+                    status = '🟡 警告';
+                    statusColor = '#facc15';
+                    position = '50%';
+                    advice = '📉 <strong>浓度处于边际递减区间。</strong>收益效率开始下降，建议缩减50%投放规模，避免过度拥挤。';
+                } else if (C >= 0.48) {
+                    status = '🟢 安全';
+                    statusColor = '#22c55e';
+                    position = '100%';
+                    advice = '🎯 <strong>浓度处于保本中轴线区间。</strong>市场均衡状态最佳，可主力重仓，按计划投放资源。';
+                } else {
+                    status = '🔵 过低';
+                    statusColor = '#60a5fa';
+                    position = '20%';
+                    advice = '📊 <strong>浓度低于保本线。</strong>市场参与度不足，建议小仓位试探，观察市场反应后再决定是否加仓。';
+                }
+
+                if (riskStatus) {
+                    riskStatus.textContent = status;
+                    riskStatus.style.color = statusColor;
+                }
+                if (riskPosition) riskPosition.textContent = position;
+                if (riskAdvice) {
+                    riskAdvice.innerHTML = '💡 ' + advice;
+                    riskAdvice.style.borderLeftColor = statusColor;
+                }
+            }
+
+            window.updateRiskFuse = updateRiskFuseDisplay;
+
+            const targetNode = document.getElementById('coneCVal');
+            if (targetNode) {
+                const observer = new MutationObserver(function() {
+                    clearTimeout(window._riskFuseTimer);
+                    window._riskFuseTimer = setTimeout(updateRiskFuseDisplay, 100);
+                });
+                observer.observe(targetNode, { childList: true, characterData: true, subtree: true });
+            }
+
+            setTimeout(updateRiskFuseDisplay, 300);
+        })();
+
+        // ================================================================
+        // ===== 漏斗对接引擎 =====
+        // ================================================================
+        (function() {
+            const capmModeToggle = document.getElementById('capmModeToggle');
+            const capmModeLabel = document.getElementById('capmModeLabel');
+            const funnelStatusBar = document.getElementById('funnelStatusBar');
+            const funnelStatusInfo = document.getElementById('funnelStatusInfo');
+
+            function isFunnelMode() {
+                return localStorage.getItem('capmAutoMode') === 'true';
+            }
+
+            function setFunnelMode(enabled) {
+                localStorage.setItem('capmAutoMode', enabled ? 'true' : 'false');
+                updateModeDisplay();
+                if (typeof window.updateFormula === 'function') {
+                    window.updateFormula();
+                }
+                window.dispatchEvent(new CustomEvent('funnel-bus-update'));
+            }
+
+            function updateModeDisplay() {
+                const funnelMode = isFunnelMode();
+                if (capmModeLabel) {
+                    capmModeLabel.textContent = funnelMode ? '漏斗接管' : '手动模式';
+                    capmModeLabel.style.color = funnelMode ? '#a78bfa' : 'rgba(255,255,255,0.3)';
+                }
+                if (capmModeToggle) {
+                    capmModeToggle.textContent = funnelMode ? '切换手动' : '切换漏斗接管';
+                }
+                if (funnelStatusBar) {
+                    funnelStatusBar.style.display = funnelMode ? 'block' : 'none';
+                }
+
+                if (funnelMode && funnelStatusInfo) {
+                    try {
+                        const funnel = JSON.parse(localStorage.getItem('funnelOutput') || 'null');
+                        if (funnel && funnel.timestamp) {
+                            funnelStatusInfo.textContent = `${funnel.domain || '—'} · ${funnel.marketType || '—'} · ${new Date(funnel.timestamp).toLocaleTimeString()}`;
+                        } else {
+                            funnelStatusInfo.textContent = '等待漏斗数据...';
+                        }
+                    } catch(e) {
+                        funnelStatusInfo.textContent = '数据解析失败';
+                    }
+                }
+            }
+
+            function applyFunnelToVector(funnel) {
+                if (!funnel) return;
+
+                const kellyInput = document.getElementById('kellyInput');
+                const leverageInput = document.getElementById('leverageInput');
+                const sharpeInput = document.getElementById('sharpeInput');
+                const mddInput = document.getElementById('mddInput');
+                const dimInput = document.getElementById('dimInput');
+                const ocInput = document.getElementById('ocInput');
+
+                if (funnel.L3_grade) {
+                    let rho0 = 0.7;
+                    if (funnel.L3_grade === 'primary') rho0 = 0.95;
+                    else if (funnel.L3_grade === 'secondary') rho0 = 0.65;
+                    else if (funnel.L3_grade === 'tertiary') rho0 = 0.25;
+                    window.funnelRho0 = rho0;
+
+                    const coneRhoVal = document.getElementById('coneRhoVal');
+                    if (coneRhoVal) coneRhoVal.textContent = rho0.toFixed(2);
+                }
+
+                if (funnel.L6_riskIndex !== undefined) {
+                    const coneHInput = document.getElementById('coneHInput');
+                    if (coneHInput) {
+                        const h = Math.min(0.9, Math.max(0.2, 0.3 + funnel.L6_riskIndex * 0.4));
+                        coneHInput.value = h.toFixed(2);
+                        const coneHVal = document.getElementById('coneHVal');
+                        if (coneHVal) coneHVal.textContent = h.toFixed(2);
+                    }
+                }
+
+                if (kellyInput && funnel.vectorKelly !== undefined) {
+                    kellyInput.value = Math.min(0.80, Math.max(0.05, funnel.vectorKelly));
+                }
+                if (leverageInput && funnel.vectorLeverage !== undefined) {
+                    leverageInput.value = Math.min(4.0, Math.max(0.5, funnel.vectorLeverage));
+                }
+                if (sharpeInput && funnel.vectorSharpe !== undefined) {
+                    sharpeInput.value = Math.min(4.0, Math.max(0.2, funnel.vectorSharpe));
+                }
+                if (mddInput && funnel.vectorMdd !== undefined) {
+                    mddInput.value = Math.min(0.60, Math.max(0.05, funnel.vectorMdd));
+                }
+                if (dimInput && funnel.vectorDim !== undefined) {
+                    dimInput.value = Math.min(0.90, Math.max(0.10, funnel.vectorDim));
+                }
+                if (ocInput && funnel.vectorOc !== undefined) {
+                    ocInput.value = Math.min(0.70, Math.max(0.05, funnel.vectorOc));
+                }
+
+                if (typeof window.updateRiskVector === 'function') {
+                    window.updateRiskVector();
+                }
+            }
+
+            window.getFunnelData = function() {
+                if (!isFunnelMode()) return null;
+                try {
+                    const funnel = JSON.parse(localStorage.getItem('funnelOutput') || 'null');
+                    if (!funnel || !funnel.timestamp) return null;
+                    const ageMin = (Date.now() - funnel.timestamp) / 60000;
+                    if (ageMin > 30) return null;
+                    return funnel;
+                } catch(e) { return null; }
+            };
+
+            if (capmModeToggle) {
+                capmModeToggle.addEventListener('click', function() {
+                    setFunnelMode(!isFunnelMode());
+                });
+            }
+
+            window.addEventListener('storage', function(e) {
+                if (e.key === 'funnelOutput' || e.key === 'capmAutoMode') {
+                    updateModeDisplay();
+                    if (isFunnelMode()) {
+                        const funnel = window.getFunnelData();
+                        applyFunnelToVector(funnel);
+                    }
+                }
+            });
+
+            window.addEventListener('funnel-bus-update', function() {
+                updateModeDisplay();
+                if (isFunnelMode()) {
+                    const funnel = window.getFunnelData();
+                    applyFunnelToVector(funnel);
+                }
+            });
+
+            updateModeDisplay();
+
+            if (isFunnelMode()) {
+                setTimeout(function() {
+                    const funnel = window.getFunnelData();
+                    applyFunnelToVector(funnel);
+                }, 200);
+            }
+        })();
+
     </script>
 
 </body>
