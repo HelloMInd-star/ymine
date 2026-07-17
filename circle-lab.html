@@ -2105,11 +2105,14 @@
             grid-template-columns: 1fr 1fr;
             gap: 16px;
         }
+        .js-options.js-options-3 {
+            grid-template-columns: 1fr 1fr 1fr;
+        }
         .js-option {
             background: rgba(255, 255, 255, 0.02);
             border: 1px solid rgba(255, 255, 255, 0.05);
             border-radius: 14px;
-            padding: 24px 20px;
+            padding: 22px 18px;
             text-align: center;
             cursor: pointer;
             transition: all 0.25s ease;
@@ -2130,15 +2133,57 @@
             background: rgba(167, 139, 250, 0.04);
         }
         .js-option:hover::before { opacity: 1; }
-        .js-option.selected {
+
+        /* 决策风格三选：紫/青/灰 */
+        .js-option.js-style.selected[data-style="decisive"] {
+            border-color: rgba(167, 139, 250, 0.7);
+            background: rgba(167, 139, 250, 0.1);
+            box-shadow: 0 0 30px rgba(167, 139, 250, 0.18);
+        }
+        .js-option.js-style.selected[data-style="range"] {
+            border-color: rgba(45, 212, 191, 0.7);
+            background: rgba(45, 212, 191, 0.1);
+            box-shadow: 0 0 30px rgba(45, 212, 191, 0.18);
+        }
+        .js-option.js-style.selected[data-style="avoidant"] {
+            border-color: rgba(148, 163, 184, 0.5);
+            background: rgba(148, 163, 184, 0.08);
+            box-shadow: 0 0 24px rgba(148, 163, 184, 0.12);
+        }
+
+        /* 第二步 · 蓝红选择沿用原配色 */
+        .js-option.js-judge.selected[data-judgment="blue"],
+        .js-option.js-judge.selected[data-judgment="blue-leaning"] {
             border-color: rgba(96, 165, 250, 0.6);
             background: rgba(96, 165, 250, 0.08);
             box-shadow: 0 0 30px rgba(96, 165, 250, 0.1);
         }
-        .js-option.selected.red {
+        .js-option.js-judge.selected[data-judgment="red"],
+        .js-option.js-judge.selected[data-judgment="red-leaning"] {
             border-color: rgba(248, 113, 113, 0.6);
             background: rgba(248, 113, 113, 0.08);
             box-shadow: 0 0 30px rgba(248, 113, 113, 0.1);
+        }
+        .js-option.js-judge.selected[data-judgment="neutral"] {
+            border-color: rgba(250, 204, 21, 0.55);
+            background: rgba(250, 204, 21, 0.08);
+            box-shadow: 0 0 30px rgba(250, 204, 21, 0.12);
+        }
+        .js-option.js-judge.selected {
+            border-color: rgba(96, 165, 250, 0.6);
+            background: rgba(96, 165, 250, 0.08);
+            box-shadow: 0 0 30px rgba(96, 165, 250, 0.1);
+        }
+
+        .js-sub-question {
+            margin-top: 18px;
+            padding-top: 18px;
+            border-top: 1px dashed rgba(255, 255, 255, 0.06);
+            animation: fadeInUp 0.3s ease;
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(8px); }
+            to   { opacity: 1; transform: translateY(0); }
         }
         .jo-emoji {
             font-size: 40px;
@@ -3564,17 +3609,60 @@
             </div>
 
             <div class="js-question">
-                <div class="js-q-title">你当前的赛道 / 正在做的项目，你认为它处于：</div>
+                <div class="js-q-title">第一步 · 你愿意现在就给自己的赛道下个判断吗？</div>
+                <div class="js-options js-options-3">
+                    <div class="js-option js-style" data-style="decisive">
+                        <div class="jo-emoji">⚡</div>
+                        <div class="jo-label">愿意选</div>
+                        <div class="jo-desc">有判断 · 敢表态 · 愿承担</div>
+                    </div>
+                    <div class="js-option js-style" data-style="range">
+                        <div class="jo-emoji">📊</div>
+                        <div class="jo-label">给个区间</div>
+                        <div class="jo-desc">谨慎 · 不走极端 · 保留余地</div>
+                    </div>
+                    <div class="js-option js-style" data-style="avoidant">
+                        <div class="jo-emoji">🤔</div>
+                        <div class="jo-label">暂不判断</div>
+                        <div class="jo-desc">信息不足 · 再观察</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 第二步：根据决策风格展开不同的下钻选项 -->
+            <div class="js-question js-sub-question" id="jsDecisiveBlock" style="display:none;">
+                <div class="js-q-title">第二步 · 那你认为是蓝海还是红海？</div>
                 <div class="js-options">
-                    <div class="js-option" data-judgment="blue">
+                    <div class="js-option js-judge" data-judgment="blue">
                         <div class="jo-emoji">🌊</div>
                         <div class="jo-label">蓝海市场</div>
                         <div class="jo-desc">竞争少 · 需求未被满足 · 高增长</div>
                     </div>
-                    <div class="js-option" data-judgment="red">
+                    <div class="js-option js-judge" data-judgment="red">
                         <div class="jo-emoji">🔥</div>
                         <div class="jo-label">红海市场</div>
                         <div class="jo-desc">竞争激烈 · 需求饱和 · 价格战</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="js-question js-sub-question" id="jsRangeBlock" style="display:none;">
+                <div class="js-q-title">第二步 · 你的赛道更靠近哪一端？</div>
+                <div class="js-options js-options-3">
+                    <div class="js-option js-judge js-range-blue" data-judgment="blue-leaning">
+                        <div class="jo-emoji">🌊</div>
+                        <div class="jo-label">偏蓝海</div>
+                        <div class="jo-desc">蓝海为主 · 偶有竞争</div>
+                    </div>
+                    <div class="js-option js-judge js-range-mid" data-judgment="neutral">
+                        <div class="jo-emoji">⚖️</div>
+                        <div class="jo-label">中性区间</div>
+                        <div class="jo-desc">蓝红交错 · 难以一刀切</div>
+                    </div>
+                    <div class="js-option js-judge js-range-red" data-judgment="red-leaning">
+                        <div class="jo-emoji">🔥</div>
+                        <div class="jo-label">偏红海</div>
+                        <div class="jo-desc">红海为主 · 仍有缝隙</div>
                     </div>
                 </div>
             </div>
@@ -3593,6 +3681,10 @@
 
             <div class="js-result" id="jsResult" style="display:none;">
                 <div class="jr-card">
+                    <div class="jr-label">决策风格</div>
+                    <div class="jr-value" id="jrStyle">—</div>
+                </div>
+                <div class="jr-card">
                     <div class="jr-label">你的预判</div>
                     <div class="jr-value" id="jrJudgment">—</div>
                 </div>
@@ -3601,8 +3693,8 @@
                     <div class="jr-value" id="jrConfidence">—</div>
                 </div>
                 <div class="jr-card jr-hint">
-                    <div class="jr-label">认知校准</div>
-                    <div class="jr-desc">后面的供需模拟会给出数据验证，看看你的直觉和客观数据差多少。</div>
+                    <div class="jr-label">行动力评估</div>
+                    <div class="jr-desc" id="jrActionDesc">—</div>
                 </div>
             </div>
 
@@ -5587,35 +5679,100 @@
         // ===== 市场预判设问 · 创始人认知起点 ===== //
         // ============================================================ //
         (function() {
-            const options = document.querySelectorAll('.js-option');
+            const styleOptions = document.querySelectorAll('.js-option.js-style');
+            const judgeOptions = document.querySelectorAll('.js-option.js-judge');
+            const decisiveBlock = document.getElementById('jsDecisiveBlock');
+            const rangeBlock = document.getElementById('jsRangeBlock');
             const confidenceBlock = document.getElementById('jsConfidenceBlock');
             const confidenceSlider = document.getElementById('jsConfidenceSlider');
             const confidenceVal = document.getElementById('jsConfidenceVal');
             const resultBlock = document.getElementById('jsResult');
+            const jrStyle = document.getElementById('jrStyle');
             const jrJudgment = document.getElementById('jrJudgment');
             const jrConfidence = document.getElementById('jrConfidence');
+            const jrActionDesc = document.getElementById('jrActionDesc');
             const nextBtn = document.getElementById('jsNextBtn');
 
-            if (!options.length) return;
+            if (!styleOptions.length) return;
 
-            let selectedJudgment = null;
+            // 决策风格 → 行动力评分（0-1）+ 描述
+            const STYLE_PROFILES = {
+                decisive: {
+                    label: '⚡ 决断型',
+                    color: '#a78bfa',
+                    actionScore: 0.95,
+                    desc: '敢表态、愿承担，符合创业者的核心特质。后续模拟会验证你的判断准不准。'
+                },
+                range: {
+                    label: '📊 谨慎型',
+                    color: '#2dd4be',
+                    actionScore: 0.65,
+                    desc: '不走极端、留有余地。优势是不易翻车，劣势是可能错过窗口期。'
+                },
+                avoidant: {
+                    label: '🤔 回避型',
+                    color: '#94a3b8',
+                    actionScore: 0.25,
+                    desc: '选择"再观察"。在创业语境下，长期回避决策本身就是一种高风险行为。'
+                }
+            };
+
+            // 预判类型 → 显示文本 + 颜色
+            const JUDGE_LABELS = {
+                'blue':         { text: '🌊 蓝海市场',    color: '#60a5fa', polarity: 'blue',  strength: 1.0 },
+                'red':          { text: '🔥 红海市场',    color: '#f87171', polarity: 'red',   strength: 1.0 },
+                'blue-leaning': { text: '🌊 偏蓝海',      color: '#60a5fa', polarity: 'blue',  strength: 0.5 },
+                'neutral':      { text: '⚖️ 中性区间',    color: '#facc15', polarity: 'mid',   strength: 0.0 },
+                'red-leaning':  { text: '🔥 偏红海',      color: '#f87171', polarity: 'red',   strength: 0.5 }
+            };
+
+            let selectedStyle = null;      // decisive / range / avoidant
+            let selectedJudgment = null;  // blue / red / blue-leaning / neutral / red-leaning
             let confidence = 50;
 
-            options.forEach(opt => {
+            // 第一步：选择决策风格
+            styleOptions.forEach(opt => {
                 opt.addEventListener('click', function() {
-                    const type = this.getAttribute('data-judgment');
-                    selectedJudgment = type;
+                    selectedStyle = this.getAttribute('data-style');
 
-                    options.forEach(o => {
-                        o.classList.remove('selected', 'red');
-                    });
+                    styleOptions.forEach(o => o.classList.remove('selected'));
                     this.classList.add('selected');
-                    if (type === 'red') this.classList.add('red');
 
-                    confidenceBlock.style.display = 'block';
-                    resultBlock.style.display = 'flex';
+                    // 重置下钻选项
+                    judgeOptions.forEach(o => o.classList.remove('selected'));
+                    selectedJudgment = null;
+
+                    // 切换下钻区块显示
+                    decisiveBlock.style.display = (selectedStyle === 'decisive') ? 'block' : 'none';
+                    rangeBlock.style.display = (selectedStyle === 'range') ? 'block' : 'none';
+
+                    // 回避型不需要信心滑块，直接出结果
+                    if (selectedStyle === 'avoidant') {
+                        confidenceBlock.style.display = 'none';
+                        resultBlock.style.display = 'flex';
+                        nextBtn.disabled = false;
+                    } else {
+                        confidenceBlock.style.display = 'block';
+                        resultBlock.style.display = 'none';
+                        nextBtn.disabled = true;
+                    }
+
                     updateResult();
-                    checkNext();
+                    saveJudgment();
+                });
+            });
+
+            // 第二步：选择蓝海/红海 或 区间
+            judgeOptions.forEach(opt => {
+                opt.addEventListener('click', function() {
+                    selectedJudgment = this.getAttribute('data-judgment');
+                    const block = this.closest('.js-sub-question');
+                    block.querySelectorAll('.js-judge').forEach(o => o.classList.remove('selected'));
+                    this.classList.add('selected');
+
+                    resultBlock.style.display = 'flex';
+                    nextBtn.disabled = false;
+                    updateResult();
                     saveJudgment();
                 });
             });
@@ -5628,24 +5785,40 @@
             });
 
             function updateResult() {
-                if (!selectedJudgment) return;
-                jrJudgment.textContent = selectedJudgment === 'blue' ? '🌊 蓝海市场' : '🔥 红海市场';
-                jrJudgment.style.color = selectedJudgment === 'blue' ? '#60a5fa' : '#f87171';
-                jrConfidence.textContent = confidence + '%';
-            }
+                const profile = STYLE_PROFILES[selectedStyle];
+                if (!profile) return;
+                jrStyle.textContent = profile.label;
+                jrStyle.style.color = profile.color;
 
-            function checkNext() {
                 if (selectedJudgment) {
-                    nextBtn.disabled = false;
+                    const j = JUDGE_LABELS[selectedJudgment];
+                    jrJudgment.textContent = j.text;
+                    jrJudgment.style.color = j.color;
+                    jrConfidence.textContent = confidence + '%';
+                } else if (selectedStyle === 'avoidant') {
+                    jrJudgment.textContent = '—';
+                    jrJudgment.style.color = '#94a3b8';
+                    jrConfidence.textContent = '—';
+                } else {
+                    jrJudgment.textContent = '待选';
+                    jrJudgment.style.color = 'rgba(255,255,255,0.3)';
+                    jrConfidence.textContent = '—';
                 }
+
+                jrActionDesc.textContent = profile.desc;
             }
 
             function saveJudgment() {
-                if (!selectedJudgment) return;
+                if (!selectedStyle) return;
+                const profile = STYLE_PROFILES[selectedStyle];
                 window.circleLabData = window.circleLabData || {};
                 window.circleLabData.judgment = {
+                    style: selectedStyle,
                     type: selectedJudgment,
-                    confidence: confidence / 100,
+                    polarity: selectedJudgment ? JUDGE_LABELS[selectedJudgment].polarity : null,
+                    strength: selectedJudgment ? JUDGE_LABELS[selectedJudgment].strength : 0,
+                    confidence: selectedStyle === 'avoidant' ? 0 : confidence / 100,
+                    actionScore: profile.actionScore,
                     hasData: true
                 };
                 if (typeof window.updateCircleLabMatch === 'function') {
@@ -6513,20 +6686,36 @@
                         const blueScore = mk.blueProfit * 0.6 + mk.blueStability * 0.4;
                         const redScore = mk.redProfit * 0.6 + mk.redStability * 0.4;
                         const gap = Math.abs(blueScore - redScore) / Math.max(blueScore, redScore, 0.01);
+                        const actualPolarity = blueScore > redScore ? 'blue' : 'red';
 
-                        let correct = false;
-                        if (judgment.type === 'blue' && blueScore > redScore) correct = true;
-                        if (judgment.type === 'red' && redScore > blueScore) correct = true;
+                        let accuracyScore = 50; // 中性基线
 
-                        const confidence = judgment.confidence;
-                        let accuracyScore;
-                        if (correct) {
-                            accuracyScore = 50 + 50 * (0.5 + confidence * 0.5) * Math.min(1, gap * 2);
-                        } else {
-                            accuracyScore = Math.max(0, 50 - 40 * (0.5 + confidence * 0.5) * Math.min(1, gap * 2));
+                        if (judgment.style === 'avoidant') {
+                            // 回避型：市场差距越大，错失越多，准确度越低
+                            accuracyScore = Math.max(15, 50 - gap * 60);
+                        } else if (judgment.style === 'range') {
+                            // 谨慎型：polarity 命中加分，strength 越低风险越小
+                            const polarityCorrect = (judgment.polarity === actualPolarity);
+                            const strength = judgment.strength; // 0=中性, 0.5=偏一端
+                            if (judgment.polarity === 'mid') {
+                                // 选中性区间：市场差距越小，越准
+                                accuracyScore = 50 + (1 - Math.min(1, gap * 2)) * 30;
+                            } else if (polarityCorrect) {
+                                accuracyScore = 50 + 35 * (0.5 + judgment.confidence * 0.5) * Math.min(1, gap * 3);
+                            } else {
+                                accuracyScore = Math.max(20, 50 - 25 * (0.5 + judgment.confidence * 0.5) * Math.min(1, gap * 3));
+                            }
+                        } else if (judgment.style === 'decisive') {
+                            // 决断型：直接判断蓝/红，对了高分错了低分
+                            const polarityCorrect = (judgment.polarity === actualPolarity);
+                            if (polarityCorrect) {
+                                accuracyScore = 50 + 50 * (0.5 + judgment.confidence * 0.5) * Math.min(1, gap * 2);
+                            } else {
+                                accuracyScore = Math.max(5, 50 - 40 * (0.5 + judgment.confidence * 0.5) * Math.min(1, gap * 2));
+                            }
                         }
 
-                        window.circleLabData.market.judgmentAccuracy = Math.min(100, accuracyScore) / 100;
+                        window.circleLabData.market.judgmentAccuracy = Math.min(100, Math.max(0, accuracyScore)) / 100;
                     }
                 }
             }
@@ -6830,13 +7019,23 @@
                     awarenessScore = 40;
                 }
 
-                const totalScore = Math.round(
+                let baseScore =
                     founderScore * 0.28 +
                     decisionScore * 0.22 +
                     marketScore * 0.18 +
                     executionScore * 0.12 +
-                    awarenessScore * 0.20
-                );
+                    awarenessScore * 0.20;
+
+                // 行动力前置修正：作为创业者的元特质，对总分做 ±15% 修正
+                // 决断型 ×1.05, 谨慎型 ×0.97, 回避型 ×0.82
+                let actionMultiplier = 1.0;
+                if (judgment.hasData && typeof judgment.actionScore === 'number') {
+                    // actionScore ∈ [0.25, 0.95]，映射到乘数 [0.82, 1.05]
+                    actionMultiplier = 0.82 + (judgment.actionScore - 0.25) * (0.23 / 0.70);
+                    actionMultiplier = Math.max(0.82, Math.min(1.05, actionMultiplier));
+                }
+
+                const totalScore = Math.round(Math.min(100, Math.max(0, baseScore * actionMultiplier)));
 
                 const colorClass = getColorClass(totalScore);
                 const strokeColor = getStrokeColor(totalScore);
