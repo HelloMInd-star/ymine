@@ -3534,10 +3534,61 @@
             const practiceContribution = document.getElementById('practiceContribution');
             const totalSuccess = document.getElementById('totalSuccess');
 
+            // ===== 读取漏斗覆盖状态 =====
+            function getFunnelOverride() {
+                const autoMode = localStorage.getItem('capmAutoMode') === 'true';
+                if (!autoMode) return null;
+                try {
+                    const funnel = JSON.parse(localStorage.getItem('funnelOutput') || 'null');
+                    if (!funnel || !funnel.timestamp) return null;
+                    // 30 分钟内的数据才有效
+                    const ageMin = (Date.now() - funnel.timestamp) / 60000;
+                    if (ageMin > 30) return null;
+                    return funnel;
+                } catch(e) { return null; }
+            }
+
+            // ===== 注入漏斗提示条 =====
+            let funnelBanner = null;
+            function ensureBanner() {
+                if (funnelBanner) return funnelBanner;
+                const totalSuccessEl = document.getElementById('totalSuccess');
+                if (!totalSuccessEl || !totalSuccessEl.parentElement) return null;
+                funnelBanner = document.createElement('div');
+                funnelBanner.style.cssText = 'display:none; font-size:11px; color:#a78bfa; background:rgba(167,139,250,0.06); border:1px solid rgba(167,139,250,0.15); border-radius:8px; padding:6px 12px; margin-top:8px; text-align:center;';
+                totalSuccessEl.parentElement.appendChild(funnelBanner);
+                return funnelBanner;
+            }
+
             window.updateFormula = function() {
-                const theory = parseFloat(theoryInput.value);
-                const ai = parseFloat(aiInput.value);
-                const practice = parseFloat(practiceInput.value);
+                let theory, ai, practice;
+                const funnel = getFunnelOverride();
+
+                if (funnel) {
+                    // 漏斗接管：覆盖滑块值
+                    theory   = funnel.Rf;
+                    ai       = funnel.Rp;
+                    practice = funnel.beta;
+
+                    // 同步滑块视觉位置（让用户看到被覆盖后的值）
+                    theoryInput.value   = Math.min(parseFloat(theoryInput.max),   Math.max(parseFloat(theoryInput.min),   theory));
+                    aiInput.value       = Math.min(parseFloat(aiInput.max),       Math.max(parseFloat(aiInput.min),       ai));
+                    practiceInput.value = Math.min(parseFloat(practiceInput.max), Math.max(parseFloat(practiceInput.min),   practice));
+
+                    // 显示漏斗接管提示
+                    const banner = ensureBanner();
+                    if (banner) {
+                        banner.style.display = 'block';
+                        banner.innerHTML = `🔭 漏斗接管中 · ${funnel.domain} · ${funnel.marketType} · ${new Date(funnel.timestamp).toLocaleTimeString()}`;
+                    }
+                } else {
+                    // 手动模式：读滑块
+                    theory   = parseFloat(theoryInput.value);
+                    ai       = parseFloat(aiInput.value);
+                    practice = parseFloat(practiceInput.value);
+                    const banner = ensureBanner();
+                    if (banner) banner.style.display = 'none';
+                }
 
                 theoryVal.textContent = theory.toFixed(2);
                 aiVal.textContent = ai.toFixed(2);
@@ -3547,7 +3598,14 @@
                 aiContribution.textContent = ai.toFixed(2) + '%';
                 practiceContribution.textContent = practice.toFixed(2) + '%';
 
-                const success = theory + ai * practice;
+                // 计算基础成功值
+                let success = theory + ai * practice;
+
+                // L7 国家意志兜底收敛
+                if (funnel && funnel.L7_finalClip && funnel.L7_finalClip < 1.0) {
+                    success = success * funnel.L7_finalClip;
+                }
+
                 totalSuccess.textContent = success.toFixed(2) + '%';
             };
 
@@ -3555,6 +3613,14 @@
             aiInput.addEventListener('input', window.updateFormula);
             practiceInput.addEventListener('input', window.updateFormula);
             window.updateFormula();
+
+            // ===== 监听跨页漏斗更新 =====
+            window.addEventListener('storage', (e) => {
+                if (e.key === 'funnelOutput' || e.key === 'capmAutoMode') {
+                    window.updateFormula();
+                }
+            });
+            window.addEventListener('funnel-bus-update', window.updateFormula);
         })();
 
         // ================================================================

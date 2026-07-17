@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>信息漏斗 · 商业精算 V3.0 · 七层前置筛选</title>
+    <style>
+        /* ===== 全局重置 ===== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background: #0b0b1a;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            min-height: 100vh;
+            padding: 20px 20px 20px 360px;
+            overflow-x: hidden;
+        }
+
+        #glow {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 0;
+            background: radial-gradient(600px circle at var(--x, 50%) var(--y, 50%), rgba(120,80,255,0.06), transparent 80%);
+            transition: background 0.1s;
+        }
+
+        /* ===== 复用总控台侧边栏样式 ===== */
+        .sidebar {
+            position: fixed; top: 0; left: 0; width: 260px; min-height: 100vh;
+            padding: 32px 16px 24px;
+            background: rgba(11,11,26,0.85); backdrop-filter: blur(12px);
+            border-right: 1px solid rgba(255,255,255,0.04);
+            overflow-y: auto; z-index: 1000; display: flex; flex-direction: column;
+        }
+        .sidebar::-webkit-scrollbar { width: 3px; }
+        .sidebar::-webkit-scrollbar-thumb { background: rgba(167,139,250,0.15); border-radius: 4px; }
+        .sidebar .logo { font-size: 16px; font-weight: 700; color: #f1f5f9; margin-bottom: 4px; letter-spacing: -0.3px; }
+        .sidebar .logo span { color: #a78bfa; }
+        .sidebar .logo-sub { font-size: 11px; color: rgba(255,255,255,0.15); margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.04); padding-bottom: 14px; }
+        .nav-group { margin-bottom: 16px; }
+        .nav-group .group-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.8px; color: rgba(255,255,255,0.1); padding: 0 12px; margin-bottom: 4px; }
+        .nav-item { display: flex; align-items: center; gap: 10px; padding: 7px 12px; border-radius: 8px; text-decoration: none; color: rgba(255,255,255,0.3); font-size: 13px; font-weight: 500; transition: all 0.25s ease; cursor: pointer; border-left: 2px solid transparent; }
+        .nav-item:hover { background: rgba(255,255,255,0.03); color: rgba(255,255,255,0.6); border-left-color: rgba(167,139,250,0.2); }
+        .nav-item.active { color: #f1f5f9; background: rgba(167,139,250,0.05); border-left-color: #a78bfa; }
+        .nav-item .icon { font-size: 14px; width: 24px; text-align: center; flex-shrink: 0; }
+        .nav-item .level-tag { font-size: 9px; color: rgba(255,255,255,0.1); background: rgba(255,255,255,0.03); padding: 0 8px; border-radius: 8px; margin-left: auto; }
+        .nav-item .level-tag.active-tag { color: #a78bfa; background: rgba(167,139,250,0.08); }
+        .nav-divider { border: none; border-top: 1px solid rgba(255,255,255,0.03); margin: 8px 12px; }
+        .sidebar .footer-nav { margin-top: auto; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.03); font-size: 11px; color: rgba(255,255,255,0.08); text-align: center; }
+
+        /* ===== 页面内导航 ===== */
+        .page-nav {
+            position: fixed; top: 0; left: 260px; width: 100px; height: 100vh;
+            padding: 32px 8px 24px;
+            background: rgba(11,11,26,0.7); backdrop-filter: blur(12px);
+            border-right: 1px solid rgba(255,255,255,0.04);
+            overflow-y: auto; z-index: 100; display: flex; flex-direction: column;
+        }
+        .page-nav .pn-label { font-size: 10px; color: rgba(255,255,255,0.1); text-transform: uppercase; letter-spacing: 0.5px; padding: 0 8px; margin-bottom: 12px; }
+        .page-nav .pn-item { display: flex; align-items: center; gap: 6px; padding: 6px 8px; margin-bottom: 2px; border-radius: 8px; color: rgba(255,255,255,0.25); font-size: 11px; font-weight: 500; text-decoration: none; transition: all 0.25s ease; cursor: pointer; border-left: 2px solid transparent; }
+        .page-nav .pn-item:hover { background: rgba(255,255,255,0.03); color: rgba(255,255,255,0.6); border-left-color: rgba(167,139,250,0.3); }
+        .page-nav .pn-item.active { color: #f1f5f9; background: rgba(167,139,250,0.06); border-left-color: #a78bfa; }
+        .page-nav .pn-item .icon { font-size: 12px; }
+
+        /* ===== 主容器 ===== */
+        .container {
+            max-width: 1200px; width: 100%;
+            background: radial-gradient(ellipse at 30% 30%, #120b24, #0b0b1a 70%, #05030a);
+            border-radius: 32px; padding: 52px 52px 44px;
+            border: 1px solid rgba(255,255,255,0.06);
+            box-shadow: 0 30px 80px rgba(40,10,80,0.4);
+            position: relative; overflow: hidden; z-index: 1; backdrop-filter: blur(2px);
+        }
+        .container::before {
+            content: ''; position: absolute; top: -100px; right: -100px; width: 400px; height: 400px;
+            background: radial-gradient(circle, rgba(80,30,140,0.15), transparent 70%);
+            border-radius: 50%; pointer-events: none; animation: floatBg 12s ease-in-out infinite alternate;
+        }
+        @keyframes floatBg { 0% { transform: translate(0,0) scale(1); } 100% { transform: translate(30px,-20px) scale(1.1); } }
+        @keyframes fadeInUp { 0% { opacity: 0; transform: translateY(30px); } 100% { opacity: 1; transform: translateY(0); } }
+
+        /* ===== 头部 ===== */
+        .header { text-align: center; margin-bottom: 24px; opacity: 0; animation: fadeInUp 0.8s ease forwards; }
+        .badge { display: inline-block; background: rgba(167,139,250,0.06); border: 1px solid rgba(167,139,250,0.15); color: #a78bfa; font-size: 13px; font-weight: 600; padding: 4px 16px; border-radius: 20px; letter-spacing: 0.3px; margin-bottom: 12px; }
+        .header h1 { font-size: 32px; font-weight: 700; color: #f1f5f9; letter-spacing: -0.5px; background: linear-gradient(135deg, #f1f5f9, #a78bfa, #60a5fa, #f1f5f9); background-size: 300% 300%; -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: gradientFlow 6s ease-in-out infinite; }
+        @keyframes gradientFlow { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        .header .sub { font-size: 15px; color: rgba(255,255,255,0.35); font-weight: 300; margin-top: 4px; }
+
+        /* ===== 数据总线状态条 ===== */
+        .bus-bar {
+            display: flex; align-items: center; justify-content: space-between;
+            background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 12px; padding: 12px 20px; margin-bottom: 28px;
+            font-size: 12px; color: rgba(255,255,255,0.4);
+            opacity: 0; animation: fadeInUp 0.6s ease 0.04s forwards;
+        }
+        .bus-bar .bus-left { display: flex; align-items: center; gap: 8px; }
+        .bus-bar .bus-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.15); }
+        .bus-bar .bus-dot.on { background: #22c55e; box-shadow: 0 0 12px rgba(34,197,94,0.6); }
+        .bus-bar .bus-right { display: flex; align-items: center; gap: 16px; }
+        .bus-bar .bus-toggle { display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none; }
+        .bus-bar .bus-toggle .switch { width: 36px; height: 18px; background: rgba(255,255,255,0.1); border-radius: 10px; position: relative; transition: background 0.25s; }
+        .bus-bar .bus-toggle .switch::after { content: ''; position: absolute; top: 2px; left: 2px; width: 14px; height: 14px; border-radius: 50%; background: #fff; transition: left 0.25s; }
+        .bus-bar .bus-toggle.on .switch { background: #a78bfa; }
+        .bus-bar .bus-toggle.on .switch::after { left: 20px; }
+        .bus-bar .bus-toggle .label { color: rgba(255,255,255,0.5); }
+        .bus-bar .bus-toggle.on .label { color: #a78bfa; }
+
+        /* ===== 输入区 ===== */
+        .input-section {
+            background: rgba(167,139,250,0.03); border: 1px solid rgba(167,139,250,0.08);
+            border-radius: 16px; padding: 24px 28px; margin-bottom: 32px;
+            opacity: 0; animation: fadeInUp 0.6s ease 0.06s forwards;
+        }
+        .input-section label { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.6); display: block; margin-bottom: 8px; }
+        .input-section textarea {
+            width: 100%; min-height: 100px; resize: vertical;
+            background: rgba(11,11,26,0.6); border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 10px; padding: 14px 16px;
+            color: #f1f5f9; font-family: inherit; font-size: 14px; line-height: 1.6;
+            outline: none; transition: border-color 0.25s;
+        }
+        .input-section textarea:focus { border-color: #a78bfa; }
+        .input-section .input-row { display: flex; gap: 12px; margin-top: 12px; align-items: center; }
+        .input-section select {
+            background: rgba(11,11,26,0.6); border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 8px; padding: 8px 12px; color: #f1f5f9; font-size: 13px; outline: none;
+        }
+        .input-section button {
+            background: linear-gradient(135deg, #a78bfa, #7c3aed); color: #fff; border: none;
+            padding: 10px 24px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer;
+            margin-left: auto; transition: transform 0.15s, box-shadow 0.25s;
+        }
+        .input-section button:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(167,139,250,0.3); }
+        .input-section button:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
+
+        /* ===== 漏斗层级 ===== */
+        .funnel-layer {
+            background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04);
+            border-radius: 14px; padding: 20px 24px; margin-bottom: 16px;
+            opacity: 0; animation: fadeInUp 0.5s ease forwards;
+            transition: border-color 0.3s, background 0.3s;
+            position: relative;
+        }
+        .funnel-layer.active { border-color: rgba(167,139,250,0.3); background: rgba(167,139,250,0.04); }
+        .funnel-layer.rejected { border-color: rgba(248,113,113,0.3); background: rgba(248,113,113,0.04); }
+        .funnel-layer.passed { border-color: rgba(34,197,94,0.25); }
+
+        .funnel-layer .layer-head { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+        .funnel-layer .layer-num {
+            font-size: 11px; font-weight: 700; color: #a78bfa;
+            background: rgba(167,139,250,0.12); padding: 3px 10px; border-radius: 12px;
+            letter-spacing: 0.5px;
+        }
+        .funnel-layer .layer-title { font-size: 16px; font-weight: 600; color: rgba(255,255,255,0.8); flex: 1; }
+        .funnel-layer .layer-discipline { font-size: 10px; color: rgba(255,255,255,0.25); text-transform: uppercase; letter-spacing: 0.5px; }
+        .funnel-layer .layer-status {
+            font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 12px;
+            background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.3);
+        }
+        .funnel-layer.passed .layer-status { background: rgba(34,197,94,0.12); color: #22c55e; }
+        .funnel-layer.rejected .layer-status { background: rgba(248,113,113,0.12); color: #f87171; }
+        .funnel-layer.active .layer-status { background: rgba(167,139,250,0.15); color: #a78bfa; }
+
+        .funnel-layer .layer-body { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .funnel-layer .layer-metric { display: flex; flex-direction: column; gap: 4px; }
+        .funnel-layer .layer-metric .ml { font-size: 10px; color: rgba(255,255,255,0.2); text-transform: uppercase; letter-spacing: 0.3px; }
+        .funnel-layer .layer-metric .mv { font-size: 18px; font-weight: 700; color: #f1f5f9; }
+        .funnel-layer .layer-metric .mv.purple { color: #a78bfa; }
+        .funnel-layer .layer-metric .mv.gold { color: #facc15; }
+        .funnel-layer .layer-metric .mv.blue { color: #60a5fa; }
+        .funnel-layer .layer-metric .mv.red { color: #f87171; }
+        .funnel-layer .layer-metric .mv.green { color: #22c55e; }
+        .funnel-layer .layer-metric .mv .unit { font-size: 11px; color: rgba(255,255,255,0.25); font-weight: 400; }
+        .funnel-layer .layer-metric .bar { height: 4px; background: rgba(255,255,255,0.06); border-radius: 2px; overflow: hidden; margin-top: 4px; }
+        .funnel-layer .layer-metric .bar .fill { height: 100%; background: #a78bfa; border-radius: 2px; transition: width 0.4s ease; }
+        .funnel-layer .layer-note { font-size: 11px; color: rgba(255,255,255,0.25); margin-top: 8px; line-height: 1.5; }
+
+        /* ===== 最终输出 ===== */
+        .final-output {
+            background: linear-gradient(135deg, rgba(167,139,250,0.08), rgba(96,165,250,0.04));
+            border: 1px solid rgba(167,139,250,0.2); border-radius: 16px;
+            padding: 24px 28px; margin-top: 24px; text-align: center;
+            opacity: 0; animation: fadeInUp 0.6s ease 0.3s forwards;
+        }
+        .final-output .fo-title { font-size: 14px; color: rgba(255,255,255,0.4); margin-bottom: 8px; letter-spacing: 0.5px; }
+        .final-output .fo-value { font-size: 42px; font-weight: 800; color: #f1f5f9; letter-spacing: -1px; }
+        .final-output .fo-value .unit { font-size: 18px; color: rgba(255,255,255,0.3); font-weight: 400; margin-left: 4px; }
+        .final-output .fo-injection { display: flex; justify-content: center; gap: 28px; margin-top: 16px; font-size: 12px; color: rgba(255,255,255,0.4); flex-wrap: wrap; }
+        .final-output .fo-injection span strong { color: #a78bfa; font-weight: 700; }
+
+        /* ===== 响应式 ===== */
+        @media (max-width: 1024px) {
+            body { padding: 20px; }
+            .sidebar, .page-nav { display: none; }
+            .container { padding: 32px 24px; }
+        }
+    </style>
+</head>
+<body>
+    <div id="glow"></div>
+
+    <!-- ===== 全局侧边栏 ===== -->
+    <div class="sidebar">
+        <div class="logo">Y.<span>Mine</span></div>
+        <div class="logo-sub">自动化决策系统</div>
+
+        <div class="nav-group">
+            <div class="group-label">🧮 精算系统</div>
+            <a href="info-funnel.html" class="nav-item active">
+                <span class="icon">🔭</span> 信息漏斗
+                <span class="level-tag active-tag">前置</span>
+            </a>
+            <a href="marketing-reinvented.html" class="nav-item">
+                <span class="icon">📊</span> 资本定价估值
+                <span class="level-tag">CAPM</span>
+            </a>
+        </div>
+
+        <hr class="nav-divider" />
+
+        <div class="nav-group">
+            <div class="group-label">⚙️ 核心系统</div>
+            <a href="index.html" class="nav-item"><span class="icon">🏠</span> 总控台</a>
+            <a href="circle-lab.html" class="nav-item"><span class="icon">🧪</span> 画圈实验</a>
+            <a href="gamemind.html" class="nav-item"><span class="icon">🎯</span> 博弈论底座</a>
+            <a href="moodmind.html" class="nav-item"><span class="icon">📊</span> 估值底座</a>
+            <a href="evolvemind.html" class="nav-item"><span class="icon">🧠</span> EvolveMind</a>
+        </div>
+
+        <hr class="nav-divider" />
+
+        <div class="nav-group">
+            <div class="group-label">🔗 证据链</div>
+            <a href="cross-domain-mapping.html" class="nav-item"><span class="icon">⚡</span> 跨领域吞噬</a>
+            <a href="business-learning-evidence.html" class="nav-item"><span class="icon">📊</span> 商业证据链</a>
+            <a href="value-pyramid.html" class="nav-item"><span class="icon">📐</span> 价值金字塔</a>
+        </div>
+
+        <div class="footer-nav">v3.0 · 精算漏斗</div>
+    </div>
+
+    <!-- ===== 页面内导航 ===== -->
+    <div class="page-nav">
+        <div class="pn-label">漏斗层级</div>
+        <a href="#layer1" class="pn-item"><span class="icon">⚛️</span> L1 熵过滤</a>
+        <a href="#layer2" class="pn-item"><span class="icon">📐</span> L2 向量化</a>
+        <a href="#layer3" class="pn-item"><span class="icon">🎚️</span> L3 置信分级</a>
+        <a href="#layer4" class="pn-item"><span class="icon">🦢</span> L4 黑天鹅</a>
+        <a href="#layer5" class="pn-item"><span class="icon">🌐</span> L5 宏观场域</a>
+        <a href="#layer6" class="pn-item"><span class="icon">🌊</span> L6 红蓝海</a>
+        <a href="#layer7" class="pn-item"><span class="icon">🏛️</span> L7 国家意志</a>
+        <hr class="nav-divider" style="border: none; border-top: 1px solid rgba(255,255,255,0.03); margin: 6px 0;" />
+        <a href="#finalOutput" class="pn-item"><span class="icon">🎯</span> 最终输出</a>
+    </div>
+
+    <!-- ===== 主容器 ===== -->
+    <div class="container">
+
+        <div class="header">
+            <div class="badge">🧮 商业精算 V3.0 · 信息前置筛选</div>
+            <h1>信息漏斗 · 七层精算</h1>
+            <div class="sub">从 100% 噪声到 20% 纯信号 · 漏斗覆盖 CAPM 输入</div>
+        </div>
+
+        <!-- ===== 数据总线状态条 ===== -->
+        <div class="bus-bar">
+            <div class="bus-left">
+                <span class="bus-dot" id="busDot"></span>
+                <span id="busStatus">数据总线：未启动</span>
+            </div>
+            <div class="bus-right">
+                <div class="bus-toggle" id="autoToggle">
+                    <span class="label">手动</span>
+                    <div class="switch"></div>
+                </div>
+                <a href="marketing-reinvented.html" style="color: rgba(255,255,255,0.4); text-decoration: none; font-size: 12px;">→ 资本定价</a>
+            </div>
+        </div>
+
+        <!-- ===== 输入区 ===== -->
+        <div class="input-section">
+            <label for="rawInput">输入待评估的商业信息 / 项目描述 / 行业判断</label>
+            <textarea id="rawInput" placeholder="例：某新能源储能公司，主打工商业储能，2023 年营收 2 亿，毛利率 18%，国资占比 22%，受益于双碳政策..."></textarea>
+            <div class="input-row">
+                <select id="domainSelect">
+                    <option value="auto">行业自动识别</option>
+                    <option value="低空经济">低空经济</option>
+                    <option value="新能源">新能源</option>
+                    <option value="咖啡连锁">咖啡连锁</option>
+                    <option value="教育">教育</option>
+                    <option value="MCN">MCN/内容</option>
+                    <option value="SaaS">SaaS/软件</option>
+                    <option value="半导体">半导体</option>
+                    <option value="其他">其他</option>
+                </select>
+                <button id="runBtn">▶ 启动七层漏斗</button>
+            </div>
+        </div>
+
+        <!-- ===== L1 熵过滤 ===== -->
+        <div class="funnel-layer" id="layer1">
+            <div class="layer-head">
+                <span class="layer-num">L1</span>
+                <span class="layer-title">化学级元素筛选 · 文字熵度过滤</span>
+                <span class="layer-discipline">信息论</span>
+                <span class="layer-status" id="l1Status">待启动</span>
+            </div>
+            <div class="layer-body">
+                <div class="layer-metric">
+                    <span class="ml">原始熵值</span>
+                    <span class="mv" id="l1Entropy">— <span class="unit">bits</span></span>
+                    <div class="bar"><div class="fill" id="l1EntropyBar" style="width: 0%;"></div></div>
+                </div>
+                <div class="layer-metric">
+                    <span class="ml">噪声剔除数</span>
+                    <span class="mv red" id="l1Noise">— <span class="unit">tokens</span></span>
+                </div>
+            </div>
+            <div class="layer-note" id="l1Note">对输入做 Token 级熵值计算，剔除情绪噪音、逻辑跳跃和大众废话。</div>
+        </div>
+
+        <!-- ===== L2 向量化 ===== -->
+        <div class="funnel-layer" id="layer2">
+            <div class="layer-head">
+                <span class="layer-num">L2</span>
+                <span class="layer-title">向量级映射 · 数学底座</span>
+                <span class="layer-discipline">线性代数</span>
+                <span class="layer-status" id="l2Status">待启动</span>
+            </div>
+            <div class="layer-body">
+                <div class="layer-metric">
+                    <span class="ml">向量维度</span>
+                    <span class="mv blue" id="l2Dim">— <span class="unit">维</span></span>
+                </div>
+                <div class="layer-metric">
+                    <span class="ml">信息强度（模长）</span>
+                    <span class="mv blue" id="l2Mag">—</span>
+                    <div class="bar"><div class="fill" id="l2MagBar" style="width: 0%;"></div></div>
+                </div>
+            </div>
+            <div class="layer-note" id="l2Note">TF-IDF + PCA 降维至 32 维，建立信息的结构化数学坐标。</div>
+        </div>
+
+        <!-- ===== L3 置信分级 ===== -->
+        <div class="funnel-layer" id="layer3">
+            <div class="layer-head">
+                <span class="layer-num">L3</span>
+                <span class="layer-title">置信区间与噪声源剥离</span>
+                <span class="layer-discipline">统计学</span>
+                <span class="layer-status" id="l3Status">待启动</span>
+            </div>
+            <div class="layer-body">
+                <div class="layer-metric">
+                    <span class="ml">信源等级</span>
+                    <span class="mv" id="l3Level">—</span>
+                </div>
+                <div class="layer-metric">
+                    <span class="ml">置信度</span>
+                    <span class="mv gold" id="l3Conf">— <span class="unit">%</span></span>
+                    <div class="bar"><div class="fill" id="l3ConfBar" style="width: 0%; background: #facc15;"></div></div>
+                </div>
+            </div>
+            <div class="layer-note" id="l3Note">三手信源（大众噪音）在此层被拦截，不进入下游精算。</div>
+        </div>
+
+        <!-- ===== L4 黑天鹅 ===== -->
+        <div class="funnel-layer" id="layer4">
+            <div class="layer-head">
+                <span class="layer-num">L4</span>
+                <span class="layer-title">黑天鹅对标 · 波幅震荡</span>
+                <span class="layer-discipline">物理学</span>
+                <span class="layer-status" id="l4Status">待启动</span>
+            </div>
+            <div class="layer-body">
+                <div class="layer-metric">
+                    <span class="ml">最近黑天鹅</span>
+                    <span class="mv" id="l4Event" style="font-size: 14px;">—</span>
+                </div>
+                <div class="layer-metric">
+                    <span class="ml">冲击振幅</span>
+                    <span class="mv red" id="l4Amp">— <span class="unit">/100</span></span>
+                    <div class="bar"><div class="fill" id="l4AmpBar" style="width: 0%; background: #f87171;"></div></div>
+                </div>
+            </div>
+            <div class="layer-note" id="l4Note">与历史极端事件对标，量化外部冲击烈度。振幅 > 70 为致命震荡。</div>
+        </div>
+
+        <!-- ===== L5 宏观场域 ===== -->
+        <div class="funnel-layer" id="layer5">
+            <div class="layer-head">
+                <span class="layer-num">L5</span>
+                <span class="layer-title">宏观场域总控</span>
+                <span class="layer-discipline">宏观物理</span>
+                <span class="layer-status" id="l5Status">待启动</span>
+            </div>
+            <div class="layer-body">
+                <div class="layer-metric">
+                    <span class="ml">场域覆盖度</span>
+                    <span class="mv purple" id="l5Coverage">— <span class="unit">%</span></span>
+                    <div class="bar"><div class="fill" id="l5CoverageBar" style="width: 0%;"></div></div>
+                </div>
+                <div class="layer-metric">
+                    <span class="ml">吸收系数</span>
+                    <span class="mv purple" id="l5Absorb">— <span class="unit">%</span></span>
+                    <div class="bar"><div class="fill" id="l5AbsorbBar" style="width: 0%;"></div></div>
+                </div>
+            </div>
+            <div class="layer-note" id="l5Note">评估信息是否处于宏观政策与基建网络的覆盖下，吸收微观震荡。</div>
+        </div>
+
+        <!-- ===== L6 红蓝海 ===== -->
+        <div class="funnel-layer" id="layer6">
+            <div class="layer-head">
+                <span class="layer-num">L6</span>
+                <span class="layer-title">红蓝海供需评估</span>
+                <span class="layer-discipline">商业经济学</span>
+                <span class="layer-status" id="l6Status">待启动</span>
+            </div>
+            <div class="layer-body">
+                <div class="layer-metric">
+                    <span class="ml">市场类型</span>
+                    <span class="mv" id="l6Type">—</span>
+                </div>
+                <div class="layer-metric">
+                    <span class="ml">风险指数</span>
+                    <span class="mv" id="l6Risk">—</span>
+                    <div class="bar"><div class="fill" id="l6RiskBar" style="width: 0%; background: #f87171;"></div></div>
+                    <span style="font-size: 10px; color: rgba(255,255,255,0.15); margin-top: 2px;">风控铁律：0.68</span>
+                </div>
+            </div>
+            <div class="layer-note" id="l6Note">引入 0.68 正态分布铁律，判断红海 / 灰海 / 蓝海。</div>
+        </div>
+
+        <!-- ===== L7 国家意志 ===== -->
+        <div class="funnel-layer" id="layer7">
+            <div class="layer-head">
+                <span class="layer-num">L7</span>
+                <span class="layer-title">国家意志与国资占比 · 兜底</span>
+                <span class="layer-discipline">政治经济学</span>
+                <span class="layer-status" id="l7Status">待启动</span>
+            </div>
+            <div class="layer-body">
+                <div class="layer-metric">
+                    <span class="ml">政策扶持度</span>
+                    <span class="mv gold" id="l7Policy">— <span class="unit">%</span></span>
+                    <div class="bar"><div class="fill" id="l7PolicyBar" style="width: 0%; background: #facc15;"></div></div>
+                </div>
+                <div class="layer-metric">
+                    <span class="ml">国资占比</span>
+                    <span class="mv gold" id="l7Soe">— <span class="unit">%</span></span>
+                    <div class="bar"><div class="fill" id="l7SoeBar" style="width: 0%; background: #facc15;"></div></div>
+                </div>
+            </div>
+            <div class="layer-note" id="l7Note">国家意志作为系统最底层兜底参数，国资占比 > 50% 强制收敛到安全区间。</div>
+        </div>
+
+        <!-- ===== 最终输出 ===== -->
+        <div class="final-output" id="finalOutput">
+            <div class="fo-title">最终精算值 · 注入 CAPM</div>
+            <div class="fo-value" id="finalValue">—<span class="unit">%</span></div>
+            <div class="fo-injection">
+                <span>Rf = <strong id="injRf">—</strong></span>
+                <span>Rp = <strong id="injRp">—</strong></span>
+                <span>β = <strong id="injBeta">—</strong></span>
+                <span>L7 收敛 = <strong id="injClip">—</strong></span>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // ================================================================
+        // ===== 静态数据库 · 黑天鹅事件库（20 个典型事件） =====
+        // ================================================================
+        const BLACK_SWAN_DB = [
+            { name: '2008次贷危机',     domain: '金融',     severity: 0.98, keywords: ['次贷','金融危机','雷曼','投行','衍生品'] },
+            { name: '2020新冠疫情',     domain: '全行业',   severity: 0.95, keywords: ['疫情','隔离','停摆','封控','新冠'] },
+            { name: '2021教培双减',     domain: '教育',     severity: 0.95, keywords: ['双减','教培','学科培训','K12'] },
+            { name: '2020瑞幸造假',     domain: '咖啡/资本', severity: 0.85, keywords: ['瑞幸','造假','浑水','财务造假'] },
+            { name: '2023硅谷银行倒闭', domain: '金融',     severity: 0.80, keywords: ['硅谷银行','SVB','挤兑','利率'] },
+            { name: '2022俄乌冲突',     domain: '能源/全行业', severity: 0.88, keywords: ['俄乌','制裁','能源','天然气','石油'] },
+            { name: '2023ChatGPT发布',  domain: 'AI/科技',   severity: 0.90, keywords: ['ChatGPT','大模型','生成式AI','OpenAI'] },
+            { name: '2021恒大暴雷',     domain: '房地产',   severity: 0.92, keywords: ['恒大','房地产','债务','暴雷'] },
+            { name: '2018P2P爆雷潮',    domain: '金融',     severity: 0.85, keywords: ['P2P','爆雷','互金','网贷'] },
+            { name: '2020原油宝事件',   domain: '金融/能源', severity: 0.78, keywords: ['原油宝','负油价','期货'] },
+            { name: '2023中东冲突',     domain: '能源/地缘', severity: 0.75, keywords: ['巴以','中东','红海','航运'] },
+            { name: '2018中美贸易战',   domain: '全行业',   severity: 0.82, keywords: ['贸易战','关税','制裁','脱钩'] },
+            { name: '2021反垄断潮',     domain: '互联网',   severity: 0.80, keywords: ['反垄断','平台经济','阿里','腾讯','罚款'] },
+            { name: '2022芯片法案',     domain: '半导体',   severity: 0.78, keywords: ['芯片','半导体','制裁','卡脖子','EDA'] },
+            { name: '2023数据二十条',   domain: '数据要素', severity: 0.65, keywords: ['数据要素','数据二十条','数据资产'] },
+            { name: '2024低空经济政策', domain: '低空经济', severity: 0.70, keywords: ['低空经济','eVTOL','无人机','空域'] },
+            { name: '2023双碳目标加码', domain: '新能源',   severity: 0.72, keywords: ['双碳','储能','光伏','风电','碳中和'] },
+            { name: '2024AI监管法案',   domain: 'AI',       severity: 0.68, keywords: ['AI监管','算法备案','深度合成'] },
+            { name: '2023医药反腐',     domain: '医药',     severity: 0.75, keywords: ['医药反腐','集采','医疗'] },
+            { name: '2024出海潮',       domain: '全行业',   severity: 0.55, keywords: ['出海','东南亚','跨境电商','TikTok'] }
+        ];
+
+        // ================================================================
+        // ===== 静态数据库 · 国家意志库（行业 → 政策扶持 + 国资占比） =====
+        // ================================================================
+        const STATE_WILL_DB = {
+            '低空经济':   { policySupport: 0.92, soeRatio: 0.45, note: '国家战略性新兴产业' },
+            '新能源':     { policySupport: 0.88, soeRatio: 0.35, note: '双碳目标核心赛道' },
+            '半导体':     { policySupport: 0.85, soeRatio: 0.40, note: '卡脖子攻关' },
+            '数据要素':   { policySupport: 0.82, soeRatio: 0.50, note: '数据二十条' },
+            'SaaS':       { policySupport: 0.45, soeRatio: 0.10, note: '市场化竞争' },
+            '咖啡连锁':   { policySupport: 0.30, soeRatio: 0.05, note: '纯消费市场化' },
+            '教育':       { policySupport: 0.15, soeRatio: 0.10, note: '双减后强监管' },
+            'MCN':        { policySupport: 0.35, soeRatio: 0.08, note: '内容监管趋严' },
+            '房地产':     { policySupport: 0.40, soeRatio: 0.30, note: '保交楼 + 去杠杆' },
+            '医药':       { policySupport: 0.55, soeRatio: 0.20, note: '集采压制 + 创新药扶持' },
+            '金融':       { policySupport: 0.60, soeRatio: 0.55, note: '强监管 + 国资主导' },
+            '互联网':     { policySupport: 0.35, soeRatio: 0.05, note: '反垄断后常态' },
+            '其他':       { policySupport: 0.30, soeRatio: 0.10, note: '默认值' }
+        };
+
+        // ================================================================
+        // ===== 核心状态对象 =====
+        // ================================================================
+        const ActuaryState = {
+            raw: null,
+            domain: null,
+            L1: { entropy: 0, tokens: [], filteredText: '', noiseRemoved: 0 },
+            L2: { embedding: [], dimension: 32, magnitude: 0 },
+            L3: { level: null, permission: null, confidence: 0 },
+            L4: { maxEvent: null, maxCorrelation: 0, amplitude: 0, resonanceRisk: null },
+            L5: { coverage: 0, absorption: 0, domain: null },
+            L6: { type: null, riskIndex: 0, riskLine: 0.68 },
+            L7: { policySupport: 0, soeRatio: 0, finalClip: 1.0 },
+            finalValuation: 0,
+            // 注入 CAPM 的输出
+            injection: { Rf: 0, Rp: 0, beta: 0, L7_finalClip: 1.0 }
+        };
+
+        // ================================================================
+        // ===== 漏斗引擎（占位实现，后续逐步接入真实算法） =====
+        // ================================================================
+
+        // 简易分词
+        function tokenize(text) {
+            return text.replace(/[，。！？\n\r\t]/g, ' ')
+                       .split(/\s+/)
+                       .filter(t => t.length > 0);
+        }
+
+        // L1 · 信息熵过滤（占位：用词频熵近似）
+        function L1_entropyFilter(rawText) {
+            const tokens = tokenize(rawText);
+            const freq = {};
+            tokens.forEach(t => freq[t] = (freq[t] || 0) + 1);
+            const total = tokens.length || 1;
+            let entropy = 0;
+            Object.values(freq).forEach(c => {
+                const p = c / total;
+                entropy -= p * Math.log2(p);
+            });
+            // 归一化到 0~8 bits 区间
+            const normEntropy = Math.min(8, entropy);
+
+            // 简单噪声剔除：剔除长度 < 2 的 token
+            const cleaned = tokens.filter(t => t.length >= 2);
+            const noiseRemoved = tokens.length - cleaned.length;
+
+            return {
+                entropy: normEntropy,
+                tokens: cleaned,
+                filteredText: cleaned.join(''),
+                noiseRemoved
+            };
+        }
+
+        // L2 · TF-IDF + 伪 PCA 降维（占位：用 hash 投影到 32 维）
+        function L2_embedToVector(tokens) {
+            const dim = 32;
+            const vec = new Array(dim).fill(0);
+            tokens.forEach(t => {
+                let h = 0;
+                for (let i = 0; i < t.length; i++) h = (h * 31 + t.charCodeAt(i)) | 0;
+                vec[Math.abs(h) % dim] += 1;
+            });
+            // L2 归一化
+            const mag = Math.sqrt(vec.reduce((s, v) => s + v * v, 0)) || 1;
+            const normalized = vec.map(v => v / mag);
+            return { embedding: normalized, dimension: dim, magnitude: mag };
+        }
+
+        // L3 · 置信分级（占位：基于信息长度 + 数字密度判断信源等级）
+        function L3_classifyConfidence(rawText, vector) {
+            const hasNumbers = /\d/.test(rawText);
+            const hasSpecificData = /\d+(\.\d+)?\s*(亿|万|%)|占比|毛利率|营收/.test(rawText);
+            const length = rawText.length;
+
+            let level, permission, confidence;
+            if (hasSpecificData && length > 50) {
+                level = '一手信源'; permission = 'FULL'; confidence = 85;
+            } else if (hasNumbers) {
+                level = '二手信源'; permission = 'LIMITED'; confidence = 60;
+            } else {
+                level = '三手信源'; permission = 'NONE'; confidence = 25;
+            }
+            return { level, permission, confidence };
+        }
+
+        // L4 · 黑天鹅对标
+        function L4_blackSwanCorrelation(rawText, domain) {
+            let best = { event: null, correlation: 0, severity: 0 };
+            BLACK_SWAN_DB.forEach(swan => {
+                // 同领域优先 + 关键词命中
+                let score = 0;
+                if (swan.domain.includes(domain) || domain.includes(swan.domain.split('/')[0])) score += 0.3;
+                swan.keywords.forEach(kw => {
+                    if (rawText.includes(kw)) score += 0.25;
+                });
+                score *= swan.severity;
+                if (score > best.correlation) {
+                    best = { event: swan.name, correlation: score, severity: swan.severity };
+                }
+            });
+            const amplitude = Math.min(100, best.correlation * 100);
+            let risk;
+            if (amplitude > 70) risk = 'high';
+            else if (amplitude > 40) risk = 'mid';
+            else risk = 'low';
+            return { maxEvent: best.event, maxCorrelation: best.correlation, amplitude, resonanceRisk: risk };
+        }
+
+        // L5 · 宏观场域
+        function L5_macroFieldRegulation(domain) {
+            const db = STATE_WILL_DB[domain] || STATE_WILL_DB['其他'];
+            return {
+                coverage: db.policySupport,
+                absorption: db.policySupport * 0.7 + db.soeRatio * 0.3,
+                domain
+            };
+        }
+
+        // L6 · 红蓝海
+        function L6_marketJudgment(L4, L5) {
+            const effectiveShock = L4.amplitude * (1 - L5.absorption);
+            const riskIndex = Math.min(1, effectiveShock / 100);
+            let type;
+            if (riskIndex < 0.48) type = '蓝海';
+            else if (riskIndex < 0.68) type = '灰海';
+            else type = '红海';
+            return { type, riskIndex, riskLine: 0.68 };
+        }
+
+        // L7 · 国家意志兜底
+        function L7_stateWillBottomLine(domain) {
+            const db = STATE_WILL_DB[domain] || STATE_WILL_DB['其他'];
+            let clip = 1.0;
+            if (db.soeRatio > 0.5) clip = 0.85;       // 强收敛
+            else if (db.soeRatio > 0.3) clip = 0.92;
+            return { policySupport: db.policySupport, soeRatio: db.soeRatio, finalClip: clip };
+        }
+
+        // ================================================================
+        // ===== 主流水线 =====
+        // ================================================================
+        function runPipeline(rawText, domain) {
+            const s = Object.assign({}, ActuaryState);
+            s.raw = rawText;
+            s.domain = domain;
+
+            // —— 向外发散：捕捉信息 —— //
+            s.L1 = L1_entropyFilter(rawText);
+            s.L2 = L2_embedToVector(s.L1.tokens);
+            s.L3 = L3_classifyConfidence(rawText, s.L2.embedding);
+
+            // 硬拦截：三手信源
+            if (s.L3.permission === 'NONE') {
+                return { status: 'REJECTED', reason: 'tertiary_source', state: s };
+            }
+
+            // —— 向内收敛：精算风控 —— //
+            s.L4 = L4_blackSwanCorrelation(rawText, domain);
+            s.L5 = L5_macroFieldRegulation(domain);
+            s.L6 = L6_marketJudgment(s.L4, s.L5);
+            s.L7 = L7_stateWillBottomLine(domain);
+
+            // 最终精算 = 基准值 × 场域吸收 × (1 - 风险溢出) × 国家收敛
+            const baseValue = 60;  // 基准精算值
+            const riskOverflow = Math.max(0, s.L6.riskIndex - 0.68);
+            s.finalValuation = baseValue
+                             * (0.7 + s.L5.absorption * 0.3)
+                             * (1 - riskOverflow)
+                             * s.L7.finalClip;
+
+            // 注入 CAPM 的参数映射
+            s.injection = {
+                Rf:   2 + s.L5.coverage * 4,                    // 无风险利率 2~6%
+                Rp:   1 + (1 - s.L6.riskIndex) * 9,            // 风险溢价 1~10%
+                beta: 0.3 + s.L4.amplitude / 100 * 2.2,       // β 0.3~2.5
+                L7_finalClip: s.L7.finalClip
+            };
+
+            return { status: 'OK', state: s };
+        }
+
+        // ================================================================
+        // ===== UI 渲染 =====
+        // ================================================================
+        function renderLayer(layerId, status, html) {
+            const el = document.getElementById(layerId);
+            el.classList.remove('active', 'passed', 'rejected');
+            if (status === 'active') el.classList.add('active');
+            else if (status === 'passed') el.classList.add('passed');
+            else if (status === 'rejected') el.classList.add('rejected');
+        }
+
+        function setMetric(id, value, unit) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            el.innerHTML = value + (unit ? ` <span class="unit">${unit}</span>` : '');
+        }
+
+        function setBar(id, percent) {
+            const el = document.getElementById(id);
+            if (el) el.style.width = Math.min(100, Math.max(0, percent)) + '%';
+        }
+
+        function animatePipeline(state) {
+            // 重置所有层
+            ['layer1','layer2','layer3','layer4','layer5','layer6','layer7'].forEach(id => {
+                renderLayer(id, 'idle');
+                document.getElementById(id.replace('layer','l') + 'Status').textContent = '待启动';
+            });
+
+            const layers = [
+                { id: 'layer1', delay: 200, fn: () => {
+                    document.getElementById('l1Status').textContent = '运行中';
+                    renderLayer('layer1', 'active');
+                    setTimeout(() => {
+                        setMetric('l1Entropy', state.L1.entropy.toFixed(2), 'bits');
+                        setBar('l1EntropyBar', state.L1.entropy / 8 * 100);
+                        setMetric('l1Noise', state.L1.noiseRemoved, 'tokens');
+                        document.getElementById('l1Status').textContent = '通过';
+                        renderLayer('layer1', 'passed');
+                    }, 300);
+                }},
+                { id: 'layer2', delay: 600, fn: () => {
+                    document.getElementById('l2Status').textContent = '运行中';
+                    renderLayer('layer2', 'active');
+                    setTimeout(() => {
+                        setMetric('l2Dim', state.L2.dimension, '维');
+                        setMetric('l2Mag', state.L2.magnitude.toFixed(2));
+                        setBar('l2MagBar', Math.min(100, state.L2.magnitude * 20));
+                        document.getElementById('l2Status').textContent = '通过';
+                        renderLayer('layer2', 'passed');
+                    }, 300);
+                }},
+                { id: 'layer3', delay: 1000, fn: () => {
+                    document.getElementById('l3Status').textContent = '运行中';
+                    renderLayer('layer3', 'active');
+                    setTimeout(() => {
+                        document.getElementById('l3Level').textContent = state.L3.level;
+                        document.getElementById('l3Level').className = 'mv ' + (state.L3.permission === 'FULL' ? 'green' : state.L3.permission === 'LIMITED' ? 'gold' : 'red');
+                        setMetric('l3Conf', state.L3.confidence, '%');
+                        setBar('l3ConfBar', state.L3.confidence);
+                        if (state.L3.permission === 'NONE') {
+                            document.getElementById('l3Status').textContent = '拦截';
+                            renderLayer('layer3', 'rejected');
+                            document.getElementById('l3Note').textContent = '⚠️ 三手信源被拦截，漏斗终止。';
+                        } else {
+                            document.getElementById('l3Status').textContent = '通过';
+                            renderLayer('layer3', 'passed');
+                        }
+                    }, 300);
+                }},
+                { id: 'layer4', delay: 1400, fn: () => {
+                    if (state.L3.permission === 'NONE') return;
+                    document.getElementById('l4Status').textContent = '运行中';
+                    renderLayer('layer4', 'active');
+                    setTimeout(() => {
+                        document.getElementById('l4Event').textContent = state.L4.maxEvent || '无匹配';
+                        setMetric('l4Amp', state.L4.amplitude.toFixed(0), '/100');
+                        setBar('l4AmpBar', state.L4.amplitude);
+                        document.getElementById('l4Status').textContent = state.L4.resonanceRisk === 'high' ? '高风险' : '通过';
+                        renderLayer('layer4', state.L4.resonanceRisk === 'high' ? 'rejected' : 'passed');
+                    }, 300);
+                }},
+                { id: 'layer5', delay: 1800, fn: () => {
+                    if (state.L3.permission === 'NONE') return;
+                    document.getElementById('l5Status').textContent = '运行中';
+                    renderLayer('layer5', 'active');
+                    setTimeout(() => {
+                        setMetric('l5Coverage', (state.L5.coverage * 100).toFixed(0), '%');
+                        setBar('l5CoverageBar', state.L5.coverage * 100);
+                        setMetric('l5Absorb', (state.L5.absorption * 100).toFixed(0), '%');
+                        setBar('l5AbsorbBar', state.L5.absorption * 100);
+                        document.getElementById('l5Status').textContent = '通过';
+                        renderLayer('layer5', 'passed');
+                    }, 300);
+                }},
+                { id: 'layer6', delay: 2200, fn: () => {
+                    if (state.L3.permission === 'NONE') return;
+                    document.getElementById('l6Status').textContent = '运行中';
+                    renderLayer('layer6', 'active');
+                    setTimeout(() => {
+                        document.getElementById('l6Type').textContent = state.L6.type;
+                        document.getElementById('l6Type').className = 'mv ' + (state.L6.type === '蓝海' ? 'green' : state.L6.type === '灰海' ? 'gold' : 'red');
+                        setMetric('l6Risk', state.L6.riskIndex.toFixed(2));
+                        setBar('l6RiskBar', state.L6.riskIndex * 100);
+                        document.getElementById('l6Status').textContent = state.L6.type === '红海' ? '红海警告' : '通过';
+                        renderLayer('layer6', state.L6.type === '红海' ? 'rejected' : 'passed');
+                    }, 300);
+                }},
+                { id: 'layer7', delay: 2600, fn: () => {
+                    if (state.L3.permission === 'NONE') return;
+                    document.getElementById('l7Status').textContent = '运行中';
+                    renderLayer('layer7', 'active');
+                    setTimeout(() => {
+                        setMetric('l7Policy', (state.L7.policySupport * 100).toFixed(0), '%');
+                        setBar('l7PolicyBar', state.L7.policySupport * 100);
+                        setMetric('l7Soe', (state.L7.soeRatio * 100).toFixed(0), '%');
+                        setBar('l7SoeBar', state.L7.soeRatio * 100);
+                        document.getElementById('l7Status').textContent = '收敛';
+                        renderLayer('layer7', 'passed');
+
+                        // 最终输出
+                        document.getElementById('finalValue').innerHTML = state.finalValuation.toFixed(1) + '<span class="unit">%</span>';
+                        document.getElementById('injRf').textContent = state.injection.Rf.toFixed(2) + '%';
+                        document.getElementById('injRp').textContent = state.injection.Rp.toFixed(2) + '%';
+                        document.getElementById('injBeta').textContent = state.injection.beta.toFixed(2);
+                        document.getElementById('injClip').textContent = (state.injection.L7_finalClip * 100).toFixed(0) + '%';
+
+                        // 写入 localStorage 数据总线
+                        publishToBus(state);
+                    }, 300);
+                }}
+            ];
+
+            layers.forEach(l => setTimeout(l.fn, l.delay));
+        }
+
+        // ================================================================
+        // ===== 跨页数据总线（localStorage + storage 事件） =====
+        // ================================================================
+        function publishToBus(state) {
+            const output = {
+                status: 'OK',
+                Rf: state.injection.Rf,
+                Rp: state.injection.Rp,
+                beta: state.injection.beta,
+                L7_finalClip: state.injection.L7_finalClip,
+                finalValuation: state.finalValuation,
+                domain: state.domain,
+                marketType: state.L6.type,
+                riskIndex: state.L6.riskIndex,
+                timestamp: Date.now()
+            };
+            localStorage.setItem('funnelOutput', JSON.stringify(output));
+
+            // 触发本页事件（storage 事件不会在同页触发）
+            window.dispatchEvent(new CustomEvent('funnel-bus-update', { detail: output }));
+
+            // 更新总线状态条
+            updateBusBar();
+        }
+
+        function updateBusBar() {
+            try {
+                const funnel = JSON.parse(localStorage.getItem('funnelOutput') || 'null');
+                const dot = document.getElementById('busDot');
+                const status = document.getElementById('busStatus');
+                if (funnel && funnel.timestamp) {
+                    const ageMin = (Date.now() - funnel.timestamp) / 60000;
+                    if (ageMin < 30) {
+                        dot.classList.add('on');
+                        status.textContent = `数据总线：就绪 · ${funnel.domain} · ${funnel.marketType} · 精算值 ${funnel.finalValuation.toFixed(1)}%`;
+                    } else {
+                        dot.classList.remove('on');
+                        status.textContent = '数据总线：数据已过期';
+                    }
+                } else {
+                    dot.classList.remove('on');
+                    status.textContent = '数据总线：未启动';
+                }
+            } catch(e) {}
+        }
+
+        // ================================================================
+        // ===== 自动接管开关 =====
+        // ================================================================
+        const autoToggle = document.getElementById('autoToggle');
+        function setAutoMode(on) {
+            if (on) autoToggle.classList.add('on'); else autoToggle.classList.remove('on');
+            autoToggle.querySelector('.label').textContent = on ? '漏斗接管' : '手动';
+            localStorage.setItem('capmAutoMode', on ? 'true' : 'false');
+            window.dispatchEvent(new CustomEvent('funnel-bus-update'));
+        }
+        autoToggle.addEventListener('click', () => {
+            setAutoMode(!autoToggle.classList.contains('on'));
+        });
+        // 初始化开关状态
+        if (localStorage.getItem('capmAutoMode') === 'true') setAutoMode(true);
+
+        // ================================================================
+        // ===== 启动按钮 =====
+        // ================================================================
+        document.getElementById('runBtn').addEventListener('click', () => {
+            const rawText = document.getElementById('rawInput').value.trim();
+            const domain = document.getElementById('domainSelect').value;
+
+            if (!rawText) {
+                alert('请输入待评估的商业信息');
+                return;
+            }
+
+            let finalDomain = domain;
+            if (domain === 'auto') {
+                // 简单关键词识别
+                const domainKeywords = {
+                    '低空经济': ['低空','eVTOL','无人机','空域'],
+                    '新能源': ['储能','光伏','风电','新能源','双碳','碳中和'],
+                    '半导体': ['芯片','半导体','EDA','晶圆'],
+                    '咖啡连锁': ['咖啡','瑞幸','星巴克'],
+                    '教育': ['教培','教育','培训','K12'],
+                    'MCN': ['MCN','直播','带货','博主'],
+                    'SaaS': ['SaaS','软件','云服务','订阅'],
+                    '金融': ['金融','银行','贷款','保险']
+                };
+                for (const [d, kws] of Object.entries(domainKeywords)) {
+                    if (kws.some(kw => rawText.includes(kw))) { finalDomain = d; break; }
+                }
+                if (finalDomain === 'auto') finalDomain = '其他';
+            }
+
+            const result = runPipeline(rawText, finalDomain);
+            if (result.status === 'REJECTED') {
+                // 仍渲染前三层
+                animatePipeline(result.state);
+                setTimeout(() => {
+                    document.getElementById('finalValue').innerHTML = '拦截<span class="unit"></span>';
+                    document.getElementById('finalValue').style.color = '#f87171';
+                }, 1500);
+            } else {
+                document.getElementById('finalValue').style.color = '';
+                animatePipeline(result.state);
+            }
+        });
+
+        // ================================================================
+        // ===== 鼠标光晕 + 页面导航高亮 =====
+        // ================================================================
+        const glow = document.getElementById('glow');
+        document.addEventListener('mousemove', (e) => {
+            glow.style.setProperty('--x', (e.clientX / window.innerWidth * 100) + '%');
+            glow.style.setProperty('--y', (e.clientY / window.innerHeight * 100) + '%');
+        });
+
+        // 页面内导航点击高亮
+        document.querySelectorAll('.page-nav .pn-item').forEach(item => {
+            item.addEventListener('click', () => {
+                document.querySelectorAll('.page-nav .pn-item').forEach(i => i.classList.remove('active'));
+                item.classList.add('active');
+            });
+        });
+
+        // 初始渲染总线状态
+        updateBusBar();
+        // 监听跨页更新
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'funnelOutput' || e.key === 'capmAutoMode') updateBusBar();
+        });
+    </script>
+</body>
+</html>

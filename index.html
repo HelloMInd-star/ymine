@@ -753,6 +753,21 @@
         <div class="logo">Y.<span>Mine</span></div>
         <div class="logo-sub">自动化决策系统</div>
 
+        <!-- 精算系统（最高优先级 · 信息前置筛选 + 资本定价） -->
+        <div class="nav-group">
+            <div class="group-label">🧮 精算系统</div>
+            <a href="info-funnel.html" class="nav-item">
+                <span class="icon">🔭</span> 信息漏斗
+                <span class="level-tag active-tag">前置</span>
+            </a>
+            <a href="marketing-reinvented.html" class="nav-item">
+                <span class="icon">📊</span> 资本定价估值
+                <span class="level-tag">CAPM</span>
+            </a>
+        </div>
+
+        <hr class="nav-divider" />
+
         <!-- 核心系统 -->
         <div class="nav-group">
             <div class="group-label">⚙️ 核心系统</div>
@@ -786,10 +801,6 @@
             <a href="cross-domain-mapping.html" class="nav-item">
                 <span class="icon">⚡</span> 跨领域吞噬
                 <span class="level-tag">验证</span>
-            </a>
-            <a href="marketing-reinvented.html" class="nav-item">
-                <span class="icon">🔍</span> 营销学重构
-                <span class="level-tag">重构</span>
             </a>
             <a href="business-learning-evidence.html" class="nav-item">
                 <span class="icon">📊</span> 商业证据链
@@ -855,17 +866,54 @@
                 </div>
             </div>
 
-            <!-- ===== 推荐路径 ===== -->
+            <!-- ===== 推荐路径（精算流水线） ===== -->
             <div class="recommend">
-                <span class="label">📌 推荐路径</span>
+                <span class="label">📌 精算流水线</span>
                 <div class="path">
+                    <span class="step">信息漏斗</span>
+                    <span class="arrow">→</span>
                     <span class="step">画圈实验</span>
                     <span class="arrow">→</span>
-                    <span class="step">博弈论底座</span>
+                    <span class="step">资本定价估值</span>
                     <span class="arrow">→</span>
-                    <span class="step">估值底座</span>
-                    <span class="arrow">→</span>
-                    <span class="step" style="color:rgba(255,255,255,0.08);">证据链</span>
+                    <span class="step" style="color:rgba(255,255,255,0.08);">商业证据链</span>
+                </div>
+            </div>
+
+            <!-- ===== 精算系统数据流可视化 ===== -->
+            <div class="section-label">🧮 精算系统 · 数据流</div>
+            <div id="funnelFlow" style="background: rgba(167,139,250,0.03); border: 1px solid rgba(167,139,250,0.10); border-radius: 16px; padding: 18px 22px; margin-bottom: 28px;">
+                <div style="display: grid; grid-template-columns: 1fr auto 1fr auto 1fr auto 1fr; gap: 8px; align-items: center; font-size: 12px;">
+                    <a href="info-funnel.html" style="text-decoration:none; text-align:center; padding: 12px 8px; background: rgba(167,139,250,0.06); border: 1px solid rgba(167,139,250,0.12); border-radius: 10px; color: rgba(255,255,255,0.7);">
+                        <div style="font-size: 20px;">🔭</div>
+                        <div style="font-weight:600; margin-top:4px;">信息漏斗</div>
+                        <div style="font-size: 10px; color: rgba(255,255,255,0.25); margin-top: 2px;">七层前置筛选</div>
+                        <div id="flowStatusFunnel" style="font-size: 9px; margin-top: 4px; color: rgba(255,255,255,0.15);">○ 待启动</div>
+                    </a>
+                    <span style="color: rgba(167,139,250,0.4); font-size: 16px;">→</span>
+                    <a href="circle-lab.html" style="text-decoration:none; text-align:center; padding: 12px 8px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04); border-radius: 10px; color: rgba(255,255,255,0.7);">
+                        <div style="font-size: 20px;">🧪</div>
+                        <div style="font-weight:600; margin-top:4px;">画圈实验</div>
+                        <div style="font-size: 10px; color: rgba(255,255,255,0.25); margin-top: 2px;">行为信号采集</div>
+                        <div id="flowStatusCircle" style="font-size: 9px; margin-top: 4px; color: rgba(255,255,255,0.15);">○ 待启动</div>
+                    </a>
+                    <span style="color: rgba(167,139,250,0.4); font-size: 16px;">→</span>
+                    <a href="marketing-reinvented.html" style="text-decoration:none; text-align:center; padding: 12px 8px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04); border-radius: 10px; color: rgba(255,255,255,0.7);">
+                        <div style="font-size: 20px;">📊</div>
+                        <div style="font-weight:600; margin-top:4px;">资本定价</div>
+                        <div style="font-size: 10px; color: rgba(255,255,255,0.25); margin-top: 2px;">CAPM 精算</div>
+                        <div id="flowStatusCapm" style="font-size: 9px; margin-top: 4px; color: rgba(255,255,255,0.15);">○ 待启动</div>
+                    </a>
+                    <span style="color: rgba(167,139,250,0.4); font-size: 16px;">→</span>
+                    <a href="business-learning-evidence.html" style="text-decoration:none; text-align:center; padding: 12px 8px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04); border-radius: 10px; color: rgba(255,255,255,0.7);">
+                        <div style="font-size: 20px;">📈</div>
+                        <div style="font-weight:600; margin-top:4px;">商业证据链</div>
+                        <div style="font-size: 10px; color: rgba(255,255,255,0.25); margin-top: 2px;">模型对标</div>
+                        <div id="flowStatusEvidence" style="font-size: 9px; margin-top: 4px; color: rgba(255,255,255,0.15);">○ 待启动</div>
+                    </a>
+                </div>
+                <div style="text-align: center; margin-top: 10px; font-size: 10px; color: rgba(255,255,255,0.15); letter-spacing: 0.3px;">
+                    localStorage 数据总线 · 跨页实时同步 · 漏斗覆盖 CAPM 输入
                 </div>
             </div>
 
@@ -895,10 +943,6 @@
             <div class="nav-grid">
                 <a href="cross-domain-mapping.html" class="nav-card">
                     <span class="icon">⚡</span> 6小时吞噬6个领域
-                    <span class="arrow">→</span>
-                </a>
-                <a href="marketing-reinvented.html" class="nav-card">
-                    <span class="icon">🔍</span> 元架构重构营销学
                     <span class="arrow">→</span>
                 </a>
                 <a href="business-learning-evidence.html" class="nav-card">
@@ -955,6 +999,86 @@
             glow.style.setProperty('--x', x + '%');
             glow.style.setProperty('--y', y + '%');
         });
+
+        // ===== 精算系统数据流状态灯 =====
+        // 读取 localStorage 数据总线，实时反映各模块状态
+        function updateFlowStatus() {
+            const setLight = (id, text, color) => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                el.textContent = text;
+                el.style.color = color;
+            };
+
+            // 信息漏斗：检查 funnelOutput
+            try {
+                const funnel = JSON.parse(localStorage.getItem('funnelOutput') || 'null');
+                if (funnel && funnel.timestamp) {
+                    const ageMin = (Date.now() - funnel.timestamp) / 60000;
+                    if (ageMin < 30) {
+                        setLight('flowStatusFunnel', '● 已就绪', '#22c55e');
+                    } else {
+                        setLight('flowStatusFunnel', '○ 数据过期', 'rgba(255,255,255,0.25)');
+                    }
+                } else {
+                    setLight('flowStatusFunnel', '○ 待启动', 'rgba(255,255,255,0.15)');
+                }
+            } catch(e) {
+                setLight('flowStatusFunnel', '○ 待启动', 'rgba(255,255,255,0.15)');
+            }
+
+            // 画圈实验：检查 circleLabData
+            try {
+                const circle = JSON.parse(localStorage.getItem('circleLabData') || 'null');
+                if (circle && (circle.motor?.hasData || circle.model?.hasData || circle.market?.hasData)) {
+                    setLight('flowStatusCircle', '● 已采集', '#22c55e');
+                } else {
+                    setLight('flowStatusCircle', '○ 待启动', 'rgba(255,255,255,0.15)');
+                }
+            } catch(e) {
+                setLight('flowStatusCircle', '○ 待启动', 'rgba(255,255,255,0.15)');
+            }
+
+            // 资本定价：检查是否被漏斗覆盖
+            try {
+                const funnel = JSON.parse(localStorage.getItem('funnelOutput') || 'null');
+                const capmAuto = localStorage.getItem('capmAutoMode');
+                if (capmAuto === 'true' && funnel) {
+                    setLight('flowStatusCapm', '● 漏斗接管', '#a78bfa');
+                } else if (capmAuto === 'false') {
+                    setLight('flowStatusCapm', '● 手动模式', '#60a5fa');
+                } else {
+                    setLight('flowStatusCapm', '○ 待启动', 'rgba(255,255,255,0.15)');
+                }
+            } catch(e) {
+                setLight('flowStatusCapm', '○ 待启动', 'rgba(255,255,255,0.15)');
+            }
+
+            // 商业证据链：检查 founderMatch
+            try {
+                const founder = JSON.parse(localStorage.getItem('founderMatch') || 'null');
+                if (founder && founder.matchScore) {
+                    setLight('flowStatusEvidence', '● 已对标', '#22c55e');
+                } else {
+                    setLight('flowStatusEvidence', '○ 待启动', 'rgba(255,255,255,0.15)');
+                }
+            } catch(e) {
+                setLight('flowStatusEvidence', '○ 待启动', 'rgba(255,255,255,0.15)');
+            }
+        }
+
+        // 初始渲染
+        updateFlowStatus();
+
+        // 监听跨页 storage 变化（其他页面更新 localStorage 时实时刷新状态灯）
+        window.addEventListener('storage', (e) => {
+            if (['funnelOutput', 'circleLabData', 'capmAutoMode', 'founderMatch'].includes(e.key)) {
+                updateFlowStatus();
+            }
+        });
+
+        // 本页自身可能修改 localStorage 时也要刷新（storage 事件不触发同页）
+        window.addEventListener('funnel-bus-update', updateFlowStatus);
     </script>
 
 </body>
