@@ -1,0 +1,1512 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Y.Mine · 案例库 · 16 案例向量矩阵</title>
+    <style>
+        /* ===== 全局重置 ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0b0b1a;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            padding: 20px 20px 20px 0;
+            overflow-x: hidden;
+            color: #f1f5f9;
+        }
+
+        /* ===== 左侧导航栏 ===== */
+        .sidebar {
+            width: 260px;
+            min-height: 100vh;
+            padding: 32px 16px 24px;
+            background: rgba(11, 11, 26, 0.85);
+            backdrop-filter: blur(12px);
+            border-right: 1px solid rgba(255, 255, 255, 0.04);
+            flex-shrink: 0;
+            overflow-y: auto;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar::-webkit-scrollbar { width: 3px; }
+        .sidebar::-webkit-scrollbar-track { background: transparent; }
+        .sidebar::-webkit-scrollbar-thumb { background: rgba(167, 139, 250, 0.15); border-radius: 4px; }
+
+        .sidebar .logo {
+            font-size: 16px;
+            font-weight: 700;
+            color: #f1f5f9;
+            margin-bottom: 4px;
+            letter-spacing: -0.3px;
+        }
+        .sidebar .logo span { color: #a78bfa; }
+        .sidebar .logo-sub {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.15);
+            margin-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            padding-bottom: 14px;
+        }
+
+        .nav-group { margin-bottom: 16px; }
+        .nav-group .group-label {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: rgba(255, 255, 255, 0.1);
+            padding: 0 12px;
+            margin-bottom: 4px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 7px 12px;
+            border-radius: 8px;
+            text-decoration: none;
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.25s ease;
+            cursor: pointer;
+            border-left: 2px solid transparent;
+        }
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.03);
+            color: rgba(255, 255, 255, 0.6);
+            border-left-color: rgba(167, 139, 250, 0.2);
+        }
+        .nav-item.active {
+            color: #f1f5f9;
+            background: rgba(167, 139, 250, 0.05);
+            border-left-color: #a78bfa;
+        }
+        .nav-item .icon {
+            font-size: 14px;
+            width: 24px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+        .nav-item .level-tag {
+            font-size: 9px;
+            color: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.03);
+            padding: 0 8px;
+            border-radius: 8px;
+            margin-left: auto;
+        }
+        .nav-item .level-tag.active-tag {
+            color: #a78bfa;
+            background: rgba(167, 139, 250, 0.08);
+        }
+
+        .nav-divider {
+            border: none;
+            border-top: 1px solid rgba(255, 255, 255, 0.03);
+            margin: 8px 12px;
+        }
+
+        .sidebar .footer-nav {
+            margin-top: auto;
+            padding-top: 16px;
+            border-top: 1px solid rgba(255, 255, 255, 0.03);
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.08);
+            text-align: center;
+        }
+
+        /* ===== 鼠标跟随光晕 ===== */
+        #glow {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            background: radial-gradient(600px circle at var(--x, 50%) var(--y, 50%), rgba(120, 80, 255, 0.06), transparent 80%);
+            transition: background 0.1s;
+        }
+
+        /* ===== 主内容 ===== */
+        .main-content {
+            flex: 1;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 32px 32px 32px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            background: radial-gradient(ellipse at 30% 30%, #120b24, #0b0b1a 70%, #05030a);
+            border-radius: 32px;
+            padding: 36px 44px 44px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            box-shadow: 0 30px 80px rgba(40, 10, 80, 0.4);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+            backdrop-filter: blur(2px);
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: -100px;
+            right: -100px;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(80, 30, 140, 0.15), transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: floatBg 12s ease-in-out infinite alternate;
+        }
+        .container::after {
+            content: '';
+            position: absolute;
+            bottom: -80px;
+            left: -80px;
+            width: 350px;
+            height: 350px;
+            background: radial-gradient(circle, rgba(30, 60, 150, 0.1), transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: floatBg 10s ease-in-out infinite alternate-reverse;
+        }
+
+        @keyframes floatBg {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(30px, -20px) scale(1.1); }
+        }
+
+        @keyframes gradientFlow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* ===== 返回链接 ===== */
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            color: rgba(167, 139, 250, 0.7);
+            text-decoration: none;
+            padding: 6px 14px;
+            border: 1px solid rgba(167, 139, 250, 0.15);
+            border-radius: 16px;
+            background: rgba(167, 139, 250, 0.04);
+            transition: 0.25s;
+            position: relative;
+            z-index: 1;
+            margin-bottom: 18px;
+        }
+        .back-link:hover {
+            color: #c4b5fd;
+            border-color: rgba(167, 139, 250, 0.4);
+            background: rgba(167, 139, 250, 0.1);
+        }
+
+        /* ===== 头部 ===== */
+        .header {
+            text-align: center;
+            margin-bottom: 28px;
+            position: relative;
+            z-index: 1;
+        }
+        .badge {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 13px;
+            font-weight: 600;
+            padding: 4px 16px;
+            border-radius: 20px;
+            letter-spacing: 0.3px;
+            margin-bottom: 12px;
+        }
+        .header h1 {
+            font-size: 34px;
+            font-weight: 700;
+            color: #f1f5f9;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #f1f5f9, #a78bfa, #60a5fa, #f1f5f9);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradientFlow 6s ease-in-out infinite;
+        }
+        .header .sub {
+            margin-top: 8px;
+            font-size: 15px;
+            color: rgba(255, 255, 255, 0.35);
+            font-weight: 300;
+        }
+
+        /* ===== 段落标题 ===== */
+        .section-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: rgba(255, 255, 255, 0.08);
+            margin: 28px 0 14px;
+            padding-bottom: 6px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ===== 板块1 · 案例卡片矩阵 ===== */
+        .case-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .case-card {
+            background: rgba(255, 255, 255, 0.025);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 14px;
+            padding: 14px 14px 12px;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(4px);
+        }
+        .case-card:hover {
+            transform: translateY(-3px);
+            border-color: rgba(167, 139, 250, 0.25);
+            background: rgba(255, 255, 255, 0.04);
+            box-shadow: 0 12px 32px rgba(80, 30, 140, 0.2);
+        }
+        .case-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--type-color, #a78bfa);
+            opacity: 0.6;
+        }
+
+        .case-card .case-id {
+            font-size: 9px;
+            color: rgba(255, 255, 255, 0.25);
+            font-family: 'SF Mono', Menlo, monospace;
+            letter-spacing: 0.5px;
+            margin-bottom: 2px;
+        }
+        .case-card .case-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.85);
+            margin-bottom: 8px;
+            line-height: 1.3;
+            min-height: 34px;
+        }
+        .case-card .type-badge {
+            display: inline-block;
+            font-size: 9px;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            letter-spacing: 0.3px;
+            background: var(--type-bg);
+            color: var(--type-color);
+            border: 1px solid var(--type-border);
+        }
+
+        .case-card .vector-mini {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 3px;
+            margin-bottom: 10px;
+        }
+        .case-card .v-cell {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 4px;
+            padding: 3px 0;
+            text-align: center;
+            font-size: 8px;
+            font-family: 'SF Mono', Menlo, monospace;
+            color: rgba(255, 255, 255, 0.4);
+        }
+        .case-card .v-cell .v-label {
+            display: block;
+            font-size: 7px;
+            color: rgba(255, 255, 255, 0.2);
+            margin-bottom: 1px;
+            text-transform: uppercase;
+        }
+
+        .case-card .case-metrics {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 8px;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+            font-size: 10px;
+        }
+        .case-card .metric-c {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        .case-card .metric-c .label {
+            font-size: 8px;
+            color: rgba(255, 255, 255, 0.25);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        .case-card .metric-c .value {
+            font-size: 14px;
+            font-weight: 700;
+            font-family: 'SF Mono', Menlo, monospace;
+        }
+        .case-card .metric-c.green .value { color: #22c55e; }
+        .case-card .metric-c.yellow .value { color: #eab308; }
+        .case-card .metric-c.red .value { color: #ef4444; }
+        .case-card .metric-pe {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+        .case-card .metric-pe .label {
+            font-size: 8px;
+            color: rgba(255, 255, 255, 0.25);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        .case-card .metric-pe .value {
+            font-size: 14px;
+            font-weight: 700;
+            color: #a78bfa;
+            font-family: 'SF Mono', Menlo, monospace;
+        }
+
+        /* ===== 板块2 · 对比表 ===== */
+        .table-wrap {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 14px;
+            overflow: auto;
+            position: relative;
+            z-index: 1;
+            max-height: 560px;
+        }
+        .table-wrap::-webkit-scrollbar { width: 6px; height: 6px; }
+        .table-wrap::-webkit-scrollbar-thumb { background: rgba(167,139,250,0.2); border-radius: 4px; }
+
+        table.cmp-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+            min-width: 880px;
+        }
+        table.cmp-table thead th {
+            position: sticky;
+            top: 0;
+            background: rgba(18, 11, 36, 0.95);
+            backdrop-filter: blur(8px);
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 10px 8px;
+            text-align: center;
+            border-bottom: 1px solid rgba(167, 139, 250, 0.15);
+            white-space: nowrap;
+            z-index: 2;
+        }
+        table.cmp-table thead th:first-child { text-align: left; padding-left: 16px; }
+        table.cmp-table tbody td {
+            padding: 9px 8px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            color: rgba(255, 255, 255, 0.6);
+            font-family: 'SF Mono', Menlo, monospace;
+            font-size: 11px;
+        }
+        table.cmp-table tbody td:first-child {
+            text-align: left;
+            padding-left: 16px;
+            color: rgba(167, 139, 250, 0.7);
+            font-weight: 600;
+        }
+        table.cmp-table tbody td.name-cell {
+            text-align: left;
+            color: rgba(255, 255, 255, 0.8);
+            font-family: system-ui;
+            font-weight: 500;
+        }
+        table.cmp-table tbody td.type-cell {
+            text-align: left;
+            font-family: system-ui;
+            font-size: 10px;
+        }
+        table.cmp-table tbody tr:hover {
+            background: rgba(167, 139, 250, 0.04);
+        }
+        table.cmp-table tbody td.c-cell { font-weight: 700; }
+        table.cmp-table tbody td.c-cell.green { color: #22c55e; }
+        table.cmp-table tbody td.c-cell.yellow { color: #eab308; }
+        table.cmp-table tbody td.c-cell.red { color: #ef4444; }
+        table.cmp-table tbody td.pe-cell { color: #a78bfa; font-weight: 600; }
+
+        .type-pill {
+            display: inline-block;
+            padding: 1px 7px;
+            border-radius: 6px;
+            font-size: 9px;
+            font-weight: 600;
+            background: var(--type-bg);
+            color: var(--type-color);
+            border: 1px solid var(--type-border);
+            white-space: nowrap;
+        }
+
+        /* ===== 板块3 · 相似度匹配 ===== */
+        .match-area {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 14px;
+            padding: 18px 22px;
+            position: relative;
+            z-index: 1;
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 22px;
+        }
+
+        .match-sliders h3,
+        .match-results h3 {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.5);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            margin-bottom: 14px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        }
+        .match-sliders h3 .hint,
+        .match-results h3 .hint {
+            font-size: 9px;
+            color: rgba(255, 255, 255, 0.2);
+            font-weight: 400;
+            margin-left: 8px;
+            text-transform: none;
+            letter-spacing: 0;
+        }
+
+        .slider-row {
+            display: grid;
+            grid-template-columns: 90px 1fr 48px;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .slider-row .s-label {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.55);
+            font-weight: 500;
+        }
+        .slider-row .s-label .s-sub {
+            display: block;
+            font-size: 8px;
+            color: rgba(255, 255, 255, 0.2);
+            margin-top: 1px;
+        }
+        .slider-row input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 4px;
+            outline: none;
+        }
+        .slider-row input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 14px;
+            height: 14px;
+            background: #a78bfa;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(167, 139, 250, 0.5);
+            transition: transform 0.15s;
+        }
+        .slider-row input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+        .slider-row input[type="range"]::-moz-range-thumb {
+            width: 14px;
+            height: 14px;
+            background: #a78bfa;
+            border-radius: 50%;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 0 10px rgba(167, 139, 250, 0.5);
+        }
+        .slider-row .s-value {
+            font-size: 12px;
+            color: #a78bfa;
+            font-family: 'SF Mono', Menlo, monospace;
+            text-align: right;
+            font-weight: 600;
+        }
+
+        .user-vector-display {
+            margin-top: 14px;
+            padding: 10px 12px;
+            background: rgba(167, 139, 250, 0.05);
+            border: 1px dashed rgba(167, 139, 250, 0.2);
+            border-radius: 10px;
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.4);
+            font-family: 'SF Mono', Menlo, monospace;
+            word-break: break-all;
+        }
+        .user-vector-display .uv-label {
+            color: rgba(255, 255, 255, 0.25);
+            margin-right: 6px;
+        }
+        .user-vector-display .uv-val {
+            color: #c4b5fd;
+        }
+
+        .top-matches {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .top-match {
+            display: grid;
+            grid-template-columns: 28px 1fr auto;
+            gap: 12px;
+            align-items: center;
+            padding: 12px 14px;
+            background: rgba(255, 255, 255, 0.025);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            transition: 0.25s;
+        }
+        .top-match:hover {
+            border-color: rgba(167, 139, 250, 0.3);
+            background: rgba(167, 139, 250, 0.05);
+        }
+        .top-match.rank-1 {
+            background: linear-gradient(135deg, rgba(167, 139, 250, 0.12), rgba(167, 139, 250, 0.03));
+            border-color: rgba(167, 139, 250, 0.35);
+        }
+        .top-match .rank {
+            font-size: 18px;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.15);
+            text-align: center;
+            font-family: 'SF Mono', Menlo, monospace;
+        }
+        .top-match.rank-1 .rank { color: #a78bfa; }
+        .top-match.rank-2 .rank { color: rgba(192, 132, 252, 0.5); }
+        .top-match.rank-3 .rank { color: rgba(255, 255, 255, 0.3); }
+        .top-match .info .m-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.85);
+            margin-bottom: 3px;
+        }
+        .top-match .info .m-meta {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.3);
+            font-family: 'SF Mono', Menlo, monospace;
+        }
+        .top-match .score {
+            text-align: right;
+        }
+        .top-match .score .pct {
+            font-size: 18px;
+            font-weight: 700;
+            color: #22c55e;
+            font-family: 'SF Mono', Menlo, monospace;
+        }
+        .top-match .score .pct-label {
+            display: block;
+            font-size: 8px;
+            color: rgba(255, 255, 255, 0.25);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            margin-top: 2px;
+        }
+
+        .full-rank-list {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px dashed rgba(255, 255, 255, 0.05);
+        }
+        .full-rank-list .fr-title {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.25);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+        .full-rank-list .fr-bars {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            max-height: 180px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+        .full-rank-list .fr-bars::-webkit-scrollbar { width: 3px; }
+        .full-rank-list .fr-bars::-webkit-scrollbar-thumb { background: rgba(167,139,250,0.15); border-radius: 4px; }
+        .fr-bar {
+            display: grid;
+            grid-template-columns: 60px 1fr 44px;
+            gap: 8px;
+            align-items: center;
+            font-size: 10px;
+        }
+        .fr-bar .frb-name {
+            color: rgba(255, 255, 255, 0.4);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .fr-bar .frb-track {
+            height: 6px;
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        .fr-bar .frb-fill {
+            height: 100%;
+            background: linear-gradient(90deg, rgba(167, 139, 250, 0.6), #a78bfa);
+            border-radius: 3px;
+            transition: width 0.3s;
+        }
+        .fr-bar .frb-val {
+            text-align: right;
+            color: rgba(255, 255, 255, 0.5);
+            font-family: 'SF Mono', Menlo, monospace;
+            font-size: 9px;
+        }
+
+        /* ===== 板块4 · 散点图 ===== */
+        .scatter-wrap {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 14px;
+            padding: 18px 22px 22px;
+            position: relative;
+            z-index: 1;
+        }
+        .scatter-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px 16px;
+            margin-bottom: 14px;
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.45);
+        }
+        .scatter-legend .lg-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .scatter-legend .lg-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .scatter-plot {
+            position: relative;
+            width: 100%;
+            height: 380px;
+            background:
+                linear-gradient(to right, rgba(255,255,255,0.025) 1px, transparent 1px) 0 0 / 20% 100%,
+                linear-gradient(to bottom, rgba(255,255,255,0.025) 1px, transparent 1px) 0 0 / 100% 20%,
+                rgba(255, 255, 255, 0.01);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            margin-left: 44px;
+            margin-bottom: 28px;
+        }
+
+        .scatter-y-axis {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 40px;
+            height: 100%;
+            display: flex;
+            flex-direction: column-reverse;
+            justify-content: space-between;
+            padding: 0 4px 0 0;
+            font-size: 9px;
+            color: rgba(255, 255, 255, 0.3);
+            font-family: 'SF Mono', Menlo, monospace;
+            text-align: right;
+        }
+        .scatter-y-axis .y-label {
+            transform: translateX(-30px) translateY(-4px);
+            position: absolute;
+            top: 50%;
+            font-size: 9px;
+            color: rgba(255, 255, 255, 0.35);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            writing-mode: vertical-rl;
+            transform: rotate(180deg) translateY(0);
+            left: -22px;
+        }
+
+        .scatter-x-axis {
+            position: absolute;
+            left: 0;
+            bottom: -22px;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            font-size: 9px;
+            color: rgba(255, 255, 255, 0.3);
+            font-family: 'SF Mono', Menlo, monospace;
+        }
+        .scatter-x-axis .x-label {
+            position: absolute;
+            bottom: -16px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 9px;
+            color: rgba(255, 255, 255, 0.35);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .scatter-dot {
+            position: absolute;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            transform: translate(-50%, 50%);
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 0 8px var(--dot-glow, rgba(167, 139, 250, 0.4));
+        }
+        .scatter-dot:hover {
+            transform: translate(-50%, 50%) scale(1.5);
+            z-index: 10;
+            border-color: rgba(255, 255, 255, 0.6);
+        }
+        .scatter-dot .dot-tooltip {
+            position: absolute;
+            bottom: 18px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(11, 11, 26, 0.96);
+            border: 1px solid rgba(167, 139, 250, 0.3);
+            border-radius: 8px;
+            padding: 8px 10px;
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.85);
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s;
+            z-index: 100;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+        }
+        .scatter-dot:hover .dot-tooltip {
+            opacity: 1;
+        }
+        .scatter-dot .dot-tooltip .tt-title {
+            color: #a78bfa;
+            font-weight: 600;
+            margin-bottom: 3px;
+            font-size: 11px;
+        }
+        .scatter-dot .dot-tooltip .tt-row {
+            color: rgba(255, 255, 255, 0.55);
+            font-family: 'SF Mono', Menlo, monospace;
+            font-size: 9px;
+        }
+
+        /* ===== 底部 ===== */
+        .footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.15);
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 32px;
+            position: relative;
+            z-index: 1;
+        }
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.2);
+            text-decoration: none;
+            margin-right: 20px;
+            transition: color 0.2s;
+        }
+        .footer-links a:hover { color: rgba(255, 255, 255, 0.5); }
+        .footer-status { display: flex; align-items: center; gap: 6px; }
+        .dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: #22c55e;
+            border-radius: 50%;
+            box-shadow: 0 0 12px rgba(34, 197, 94, 0.2);
+        }
+
+        .bus-status {
+            font-size: 10px;
+            color: rgba(34, 197, 94, 0.6);
+            font-family: 'SF Mono', Menlo, monospace;
+            margin-left: 10px;
+        }
+
+        /* ===== 响应式 ===== */
+        @media (max-width: 1100px) {
+            .case-grid { grid-template-columns: repeat(3, 1fr); }
+            .match-area { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 900px) {
+            body {
+                padding: 0;
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                height: auto;
+                min-height: 0;
+                padding: 16px;
+                border-right: none;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+                position: relative;
+                flex-direction: row;
+                flex-wrap: wrap;
+                gap: 6px;
+                backdrop-filter: blur(8px);
+            }
+            .sidebar .logo, .sidebar .logo-sub, .sidebar .footer-nav { display: none; }
+            .sidebar .nav-group {
+                margin-bottom: 0;
+                display: flex;
+                flex-wrap: wrap;
+                gap: 4px;
+            }
+            .sidebar .nav-group .group-label { display: none; }
+            .sidebar .nav-item {
+                padding: 4px 10px;
+                font-size: 12px;
+                border-left: none;
+                border-bottom: 2px solid transparent;
+            }
+            .sidebar .nav-item.active {
+                border-bottom-color: #a78bfa;
+                background: transparent;
+            }
+            .sidebar .nav-item .level-tag { display: none; }
+            .sidebar .nav-divider { display: none; }
+            .main-content { padding: 16px; }
+            .container { padding: 20px 16px; border-radius: 0; }
+            .header h1 { font-size: 24px; }
+            .case-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 480px) {
+            .case-grid { grid-template-columns: 1fr; }
+            .header h1 { font-size: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== 鼠标跟随光晕 ===== -->
+    <div id="glow"></div>
+
+    <!-- ===== 左侧导航栏 ===== -->
+    <div class="sidebar">
+        <div class="logo">Y.<span>Mine</span></div>
+        <div class="logo-sub">自动化决策系统</div>
+
+        <!-- 精算系统 -->
+        <div class="nav-group">
+            <div class="group-label">🧮 精算系统</div>
+            <a href="info-funnel.html" class="nav-item">
+                <span class="icon">🔭</span> 信息漏斗
+                <span class="level-tag active-tag">前置</span>
+            </a>
+            <a href="marketing-reinvented.html" class="nav-item">
+                <span class="icon">🧪</span> 金融估值模拟器
+                <span class="level-tag">精算</span>
+            </a>
+        </div>
+
+        <hr class="nav-divider" />
+
+        <!-- 核心系统 -->
+        <div class="nav-group">
+            <div class="group-label">⚙️ 核心系统</div>
+            <a href="index.html" class="nav-item">
+                <span class="icon">🏠</span> 总控台
+                <span class="level-tag">首页</span>
+            </a>
+            <a href="circle-lab.html" class="nav-item">
+                <span class="icon">🧪</span> 画圈实验
+                <span class="level-tag">方法论</span>
+            </a>
+            <a href="gamemind.html" class="nav-item">
+                <span class="icon">🎯</span> GameMind
+                <span class="level-tag">策略</span>
+            </a>
+            <a href="moodmind.html" class="nav-item">
+                <span class="icon">📊</span> MoodMind
+                <span class="level-tag">估值</span>
+            </a>
+            <a href="evolvemind.html" class="nav-item">
+                <span class="icon">🧠</span> EvolveMind
+                <span class="level-tag">认知</span>
+            </a>
+            <a href="case-library.html" class="nav-item active">
+                <span class="icon">📁</span> 案例库
+                <span class="level-tag active-tag">本页</span>
+            </a>
+        </div>
+
+        <hr class="nav-divider" />
+
+        <!-- 证据链 -->
+        <div class="nav-group">
+            <div class="group-label">🔗 证据链</div>
+            <a href="cross-domain-mapping.html" class="nav-item">
+                <span class="icon">⚡</span> 跨领域吞噬
+                <span class="level-tag">验证</span>
+            </a>
+            <a href="business-learning-evidence.html" class="nav-item">
+                <span class="icon">📊</span> 商业证据链
+                <span class="level-tag">闭环</span>
+            </a>
+            <a href="value-pyramid.html" class="nav-item">
+                <span class="icon">📐</span> 价值金字塔
+                <span class="level-tag">分层</span>
+            </a>
+        </div>
+
+        <hr class="nav-divider" />
+
+        <!-- 工具 -->
+        <div class="nav-group">
+            <div class="group-label">🛠️ 工具</div>
+            <a href="language-mapping-evidence.html" class="nav-item">
+                <span class="icon">🌐</span> 语言映射
+                <span class="level-tag">迁移</span>
+            </a>
+            <a href="general-game-os.html" class="nav-item">
+                <span class="icon">🚁</span> 低空经济
+                <span class="level-tag">应用</span>
+            </a>
+            <a href="binary-solver.html" class="nav-item">
+                <span class="icon">🧩</span> 二元拆分
+                <span class="level-tag">工具</span>
+            </a>
+        </div>
+
+        <div class="footer-nav">v1.2 · 案例库</div>
+    </div>
+
+    <!-- ===== 主内容 ===== -->
+    <div class="main-content">
+
+        <div class="container">
+
+            <!-- ===== 返回链接 ===== -->
+            <a href="index.html" class="back-link">← 返回总控台</a>
+
+            <!-- ===== 头部 ===== -->
+            <div class="header">
+                <div class="badge">✦ 案例库 · 16 案例向量矩阵</div>
+                <h1>案例库 · 16 案例向量矩阵</h1>
+                <div class="sub">瑞幸 × 隐形冠军 × AI 行业 · 余弦相似度匹配</div>
+            </div>
+
+            <!-- ===== 板块 1 · 案例卡片矩阵 ===== -->
+            <div class="section-label">📋 板块 1 · 案例卡片矩阵（16 案例 · 4 列网格）</div>
+            <div class="case-grid" id="caseGrid"></div>
+
+            <!-- ===== 板块 2 · 案例对比表 ===== -->
+            <div class="section-label">📊 板块 2 · 案例对比表（16 行 · 10 列指标）</div>
+            <div class="table-wrap">
+                <table class="cmp-table" id="cmpTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>名称</th>
+                            <th>类型</th>
+                            <th>凯利 f*</th>
+                            <th>杠杆 L</th>
+                            <th>夏普 SR</th>
+                            <th>回撤 mdd</th>
+                            <th>边际递减 dim</th>
+                            <th>机会成本 oc</th>
+                            <th>浓度 C</th>
+                            <th>估值乘数</th>
+                        </tr>
+                    </thead>
+                    <tbody id="cmpBody"></tbody>
+                </table>
+            </div>
+
+            <!-- ===== 板块 3 · 向量相似度匹配 ===== -->
+            <div class="section-label">🎯 板块 3 · 向量相似度匹配（创始人画像圈映射）</div>
+            <div class="match-area">
+                <div class="match-sliders">
+                    <h3>🎛️ 你的 6 维向量 <span class="hint">滑块范围 0-1</span></h3>
+                    <div class="slider-row">
+                        <div class="s-label">凯利 f*<span class="s-sub">Kelly fraction</span></div>
+                        <input type="range" id="s0" min="0" max="1" step="0.01" value="0.40" data-idx="0" />
+                        <div class="s-value" id="v0">0.40</div>
+                    </div>
+                    <div class="slider-row">
+                        <div class="s-label">杠杆 L<span class="s-sub">Leverage</span></div>
+                        <input type="range" id="s1" min="0" max="1" step="0.01" value="0.50" data-idx="1" />
+                        <div class="s-value" id="v1">0.50</div>
+                    </div>
+                    <div class="slider-row">
+                        <div class="s-label">夏普 SR<span class="s-sub">Sharpe Ratio</span></div>
+                        <input type="range" id="s2" min="0" max="1" step="0.01" value="0.50" data-idx="2" />
+                        <div class="s-value" id="v2">0.50</div>
+                    </div>
+                    <div class="slider-row">
+                        <div class="s-label">回撤 mdd<span class="s-sub">Max Drawdown</span></div>
+                        <input type="range" id="s3" min="0" max="1" step="0.01" value="0.40" data-idx="3" />
+                        <div class="s-value" id="v3">0.40</div>
+                    </div>
+                    <div class="slider-row">
+                        <div class="s-label">边际递减<span class="s-sub">Diminishing</span></div>
+                        <input type="range" id="s4" min="0" max="1" step="0.01" value="0.50" data-idx="4" />
+                        <div class="s-value" id="v4">0.50</div>
+                    </div>
+                    <div class="slider-row">
+                        <div class="s-label">机会成本<span class="s-sub">Opp. Cost</span></div>
+                        <input type="range" id="s5" min="0" max="1" step="0.01" value="0.40" data-idx="5" />
+                        <div class="s-value" id="v5">0.40</div>
+                    </div>
+                    <div class="user-vector-display">
+                        <span class="uv-label">当前向量 →</span>
+                        <span class="uv-val" id="uvDisplay">[0.40, 0.50, 0.50, 0.40, 0.50, 0.40]</span>
+                    </div>
+                </div>
+
+                <div class="match-results">
+                    <h3>🏆 Top 3 最匹配案例 <span class="hint">余弦相似度</span></h3>
+                    <div class="top-matches" id="topMatches"></div>
+
+                    <div class="full-rank-list">
+                        <div class="fr-title">完整相似度排行（16 案例）</div>
+                        <div class="fr-bars" id="fullRank"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== 板块 4 · 浓度-估值散点图 ===== -->
+            <div class="section-label">🔬 板块 4 · 浓度-估值散点图（C × PE）</div>
+            <div class="scatter-wrap">
+                <div class="scatter-legend" id="scatterLegend"></div>
+                <div class="scatter-plot" id="scatterPlot">
+                    <div class="scatter-y-axis" id="scatterY"></div>
+                    <div class="scatter-x-axis" id="scatterX"></div>
+                </div>
+            </div>
+
+            <!-- ===== 底部 ===== -->
+            <div class="footer">
+                <div class="footer-links">
+                    <a href="index.html">🏠 总控台</a>
+                    <a href="circle-lab.html">🧪 画圈实验</a>
+                    <a href="business-learning-evidence.html">📊 商业证据链</a>
+                </div>
+                <div class="footer-status">
+                    <span class="dot"></span>
+                    <span>案例库运行中 · v1.2<span class="bus-status" id="busStatus">○ 总线待写入</span></span>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <script>
+        // ============================================================
+        // 16 案例数据 · 6 维向量 [f*, L, SR, mdd, dim, oc]
+        // ============================================================
+        const CASES = [
+            // 瑞幸 + 隐形冠军（8 个）
+            { id: 'CASE_001', name: '瑞幸 9.9 价格战', type: '价格战反例', typeKey: 'price-war',
+              vector: [0.08, 1.8, 0.4, 0.5, 0.7, 0.3], C: 0.32, pe: 8, beta: 1.8, fstar: 0.08 },
+            { id: 'CASE_002', name: '海天味业', type: '防御型基础', typeKey: 'defensive',
+              vector: [0.22, 0.5, 1.2, 0.15, 0.4, 0.2], C: 0.48, pe: 15 },
+            { id: 'CASE_003', name: '公牛集团', type: '防御型基础', typeKey: 'defensive',
+              vector: [0.20, 0.4, 1.3, 0.18, 0.4, 0.2], C: 0.50, pe: 16 },
+            { id: 'CASE_004', name: '福耀玻璃', type: 'B2B 隐形冠军', typeKey: 'b2b',
+              vector: [0.32, 1.0, 1.1, 0.30, 0.5, 0.4], C: 0.58, pe: 22 },
+            { id: 'CASE_005', name: '海康威视', type: 'B2B 隐形冠军', typeKey: 'b2b',
+              vector: [0.35, 1.1, 1.2, 0.32, 0.5, 0.4], C: 0.60, pe: 24 },
+            { id: 'CASE_006', name: '三花智控', type: 'B2B 隐形冠军', typeKey: 'b2b',
+              vector: [0.30, 0.9, 1.0, 0.28, 0.5, 0.4], C: 0.56, pe: 21 },
+            { id: 'CASE_007', name: '海光信息', type: '高端定制', typeKey: 'premium',
+              vector: [0.55, 1.6, 1.5, 0.45, 0.7, 0.6], C: 0.68, pe: 35 },
+            { id: 'CASE_008', name: '北方华创', type: '高端定制', typeKey: 'premium',
+              vector: [0.58, 1.7, 1.6, 0.48, 0.7, 0.6], C: 0.70, pe: 38 },
+            // AI 行业（8 个）
+            { id: 'CASE_009', name: 'OpenAI GPT-5', type: 'AI 旗舰', typeKey: 'ai-flagship',
+              vector: [0.65, 2.0, 1.8, 0.55, 0.6, 0.5], C: 0.75, pe: 45 },
+            { id: 'CASE_010', name: 'Anthropic Claude 4.5', type: 'AI 旗舰', typeKey: 'ai-flagship',
+              vector: [0.60, 1.8, 1.7, 0.50, 0.6, 0.5], C: 0.72, pe: 42 },
+            { id: 'CASE_011', name: 'Google Gemini 2.5 Pro', type: 'AI 旗舰', typeKey: 'ai-flagship',
+              vector: [0.50, 1.5, 1.6, 0.45, 0.5, 0.4], C: 0.65, pe: 32 },
+            { id: 'CASE_012', name: 'DeepSeek V3.5', type: 'AI 性价比', typeKey: 'ai-value',
+              vector: [0.18, 1.2, 1.4, 0.40, 0.5, 0.3], C: 0.42, pe: 18 },
+            { id: 'CASE_013', name: '字节豆包', type: 'AI 性价比', typeKey: 'ai-value',
+              vector: [0.20, 1.3, 1.5, 0.42, 0.5, 0.3], C: 0.44, pe: 20 },
+            { id: 'CASE_014', name: '阿里 Qwen3-Max', type: 'AI 主流', typeKey: 'ai-mainstream',
+              vector: [0.30, 1.4, 1.3, 0.35, 0.5, 0.4], C: 0.50, pe: 24 },
+            { id: 'CASE_015', name: 'AWS H100 算力', type: 'AI 算力头部', typeKey: 'ai-compute',
+              vector: [0.45, 1.5, 1.2, 0.30, 0.4, 0.5], C: 0.62, pe: 30 },
+            { id: 'CASE_016', name: 'Lambda H100 算力', type: 'AI 算力裸金属', typeKey: 'ai-compute',
+              vector: [0.15, 0.8, 0.9, 0.20, 0.4, 0.2], C: 0.40, pe: 14 }
+        ];
+
+        // ============================================================
+        // 类型颜色映射（价格战红/防御型绿/B2B 蓝/高端紫/AI 旗舰橙/AI 性价比黄/AI 算力青/AI 主流粉）
+        // ============================================================
+        const TYPE_STYLES = {
+            'price-war':       { color: '#ef4444', bg: 'rgba(239, 68, 68, 0.08)',  border: 'rgba(239, 68, 68, 0.3)',  glow: 'rgba(239, 68, 68, 0.4)'  },
+            'defensive':       { color: '#22c55e', bg: 'rgba(34, 197, 94, 0.08)',  border: 'rgba(34, 197, 94, 0.3)',  glow: 'rgba(34, 197, 94, 0.4)'  },
+            'b2b':             { color: '#3b82f6', bg: 'rgba(59, 130, 246, 0.08)', border: 'rgba(59, 130, 246, 0.3)', glow: 'rgba(59, 130, 246, 0.4)' },
+            'premium':         { color: '#a78bfa', bg: 'rgba(167, 139, 250, 0.08)',border: 'rgba(167, 139, 250, 0.3)',glow: 'rgba(167, 139, 250, 0.4)'},
+            'ai-flagship':     { color: '#fb923c', bg: 'rgba(251, 146, 60, 0.08)', border: 'rgba(251, 146, 60, 0.3)', glow: 'rgba(251, 146, 60, 0.4)' },
+            'ai-value':        { color: '#eab308', bg: 'rgba(234, 179, 8, 0.08)',  border: 'rgba(234, 179, 8, 0.3)',  glow: 'rgba(234, 179, 8, 0.4)'  },
+            'ai-compute':      { color: '#06b6d4', bg: 'rgba(6, 182, 212, 0.08)',  border: 'rgba(6, 182, 212, 0.3)',  glow: 'rgba(6, 182, 212, 0.4)'  },
+            'ai-mainstream':   { color: '#ec4899', bg: 'rgba(236, 72, 153, 0.08)', border: 'rgba(236, 72, 153, 0.3)', glow: 'rgba(236, 72, 153, 0.4)' }
+        };
+
+        const VEC_LABELS = ['f*', 'L', 'SR', 'mdd', 'dim', 'oc'];
+
+        // ============================================================
+        // 工具：浓度 C 的颜色分级
+        // ============================================================
+        function cGrade(c) {
+            if (c >= 0.68) return 'green';
+            if (c >= 0.48) return 'yellow';
+            return 'red';
+        }
+
+        function fmt(n) {
+            return Number(n).toFixed(2);
+        }
+
+        // ============================================================
+        // 板块 1 · 渲染案例卡片矩阵
+        // ============================================================
+        function renderCards() {
+            const grid = document.getElementById('caseGrid');
+            grid.innerHTML = CASES.map(c => {
+                const st = TYPE_STYLES[c.typeKey];
+                const cg = cGrade(c.C);
+                const vCells = c.vector.map((v, i) => `
+                    <div class="v-cell">
+                        <span class="v-label">${VEC_LABELS[i]}</span>${fmt(v)}
+                    </div>
+                `).join('');
+                const extraMeta = c.beta ? `<span style="color:rgba(255,255,255,0.25);font-size:9px;">β=${c.beta}</span>` : '';
+                return `
+                    <div class="case-card" style="--type-color:${st.color};--type-bg:${st.bg};--type-border:${st.border};">
+                        <div class="case-id">${c.id}</div>
+                        <div class="case-name">${c.name}</div>
+                        <div class="type-badge">${c.type}</div>
+                        <div class="vector-mini">${vCells}</div>
+                        <div class="case-metrics">
+                            <div class="metric-c ${cg}">
+                                <span class="label">浓度 C</span>
+                                <span class="value">${fmt(c.C)}</span>
+                            </div>
+                            <div class="metric-pe">
+                                <span class="label">估值乘数 ${extraMeta}</span>
+                                <span class="value">${c.pe}x PE</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // ============================================================
+        // 板块 2 · 渲染对比表
+        // ============================================================
+        function renderTable() {
+            const body = document.getElementById('cmpBody');
+            body.innerHTML = CASES.map(c => {
+                const st = TYPE_STYLES[c.typeKey];
+                const cg = cGrade(c.C);
+                return `
+                    <tr>
+                        <td>${c.id}</td>
+                        <td class="name-cell">${c.name}</td>
+                        <td class="type-cell">
+                            <span class="type-pill" style="--type-color:${st.color};--type-bg:${st.bg};--type-border:${st.border};">${c.type}</span>
+                        </td>
+                        <td>${fmt(c.vector[0])}</td>
+                        <td>${fmt(c.vector[1])}</td>
+                        <td>${fmt(c.vector[2])}</td>
+                        <td>${fmt(c.vector[3])}</td>
+                        <td>${fmt(c.vector[4])}</td>
+                        <td>${fmt(c.vector[5])}</td>
+                        <td class="c-cell ${cg}">${fmt(c.C)}</td>
+                        <td class="pe-cell">${c.pe}x</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // ============================================================
+        // 板块 3 · 余弦相似度匹配
+        // ============================================================
+        function cosineSim(a, b) {
+            let dot = 0, na = 0, nb = 0;
+            for (let i = 0; i < a.length; i++) {
+                dot += a[i] * b[i];
+                na += a[i] * a[i];
+                nb += b[i] * b[i];
+            }
+            const denom = Math.sqrt(na) * Math.sqrt(nb);
+            if (denom === 0) return 0;
+            return dot / denom;
+        }
+
+        function getUserVector() {
+            return [0,1,2,3,4,5].map(i => parseFloat(document.getElementById('s' + i).value));
+        }
+
+        function renderMatch() {
+            const uv = getUserVector();
+            document.getElementById('uvDisplay').textContent = '[' + uv.map(fmt).join(', ') + ']';
+
+            const scored = CASES.map(c => ({
+                ...c,
+                sim: cosineSim(uv, c.vector)
+            })).sort((a, b) => b.sim - a.sim);
+
+            // Top 3
+            const top3 = scored.slice(0, 3);
+            document.getElementById('topMatches').innerHTML = top3.map((c, i) => {
+                const st = TYPE_STYLES[c.typeKey];
+                const pct = (c.sim * 100).toFixed(1);
+                return `
+                    <div class="top-match rank-${i+1}">
+                        <div class="rank">${i+1}</div>
+                        <div class="info">
+                            <div class="m-name">${c.id} · ${c.name}</div>
+                            <div class="m-meta">
+                                <span class="type-pill" style="--type-color:${st.color};--type-bg:${st.bg};--type-border:${st.border};">${c.type}</span>
+                                &nbsp;C=${fmt(c.C)} · ${c.pe}x PE
+                            </div>
+                        </div>
+                        <div class="score">
+                            <span class="pct">${pct}%</span>
+                            <span class="pct-label">相似度</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // Full rank
+            const maxSim = scored[0].sim || 1;
+            document.getElementById('fullRank').innerHTML = scored.map(c => {
+                const pct = (c.sim * 100).toFixed(1);
+                const w = (c.sim / maxSim * 100).toFixed(1);
+                return `
+                    <div class="fr-bar">
+                        <div class="frb-name" title="${c.id} ${c.name}">${c.id}</div>
+                        <div class="frb-track"><div class="frb-fill" style="width:${w}%;"></div></div>
+                        <div class="frb-val">${pct}%</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // 绑定滑块事件
+        function bindSliders() {
+            for (let i = 0; i < 6; i++) {
+                const sl = document.getElementById('s' + i);
+                const vl = document.getElementById('v' + i);
+                sl.addEventListener('input', () => {
+                    vl.textContent = fmt(sl.value);
+                    renderMatch();
+                });
+            }
+        }
+
+        // ============================================================
+        // 板块 4 · 浓度-估值散点图
+        // ============================================================
+        const SCATTER = {
+            xMin: 0.30, xMax: 0.80, // C 范围
+            yMin: 0,    yMax: 50    // PE 范围
+        };
+
+        function renderScatter() {
+            // 图例
+            const legend = document.getElementById('scatterLegend');
+            const legendTypes = [
+                { key: 'price-war', label: '价格战' },
+                { key: 'defensive', label: '防御型' },
+                { key: 'b2b', label: 'B2B 隐形冠军' },
+                { key: 'premium', label: '高端定制' },
+                { key: 'ai-flagship', label: 'AI 旗舰' },
+                { key: 'ai-value', label: 'AI 性价比' },
+                { key: 'ai-mainstream', label: 'AI 主流' },
+                { key: 'ai-compute', label: 'AI 算力' }
+            ];
+            legend.innerHTML = legendTypes.map(t => {
+                const st = TYPE_STYLES[t.key];
+                return `<div class="lg-item"><span class="lg-dot" style="background:${st.color};box-shadow:0 0 6px ${st.glow};"></span>${t.label}</div>`;
+            }).join('');
+
+            // Y 轴刻度
+            const yAxis = document.getElementById('scatterY');
+            const yTicks = [0, 10, 20, 30, 40, 50];
+            yAxis.innerHTML = '<span class="y-label">PE 估值乘数</span>' + yTicks.map(t =>
+                `<span>${t}x</span>`
+            ).join('');
+
+            // X 轴刻度
+            const xAxis = document.getElementById('scatterX');
+            const xTicks = [0.3, 0.4, 0.5, 0.6, 0.7, 0.8];
+            xAxis.innerHTML = xTicks.map(t => `<span>${t.toFixed(1)}</span>`).join('') +
+                '<span class="x-label">圆锥浓度 C</span>';
+
+            // 散点
+            const plot = document.getElementById('scatterPlot');
+            // 清除旧的 dot
+            plot.querySelectorAll('.scatter-dot').forEach(d => d.remove());
+
+            CASES.forEach(c => {
+                const st = TYPE_STYLES[c.typeKey];
+                const xPct = (c.C - SCATTER.xMin) / (SCATTER.xMax - SCATTER.xMin) * 100;
+                const yPct = (c.pe - SCATTER.yMin) / (SCATTER.yMax - SCATTER.yMin) * 100;
+                const dot = document.createElement('div');
+                dot.className = 'scatter-dot';
+                dot.style.left = xPct + '%';
+                dot.style.bottom = yPct + '%';
+                dot.style.background = st.color;
+                dot.style.setProperty('--dot-glow', st.glow);
+                dot.innerHTML = `
+                    <div class="dot-tooltip">
+                        <div class="tt-title">${c.id} · ${c.name}</div>
+                        <div class="tt-row">类型: ${c.type}</div>
+                        <div class="tt-row">浓度 C: ${fmt(c.C)}</div>
+                        <div class="tt-row">估值乘数: ${c.pe}x PE</div>
+                        <div class="tt-row">向量: [${c.vector.map(fmt).join(', ')}]</div>
+                    </div>
+                `;
+                plot.appendChild(dot);
+            });
+        }
+
+        // ============================================================
+        // 鼠标跟随光晕
+        // ============================================================
+        function bindGlow() {
+            const glow = document.getElementById('glow');
+            document.addEventListener('mousemove', (e) => {
+                const x = e.clientX / window.innerWidth * 100;
+                const y = e.clientY / window.innerHeight * 100;
+                glow.style.setProperty('--x', x + '%');
+                glow.style.setProperty('--y', y + '%');
+            });
+        }
+
+        // ============================================================
+        // 数据写入总线
+        // ============================================================
+        function writeToBus() {
+            window.caseLibrary = { cases: CASES, timestamp: Date.now() };
+            try {
+                localStorage.setItem('caseLibrary', JSON.stringify(window.caseLibrary));
+                window.dispatchEvent(new CustomEvent('case-library-bus-update'));
+                const bs = document.getElementById('busStatus');
+                if (bs) {
+                    bs.textContent = '● 总线已写入 localStorage';
+                    bs.style.color = 'rgba(34, 197, 94, 0.7)';
+                }
+            } catch (e) {
+                const bs = document.getElementById('busStatus');
+                if (bs) {
+                    bs.textContent = '× 总线写入失败';
+                    bs.style.color = 'rgba(239, 68, 68, 0.7)';
+                }
+            }
+        }
+
+        // ============================================================
+        // 初始化
+        // ============================================================
+        function init() {
+            bindGlow();
+            renderCards();
+            renderTable();
+            bindSliders();
+            renderMatch();
+            renderScatter();
+            writeToBus();
+        }
+
+        // 监听其他页面写入的 case-library-bus-update 事件（跨页同步演示）
+        window.addEventListener('case-library-bus-update', () => {
+            const bs = document.getElementById('busStatus');
+            if (bs) {
+                bs.textContent = '● 总线已同步';
+                bs.style.color = 'rgba(34, 197, 94, 0.7)';
+            }
+        });
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+    </script>
+
+</body>
+</html>
