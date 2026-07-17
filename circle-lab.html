@@ -2063,6 +2063,228 @@
                 grid-template-columns: 1fr;
             }
         }
+
+        /* ============================================================ */
+        /* ===== 真实画圈实验 · 运动-认知耦合采集 ===== */
+        /* ============================================================ */
+        .motor-lab-section {
+            padding: 24px 40px 28px;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        }
+        .motor-lab-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+        .motor-lab-header .ml-icon { font-size: 24px; }
+        .motor-lab-header .ml-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        .motor-lab-header .ml-title span { color: #a78bfa; }
+        .motor-lab-grid {
+            display: flex;
+            gap: 0;
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 14px;
+            overflow: hidden;
+        }
+        .motor-theory {
+            width: 40%;
+            padding: 20px 28px 20px 24px;
+            border-right: 1px solid rgba(255, 255, 255, 0.04);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .motor-theory .mt-item {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+            padding: 10px 14px;
+        }
+        .motor-theory .mt-item .mt-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.3);
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .motor-theory .mt-item .mt-label .dot {
+            width: 6px; height: 6px; border-radius: 50%;
+            background: #a78bfa; display: inline-block;
+        }
+        .motor-theory .mt-item .mt-text {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.25);
+            line-height: 1.6;
+        }
+        .motor-theory .mt-item .mt-text .hl { color: #a78bfa; font-weight: 500; }
+        .motor-demo {
+            width: 60%;
+            padding: 14px 28px 16px 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .motor-canvas-wrap {
+            position: relative;
+            width: 100%;
+            max-width: 340px;
+            aspect-ratio: 1 / 1;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            padding: 4px;
+            margin-bottom: 10px;
+        }
+        .motor-canvas-wrap canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            border-radius: 12px;
+            background: rgba(0, 0, 0, 0.2);
+            touch-action: none;
+            cursor: crosshair;
+            object-fit: contain;
+        }
+        .motor-hint {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.15);
+            text-align: center;
+            pointer-events: none;
+            white-space: nowrap;
+            transition: opacity 0.3s;
+        }
+        .motor-hint.hidden { opacity: 0; }
+        .motor-metrics {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 6px;
+            width: 100%;
+            max-width: 340px;
+            margin-bottom: 10px;
+        }
+        .motor-metrics .mm {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+            padding: 8px 6px;
+            text-align: center;
+        }
+        .motor-metrics .mm .mm-label {
+            font-size: 9px;
+            color: rgba(255, 255, 255, 0.35);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        .motor-metrics .mm .mm-val {
+            font-size: 15px;
+            font-weight: 700;
+            color: #f1f5f9;
+            margin-top: 2px;
+        }
+        .motor-metrics .mm .mm-val.good { color: #4ade80; }
+        .motor-metrics .mm .mm-val.warn { color: #facc15; }
+        .motor-metrics .mm .mm-val.bad { color: #f87171; }
+        .motor-metrics .mm .mm-unit {
+            font-size: 9px;
+            color: rgba(255, 255, 255, 0.25);
+        }
+        .motor-actions {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+        }
+        .motor-actions button {
+            padding: 5px 16px;
+            border: none;
+            border-radius: 16px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.04);
+            color: rgba(255, 255, 255, 0.35);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+        }
+        .motor-actions button.primary {
+            background: rgba(167, 139, 250, 0.12);
+            color: #a78bfa;
+            border-color: rgba(167, 139, 250, 0.12);
+        }
+        .motor-actions button.primary:hover {
+            background: rgba(167, 139, 250, 0.22);
+            transform: translateY(-2px);
+        }
+        .motor-actions button:hover {
+            background: rgba(255, 255, 255, 0.06);
+            color: #f1f5f9;
+            transform: translateY(-2px);
+        }
+        .motor-pacd-map {
+            margin-top: 14px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+        .motor-pacd-map .pm-card {
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+            padding: 10px 12px;
+            text-align: center;
+        }
+        .motor-pacd-map .pm-card .pm-icon { font-size: 18px; }
+        .motor-pacd-map .pm-card .pm-label {
+            font-size: 12px; font-weight: 600;
+            color: rgba(255, 255, 255, 0.35);
+            margin-top: 2px;
+        }
+        .motor-pacd-map .pm-card .pm-neuro {
+            font-size: 10px;
+            color: #c4b5fd;
+            margin-top: 2px;
+        }
+        .motor-pacd-map .pm-card .pm-biz {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.3);
+            margin-top: 1px;
+        }
+        .motor-history {
+            margin-top: 10px;
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.15);
+            text-align: center;
+        }
+        .motor-history .mh-item {
+            display: inline-block;
+            margin: 0 4px;
+            padding: 2px 8px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 8px;
+        }
+        @media (max-width: 900px) {
+            .motor-lab-grid { flex-direction: column; }
+            .motor-theory { width: 100%; border-right: none; border-bottom: 1px solid rgba(255,255,255,0.04); }
+            .motor-demo { width: 100%; }
+            .motor-metrics { max-width: 100%; }
+            .motor-pacd-map { grid-template-columns: 1fr 1fr; }
+        }
+        @media (max-width: 600px) {
+            .motor-metrics { grid-template-columns: 1fr 1fr; }
+            .motor-pacd-map { grid-template-columns: 1fr; }
+            .motor-lab-section { padding: 16px 18px 18px; }
+        }
     </style>
 </head>
 <body>
@@ -2107,6 +2329,7 @@
         <a class="idx-item" data-target="section-core"><span class="num">③</span><span class="label">路径</span></a>
         <div class="idx-divider"></div>
         <a class="idx-item" data-target="section-cognition"><span class="num">④</span><span class="label">认知</span></a>
+        <a class="idx-item" data-target="section-motor"><span class="num">🧪</span><span class="label">实验</span></a>
         <a class="idx-item" data-target="section-workflow"><span class="num">⑤</span><span class="label">工作流</span></a>
         <a class="idx-item" data-target="section-duality"><span class="num">⑥</span><span class="label">静/动</span></a>
         <a class="idx-item" data-target="section-math"><span class="num">⑦</span><span class="label">数学</span></a>
@@ -2385,6 +2608,105 @@
             <div class="loop-conclusion">
                 💡 <strong>目标：</strong>让大脑记住结构，让数学能够再推演。<br>
                 <span style="font-size:12px; color:rgba(255,255,255,0.15);">— 学习是输入，运用是调用，忘记是重置，循环是进化 —</span>
+            </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- ===== 真实画圈实验 · 运动-认知耦合采集 ===== -->
+        <!-- ============================================================ -->
+        <div class="section-anchor" id="section-motor"></div>
+        <div class="motor-lab-section">
+            <div class="motor-lab-header">
+                <span class="ml-icon">🧪</span>
+                <span class="ml-title">真实画圈实验 · <span>运动-认知耦合采集</span></span>
+            </div>
+            <div class="motor-lab-grid">
+                <div class="motor-theory">
+                    <div class="mt-item">
+                        <div class="mt-label"><span class="dot"></span> 实验原理</div>
+                        <div class="mt-text">
+                            手部画圈激活<strong>小脑-运动皮层环路</strong>。采集轨迹可量化
+                            <span class="hl">时序控制精度</span>与<span class="hl">预测性内部模型</span>的拟合度。
+                        </div>
+                    </div>
+                    <div class="mt-item">
+                        <div class="mt-label"><span class="dot"></span> 采集指标</div>
+                        <div class="mt-text">
+                            <strong>圆度</strong> → 运动协调稳定性<br>
+                            <strong>径向误差</strong> → 预测-反馈偏差<br>
+                            <strong>速度变异</strong> → 小脑时序控制精度<br>
+                            <strong>圆心漂移</strong> → 累积误差与修正能力
+                        </div>
+                    </div>
+                    <div class="mt-item">
+                        <div class="mt-label"><span class="dot"></span> 操作说明</div>
+                        <div class="mt-text">
+                            1. 将鼠标/手指放在虚线圆上<br>
+                            2. 按住并沿圆环画一整圈<br>
+                            3. 松开后自动计算运动学指标<br>
+                            4. 重复多次观察<span class="hl">学习曲线</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="motor-demo">
+                    <div class="motor-canvas-wrap">
+                        <canvas id="motorCanvas" width="340" height="340"></canvas>
+                        <div class="motor-hint" id="motorHint">按住鼠标或手指，沿虚线画一圈</div>
+                    </div>
+                    <div class="motor-metrics" id="motorMetrics">
+                        <div class="mm">
+                            <div class="mm-label">圆度</div>
+                            <div class="mm-val" id="mmCircularity">—</div>
+                            <div class="mm-unit">0-1</div>
+                        </div>
+                        <div class="mm">
+                            <div class="mm-label">径向误差</div>
+                            <div class="mm-val" id="mmRadial">—</div>
+                            <div class="mm-unit">px</div>
+                        </div>
+                        <div class="mm">
+                            <div class="mm-label">速度变异</div>
+                            <div class="mm-val" id="mmSpeedCV">—</div>
+                            <div class="mm-unit">CV%</div>
+                        </div>
+                        <div class="mm">
+                            <div class="mm-label">完成时间</div>
+                            <div class="mm-val" id="mmTime">—</div>
+                            <div class="mm-unit">ms</div>
+                        </div>
+                    </div>
+                    <div class="motor-actions">
+                        <button class="primary" id="motorClearBtn">🗑️ 清除</button>
+                        <button id="motorReplayBtn">🔁 回放轨迹</button>
+                    </div>
+                    <div class="motor-history" id="motorHistory"></div>
+                </div>
+            </div>
+            <div class="motor-pacd-map">
+                <div class="pm-card">
+                    <div class="pm-icon">🎯</div>
+                    <div class="pm-label">Plan · 计划</div>
+                    <div class="pm-neuro">目标圆 = 内部模型预期</div>
+                    <div class="pm-biz">商业目标设定与范围界定</div>
+                </div>
+                <div class="pm-card">
+                    <div class="pm-icon">✍️</div>
+                    <div class="pm-label">Act · 执行</div>
+                    <div class="pm-neuro">实际轨迹 = 运动指令输出</div>
+                    <div class="pm-biz">战略执行与资源投放</div>
+                </div>
+                <div class="pm-card">
+                    <div class="pm-icon">📏</div>
+                    <div class="pm-label">Check · 检查</div>
+                    <div class="pm-neuro">径向误差 = 感觉预测偏差</div>
+                    <div class="pm-biz">市场反馈与偏差检测</div>
+                </div>
+                <div class="pm-card">
+                    <div class="pm-icon">🔄</div>
+                    <div class="pm-label">Do · 修正</div>
+                    <div class="pm-neuro">圆度提升 = 小脑学习巩固</div>
+                    <div class="pm-biz">迭代优化与闭环调整</div>
+                </div>
             </div>
         </div>
 
@@ -2829,6 +3151,7 @@
             document.getElementById('section-mapping'),
             document.getElementById('section-core'),
             document.getElementById('section-cognition'),
+            document.getElementById('section-motor'),
             document.getElementById('section-workflow'),
             document.getElementById('section-duality'),
             document.getElementById('section-math'),
@@ -3935,6 +4258,319 @@
             animateAI();
             window.addEventListener('beforeunload', () => cancelAnimationFrame(animId));
             window.addEventListener('resize', drawAI);
+        })();
+
+        // ============================================================ //
+        // ===== 真实画圈实验 · 运动-认知耦合采集 ===== //
+        // ============================================================ //
+        (function() {
+            const canvas = document.getElementById('motorCanvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const hint = document.getElementById('motorHint');
+            const historyEl = document.getElementById('motorHistory');
+
+            const mmCircularity = document.getElementById('mmCircularity');
+            const mmRadial = document.getElementById('mmRadial');
+            const mmSpeedCV = document.getElementById('mmSpeedCV');
+            const mmTime = document.getElementById('mmTime');
+
+            const dpr = window.devicePixelRatio || 1;
+            const rectSize = 340;
+            canvas.width = rectSize * dpr;
+            canvas.height = rectSize * dpr;
+            ctx.scale(dpr, dpr);
+
+            const cx = rectSize / 2;
+            const cy = rectSize / 2;
+            const targetRadius = 100;
+
+            let isDrawing = false;
+            let points = [];
+            let history = [];
+            let replayAnimId = null;
+
+            try {
+                const saved = localStorage.getItem('motorLabHistory');
+                if (saved) history = JSON.parse(saved);
+            } catch(e) {}
+            updateHistoryDisplay();
+
+            function drawBase() {
+                ctx.clearRect(0, 0, rectSize, rectSize);
+
+                ctx.strokeStyle = 'rgba(255,255,255,0.02)';
+                ctx.lineWidth = 1;
+                for (let i = 0; i <= 8; i++) {
+                    const x = (i / 8) * rectSize;
+                    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, rectSize); ctx.stroke();
+                    const y = (i / 8) * rectSize;
+                    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(rectSize, y); ctx.stroke();
+                }
+
+                ctx.strokeStyle = 'rgba(167, 139, 250, 0.25)';
+                ctx.lineWidth = 2;
+                ctx.setLineDash([6, 6]);
+                ctx.beginPath();
+                ctx.arc(cx, cy, targetRadius, 0, Math.PI * 2);
+                ctx.stroke();
+                ctx.setLineDash([]);
+
+                ctx.fillStyle = 'rgba(167, 139, 250, 0.3)';
+                ctx.beginPath();
+                ctx.arc(cx, cy, 3, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            function drawTrajectory() {
+                if (points.length < 2) return;
+
+                ctx.strokeStyle = 'rgba(250, 204, 21, 0.7)';
+                ctx.lineWidth = 2.5;
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+                ctx.beginPath();
+                ctx.moveTo(points[0].x, points[0].y);
+                for (let i = 1; i < points.length; i++) {
+                    ctx.lineTo(points[i].x, points[i].y);
+                }
+                ctx.stroke();
+
+                ctx.fillStyle = '#4ade80';
+                ctx.beginPath();
+                ctx.arc(points[0].x, points[0].y, 4, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = '#f87171';
+                ctx.beginPath();
+                ctx.arc(points[points.length - 1].x, points[points.length - 1].y, 4, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            function redraw() {
+                drawBase();
+                drawTrajectory();
+            }
+
+            function calcCircularity(pts) {
+                if (pts.length < 10) return 0;
+                let area = 0;
+                for (let i = 0; i < pts.length; i++) {
+                    const j = (i + 1) % pts.length;
+                    area += pts[i].x * pts[j].y;
+                    area -= pts[j].x * pts[i].y;
+                }
+                area = Math.abs(area) / 2;
+                let perimeter = 0;
+                for (let i = 1; i < pts.length; i++) {
+                    const dx = pts[i].x - pts[i-1].x;
+                    const dy = pts[i].y - pts[i-1].y;
+                    perimeter += Math.sqrt(dx*dx + dy*dy);
+                }
+                if (perimeter === 0) return 0;
+                const circularity = (4 * Math.PI * area) / (perimeter * perimeter);
+                return Math.min(Math.max(circularity, 0), 1);
+            }
+
+            function calcRadialError(pts, center, r) {
+                if (pts.length < 5) return { mean: 0, std: 0 };
+                const distances = pts.map(p => {
+                    const dx = p.x - center.x;
+                    const dy = p.y - center.y;
+                    return Math.sqrt(dx*dx + dy*dy);
+                });
+                const mean = distances.reduce((a,b) => a+b, 0) / distances.length;
+                const variance = distances.reduce((sum, d) => sum + (d - mean)*(d - mean), 0) / distances.length;
+                return { mean: Math.abs(mean - r), std: Math.sqrt(variance) };
+            }
+
+            function calcSpeedCV(pts) {
+                if (pts.length < 5) return 0;
+                const speeds = [];
+                for (let i = 1; i < pts.length; i++) {
+                    const dt = pts[i].t - pts[i-1].t;
+                    if (dt <= 0) continue;
+                    const dx = pts[i].x - pts[i-1].x;
+                    const dy = pts[i].y - pts[i-1].y;
+                    const dist = Math.sqrt(dx*dx + dy*dy);
+                    speeds.push(dist / dt);
+                }
+                if (speeds.length < 2) return 0;
+                const meanSpeed = speeds.reduce((a,b) => a+b, 0) / speeds.length;
+                const variance = speeds.reduce((sum, s) => sum + (s - meanSpeed)*(s - meanSpeed), 0) / speeds.length;
+                const std = Math.sqrt(variance);
+                return (std / meanSpeed) * 100;
+            }
+
+            function calcCentroid(pts) {
+                const sx = pts.reduce((a, p) => a + p.x, 0) / pts.length;
+                const sy = pts.reduce((a, p) => a + p.y, 0) / pts.length;
+                return { x: sx, y: sy };
+            }
+
+            function getPos(e) {
+                const r = canvas.getBoundingClientRect();
+                return {
+                    x: (e.clientX - r.left) * (rectSize / r.width),
+                    y: (e.clientY - r.top) * (rectSize / r.height)
+                };
+            }
+
+            canvas.addEventListener('pointerdown', function(e) {
+                e.preventDefault();
+                if (replayAnimId) { cancelAnimationFrame(replayAnimId); replayAnimId = null; }
+                isDrawing = true;
+                points = [];
+                const pos = getPos(e);
+                points.push({ t: performance.now(), x: pos.x, y: pos.y });
+                hint.classList.add('hidden');
+                redraw();
+                canvas.setPointerCapture(e.pointerId);
+            });
+
+            canvas.addEventListener('pointermove', function(e) {
+                if (!isDrawing) return;
+                e.preventDefault();
+                const pos = getPos(e);
+                const last = points[points.length - 1];
+                const dx = pos.x - last.x;
+                const dy = pos.y - last.y;
+                if (Math.sqrt(dx*dx + dy*dy) >= 3) {
+                    points.push({ t: performance.now(), x: pos.x, y: pos.y });
+                    redraw();
+                }
+            });
+
+            canvas.addEventListener('pointerup', function(e) {
+                if (!isDrawing) return;
+                isDrawing = false;
+                canvas.releasePointerCapture(e.pointerId);
+
+                if (points.length < 10) {
+                    hint.textContent = '轨迹太短，请再画一圈';
+                    hint.classList.remove('hidden');
+                    return;
+                }
+
+                const circularity = calcCircularity(points);
+                const radial = calcRadialError(points, {x: cx, y: cy}, targetRadius);
+                const speedCV = calcSpeedCV(points);
+                const duration = points[points.length - 1].t - points[0].t;
+                const centroid = calcCentroid(points);
+                const drift = Math.sqrt((centroid.x - cx)**2 + (centroid.y - cy)**2);
+
+                const record = {
+                    time: Date.now(),
+                    circularity: circularity,
+                    radialStd: radial.std,
+                    speedCV: speedCV,
+                    duration: duration,
+                    drift: drift
+                };
+                history.unshift(record);
+                if (history.length > 10) history = history.slice(0, 10);
+                try { localStorage.setItem('motorLabHistory', JSON.stringify(history)); } catch(e) {}
+
+                updateMetrics(circularity, radial.std, speedCV, duration);
+                updateHistoryDisplay();
+
+                redraw();
+                ctx.fillStyle = 'rgba(96, 165, 250, 0.5)';
+                ctx.beginPath();
+                ctx.arc(centroid.x, centroid.y, 4, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.strokeStyle = 'rgba(96, 165, 250, 0.3)';
+                ctx.lineWidth = 1;
+                ctx.setLineDash([3, 3]);
+                ctx.beginPath();
+                ctx.moveTo(cx, cy);
+                ctx.lineTo(centroid.x, centroid.y);
+                ctx.stroke();
+                ctx.setLineDash([]);
+
+                hint.textContent = '再画一圈，观察指标变化';
+                hint.classList.remove('hidden');
+            });
+
+            function setMetricColor(el, value, thresholds) {
+                el.classList.remove('good', 'warn', 'bad');
+                if (value >= thresholds.good) el.classList.add('good');
+                else if (value >= thresholds.warn) el.classList.add('warn');
+                else el.classList.add('bad');
+            }
+
+            function updateMetrics(circ, radialStd, spCV, duration) {
+                mmCircularity.textContent = circ.toFixed(2);
+                setMetricColor(mmCircularity, circ, { good: 0.85, warn: 0.6 });
+
+                mmRadial.textContent = radialStd.toFixed(1);
+                const radialScore = radialStd < 10 ? 1 : (radialStd < 20 ? 0.5 : 0);
+                setMetricColor(mmRadial, radialScore, { good: 0.6, warn: 0.3 });
+
+                mmSpeedCV.textContent = spCV.toFixed(1);
+                const speedScore = spCV < 20 ? 1 : (spCV < 40 ? 0.5 : 0);
+                setMetricColor(mmSpeedCV, speedScore, { good: 0.6, warn: 0.3 });
+
+                mmTime.textContent = Math.round(duration);
+                mmTime.classList.remove('good', 'warn', 'bad');
+            }
+
+            function updateHistoryDisplay() {
+                if (history.length === 0) { historyEl.innerHTML = ''; return; }
+                const items = history.slice(0, 5).map((h, i) => {
+                    return `<span class="mh-item">#${i+1} 圆度${h.circularity.toFixed(2)}</span>`;
+                }).join('');
+                historyEl.innerHTML = '<strong>最近记录：</strong>' + items;
+            }
+
+            document.getElementById('motorClearBtn').addEventListener('click', function() {
+                points = [];
+                history = [];
+                try { localStorage.removeItem('motorLabHistory'); } catch(e) {}
+                updateHistoryDisplay();
+                mmCircularity.textContent = '—';
+                mmRadial.textContent = '—';
+                mmSpeedCV.textContent = '—';
+                mmTime.textContent = '—';
+                [mmCircularity, mmRadial, mmSpeedCV, mmTime].forEach(el => el.classList.remove('good','warn','bad'));
+                hint.textContent = '按住鼠标或手指，沿虚线画一圈';
+                hint.classList.remove('hidden');
+                redraw();
+            });
+
+            document.getElementById('motorReplayBtn').addEventListener('click', function() {
+                if (points.length < 2) return;
+                if (replayAnimId) { cancelAnimationFrame(replayAnimId); replayAnimId = null; }
+
+                let idx = 0;
+                function step() {
+                    drawBase();
+                    if (idx >= points.length) {
+                        drawTrajectory();
+                        return;
+                    }
+                    ctx.strokeStyle = 'rgba(250, 204, 21, 0.8)';
+                    ctx.lineWidth = 2.5;
+                    ctx.lineCap = 'round';
+                    ctx.beginPath();
+                    ctx.moveTo(points[0].x, points[0].y);
+                    for (let i = 1; i <= idx; i++) {
+                        ctx.lineTo(points[i].x, points[i].y);
+                    }
+                    ctx.stroke();
+
+                    ctx.fillStyle = '#facc15';
+                    ctx.beginPath();
+                    ctx.arc(points[idx].x, points[idx].y, 4, 0, Math.PI*2);
+                    ctx.fill();
+
+                    idx++;
+                    replayAnimId = requestAnimationFrame(step);
+                }
+                step();
+            });
+
+            drawBase();
         })();
     </script>
 
