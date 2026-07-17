@@ -2285,6 +2285,232 @@
             .motor-pacd-map { grid-template-columns: 1fr; }
             .motor-lab-section { padding: 16px 18px 18px; }
         }
+
+        /* ============================================================ */
+        /* ===== 人脑决策建模 · 对照组 ===== */
+        /* ============================================================ */
+        .brain-model-section {
+            padding: 24px 40px 28px;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        }
+        .brain-model-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+        .brain-model-header .bm-icon { font-size: 24px; }
+        .brain-model-header .bm-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        .brain-model-header .bm-title span { color: #60a5fa; }
+        .brain-model-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 14px;
+            overflow: hidden;
+        }
+        .bm-panel {
+            padding: 20px 24px;
+            border-right: 1px solid rgba(255, 255, 255, 0.04);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .bm-panel:last-child { border-right: none; }
+        .bm-panel .bm-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: rgba(255, 255, 255, 0.2);
+            margin-bottom: 12px;
+        }
+        .bm-canvas-wrap {
+            position: relative;
+            width: 100%;
+            max-width: 300px;
+            aspect-ratio: 1 / 1;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            padding: 4px;
+            margin-bottom: 12px;
+        }
+        .bm-canvas-wrap canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            border-radius: 12px;
+            background: rgba(0, 0, 0, 0.2);
+            object-fit: contain;
+        }
+        .bm-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            width: 100%;
+            max-width: 260px;
+            margin-bottom: 10px;
+        }
+        .bm-controls .bm-ctrl {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        .bm-controls .bm-ctrl label {
+            font-size: 11px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.3);
+            display: flex;
+            justify-content: space-between;
+        }
+        .bm-controls .bm-ctrl label span { color: #60a5fa; }
+        .bm-controls input[type="range"] {
+            width: 100%;
+            accent-color: #60a5fa;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 4px;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+        .bm-controls input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 12px; height: 12px;
+            border-radius: 50%;
+            background: #60a5fa;
+            cursor: pointer;
+        }
+        .bm-actions {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+        }
+        .bm-actions button {
+            padding: 5px 16px;
+            border: none;
+            border-radius: 16px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.04);
+            color: rgba(255, 255, 255, 0.35);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+        }
+        .bm-actions button.primary {
+            background: rgba(96, 165, 250, 0.12);
+            color: #60a5fa;
+            border-color: rgba(96, 165, 250, 0.12);
+        }
+        .bm-actions button:hover {
+            background: rgba(255, 255, 255, 0.06);
+            color: #f1f5f9;
+            transform: translateY(-2px);
+        }
+        .bm-results {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+            width: 100%;
+            max-width: 260px;
+            margin-top: 8px;
+        }
+        .bm-results .bm-res {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+            padding: 6px 4px;
+            text-align: center;
+        }
+        .bm-results .bm-res .bm-res-label {
+            font-size: 8px;
+            color: rgba(255, 255, 255, 0.2);
+            text-transform: uppercase;
+        }
+        .bm-results .bm-res .bm-res-val {
+            font-size: 12px;
+            font-weight: 700;
+            color: #f1f5f9;
+            margin-top: 1px;
+        }
+        .bm-results .bm-res .bm-res-val.green { color: #4ade80; }
+        .bm-results .bm-res .bm-res-val.yellow { color: #facc15; }
+        .bm-results .bm-res .bm-res-val.red { color: #f87171; }
+        .bm-compare {
+            margin-top: 16px;
+            padding: 16px 20px;
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 12px;
+        }
+        .bm-compare-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.3);
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .bm-compare-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+        }
+        .bm-compare-item {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 10px;
+            padding: 10px 12px;
+            text-align: center;
+        }
+        .bm-compare-item .bci-icon { font-size: 16px; }
+        .bm-compare-item .bci-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.4);
+            margin-top: 3px;
+        }
+        .bm-compare-item .bci-diff {
+            font-size: 14px;
+            font-weight: 700;
+            margin-top: 2px;
+        }
+        .bm-compare-item .bci-diff.improve { color: #4ade80; }
+        .bm-compare-item .bci-diff.worse { color: #f87171; }
+        .bm-compare-item .bci-desc {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.15);
+            margin-top: 2px;
+        }
+        .bm-insight {
+            margin-top: 14px;
+            padding: 12px 16px;
+            background: rgba(96, 165, 250, 0.04);
+            border-left: 3px solid rgba(96, 165, 250, 0.2);
+            border-radius: 0 8px 8px 0;
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.4);
+            line-height: 1.6;
+        }
+        .bm-insight strong { color: rgba(255, 255, 255, 0.6); }
+        .bm-insight .hl { color: #60a5fa; font-weight: 500; }
+        @media (max-width: 900px) {
+            .brain-model-grid { grid-template-columns: 1fr; }
+            .bm-panel { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.04); }
+            .bm-panel:last-child { border-bottom: none; }
+            .bm-compare-grid { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 600px) {
+            .brain-model-section { padding: 16px 18px 18px; }
+            .bm-results { grid-template-columns: 1fr 1fr; }
+        }
     </style>
 </head>
 <body>
@@ -2330,6 +2556,7 @@
         <div class="idx-divider"></div>
         <a class="idx-item" data-target="section-cognition"><span class="num">④</span><span class="label">认知</span></a>
         <a class="idx-item" data-target="section-motor"><span class="num">🧪</span><span class="label">实验</span></a>
+        <a class="idx-item" data-target="section-model"><span class="num">📊</span><span class="label">建模</span></a>
         <a class="idx-item" data-target="section-workflow"><span class="num">⑤</span><span class="label">工作流</span></a>
         <a class="idx-item" data-target="section-duality"><span class="num">⑥</span><span class="label">静/动</span></a>
         <a class="idx-item" data-target="section-math"><span class="num">⑦</span><span class="label">数学</span></a>
@@ -2707,6 +2934,117 @@
                     <div class="pm-neuro">圆度提升 = 小脑学习巩固</div>
                     <div class="pm-biz">迭代优化与闭环调整</div>
                 </div>
+            </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- ===== 人脑决策建模 · 对照组 ===== -->
+        <!-- ============================================================ -->
+        <div class="section-anchor" id="section-model"></div>
+        <div class="brain-model-section">
+            <div class="brain-model-header">
+                <span class="bm-icon">🧠</span>
+                <span class="bm-title">人脑决策建模 · <span>对照组模拟</span></span>
+            </div>
+            <div class="brain-model-grid">
+                <div class="bm-panel">
+                    <div class="bm-label">🤖 理性决策（贝叶斯模型）</div>
+                    <div class="bm-canvas-wrap">
+                        <canvas id="modelCanvasIdeal" width="300" height="300"></canvas>
+                    </div>
+                    <div class="bm-controls">
+                        <div class="bm-ctrl">
+                            <label>信息准确度 <span id="idealInfo">80%</span></label>
+                            <input type="range" id="idealInfoInput" min="0" max="100" value="80">
+                        </div>
+                        <div class="bm-ctrl">
+                            <label>反馈速度 <span id="idealSpeed">快</span></label>
+                            <input type="range" id="idealSpeedInput" min="0" max="2" value="1">
+                        </div>
+                    </div>
+                    <div class="bm-actions">
+                        <button class="primary" id="idealRunBtn">▶ 运行</button>
+                        <button id="idealResetBtn">🔄 重置</button>
+                    </div>
+                    <div class="bm-results">
+                        <div class="bm-res">
+                            <div class="bm-res-label">圆度</div>
+                            <div class="bm-res-val" id="idealCirc">—</div>
+                        </div>
+                        <div class="bm-res">
+                            <div class="bm-res-label">误差</div>
+                            <div class="bm-res-val" id="idealRad">—</div>
+                        </div>
+                        <div class="bm-res">
+                            <div class="bm-res-label">收敛</div>
+                            <div class="bm-res-val" id="idealConv">—</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bm-panel">
+                    <div class="bm-label">🧠 真实人脑（含偏差）</div>
+                    <div class="bm-canvas-wrap">
+                        <canvas id="modelCanvasReal" width="300" height="300"></canvas>
+                    </div>
+                    <div class="bm-controls">
+                        <div class="bm-ctrl">
+                            <label>锚定偏差 <span id="realAnchor">30%</span></label>
+                            <input type="range" id="realAnchorInput" min="0" max="100" value="30">
+                        </div>
+                        <div class="bm-ctrl">
+                            <label>损失厌恶 <span id="realLoss">40%</span></label>
+                            <input type="range" id="realLossInput" min="0" max="100" value="40">
+                        </div>
+                        <div class="bm-ctrl">
+                            <label>过度自信 <span id="realOverconf">25%</span></label>
+                            <input type="range" id="realOverconfInput" min="0" max="100" value="25">
+                        </div>
+                    </div>
+                    <div class="bm-actions">
+                        <button class="primary" id="realRunBtn">▶ 运行</button>
+                        <button id="realResetBtn">🔄 重置</button>
+                    </div>
+                    <div class="bm-results">
+                        <div class="bm-res">
+                            <div class="bm-res-label">圆度</div>
+                            <div class="bm-res-val" id="realCirc">—</div>
+                        </div>
+                        <div class="bm-res">
+                            <div class="bm-res-label">误差</div>
+                            <div class="bm-res-val" id="realRad">—</div>
+                        </div>
+                        <div class="bm-res">
+                            <div class="bm-res-label">收敛</div>
+                            <div class="bm-res-val" id="realConv">—</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="bm-compare">
+                <div class="bm-compare-title">📊 偏差影响对比</div>
+                <div class="bm-compare-grid">
+                    <div class="bm-compare-item">
+                        <div class="bci-icon">🎯</div>
+                        <div class="bci-label">决策精度</div>
+                        <div class="bci-diff improve" id="diffAccuracy">+35%</div>
+                        <div class="bci-desc">理性 vs 真实</div>
+                    </div>
+                    <div class="bm-compare-item">
+                        <div class="bci-icon">⚡</div>
+                        <div class="bci-label">收敛速度</div>
+                        <div class="bci-diff improve" id="diffSpeed">+28%</div>
+                        <div class="bci-desc">理性更快</div>
+                    </div>
+                    <div class="bm-compare-item">
+                        <div class="bci-icon">💰</div>
+                        <div class="bci-label">期望收益</div>
+                        <div class="bci-diff worse" id="diffProfit">-18%</div>
+                        <div class="bci-desc">偏差导致损失</div>
+                    </div>
+                </div>
+            </div>
+            <div class="bm-insight">
+                💡 <strong>核心洞察：</strong>画圈实验中的偏差与商业决策偏差遵循相同的数学规律。<span class="hl">锚定偏差</span>使决策偏离目标圆心，<span class="hl">损失厌恶</span>减缓修正速度，<span class="hl">过度自信</span>放大误差。理性模型提供了"无偏差基准"，真实人脑模型展示了偏差如何累积为系统性失误。
             </div>
         </div>
 
@@ -3152,6 +3490,7 @@
             document.getElementById('section-core'),
             document.getElementById('section-cognition'),
             document.getElementById('section-motor'),
+            document.getElementById('section-model'),
             document.getElementById('section-workflow'),
             document.getElementById('section-duality'),
             document.getElementById('section-math'),
@@ -4571,6 +4910,348 @@
             });
 
             drawBase();
+        })();
+
+        // ============================================================ //
+        // ===== 人脑决策建模 · 对照组模拟 ===== //
+        // ============================================================ //
+        (function() {
+            const canvasIdeal = document.getElementById('modelCanvasIdeal');
+            const canvasReal = document.getElementById('modelCanvasReal');
+            if (!canvasIdeal || !canvasReal) return;
+
+            const ctxIdeal = canvasIdeal.getContext('2d');
+            const ctxReal = canvasReal.getContext('2d');
+
+            const dpr = window.devicePixelRatio || 1;
+            const size = 300;
+            [canvasIdeal, canvasReal].forEach(c => {
+                c.width = size * dpr;
+                c.height = size * dpr;
+                c.getContext('2d').scale(dpr, dpr);
+            });
+
+            const cx = size / 2;
+            const cy = size / 2;
+            const targetRadius = 80;
+
+            let idealRunning = false;
+            let realRunning = false;
+            let idealAnimId = null;
+            let realAnimId = null;
+
+            let idealPoints = [];
+            let realPoints = [];
+
+            let idealParams = { infoAccuracy: 0.8, feedbackSpeed: 1 };
+            let realParams = { anchor: 0.3, lossAversion: 0.4, overconfidence: 0.25 };
+
+            function drawModelBase(ctx) {
+                ctx.clearRect(0, 0, size, size);
+                ctx.strokeStyle = 'rgba(255,255,255,0.02)';
+                ctx.lineWidth = 1;
+                for (let i = 0; i <= 6; i++) {
+                    const x = (i / 6) * size;
+                    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, size); ctx.stroke();
+                    const y = (i / 6) * size;
+                    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(size, y); ctx.stroke();
+                }
+                ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+                ctx.lineWidth = 2;
+                ctx.setLineDash([6, 6]);
+                ctx.beginPath();
+                ctx.arc(cx, cy, targetRadius, 0, Math.PI * 2);
+                ctx.stroke();
+                ctx.setLineDash([]);
+                ctx.fillStyle = 'rgba(255,255,255,0.15)';
+                ctx.beginPath();
+                ctx.arc(cx, cy, 3, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            function drawModelTrajectory(ctx, points, color) {
+                if (points.length < 2) return;
+                ctx.strokeStyle = color;
+                ctx.lineWidth = 2.5;
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+                ctx.beginPath();
+                ctx.moveTo(points[0].x, points[0].y);
+                for (let i = 1; i < points.length; i++) {
+                    ctx.lineTo(points[i].x, points[i].y);
+                }
+                ctx.stroke();
+                ctx.fillStyle = '#4ade80';
+                ctx.beginPath();
+                ctx.arc(points[0].x, points[0].y, 3, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.fillStyle = '#f87171';
+                ctx.beginPath();
+                ctx.arc(points[points.length - 1].x, points[points.length - 1].y, 3, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            function calcCircularity(pts) {
+                if (pts.length < 10) return 0;
+                let area = 0;
+                for (let i = 0; i < pts.length; i++) {
+                    const j = (i + 1) % pts.length;
+                    area += pts[i].x * pts[j].y;
+                    area -= pts[j].x * pts[i].y;
+                }
+                area = Math.abs(area) / 2;
+                let perimeter = 0;
+                for (let i = 1; i < pts.length; i++) {
+                    const dx = pts[i].x - pts[i - 1].x;
+                    const dy = pts[i].y - pts[i - 1].y;
+                    perimeter += Math.sqrt(dx * dx + dy * dy);
+                }
+                if (perimeter === 0) return 0;
+                return Math.min(Math.max((4 * Math.PI * area) / (perimeter * perimeter), 0), 1);
+            }
+
+            function calcRadialStd(pts) {
+                if (pts.length < 5) return 0;
+                const dists = pts.map(p => {
+                    const dx = p.x - cx;
+                    const dy = p.y - cy;
+                    return Math.sqrt(dx * dx + dy * dy);
+                });
+                const mean = dists.reduce((a, b) => a + b, 0) / dists.length;
+                const variance = dists.reduce((sum, d) => sum + (d - mean) * (d - mean), 0) / dists.length;
+                return Math.sqrt(variance);
+            }
+
+            function calcConvergence(pts) {
+                if (pts.length < 10) return 0;
+                const recent = pts.slice(-10);
+                const dists = recent.map(p => {
+                    const dx = p.x - cx;
+                    const dy = p.y - cy;
+                    return Math.abs(Math.sqrt(dx * dx + dy * dy) - targetRadius);
+                });
+                const mean = dists.reduce((a, b) => a + b, 0) / dists.length;
+                return Math.max(0, 1 - mean / targetRadius);
+            }
+
+            function updateResults(elemPrefix, points) {
+                const circ = calcCircularity(points);
+                const rad = calcRadialStd(points);
+                const conv = calcConvergence(points);
+
+                const elCirc = document.getElementById(elemPrefix + 'Circ');
+                const elRad = document.getElementById(elemPrefix + 'Rad');
+                const elConv = document.getElementById(elemPrefix + 'Conv');
+
+                elCirc.textContent = circ.toFixed(2);
+                elRad.textContent = rad.toFixed(1);
+                elConv.textContent = (conv * 100).toFixed(0) + '%';
+
+                [elCirc, elRad, elConv].forEach(el => el.classList.remove('green', 'yellow', 'red'));
+                elCirc.classList.add(circ >= 0.85 ? 'green' : (circ >= 0.6 ? 'yellow' : 'red'));
+                elRad.classList.add(rad < 10 ? 'green' : (rad < 20 ? 'yellow' : 'red'));
+                elConv.classList.add(conv >= 0.7 ? 'green' : (conv >= 0.4 ? 'yellow' : 'red'));
+            }
+
+            function updateCompare() {
+                const idealCirc = calcCircularity(idealPoints);
+                const realCirc = calcCircularity(realPoints);
+                const idealConv = calcConvergence(idealPoints);
+                const realConv = calcConvergence(realPoints);
+
+                const accDiff = ((idealCirc - realCirc) / idealCirc * 100).toFixed(0);
+                const speedDiff = ((idealConv - realConv) / idealConv * 100).toFixed(0);
+                const profitDiff = -((realParams.anchor + realParams.lossAversion + realParams.overconfidence) / 3 * 25).toFixed(0);
+
+                const elAcc = document.getElementById('diffAccuracy');
+                const elSpeed = document.getElementById('diffSpeed');
+                const elProfit = document.getElementById('diffProfit');
+
+                elAcc.textContent = '+' + accDiff + '%';
+                elSpeed.textContent = '+' + speedDiff + '%';
+                elProfit.textContent = profitDiff + '%';
+
+                elAcc.className = 'bci-diff ' + (accDiff >= 0 ? 'improve' : 'worse');
+                elSpeed.className = 'bci-diff ' + (speedDiff >= 0 ? 'improve' : 'worse');
+                elProfit.className = 'bci-diff ' + (profitDiff >= 0 ? 'improve' : 'worse');
+            }
+
+            let idealAngle = 0;
+            let idealRadius = targetRadius * 1.3;
+            let idealCenterOffset = { x: 0, y: 0 };
+
+            function animateIdeal() {
+                if (!idealRunning) return;
+
+                idealAngle += 0.03 * idealParams.feedbackSpeed;
+
+                const noise = (Math.random() - 0.5) * 2 * (1 - idealParams.infoAccuracy);
+                const targetR = targetRadius + noise * 10;
+
+                idealRadius += (targetR - idealRadius) * 0.15 * idealParams.feedbackSpeed;
+
+                idealCenterOffset.x += (-idealCenterOffset.x) * 0.05;
+                idealCenterOffset.y += (-idealCenterOffset.y) * 0.05;
+
+                const x = cx + idealCenterOffset.x + idealRadius * Math.cos(idealAngle);
+                const y = cy + idealCenterOffset.y + idealRadius * Math.sin(idealAngle);
+
+                idealPoints.push({ x, y });
+                if (idealPoints.length > 120) idealPoints.shift();
+
+                drawModelBase(ctxIdeal);
+                drawModelTrajectory(ctxIdeal, idealPoints, 'rgba(74, 222, 128, 0.7)');
+
+                if (idealPoints.length > 20) {
+                    updateResults('ideal', idealPoints);
+                    if (realPoints.length > 20) updateCompare();
+                }
+
+                idealAnimId = requestAnimationFrame(animateIdeal);
+            }
+
+            let realAngle = 0;
+            let realRadius = targetRadius * 1.5;
+            let realCenterOffset = { x: 20, y: 10 };
+            let realLossCounter = 0;
+            let realConfidenceBoost = 1;
+
+            function animateReal() {
+                if (!realRunning) return;
+
+                realAngle += 0.025;
+
+                const anchorEffect = (Math.random() < realParams.anchor * 0.1) ? 1 : 0;
+                if (anchorEffect) {
+                    realCenterOffset.x += (Math.random() - 0.5) * 3;
+                    realCenterOffset.y += (Math.random() - 0.5) * 3;
+                }
+
+                const lossEffect = realParams.lossAversion * 0.005;
+                const distFromTarget = Math.abs(realRadius - targetRadius);
+                if (distFromTarget > 5) {
+                    realLossCounter++;
+                    if (realLossCounter > 10) {
+                        realRadius += (targetRadius - realRadius) * (0.08 - lossEffect);
+                        realLossCounter = 0;
+                    } else {
+                        realRadius += (targetRadius - realRadius) * 0.02;
+                    }
+                }
+
+                const overconfEffect = 1 + realParams.overconfidence * 0.2;
+                realConfidenceBoost *= 0.995;
+                if (Math.random() < realParams.overconfidence * 0.05) {
+                    realConfidenceBoost = overconfEffect;
+                }
+
+                const noise = (Math.random() - 0.5) * 4 * realConfidenceBoost;
+                const targetR = targetRadius + noise;
+
+                realRadius += (targetR - realRadius) * 0.08;
+
+                realCenterOffset.x += (-realCenterOffset.x) * 0.02;
+                realCenterOffset.y += (-realCenterOffset.y) * 0.02;
+
+                const x = cx + realCenterOffset.x + realRadius * Math.cos(realAngle);
+                const y = cy + realCenterOffset.y + realRadius * Math.sin(realAngle);
+
+                realPoints.push({ x, y });
+                if (realPoints.length > 120) realPoints.shift();
+
+                drawModelBase(ctxReal);
+                drawModelTrajectory(ctxReal, realPoints, 'rgba(248, 113, 113, 0.7)');
+
+                if (realPoints.length > 20) {
+                    updateResults('real', realPoints);
+                    if (idealPoints.length > 20) updateCompare();
+                }
+
+                realAnimId = requestAnimationFrame(animateReal);
+            }
+
+            document.getElementById('idealRunBtn').addEventListener('click', function() {
+                idealRunning = !idealRunning;
+                this.textContent = idealRunning ? '⏸️ 暂停' : '▶ 运行';
+                if (idealRunning) animateIdeal();
+                else cancelAnimationFrame(idealAnimId);
+            });
+
+            document.getElementById('idealResetBtn').addEventListener('click', function() {
+                idealRunning = false;
+                cancelAnimationFrame(idealAnimId);
+                idealPoints = [];
+                idealAngle = 0;
+                idealRadius = targetRadius * 1.3;
+                idealCenterOffset = { x: 0, y: 0 };
+                document.getElementById('idealRunBtn').textContent = '▶ 运行';
+                ['idealCirc', 'idealRad', 'idealConv'].forEach(id => {
+                    const el = document.getElementById(id);
+                    el.textContent = '—';
+                    el.classList.remove('green', 'yellow', 'red');
+                });
+                drawModelBase(ctxIdeal);
+                updateCompare();
+            });
+
+            document.getElementById('realRunBtn').addEventListener('click', function() {
+                realRunning = !realRunning;
+                this.textContent = realRunning ? '⏸️ 暂停' : '▶ 运行';
+                if (realRunning) animateReal();
+                else cancelAnimationFrame(realAnimId);
+            });
+
+            document.getElementById('realResetBtn').addEventListener('click', function() {
+                realRunning = false;
+                cancelAnimationFrame(realAnimId);
+                realPoints = [];
+                realAngle = 0;
+                realRadius = targetRadius * 1.5;
+                realCenterOffset = { x: 20, y: 10 };
+                realLossCounter = 0;
+                realConfidenceBoost = 1;
+                document.getElementById('realRunBtn').textContent = '▶ 运行';
+                ['realCirc', 'realRad', 'realConv'].forEach(id => {
+                    const el = document.getElementById(id);
+                    el.textContent = '—';
+                    el.classList.remove('green', 'yellow', 'red');
+                });
+                drawModelBase(ctxReal);
+                updateCompare();
+            });
+
+            document.getElementById('idealInfoInput').addEventListener('input', function(e) {
+                const val = parseInt(e.target.value);
+                idealParams.infoAccuracy = val / 100;
+                document.getElementById('idealInfo').textContent = val + '%';
+            });
+
+            document.getElementById('idealSpeedInput').addEventListener('input', function(e) {
+                const val = parseFloat(e.target.value);
+                idealParams.feedbackSpeed = val;
+                document.getElementById('idealSpeed').textContent = val < 0.5 ? '慢' : (val < 1.5 ? '中' : '快');
+            });
+
+            document.getElementById('realAnchorInput').addEventListener('input', function(e) {
+                const val = parseInt(e.target.value);
+                realParams.anchor = val / 100;
+                document.getElementById('realAnchor').textContent = val + '%';
+            });
+
+            document.getElementById('realLossInput').addEventListener('input', function(e) {
+                const val = parseInt(e.target.value);
+                realParams.lossAversion = val / 100;
+                document.getElementById('realLoss').textContent = val + '%';
+            });
+
+            document.getElementById('realOverconfInput').addEventListener('input', function(e) {
+                const val = parseInt(e.target.value);
+                realParams.overconfidence = val / 100;
+                document.getElementById('realOverconf').textContent = val + '%';
+            });
+
+            drawModelBase(ctxIdeal);
+            drawModelBase(ctxReal);
         })();
     </script>
 
