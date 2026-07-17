@@ -16,7 +16,7 @@
             background: #0b0b1a;
             font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
             min-height: 100vh;
-            padding: 20px 20px 20px 220px;
+            padding: 20px 20px 20px 360px;
             overflow-x: hidden;
             cursor: default;
         }
@@ -33,15 +33,49 @@
             transition: background 0.1s;
         }
 
-        /* ===== 左侧固定导航栏 ===== */
+        /* ===== 全局侧边栏导航 ===== */
         .sidebar {
             position: fixed;
             top: 0;
             left: 0;
-            width: 200px;
+            width: 260px;
+            min-height: 100vh;
+            padding: 32px 16px 24px;
+            background: rgba(11, 11, 26, 0.85);
+            backdrop-filter: blur(12px);
+            border-right: 1px solid rgba(255, 255, 255, 0.04);
+            flex-shrink: 0;
+            overflow-y: auto;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+        }
+        .sidebar::-webkit-scrollbar { width: 3px; }
+        .sidebar::-webkit-scrollbar-track { background: transparent; }
+        .sidebar::-webkit-scrollbar-thumb { background: rgba(167, 139, 250, 0.15); border-radius: 4px; }
+        .sidebar .logo { font-size: 16px; font-weight: 700; color: #f1f5f9; margin-bottom: 4px; letter-spacing: -0.3px; }
+        .sidebar .logo span { color: #a78bfa; }
+        .sidebar .logo-sub { font-size: 11px; color: rgba(255,255,255,0.15); margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.04); padding-bottom: 14px; }
+        .nav-group { margin-bottom: 16px; }
+        .nav-group .group-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.8px; color: rgba(255,255,255,0.1); padding: 0 12px; margin-bottom: 4px; }
+        .nav-item { display: flex; align-items: center; gap: 10px; padding: 7px 12px; border-radius: 8px; text-decoration: none; color: rgba(255,255,255,0.3); font-size: 13px; font-weight: 500; transition: all 0.25s ease; cursor: pointer; border-left: 2px solid transparent; }
+        .nav-item:hover { background: rgba(255,255,255,0.03); color: rgba(255,255,255,0.6); border-left-color: rgba(167,139,250,0.2); }
+        .nav-item.active { color: #f1f5f9; background: rgba(167,139,250,0.05); border-left-color: #a78bfa; }
+        .nav-item .icon { font-size: 14px; width: 24px; text-align: center; flex-shrink: 0; }
+        .nav-item .level-tag { font-size: 9px; color: rgba(255,255,255,0.1); background: rgba(255,255,255,0.03); padding: 0 8px; border-radius: 8px; margin-left: auto; }
+        .nav-item .level-tag.active-tag { color: #a78bfa; background: rgba(167,139,250,0.08); }
+        .nav-divider { border: none; border-top: 1px solid rgba(255,255,255,0.03); margin: 8px 12px; }
+        .sidebar .footer-nav { margin-top: auto; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.03); font-size: 11px; color: rgba(255,255,255,0.08); text-align: center; }
+
+        /* ===== 页面内导航 ===== */
+        .page-nav {
+            position: fixed;
+            top: 0;
+            left: 260px;
+            width: 100px;
             height: 100vh;
-            padding: 28px 12px 20px;
-            background: rgba(11, 11, 26, 0.92);
+            padding: 32px 8px 24px;
+            background: rgba(11, 11, 26, 0.7);
             backdrop-filter: blur(12px);
             border-right: 1px solid rgba(255, 255, 255, 0.04);
             overflow-y: auto;
@@ -49,54 +83,12 @@
             display: flex;
             flex-direction: column;
         }
-
-        .sidebar .logo {
-            font-size: 13px;
-            font-weight: 700;
-            color: #f1f5f9;
-            margin-bottom: 2px;
-            letter-spacing: -0.3px;
-            text-align: center;
-        }
-        .sidebar .logo span {
-            color: #a78bfa;
-        }
-        .sidebar .sub-logo {
-            font-size: 10px;
-            color: rgba(255, 255, 255, 0.15);
-            margin-bottom: 16px;
-            letter-spacing: 0.3px;
-            text-align: center;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-            padding-bottom: 12px;
-        }
-
-        .sidebar .nav-divider {
-            border: none;
-            border-top: 1px solid rgba(255, 255, 255, 0.03);
-            margin: 6px 0;
-        }
-
-        .sidebar .nav-section-label {
-            font-size: 9px;
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
-            color: rgba(255, 255, 255, 0.08);
-            padding: 6px 8px 2px;
-            font-weight: 600;
-        }
-
-        .sidebar .nav-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 6px 10px;
-            margin-bottom: 1px;
-            border-radius: 8px;
-            color: rgba(255, 255, 255, 0.25);
-            font-size: 12px;
-            font-weight: 500;
-            text-decoration: none;
+        .page-nav .pn-label { font-size: 10px; color: rgba(255,255,255,0.1); text-transform: uppercase; letter-spacing: 0.5px; padding: 0 8px; margin-bottom: 12px; }
+        .page-nav .pn-item { display: flex; align-items: center; gap: 6px; padding: 6px 8px; margin-bottom: 2px; border-radius: 8px; color: rgba(255,255,255,0.25); font-size: 11px; font-weight: 500; text-decoration: none; transition: all 0.25s ease; cursor: pointer; border-left: 2px solid transparent; }
+        .page-nav .pn-item:hover { background: rgba(255,255,255,0.03); color: rgba(255,255,255,0.6); border-left-color: rgba(167,139,250,0.3); }
+        .page-nav .pn-item.active { color: #f1f5f9; background: rgba(167,139,250,0.06); border-left-color: #a78bfa; }
+        .page-nav .pn-item .icon { font-size: 12px; }
+        .page-nav .pn-divider { border: none; border-top: 1px solid rgba(255,255,255,0.03); margin: 6px 0; }
             transition: all 0.25s ease;
             cursor: pointer;
             border-left: 2px solid transparent;
@@ -1482,102 +1474,60 @@
 
     <div id="glow"></div>
 
-    <!-- ===== 左侧固定导航栏 ===== -->
-    <div class="sidebar" id="sidebar">
+    <!-- ===== 全局侧边栏导航 ===== -->
+    <div class="sidebar">
         <div class="logo">Y.<span>Mine</span></div>
-        <div class="sub-logo">资本定价 · 完整证据链</div>
-
-        <hr class="nav-divider" />
-
-        <div class="nav-section-label">核心</div>
-        <a class="nav-item" data-target="section-value">
-            <span class="icon">🧠</span>
-            <span class="label">核心主张</span>
-        </a>
-        <a class="nav-item" data-target="section-meta">
-            <span class="icon">📊</span>
-            <span class="label">验证逻辑</span>
-        </a>
-
-        <hr class="nav-divider" />
-
-        <div class="nav-section-label">模拟器</div>
-        <a class="nav-item" data-target="section-simulator">
-            <span class="icon">📈</span>
-            <span class="label">营销模拟</span>
-        </a>
-        <a class="nav-item" data-target="section-pricing">
-            <span class="icon">💰</span>
-            <span class="label">定价模拟</span>
-        </a>
-
-        <hr class="nav-divider" />
-
-        <div class="nav-section-label">推导</div>
-        <a class="nav-item" data-target="section-layer1">
-            <span class="icon">🌀</span>
-            <span class="label">一/二/三</span>
-        </a>
-        <a class="nav-item" data-target="section-cone">
-            <span class="icon">🔺</span>
-            <span class="label">圆锥建模</span>
-        </a>
-        <a class="nav-item" data-target="section-layer2">
-            <span class="icon">🔄</span>
-            <span class="label">A/B对照</span>
-        </a>
-        <a class="nav-item" data-target="section-layer3">
-            <span class="icon">🎯</span>
-            <span class="label">核心比喻</span>
-        </a>
-        <a class="nav-item" data-target="section-layer4">
-            <span class="icon">📐</span>
-            <span class="label">三维评估</span>
-        </a>
-        <a class="nav-item" data-target="section-layer5">
-            <span class="icon">📋</span>
-            <span class="label">理论对照</span>
-        </a>
-        <a class="nav-item" data-target="section-layer6">
-            <span class="icon">💡</span>
-            <span class="label">学习真相</span>
-        </a>
-        <a class="nav-item" data-target="section-layer7">
-            <span class="icon">📐</span>
-            <span class="label">公式收束</span>
-        </a>
-        <a class="nav-item" data-target="section-layer8">
-            <span class="icon">📊</span>
-            <span class="label">凯利配置</span>
-        </a>
-
-        <hr class="nav-divider" />
-
-        <div class="nav-section-label">验证 &amp; 落地</div>
-        <a class="nav-item" data-target="section-test">
-            <span class="icon">🧪</span>
-            <span class="label">基础测试</span>
-        </a>
-
-        <hr class="nav-divider" />
-
-        <div class="nav-section-label">产出</div>
-        <a class="nav-item" data-target="section-output">
-            <span class="icon">📦</span>
-            <span class="label">内容资产</span>
-        </a>
-        <a class="nav-item" data-target="section-structure">
-            <span class="icon">🗺️</span>
-            <span class="label">系统结构</span>
-        </a>
-        <a class="nav-item" data-target="section-extension">
-            <span class="icon">∞</span>
-            <span class="label">可迁移</span>
-        </a>
-
-        <div class="footer-nav">
-            <a href="index.html">← 返回作品集</a>
+        <div class="logo-sub">自动化决策系统</div>
+        <div class="nav-group">
+            <div class="group-label">⚙️ 核心系统</div>
+            <a href="index.html" class="nav-item"><span class="icon">🏠</span> 总控台<span class="level-tag">首页</span></a>
+            <a href="circle-lab.html" class="nav-item"><span class="icon">🧪</span> 画圈实验<span class="level-tag">方法论</span></a>
+            <a href="gamemind.html" class="nav-item"><span class="icon">🎯</span> 博弈论底座<span class="level-tag">策略</span></a>
+            <a href="moodmind.html" class="nav-item"><span class="icon">📊</span> 估值底座<span class="level-tag">估值</span></a>
+            <a href="evolvemind.html" class="nav-item"><span class="icon">🧠</span> EvolveMind<span class="level-tag">认知</span></a>
         </div>
+        <hr class="nav-divider" />
+        <div class="nav-group">
+            <div class="group-label">🔗 证据链</div>
+            <a href="cross-domain-mapping.html" class="nav-item"><span class="icon">⚡</span> 跨领域吞噬<span class="level-tag">验证</span></a>
+            <a href="marketing-reinvented.html" class="nav-item active"><span class="icon">🔍</span> 营销学重构<span class="level-tag active-tag">重构</span></a>
+            <a href="business-learning-evidence.html" class="nav-item"><span class="icon">📊</span> 商业证据链<span class="level-tag">闭环</span></a>
+            <a href="value-pyramid.html" class="nav-item"><span class="icon">📐</span> 价值金字塔<span class="level-tag">分层</span></a>
+        </div>
+        <hr class="nav-divider" />
+        <div class="nav-group">
+            <div class="group-label">🛠️ 工具</div>
+            <a href="language-mapping-evidence.html" class="nav-item"><span class="icon">🌐</span> 语言映射<span class="level-tag">迁移</span></a>
+            <a href="general-game-os.html" class="nav-item"><span class="icon">🚁</span> 低空经济<span class="level-tag">应用</span></a>
+            <a href="binary-solver.html" class="nav-item"><span class="icon">🧩</span> 二元拆分<span class="level-tag">工具</span></a>
+        </div>
+        <div class="footer-nav">v1.0 · 系统运行中</div>
+    </div>
+
+    <!-- ===== 页面内导航 ===== -->
+    <div class="page-nav" id="sidebar">
+        <div class="pn-label">重构</div>
+        <a class="pn-item" data-target="section-value"><span class="icon">🧠</span><span class="label">主张</span></a>
+        <a class="pn-item" data-target="section-meta"><span class="icon">📊</span><span class="label">逻辑</span></a>
+        <div class="pn-divider"></div>
+        <a class="pn-item" data-target="section-simulator"><span class="icon">📈</span><span class="label">营销</span></a>
+        <a class="pn-item" data-target="section-pricing"><span class="icon">💰</span><span class="label">定价</span></a>
+        <div class="pn-divider"></div>
+        <a class="pn-item" data-target="section-layer1"><span class="icon">🌀</span><span class="label">一/二/三</span></a>
+        <a class="pn-item" data-target="section-cone"><span class="icon">🔺</span><span class="label">圆锥</span></a>
+        <a class="pn-item" data-target="section-layer2"><span class="icon">🔄</span><span class="label">A/B</span></a>
+        <a class="pn-item" data-target="section-layer3"><span class="icon">🎯</span><span class="label">比喻</span></a>
+        <a class="pn-item" data-target="section-layer4"><span class="icon">📐</span><span class="label">三维</span></a>
+        <a class="pn-item" data-target="section-layer5"><span class="icon">📋</span><span class="label">理论</span></a>
+        <a class="pn-item" data-target="section-layer6"><span class="icon">💡</span><span class="label">真相</span></a>
+        <a class="pn-item" data-target="section-layer7"><span class="icon">📐</span><span class="label">公式</span></a>
+        <a class="pn-item" data-target="section-layer8"><span class="icon">📊</span><span class="label">凯利</span></a>
+        <div class="pn-divider"></div>
+        <a class="pn-item" data-target="section-test"><span class="icon">🧪</span><span class="label">测试</span></a>
+        <div class="pn-divider"></div>
+        <a class="pn-item" data-target="section-output"><span class="icon">📦</span><span class="label">资产</span></a>
+        <a class="pn-item" data-target="section-structure"><span class="icon">🗺️</span><span class="label">结构</span></a>
+        <a class="pn-item" data-target="section-extension"><span class="icon">∞</span><span class="label">迁移</span></a>
     </div>
 
     <!-- ===== 主容器 ===== -->
@@ -2868,7 +2818,7 @@
         });
 
         // ===== 左侧导航栏交互 =====
-        const navItems = document.querySelectorAll('.nav-item');
+        const navItems = document.querySelectorAll('.pn-item');
         const sections = [
             document.getElementById('section-value'),
             document.getElementById('section-meta'),
