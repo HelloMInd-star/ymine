@@ -2765,6 +2765,233 @@
             .market-model-section { padding: 16px 18px 18px; }
             .mm-results { grid-template-columns: 1fr 1fr; }
         }
+
+        /* ============================================================ */
+        /* ===== 匹配度计算 · 商业模型-创始人匹配率 ===== */
+        /* ============================================================ */
+        .match-section {
+            padding: 24px 40px 28px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        }
+        .match-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 18px;
+        }
+        .match-header .m-icon { font-size: 24px; }
+        .match-header .m-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        .match-header .m-title span { color: #a78bfa; }
+        .match-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 14px;
+            overflow: hidden;
+        }
+        .match-left {
+            padding: 24px;
+            border-right: 1px solid rgba(255, 255, 255, 0.04);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .match-gauge {
+            position: relative;
+            width: 220px;
+            height: 220px;
+            margin-bottom: 16px;
+        }
+        .match-gauge svg {
+            width: 100%;
+            height: 100%;
+            transform: rotate(-90deg);
+        }
+        .match-gauge-bg {
+            fill: none;
+            stroke: rgba(255, 255, 255, 0.04);
+            stroke-width: 12;
+        }
+        .match-gauge-progress {
+            fill: none;
+            stroke-width: 12;
+            stroke-linecap: round;
+            transition: stroke-dashoffset 0.8s ease-out, stroke 0.5s ease;
+        }
+        .match-gauge-center {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+        .match-gauge-center .m-value {
+            font-size: 48px;
+            font-weight: 800;
+            line-height: 1;
+        }
+        .match-gauge-center .m-value.green { color: #4ade80; }
+        .match-gauge-center .m-value.yellow { color: #facc15; }
+        .match-gauge-center .m-value.red { color: #f87171; }
+        .match-gauge-center .m-label {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.3);
+            margin-top: 4px;
+        }
+        .match-status {
+            padding: 8px 16px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 12px;
+        }
+        .match-status.green {
+            background: rgba(74, 222, 128, 0.1);
+            color: #4ade80;
+            border: 1px solid rgba(74, 222, 128, 0.15);
+        }
+        .match-status.yellow {
+            background: rgba(250, 204, 21, 0.1);
+            color: #facc15;
+            border: 1px solid rgba(250, 204, 21, 0.15);
+        }
+        .match-status.red {
+            background: rgba(248, 113, 113, 0.1);
+            color: #f87171;
+            border: 1px solid rgba(248, 113, 113, 0.15);
+        }
+        .match-right {
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+        }
+        .match-radar {
+            position: relative;
+            width: 100%;
+            max-width: 280px;
+            aspect-ratio: 1 / 1;
+            margin: 0 auto 16px;
+        }
+        .match-radar svg {
+            width: 100%;
+            height: 100%;
+        }
+        .match-radar-bg {
+            fill: none;
+            stroke: rgba(255, 255, 255, 0.03);
+            stroke-width: 1;
+        }
+        .match-radar-axis {
+            fill: none;
+            stroke: rgba(255, 255, 255, 0.04);
+            stroke-width: 1;
+        }
+        .match-radar-polygon {
+            fill: rgba(167, 139, 250, 0.15);
+            stroke: #a78bfa;
+            stroke-width: 2;
+            transition: all 0.5s ease;
+        }
+        .match-radar-point {
+            fill: #a78bfa;
+            r: 4;
+        }
+        .match-radar-labels {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+        }
+        .match-radar-labels .rl-item {
+            position: absolute;
+            font-size: 10px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.3);
+            white-space: nowrap;
+        }
+        .match-factors {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-top: auto;
+        }
+        .match-factors .mf-item {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+            padding: 10px 12px;
+        }
+        .match-factors .mf-item .mf-label {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.2);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .match-factors .mf-item .mf-bar {
+            height: 4px;
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 4px;
+            margin-top: 6px;
+            overflow: hidden;
+        }
+        .match-factors .mf-item .mf-bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+        .match-factors .mf-item .mf-bar-fill.green { background: #4ade80; }
+        .match-factors .mf-item .mf-bar-fill.yellow { background: #facc15; }
+        .match-factors .mf-item .mf-bar-fill.red { background: #f87171; }
+        .match-factors .mf-item .mf-value {
+            font-size: 14px;
+            font-weight: 700;
+            color: #f1f5f9;
+            margin-top: 3px;
+        }
+        .match-insight {
+            margin-top: 14px;
+            padding: 12px 16px;
+            background: rgba(167, 139, 250, 0.04);
+            border-left: 3px solid rgba(167, 139, 250, 0.2);
+            border-radius: 0 8px 8px 0;
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.4);
+            line-height: 1.7;
+        }
+        .match-insight strong { color: rgba(255, 255, 255, 0.6); }
+        .match-insight .hl { color: #a78bfa; font-weight: 500; }
+        .match-legend {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            margin-top: 10px;
+        }
+        .match-legend .ml-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.2);
+        }
+        .match-legend .ml-item .ml-dot {
+            width: 8px; height: 8px; border-radius: 50%;
+        }
+        .match-legend .ml-item.green .ml-dot { background: #4ade80; }
+        .match-legend .ml-item.yellow .ml-dot { background: #facc15; }
+        .match-legend .ml-item.red .ml-dot { background: #f87171; }
+        @media (max-width: 900px) {
+            .match-container { grid-template-columns: 1fr; }
+            .match-left { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.04); }
+            .match-factors { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 600px) {
+            .match-section { padding: 16px 18px 18px; }
+            .match-gauge { width: 180px; height: 180px; }
+            .match-gauge-center .m-value { font-size: 36px; }
+        }
     </style>
 </head>
 <body>
@@ -2812,6 +3039,7 @@
         <a class="idx-item" data-target="section-motor"><span class="num">🧪</span><span class="label">实验</span></a>
         <a class="idx-item" data-target="section-model"><span class="num">📊</span><span class="label">建模</span></a>
         <a class="idx-item" data-target="section-market"><span class="num">🌊</span><span class="label">供需</span></a>
+        <a class="idx-item" data-target="section-match"><span class="num">🎯</span><span class="label">匹配</span></a>
         <a class="idx-item" data-target="section-workflow"><span class="num">⑤</span><span class="label">工作流</span></a>
         <a class="idx-item" data-target="section-duality"><span class="num">⑥</span><span class="label">静/动</span></a>
         <a class="idx-item" data-target="section-math"><span class="num">⑦</span><span class="label">数学</span></a>
@@ -3427,6 +3655,87 @@
         </div>
 
         <!-- ============================================================ -->
+        <!-- ===== 匹配度计算 · 商业模型-创始人匹配率 ===== -->
+        <!-- ============================================================ -->
+        <div class="section-anchor" id="section-match"></div>
+        <div class="match-section">
+            <div class="match-header">
+                <span class="m-icon">🎯</span>
+                <span class="m-title">匹配度计算 · <span>商业模型-创始人匹配率</span></span>
+            </div>
+            <div class="match-container">
+                <div class="match-left">
+                    <div class="match-gauge">
+                        <svg viewBox="0 0 200 200">
+                            <circle cx="100" cy="100" r="85" class="match-gauge-bg"/>
+                            <circle cx="100" cy="100" r="85" class="match-gauge-progress" id="matchProgress"
+                                    stroke-dasharray="534" stroke-dashoffset="534"/>
+                        </svg>
+                        <div class="match-gauge-center">
+                            <div class="m-value" id="matchValue">—</div>
+                            <div class="m-label">匹配率</div>
+                        </div>
+                    </div>
+                    <div class="match-status" id="matchStatus">等待数据...</div>
+                    <div class="match-legend">
+                        <div class="ml-item green"><span class="ml-dot"></span> 高匹配</div>
+                        <div class="ml-item yellow"><span class="ml-dot"></span> 中等匹配</div>
+                        <div class="ml-item red"><span class="ml-dot"></span> 低匹配</div>
+                    </div>
+                </div>
+                <div class="match-right">
+                    <div class="match-radar">
+                        <svg viewBox="0 0 200 200">
+                            <circle cx="100" cy="100" r="10" class="match-radar-bg"/>
+                            <circle cx="100" cy="100" r="30" class="match-radar-bg"/>
+                            <circle cx="100" cy="100" r="50" class="match-radar-bg"/>
+                            <circle cx="100" cy="100" r="70" class="match-radar-bg"/>
+                            <line x1="100" y1="30" x2="100" y2="170" class="match-radar-axis"/>
+                            <line x1="30" y1="100" x2="170" y2="100" class="match-radar-axis"/>
+                            <line x1="52" y1="52" x2="148" y2="148" class="match-radar-axis"/>
+                            <line x1="148" y1="52" x2="52" y2="148" class="match-radar-axis"/>
+                            <polygon id="radarPolygon" class="match-radar-polygon" points="100,30 100,30 100,30 100,30 100,30 100,30"/>
+                        </svg>
+                        <div class="match-radar-labels">
+                            <div class="rl-item" style="top:10px; left:50%; transform:translateX(-50%);">创始人能力</div>
+                            <div class="rl-item" style="top:50%; right:10px; transform:translateY(-50%);">决策质量</div>
+                            <div class="rl-item" style="bottom:10px; left:50%; transform:translateX(-50%);">市场适配</div>
+                            <div class="rl-item" style="top:50%; left:10px; transform:translateY(-50%);">执行效率</div>
+                        </div>
+                    </div>
+                    <div class="match-factors">
+                        <div class="mf-item">
+                            <div class="mf-label">🧪 创始人能力</div>
+                            <div class="mf-bar"><div class="mf-bar-fill" id="mfFounder"></div></div>
+                            <div class="mf-value" id="mfFounderVal">—</div>
+                        </div>
+                        <div class="mf-item">
+                            <div class="mf-label">🧠 决策质量</div>
+                            <div class="mf-bar"><div class="mf-bar-fill" id="mfDecision"></div></div>
+                            <div class="mf-value" id="mfDecisionVal">—</div>
+                        </div>
+                        <div class="mf-item">
+                            <div class="mf-label">🌊 市场适配</div>
+                            <div class="mf-bar"><div class="mf-bar-fill" id="mfMarket"></div></div>
+                            <div class="mf-value" id="mfMarketVal">—</div>
+                        </div>
+                        <div class="mf-item">
+                            <div class="mf-label">⚡ 执行效率</div>
+                            <div class="mf-bar"><div class="mf-bar-fill" id="mfExecution"></div></div>
+                            <div class="mf-value" id="mfExecutionVal">—</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="match-insight">
+                💡 <strong>核心洞察：</strong>匹配率综合评估创始人能力、决策质量与市场适配度。
+                <span class="hl">高匹配（>75%）</span>：创始人特质与商业模型高度契合，成功概率显著提升；
+                <span class="hl">中等匹配（50-75%）</span>：存在改进空间，建议针对性优化短板；
+                <span class="hl">低匹配（<50%）</span>：需重新审视战略方向或团队配置。
+            </div>
+        </div>
+
+        <!-- ============================================================ -->
         <!-- ===== 算法工作流 + Token 流对比 ===== -->
         <!-- ============================================================ -->
         <div class="section-anchor" id="section-workflow"></div>
@@ -3870,6 +4179,7 @@
             document.getElementById('section-motor'),
             document.getElementById('section-model'),
             document.getElementById('section-market'),
+            document.getElementById('section-match'),
             document.getElementById('section-workflow'),
             document.getElementById('section-duality'),
             document.getElementById('section-math'),
@@ -5192,6 +5502,14 @@
                 updateMetrics(circularity, radial.std, speedCV, duration);
                 updateHistoryDisplay();
 
+                if (window.circleLabData && window.circleLabData.motor) {
+                    window.circleLabData.motor.circularity = circularity;
+                    window.circleLabData.motor.radialError = radial.std;
+                    window.circleLabData.motor.speedCV = speedCV;
+                    window.circleLabData.motor.duration = duration;
+                    window.circleLabData.motor.hasData = true;
+                }
+
                 redraw();
                 ctx.fillStyle = 'rgba(96, 165, 250, 0.5)';
                 ctx.beginPath();
@@ -5289,6 +5607,9 @@
             });
 
             drawBase();
+
+            window.circleLabData = window.circleLabData || {};
+            window.circleLabData.motor = { circularity: 0, radialError: 0, speedCV: 0, duration: 0, hasData: false };
         })();
 
         // ============================================================ //
@@ -5430,6 +5751,17 @@
                 elCirc.classList.add(circ >= 0.85 ? 'green' : (circ >= 0.6 ? 'yellow' : 'red'));
                 elRad.classList.add(rad < 10 ? 'green' : (rad < 20 ? 'yellow' : 'red'));
                 elConv.classList.add(conv >= 0.7 ? 'green' : (conv >= 0.4 ? 'yellow' : 'red'));
+
+                if (window.circleLabData && window.circleLabData.model) {
+                    if (elemPrefix === 'ideal') {
+                        window.circleLabData.model.idealCirc = circ;
+                        window.circleLabData.model.idealConv = conv;
+                    } else {
+                        window.circleLabData.model.realCirc = circ;
+                        window.circleLabData.model.realConv = conv;
+                    }
+                    window.circleLabData.model.hasData = true;
+                }
             }
 
             function updateCompare() {
@@ -5631,6 +5963,9 @@
 
             drawModelBase(ctxIdeal);
             drawModelBase(ctxReal);
+
+            window.circleLabData = window.circleLabData || {};
+            window.circleLabData.model = { idealCirc: 0, realCirc: 0, idealConv: 0, realConv: 0, hasData: false };
         })();
 
         // ============================================================ //
@@ -5768,6 +6103,19 @@
                 elStab.classList.add(m.stability >= 0.7 ? 'green' : (m.stability >= 0.4 ? 'yellow' : 'red'));
                 elVol.classList.add(m.volatility < 10 ? 'green' : (m.volatility < 20 ? 'yellow' : 'red'));
                 elProf.classList.add(m.profit >= 0.6 ? 'green' : (m.profit >= 0.3 ? 'yellow' : 'red'));
+
+                if (window.circleLabData && window.circleLabData.market) {
+                    if (prefix === 'blue') {
+                        window.circleLabData.market.blueStability = m.stability;
+                        window.circleLabData.market.blueVolatility = m.volatility;
+                        window.circleLabData.market.blueProfit = m.profit;
+                    } else {
+                        window.circleLabData.market.redStability = m.stability;
+                        window.circleLabData.market.redVolatility = m.volatility;
+                        window.circleLabData.market.redProfit = m.profit;
+                    }
+                    window.circleLabData.market.hasData = true;
+                }
             }
 
             function updateMarketCompare() {
@@ -5948,6 +6296,149 @@
 
             drawMarketBase(ctxBlue);
             drawMarketBase(ctxRed);
+
+            window.circleLabData = window.circleLabData || {};
+            window.circleLabData.market = { blueStability: 0, blueVolatility: 0, blueProfit: 0, redStability: 0, redVolatility: 0, redProfit: 0, hasData: false };
+        })();
+
+        // ============================================================ //
+        // ===== 匹配度计算 · 商业模型-创始人匹配率 ===== //
+        // ============================================================ //
+        (function() {
+            const matchValue = document.getElementById('matchValue');
+            const matchStatus = document.getElementById('matchStatus');
+            const matchProgress = document.getElementById('matchProgress');
+            const radarPolygon = document.getElementById('radarPolygon');
+
+            const mfFounder = document.getElementById('mfFounder');
+            const mfFounderVal = document.getElementById('mfFounderVal');
+            const mfDecision = document.getElementById('mfDecision');
+            const mfDecisionVal = document.getElementById('mfDecisionVal');
+            const mfMarket = document.getElementById('mfMarket');
+            const mfMarketVal = document.getElementById('mfMarketVal');
+            const mfExecution = document.getElementById('mfExecution');
+            const mfExecutionVal = document.getElementById('mfExecutionVal');
+
+            if (!matchValue) return;
+
+            const gaugeRadius = 85;
+            const gaugeCircumference = 2 * Math.PI * gaugeRadius;
+            matchProgress.style.strokeDasharray = gaugeCircumference;
+            matchProgress.style.strokeDashoffset = gaugeCircumference;
+
+            function getColorClass(value) {
+                if (value >= 75) return 'green';
+                if (value >= 50) return 'yellow';
+                return 'red';
+            }
+
+            function getStrokeColor(value) {
+                if (value >= 75) return '#4ade80';
+                if (value >= 50) return '#facc15';
+                return '#f87171';
+            }
+
+            function getStatusText(value) {
+                if (value >= 85) return '✨ 高度匹配';
+                if (value >= 75) return '🎯 良好匹配';
+                if (value >= 60) return '📊 中等匹配';
+                if (value >= 50) return '⚠️ 有待改进';
+                if (value >= 35) return '🔴 低匹配';
+                return '❌ 严重不匹配';
+            }
+
+            function updateMatch() {
+                const data = window.circleLabData || {};
+                const motor = data.motor || { hasData: false };
+                const model = data.model || { hasData: false };
+                const market = data.market || { hasData: false };
+
+                let founderScore = 0;
+                if (motor.hasData) {
+                    const circScore = motor.circularity * 100;
+                    const radialScore = Math.max(0, 100 - motor.radialError * 2);
+                    const speedScore = Math.max(0, 100 - motor.speedCV);
+                    founderScore = (circScore * 0.5 + radialScore * 0.3 + speedScore * 0.2);
+                } else {
+                    founderScore = 40;
+                }
+
+                let decisionScore = 0;
+                if (model.hasData) {
+                    const circDiff = Math.abs(model.idealCirc - model.realCirc);
+                    const convDiff = Math.abs(model.idealConv - model.realConv);
+                    const accuracy = 100 - (circDiff * 50 + convDiff * 50);
+                    decisionScore = Math.max(0, Math.min(100, accuracy));
+                } else {
+                    decisionScore = 50;
+                }
+
+                let marketScore = 0;
+                if (market.hasData) {
+                    const stability = market.blueStability * 100;
+                    const profit = market.blueProfit * 100;
+                    const volatility = Math.max(0, 100 - market.blueVolatility * 2);
+                    marketScore = (stability * 0.4 + profit * 0.4 + volatility * 0.2);
+                } else {
+                    marketScore = 50;
+                }
+
+                let executionScore = 0;
+                if (motor.hasData) {
+                    const speedScore = Math.max(0, 100 - motor.duration / 50);
+                    executionScore = Math.min(100, speedScore);
+                } else if (model.hasData) {
+                    executionScore = model.idealConv * 80 + 20;
+                } else {
+                    executionScore = 45;
+                }
+
+                const totalScore = Math.round(
+                    founderScore * 0.35 +
+                    decisionScore * 0.30 +
+                    marketScore * 0.25 +
+                    executionScore * 0.10
+                );
+
+                const colorClass = getColorClass(totalScore);
+                const strokeColor = getStrokeColor(totalScore);
+
+                matchValue.textContent = totalScore + '%';
+                matchValue.className = 'm-value ' + colorClass;
+
+                matchStatus.textContent = getStatusText(totalScore);
+                matchStatus.className = 'match-status ' + colorClass;
+
+                matchProgress.style.stroke = strokeColor;
+                const offset = gaugeCircumference - (totalScore / 100) * gaugeCircumference;
+                matchProgress.style.strokeDashoffset = offset;
+
+                const r = 70;
+                const fs = Math.min(100, founderScore) / 100;
+                const ds = Math.min(100, decisionScore) / 100;
+                const ms = Math.min(100, marketScore) / 100;
+                const es = Math.min(100, executionScore) / 100;
+
+                const p1 = `100,${100 - r * fs}`;
+                const p2 = `${100 + r * ds},100`;
+                const p3 = `100,${100 + r * ms}`;
+                const p4 = `${100 - r * es},100`;
+                radarPolygon.setAttribute('points', `${p1} ${p2} ${p3} ${p4}`);
+
+                function updateFactor(el, val, labelEl) {
+                    const v = Math.round(Math.min(100, val));
+                    el.style.width = v + '%';
+                    el.className = 'mf-bar-fill ' + getColorClass(v);
+                    labelEl.textContent = v + '%';
+                }
+
+                updateFactor(mfFounder, founderScore, mfFounderVal);
+                updateFactor(mfDecision, decisionScore, mfDecisionVal);
+                updateFactor(mfMarket, marketScore, mfMarketVal);
+                updateFactor(mfExecution, executionScore, mfExecutionVal);
+            }
+
+            setInterval(updateMatch, 500);
         })();
     </script>
 
