@@ -98,6 +98,40 @@
             this.timestamp = Date.now();
             this.listeners = {};
 
+            this.brandVolume = {
+                V: 1.0,
+                r: 0.10,
+                h: 1.0,
+                growthRate: 0,
+                frozen: false,
+                freezeReason: '',
+                totalDeposited: 0,
+                lastGrowthTick: 0,
+                decayPerTick: 0.0005
+            };
+
+            this.hedgeReservoir = {
+                totalPool: 0,
+                privateDomain: 0,
+                premiumContent: 0,
+                privateRatio: 0.75,
+                contentRatio: 0.25,
+                lastInjection: 0,
+                injectionSource: ''
+            };
+
+            this.pokerBridge = {
+                connected: false,
+                handsPlayed: 0,
+                totalPnL: 0,
+                runningWinRate: 0.50,
+                lastHandResult: null,
+                gtBias: 0,
+                kellyBias: 0,
+                bigBlind: 10,
+                stackSize: 1000
+            };
+
             this._initDefaultParticipants();
         }
 
@@ -342,6 +376,10 @@
             this.state = newState;
 
             const decision = this.generateDecisionCommand(newState, effectiveZ, currentVol);
+            this._lastDistribution = decision.distribution;
+
+            this._updateBrandVolume(newState, effectiveZ, decision);
+            const hedgeInjection = this._updateHedgeReservoir(newState, decision, stateChanged);
 
             const snapshot = {
                 timestamp: this.timestamp,
@@ -358,6 +396,9 @@
                 state: this.state,
                 decision,
                 kellyFraction: this.config.kellyFraction,
+                brandVolume: { ...this.brandVolume },
+                hedgeReservoir: { ...this.hedgeReservoir, lastInjection: hedgeInjection },
+                pokerBridge: { ...this.pokerBridge },
                 participants: this.participants.filter(p => p.alive).map(p => ({
                     type: p.type,
                     position: p.position,
@@ -394,6 +435,16 @@
                 cardsDealt: 0,
                 revelation: 0
             };
+            this.brandVolume = {
+                V: 1.0, r: 0.10, h: 1.0, growthRate: 0,
+                frozen: false, freezeReason: '', totalDeposited: 0,
+                lastGrowthTick: 0, decayPerTick: 0.0005
+            };
+            this.hedgeReservoir = {
+                totalPool: 0, privateDomain: 0, premiumContent: 0,
+                privateRatio: 0.75, contentRatio: 0.25,
+                lastInjection: 0, injectionSource: ''
+            };
             this._initDefaultParticipants();
             this._emit('reset');
         }
@@ -407,6 +458,123 @@
             if (this.listeners[event]) {
                 this.listeners[event].forEach(cb => cb(data));
             }
+        }
+
+        _updateBrandVolume(state, z, decision) {
+            const bv = this.brandVolume;
+            const alive = this.participants.filter(p => p.alive).length;
+            const penetration = alive / this.participants.length;
+            const tensionFactor = Math.min(1, Math.abs(z) / 3);
+            const canGrow = state.id === 'calm' && decision.budgetMultiplier >= 0.95;
+
+            bv.r = 0.10 + penetration * 0.20 * (1 - tensionFactor * 0.5);
+            bv.r = Math.max(0.05, Math.min(0.45, bv.r));
+
+            if (canGrow) {
+                const growthIncrement = 0.003 * (1 - this.coneCollapse * 0.5);
+                bv.h += growthIncrement;
+                bv.growthRate = growthIncrement / Math.max(0.01, bv.h);
+                bv.frozen = false;
+                bv.freezeReason = '';
+                bv.lastGrowthTick = this.dealer.cardsDealt;
+                bv.totalDeposited += growthIncrement;
+            } else {
+                bv.h = Math.max(0.01, bv.h - bv.decayPerTick);
+                bv.growthRate = -bv.decayPerTick / Math.max(0.01, bv.h);
+                bv.frozen = true;
+                if (state.id === 'black_swan') bv.freezeReason = 'BLACK_SWAN: 买量熔断，品牌投资冻结';
+                else if (state.id === 'meltdown') bv.freezeReason = 'MELTDOWN: 系统性风险，全线冻结';
+                else if (state.id === 'extreme') bv.freezeReason = 'EXTREME: 极端波动，品牌投资缩减';
+                else bv.freezeReason = 'TENSION: 张力累积，增长放缓';
+            }
+
+            bv.V = Math.PI * bv.r * bv.r * bv.h;
+        }
+
+        _updateHedgeReservoir(state, decision, stateChanged) {
+            const hr = this.hedgeReservoir;
+            let injected = 0;
+            let injectionSource = '';
+
+            if (stateChanged && (state.id === 'black_swan' || state.id === 'meltdown')) {
+                const steadyPaidWeight = 0.40;
+                const currentPaidWeight = decision.distribution.paid_ads.weight;
+                const weightGap = Math.max(0, steadyPaidWeight - currentPaidWeight);
+                const releasedBudget = weightGap * 1.0;
+                if (releasedBudget > 0.001) {
+                    const toPrivate = releasedBudget * hr.privateRatio;
+                    const toContent = releasedBudget * hr.contentRatio;
+                    hr.privateDomain += toPrivate;
+                    hr.premiumContent += toContent;
+                    hr.totalPool = hr.privateDomain + hr.premiumContent;
+                    injected = releasedBudget;
+                    injectionSource = state.id + '_FUSE_TRIGGERED';
+                    hr.lastInjection = this.dealer.cardsDealt;
+                    hr.injectionSource = injectionSource;
+                }
+            } else if (state.id === 'calm' && hr.totalPool > 0.001) {
+                const drainRate = 0.005;
+                const drainPrivate = hr.privateDomain * drainRate;
+                const drainContent = hr.premiumContent * drainRate;
+                hr.privateDomain = Math.max(0, hr.privateDomain - drainPrivate);
+                hr.premiumContent = Math.max(0, hr.premiumContent - drainContent);
+                hr.totalPool = hr.privateDomain + hr.premiumContent;
+                if (hr.totalPool < 0.001) {
+                    hr.totalPool = 0;
+                    hr.privateDomain = 0;
+                    hr.premiumContent = 0;
+                }
+            }
+
+            return injected > 0 ? { amount: injected, source: injectionSource } : null;
+        }
+
+        pokerSettleHand(handResult) {
+            if (!handResult || typeof handResult.pnl !== 'number') return null;
+            const pb = this.pokerBridge;
+            pb.connected = true;
+            pb.handsPlayed += 1;
+            pb.totalPnL += handResult.pnl;
+            pb.lastHandResult = {
+                pnl: handResult.pnl,
+                won: handResult.pnl > 0,
+                potSize: handResult.potSize || Math.abs(handResult.pnl) * 2,
+                timestamp: Date.now()
+            };
+            const wins = (pb.runningWinRate * (pb.handsPlayed - 1) + (handResult.pnl > 0 ? 1 : 0)) / pb.handsPlayed;
+            pb.runningWinRate = wins;
+
+            const bb = pb.bigBlind;
+            const pnlInBB = handResult.pnl / bb;
+            const gtShift = Math.max(-0.08, Math.min(0.08, pnlInBB * 0.003));
+            pb.gtBias = gtShift;
+            this.dealer.groundTruth = Math.max(0.10, Math.min(0.95, this.dealer.groundTruth + gtShift));
+
+            const kellyDelta = Math.max(-0.15, Math.min(0.15, (wins - 0.5) * 0.3));
+            pb.kellyBias = kellyDelta;
+            const newKelly = Math.max(0, Math.min(1, this.config.kellyFraction + kellyDelta));
+            this.config.kellyFraction = newKelly;
+
+            let injectedShock = 0;
+            if (Math.abs(pnlInBB) > 50) {
+                injectedShock = pnlInBB > 0 ? 1.5 : -2.0;
+            } else if (Math.abs(pnlInBB) > 20) {
+                injectedShock = pnlInBB > 0 ? 0.6 : -0.8;
+            }
+            if (injectedShock !== 0) {
+                this.tick(injectedShock);
+            }
+
+            return {
+                handsPlayed: pb.handsPlayed,
+                totalPnL: pb.totalPnL,
+                runningWinRate: pb.runningWinRate,
+                gtShift,
+                newGroundTruth: this.dealer.groundTruth,
+                kellyDelta,
+                newKellyFraction: newKelly,
+                injectedShock
+            };
         }
 
         getGaussianBands() {

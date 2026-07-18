@@ -132,6 +132,50 @@
                 criticalErrors: 0,
                 warnings: 0
             }
+        },
+        brandVolume: {
+            storageKey: 'brandVolume',
+            eventName: 'brand-volume-update',
+            defaultValue: {
+                V: 0,
+                r: 0.10,
+                h: 0.01,
+                growthRate: 0,
+                frozen: false,
+                freezeReason: '',
+                totalDeposited: 0,
+                lastGrowthTick: 0,
+                timestamp: 0
+            }
+        },
+        hedgeReservoir: {
+            storageKey: 'hedgeReservoir',
+            eventName: 'hedge-reservoir-update',
+            defaultValue: {
+                totalPool: 0,
+                privateDomain: 0,
+                premiumContent: 0,
+                privateRatio: 0.75,
+                contentRatio: 0.25,
+                lastInjection: 0,
+                injectionSource: '',
+                timestamp: 0
+            }
+        },
+        pokerEgg: {
+            storageKey: 'pokerEggState',
+            eventName: 'poker-egg-update',
+            defaultValue: {
+                connected: false,
+                handsPlayed: 0,
+                totalPnL: 0,
+                winRate: 0.50,
+                lastHandResult: null,
+                gtAdjustment: 0,
+                kellyAdjustment: 0,
+                bigBlind: 10,
+                timestamp: 0
+            }
         }
     };
 

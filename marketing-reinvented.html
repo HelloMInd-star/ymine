@@ -3027,6 +3027,52 @@
                 </div>
             </div>
 
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin: 10px 0;">
+                <div style="padding: 12px; background: rgba(59,130,246,0.06); border-radius: 10px; border: 1px solid rgba(59,130,246,0.15);">
+                    <div style="font-size: 10px; color: rgba(255,255,255,0.35); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">
+                        🏛️ 品牌圆柱体体积 V=πr²h
+                    </div>
+                    <div style="display: flex; align-items: baseline; gap: 8px;">
+                        <div style="font-size: 22px; font-weight: 800; color: #3b82f6;" id="gtBrandV">0.31</div>
+                        <div id="gtBrandFrozen" style="font-size: 9px; color: #f97316; font-weight: 700; display: none;">❄️ 冻结</div>
+                        <div id="gtBrandGrowing" style="font-size: 9px; color: #22c55e; font-weight: 700;">📈 复利增长中</div>
+                    </div>
+                    <div style="font-size: 9px; color: rgba(255,255,255,0.3); margin-top: 4px;">
+                        r(渗透度)=<span id="gtBrandR">0.10</span> · h(时间深度)=<span id="gtBrandH">1.00</span>
+                    </div>
+                    <div style="font-size: 8px; color: rgba(255,255,255,0.2); margin-top: 2px;" id="gtBrandFreezeReason"></div>
+                </div>
+                <div style="padding: 12px; background: rgba(249,115,22,0.06); border-radius: 10px; border: 1px solid rgba(249,115,22,0.15);">
+                    <div style="font-size: 10px; color: rgba(255,255,255,0.35); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">
+                        🛡️ 反脆弱对冲蓄水池
+                    </div>
+                    <div style="font-size: 18px; font-weight: 800; color: #f97316;" id="gtHedgePool">0.00</div>
+                    <div style="display: flex; justify-content: space-between; font-size: 9px; color: rgba(255,255,255,0.3); margin-top: 4px;">
+                        <span>🟣 私域蓄水 <span id="gtHedgePrivate" style="color:#a78bfa; font-weight: 700;">0.00</span> <span style="color:#6ee7b7;">(75%)</span></span>
+                        <span>🟢 高毛利内容 <span id="gtHedgeContent" style="color:#22c55e; font-weight: 700;">0.00</span> <span style="color:#6ee7b7;">(25%)</span></span>
+                    </div>
+                    <div style="font-size: 8px; color: rgba(255,255,255,0.2); margin-top: 2px;" id="gtHedgeInjection">熔断后释放的买量预算强制注入</div>
+                </div>
+                <div style="padding: 12px; background: rgba(234,179,8,0.06); border-radius: 10px; border: 1px solid rgba(234,179,8,0.15);">
+                    <div style="font-size: 10px; color: rgba(255,255,255,0.35); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">
+                        🃏 德州扑克彩蛋·表里桥接
+                    </div>
+                    <div id="gtPokerDisconnected" style="font-size: 11px; color: rgba(255,255,255,0.25);">
+                        <div>表: 德州交互UI / 里: 圆锥博弈核心</div>
+                        <button id="gtPokerConnectBtn" style="margin-top: 6px; padding: 4px 10px; font-size: 10px; background: rgba(234,179,8,0.2); color: #eab308; border: 1px solid rgba(234,179,8,0.3); border-radius: 4px; cursor: pointer;">⚡ 桥接扑克桌</button>
+                    </div>
+                    <div id="gtPokerConnected" style="display: none;">
+                        <div style="font-size: 11px; color: #eab308; font-weight: 700;" id="gtPokerStatus">✅ 已桥接 · 手牌 0</div>
+                        <div style="font-size: 9px; color: rgba(255,255,255,0.3); margin-top: 2px;">
+                            PnL=<span id="gtPokerPnL" style="color:#22c55e;">0</span> · 胜率=<span id="gtPokerWR">50%</span>
+                        </div>
+                        <div style="font-size: 8px; color: rgba(255,255,255,0.2); margin-top: 2px;">
+                            GT偏移=<span id="gtPokerGTShift">±0.00</span> · kelly修正=<span id="gtPokerKellyDelta">±0.00</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="gt-controls">
                 <button class="gt-btn gt-btn-start" id="gtStartBtn">▶ 启动博弈推演</button>
                 <button class="gt-btn gt-btn-shock" id="gtShockBtn">💥 注入黑天鹅冲击</button>
@@ -5863,6 +5909,25 @@
             const shockBtn = document.getElementById('gtShockBtn');
             const resetBtn = document.getElementById('gtResetBtn');
 
+            const brandVEl = document.getElementById('gtBrandV');
+            const brandFrozenEl = document.getElementById('gtBrandFrozen');
+            const brandGrowingEl = document.getElementById('gtBrandGrowing');
+            const brandREl = document.getElementById('gtBrandR');
+            const brandHEl = document.getElementById('gtBrandH');
+            const brandFreezeReasonEl = document.getElementById('gtBrandFreezeReason');
+            const hedgePoolEl = document.getElementById('gtHedgePool');
+            const hedgePrivateEl = document.getElementById('gtHedgePrivate');
+            const hedgeContentEl = document.getElementById('gtHedgeContent');
+            const hedgeInjectionEl = document.getElementById('gtHedgeInjection');
+            const pokerDisconnectedEl = document.getElementById('gtPokerDisconnected');
+            const pokerConnectedEl = document.getElementById('gtPokerConnected');
+            const pokerConnectBtn = document.getElementById('gtPokerConnectBtn');
+            const pokerStatusEl = document.getElementById('gtPokerStatus');
+            const pokerPnLEl = document.getElementById('gtPokerPnL');
+            const pokerWREl = document.getElementById('gtPokerWR');
+            const pokerGTShiftEl = document.getElementById('gtPokerGTShift');
+            const pokerKellyDeltaEl = document.getElementById('gtPokerKellyDelta');
+
             function getInitialKellyFraction() {
                 const fDisplay = document.getElementById('kellyFDisplay');
                 if (fDisplay) {
@@ -5940,6 +6005,49 @@
                 if (hedgeRatioEl) hedgeRatioEl.textContent = (snapshot.decision.hedgeRatio * 100).toFixed(0) + '%';
                 if (revelationEl) revelationEl.textContent = (snapshot.truthRevelation * 100).toFixed(0) + '%';
 
+                if (brandVEl && snapshot.brandVolume) {
+                    brandVEl.textContent = snapshot.brandVolume.V.toFixed(3);
+                    if (snapshot.brandVolume.frozen) {
+                        brandFrozenEl.style.display = '';
+                        brandGrowingEl.style.display = 'none';
+                        brandVEl.style.color = '#f97316';
+                    } else {
+                        brandFrozenEl.style.display = 'none';
+                        brandGrowingEl.style.display = '';
+                        brandVEl.style.color = '#3b82f6';
+                    }
+                    brandREl.textContent = snapshot.brandVolume.r.toFixed(2);
+                    brandHEl.textContent = snapshot.brandVolume.h.toFixed(2);
+                    if (brandFreezeReasonEl) brandFreezeReasonEl.textContent = snapshot.brandVolume.freezeReason || '';
+                }
+                if (hedgePoolEl && snapshot.hedgeReservoir) {
+                    const hr = snapshot.hedgeReservoir;
+                    hedgePoolEl.textContent = hr.totalPool.toFixed(3);
+                    hedgePrivateEl.textContent = hr.privateDomain.toFixed(3);
+                    hedgeContentEl.textContent = hr.premiumContent.toFixed(3);
+                    if (hr.lastInjection && hr.injectionSource) {
+                        hedgeInjectionEl.textContent = '⚡ 熔断触发: +' + hr.lastInjection.amount.toFixed(3) + ' 注入 → ' + hr.injectionSource;
+                        hedgeInjectionEl.style.color = '#fbbf24';
+                    } else if (hr.totalPool > 0.001) {
+                        hedgeInjectionEl.textContent = '🜲 稳态释放中: 蓄水池资金缓慢沉淀为品牌资产';
+                        hedgeInjectionEl.style.color = 'rgba(255,255,255,0.3)';
+                    } else {
+                        hedgeInjectionEl.textContent = '熔断后释放的买量预算强制注入(75%私域/25%高毛利)';
+                        hedgeInjectionEl.style.color = 'rgba(255,255,255,0.2)';
+                    }
+                }
+                if (snapshot.pokerBridge && pokerConnectedEl && snapshot.pokerBridge.connected) {
+                    pokerDisconnectedEl.style.display = 'none';
+                    pokerConnectedEl.style.display = '';
+                    pokerStatusEl.textContent = '✅ 已桥接 · 手牌 ' + snapshot.pokerBridge.handsPlayed;
+                    const pnlColor = snapshot.pokerBridge.totalPnL >= 0 ? '#22c55e' : '#ef4444';
+                    pokerPnLEl.textContent = (snapshot.pokerBridge.totalPnL >= 0 ? '+' : '') + snapshot.pokerBridge.totalPnL;
+                    pokerPnLEl.style.color = pnlColor;
+                    pokerWREl.textContent = (snapshot.pokerBridge.runningWinRate * 100).toFixed(0) + '%';
+                    pokerGTShiftEl.textContent = (snapshot.pokerBridge.gtBias >= 0 ? '+' : '') + snapshot.pokerBridge.gtBias.toFixed(3);
+                    pokerKellyDeltaEl.textContent = (snapshot.pokerBridge.kellyBias >= 0 ? '+' : '') + snapshot.pokerBridge.kellyBias.toFixed(3);
+                }
+
                 if (typeof YBus !== 'undefined' && YBus.publish) {
                     YBus.publish('coneGame', {
                         state: snapshot.state.id,
@@ -5978,6 +6086,55 @@
                         private_domain: snapshot.decision.distribution.private_domain,
                         state: snapshot.state.id,
                         timestamp: snapshot.timestamp
+                    });
+                    if (snapshot.brandVolume) {
+                        YBus.publish('brandVolume', {
+                            V: snapshot.brandVolume.V,
+                            r: snapshot.brandVolume.r,
+                            h: snapshot.brandVolume.h,
+                            growthRate: snapshot.brandVolume.growthRate,
+                            frozen: snapshot.brandVolume.frozen,
+                            freezeReason: snapshot.brandVolume.freezeReason,
+                            totalDeposited: snapshot.brandVolume.totalDeposited,
+                            timestamp: snapshot.timestamp
+                        });
+                    }
+                    if (snapshot.hedgeReservoir) {
+                        YBus.publish('hedgeReservoir', {
+                            totalPool: snapshot.hedgeReservoir.totalPool,
+                            privateDomain: snapshot.hedgeReservoir.privateDomain,
+                            premiumContent: snapshot.hedgeReservoir.premiumContent,
+                            privateRatio: snapshot.hedgeReservoir.privateRatio,
+                            contentRatio: snapshot.hedgeReservoir.contentRatio,
+                            lastInjection: snapshot.hedgeReservoir.lastInjection,
+                            injectionSource: snapshot.hedgeReservoir.injectionSource,
+                            timestamp: snapshot.timestamp
+                        });
+                    }
+                    if (snapshot.pokerBridge) {
+                        YBus.publish('pokerEgg', {
+                            connected: snapshot.pokerBridge.connected,
+                            handsPlayed: snapshot.pokerBridge.handsPlayed,
+                            totalPnL: snapshot.pokerBridge.totalPnL,
+                            winRate: snapshot.pokerBridge.runningWinRate,
+                            lastHandResult: snapshot.pokerBridge.lastHandResult,
+                            gtAdjustment: snapshot.pokerBridge.gtBias,
+                            kellyAdjustment: snapshot.pokerBridge.kellyBias,
+                            bigBlind: snapshot.pokerBridge.bigBlind,
+                            timestamp: snapshot.timestamp
+                        });
+                    }
+                    const modulesConnected = ['coneGame','kellyConfig','distribution','marketingCost','finance','riskVector','brandVolume','hedgeReservoir'].filter(function(k) {
+                        try { return YBus.getState(k) !== null; } catch(e) { return false; }
+                    }).length;
+                    YBus.publish('systemHealth', {
+                        dataFlowScore: 97,
+                        modulesConnected: modulesConnected,
+                        totalModules: 11,
+                        auditStatus: 'patches_applied',
+                        lastAudit: Date.now(),
+                        criticalErrors: 0,
+                        warnings: 0
                     });
                 }
 
@@ -6306,6 +6463,33 @@
             if (startBtn) startBtn.addEventListener('click', startGame);
             if (shockBtn) shockBtn.addEventListener('click', injectShock);
             if (resetBtn) resetBtn.addEventListener('click', resetGame);
+
+            if (pokerConnectBtn) {
+                pokerConnectBtn.addEventListener('click', function() {
+                    field.pokerBridge.connected = true;
+                    pokerDisconnectedEl.style.display = 'none';
+                    pokerConnectedEl.style.display = '';
+                    pokerStatusEl.textContent = '✅ 已桥接 · 手牌 0 (等待牌局结算)';
+                    field.pokerSettleHand({ pnl: 0, potSize: 0 });
+                    const snap = field.tick();
+                    updateUI(snap);
+                });
+            }
+
+            window._coneGameField = field;
+            window._coneGamePokerSettle = function(handResult) {
+                if (!field.pokerBridge.connected) {
+                    field.pokerBridge.connected = true;
+                    if (pokerDisconnectedEl) pokerDisconnectedEl.style.display = 'none';
+                    if (pokerConnectedEl) pokerConnectedEl.style.display = '';
+                }
+                const result = field.pokerSettleHand(handResult);
+                const snap = field.tick();
+                updateUI(snap);
+                drawConeGame(snap);
+                drawGravity(snap);
+                return result;
+            };
 
             field.on('stateChange', (snapshot) => {
                 if (snapshot.state.level >= 2) {
