@@ -1,0 +1,1248 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Y.Mine · 终极模拟沙盘 — 人性博弈 × 机器精算 × 市场反馈</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#07090f;--bg2:#0d1119;--bg3:#151b29;--line:#1f2937;
+  --gold:#f5c842;--red:#ef4444;--green:#22c55e;--blue:#3b82f6;
+  --purple:#a78bfa;--cyan:#22d3ee;--dim:#64748b;--text:#e5e7eb;
+  --human:#f97316;--machine:#22d3ee;--market:#a78bfa;
+}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;overflow-x:hidden;}
+a{color:var(--cyan);text-decoration:none}
+
+/* ===== 顶部标题栏 ===== */
+.topbar{
+  height:56px;padding:0 24px;display:flex;align-items:center;gap:20px;
+  background:linear-gradient(180deg,rgba(21,27,41,0.95),rgba(7,9,15,0.9));
+  border-bottom:1px solid var(--line);position:relative;z-index:10;
+  backdrop-filter:blur(12px);
+}
+.brand{font-size:15px;font-weight:800;letter-spacing:2px;background:linear-gradient(90deg,var(--gold),var(--cyan));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.brand-sub{font-size:11px;color:var(--dim);margin-left:-10px}
+.topbar .sep{flex:1}
+.topbar .tag{font-size:11px;padding:3px 10px;border-radius:20px;border:1px solid var(--line);color:var(--dim);letter-spacing:1px}
+.tag.on{color:var(--green);border-color:rgba(34,197,94,0.4);background:rgba(34,197,94,0.08)}
+.btn-start{
+  padding:9px 28px;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:700;letter-spacing:2px;
+  background:linear-gradient(135deg,#ef4444,#a78bfa);color:#fff;
+  box-shadow:0 0 20px rgba(239,68,68,0.4);transition:all .2s;
+}
+.btn-start:hover{transform:translateY(-1px);box-shadow:0 0 30px rgba(167,139,250,0.6)}
+.btn-start:disabled{opacity:.4;cursor:not-allowed;transform:none;box-shadow:none}
+.btn-reset{padding:8px 16px;border:1px solid var(--line);background:transparent;color:var(--dim);border-radius:6px;cursor:pointer;font-size:12px}
+.btn-reset:hover{color:var(--text);border-color:var(--dim)}
+
+/* ===== 三栏主体 ===== */
+.main{
+  display:grid;grid-template-columns:340px 1fr 480px;gap:1px;
+  height:calc(100vh - 56px);background:var(--line);
+}
+.panel{background:var(--bg);display:flex;flex-direction:column;overflow:hidden}
+.panel-head{
+  padding:12px 16px;border-bottom:1px solid var(--line);
+  display:flex;align-items:center;gap:10px;flex-shrink:0;
+}
+.panel-head .dot{width:8px;height:8px;border-radius:50%}
+.panel-head .name{font-size:13px;font-weight:700;letter-spacing:1px}
+.panel-head .role{font-size:10px;color:var(--dim);letter-spacing:1px;margin-left:auto}
+.panel-body{flex:1;overflow-y:auto;padding:14px;position:relative}
+.panel-body::-webkit-scrollbar{width:4px}
+.panel-body::-webkit-scrollbar-thumb{background:var(--line);border-radius:2px}
+
+/* ===== 左：人性博弈层 ===== */
+.human-dot{background:var(--human);box-shadow:0 0 10px var(--human)}
+/* 对手信息 */
+.opponent-card{
+  background:linear-gradient(135deg,rgba(249,115,22,0.08),rgba(239,68,68,0.05));
+  border:1px solid rgba(249,115,22,0.2);border-radius:10px;padding:12px;margin-bottom:12px;
+}
+.opp-top{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.opp-avatar{
+  width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,#7c2d12,#b45309);
+  display:flex;align-items:center;justify-content:center;font-size:20px;
+  border:2px solid rgba(249,115,22,0.4);position:relative;
+}
+.opp-avatar.thinking::after{
+  content:'';position:absolute;inset:-4px;border:2px solid var(--human);border-radius:50%;
+  animation:pulse 1s infinite;border-top-color:transparent;
+}
+@keyframes pulse{to{transform:rotate(360deg)}}
+.opp-name{font-size:13px;font-weight:700}
+.opp-stack{font-size:11px;color:var(--dim)}
+.opp-tells{font-size:10px;color:var(--gold);margin-left:auto;text-align:right;line-height:1.4}
+.opp-bet{
+  text-align:center;padding:8px;border-radius:6px;
+  background:rgba(239,68,68,0.15);border:1px dashed rgba(239,68,68,0.4);
+  font-size:12px;margin-bottom:10px;
+}
+.opp-bet.big{background:rgba(239,68,68,0.25);border-style:solid;animation:shake .4s}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-3px)}75%{transform:translateX(3px)}}
+.opp-bet .label{color:var(--dim);font-size:10px}
+.opp-bet .amt{font-size:18px;font-weight:800;color:#fca5a5}
+
+/* 噪音干扰带 */
+.noise-bar{
+  background:rgba(0,0,0,0.3);border-radius:6px;padding:8px 10px;margin-bottom:10px;
+  font-size:10px;line-height:1.6;max-height:76px;overflow:hidden;position:relative;
+}
+.noise-bar::before{
+  content:'📡 市场噪音 / 对手信号';position:absolute;top:4px;right:8px;
+  font-size:9px;color:var(--dim);letter-spacing:1px;
+}
+.noise-item{display:flex;gap:6px;align-items:flex-start;margin-bottom:3px}
+.noise-item .tag-fud{font-size:9px;padding:1px 5px;border-radius:3px;flex-shrink:0}
+.tag-fud.bluff{background:rgba(239,68,68,0.25);color:#fca5a5}
+.tag-fud.news{background:rgba(59,130,246,0.25);color:#93c5fd}
+.tag-fud.fomo{background:rgba(245,200,66,0.25);color:#fde047}
+.tag-fud.tell{background:rgba(167,139,250,0.25);color:#c4b5fd}
+
+/* 牌桌 */
+.poker-table{
+  background:radial-gradient(ellipse at center,#0f2014 0%,#071108 100%);
+  border:3px solid #1a3a20;border-radius:50%/40%;padding:18px 14px;
+  position:relative;margin:10px 0;
+}
+.community-cards,.hole-cards-row{display:flex;gap:6px;justify-content:center}
+.hole-cards-row{margin-top:12px}
+.cmini{
+  width:34px;height:48px;border-radius:4px;background:#fff;color:#000;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  font-size:10px;font-weight:700;flex-shrink:0;
+  box-shadow:0 2px 6px rgba(0,0,0,0.5);position:relative;
+}
+.cmini.red{color:#c00}
+.cmini.back{background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:transparent;background-image:repeating-linear-gradient(45deg,rgba(255,255,255,0.1) 0 4px,transparent 4px 8px)}
+.cmini.dealing{animation:deal .4s ease-out}
+@keyframes deal{from{transform:translateY(-60px) rotate(-20deg);opacity:0}to{transform:translateY(0);opacity:1}}
+.pot-info{text-align:center;margin-top:10px;font-size:10px;color:#86efac}
+.pot-info .pot{font-size:15px;font-weight:800;color:#fde047}
+
+/* 我的信息 */
+.me-card{
+  background:linear-gradient(135deg,rgba(34,211,238,0.08),rgba(59,130,246,0.05));
+  border:1px solid rgba(34,211,238,0.2);border-radius:10px;padding:12px;
+}
+.me-top{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.me-avatar{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#0e7490,#0369a1);display:flex;align-items:center;justify-content:center;font-size:18px;border:2px solid var(--cyan)}
+.me-name{font-size:13px;font-weight:700}
+.me-stack{font-size:11px;color:var(--dim)}
+.me-bet-amt{margin-left:auto;font-size:12px;color:var(--cyan)}
+
+.action-btns{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:10px}
+.act-btn{
+  padding:9px 4px;border:1px solid var(--line);border-radius:6px;background:var(--bg3);
+  color:var(--text);font-size:11px;font-weight:700;cursor:pointer;transition:all .15s;
+  text-align:center;letter-spacing:1px;
+}
+.act-btn:hover:not(:disabled){transform:translateY(-1px)}
+.act-btn:disabled{opacity:.35;cursor:not-allowed}
+.act-btn.fold{border-color:rgba(239,68,68,0.4);color:#fca5a5}
+.act-btn.fold:hover:not(:disabled){background:rgba(239,68,68,0.2);box-shadow:0 0 10px rgba(239,68,68,0.3)}
+.act-btn.call{border-color:rgba(34,197,94,0.4);color:#86efac}
+.act-btn.call:hover:not(:disabled){background:rgba(34,197,94,0.15);box-shadow:0 0 10px rgba(34,197,94,0.3)}
+.act-btn.raise{border-color:rgba(245,200,66,0.4);color:#fde047}
+.act-btn.raise:hover:not(:disabled){background:rgba(245,200,66,0.15);box-shadow:0 0 10px rgba(245,200,66,0.3)}
+.act-btn.reco{position:relative}
+.act-btn.reco::after{content:'✦机器推荐';position:absolute;top:-7px;right:3px;font-size:8px;color:var(--cyan);background:var(--bg);padding:0 3px;letter-spacing:0.5px}
+
+/* ===== 中：机器精算层 ===== */
+.machine-dot{background:var(--machine);box-shadow:0 0 10px var(--machine)}
+/* 凯利仪表 */
+.meter-group{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.meter{
+  background:var(--bg2);border:1px solid var(--line);border-radius:8px;padding:10px;
+}
+.meter-label{font-size:10px;color:var(--dim);letter-spacing:1px;margin-bottom:4px;display:flex;justify-content:space-between}
+.meter-val{font-size:18px;font-weight:800;font-family:'SF Mono',ui-monospace,monospace}
+.meter-val.good{color:#86efac}.meter-val.warn{color:#fde047}.meter-val.bad{color:#fca5a5}
+.meter-sub{font-size:9px;color:var(--dim);margin-top:2px}
+.kelly-bar{height:6px;background:var(--bg);border-radius:3px;overflow:hidden;margin-top:6px;position:relative}
+.kelly-fill{height:100%;background:linear-gradient(90deg,var(--red),var(--gold),var(--green));transition:width .5s;border-radius:3px}
+.kelly-marker{position:absolute;top:-3px;width:2px;height:12px;background:#fff;box-shadow:0 0 4px #fff;transition:left .5s}
+
+/* 信号过滤 */
+.signal-filter{
+  background:var(--bg2);border:1px solid var(--line);border-radius:8px;padding:10px;margin-bottom:12px;
+}
+.sf-title{font-size:10px;color:var(--cyan);letter-spacing:2px;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.sf-title::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--cyan);animation:pulse2 1.5s infinite}
+@keyframes pulse2{50%{opacity:.3}}
+.sf-row{display:flex;justify-content:space-between;align-items:center;font-size:11px;padding:4px 0;border-bottom:1px dashed rgba(255,255,255,0.05)}
+.sf-row:last-child{border-bottom:none}
+.sf-row .k{color:var(--dim)}
+.sf-row .v{font-family:'SF Mono',ui-monospace,monospace;font-weight:700}
+
+/* DCF锚 */
+.dcf-box{
+  background:linear-gradient(135deg,rgba(34,211,238,0.05),rgba(59,130,246,0.05));
+  border:1px solid rgba(34,211,238,0.2);border-radius:8px;padding:10px;margin-bottom:12px;
+}
+.dcf-title{font-size:10px;color:var(--machine);letter-spacing:2px;margin-bottom:8px}
+.dcf-row{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center;font-size:11px;margin-bottom:6px}
+.dcf-price{text-align:center;font-family:'SF Mono',monospace;font-weight:800;font-size:14px;padding:4px 10px;border-radius:4px}
+.dcf-price.above{background:rgba(239,68,68,0.15);color:#fca5a5}
+.dcf-price.below{background:rgba(34,197,94,0.15);color:#86efac}
+.dcf-range{height:20px;background:var(--bg);border-radius:3px;position:relative;margin:6px 0;overflow:hidden}
+.dcf-fill{height:100%;background:linear-gradient(90deg,rgba(239,68,68,0.2),rgba(34,197,94,0.2));position:absolute;top:0}
+.dcf-marker{position:absolute;top:0;width:2px;height:100%;background:#fff;transition:left .5s}
+.dcf-labels{display:flex;justify-content:space-between;font-size:9px;color:var(--dim)}
+
+/* 营销漏斗 */
+.funnel-stats{
+  background:var(--bg2);border:1px solid var(--line);border-radius:8px;padding:10px;margin-bottom:12px;
+}
+.funnel-stats-title{font-size:10px;color:var(--purple);letter-spacing:2px;margin-bottom:8px}
+.funnel-rows{display:flex;flex-direction:column;gap:4px}
+.funnel-row{display:grid;grid-template-columns:70px 1fr 60px;gap:6px;align-items:center;font-size:10px}
+.funnel-row .fname{color:var(--dim)}
+.funnel-row .fbar{height:8px;background:var(--bg);border-radius:4px;overflow:hidden}
+.funnel-row .fbar-fill{height:100%;border-radius:4px;transition:width .6s}
+.funnel-row .fpct{text-align:right;font-family:'SF Mono',monospace;font-weight:700}
+
+/* 圆锥状态 */
+.cone-meter{
+  background:var(--bg2);border:1px solid var(--line);border-radius:8px;padding:10px;
+}
+.cone-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.cone-name{font-size:11px;font-weight:700}
+.cone-state-tag{font-size:9px;padding:2px 8px;border-radius:10px;letter-spacing:1px}
+.cone-state-tag.calm{background:rgba(34,197,94,0.15);color:#86efac;border:1px solid rgba(34,197,94,0.3)}
+.cone-state-tag.tension{background:rgba(251,191,36,0.15);color:#fde047;border:1px solid rgba(251,191,36,0.3)}
+.cone-state-tag.extreme{background:rgba(249,115,22,0.15);color:#fdba74;border:1px solid rgba(249,115,22,0.3)}
+.cone-state-tag.meltdown{background:rgba(239,68,68,0.2);color:#fca5a5;border:1px solid rgba(239,68,68,0.4);animation:glowRed 1s infinite}
+@keyframes glowRed{50%{box-shadow:0 0 10px rgba(239,68,68,0.5)}}
+.cone-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
+.cone-g{background:var(--bg);border-radius:4px;padding:6px;text-align:center}
+.cone-g .k{font-size:9px;color:var(--dim)}
+.cone-g .v{font-size:13px;font-weight:800;font-family:'SF Mono',monospace;margin-top:2px}
+
+/* ===== 右：市场反馈层 ===== */
+.market-dot{background:var(--market);box-shadow:0 0 10px var(--market)}
+.kline-wrap{height:340px;position:relative;background:#0a0e16;border:1px solid var(--line);border-radius:8px;padding:8px;margin-bottom:10px}
+.kline-canvas{width:100%;height:100%;display:block}
+.kline-overlay{
+  position:absolute;top:8px;left:8px;font-size:10px;color:var(--dim);pointer-events:none;
+  font-family:'SF Mono',monospace;letter-spacing:1px;line-height:1.6;
+}
+.kline-price{font-size:18px;font-weight:800;color:#fff;letter-spacing:0}
+.kline-change{font-size:11px}
+.kline-box-label{
+  position:absolute;font-size:9px;padding:2px 6px;border-radius:3px;pointer-events:none;
+  font-family:'SF Mono',monospace;letter-spacing:0.5px;
+}
+.box-top-label{background:rgba(239,68,68,0.2);color:#fca5a5;border:1px solid rgba(239,68,68,0.4);right:8px}
+.box-bot-label{background:rgba(34,197,94,0.2);color:#86efac;border:1px solid rgba(34,197,94,0.4);right:8px}
+.result-banner{
+  margin-top:10px;padding:16px;border-radius:10px;text-align:center;display:none;
+}
+.result-banner.win{background:linear-gradient(135deg,rgba(34,197,94,0.15),rgba(34,211,238,0.1));border:1px solid rgba(34,197,94,0.4)}
+.result-banner.lose{background:linear-gradient(135deg,rgba(239,68,68,0.15),rgba(167,139,250,0.1));border:1px solid rgba(239,68,68,0.4)}
+.result-banner.show{display:block;animation:slideUp .5s}
+@keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+.result-title{font-size:16px;font-weight:800;letter-spacing:2px;margin-bottom:6px}
+.result-detail{font-size:11px;color:var(--dim);line-height:1.7}
+.result-stat{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}
+.rs-item{padding:6px;background:rgba(0,0,0,0.2);border-radius:4px}
+.rs-k{font-size:9px;color:var(--dim)}
+.rs-v{font-size:13px;font-weight:800;font-family:'SF Mono',monospace;margin-top:2px}
+
+/* 成交量 */
+.vol-wrap{height:60px;background:#0a0e16;border:1px solid var(--line);border-radius:8px;padding:4px}
+.vol-canvas{width:100%;height:100%;display:block}
+
+/* 日志流 */
+.log-stream{
+  position:absolute;bottom:0;left:0;right:0;max-height:120px;overflow:hidden;
+  padding:8px 12px;background:linear-gradient(transparent,rgba(0,0,0,0.7));
+  font-family:'SF Mono',ui-monospace,monospace;font-size:10px;line-height:1.5;
+  pointer-events:none;
+}
+.log-line{opacity:0;animation:logIn .3s forwards}
+@keyframes logIn{to{opacity:.85}}
+.log-line .ts{color:var(--dim)}.log-line.human{color:#fdba74}.log-line.machine{color:var(--cyan)}.log-line.market{color:#c4b5fd}.log-line.win{color:#86efac}.log-line.lose{color:#fca5a5}
+
+/* ===== 状态流指示器 ===== */
+.flow-indicator{
+  position:absolute;top:0;left:0;right:0;height:2px;z-index:5;
+  background:linear-gradient(90deg,var(--human),var(--machine),var(--market));
+  transform:scaleX(0);transform-origin:left;transition:transform 0.3s;
+}
+.flow-indicator.active{animation:flow 3s ease-in-out}
+@keyframes flow{0%{transform:scaleX(0)}30%{transform:scaleX(0.33)}60%{transform:scaleX(0.66)}100%{transform:scaleX(1)}}
+
+/* 数据脉冲连线 */
+.pulse-line{position:absolute;pointer-events:none;z-index:20}
+
+/* 响应式 */
+@media (max-width:1200px){.main{grid-template-columns:300px 1fr 400px}}
+</style>
+</head>
+<body>
+
+<div class="flow-indicator" id="flowIndicator"></div>
+
+<!-- ========== 顶部标题栏 ========== -->
+<div class="topbar">
+  <div class="brand">Y.MINE</div>
+  <div class="brand-sub">终极模拟沙盘</div>
+  <div style="font-size:20px;color:var(--gold);margin:0 8px">×</div>
+  <div style="font-size:13px;font-weight:700;color:var(--cyan);letter-spacing:2px">人性博弈 → 机器精算 → 市场反馈</div>
+  <div class="sep"></div>
+  <span class="tag" id="ybusTag">YBus: <span id="ybusState" style="color:var(--dim)">standby</span></span>
+  <span class="tag" id="stageTag">阶段: <span id="stageName">待命</span></span>
+  <button class="btn-reset" id="btnReset">↻ 重置</button>
+  <button class="btn-start" id="btnStart">▶ 开始模拟</button>
+</div>
+
+<!-- ========== 三栏主体 ========== -->
+<div class="main">
+
+  <!-- ===== 左：人性博弈（德州扑克+噪音） ===== -->
+  <div class="panel" id="panelHuman">
+    <div class="panel-head">
+      <div class="dot human-dot"></div>
+      <div class="name">人性博弈层</div>
+      <div class="role">HUMAN · NOISE · BLUFF</div>
+    </div>
+    <div class="panel-body" id="humanBody">
+
+      <!-- 对手 -->
+      <div class="opponent-card" id="oppCard">
+        <div class="opp-top">
+          <div class="opp-avatar" id="oppAvatar">🦊</div>
+          <div>
+            <div class="opp-name" id="oppName">SHARK_888</div>
+            <div class="opp-stack" id="oppStack">筹码: ¥100,000</div>
+          </div>
+          <div class="opp-tells" id="oppTells">
+            弃牌率 62%<br>加注率 18%
+          </div>
+        </div>
+        <div class="opp-bet" id="oppBet">
+          <div class="label">对手下注</div>
+          <div class="amt" id="oppBetAmt">—</div>
+        </div>
+      </div>
+
+      <!-- 市场噪音/诈唬信号 -->
+      <div class="noise-bar" id="noiseBar">
+        <div id="noiseContent"></div>
+      </div>
+
+      <!-- 牌桌 -->
+      <div class="poker-table">
+        <div class="community-cards" id="communityCards">
+          <div class="cmini back">?</div><div class="cmini back">?</div><div class="cmini back">?</div>
+          <div class="cmini back" style="margin-left:4px">?</div>
+          <div class="cmini back" style="margin-left:4px">?</div>
+        </div>
+        <div class="pot-info">
+          锅底 &nbsp;<span class="pot" id="potAmt">0</span>&nbsp; 筹码
+        </div>
+        <div class="hole-cards-row" id="holeCards">
+          <div class="cmini back">?</div><div class="cmini back">?</div>
+        </div>
+      </div>
+
+      <!-- 我 -->
+      <div class="me-card">
+        <div class="me-top">
+          <div class="me-avatar">🧠</div>
+          <div>
+            <div class="me-name">你 (决策者)</div>
+            <div class="me-stack" id="meStack">筹码: ¥100,000</div>
+          </div>
+          <div class="me-bet-amt" id="meBetAmt">已下注: 0</div>
+        </div>
+        <div class="action-btns">
+          <button class="act-btn fold" id="btnFold" disabled>弃牌<br><span style="font-size:9px;color:var(--dim)">FOLD</span></button>
+          <button class="act-btn call" id="btnCall" disabled>跟注<br><span style="font-size:9px;color:var(--dim)">CALL</span></button>
+          <button class="act-btn raise" id="btnRaise" disabled>加注<br><span style="font-size:9px;color:var(--dim)">RAISE</span></button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ===== 中：机器精算 ===== -->
+  <div class="panel" id="panelMachine">
+    <div class="panel-head">
+      <div class="dot machine-dot"></div>
+      <div class="name">机器精算层</div>
+      <div class="role">KELLY · DCF · FUNNEL · CONE</div>
+    </div>
+    <div class="panel-body" id="machineBody">
+
+      <!-- 核心四仪表 -->
+      <div class="meter-group">
+        <div class="meter">
+          <div class="meter-label"><span>真实胜率 p</span><span style="color:var(--dim)">Monte Carlo</span></div>
+          <div class="meter-val" id="meterP">--%</div>
+          <div class="meter-sub" id="meterPSub">等待发牌...</div>
+        </div>
+        <div class="meter">
+          <div class="meter-label"><span>隐含赔率 b</span><span style="color:var(--dim)">pot/call</span></div>
+          <div class="meter-val" id="meterB">--</div>
+          <div class="meter-sub" id="meterBSub">等待下注...</div>
+        </div>
+        <div class="meter">
+          <div class="meter-label"><span>凯利 f*</span><span style="color:var(--cyan)" id="kellyFraction">半凯利</span></div>
+          <div class="meter-val good" id="meterF">0%</div>
+          <div class="kelly-bar"><div class="kelly-fill" id="kellyFill" style="width:0%"></div><div class="kelly-marker" id="kellyMarker" style="left:0%"></div></div>
+        </div>
+        <div class="meter">
+          <div class="meter-label"><span>正期望值 EV</span><span style="color:var(--dim)">p·b-q</span></div>
+          <div class="meter-val" id="meterEV">--</div>
+          <div class="meter-sub" id="meterEVSub">等待决策...</div>
+        </div>
+      </div>
+
+      <!-- 信号过滤器（反诈唬） -->
+      <div class="signal-filter">
+        <div class="sf-title">⚡ 信号过滤器 · 反人性干扰</div>
+        <div class="sf-row"><span class="k">对手诈唬概率</span><span class="v" id="sfBluff" style="color:var(--dim)">--</span></div>
+        <div class="sf-row"><span class="k">市场噪音强度</span><span class="v" id="sfNoise" style="color:var(--dim)">--</span></div>
+        <div class="sf-row"><span class="k">情绪FOMO指数</span><span class="v" id="sfFomo" style="color:var(--dim)">--</span></div>
+        <div class="sf-row"><span class="k">信号置信度</span><span class="v" id="sfConf" style="color:var(--dim)">--</span></div>
+        <div class="sf-row"><span class="k">机器推荐动作</span><span class="v" id="sfAction" style="color:var(--cyan)">--</span></div>
+      </div>
+
+      <!-- DCF估值锚 -->
+      <div class="dcf-box">
+        <div class="dcf-title">💎 DCF估值锚 · 内在价值 vs 市场价格</div>
+        <div class="dcf-row">
+          <div style="text-align:right">
+            <div style="font-size:9px;color:var(--dim)">内在价值</div>
+            <div style="font-size:14px;font-weight:800;color:#86efac;font-family:'SF Mono',monospace" id="dcfIv">¥68.50</div>
+          </div>
+          <div class="dcf-price" id="dcfPriceBox">¥--</div>
+          <div>
+            <div style="font-size:9px;color:var(--dim)">安全边际</div>
+            <div style="font-size:14px;font-weight:800;color:var(--cyan);font-family:'SF Mono',monospace" id="dcfMargin">--%</div>
+          </div>
+        </div>
+        <div class="dcf-range" id="dcfRange">
+          <div class="dcf-fill" style="left:10%;right:10%"></div>
+          <div class="dcf-marker" id="dcfMarker" style="left:50%;background:#fff"></div>
+        </div>
+        <div class="dcf-labels">
+          <span>¥40 (低估)</span><span>¥68.5 内在价值</span><span>¥100 (高估)</span>
+        </div>
+      </div>
+
+      <!-- 营销漏斗 -->
+      <div class="funnel-stats">
+        <div class="funnel-stats-title">📊 营销获客漏斗 · 转化实况</div>
+        <div class="funnel-rows" id="funnelRows">
+          <div class="funnel-row"><span class="fname">曝光</span><span class="fbar"><div class="fbar-fill" style="width:0%;background:var(--blue)" id="fbar1"></div></span><span class="fpct" id="fpct1">--</span></div>
+          <div class="funnel-row"><span class="fname">点击</span><span class="fbar"><div class="fbar-fill" style="width:0%;background:var(--cyan)" id="fbar2"></div></span><span class="fpct" id="fpct2">--</span></div>
+          <div class="funnel-row"><span class="fname">注册</span><span class="fbar"><div class="fbar-fill" style="width:0%;background:var(--green)" id="fbar3"></div></span><span class="fpct" id="fpct3">--</span></div>
+          <div class="funnel-row"><span class="fname">付费</span><span class="fbar"><div class="fbar-fill" style="width:0%;background:var(--gold)" id="fbar4"></div></span><span class="fpct" id="fpct4">--</span></div>
+          <div class="funnel-row"><span class="fname">复购</span><span class="fbar"><div class="fbar-fill" style="width:0%;background:var(--purple)" id="fbar5"></div></span><span class="fpct" id="fpct5">--</span></div>
+          <div style="display:flex;justify-content:space-between;margin-top:6px;font-size:10px;color:var(--dim)">
+            <span>CAC <b id="cacVal" style="color:#fca5a5">--</b></span>
+            <span>LTV <b id="ltvVal" style="color:#86efac">--</b></span>
+            <span>LTV/CAC <b id="ltvcacVal" style="color:var(--cyan)">--</b></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 圆锥博弈状态 -->
+      <div class="cone-meter">
+        <div class="cone-head">
+          <div class="cone-name">🌀 圆锥博弈场状态</div>
+          <div class="cone-state-tag calm" id="coneStateTag">CALM 平静</div>
+        </div>
+        <div class="cone-grid">
+          <div class="cone-g"><div class="k">σ冲击</div><div class="v" id="coneSigma" style="color:var(--green)">0.0</div></div>
+          <div class="cone-g"><div class="k">γ反脆弱</div><div class="v" id="coneGamma" style="color:var(--green)">0.00</div></div>
+          <div class="cone-g"><div class="k">品牌体积V</div><div class="v" id="coneVolume" style="color:var(--cyan)">0</div></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ===== 右：市场反馈（K线+箱体+成交量） ===== -->
+  <div class="panel" id="panelMarket">
+    <div class="panel-head">
+      <div class="dot market-dot"></div>
+      <div class="name">市场反馈层</div>
+      <div class="role">KLINE · BOX · BREAKOUT</div>
+    </div>
+    <div class="panel-body" id="marketBody">
+
+      <div class="kline-wrap" id="klineWrap">
+        <canvas id="klineCanvas" class="kline-canvas"></canvas>
+        <canvas id="volCanvas" class="vol-canvas" style="position:absolute;bottom:8px;left:8px;right:8px;height:50px;width:calc(100% - 16px)"></canvas>
+        <div class="kline-overlay">
+          <div style="color:var(--dim);font-size:9px" id="klineTicker">NXNE · 日线</div>
+          <div class="kline-price" id="klinePrice">¥68.50</div>
+          <div class="kline-change" id="klineChange">--</div>
+          <div style="margin-top:4px;font-size:9px;color:var(--dim)" id="klineVol">成交量: --</div>
+        </div>
+      </div>
+
+      <!-- 结果横幅 -->
+      <div class="result-banner" id="resultBanner">
+        <div class="result-title" id="resultTitle"></div>
+        <div class="result-detail" id="resultDetail"></div>
+        <div class="result-stat" id="resultStat"></div>
+      </div>
+
+      <!-- 决策质量计分 -->
+      <div style="background:var(--bg2);border:1px solid var(--line);border-radius:8px;padding:10px;margin-top:10px">
+        <div style="font-size:10px;color:var(--purple);letter-spacing:2px;margin-bottom:8px">🧭 决策质量评分</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:11px">
+          <div><span style="color:var(--dim)">人性过滤：</span><b id="scoreHuman">--</b></div>
+          <div><span style="color:var(--dim)">凯利执行：</span><b id="scoreKelly">--</b></div>
+          <div><span style="color:var(--dim)">DCF尊重：</span><b id="scoreDCF">--</b></div>
+          <div><span style="color:var(--dim)">反脆弱性：</span><b id="scoreGamma">--</b></div>
+        </div>
+        <div style="margin-top:8px;text-align:center;font-size:20px;font-weight:800;font-family:'SF Mono',monospace" id="scoreTotal">--</div>
+        <div style="text-align:center;font-size:10px;color:var(--dim);letter-spacing:1px" id="scoreTotalLabel">等待决策</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- 全局日志流（覆盖在body上） -->
+<div class="log-stream" id="logStream"></div>
+
+<!-- ========== 引入 YBus ========== -->
+<script src="assets/js/bus.js"></script>
+
+<script>
+/* ================================================================
+ * Y.Mine 终极模拟沙盘
+ * 三层联动：人性博弈 → 机器精算 → 市场反馈
+ * 全部纯Canvas/SVG绘制，无外部依赖
+ * ================================================================ */
+(function(){
+'use strict';
+
+/* ---------- 工具 ---------- */
+const $ = id => document.getElementById(id);
+const rand = (a,b) => a + Math.random()*(b-a);
+const randInt = (a,b) => Math.floor(rand(a,b+1));
+const clamp = (v,lo,hi) => Math.max(lo,Math.min(hi,v));
+const fmt = n => n.toLocaleString('zh-CN',{maximumFractionDigits:0});
+
+/* ---------- 全局状态 ---------- */
+const STAGE = {
+  IDLE:'idle',       // 待命
+  DEALING:'dealing', // 发牌
+  NOISE:'noise',     // 噪音注入/对手下注
+  THINKING:'thinking',// 等待玩家决策
+  ACTUARY:'actuary', // 机器精算
+  SETTLE:'settle',   // K线结算
+  DONE:'done'
+};
+const state = {
+  stage:STAGE.IDLE,
+  // 牌局
+  hand:{hole:[],community:[],stage:0}, // 0=preflop 1=flop 2=turn 3=river
+  pot:0, myBet:0, oppBet:0, stack:100000, oppStack:100000,
+  myCallAmt:0,
+  oppHand:null, oppBluffing:false,
+  // 机器
+  p:0, b:0, fStar:0, ev:0, bluffProb:0.5, noiseLevel:0.5, fomoLevel:0.5,
+  confidence:0, recAction:null,
+  cac:0, ltv:0, ltvcac:0,
+  // 圆锥
+  sigma:0, gamma:0, volume:0, coneState:'CALM',
+  // DCF
+  iv:68.5, price:68.5, margin:0,
+  // K线
+  candles:[], currentCandle:null, boxTop:82, boxBot:58, boxMid:68.5,
+  klineTimer:null,
+  // 决策
+  decision:null, correct:null, finalPnL:0, breakout:null,
+  autoPlay:false,
+  // 演示参数
+  scenario:null
+};
+
+/* ---------- 日志 ---------- */
+function log(msg, cls=''){
+  const el = document.createElement('div');
+  el.className = 'log-line '+cls;
+  const ts = new Date().toLocaleTimeString('zh-CN',{hour12:false})+'.'+String(new Date().getMilliseconds()).padStart(3,'0');
+  el.innerHTML = `<span class="ts">[${ts}]</span> ${msg}`;
+  const box = $('logStream');
+  box.appendChild(el);
+  setTimeout(()=>el.remove(),6000);
+  while(box.children.length>6) box.removeChild(box.firstChild);
+}
+
+/* ---------- 场景预设 ---------- */
+const SCENARIOS = [
+  {
+    name:'高胜率+对手诈唬',
+    hole:[{r:'A',s:'♠',v:14,red:false},{r:'A',s:'♥',v:14,red:true}], // AA - 顶级对子
+    community:[
+      [{r:'Q',s:'♦',v:12,red:true},{r:'7',s:'♣',v:7,red:false},{r:'2',s:'♠',v:2,red:false}],
+      {r:'K',s:'♥',v:13,red:true},
+      {r:'J',s:'♦',v:11,red:true}
+    ],
+    oppBet:[5000, 15000, 30000], // 三次下注 - overbet暗示诈唬
+    oppHand:{r:'9',s:'♣',v:9,red:false}, // 9 high - 纯诈唬
+    bluffing:true,
+    noise:[
+      {type:'bluff',text:'对手超池下注3倍，显示AA/KK强势'},
+      {type:'news',text:'【突发】行业传出利空消息，市场恐慌'},
+      {type:'tell',text:'对手下注时间0.3秒——异常迅速'},
+      {type:'fomo',text:'朋友圈都在说要"抄底"！'},
+      {type:'bluff',text:'对手亮出一张"K"角？(可能是诱导)'}
+    ],
+    trueP:0.88, b:2.1,
+    recAction:'RAISE',
+    iv:78.0, boxTop:88, boxBot:65, startPrice:68.5
+  }
+];
+
+/* ================================================================
+ * 第一层：人性博弈（扑克+噪音）
+ * ================================================================ */
+function renderCards(holeCards, communityCards){
+  const hc = $('holeCards'); hc.innerHTML='';
+  holeCards.forEach((c,i)=>{
+    const el = document.createElement('div');
+    el.className = 'cmini dealing'+(c.red?' red':'');
+    el.style.animationDelay = (i*0.15)+'s';
+    el.innerHTML = `<div>${c.r}</div><div style="font-size:14px;line-height:1">${c.s}</div>`;
+    hc.appendChild(el);
+  });
+  const cc = $('communityCards'); cc.innerHTML='';
+  const showN = state.hand.stage === 0 ? 0 : state.hand.stage === 1 ? 3 : state.hand.stage === 2 ? 4 : 5;
+  for(let i=0;i<5;i++){
+    const el = document.createElement('div');
+    if(i<showN){
+      const c = communityCards[i<3?i:i-1==0?3:4]; // flop 0,1,2; turn 3; river 4
+      const actualC = i<3 ? communityCards[i] : i===3 ? communityCards[3] : communityCards[4];
+      el.className = 'cmini dealing'+(actualC.red?' red':'');
+      el.style.animationDelay = (0.3+i*0.12)+'s';
+      el.innerHTML = `<div>${actualC.r}</div><div style="font-size:14px;line-height:1">${actualC.s}</div>`;
+    } else {
+      el.className='cmini back';
+      el.textContent='?';
+      if(i===3) el.style.marginLeft='4px';
+      if(i===4) el.style.marginLeft='4px';
+    }
+    cc.appendChild(el);
+  }
+}
+function setOppBet(amt, big=false){
+  $('oppBetAmt').textContent = amt===0?'—':'¥'+fmt(amt);
+  const ob = $('oppBet');
+  ob.classList.toggle('big', big);
+  void ob.offsetWidth;
+  if(big) ob.classList.add('big');
+}
+function addNoise(item){
+  const box = $('noiseContent');
+  const tagCls = item.type;
+  const tagText = {bluff:'诈唬',news:'消息',fomo:'FOMO',tell:'马脚'}[item.type]||'信号';
+  const el = document.createElement('div');
+  el.className='noise-item';
+  el.style.opacity='0';el.style.transform='translateX(-10px)';
+  el.innerHTML = `<span class="tag-fud ${tagCls}">${tagText}</span><span>${item.text}</span>`;
+  box.appendChild(el);
+  requestAnimationFrame(()=>{
+    el.style.transition='all .4s';el.style.opacity='1';el.style.transform='translateX(0)';
+  });
+  while(box.children.length>6) box.removeChild(box.firstChild);
+}
+function setBtnsEnabled(fold,call,raise, reco=null){
+  $('btnFold').disabled = !fold;
+  $('btnCall').disabled = !call;
+  $('btnRaise').disabled = !raise;
+  document.querySelectorAll('.act-btn').forEach(b=>b.classList.remove('reco'));
+  if(reco==='FOLD') $('btnFold').classList.add('reco');
+  if(reco==='CALL') $('btnCall').classList.add('reco');
+  if(reco==='RAISE') $('btnRaise').classList.add('reco');
+}
+function updateStacks(){
+  $('meStack').textContent = '筹码: ¥'+fmt(state.stack);
+  $('meBetAmt').textContent = '已下注: ¥'+fmt(state.myBet);
+  $('oppStack').textContent = '筹码: ¥'+fmt(state.oppStack);
+  $('potAmt').textContent = fmt(state.pot);
+}
+
+/* ================================================================
+ * 第二层：机器精算（Kelly/DCF/营销/圆锥）
+ * ================================================================ */
+function computeKelly(p,b,fraction=0.5){
+  const q = 1-p;
+  let f = b>0 && p>0 ? p - q/b : 0;
+  f = clamp(f*fraction, 0, 1);
+  const edge = p*b - q;
+  let action = 'FOLD';
+  if(f<=0.02) action='FOLD';
+  else if(f<0.15) action='CALL';
+  else if(f<0.35) action='RAISE';
+  else if(f<0.6) action='BIG_BET';
+  else action='ALL_IN';
+  return {f_star:f,edge,action};
+}
+function updateMachine(){
+  // 凯利仪表
+  const k = computeKelly(state.p, state.b, 0.5);
+  state.fStar = k.f_star;
+  state.ev = k.edge;
+  state.recAction = k.action;
+
+  $('meterP').textContent = (state.p*100).toFixed(1)+'%';
+  $('meterP').className = 'meter-val '+(state.p>0.6?'good':state.p>0.4?'warn':'bad');
+  $('meterPSub').textContent = state.p>0.6?'强牌，正期望':state.p>0.4?'边缘牌，需精算':'弱牌，风险高';
+
+  $('meterB').textContent = state.b.toFixed(2);
+  $('meterB').className = 'meter-val '+(state.b>1.5?'good':'warn');
+  $('meterBSub').textContent = state.b>1.5?'赔率良好':'赔率偏紧';
+
+  $('meterF').textContent = (k.f_star*100).toFixed(1)+'%';
+  $('meterF').className = 'meter-val '+(k.f_star>0.3?'good':k.f_star>0.1?'warn':'bad');
+  $('kellyFill').style.width = (k.f_star*100)+'%';
+  $('kellyMarker').style.left = (k.f_star*100)+'%';
+
+  const evText = k.edge>0?'+¥'+fmt(k.edge*10000):'¥'+fmt(k.edge*10000);
+  $('meterEV').textContent = evText;
+  $('meterEV').className = 'meter-val '+(k.edge>0?'good':'bad');
+  $('meterEVSub').textContent = k.edge>0?'正期望，可下注':'负期望，建议弃牌';
+
+  // 信号过滤器
+  $('sfBluff').textContent = (state.bluffProb*100).toFixed(0)+'%';
+  $('sfBluff').style.color = state.bluffProb>0.5?'#fca5a5':'#86efac';
+  $('sfNoise').textContent = (state.noiseLevel*100).toFixed(0)+'%';
+  $('sfNoise').style.color = state.noiseLevel>0.5?'#fde047':'#86efac';
+  $('sfFomo').textContent = (state.fomoLevel*100).toFixed(0)+'%';
+  $('sfFomo').style.color = state.fomoLevel>0.5?'#fde047':'#86efac';
+  state.confidence = clamp(1 - (state.noiseLevel*0.3 + state.fomoLevel*0.3 + (state.bluffProb>0.6?0.2:0)),0.1,0.99);
+  $('sfConf').textContent = (state.confidence*100).toFixed(0)+'%';
+  $('sfConf').style.color = state.confidence>0.6?'#86efac':'#fde047';
+  const recTxt = {FOLD:'弃牌 FOLD',CALL:'跟注 CALL',RAISE:'加注 RAISE',BIG_BET:'大注 BET',ALL_IN:'全下 ALL-IN'}[state.recAction];
+  $('sfAction').textContent = recTxt;
+  $('sfAction').style.color = state.recAction==='FOLD'?'#fca5a5':state.recAction==='RAISE'||state.recAction==='BIG_BET'||state.recAction==='ALL_IN'?'#fde047':'#86efac';
+
+  // DCF
+  const margin = (state.iv - state.price)/state.iv;
+  state.margin = margin;
+  $('dcfIv').textContent = '¥'+state.iv.toFixed(2);
+  $('dcfPriceBox').textContent = '¥'+state.price.toFixed(2);
+  $('dcfPriceBox').className = 'dcf-price '+(state.price>state.iv?'above':'below');
+  $('dcfMargin').textContent = (margin*100).toFixed(1)+'%';
+  $('dcfMargin').style.color = margin>0?'#86efac':'#fca5a5';
+  // marker位置: 价格范围40-100映射到0-100%
+  const pct = clamp((state.price-40)/(100-40)*100,0,100);
+  $('dcfMarker').style.left = pct+'%';
+
+  // 营销漏斗
+  const conv = [1.0, 0.38+Math.random()*0.05, 0.18+Math.random()*0.04, 0.07+Math.random()*0.02, 0.035+Math.random()*0.01];
+  // 如果胜率高且决策正确，转化率更好
+  const qualityBoost = state.p>0.6 ? 1.15 : state.p<0.4 ? 0.75 : 1;
+  for(let i=0;i<5;i++){
+    const v = conv[i]*qualityBoost;
+    $('fbar'+(i+1)).style.width = (v*100)+'%';
+    $('fpct'+(i+1)).textContent = (v*100).toFixed(1)+'%';
+  }
+  state.cac = Math.round(50 + (1-state.p)*120 + state.noiseLevel*80);
+  state.ltv = Math.round(180 + state.p*220 - state.noiseLevel*40);
+  state.ltvcac = (state.ltv/state.cac).toFixed(2);
+  $('cacVal').textContent = '¥'+state.cac;
+  $('ltvVal').textContent = '¥'+state.ltv;
+  $('ltvcacVal').textContent = state.ltvcac;
+  $('ltvcacVal').style.color = state.ltvcac>3?'#86efac':state.ltvcac>1.5?'#fde047':'#fca5a5';
+
+  // 圆锥状态
+  // σ = f*(b-p) if bluffing add shock
+  state.sigma = clamp(Math.abs(state.b - state.p)*2 + (state.oppBluffing?0.8:0) + state.noiseLevel*0.5, 0, 3);
+  // γ = f* * p * ltvcac/3 (反脆弱)
+  state.gamma = state.fStar * state.p * (state.ltvcac/3);
+  state.volume = Math.round(state.volume + state.fStar*50 + (state.p>0.5?20:0));
+  $('coneSigma').textContent = state.sigma.toFixed(2);
+  $('coneSigma').style.color = state.sigma<0.8?'#86efac':state.sigma<1.5?'#fde047':'#fca5a5';
+  $('coneGamma').textContent = state.gamma.toFixed(2);
+  $('coneGamma').style.color = state.gamma>0.3?'#86efac':state.gamma>0.1?'#fde047':'#fca5a5';
+  $('coneVolume').textContent = state.volume;
+
+  state.coneState = state.sigma<0.6?'CALM':state.sigma<1.2?'TENSION':state.sigma<2?'EXTREME':'MELTDOWN';
+  const tag = $('coneStateTag');
+  tag.className = 'cone-state-tag '+state.coneState.toLowerCase();
+  tag.textContent = {CALM:'CALM 平静',TENSION:'TENSION 紧张',EXTREME:'EXTREME 极端',MELTDOWN:'MELTDOWN 熔断'}[state.coneState];
+
+  // 发布到YBus
+  if(window.YBus){
+    YBus.publish('poker',{
+      stage:state.hand.stage,equity:state.p,kellyFraction:state.fStar,
+      kellyAction:state.recAction,groundTruth:state.iv/100,coneState:state.coneState.toLowerCase(),
+      gamma:state.gamma,pot:state.pot,stack:state.stack,pnl:state.finalPnL,
+      dcfPassed:state.margin>0,brandVolume:state.volume,timestamp:Date.now()
+    });
+  }
+
+  // 根据凯利给按钮加推荐标识
+  setBtnsEnabled(true,true,true,state.recAction==='FOLD'?'FOLD':state.recAction==='CALL'||state.recAction==='BIG_BET'?'CALL':'RAISE');
+}
+
+/* ================================================================
+ * 第三层：K线图（Canvas绘制，真实走势+箱体）
+ * ================================================================ */
+function initKline(){
+  state.candles = [];
+  const startP = state.scenario ? state.scenario.startPrice : 68.5;
+  state.price = startP;
+  state.boxTop = state.scenario ? state.scenario.boxTop : 82;
+  state.boxBot = state.scenario ? state.scenario.boxBot : 58;
+  state.boxMid = startP;
+  // 先生成15根历史K线（箱体震荡）
+  let p = startP;
+  for(let i=0;i<15;i++){
+    const open = p;
+    const volatility = 1.5;
+    const close = clamp(open + rand(-volatility,volatility), state.boxBot+1, state.boxTop-1);
+    const high = Math.max(open,close) + Math.random()*1.2;
+    const low = Math.min(open,close) - Math.random()*1.2;
+    const vol = randInt(20000,80000);
+    state.candles.push({open,high,low,close,vol});
+    p = close;
+  }
+  state.price = p;
+  drawKline();
+}
+
+function drawKline(opts={}){
+  const canvas = $('klineCanvas');
+  const vcanvas = $('volCanvas');
+  if(!canvas.parentElement) return;
+  const W = canvas.parentElement.clientWidth - 16;
+  const H = 340 - 16;
+  const VH = 50;
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = W*dpr; canvas.height = H*dpr;
+  canvas.style.width = W+'px'; canvas.style.height = H+'px';
+  vcanvas.width = W*dpr; vcanvas.height = VH*dpr;
+  vcanvas.style.width = W+'px'; vcanvas.style.height = VH+'px';
+  const ctx = canvas.getContext('2d'); ctx.scale(dpr,dpr);
+  const vctx = vcanvas.getContext('2d'); vctx.scale(dpr,dpr);
+
+  ctx.fillStyle = '#0a0e16';
+  ctx.fillRect(0,0,W,H);
+
+  const candles = state.candles;
+  const padL=40,padR=50,padT=30,padB=20;
+  const cw = W - padL - padR;
+  const ch = H - padT - padB - 60; // leave for vol
+  // max 40 candles visible
+  const visible = candles.slice(-40);
+  if(visible.length===0) return;
+  let hi=-Infinity, lo=Infinity, maxVol=0;
+  visible.forEach(c=>{hi=Math.max(hi,c.high);lo=Math.min(lo,c.low);maxVol=Math.max(maxVol,c.vol)});
+  // incorporate box levels
+  hi = Math.max(hi, state.boxTop+2); lo = Math.min(lo, state.boxBot-2);
+  const range = hi - lo;
+  hi += range*0.08; lo -= range*0.08;
+  const yOf = p => padT + (hi-p)/(hi-lo)*ch;
+  const candleW = Math.max(3, (cw/visible.length)*0.7);
+  const gap = cw/visible.length;
+
+  // 网格
+  ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+  ctx.lineWidth = 1;
+  ctx.font='10px SF Mono, monospace';ctx.fillStyle='#4b5563';
+  for(let i=0;i<=4;i++){
+    const y = padT + ch*i/4;
+    ctx.beginPath();ctx.moveTo(padL,y);ctx.lineTo(W-padR,y);ctx.stroke();
+    const p = hi - (hi-lo)*i/4;
+    ctx.fillText('¥'+p.toFixed(1), W-padR+4, y+3);
+  }
+
+  // 箱体
+  const yTop = yOf(state.boxTop), yBot = yOf(state.boxBot);
+  ctx.fillStyle = 'rgba(167,139,250,0.05)';
+  ctx.fillRect(padL,yTop,cw,yBot-yTop);
+  ctx.strokeStyle = 'rgba(239,68,68,0.6)';ctx.lineWidth=1;ctx.setLineDash([4,3]);
+  ctx.beginPath();ctx.moveTo(padL,yTop);ctx.lineTo(W-padR,yTop);ctx.stroke();
+  ctx.strokeStyle = 'rgba(34,197,94,0.6)';
+  ctx.beginPath();ctx.moveTo(padL,yBot);ctx.lineTo(W-padR,yBot);ctx.stroke();
+  ctx.setLineDash([]);
+  // 箱体标签
+  ctx.fillStyle='rgba(239,68,68,0.9)';ctx.font='10px SF Mono,monospace';
+  ctx.fillText('压力 ¥'+state.boxTop.toFixed(1), W-padR-5, yTop-4);
+  ctx.fillStyle='rgba(34,197,94,0.9)';
+  ctx.fillText('支撑 ¥'+state.boxBot.toFixed(1), W-padR-5, yBot+12);
+
+  // 突破箭头
+  if(state.breakout){
+    const lastX = padL + (visible.length-0.5)*gap;
+    const lastY = yOf(state.price);
+    ctx.strokeStyle = state.breakout==='up'?'#22c55e':'#ef4444';
+    ctx.fillStyle = state.breakout==='up'?'#22c55e':'#ef4444';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(lastX, lastY);
+    const dx = state.breakout==='up'?-20:20, dy = state.breakout==='up'?-40:40;
+    ctx.lineTo(lastX+dx, lastY+dy);
+    ctx.stroke();
+    // 箭头头部
+    const ang = Math.atan2(dy,dx);
+    ctx.beginPath();
+    ctx.moveTo(lastX+dx,lastY+dy);
+    ctx.lineTo(lastX+dx-8*Math.cos(ang-0.4), lastY+dy-8*Math.sin(ang-0.4));
+    ctx.lineTo(lastX+dx-8*Math.cos(ang+0.4), lastY+dy-8*Math.sin(ang+0.4));
+    ctx.closePath();ctx.fill();
+    ctx.font='bold 14px sans-serif';
+    ctx.fillText(state.breakout==='up'?'突破 ↑ 箱体上沿':'击穿 ↓ 箱体下沿', lastX-40, lastY+dy/2);
+  }
+
+  // K线蜡烛
+  visible.forEach((c,i)=>{
+    const x = padL + (i+0.5)*gap;
+    const yO = yOf(c.open), yC = yOf(c.close), yH = yOf(c.high), yL = yOf(c.low);
+    const up = c.close>=c.open;
+    const col = up?'#22c55e':'#ef4444';
+    ctx.strokeStyle=col;ctx.fillStyle=col;
+    ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(x,yH);ctx.lineTo(x,yL);ctx.stroke();
+    const bodyTop = Math.min(yO,yC), bodyH = Math.max(1,Math.abs(yO-yC));
+    ctx.fillRect(x-candleW/2, bodyTop, candleW, bodyH);
+
+    // 成交量
+    const vH = (c.vol/maxVol)*VH;
+    vctx.fillStyle = up?'rgba(34,197,94,0.5)':'rgba(239,68,68,0.5)';
+    vctx.fillRect(x-candleW/2, VH-vH, candleW, vH);
+  });
+
+  // 最新价标签
+  const lastC = visible[visible.length-1];
+  const lastY = yOf(lastC.close);
+  ctx.fillStyle = lastC.close>=lastC.open?'#22c55e':'#ef4444';
+  ctx.fillRect(W-padR, lastY-8, 46, 16);
+  ctx.fillStyle='#fff';ctx.font='bold 10px SF Mono,monospace';
+  ctx.fillText('¥'+lastC.close.toFixed(2), W-padR+3, lastY+3);
+
+  // 价格显示
+  $('klinePrice').textContent = '¥'+lastC.close.toFixed(2);
+  $('klinePrice').style.color = lastC.close>=visible[Math.max(0,visible.length-2)].close?'#86efac':'#fca5a5';
+  const firstP = visible[0].open;
+  const chg = ((lastC.close-firstP)/firstP*100);
+  $('klineChange').textContent = (chg>=0?'+':'')+chg.toFixed(2)+'%';
+  $('klineChange').style.color = chg>=0?'#86efac':'#fca5a5';
+  const totalVol = visible.reduce((s,c)=>s+c.vol,0);
+  $('klineVol').textContent = '成交量: '+fmt(totalVol);
+}
+
+/* 加一根新K线（动态生成） */
+function pushCandle(direction){
+  const last = state.candles[state.candles.length-1];
+  const open = last.close;
+  // direction: 'up'=突破上沿 'down'=击穿下沿 'neutral'=震荡
+  let drift=0, vol=1.5, biasVol=1;
+  if(direction==='up'){drift=1.2;vol=2.5;biasVol=2.2}
+  else if(direction==='down'){drift=-1.2;vol=2.5;biasVol=2.2}
+  else{drift=rand(-0.3,0.3);vol=1.2}
+  const close = open + drift + rand(-vol,vol);
+  const high = Math.max(open,close) + Math.random()*vol*0.8;
+  const low = Math.min(open,close) - Math.random()*vol*0.8;
+  const volume = randInt(30000, 90000)*biasVol;
+  state.candles.push({open,high,low,close,vol:volume});
+  state.price = close;
+  // 动态调整price反馈到DCF（映射）
+  state.price = close;
+}
+
+function animateBreakout(direction, cb){
+  // 生成5-8根突破K线
+  const total = 7;
+  let i = 0;
+  const step = ()=>{
+    pushCandle(i<2?'neutral':direction);
+    drawKline();
+    i++;
+    if(i<total) setTimeout(step, 350);
+    else cb && cb();
+  };
+  step();
+}
+
+/* ================================================================
+ * 核心流程控制
+ * ================================================================ */
+function setStage(s){
+  state.stage = s;
+  const names = {idle:'待命',dealing:'发牌',noise:'噪音',thinking:'待决策',actuary:'精算',settle:'结算',done:'完成'};
+  $('stageName').textContent = names[s]||s;
+  $('ybusState').textContent = s==='idle'?'standby':'publishing';
+  $('ybusState').style.color = s==='idle'?'var(--dim)':'var(--green)';
+  const fi = $('flowIndicator');
+  if(s!=='idle'){fi.classList.remove('active');void fi.offsetWidth;fi.classList.add('active');}
+}
+
+/* 开始模拟 */
+function startSimulation(){
+  if(state.stage!=='idle' && state.stage!=='done') return;
+  $('btnStart').disabled = true;
+  $('resultBanner').className='result-banner';
+  $('noiseContent').innerHTML='';
+  state.scenario = SCENARIOS[0];
+  const sc = state.scenario;
+  state.stack=100000; state.oppStack=100000; state.pot=0; state.myBet=0; state.oppBet=0;
+  state.sigma=0; state.gamma=0; state.volume=0; state.finalPnL=0; state.breakout=null;
+  state.iv = sc.iv; state.price = sc.startPrice; state.boxTop=sc.boxTop; state.boxBot=sc.boxBot;
+  state.oppBluffing = sc.bluffing;
+  state.p = sc.trueP; state.b = sc.b;
+  state.decision=null; state.correct=null;
+  $('oppAvatar').classList.add('thinking');
+
+  log('━━━ 终极模拟沙盘启动 ━━━','machine');
+  log(`场景: ${sc.name} · 真实胜率p=${(sc.trueP*100).toFixed(0)}% · 对手诈唬=${sc.bluffing}`, 'machine');
+
+  setStage(STAGE.DEALING);
+  initKline();
+  log('K线历史加载完成：箱体 ['+state.boxBot+'-'+state.boxTop+']', 'market');
+
+  // 阶段1: 发preflop
+  setTimeout(()=>{
+    state.hand.hole = sc.hole.slice();
+    state.hand.community = sc.community;
+    state.hand.stage = 1;
+    state.pot = 3000; state.myBet=1000; state.oppBet=2000;
+    renderCards(state.hand.hole, state.hand.community[0]);
+    updateStacks();
+    log('发牌完成 · 底牌 A♠A♥ (口袋A)','human');
+    setOppBet(sc.oppBet[0], false);
+    state.oppBet = sc.oppBet[0];
+    state.myCallAmt = sc.oppBet[0] - state.myBet;
+    state.b = state.pot / state.myCallAmt;
+    state.p = sc.trueP;
+    state.bluffProb=0.4; state.noiseLevel=0.3; state.fomoLevel=0.2;
+    updateMachine();
+    log('机器精算启动: Monte Carlo模拟 p='+(state.p*100).toFixed(0)+'% b='+state.b.toFixed(2)+' f*='+(state.fStar*100).toFixed(1)+'%', 'machine');
+
+    // 阶段2: 注入噪音
+    setTimeout(()=>{
+      setStage(STAGE.NOISE);
+      log('⚡ 人性干扰注入中...','human');
+      let ni = 0;
+      const addN = ()=>{
+        if(ni<sc.noise.length){
+          addNoise(sc.noise[ni]);
+          log(`📡 ${sc.noise[ni].text}`, 'human');
+          // 噪音提升FOMO和噪音等级
+          if(sc.noise[ni].type==='fomo') state.fomoLevel = clamp(state.fomoLevel+0.15,0,1);
+          if(sc.noise[ni].type==='news') state.noiseLevel = clamp(state.noiseLevel+0.15,0,1);
+          if(sc.noise[ni].type==='tell') state.bluffProb = clamp(state.bluffProb-0.05,0,1);
+          if(sc.noise[ni].type==='bluff') {state.bluffProb=clamp(state.bluffProb+0.1,0,1);state.noiseLevel=clamp(state.noiseLevel+0.08,0,1);}
+          updateMachine();
+          ni++;
+          setTimeout(addN, 700);
+        } else {
+          // 对手加大下注
+          $('oppAvatar').classList.remove('thinking');
+          setTimeout(()=>{
+            setOppBet(sc.oppBet[1], true);
+            state.oppBet = sc.oppBet[1];
+            state.pot += state.oppBet - 2000;
+            state.myCallAmt = state.oppBet - state.myBet;
+            state.b = state.pot / Math.max(1,state.myCallAmt);
+            updateStacks();
+            log('🔥 对手翻牌后加注 ¥'+fmt(sc.oppBet[1])+' (诈唬节奏!)','human');
+            updateMachine();
+            setStage(STAGE.THINKING);
+            log('⏳ 等待你的决策... (FOLD/CALL/RAISE)','human');
+          }, 400);
+        }
+      };
+      addN();
+    }, 600);
+  }, 800);
+}
+
+/* 玩家决策 */
+function playerDecision(action){
+  if(state.stage!==STAGE.THINKING) return;
+  state.decision = action;
+  setBtnsEnabled(false,false,false);
+  log('━━━ 你的决策: '+{FOLD:'弃牌',CALL:'跟注',RAISE:'加注'}[action]+' ━━━', action==='FOLD'?'lose':'win');
+  setStage(STAGE.ACTUARY);
+
+  // 机器精算结果
+  setTimeout(()=>{
+    // 判断决策正确性
+    // 场景AA对诈唬，正确决策是RAISE/CALL（跟注或加注）
+    const optimal = state.recAction; // RAISE
+    state.correct = (action===optimal || (optimal==='RAISE'&&action==='CALL'));
+    if(action==='FOLD'){
+      state.correct = false; // 弃掉AA是错的
+      log('❌ 你弃掉了AA！在胜率88%时弃牌=放弃正EV，属于人性被噪音吓退','lose');
+    } else if(action==='CALL'){
+      log('⚠️ 你跟注了——但凯利f*=44%建议加注更优，你的决策偏保守','machine');
+    } else if(action==='RAISE'){
+      log('✅ 你加注！按凯利f*='+(state.fStar*100).toFixed(1)+'%执行，完美过滤诈唬','win');
+      state.correct = true;
+    }
+
+    // 推进到river
+    state.hand.stage=3;
+    renderCards(state.hand.hole,[...state.hand.community[0],state.hand.community[1],state.hand.community[2]]);
+    // 最终下注
+    state.pot += 30000;
+    if(action==='RAISE'){state.myBet += 50000; state.pot += 50000;}
+    else if(action==='CALL'){state.myBet += state.myCallAmt;}
+    updateStacks();
+
+    // 结算
+    setTimeout(()=>{
+      setStage(STAGE.SETTLE);
+      log('━━━ 摊牌 ━━━','machine');
+      log(`对手: ${state.oppBluffing?'9-high (纯诈唬!)':'强牌 - 实际持有'}`,'human');
+      log(`你: A♠A♥ (顶对顶踢脚)`,'win');
+
+      let won=false;
+      if(action==='FOLD'){
+        won=false;
+        state.finalPnL = -state.myBet;
+      } else {
+        won = true; // 对手诈唬，你赢
+        state.finalPnL = state.pot - state.myBet;
+      }
+
+      if(won){
+        log(`🎉 你赢了锅底 ¥${fmt(state.pot)} · PnL +¥${fmt(state.finalPnL)}`,'win');
+        state.gamma += 0.15; state.volume += 100;
+      } else {
+        log(`💸 你放弃了锅底 ¥${fmt(state.pot)} · PnL -¥${fmt(Math.abs(state.finalPnL))}`,'lose');
+        state.sigma += 0.5; state.gamma -= 0.05;
+      }
+
+      // 市场反馈：K线突破/击穿
+      log('━━━ 市场反馈：K线结算 ━━━','market');
+      state.breakout = (state.correct && won) ? 'up' : 'down';
+      animateBreakout(state.breakout, ()=>{
+        finalizeResult(won);
+      });
+    }, 800);
+  }, 800);
+}
+
+function finalizeResult(won){
+  // 计算各项得分
+  const humanScore = state.correct && state.decision!=='FOLD' ? 95 : state.decision==='CALL'?68:32;
+  const kellyScore = state.decision==='RAISE'?96:state.decision==='CALL'?72:20;
+  const dcfScore = state.margin>0?90:45;
+  const gammaScore = Math.round(clamp(state.gamma*180,20,99));
+  const total = Math.round((humanScore+kellyScore+dcfScore+gammaScore)/4);
+
+  $('scoreHuman').innerHTML=humanScore+'<span style="color:'+(humanScore>80?'#86efac':'#fca5a5')+'">'+(humanScore>80?' 优':humanScore>60?' 中':' 差')+'</span>';
+  $('scoreKelly').innerHTML=kellyScore+'<span style="color:'+(kellyScore>80?'#86efac':'#fca5a5')+'">'+(kellyScore>80?' 优':kellyScore>60?' 中':' 差')+'</span>';
+  $('scoreDCF').innerHTML=dcfScore+'<span style="color:'+(dcfScore>80?'#86efac':'#fca5a5')+'">'+(dcfScore>80?' 尊重':' 违背')+'</span>';
+  $('scoreGamma').innerHTML=gammaScore+'<span style="color:'+(gammaScore>60?'#86efac':'#fca5a5')+'"> γ='+state.gamma.toFixed(2)+'</span>';
+  $('scoreTotal').textContent = total+'分';
+  $('scoreTotal').style.color = total>=85?'#86efac':total>=65?'#fde047':'#fca5a5';
+  $('scoreTotalLabel').textContent = total>=85?'决策大师 · 人机合一':total>=65?'理性决策 · 有优化空间':'人性弱点暴露 · 被噪音击败';
+
+  // 结果横幅
+  const banner = $('resultBanner');
+  banner.className = 'result-banner '+(won?'win':'lose')+' show';
+  const title = $('resultTitle');
+  const detail = $('resultDetail');
+  const stat = $('resultStat');
+  if(won && state.correct){
+    title.textContent = '🎯 突破箱体上沿 · 决策完美';
+    title.style.color = '#86efac';
+    detail.innerHTML = '你识破了对手的诈唬，用凯利精算过滤了所有噪音，尊重DCF估值锚。市场用突破上沿奖励了你的理性决策！<br>人性博弈 × 机器精算 × 市场反馈 — 三层共振，反脆弱γ累积。';
+  } else if(won){
+    title.textContent = '📈 险胜 · 但决策非最优';
+    title.style.color = '#fde047';
+    detail.innerHTML = '你赢了这一手，但下注比例偏离凯利最优，仓位过轻。长期EV会被摩擦成本吞噬。';
+  } else {
+    title.textContent = '💥 击穿箱体下沿 · 决策失败';
+    title.style.color = '#fca5a5';
+    detail.innerHTML = '你被对手的诈唬和市场噪音吓退，在胜率88%时弃牌，放弃了巨大正EV。市场用下跌惩罚了人性的恐惧。';
+  }
+  stat.innerHTML = `
+    <div class="rs-item"><div class="rs-k">PnL</div><div class="rs-v" style="color:${state.finalPnL>=0?'#86efac':'#fca5a5'}">${state.finalPnL>=0?'+':''}¥${fmt(state.finalPnL)}</div></div>
+    <div class="rs-item"><div class="rs-k">γ反脆弱</div><div class="rs-v" style="color:${state.gamma>0.2?'#86efac':'#fca5a5'}">${state.gamma.toFixed(2)}</div></div>
+    <div class="rs-item"><div class="rs-k">σ冲击</div><div class="rs-v" style="color:${state.sigma<1?'#86efac':'#fca5a5'}">${state.sigma.toFixed(2)}</div></div>
+    <div class="rs-item"><div class="rs-k">K线</div><div class="rs-v" style="color:${state.breakout==='up'?'#86efac':'#fca5a5'}">${state.breakout==='up'?'↑突破':'↓击穿'}</div></div>
+  `;
+
+  setStage(STAGE.DONE);
+  $('btnStart').disabled = false;
+  $('btnStart').textContent = '▶ 再次模拟';
+  log('━━━ 模拟完成 · 总分 '+total+' ━━━', won?'win':'lose');
+}
+
+function resetSimulation(){
+  state.stage=STAGE.IDLE;
+  state.candles=[];state.breakout=null;state.decision=null;
+  $('btnStart').disabled=false;
+  $('btnStart').textContent='▶ 开始模拟';
+  $('resultBanner').className='result-banner';
+  $('noiseContent').innerHTML='';
+  $('oppBetAmt').textContent='—';$('oppBet').classList.remove('big');
+  $('oppAvatar').classList.remove('thinking');
+  $('holeCards').innerHTML='<div class="cmini back">?</div><div class="cmini back">?</div>';
+  $('communityCards').innerHTML='<div class="cmini back">?</div><div class="cmini back">?</div><div class="cmini back">?</div><div class="cmini back" style="margin-left:4px">?</div><div class="cmini back" style="margin-left:4px">?</div>';
+  state.stack=100000;state.oppStack=100000;state.pot=0;state.myBet=0;
+  updateStacks();
+  setBtnsEnabled(false,false,false);
+  // 重置机器仪表
+  ['meterP','meterB','meterF','meterEV'].forEach(id=>{$(id).textContent=id==='meterF'?'0%':'--';$(id).className='meter-val'});
+  $('meterPSub').textContent='等待发牌...';$('meterBSub').textContent='等待下注...';$('meterEVSub').textContent='等待决策...';
+  $('kellyFill').style.width='0%';$('kellyMarker').style.left='0%';
+  ['sfBluff','sfNoise','sfFomo','sfConf','sfAction'].forEach(id=>{$(id).textContent='--';$(id).style.color='var(--dim)'});
+  state.price=68.5;state.iv=68.5;
+  $('dcfPriceBox').textContent='¥--';$('dcfMargin').textContent='--%';$('dcfMarker').style.left='50%';
+  for(let i=1;i<=5;i++){$('fbar'+i).style.width='0%';$('fpct'+i).textContent='--';}
+  $('cacVal').textContent='--';$('ltvVal').textContent='--';$('ltvcacVal').textContent='--';
+  $('coneSigma').textContent='0.0';$('coneGamma').textContent='0.00';$('coneVolume').textContent='0';
+  $('coneStateTag').className='cone-state-tag calm';$('coneStateTag').textContent='CALM 平静';
+  $('klinePrice').textContent='¥68.50';$('klineChange').textContent='--';$('klineVol').textContent='成交量: --';
+  ['scoreHuman','scoreKelly','scoreDCF','scoreGamma','scoreTotal'].forEach(id=>$(id).textContent='--');
+  $('scoreTotalLabel').textContent='等待决策';
+  const kc = $('klineCanvas'), kctx=kc.getContext('2d');kctx.clearRect(0,0,kc.width,kc.height);
+  const vc = $('volCanvas'), vctx=vc.getContext('2d');vctx.clearRect(0,0,vc.width,vc.height);
+  setStage(STAGE.IDLE);
+  log('沙盘已重置','machine');
+}
+
+/* ---------- 事件绑定 ---------- */
+$('btnStart').addEventListener('click', startSimulation);
+$('btnReset').addEventListener('click', resetSimulation);
+$('btnFold').addEventListener('click',()=>playerDecision('FOLD'));
+$('btnCall').addEventListener('click',()=>playerDecision('CALL'));
+$('btnRaise').addEventListener('click',()=>playerDecision('RAISE'));
+
+window.addEventListener('resize', ()=>{ if(state.candles.length) drawKline(); });
+
+// 监听YBus其他模块数据
+window.addEventListener('storage', e=>{
+  if(e.key==='pokerEggState' && state.stage!=='idle'){
+    try{
+      const d = JSON.parse(e.newValue);
+      if(d && d.equity){
+        state.p = d.equity;
+        state.gamma = d.gamma||state.gamma;
+        updateMachine();
+        drawKline();
+      }
+    }catch(e){}
+  }
+});
+
+/* ---------- 初始化 ---------- */
+setStage(STAGE.IDLE);
+updateStacks();
+log('终极模拟沙盘已就绪 · 点击 [开始模拟] 体验人机合一决策流','machine');
+log('三层架构：左=人性(扑克+诈唬+噪音) | 中=机器(Kelly+DCF+圆锥) | 右=市场(K线+箱体突破)','machine');
+
+})();
+</script>
+</body>
+</html>
