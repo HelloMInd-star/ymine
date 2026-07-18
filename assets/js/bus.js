@@ -76,6 +76,62 @@
                 status: 'idle',
                 timestamp: 0
             }
+        },
+        coneGame: {
+            storageKey: 'coneGameState',
+            eventName: 'cone-game-update',
+            defaultValue: {
+                state: 'calm',
+                zScore: 0,
+                price: 0.68,
+                volatility: 0,
+                centerPressure: 0,
+                coneCollapse: 0,
+                groundTruth: 0.68,
+                truthRevelation: 0,
+                kellyFraction: 0.5,
+                decision: null,
+                aliveCount: 25,
+                totalCount: 25,
+                timestamp: 0
+            }
+        },
+        kellyConfig: {
+            storageKey: 'kellyConfig',
+            eventName: 'kelly-config-update',
+            defaultValue: {
+                p: 0.5,
+                b: 1.0,
+                f_star: 0,
+                actualRatio: 1.0,
+                winZone: 'main',
+                budgetMultiplier: 1.0,
+                timestamp: 0
+            }
+        },
+        distribution: {
+            storageKey: 'channelDistribution',
+            eventName: 'distribution-update',
+            defaultValue: {
+                paid_ads: { weight: 0.40, budget: '$40%', friction: 0.85, alpha: 0.3 },
+                content: { weight: 0.35, budget: '$35%', friction: 0.15, alpha: 1.2 },
+                private_domain: { weight: 0.25, budget: '$25%', friction: 0.05, alpha: 2.0 },
+                state: 'calm',
+                timestamp: 0
+            }
+        },
+        systemHealth: {
+            storageKey: 'systemHealth',
+            eventName: 'system-health-update',
+            defaultValue: {
+                dataFlowScore: 46,
+                modulesConnected: 0,
+                totalModules: 8,
+                auditStatus: 'pending',
+                lastAudit: 0,
+                criticalErrors: 0,
+                warnings: 0
+            }
         }
     };
 

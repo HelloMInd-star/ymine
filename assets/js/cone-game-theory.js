@@ -20,6 +20,13 @@
     const SIGMA_1 = 0.682689492;
     const SIGMA_2 = 0.954499736;
     const SIGMA_3 = 0.997300204;
+    const GROUND_TRUTH_SIGMA = 0.16;
+
+    const CHANNEL_FRICTION = {
+        paid_ads: { phi: 0.85, alpha: 0.3, name: '买量投放', color: '#ef4444' },
+        content: { phi: 0.15, alpha: 1.2, name: '自然内容', color: '#22c55e' },
+        private_domain: { phi: 0.05, alpha: 2.0, name: '私域裂变', color: '#a78bfa' }
+    };
 
     const PARTICIPANT_TYPES = {
         BULL: { id: 'bull', name: '多头', color: '#22c55e', pressure: 1 },
@@ -157,9 +164,15 @@
                 totalWeight += weight;
             });
             const consensusPos = totalWeight > 0 ? weightedPos / totalWeight : 0;
-            const gravityPull = (this.config.gravityCenter * 2 - 1 - consensusPos) * 0.15;
-            const price = 0.5 + consensusPos * 0.4 + gravityPull + (Math.random() - 0.5) * 0.02;
+            const gtMapped = this.dealer.groundTruth * 2 - 1;
+            const gravityPull = (gtMapped - consensusPos) * (0.15 + this.dealer.revelation * 0.2);
+            const noiseSigma = 0.02 * (1 - this.dealer.revelation * 0.5);
+            const price = 0.5 + consensusPos * 0.4 + gravityPull + (Math.random() - 0.5) * noiseSigma;
             return Math.max(0.01, Math.min(0.99, price));
+        }
+
+        updateKellyFraction(fStar) {
+            this.config.kellyFraction = Math.max(0, Math.min(1, fStar));
         }
 
         determineGameState(zScore) {
@@ -167,75 +180,126 @@
             if (absZ > 3) return GAME_STATES.MELTDOWN;
             if (absZ > 2) return GAME_STATES.BLACK_SWAN;
             if (absZ > 1) return GAME_STATES.EXTREME;
-            if (absZ > 0.68) return GAME_STATES.TENSION;
+            if (absZ > 0.6745) return GAME_STATES.TENSION;
             return GAME_STATES.CALM;
         }
 
         calculateZScore(currentPrice) {
-            if (this.priceHistory.length < 20) return 0;
-            const recent = this.priceHistory.slice(-30);
-            const mean = recent.reduce((a,b) => a+b, 0) / recent.length;
-            const variance = recent.reduce((sum, p) => sum + Math.pow(p - mean, 2), 0) / recent.length;
-            const std = Math.sqrt(variance);
-            if (std === 0) return 0;
-            return (currentPrice - mean) / std;
+            const mu = this.dealer.groundTruth;
+            const sigma = GROUND_TRUTH_SIGMA;
+            return (currentPrice - mu) / sigma;
         }
 
         generateDecisionCommand(state, zScore, volatility) {
-            const kellyAdjusted = this.config.kellyFraction;
+            const baseKelly = this.config.kellyFraction;
+            const absZ = Math.abs(zScore);
+            const antiFragilityGamma = absZ > 2 ? Math.min(0.2, (absZ - 2) * 0.1) : 0;
+
+            const distribution = this.calculateOptimalDistribution(state, absZ);
+
             const commands = {
                 calm: {
                     action: 'HOLD',
-                    positionSizing: kellyAdjusted,
+                    positionSizing: baseKelly,
                     hedgeRatio: 0,
                     leverage: 1.0,
+                    antiFragilityGamma: 0,
+                    distribution: distribution,
+                    budgetMultiplier: 1.0,
                     message: '✅ 0.68引力区间稳态·执行凯利标准仓位·保持冷静',
                     orders: ['维持现有头寸', '常规再平衡', '收集Alpha']
                 },
                 tension: {
                     action: 'CAUTION',
-                    positionSizing: kellyAdjusted * 0.7,
+                    positionSizing: baseKelly * 0.7,
                     hedgeRatio: 0.15,
                     leverage: 0.7,
-                    message: '⚠️ 接近0.68边界·波动率上升·仓位警戒',
-                    orders: ['减仓至70%凯利', '买入虚值看跌保护', '提高止损位']
+                    antiFragilityGamma: 0,
+                    distribution: distribution,
+                    budgetMultiplier: 0.7,
+                    message: '⚠️ 接近0.68边界(0.6745σ)·波动率上升·仓位警戒',
+                    orders: ['减仓至70%凯利', '买入虚值看跌保护', '提高止损位', '内容渠道权重+15%']
                 },
                 extreme: {
-                    action: 'DE RISK',
-                    positionSizing: kellyAdjusted * 0.5,
+                    action: 'DE_RISK',
+                    positionSizing: baseKelly * 0.5,
                     hedgeRatio: 0.4,
                     leverage: 0.4,
+                    antiFragilityGamma: 0,
+                    distribution: distribution,
+                    budgetMultiplier: 0.5,
                     message: '🔶 击穿1σ区间·极端波动·启动半仓风控',
-                    orders: ['减仓50%', 'Delta对冲至中性', '暂停新开仓']
+                    orders: ['减仓50%', 'Delta对冲至中性', '暂停买量', 'ALL IN自然内容']
                 },
                 black_swan: {
                     action: 'LIQUIDATE_HEDGE',
                     positionSizing: 0,
                     hedgeRatio: 1.0,
                     leverage: 0,
-                    message: '🔴 黑天鹅确认·最高级别风险向量清算',
-                    orders: ['风险资产全清', '全仓对冲', '启动流动性预案', '波动率套利']
+                    antiFragilityGamma: antiFragilityGamma,
+                    distribution: distribution,
+                    budgetMultiplier: 0.08,
+                    message: '🔴 黑天鹅确认(2σ+)·最高级别风险向量清算',
+                    orders: ['风险资产全清', '全仓对冲', '启动流动性预案', '波动率套利', '尾部对冲建仓']
                 },
                 meltdown: {
                     action: 'SYSTEMIC_PROTECTION',
-                    positionSizing: -0.2,
+                    positionSizing: -antiFragilityGamma,
                     hedgeRatio: 1.5,
                     leverage: -0.5,
-                    message: '💥 系统性坍缩·熔断·逆向抄底准备',
-                    orders: ['熔断保护启动', '现金为王', '尾部风险对冲', '等待均值回归信号']
+                    antiFragilityGamma: antiFragilityGamma,
+                    distribution: distribution,
+                    budgetMultiplier: 0.0,
+                    message: '💥 系统性坍缩(3σ+)·熔断·逆向抄底准备',
+                    orders: ['熔断保护启动', '现金为王', '150%尾部风险对冲', '等待均值回归信号', '20%极限逆向建仓']
                 }
             };
             return commands[state.id];
+        }
+
+        calculateOptimalDistribution(state, absZ) {
+            const stateLevel = state.level;
+            const tensionFactor = Math.min(1, Math.max(absZ / 3, stateLevel / 4));
+            const paidWeight = Math.max(0, 0.40 - tensionFactor * 0.40);
+            const contentWeight = stateLevel >= 3 ? 0.75 : (0.35 + tensionFactor * 0.40);
+            const privateWeight = stateLevel >= 3 ? 0.25 : 0.25;
+            const total = paidWeight + contentWeight + privateWeight;
+
+            return {
+                paid_ads: {
+                    weight: paidWeight / total,
+                    budget: '$' + Math.round(paidWeight / total * 100) + '%',
+                    effectiveConcentration: (0.68 / (1 - CHANNEL_FRICTION.paid_ads.phi)),
+                    friction: CHANNEL_FRICTION.paid_ads.phi,
+                    alpha: CHANNEL_FRICTION.paid_ads.alpha
+                },
+                content: {
+                    weight: contentWeight / total,
+                    budget: '$' + Math.round(contentWeight / total * 100) + '%',
+                    effectiveConcentration: (0.68 / (1 - CHANNEL_FRICTION.content.phi)),
+                    friction: CHANNEL_FRICTION.content.phi,
+                    alpha: CHANNEL_FRICTION.content.alpha
+                },
+                private_domain: {
+                    weight: privateWeight / total,
+                    budget: '$' + Math.round(privateWeight / total * 100) + '%',
+                    effectiveConcentration: (0.68 / (1 - CHANNEL_FRICTION.private_domain.phi)),
+                    friction: CHANNEL_FRICTION.private_domain.phi,
+                    alpha: CHANNEL_FRICTION.private_domain.alpha
+                }
+            };
         }
 
         tick(externalShock = 0) {
             this.timestamp = Date.now();
             this.dealer.cardsDealt++;
 
-            if (Math.random() < 0.05) {
-                this.dealer.groundTruth += (Math.random() - 0.5) * 0.03;
-                this.dealer.groundTruth = Math.max(0.3, Math.min(0.85, this.dealer.groundTruth));
-            }
+            this.coneCollapse = 1 - (this.participants.filter(p => p.alive).length / this.participants.length);
+            const truthRevelation = Math.min(1, this.coneCollapse * 1.5 + this.dealer.cardsDealt * 0.002);
+            const truthDrift = (Math.random() - 0.5) * 0.03 * (1 - truthRevelation);
+            this.dealer.groundTruth += truthDrift;
+            this.dealer.groundTruth = Math.max(0.3, Math.min(0.85, this.dealer.groundTruth));
+            this.dealer.revelation = truthRevelation;
 
             this.dealer.entropy = -this.participants
                 .filter(p => p.alive)
@@ -252,38 +316,48 @@
 
             this.calculateCenterPressure();
             this.participants.forEach(p => {
-                p.updatePressure(this.config.gravityCenter, currentVol);
+                p.updatePressure(this.dealer.groundTruth, currentVol * (1 - truthRevelation * 0.5));
                 if (externalShock !== 0 && Math.abs(externalShock) > 0.5) {
                     p.position += externalShock * 0.2 * (Math.random() + 0.5);
                     p.position = Math.max(-1, Math.min(1, p.position));
                 }
             });
 
-            this.coneCollapse = 1 - (this.participants.filter(p => p.alive).length / this.participants.length);
-            this.coneCollapse = Math.min(1, Math.max(0, this.coneCollapse + this.config.collapseRate * this.centerPressure * 0.1));
+            this.coneCollapse = Math.min(1, Math.max(0, this.coneCollapse + this.config.collapseRate * Math.abs(this.centerPressure) * 0.1));
 
-            const price = this.calculateImpliedPrice();
+            let price = this.calculateImpliedPrice();
+            if (externalShock !== 0) {
+                const shockImpact = externalShock * GROUND_TRUTH_SIGMA * 0.7;
+                price += shockImpact;
+                price = Math.max(0.01, Math.min(0.99, price));
+            }
             this.priceHistory.push(price);
             if (this.priceHistory.length > 120) this.priceHistory.shift();
 
             const zScore = this.calculateZScore(price);
-            const newState = this.determineGameState(zScore + externalShock);
+            const shockZ = externalShock * 0.8;
+            const effectiveZ = zScore + shockZ;
+            const newState = this.determineGameState(effectiveZ);
             const stateChanged = newState.id !== this.state.id;
             this.state = newState;
 
-            const decision = this.generateDecisionCommand(newState, zScore, currentVol);
+            const decision = this.generateDecisionCommand(newState, effectiveZ, currentVol);
 
             const snapshot = {
                 timestamp: this.timestamp,
+                tick: this.dealer.cardsDealt,
                 price,
-                zScore,
+                zScore: effectiveZ,
+                realizedZ: zScore,
                 volatility: currentVol,
                 centerPressure: this.centerPressure,
                 coneCollapse: this.coneCollapse,
                 groundTruth: this.dealer.groundTruth,
+                truthRevelation: this.dealer.revelation,
                 entropy: this.dealer.entropy,
                 state: this.state,
                 decision,
+                kellyFraction: this.config.kellyFraction,
                 participants: this.participants.filter(p => p.alive).map(p => ({
                     type: p.type,
                     position: p.position,
@@ -317,7 +391,8 @@
                 position: 1.0,
                 groundTruth: this.config.gravityCenter,
                 entropy: 0,
-                cardsDealt: 0
+                cardsDealt: 0,
+                revelation: 0
             };
             this._initDefaultParticipants();
             this._emit('reset');
