@@ -176,6 +176,28 @@
                 bigBlind: 10,
                 timestamp: 0
             }
+        },
+        valuation: {
+            storageKey: 'valuationAnchor',
+            eventName: 'valuation-anchor-update',
+            defaultValue: {
+                wacc: 0.095,
+                enterpriseValue: 0,
+                npv: 0,
+                irr: 0,
+                blendedAnchor: 0.68,
+                strategicNPV: 0,
+                hurdleRate: 0.08,
+                waitOptionValue: 0,
+                expandOptionValue: 0,
+                abandonOptionValue: 0,
+                relativeTargetPrice: 0,
+                bondPrice: 1000,
+                bondYTM: 0.055,
+                valuationGap: 0,
+                mispricingSignal: 'fair',
+                timestamp: 0
+            }
         }
     };
 

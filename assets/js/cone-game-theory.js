@@ -132,6 +132,24 @@
                 stackSize: 1000
             };
 
+            this.valuationAnchor = {
+                enabled: false,
+                blendedValue: 0.68,
+                wacc: 0.095,
+                hurdleRate: 0.08,
+                npv: 0,
+                irr: 0,
+                strategicNPV: 0,
+                waitOptVal: 0,
+                expandOptVal: 0,
+                abandonOptVal: 0,
+                valuationGap: 0,
+                mispricingSignal: 'fair',
+                gravityStrength: 0.15,
+                kellyCapByIRR: 1.0,
+                lastUpdate: 0
+            };
+
             this._initDefaultParticipants();
         }
 
@@ -227,41 +245,74 @@
         generateDecisionCommand(state, zScore, volatility) {
             const baseKelly = this.config.kellyFraction;
             const absZ = Math.abs(zScore);
-            const antiFragilityGamma = absZ > 2 ? Math.min(0.2, (absZ - 2) * 0.1) : 0;
+            let antiFragilityGamma = absZ > 2 ? Math.min(0.2, (absZ - 2) * 0.1) : 0;
 
             const distribution = this.calculateOptimalDistribution(state, absZ);
 
+            let kellyCap = 1.0;
+            let budgetCap = 1.0;
+            let valuationAdjusted = false;
+            let valuationSignal = 'neutral';
+            if (this.valuationAnchor.enabled) {
+                const va = this.valuationAnchor;
+                if (va.npv < 0) {
+                    kellyCap = 0.3;
+                    budgetCap = 0.3;
+                    valuationSignal = 'npv_negative';
+                    valuationAdjusted = true;
+                } else if (va.irr < va.hurdleRate) {
+                    kellyCap = 0.6;
+                    budgetCap = 0.6;
+                    valuationSignal = 'irr_below_hurdle';
+                    valuationAdjusted = true;
+                }
+                if (va.expandOptVal > 0 && state.id === 'calm' && va.mispricingSignal === 'undervalued') {
+                    kellyCap = Math.min(1.0, kellyCap * 1.15);
+                }
+                if (va.abandonOptVal > Math.abs(va.npv) * 0.3) {
+                    antiFragilityGamma = Math.min(0.25, antiFragilityGamma + 0.05);
+                }
+            }
+
             const commands = {
                 calm: {
-                    action: 'HOLD',
-                    positionSizing: baseKelly,
-                    hedgeRatio: 0,
-                    leverage: 1.0,
+                    action: valuationSignal === 'npv_negative' ? 'DE_RISK' : 'HOLD',
+                    positionSizing: Math.min(baseKelly, baseKelly * kellyCap),
+                    hedgeRatio: valuationSignal === 'npv_negative' ? 0.3 : 0,
+                    leverage: valuationSignal === 'npv_negative' ? 0.5 : 1.0,
                     antiFragilityGamma: 0,
                     distribution: distribution,
-                    budgetMultiplier: 1.0,
-                    message: '✅ 0.68引力区间稳态·执行凯利标准仓位·保持冷静',
-                    orders: ['维持现有头寸', '常规再平衡', '收集Alpha']
+                    budgetMultiplier: Math.min(1.0, budgetCap),
+                    valuationSignal,
+                    valuationAdjusted,
+                    message: valuationSignal === 'npv_negative'
+                        ? '🔻 NPV为负·资本约束强制减仓'
+                        : (valuationSignal === 'irr_below_hurdle' ? '⚠️ IRR低于WACC门槛·谨慎' : '✅ 0.68引力区间稳态·执行凯利标准仓位'),
+                    orders: valuationAdjusted
+                        ? ['资本约束启动·减仓至hurdle rate许可范围', '复核DCF假设']
+                        : ['维持现有头寸', '常规再平衡', '收集Alpha']
                 },
                 tension: {
                     action: 'CAUTION',
-                    positionSizing: baseKelly * 0.7,
-                    hedgeRatio: 0.15,
+                    positionSizing: Math.min(baseKelly * 0.7, baseKelly * kellyCap),
+                    hedgeRatio: 0.15 + (valuationAdjusted ? 0.1 : 0),
                     leverage: 0.7,
                     antiFragilityGamma: 0,
                     distribution: distribution,
-                    budgetMultiplier: 0.7,
+                    budgetMultiplier: Math.min(0.7, budgetCap * 0.7),
+                    valuationSignal,
                     message: '⚠️ 接近0.68边界(0.6745σ)·波动率上升·仓位警戒',
                     orders: ['减仓至70%凯利', '买入虚值看跌保护', '提高止损位', '内容渠道权重+15%']
                 },
                 extreme: {
                     action: 'DE_RISK',
-                    positionSizing: baseKelly * 0.5,
+                    positionSizing: Math.min(baseKelly * 0.5, baseKelly * kellyCap * 0.5),
                     hedgeRatio: 0.4,
                     leverage: 0.4,
                     antiFragilityGamma: 0,
                     distribution: distribution,
-                    budgetMultiplier: 0.5,
+                    budgetMultiplier: Math.min(0.5, budgetCap * 0.5),
+                    valuationSignal,
                     message: '🔶 击穿1σ区间·极端波动·启动半仓风控',
                     orders: ['减仓50%', 'Delta对冲至中性', '暂停买量', 'ALL IN自然内容']
                 },
@@ -273,6 +324,7 @@
                     antiFragilityGamma: antiFragilityGamma,
                     distribution: distribution,
                     budgetMultiplier: 0.08,
+                    valuationSignal,
                     message: '🔴 黑天鹅确认(2σ+)·最高级别风险向量清算',
                     orders: ['风险资产全清', '全仓对冲', '启动流动性预案', '波动率套利', '尾部对冲建仓']
                 },
@@ -284,11 +336,29 @@
                     antiFragilityGamma: antiFragilityGamma,
                     distribution: distribution,
                     budgetMultiplier: 0.0,
+                    valuationSignal,
                     message: '💥 系统性坍缩(3σ+)·熔断·逆向抄底准备',
                     orders: ['熔断保护启动', '现金为王', '150%尾部风险对冲', '等待均值回归信号', '20%极限逆向建仓']
                 }
             };
             return commands[state.id];
+        }
+
+        setValuationAnchor(anchorData) {
+            if (!anchorData) return;
+            this.valuationAnchor.enabled = true;
+            if (typeof anchorData.blendedValue === 'number') {
+                this.valuationAnchor.blendedValue = Math.max(0.3, Math.min(0.85, anchorData.blendedValue));
+            }
+            if (typeof anchorData.wacc === 'number') this.valuationAnchor.wacc = anchorData.wacc;
+            if (typeof anchorData.hurdleRate === 'number') this.valuationAnchor.hurdleRate = anchorData.hurdleRate;
+            if (typeof anchorData.npv === 'number') this.valuationAnchor.npv = anchorData.npv;
+            if (typeof anchorData.irr === 'number') this.valuationAnchor.irr = anchorData.irr;
+            if (typeof anchorData.strategicNPV === 'number') this.valuationAnchor.strategicNPV = anchorData.strategicNPV;
+            if (typeof anchorData.waitOptVal === 'number') this.valuationAnchor.waitOptVal = anchorData.waitOptVal;
+            if (typeof anchorData.expandOptVal === 'number') this.valuationAnchor.expandOptVal = anchorData.expandOptVal;
+            if (typeof anchorData.abandonOptVal === 'number') this.valuationAnchor.abandonOptVal = anchorData.abandonOptVal;
+            this.valuationAnchor.lastUpdate = Date.now();
         }
 
         calculateOptimalDistribution(state, absZ) {
@@ -332,6 +402,14 @@
             const truthRevelation = Math.min(1, this.coneCollapse * 1.5 + this.dealer.cardsDealt * 0.002);
             const truthDrift = (Math.random() - 0.5) * 0.03 * (1 - truthRevelation);
             this.dealer.groundTruth += truthDrift;
+            if (this.valuationAnchor.enabled) {
+                const va = this.valuationAnchor;
+                const gap = va.blendedValue - this.dealer.groundTruth;
+                const anchorPull = gap * va.gravityStrength * truthRevelation;
+                this.dealer.groundTruth += anchorPull;
+                va.valuationGap = gap;
+                va.mispricingSignal = Math.abs(gap) < 0.05 ? 'fair' : (gap > 0 ? 'undervalued' : 'overvalued');
+            }
             this.dealer.groundTruth = Math.max(0.3, Math.min(0.85, this.dealer.groundTruth));
             this.dealer.revelation = truthRevelation;
 
@@ -399,6 +477,7 @@
                 brandVolume: { ...this.brandVolume },
                 hedgeReservoir: { ...this.hedgeReservoir, lastInjection: hedgeInjection },
                 pokerBridge: { ...this.pokerBridge },
+                valuationAnchor: { ...this.valuationAnchor },
                 participants: this.participants.filter(p => p.alive).map(p => ({
                     type: p.type,
                     position: p.position,
