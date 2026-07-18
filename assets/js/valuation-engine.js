@@ -123,8 +123,23 @@
         calculateTerminalValue(finalFCF) {
             const g = this.config.terminalGrowth;
             const { wacc } = this.calculateWACC();
+            const MIN_SPREAD = 0.03;
             if (wacc <= g) {
-                return { tv: Infinity, method: 'invalid', warning: 'WACC must be > terminal growth rate' };
+                const fallbackTV = finalFCF * (this.config.tvExitMultiple || 10);
+                return { tv: fallbackTV, method: 'exit_multiple_fallback', warning: 'WACC <= g: forced exit multiple fallback', forcedExitMultiple: this.config.tvExitMultiple || 10 };
+            }
+            if (wacc - g < MIN_SPREAD) {
+                const safeG = Math.max(-0.02, wacc - MIN_SPREAD);
+                const tv = finalFCF * (1 + safeG) / MIN_SPREAD;
+                return {
+                    tv,
+                    method: 'gordon_spread_capped',
+                    finalFCF,
+                    g: safeG,
+                    originalG: g,
+                    wacc,
+                    warning: `WACC-g spread (${((wacc - g) * 100).toFixed(1)}%) < 3% hard floor: g capped to ${(safeG * 100).toFixed(1)}%`
+                };
             }
             let tv;
             if (this.config.tvMethod === 'gordon') {
@@ -160,6 +175,8 @@
             const allCashflows = [...fcfs];
             allCashflows[allCashflows.length - 1] += tv;
             const irr = MathUtils.irr(allCashflows);
+            const MOS_CALM = 0.25;
+            const maxBid = enterpriseValue * (1 - MOS_CALM);
 
             return {
                 method: 'DCF',
@@ -173,7 +190,10 @@
                 npv,
                 irr,
                 paybackPeriod: this._paybackPeriod(fcfs),
-                profitabilityIndex: pvFCF / Math.max(initialInvestment, 1)
+                profitabilityIndex: pvFCF / Math.max(initialInvestment, 1),
+                marginOfSafety: MOS_CALM,
+                maxBid,
+                spreadWaccMinusG: waccResult.wacc - tvResult.g
             };
         }
 
@@ -643,6 +663,87 @@
         }
     }
 
+    // ================================================================
+    // 模块7：商业场景参数预设工厂
+    // ================================================================
+    const ValuationScenarioPresets = {
+        SCENARIOS: {
+            saas_ai: {
+                name: 'SaaS/AI高成长',
+                beta: 1.6, debtToCapital: 0.10, costOfDebt: 0.06, taxRate: 0.15,
+                terminalGrowth: 0.035, tvMethod: 'gordon', tvExitMultiple: 20,
+                hurdleRate: 0.15, recommendedMOS: 0.30,
+                notes: '高β高R&D，g可到名义GDP+1%，WACC常12-15%'
+            },
+            mcn_influencer: {
+                name: 'MCN/博主IP',
+                beta: 2.0, debtToCapital: 0.0, costOfDebt: 0.08, taxRate: 0.20,
+                terminalGrowth: 0.01, tvMethod: 'exit_multiple', tvExitMultiple: 8,
+                hurdleRate: 0.20, recommendedMOS: 0.45,
+                notes: 'IP半衰期3-5年，强制退出倍数法，g必须<2%'
+            },
+            consumer_physical: {
+                name: '实体消费/隐形冠军',
+                beta: 0.8, debtToCapital: 0.30, costOfDebt: 0.05, taxRate: 0.25,
+                terminalGrowth: 0.025, tvMethod: 'gordon', tvExitMultiple: 12,
+                hurdleRate: 0.10, recommendedMOS: 0.25,
+                notes: 'β<1现金流稳，WACC 8-10%，护城河高的可放宽MOS'
+            },
+            cyclical_resource: {
+                name: '周期/资源品',
+                beta: 1.8, debtToCapital: 0.40, costOfDebt: 0.07, taxRate: 0.25,
+                terminalGrowth: 0.0, tvMethod: 'exit_multiple', tvExitMultiple: 6,
+                hurdleRate: 0.15, recommendedMOS: 0.40,
+                notes: '不适用Gordon增长，必须用退出倍数，g=0'
+            },
+            crypto_early: {
+                name: '加密/早期项目',
+                beta: 2.5, debtToCapital: 0.0, costOfDebt: 0.15, taxRate: 0.10,
+                terminalGrowth: 0.0, tvMethod: 'exit_multiple', tvExitMultiple: 3,
+                hurdleRate: 0.30, recommendedMOS: 0.60,
+                notes: '极高不确定性，MOS>50%，期权价值占主导'
+            },
+            black_swan_stress: {
+                name: '黑天鹅压力测试',
+                beta: 2.5, debtToCapital: 0.30, costOfDebt: 0.12, taxRate: 0.25,
+                terminalGrowth: -0.01, tvMethod: 'exit_multiple', tvExitMultiple: 4,
+                hurdleRate: 0.25, recommendedMOS: 0.60,
+                notes: 'ERP+5%，WACC自动加3-5%，g可负'
+            }
+        },
+
+        createEngine(scenarioKey, marketOverrides = {}) {
+            const preset = this.SCENARIOS[scenarioKey];
+            if (!preset) throw new Error(`Unknown scenario: ${scenarioKey}`);
+            const market = Object.assign({
+                riskFreeRate: 0.035, marketReturn: 0.095
+            }, marketOverrides);
+            return new DCFEngine({
+                riskFreeRate: market.riskFreeRate,
+                marketRiskPremium: market.marketReturn - market.riskFreeRate,
+                beta: preset.beta,
+                debtToCapital: preset.debtToCapital,
+                costOfDebt: preset.costOfDebt,
+                taxRate: preset.taxRate,
+                terminalGrowth: preset.terminalGrowth,
+                tvMethod: preset.tvMethod,
+                tvExitMultiple: preset.tvExitMultiple
+            });
+        },
+
+        createAnchor(scenarioKey, marketOverrides = {}) {
+            const preset = this.SCENARIOS[scenarioKey];
+            if (!preset) throw new Error(`Unknown scenario: ${scenarioKey}`);
+            return { scenario: preset.name, hurdleRate: preset.hurdleRate, recommendedMOS: preset.recommendedMOS };
+        },
+
+        list() {
+            return Object.entries(this.SCENARIOS).map(([k, v]) => ({
+                key: k, name: v.name, waccHint: `beta=${v.beta}, g=${(v.terminalGrowth * 100).toFixed(1)}%`, recommendedMOS: v.recommendedMOS
+            }));
+        }
+    };
+
     return {
         MathUtils,
         DCFEngine,
@@ -651,6 +752,7 @@
         BondValuation,
         EquityValuation,
         ValuationAnchor,
-        version: '1.0.0'
+        ValuationScenarioPresets,
+        version: '1.1.0'
     };
 }));

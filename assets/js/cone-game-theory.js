@@ -17,10 +17,21 @@
     'use strict';
 
     const CONE_GRAVITY_CENTER = 0.68;
+    const CONE_1SIGMA_PMASS = 0.682689492;
+    const CONE_STEADY_SHARE = 0.68;
     const SIGMA_1 = 0.682689492;
     const SIGMA_2 = 0.954499736;
     const SIGMA_3 = 0.997300204;
-    const GROUND_TRUTH_SIGMA = 0.16;
+    const GROUND_TRUTH_SIGMA = 0.13;
+
+    // 绝对风控熔断（铁律，不可被下游覆盖）
+    const KELLY_ABSOLUTE_HARD_CAP = 0.25;
+    const KELLY_HALF_KELLY_CAP = 0.50;
+    const LEVERAGE_ABSOLUTE_CAP = 1.5;
+    const DAILY_DRAWDOWN_FUSE = -0.07;
+    const MOODZETA_VOL_AMPLIFIER = 0.40;
+    const MOODZETA_WACC_SHIFT = 0.02;
+    const MOODZETA_KELLY_DISCOUNT = 0.40;
 
     const CHANNEL_FRICTION = {
         paid_ads: { phi: 0.85, alpha: 0.3, name: '买量投放', color: '#ef4444' },
@@ -150,6 +161,24 @@
                 lastUpdate: 0
             };
 
+            this.moodMind = {
+                enabled: false,
+                zeta: 0,
+                zetaConfidence: 0,
+                source: 'none',
+                lastUpdate: 0,
+                history: [],
+                driftAccumulator: 0
+            };
+
+            this.risk = {
+                peakEquity: 1.0,
+                drawdown: 0,
+                drawdownFuseTriggered: false,
+                dailyPnL: 0,
+                kellyHardCapTriggered: false
+            };
+
             this._initDefaultParticipants();
         }
 
@@ -224,7 +253,23 @@
         }
 
         updateKellyFraction(fStar) {
-            this.config.kellyFraction = Math.max(0, Math.min(1, fStar));
+            const capped = Math.max(0, Math.min(KELLY_ABSOLUTE_HARD_CAP * 2, fStar));
+            this.config.kellyFraction = capped;
+        }
+
+        reportEquity(currentEquity) {
+            if (currentEquity > this.risk.peakEquity) this.risk.peakEquity = currentEquity;
+            this.risk.drawdown = (currentEquity - this.risk.peakEquity) / this.risk.peakEquity;
+            if (this.risk.drawdown <= DAILY_DRAWDOWN_FUSE) {
+                this.risk.drawdownFuseTriggered = true;
+            }
+        }
+
+        resetFuses() {
+            this.risk.drawdownFuseTriggered = false;
+            this.risk.kellyHardCapTriggered = false;
+            this.risk.peakEquity = 1.0;
+            this.risk.drawdown = 0;
         }
 
         determineGameState(zScore) {
@@ -341,7 +386,43 @@
                     orders: ['熔断保护启动', '现金为王', '150%尾部风险对冲', '等待均值回归信号', '20%极限逆向建仓']
                 }
             };
-            return commands[state.id];
+            let cmd = commands[state.id];
+            if (cmd) {
+                const moodZetaLocal = this.moodMind.enabled ? (this.moodMind.zeta * this.moodMind.zetaConfidence) : 0;
+                const moodKellyMult = this.getEffectiveKellyMultiplier();
+                cmd.moodZeta = moodZetaLocal;
+                cmd.moodConfidence = this.moodMind.enabled ? this.moodMind.zetaConfidence : 0;
+                cmd.moodKellyMultiplier = moodKellyMult;
+                cmd.moodPricingMultiplier = this.getMoodPricingMultiplier();
+                if (this.valuationAnchor.enabled && cmd.positionSizing > 0) {
+                    cmd.positionSizing *= this.valuationAnchor.kellyCapByIRR;
+                }
+                cmd.positionSizing *= moodKellyMult;
+                if (cmd.positionSizing > 0) {
+                    if (cmd.positionSizing > KELLY_HALF_KELLY_CAP) {
+                        this.risk.kellyHardCapTriggered = true;
+                        cmd.fuses = cmd.fuses || [];
+                        cmd.fuses.push('HALF_KELLY_CAP');
+                    }
+                    cmd.positionSizing = Math.min(cmd.positionSizing, KELLY_ABSOLUTE_HARD_CAP);
+                }
+                cmd.leverage = Math.max(-0.5, Math.min(LEVERAGE_ABSOLUTE_CAP, cmd.leverage));
+                cmd.hedgeRatio = Math.max(0, Math.min(1.5, cmd.hedgeRatio));
+                cmd.budgetMultiplier = Math.max(0, Math.min(1.0, cmd.budgetMultiplier));
+                if (this.risk.drawdownFuseTriggered) {
+                    cmd.positionSizing = Math.min(cmd.positionSizing, 0);
+                    cmd.action = 'DRAWDOWN_FUSE';
+                    cmd.fuses = cmd.fuses || [];
+                    cmd.fuses.push('DRAWDOWN_FUSE');
+                }
+                if (this.valuationAnchor.enabled) {
+                    const iv = this.valuationAnchor.blendedValue;
+                    const mos = state.id === 'calm' ? 0.25 : state.id === 'tension' ? 0.35 : 0.50;
+                    cmd.marginOfSafety = mos;
+                    cmd.maxAcceptablePrice = iv * (1 - mos);
+                }
+            }
+            return cmd;
         }
 
         setValuationAnchor(anchorData) {
@@ -359,6 +440,43 @@
             if (typeof anchorData.expandOptVal === 'number') this.valuationAnchor.expandOptVal = anchorData.expandOptVal;
             if (typeof anchorData.abandonOptVal === 'number') this.valuationAnchor.abandonOptVal = anchorData.abandonOptVal;
             this.valuationAnchor.lastUpdate = Date.now();
+        }
+
+        /**
+         * MoodMind情绪注入接口（情绪雷达）
+         * @param {number} zeta - 情绪强度 [-1, +1]，+1=极度贪婪/FOMO，-1=极度恐惧/恐慌
+         * @param {number} confidence - 情绪识别置信度 [0, 1]
+         * @param {string} source - 来源标识（poker/mcn/market/consumer）
+         */
+        injectMoodZeta(zeta, confidence = 0.5, source = 'external') {
+            const z = Math.max(-1, Math.min(1, zeta));
+            const c = Math.max(0, Math.min(1, confidence));
+            this.moodMind.zeta = z;
+            this.moodMind.zetaConfidence = c;
+            this.moodMind.source = source;
+            this.moodMind.enabled = true;
+            this.moodMind.lastUpdate = Date.now();
+            this.moodMind.history.push({ zeta: z, c, t: Date.now() });
+            if (this.moodMind.history.length > 60) this.moodMind.history.shift();
+            return { zeta: z, confidence: c, effectiveZeta: z * c };
+        }
+
+        getEffectiveWACC(baseWACC) {
+            if (!this.moodMind.enabled) return baseWACC;
+            const z = this.moodMind.zeta * this.moodMind.zetaConfidence;
+            return baseWACC - z * MOODZETA_WACC_SHIFT;
+        }
+
+        getEffectiveKellyMultiplier() {
+            if (!this.moodMind.enabled) return 1.0;
+            const absZ = Math.abs(this.moodMind.zeta) * this.moodMind.zetaConfidence;
+            return Math.max(0.25, 1 - absZ * MOODZETA_KELLY_DISCOUNT);
+        }
+
+        getMoodPricingMultiplier() {
+            if (!this.moodMind.enabled) return 1.0;
+            const z = this.moodMind.zeta * this.moodMind.zetaConfidence;
+            return 1 + z * 0.15;
         }
 
         calculateOptimalDistribution(state, absZ) {
@@ -420,17 +538,32 @@
                     return sum + (prob > 0 ? prob * Math.log(prob) : 0);
                 }, 0);
 
-            const currentVol = this.calculateVolatility() + Math.abs(externalShock) * 0.5;
+            let currentVol = this.calculateVolatility() + Math.abs(externalShock) * 0.5;
+            const moodZeta = this.moodMind.enabled ? (this.moodMind.zeta * this.moodMind.zetaConfidence) : 0;
+            const absZeta = Math.abs(moodZeta);
+            if (this.moodMind.enabled) {
+                currentVol *= (1 + absZeta * MOODZETA_VOL_AMPLIFIER);
+            }
             this.volatilityHistory.push({ t: this.timestamp, v: currentVol });
             if (this.volatilityHistory.length > this.config.volatilityWindow) {
                 this.volatilityHistory.shift();
             }
 
             this.calculateCenterPressure();
+            if (this.moodMind.enabled) {
+                const drift = moodZeta * 0.02;
+                this.dealer.groundTruth += drift;
+                this.moodMind.driftAccumulator += drift;
+                this.dealer.groundTruth = Math.max(0.15, Math.min(0.95, this.dealer.groundTruth));
+            }
             this.participants.forEach(p => {
                 p.updatePressure(this.dealer.groundTruth, currentVol * (1 - truthRevelation * 0.5));
                 if (externalShock !== 0 && Math.abs(externalShock) > 0.5) {
                     p.position += externalShock * 0.2 * (Math.random() + 0.5);
+                    p.position = Math.max(-1, Math.min(1, p.position));
+                }
+                if (this.moodMind.enabled) {
+                    p.position += moodZeta * 0.03;
                     p.position = Math.max(-1, Math.min(1, p.position));
                 }
             });
@@ -448,12 +581,24 @@
 
             const zScore = this.calculateZScore(price);
             const shockZ = externalShock * 0.8;
-            const effectiveZ = zScore + shockZ;
+            let effectiveZ = zScore + shockZ;
+            if (this.moodMind.enabled && absZeta > 0.8) {
+                const moodBoost = Math.sign(moodZeta) * 0.2;
+                effectiveZ += moodBoost;
+            }
             const newState = this.determineGameState(effectiveZ);
-            const stateChanged = newState.id !== this.state.id;
-            this.state = newState;
+            let finalState = newState;
+            if (this.moodMind.enabled && absZeta > 0.8) {
+                if (newState.id === 'CALM') finalState = GAME_STATES.TENSION;
+                else if (newState.id === 'TENSION') finalState = GAME_STATES.EXTREME;
+            }
+            if (this.risk.drawdownFuseTriggered) {
+                finalState = GAME_STATES.MELTDOWN;
+            }
+            const stateChanged = finalState.id !== this.state.id;
+            this.state = finalState;
 
-            const decision = this.generateDecisionCommand(newState, effectiveZ, currentVol);
+            const decision = this.generateDecisionCommand(finalState, effectiveZ, currentVol);
             this._lastDistribution = decision.distribution;
 
             this._updateBrandVolume(newState, effectiveZ, decision);
@@ -474,10 +619,38 @@
                 state: this.state,
                 decision,
                 kellyFraction: this.config.kellyFraction,
+                kellyCap: KELLY_ABSOLUTE_HARD_CAP,
                 brandVolume: { ...this.brandVolume },
                 hedgeReservoir: { ...this.hedgeReservoir, lastInjection: hedgeInjection },
                 pokerBridge: { ...this.pokerBridge },
                 valuationAnchor: { ...this.valuationAnchor },
+                moodMind: {
+                    enabled: this.moodMind.enabled,
+                    zeta: this.moodMind.zeta,
+                    zetaConfidence: this.moodMind.zetaConfidence,
+                    source: this.moodMind.source,
+                    effectiveZeta: moodZeta,
+                    effectiveWACC: this.getEffectiveWACC(this.valuationAnchor.wacc),
+                    kellyMultiplier: this.getEffectiveKellyMultiplier(),
+                    pricingMultiplier: this.getMoodPricingMultiplier()
+                },
+                risk: {
+                    drawdown: this.risk.drawdown,
+                    drawdownFuseTriggered: this.risk.drawdownFuseTriggered,
+                    kellyHardCapTriggered: this.risk.kellyHardCapTriggered,
+                    fuseThresholds: {
+                        kellyHardCap: KELLY_ABSOLUTE_HARD_CAP,
+                        leverageCap: LEVERAGE_ABSOLUTE_CAP,
+                        dailyDrawdownFuse: DAILY_DRAWDOWN_FUSE
+                    }
+                },
+                pricing: this.valuationAnchor.enabled ? {
+                    intrinsicValue: this.valuationAnchor.blendedValue,
+                    marginOfSafety: decision.marginOfSafety,
+                    maxBid: decision.maxAcceptablePrice,
+                    moodMultiplier: decision.moodPricingMultiplier,
+                    recommendedAsk: decision.maxAcceptablePrice * decision.moodPricingMultiplier
+                } : null,
                 participants: this.participants.filter(p => p.alive).map(p => ({
                     type: p.type,
                     position: p.position,
@@ -524,6 +697,11 @@
                 privateRatio: 0.75, contentRatio: 0.25,
                 lastInjection: 0, injectionSource: ''
             };
+            this.moodMind = {
+                enabled: false, zeta: 0, zetaConfidence: 0, source: 'none',
+                lastUpdate: 0, history: [], driftAccumulator: 0
+            };
+            this.resetFuses();
             this._initDefaultParticipants();
             this._emit('reset');
         }
