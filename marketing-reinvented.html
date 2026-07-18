@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="assets/css/base.css">
     <script src="assets/js/bus.js"></script>
     <script src="assets/js/sidebar.js"></script>
+    <script src="assets/js/cone-game-theory.js"></script>
     <style>
         /* ===== 页面内导航 ===== */
         .page-nav {
@@ -1226,6 +1227,308 @@
             color: rgba(255, 255, 255, 0.6);
         }
 
+        /* ===== 圆锥博弈场 · 上帝视角板块 ===== */
+        .game-theory-section {
+            background: linear-gradient(135deg, rgba(167,139,250,0.08), rgba(96,165,250,0.05));
+            border: 1px solid rgba(167,139,250,0.2);
+            border-radius: 20px;
+            padding: 36px 36px 32px;
+            margin-bottom: 36px;
+            opacity: 0;
+            animation: fadeInUp 0.7s ease 0.15s forwards;
+            scroll-margin-top: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        .game-theory-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(167,139,250,0.15), transparent 70%);
+            pointer-events: none;
+        }
+        .gt-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: #f1f5f9;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .gt-title .gt-tag {
+            font-size: 10px;
+            font-weight: 600;
+            color: #dc2626;
+            background: rgba(220,38,38,0.15);
+            padding: 3px 12px;
+            border-radius: 20px;
+            letter-spacing: 0.5px;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+        .gt-subtitle {
+            font-size: 13px;
+            color: rgba(255,255,255,0.3);
+            margin-bottom: 24px;
+            line-height: 1.7;
+        }
+        .gt-subtitle .god {
+            color: #facc15;
+            font-weight: 600;
+        }
+        .gt-subtitle .sigma {
+            color: #a78bfa;
+            font-weight: 600;
+        }
+        .gt-status-bar {
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            gap: 16px;
+            align-items: center;
+            background: rgba(0,0,0,0.3);
+            border-radius: 14px;
+            padding: 16px 20px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+        .gt-state-indicator {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .gt-state-dot {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #22c55e;
+            box-shadow: 0 0 20px currentColor;
+            animation: statePulse 1.5s infinite;
+        }
+        @keyframes statePulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.7; }
+        }
+        .gt-state-text {
+            font-size: 18px;
+            font-weight: 700;
+        }
+        .gt-state-desc {
+            font-size: 11px;
+            color: rgba(255,255,255,0.4);
+        }
+        .gt-gravity-bar {
+            height: 10px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 5px;
+            position: relative;
+            overflow: hidden;
+        }
+        .gt-gravity-band1 {
+            position: absolute;
+            top: 0;
+            height: 100%;
+            background: rgba(34,197,94,0.2);
+            border-radius: 5px;
+        }
+        .gt-gravity-begin {
+            position: absolute;
+            top: -4px;
+            width: 2px;
+            height: 18px;
+            background: #ef4444;
+        }
+        .gt-price-marker {
+            position: absolute;
+            top: -6px;
+            width: 4px;
+            height: 22px;
+            background: #facc15;
+            border-radius: 2px;
+            box-shadow: 0 0 10px #facc15;
+            transition: left 0.3s ease;
+        }
+        .gt-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .gt-stat-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 10px;
+            padding: 12px 10px;
+            text-align: center;
+        }
+        .gt-stat-label {
+            font-size: 9px;
+            color: rgba(255,255,255,0.25);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+        .gt-stat-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: #f1f5f9;
+        }
+        .gt-stat-value.green { color: #22c55e; }
+        .gt-stat-value.yellow { color: #facc15; }
+        .gt-stat-value.orange { color: #fb923c; }
+        .gt-stat-value.red { color: #ef4444; }
+        .gt-stat-value.purple { color: #a78bfa; }
+        .gt-canvas-area {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+        .gt-canvas-wrap {
+            background: rgba(0,0,0,0.25);
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.04);
+            padding: 12px;
+        }
+        .gt-canvas-wrap canvas {
+            display: block;
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+        }
+        .gt-canvas-caption {
+            text-align: center;
+            font-size: 10px;
+            color: rgba(255,255,255,0.15);
+            margin-top: 8px;
+        }
+        .gt-decision-box {
+            background: rgba(0,0,0,0.35);
+            border-radius: 14px;
+            padding: 20px 24px;
+            border-left: 4px solid #22c55e;
+            margin-bottom: 16px;
+            transition: all 0.4s ease;
+        }
+        .gt-decision-box.calm { border-left-color: #22c55e; }
+        .gt-decision-box.tension { border-left-color: #facc15; }
+        .gt-decision-box.extreme { border-left-color: #fb923c; }
+        .gt-decision-box.black_swan { border-left-color: #ef4444; }
+        .gt-decision-box.meltdown { border-left-color: #dc2626; }
+        .gt-decision-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+        .gt-decision-action {
+            font-size: 16px;
+            font-weight: 700;
+            color: #f1f5f9;
+        }
+        .gt-decision-kelly {
+            font-size: 12px;
+            color: rgba(255,255,255,0.4);
+        }
+        .gt-decision-kelly .val {
+            color: #facc15;
+            font-weight: 700;
+            font-size: 14px;
+        }
+        .gt-decision-msg {
+            font-size: 14px;
+            color: rgba(255,255,255,0.6);
+            line-height: 1.7;
+            margin-bottom: 12px;
+        }
+        .gt-orders {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .gt-order {
+            font-size: 11px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            background: rgba(255,255,255,0.05);
+            color: rgba(255,255,255,0.5);
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+        .gt-controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .gt-btn {
+            padding: 8px 18px;
+            border-radius: 8px;
+            border: none;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+        .gt-btn-start {
+            background: linear-gradient(135deg, #a78bfa, #7c3aed);
+            color: white;
+        }
+        .gt-btn-start:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(167,139,250,0.3);
+        }
+        .gt-btn-start.running {
+            background: rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.5);
+        }
+        .gt-btn-shock {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+        }
+        .gt-btn-shock:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(239,68,68,0.3);
+        }
+        .gt-btn-reset {
+            background: rgba(255,255,255,0.06);
+            color: rgba(255,255,255,0.5);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .gt-btn-reset:hover {
+            background: rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.8);
+        }
+        .gt-axioms {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-top: 16px;
+        }
+        .gt-axiom {
+            background: rgba(255,255,255,0.02);
+            border-radius: 8px;
+            padding: 10px 12px;
+            border-left: 2px solid rgba(167,139,250,0.3);
+        }
+        .gt-axiom-num {
+            font-size: 10px;
+            color: #a78bfa;
+            font-weight: 700;
+            margin-bottom: 2px;
+        }
+        .gt-axiom-text {
+            font-size: 10px;
+            color: rgba(255,255,255,0.3);
+            line-height: 1.5;
+        }
+
         /* ===== 响应式 ===== */
         @media (max-width: 1024px) {
             .container {
@@ -1282,6 +1585,15 @@
             }
             .struct-flow .level .l-arrow {
                 display: none;
+            }
+            .gt-stats-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            .gt-canvas-area {
+                grid-template-columns: 1fr;
+            }
+            .gt-axioms {
+                grid-template-columns: 1fr 1fr;
             }
         }
 
@@ -1408,6 +1720,7 @@
         <div class="pn-label">🏦 金融估值精算 · 独立通道</div>
         <a class="pn-item" data-target="section-riskvector"><span class="icon">📊</span><span class="label">风险向量</span></a>
         <a class="pn-item" data-target="section-cone"><span class="icon">🔺</span><span class="label">圆锥浓度</span></a>
+        <a class="pn-item" data-target="section-gametheory"><span class="icon">👁️</span><span class="label">上帝视角</span></a>
         <a class="pn-item" data-target="section-layer7"><span class="icon">📐</span><span class="label">CAPM定价</span></a>
         <a class="pn-item" data-target="section-layer8"><span class="icon">📊</span><span class="label">凯利配置</span></a>
         <a class="pn-item" data-target="section-reverse-decoder"><span class="icon">⚠️</span><span class="label">反向拆解</span></a>
@@ -2599,6 +2912,119 @@
                 <!-- 几何公理的延伸总结 -->
                 <div style="margin-top: 10px; padding: 8px 14px; background:rgba(250,204,21,0.02); border-radius:8px; border:1px solid rgba(250,204,21,0.04); font-size:12px; color:rgba(255,255,255,0.15); text-align:center;">
                     ⚡ 圆锥体同时承载 <span style="color:#a78bfa;">资本定价</span>、<span style="color:#facc15;">AI 概率稳态</span>、<span style="color:#60a5fa;">人类决策收敛</span> 三重功能
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== 圆锥博弈场 · 上帝视角 · 0.68引力法则 ===== -->
+        <div class="section-anchor" id="section-gametheory"></div>
+        <div class="game-theory-section">
+            <div class="gt-title">
+                👁️ 圆锥博弈场 · 0.68引力法则
+                <span class="gt-tag">SYSTEM CORE · 上帝视角</span>
+            </div>
+            <div class="gt-subtitle">
+                <span class="god">荷官(系统)处于圆锥顶端掌握Ground Truth</span> ·
+                多空巨鲸散户做市商构成四棱锥 · 压力向中心坍缩 ·
+                <span class="sigma">0.68(1σ) = 市场绝对引力中心</span> ·
+                区间内=正常噪音·击穿=黑天鹅清算
+            </div>
+
+            <div class="gt-status-bar">
+                <div class="gt-state-indicator">
+                    <div class="gt-state-dot" id="gtStateDot" style="background: #22c55e; color: #22c55e;"></div>
+                    <div>
+                        <div class="gt-state-text" id="gtStateText" style="color: #22c55e;">稳态博弈</div>
+                        <div class="gt-state-desc" id="gtStateDesc">0.68引力区间内·凯利仓位正常执行</div>
+                    </div>
+                </div>
+                <div class="gt-gravity-bar">
+                    <div class="gt-gravity-band1" id="gtGravityBand1" style="left: 34%; width: 32%;"></div>
+                    <div class="gt-gravity-begin" style="left: 50%;" title="0.68引力中心"></div>
+                    <div class="gt-price-marker" id="gtPriceMarker" style="left: 50%;"></div>
+                </div>
+                <div style="text-align: right;">
+                    <div style="font-size: 11px; color: rgba(255,255,255,0.25); z-Score</div>
+                    <div style="font-size: 22px; font-weight: 700; color: #f1f5f9;" id="gtZScore">0.00σ</div>
+                </div>
+            </div>
+
+            <div class="gt-stats-grid">
+                <div class="gt-stat-card">
+                    <div class="gt-stat-label">隐含价格</div>
+                    <div class="gt-stat-value" id="gtPrice">0.68</div>
+                </div>
+                <div class="gt-stat-card">
+                    <div class="gt-stat-label">波动率</div>
+                    <div class="gt-stat-value green" id="gtVolatility">0.10</div>
+                </div>
+                <div class="gt-stat-card">
+                    <div class="gt-stat-label">中心压力</div>
+                    <div class="gt-stat-value yellow" id="gtPressure">0.00</div>
+                </div>
+                <div class="gt-stat-card">
+                    <div class="gt-stat-label">坍缩度</div>
+                    <div class="gt-stat-value orange" id="gtCollapse">0%</div>
+                </div>
+                <div class="gt-stat-card">
+                    <div class="gt-stat-label">参与者存活</div>
+                    <div class="gt-stat-value purple" id="gtAlive">25/25</div>
+                </div>
+            </div>
+
+            <div class="gt-canvas-area">
+                <div class="gt-canvas-wrap">
+                    <canvas id="gtConeGameCanvas" width="560" height="320"></canvas>
+                    <div class="gt-canvas-caption">🔺 四棱锥博弈场 · 荷官俯视视角 · 多空压力实时坍缩</div>
+                </div>
+                <div class="gt-canvas-wrap">
+                    <canvas id="gtGravityCanvas" width="560" height="320"></canvas>
+                    <div class="gt-canvas-caption">📊 0.68正态分布引力带 · 价格轨迹 · σ边界监控</div>
+                </div>
+            </div>
+
+            <div class="gt-decision-box calm" id="gtDecisionBox">
+                <div class="gt-decision-header">
+                    <div class="gt-decision-action" id="gtDecisionAction">HOLD · 维持仓位</div>
+                    <div class="gt-decision-kelly">凯利仓位: <span class="val" id="gtKellySize">50%</span></div>
+                </div>
+                <div class="gt-decision-msg" id="gtDecisionMsg">
+                    ✅ 0.68引力区间稳态·执行凯利标准仓位·保持冷静
+                </div>
+                <div class="gt-orders" id="gtOrders">
+                    <span class="gt-order">维持现有头寸</span>
+                    <span class="gt-order">常规再平衡</span>
+                    <span class="gt-order">收集Alpha</span>
+                </div>
+            </div>
+
+            <div class="gt-controls">
+                <button class="gt-btn gt-btn-start" id="gtStartBtn">▶ 启动博弈推演</button>
+                <button class="gt-btn gt-btn-shock" id="gtShockBtn">💥 注入黑天鹅冲击</button>
+                <button class="gt-btn gt-btn-reset" id="gtResetBtn">↺ 重置博弈场</button>
+                <div style="margin-left: auto; font-size: 11px; color: rgba(255,255,255,0.2);">
+                    Ground Truth底牌: <span style="color: #facc15;" id="gtGroundTruth">0.68</span> ·
+                    系统熵: <span id="gtEntropy">0.00</span> ·
+                    局数: <span id="gtTicks">0</span>
+                </div>
+            </div>
+
+            <div class="gt-axioms">
+                <div class="gt-axiom">
+                    <div class="gt-axiom-num">公理 I</div>
+                    <div class="gt-axiom-text">荷官在锥顶掌握绝对底牌(Ground Truth)，决定长期引力方向</div>
+                </div>
+                <div class="gt-axiom">
+                    <div class="gt-axiom-num">公理 II</div>
+                    <div class="gt-axiom-text">多/空/巨鲸/散户/做市商构成五方博弈，压力向量向中心坍缩</div>
+                </div>
+                <div class="gt-axiom">
+                    <div class="gt-axiom-num">公理 III</div>
+                    <div class="gt-axiom-text">0.68(1σ)为市场绝对引力中心，68.27%的波动应在此区间内</div>
+                </div>
+                <div class="gt-axiom">
+                    <div class="gt-axiom-num">公理 IV</div>
+                    <div class="gt-axiom-text">击穿1σ边界=极端情绪，击穿2σ=黑天鹅，触发风险向量清算</div>
                 </div>
             </div>
         </div>
@@ -5349,6 +5775,414 @@
                     applyFunnelToVector(funnel);
                 }, 200);
             }
+        })();
+
+        // ================================================================
+        // ===== 圆锥博弈场 · 0.68引力法则 · 上帝视角引擎 =====
+        // ================================================================
+        (function() {
+            if (typeof YMineConeGame === 'undefined') return;
+            const gameCanvas = document.getElementById('gtConeGameCanvas');
+            const gravityCanvas = document.getElementById('gtGravityCanvas');
+            if (!gameCanvas || !gravityCanvas) return;
+
+            const gctx = gameCanvas.getContext('2d');
+            const grctx = gravityCanvas.getContext('2d');
+            const gw = gameCanvas.width, gh = gameCanvas.height;
+            const grw = gravityCanvas.width, grh = gravityCanvas.height;
+
+            const field = YMineConeGame.createField({ kellyFraction: 0.5 });
+            let isRunning = false;
+            let tickInterval = null;
+            let tickCount = 0;
+
+            const stateDot = document.getElementById('gtStateDot');
+            const stateText = document.getElementById('gtStateText');
+            const stateDesc = document.getElementById('gtStateDesc');
+            const priceEl = document.getElementById('gtPrice');
+            const volEl = document.getElementById('gtVolatility');
+            const pressureEl = document.getElementById('gtPressure');
+            const collapseEl = document.getElementById('gtCollapse');
+            const aliveEl = document.getElementById('gtAlive');
+            const zScoreEl = document.getElementById('gtZScore');
+            const priceMarker = document.getElementById('gtPriceMarker');
+            const decisionBox = document.getElementById('gtDecisionBox');
+            const decisionAction = document.getElementById('gtDecisionAction');
+            const decisionMsg = document.getElementById('gtDecisionMsg');
+            const kellySize = document.getElementById('gtKellySize');
+            const ordersEl = document.getElementById('gtOrders');
+            const groundTruthEl = document.getElementById('gtGroundTruth');
+            const entropyEl = document.getElementById('gtEntropy');
+            const ticksEl = document.getElementById('gtTicks');
+            const startBtn = document.getElementById('gtStartBtn');
+            const shockBtn = document.getElementById('gtShockBtn');
+            const resetBtn = document.getElementById('gtResetBtn');
+
+            const participantColors = {
+                WHALE: '#a78bfa',
+                BULL: '#22c55e',
+                BEAR: '#ef4444',
+                RETAIL: '#60a5fa',
+                MARKET_MAKER: '#facc15'
+            };
+
+            function updateUI(snapshot) {
+                const s = snapshot.state;
+                stateDot.style.background = s.color;
+                stateDot.style.color = s.color;
+                stateText.textContent = s.name;
+                stateText.style.color = s.color;
+                stateDesc.textContent = s.description;
+
+                priceEl.textContent = snapshot.price.toFixed(3);
+                volEl.textContent = snapshot.volatility.toFixed(2);
+                volEl.className = 'gt-stat-value ' + (snapshot.volatility > 0.5 ? 'red' : snapshot.volatility > 0.3 ? 'orange' : snapshot.volatility > 0.15 ? 'yellow' : 'green');
+                pressureEl.textContent = snapshot.centerPressure.toFixed(2);
+                pressureEl.className = 'gt-stat-value ' + (Math.abs(snapshot.centerPressure) > 0.5 ? 'red' : Math.abs(snapshot.centerPressure) > 0.3 ? 'orange' : 'yellow');
+                collapseEl.textContent = (snapshot.coneCollapse * 100).toFixed(0) + '%';
+                collapseEl.className = 'gt-stat-value ' + (snapshot.coneCollapse > 0.5 ? 'red' : snapshot.coneCollapse > 0.2 ? 'orange' : 'orange');
+                aliveEl.textContent = snapshot.aliveCount + '/' + snapshot.totalCount;
+                zScoreEl.textContent = snapshot.zScore.toFixed(2) + 'σ';
+                zScoreEl.style.color = s.color;
+
+                const pricePercent = Math.max(5, Math.min(95, ((snapshot.price - 0.2) / 0.8) * 100));
+                priceMarker.style.left = pricePercent + '%';
+
+                decisionBox.className = 'gt-decision-box ' + s.id;
+                decisionAction.textContent = snapshot.decision.action;
+                decisionMsg.textContent = snapshot.decision.message;
+                kellySize.textContent = (snapshot.decision.positionSizing * 100).toFixed(0) + '%';
+
+                ordersEl.innerHTML = '';
+                snapshot.decision.orders.forEach(order => {
+                    const span = document.createElement('span');
+                    span.className = 'gt-order';
+                    span.textContent = order;
+                    ordersEl.appendChild(span);
+                });
+
+                groundTruthEl.textContent = snapshot.groundTruth.toFixed(3);
+                entropyEl.textContent = snapshot.entropy.toFixed(2);
+                ticksEl.textContent = tickCount;
+            }
+
+            function drawConeGame(snapshot) {
+                gctx.clearRect(0, 0, gw, gh);
+
+                const cx = gw / 2;
+                const cy = gh * 0.62;
+                const baseR = Math.min(gw, gh) * 0.38;
+                const dealerY = gh * 0.12;
+
+                gctx.strokeStyle = 'rgba(255,255,255,0.03)';
+                gctx.lineWidth = 0.5;
+                for (let i = 0; i < 10; i++) {
+                    const x = (i / 10) * gw;
+                    gctx.beginPath(); gctx.moveTo(x, 0); gctx.lineTo(x, gh); gctx.stroke();
+                }
+                for (let i = 0; i < 8; i++) {
+                    const y = (i / 8) * gh;
+                    gctx.beginPath(); gctx.moveTo(0, y); gctx.lineTo(gw, y); gctx.stroke();
+                }
+
+                const numSides = 4;
+                const basePoints = [];
+                for (let i = 0; i < numSides; i++) {
+                    const angle = (i / numSides) * Math.PI * 2 - Math.PI / 4;
+                    const x = cx + baseR * Math.cos(angle);
+                    const y = cy + baseR * Math.sin(angle) * 0.35;
+                    basePoints.push({ x, y });
+                }
+
+                const grad = gctx.createRadialGradient(cx, cy, 0, cx, cy, baseR * 1.2);
+                grad.addColorStop(0, 'rgba(167,139,250,0.12)');
+                grad.addColorStop(0.6, 'rgba(96,165,250,0.06)');
+                grad.addColorStop(1, 'rgba(0,0,0,0)');
+                gctx.fillStyle = grad;
+                gctx.beginPath();
+                gctx.ellipse(cx, cy, baseR * 1.1, baseR * 0.4, 0, 0, Math.PI * 2);
+                gctx.fill();
+
+                gctx.fillStyle = 'rgba(255,255,255,0.02)';
+                gctx.strokeStyle = 'rgba(167,139,250,0.2)';
+                gctx.lineWidth = 1;
+                gctx.beginPath();
+                basePoints.forEach((p, i) => i === 0 ? gctx.moveTo(p.x, p.y) : gctx.lineTo(p.x, p.y));
+                gctx.closePath();
+                gctx.fill();
+                gctx.stroke();
+
+                basePoints.forEach(p => {
+                    gctx.strokeStyle = 'rgba(167,139,250,0.25)';
+                    gctx.lineWidth = 1;
+                    gctx.beginPath();
+                    gctx.moveTo(cx, dealerY);
+                    gctx.lineTo(p.x, p.y);
+                    gctx.stroke();
+                });
+
+                const drawBand = (ratio, color, width, dash) => {
+                    const r = baseR * ratio;
+                    const by = cy - (dealerY - cy) * (1 - ratio);
+                    gctx.strokeStyle = color;
+                    gctx.lineWidth = width;
+                    gctx.setLineDash(dash || []);
+                    gctx.beginPath();
+                    for (let i = 0; i <= numSides; i++) {
+                        const angle = (i / numSides) * Math.PI * 2 - Math.PI / 4;
+                        const x = cx + r * Math.cos(angle);
+                        const y = by + r * Math.sin(angle) * 0.35;
+                        i === 0 ? gctx.moveTo(x, y) : gctx.lineTo(x, y);
+                    }
+                    gctx.stroke();
+                    gctx.setLineDash([]);
+                };
+                drawBand(0.68, 'rgba(239,68,68,0.5)', 2, [4, 4]);
+                drawBand(0.52, 'rgba(250,204,21,0.3)', 1);
+                drawBand(0.84, 'rgba(34,197,94,0.2)', 1);
+
+                gctx.strokeStyle = 'rgba(250,204,21,0.4)';
+                gctx.lineWidth = 2;
+                gctx.setLineDash([3, 3]);
+                gctx.beginPath();
+                gctx.moveTo(cx, dealerY - 8);
+                gctx.lineTo(cx, cy + 15);
+                gctx.stroke();
+                gctx.setLineDash([]);
+
+                gctx.fillStyle = 'rgba(220,38,38,0.9)';
+                gctx.beginPath();
+                gctx.arc(cx, dealerY, 12, 0, Math.PI * 2);
+                gctx.fill();
+                gctx.fillStyle = '#fff';
+                gctx.font = 'bold 10px sans-serif';
+                gctx.textAlign = 'center';
+                gctx.textBaseline = 'middle';
+                gctx.fillText('🎰', cx, dealerY);
+
+                snapshot.participants.forEach(p => {
+                    const angle = Math.atan2(p.position, 0.5) + (p.type.charCodeAt(0) * 0.3);
+                    const distFromTop = 0.3 + (1 - Math.abs(p.position)) * 0.6;
+                    const r = baseR * distFromTop * (0.3 + p.conviction * 0.4);
+                    const py = dealerY + (cy - dealerY) * (1 - distFromTop * 0.7);
+                    const px = cx + r * Math.cos(angle);
+                    const pDrawY = py + r * Math.sin(angle) * 0.35;
+
+                    const size = 3 + Math.abs(p.pressure) * 3;
+                    const color = participantColors[p.type] || '#888';
+
+                    gctx.fillStyle = color;
+                    gctx.globalAlpha = 0.25;
+                    gctx.beginPath();
+                    gctx.arc(px, pDrawY, size * 2, 0, Math.PI * 2);
+                    gctx.fill();
+                    gctx.globalAlpha = 1;
+                    gctx.beginPath();
+                    gctx.arc(px, pDrawY, size, 0, Math.PI * 2);
+                    gctx.fill();
+                });
+
+                gctx.fillStyle = 'rgba(255,255,255,0.4)';
+                gctx.font = '10px sans-serif';
+                gctx.textAlign = 'left';
+                gctx.textBaseline = 'top';
+                gctx.fillText('🎰 荷官 · Ground Truth', 10, 8);
+                gctx.fillStyle = snapshot.state.color;
+                gctx.font = 'bold 11px sans-serif';
+                gctx.fillText('● ' + snapshot.state.name, gw - 110, 8);
+
+                const legendY = gh - 20;
+                const legends = [
+                    { label: '巨鲸', color: '#a78bfa' },
+                    { label: '多头', color: '#22c55e' },
+                    { label: '空头', color: '#ef4444' },
+                    { label: '散户', color: '#60a5fa' },
+                    { label: '做市商', color: '#facc15' }
+                ];
+                let lx = 10;
+                gctx.font = '9px sans-serif';
+                gctx.textAlign = 'left';
+                gctx.textBaseline = 'middle';
+                legends.forEach(l => {
+                    gctx.fillStyle = l.color;
+                    gctx.beginPath();
+                    gctx.arc(lx, legendY, 3, 0, Math.PI * 2);
+                    gctx.fill();
+                    gctx.fillStyle = 'rgba(255,255,255,0.3)';
+                    gctx.fillText(l.label, lx + 7, legendY);
+                    lx += 50;
+                });
+            }
+
+            function drawGravity(snapshot) {
+                grctx.clearRect(0, 0, grw, grh);
+
+                const padL = 50, padR = 20, padT = 20, padB = 40;
+                const plotW = grw - padL - padR;
+                const plotH = grh - padT - padB;
+
+                grctx.strokeStyle = 'rgba(255,255,255,0.03)';
+                grctx.lineWidth = 0.5;
+                for (let i = 0; i <= 8; i++) {
+                    const y = padT + (i / 8) * plotH;
+                    grctx.beginPath(); grctx.moveTo(padL, y); grctx.lineTo(grw - padR, y); grctx.stroke();
+                }
+
+                const mu = 0.68;
+                const sigma = 0.16;
+                const priceToX = (p) => padL + ((p - 0.2) / 0.8) * plotW;
+                const valToY = (v) => padT + plotH - v * plotH * 0.8;
+
+                const pdfGrad = grctx.createLinearGradient(padL, padT, padL, padT + plotH);
+                pdfGrad.addColorStop(0, 'rgba(167,139,250,0.08)');
+                pdfGrad.addColorStop(1, 'rgba(167,139,250,0)');
+
+                grctx.fillStyle = 'rgba(34,197,94,0.08)';
+                grctx.fillRect(priceToX(mu - sigma), padT, priceToX(mu + sigma) - priceToX(mu - sigma), plotH);
+                grctx.fillStyle = 'rgba(250,204,21,0.05)';
+                grctx.fillRect(priceToX(mu - 2*sigma), padT, (priceToX(mu + 2*sigma) - priceToX(mu - 2*sigma)), plotH);
+
+                grctx.strokeStyle = 'rgba(167,139,250,0.4)';
+                grctx.lineWidth = 1.5;
+                grctx.beginPath();
+                for (let i = 0; i <= 100; i++) {
+                    const p = 0.2 + (i / 100) * 0.8;
+                    const x = priceToX(p);
+                    const z = (p - mu) / sigma;
+                    const pdf = Math.exp(-0.5 * z * z) / (sigma * Math.sqrt(2 * Math.PI));
+                    const y = valToY(pdf);
+                    i === 0 ? grctx.moveTo(x, y) : grctx.lineTo(x, y);
+                }
+                grctx.stroke();
+
+                grctx.strokeStyle = 'rgba(239,68,68,0.5)';
+                grctx.lineWidth = 1.5;
+                grctx.setLineDash([4, 4]);
+                [-2, -1, 1, 2].forEach(z => {
+                    const p = mu + z * sigma;
+                    grctx.beginPath();
+                    grctx.moveTo(priceToX(p), padT);
+                    grctx.lineTo(priceToX(p), padT + plotH);
+                    grctx.stroke();
+                });
+                grctx.setLineDash([]);
+
+                grctx.strokeStyle = 'rgba(250,204,21,0.6)';
+                grctx.lineWidth = 2;
+                grctx.beginPath();
+                grctx.moveTo(priceToX(mu), padT);
+                grctx.lineTo(priceToX(mu), padT + plotH);
+                grctx.stroke();
+
+                grctx.fillStyle = 'rgba(255,255,255,0.4)';
+                grctx.font = '9px sans-serif';
+                grctx.textAlign = 'center';
+                grctx.fillText('-2σ', priceToX(mu - 2*sigma), padT + plotH + 14);
+                grctx.fillText('-1σ', priceToX(mu - sigma), padT + plotH + 14);
+                grctx.fillStyle = '#facc15';
+                grctx.fillText('μ=0.68', priceToX(mu), padT - 6);
+                grctx.fillStyle = 'rgba(255,255,255,0.4)';
+                grctx.fillText('+1σ', priceToX(mu + sigma), padT + plotH + 14);
+                grctx.fillText('+2σ', priceToX(mu + 2*sigma), padT + plotH + 14);
+
+                if (field.priceHistory.length > 1) {
+                    grctx.strokeStyle = snapshot.state.color;
+                    grctx.lineWidth = 2;
+                    grctx.beginPath();
+                    field.priceHistory.forEach((price, i) => {
+                        const x = priceToX(price);
+                        const progress = i / Math.max(1, field.priceHistory.length - 1);
+                        const y = padT + plotH - progress * plotH * 0.3 - 10;
+                        i === 0 ? grctx.moveTo(x, y) : grctx.lineTo(x, y);
+                    });
+                    grctx.stroke();
+
+                    const lastPrice = field.priceHistory[field.priceHistory.length - 1];
+                    const lastX = priceToX(lastPrice);
+                    const lastY = padT + plotH - plotH * 0.3 - 10;
+                    grctx.fillStyle = snapshot.state.color;
+                    grctx.beginPath();
+                    grctx.arc(lastX, lastY, 5, 0, Math.PI * 2);
+                    grctx.fill();
+                    grctx.fillStyle = snapshot.state.color;
+                    grctx.font = 'bold 11px sans-serif';
+                    grctx.textAlign = 'left';
+                    grctx.fillText(lastPrice.toFixed(3), lastX + 8, lastY + 4);
+                }
+
+                grctx.fillStyle = 'rgba(255,255,255,0.2)';
+                grctx.font = '9px sans-serif';
+                grctx.textAlign = 'left';
+                grctx.fillText('0.2', padL - 25, padT + plotH + 4);
+                grctx.fillText('1.0', padL - 25, padT + 4);
+                grctx.fillText('价格轴', padL, padT + plotH + 28);
+
+                grctx.fillStyle = 'rgba(34,197,94,0.2)';
+                grctx.fillRect(grw - 95, 8, 8, 8);
+                grctx.fillStyle = 'rgba(255,255,255,0.3)';
+                grctx.font = '8px sans-serif';
+                grctx.fillText('68% 稳态区间', grw - 82, 15);
+            }
+
+            function doTick(shock = 0) {
+                const snapshot = shock !== 0 ? field.injectShock(shock) : field.tick();
+                tickCount++;
+                updateUI(snapshot);
+                drawConeGame(snapshot);
+                drawGravity(snapshot);
+                return snapshot;
+            }
+
+            function startGame() {
+                if (isRunning) {
+                    isRunning = false;
+                    clearInterval(tickInterval);
+                    startBtn.textContent = '▶ 启动博弈推演';
+                    startBtn.classList.remove('running');
+                } else {
+                    isRunning = true;
+                    startBtn.textContent = '⏸ 暂停推演';
+                    startBtn.classList.add('running');
+                    tickInterval = setInterval(() => doTick(), 800);
+                }
+            }
+
+            function injectShock() {
+                const magnitude = (Math.random() > 0.5 ? 1 : -1) * (1.5 + Math.random() * 2);
+                doTick(magnitude);
+                if (!isRunning) {
+                    for (let i = 0; i < 5; i++) {
+                        setTimeout(() => doTick(), (i+1) * 200);
+                    }
+                }
+            }
+
+            function resetGame() {
+                isRunning = false;
+                clearInterval(tickInterval);
+                tickCount = 0;
+                field.reset();
+                startBtn.textContent = '▶ 启动博弈推演';
+                startBtn.classList.remove('running');
+                const initial = field.tick();
+                updateUI(initial);
+                drawConeGame(initial);
+                drawGravity(initial);
+            }
+
+            if (startBtn) startBtn.addEventListener('click', startGame);
+            if (shockBtn) shockBtn.addEventListener('click', injectShock);
+            if (resetBtn) resetBtn.addEventListener('click', resetGame);
+
+            field.on('stateChange', (snapshot) => {
+                if (snapshot.state.level >= 2) {
+                    decisionBox.style.animation = 'none';
+                    decisionBox.offsetHeight;
+                    decisionBox.style.animation = 'pulse 0.5s ease 3';
+                }
+            });
+
+            resetGame();
         })();
 
     </script>
