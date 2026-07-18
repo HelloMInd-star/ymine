@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Y.Mine · 金融估值模拟器 · 风险向量精算</title>
+    <title>Y.Mine 决策系统 · 品牌定价精算</title>
     <style>
         /* ===== 全局重置 ===== */
         * {
@@ -89,6 +89,691 @@
         .page-nav .pn-item.active { color: #f1f5f9; background: rgba(167,139,250,0.06); border-left-color: #a78bfa; }
         .page-nav .pn-item .icon { font-size: 12px; }
         .page-nav .pn-divider { border: none; border-top: 1px solid rgba(255,255,255,0.03); margin: 6px 0; }
+
+        /* ===== 三步决策引擎 · 进度条导航 ===== */
+        .step-nav {
+            background: rgba(11, 11, 26, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 16px;
+            padding: 16px 24px;
+            margin-bottom: 24px;
+            position: relative;
+        }
+        .step-nav-track {
+            position: absolute;
+            top: 32px;
+            left: 24px;
+            right: 24px;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 1px;
+        }
+        .step-nav-progress {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            background: linear-gradient(90deg, #a78bfa, #34d399);
+            border-radius: 1px;
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+        .step-nav-items {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            position: relative;
+            z-index: 1;
+        }
+        .step-nav-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            padding: 8px 16px;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        .step-nav-item:hover {
+            background: rgba(255, 255, 255, 0.03);
+        }
+        .step-nav-item.active {
+            background: rgba(167, 139, 250, 0.05);
+        }
+        .step-nav-item.completed {
+            opacity: 0.9;
+        }
+        .step-nav-item.locked {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+        .step-nav-circle {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.08);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.4);
+            transition: all 0.3s ease;
+        }
+        .step-nav-item.active .step-nav-circle {
+            background: linear-gradient(135deg, #a78bfa, #8b5cf6);
+            border-color: #a78bfa;
+            color: #fff;
+            box-shadow: 0 0 12px rgba(167, 139, 250, 0.3);
+        }
+        .step-nav-item.completed .step-nav-circle {
+            background: linear-gradient(135deg, #34d399, #10b981);
+            border-color: #34d399;
+            color: #fff;
+        }
+        .step-nav-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.6);
+            transition: color 0.3s ease;
+        }
+        .step-nav-item.active .step-nav-label {
+            color: #f1f5f9;
+        }
+        .step-nav-desc {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.25);
+        }
+        .step-nav-status {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.3);
+            margin-top: 2px;
+        }
+        .step-nav-arrow {
+            font-size: 20px;
+            color: rgba(255, 255, 255, 0.1);
+            margin: 12px 8px 0;
+        }
+
+        /* ===== 步骤头部 ===== */
+        .step-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 20px;
+            background: linear-gradient(135deg, rgba(167, 139, 250, 0.08), rgba(96, 165, 250, 0.04));
+            border: 1px solid rgba(167, 139, 250, 0.15);
+            border-radius: 16px;
+            margin-bottom: 24px;
+        }
+        .step-header-number {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #a78bfa, #8b5cf6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: 700;
+            color: #fff;
+            flex-shrink: 0;
+        }
+        .step-header-content h2 {
+            font-size: 18px;
+            font-weight: 700;
+            color: #f1f5f9;
+            margin: 0;
+        }
+        .step-header-desc {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.4);
+            margin: 4px 0 0;
+        }
+        .step-header-status {
+            margin-left: auto;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.3);
+            padding: 6px 12px;
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 20px;
+        }
+
+        /* ===== 折叠面板 ===== */
+        .collapse-panel {
+            margin-bottom: 24px;
+            background: rgba(11, 11, 26, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .collapse-panel summary {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 18px;
+            cursor: pointer;
+            list-style: none;
+            user-select: none;
+        }
+        .collapse-panel summary::-webkit-details-marker {
+            display: none;
+        }
+        .collapse-icon {
+            font-size: 16px;
+        }
+        .collapse-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.5);
+        }
+        .collapse-desc {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.2);
+            margin-left: auto;
+        }
+        .collapse-arrow {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.2);
+            transition: transform 0.3s ease;
+        }
+        .collapse-panel[open] .collapse-arrow {
+            transform: rotate(180deg);
+        }
+        .collapse-content {
+            padding: 0 18px 18px;
+            border-top: 1px solid rgba(255, 255, 255, 0.03);
+        }
+        .collapse-content .section {
+            margin-top: 18px;
+            border-color: rgba(255, 255, 255, 0.03);
+        }
+        .collapse-content .section h2 {
+            font-size: 15px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* ===== 平台策略选择器 ===== */
+        .strategy-selector {
+            margin-top: 24px;
+            padding: 20px;
+            background: rgba(167, 139, 250, 0.04);
+            border: 1px solid rgba(167, 139, 250, 0.1);
+            border-radius: 16px;
+        }
+        .strategy-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: #f1f5f9;
+            margin-bottom: 16px;
+        }
+        .strategy-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        .strategy-card {
+            position: relative;
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 2px solid rgba(255, 255, 255, 0.06);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        .strategy-card:hover {
+            border-color: rgba(167, 139, 250, 0.3);
+            background: rgba(167, 139, 250, 0.04);
+        }
+        .strategy-card.selected {
+            border-color: #a78bfa;
+            background: rgba(167, 139, 250, 0.08);
+            box-shadow: 0 0 16px rgba(167, 139, 250, 0.15);
+        }
+        .strategy-icon {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+        .strategy-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #f1f5f9;
+            margin-bottom: 4px;
+        }
+        .strategy-desc {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.4);
+            margin-bottom: 8px;
+        }
+        .strategy-tag {
+            font-size: 11px;
+            color: #a78bfa;
+            background: rgba(167, 139, 250, 0.1);
+            padding: 4px 10px;
+            border-radius: 12px;
+        }
+        .strategy-check {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.06);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .strategy-card.selected .strategy-check {
+            opacity: 1;
+            background: #34d399;
+        }
+        .strategy-check span {
+            color: #fff;
+            font-size: 12px;
+            font-weight: 700;
+        }
+        .strategy-selection {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding-top: 16px;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+        }
+        .strategy-selected-label {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.4);
+        }
+        .strategy-selected-value {
+            font-size: 13px;
+            font-weight: 600;
+            color: #f1f5f9;
+            padding: 4px 10px;
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 8px;
+        }
+        .strategy-next-btn {
+            margin-left: auto;
+            padding: 8px 20px;
+            background: rgba(167, 139, 250, 0.15);
+            border: 1px solid rgba(167, 139, 250, 0.3);
+            border-radius: 8px;
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: not-allowed;
+            transition: all 0.3s ease;
+        }
+        .strategy-next-btn:not(:disabled) {
+            background: linear-gradient(135deg, #a78bfa, #8b5cf6);
+            border-color: #a78bfa;
+            color: #fff;
+            cursor: pointer;
+        }
+        .strategy-next-btn:not(:disabled):hover {
+            box-shadow: 0 0 16px rgba(167, 139, 250, 0.3);
+        }
+
+        /* ===== 商业模式选择器 ===== */
+        .business-selector {
+            margin-bottom: 24px;
+            padding: 20px;
+            background: rgba(52, 211, 153, 0.04);
+            border: 1px solid rgba(52, 211, 153, 0.1);
+            border-radius: 16px;
+        }
+        .business-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: #f1f5f9;
+            margin-bottom: 16px;
+        }
+        .business-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        .business-card {
+            position: relative;
+            padding: 14px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 2px solid rgba(255, 255, 255, 0.06);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        .business-card:hover {
+            border-color: rgba(52, 211, 153, 0.3);
+            background: rgba(52, 211, 153, 0.04);
+        }
+        .business-card.selected {
+            border-color: #34d399;
+            background: rgba(52, 211, 153, 0.08);
+            box-shadow: 0 0 16px rgba(52, 211, 153, 0.15);
+        }
+        .business-icon {
+            font-size: 24px;
+            margin-bottom: 6px;
+        }
+        .business-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: #f1f5f9;
+            margin-bottom: 4px;
+        }
+        .business-desc {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.4);
+            margin-bottom: 8px;
+        }
+        .business-tags {
+            display: flex;
+            gap: 4px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .business-tag {
+            font-size: 10px;
+            color: #34d399;
+            background: rgba(52, 211, 153, 0.1);
+            padding: 2px 6px;
+            border-radius: 8px;
+        }
+        .business-check {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.06);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .business-card.selected .business-check {
+            opacity: 1;
+            background: #34d399;
+        }
+        .business-check span {
+            color: #fff;
+            font-size: 11px;
+            font-weight: 700;
+        }
+        .business-selection {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding-top: 14px;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+        }
+        .business-selected-label {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.4);
+        }
+        .business-selected-value {
+            font-size: 12px;
+            font-weight: 600;
+            color: #f1f5f9;
+            padding: 3px 8px;
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 6px;
+        }
+
+        /* ===== 成本拆解双视图 ===== */
+        .cost-view {
+            margin-bottom: 24px;
+            padding: 20px;
+            background: rgba(96, 165, 250, 0.04);
+            border: 1px solid rgba(96, 165, 250, 0.1);
+            border-radius: 16px;
+        }
+        .cost-view-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+        .cost-tab {
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 8px;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .cost-tab.active {
+            background: rgba(96, 165, 250, 0.15);
+            border-color: #60a5fa;
+            color: #f1f5f9;
+        }
+        .cost-tab-content {
+            display: none;
+        }
+        .cost-tab-content.active {
+            display: block;
+        }
+        .cost-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+            margin-bottom: 16px;
+        }
+        .cost-item {
+            padding: 14px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            border-left: 3px solid rgba(255, 255, 255, 0.1);
+        }
+        .cost-item.cost-one {
+            border-left-color: #f472b6;
+        }
+        .cost-item.cost-two {
+            border-left-color: #34d399;
+        }
+        .cost-item.cost-three {
+            border-left-color: #60a5fa;
+        }
+        .cost-item.cost-sunk {
+            border-left-color: #f87171;
+        }
+        .cost-item.cost-opportunity {
+            border-left-color: #facc15;
+        }
+        .cost-item.cost-variable {
+            border-left-color: #22d3ee;
+        }
+        .cost-item-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+        .cost-item-icon {
+            font-size: 16px;
+        }
+        .cost-item-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: #f1f5f9;
+        }
+        .cost-item-body {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 6px;
+        }
+        .cost-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: #f1f5f9;
+        }
+        .cost-percent {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.4);
+        }
+        .cost-item-desc {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.3);
+            margin-bottom: 10px;
+        }
+        .cost-slider input {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: rgba(255, 255, 255, 0.08);
+            appearance: none;
+            cursor: pointer;
+        }
+        .cost-slider input::-webkit-slider-thumb {
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #60a5fa;
+            cursor: pointer;
+            border: 2px solid #fff;
+        }
+        .cost-summary {
+            display: flex;
+            justify-content: flex-end;
+            gap: 20px;
+            padding-top: 14px;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+        }
+        .cost-summary-item {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .cost-summary-label {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.4);
+        }
+        .cost-summary-value {
+            font-size: 16px;
+            font-weight: 700;
+            color: #f1f5f9;
+        }
+        .cost-summary-value.gold {
+            color: #facc15;
+        }
+
+        /* ===== 对标模式切换 ===== */
+        .benchmark-toggle {
+            margin-bottom: 24px;
+            padding: 16px;
+            background: rgba(244, 114, 182, 0.04);
+            border: 1px solid rgba(244, 114, 182, 0.1);
+            border-radius: 12px;
+        }
+        .benchmark-btn {
+            padding: 10px 20px;
+            background: rgba(244, 114, 182, 0.15);
+            border: 1px solid rgba(244, 114, 182, 0.3);
+            border-radius: 8px;
+            color: #f472b6;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .benchmark-btn:hover {
+            background: rgba(244, 114, 182, 0.25);
+            box-shadow: 0 0 12px rgba(244, 114, 182, 0.2);
+        }
+        .benchmark-compare {
+            display: flex;
+            align-items: stretch;
+            gap: 16px;
+            margin-top: 16px;
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+        }
+        .benchmark-compare-left,
+        .benchmark-compare-right {
+            flex: 1;
+        }
+        .benchmark-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #f1f5f9;
+            margin-bottom: 10px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        }
+        .benchmark-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            font-size: 12px;
+        }
+        .benchmark-label {
+            color: rgba(255, 255, 255, 0.4);
+        }
+        .benchmark-value {
+            color: #f1f5f9;
+            font-weight: 500;
+        }
+        .benchmark-compare-arrow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.2);
+        }
+
+        /* ===== 数据就绪提示 ===== */
+        .data-ready {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px 20px;
+            background: linear-gradient(135deg, rgba(52, 211, 153, 0.1), rgba(34, 211, 238, 0.05));
+            border: 1px solid rgba(52, 211, 153, 0.2);
+            border-radius: 12px;
+            margin-bottom: 24px;
+        }
+        .data-ready-icon {
+            font-size: 20px;
+        }
+        .data-ready-text {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.6);
+            flex: 1;
+        }
+        .data-ready-btn {
+            padding: 8px 16px;
+            background: linear-gradient(135deg, #34d399, #10b981);
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .data-ready-btn:hover {
+            box-shadow: 0 0 12px rgba(52, 211, 153, 0.3);
+        }
+
             transition: all 0.25s ease;
             cursor: pointer;
             border-left: 2px solid transparent;
@@ -1551,7 +2236,7 @@
         <div class="nav-group">
             <div class="group-label">🔗 证据链</div>
             <a href="cross-domain-mapping.html" class="nav-item"><span class="icon">⚡</span> 跨领域吞噬<span class="level-tag">验证</span></a>
-            <a href="marketing-reinvented.html" class="nav-item active"><span class="icon">🔍</span> 金融估值模拟器<span class="level-tag active-tag">精算</span></a>
+            <a href="marketing-reinvented.html" class="nav-item active"><span class="icon">🔍</span> Y.Mine决策系统<span class="level-tag active-tag">精算</span></a>
             <a href="business-learning-evidence.html" class="nav-item"><span class="icon">📊</span> 商业证据链<span class="level-tag">闭环</span></a>
             <a href="value-pyramid.html" class="nav-item"><span class="icon">📐</span> 价值金字塔<span class="level-tag">分层</span></a>
         </div>
@@ -1567,23 +2252,16 @@
 
     <!-- ===== 页面内导航 ===== -->
     <div class="page-nav" id="sidebar">
-        <div class="pn-label">🎯 元架构重构营销</div>
-        <a class="pn-item" data-target="section-layer1"><span class="icon">🌀</span><span class="label">一/二/三</span></a>
-        <a class="pn-item" data-target="section-layer2"><span class="icon">🔄</span><span class="label">A/B对照</span></a>
-        <a class="pn-item" data-target="section-layer3"><span class="icon">🎯</span><span class="label">核心比喻</span></a>
-        <a class="pn-item" data-target="section-layer4"><span class="icon">📐</span><span class="label">三维评估</span></a>
-        <a class="pn-item" data-target="section-layer5"><span class="icon">📋</span><span class="label">理论对照</span></a>
-        <a class="pn-item" data-target="section-layer6"><span class="icon">💡</span><span class="label">学习真相</span></a>
-        <a class="pn-item" data-target="section-test"><span class="icon">🧪</span><span class="label">验证方法</span></a>
-        <a class="pn-item" data-target="section-dispatch-efficiency"><span class="icon">⚡</span><span class="label">三流效率</span></a>
-        <a class="pn-item" data-target="section-output"><span class="icon">📦</span><span class="label">最终产出</span></a>
+        <div class="pn-label">🎯 Y.Mine 决策系统</div>
+        <a class="pn-item" data-target="section-step1"><span class="icon">🎯</span><span class="label">选定战略</span></a>
+        <a class="pn-item" data-target="section-step2"><span class="icon">💰</span><span class="label">拆解成本</span></a>
+        <a class="pn-item" data-target="section-step3"><span class="icon">📊</span><span class="label">精算模型</span></a>
         <div class="pn-divider"></div>
-        <div class="pn-label">🏦 金融估值精算 · 独立通道</div>
+        <div class="pn-label">📚 精算工具</div>
         <a class="pn-item" data-target="section-riskvector"><span class="icon">📊</span><span class="label">风险向量</span></a>
         <a class="pn-item" data-target="section-cone"><span class="icon">🔺</span><span class="label">圆锥浓度</span></a>
         <a class="pn-item" data-target="section-layer7"><span class="icon">📐</span><span class="label">CAPM定价</span></a>
         <a class="pn-item" data-target="section-layer8"><span class="icon">📊</span><span class="label">凯利配置</span></a>
-        <a class="pn-item" data-target="section-reverse-decoder"><span class="icon">⚠️</span><span class="label">反向拆解</span></a>
         <a class="pn-item" data-target="section-pricing-simulator"><span class="icon">🧮</span><span class="label">定价模拟器</span></a>
         <a class="pn-item" data-target="section-fuserisk"><span class="icon">🛡️</span><span class="label">风控熔断</span></a>
         <div class="pn-divider"></div>
@@ -1596,9 +2274,9 @@
 
         <!-- ===== 头部 ===== -->
         <div class="header">
-            <div class="badge">🧪 风险向量精算 · 浓度稳态</div>
-            <h1>金融估值模拟器 · 风险向量精算</h1>
-            <div class="sub">6维风险向量 × 圆锥浓度模型 = CAPM 估值 · 0.68 稳态铁律</div>
+            <div class="badge">🧪 Y.Mine 决策系统 · 三步精算引擎</div>
+            <h1>Y.Mine 决策系统</h1>
+            <div class="sub">品牌营销方法论 × 财务数据驱动 × 金融精算输出</div>
         </div>
 
         <!-- ===== 使用说明 ===== -->
@@ -1611,11 +2289,40 @@
                 </summary>
                 <div class="guide-body">
                     <div><strong>🧭 读法</strong> — 按顺序从上往下读，每一层都在前一层的基础上推进</div>
-                    <div><strong>🎛️ 交互</strong> — 分发链路 · 定价模拟器 · 三维评估 · 公式计算器 · 凯利配置</div>
+                    <div><strong>🎛️ 交互</strong> — 三步决策引擎：选定战略 → 拆解成本 → 运行精算</div>
                     <div><strong>🔺 核心</strong> — 资本定价 = 无风险利率 + 风险溢价 × β系数</div>
                     <div><strong>📌 捷径</strong> — 左侧导航可随时跳转到任意板块</div>
                 </div>
             </details>
+        </div>
+
+        <!-- ===== 三步决策引擎 · 进度条导航 ===== -->
+        <div class="step-nav" id="stepNav">
+            <div class="step-nav-track">
+                <div class="step-nav-progress" id="stepProgress"></div>
+            </div>
+            <div class="step-nav-items">
+                <div class="step-nav-item active" data-step="1" data-target="section-step1">
+                    <div class="step-nav-circle">①</div>
+                    <div class="step-nav-label">选定品牌战略</div>
+                    <div class="step-nav-desc">方法论层</div>
+                    <div class="step-nav-status" id="step1Status">📋 待选择</div>
+                </div>
+                <div class="step-nav-arrow">→</div>
+                <div class="step-nav-item" data-step="2" data-target="section-step2">
+                    <div class="step-nav-circle">②</div>
+                    <div class="step-nav-label">拆解财务成本</div>
+                    <div class="step-nav-desc">数据层</div>
+                    <div class="step-nav-status" id="step2Status">🔒 锁定</div>
+                </div>
+                <div class="step-nav-arrow">→</div>
+                <div class="step-nav-item" data-step="3" data-target="section-step3">
+                    <div class="step-nav-circle">③</div>
+                    <div class="step-nav-label">运行精算模型</div>
+                    <div class="step-nav-desc">输出层</div>
+                    <div class="step-nav-status" id="step3Status">🔒 锁定</div>
+                </div>
+            </div>
         </div>
 
         <!-- ===== 漏斗接管状态条 ===== -->
@@ -1661,6 +2368,19 @@
         </div>
 
 
+
+        <!-- ============================================================ -->
+        <!-- ===== 第一步 ① 选定品牌战略 · 品牌营销方法论层 ===== -->
+        <!-- ============================================================ -->
+        <div class="section-anchor" id="section-step1"></div>
+        <div class="step-header" id="step1Header">
+            <div class="step-header-number">①</div>
+            <div class="step-header-content">
+                <h2>选定品牌战略</h2>
+                <p class="step-header-desc">品牌营销方法论层 · 三流分发框架 × 平台策略选择</p>
+            </div>
+            <div class="step-header-status" id="step1HeaderStatus">📋 待选择</div>
+        </div>
 
         <!-- ============================================================ -->
         <!-- ===== 元架构重构营销 · 掌握流量密码 ===== -->
@@ -1738,6 +2458,16 @@
                 <div class="mt-note">💡 隐形冠军定价权拆解是“3→1→1→3→100”框架在商业案例中的一次完整预演</div>
             </div>
         </div>
+
+        <!-- ===== 🔬 元架构底层推导（折叠面板） ===== -->
+        <details class="collapse-panel" id="theoryCollapse">
+            <summary>
+                <span class="collapse-icon">🔬</span>
+                <span class="collapse-label">元架构底层推导</span>
+                <span class="collapse-desc">仅供极客/研究员展开 · 包含A/B对照、神经数学映射、理论自洽性验证</span>
+                <span class="collapse-arrow">▼</span>
+            </summary>
+            <div class="collapse-content">
 
         <!-- ============================================================ -->
         <!-- ===== 第二层：A/B对照测试 ===== -->
@@ -2166,6 +2896,9 @@
             </div>
         </div>
 
+            </div>
+        </details>
+
         <!-- ============================================================ -->
         <!-- ===== 三流分发效率对照（运营对照组） ===== -->
         <!-- ============================================================ -->
@@ -2214,6 +2947,39 @@
             <div class="highlight-box" style="border-color:#34d399;">
                 <p><strong>💡 洞察：</strong>没有一种平台能同时打满三流。抖音赢触达、小红书赢转化、博客赢履约。<strong>真正的定价权 = 三流组合拳</strong>，而非单平台押注。</p>
             </div>
+
+            <!-- ===== 平台策略选择器 ===== -->
+            <div class="strategy-selector" id="strategySelector">
+                <div class="strategy-title">🎯 选择你的平台策略</div>
+                <div class="strategy-grid">
+                    <div class="strategy-card" data-strategy="douyin" onclick="selectStrategy('douyin')">
+                        <div class="strategy-icon">🎵</div>
+                        <div class="strategy-name">抖音模式</div>
+                        <div class="strategy-desc">高触达 · 快速扩散</div>
+                        <div class="strategy-tag">流量分发占比高</div>
+                        <div class="strategy-check"><span>✓</span></div>
+                    </div>
+                    <div class="strategy-card" data-strategy="xiaohongshu" onclick="selectStrategy('xiaohongshu')">
+                        <div class="strategy-icon">📕</div>
+                        <div class="strategy-name">小红书模式</div>
+                        <div class="strategy-desc">种草闭环 · 高转化</div>
+                        <div class="strategy-tag">信息分发占比高</div>
+                        <div class="strategy-check"><span>✓</span></div>
+                    </div>
+                    <div class="strategy-card" data-strategy="blog" onclick="selectStrategy('blog')">
+                        <div class="strategy-icon">📝</div>
+                        <div class="strategy-name">博客模式</div>
+                        <div class="strategy-desc">高履约 · 深度信任</div>
+                        <div class="strategy-tag">物理分发占比高</div>
+                        <div class="strategy-check"><span>✓</span></div>
+                    </div>
+                </div>
+                <div class="strategy-selection" id="strategySelection">
+                    <span class="strategy-selected-label">已选策略：</span>
+                    <span class="strategy-selected-value" id="strategyValue">未选择</span>
+                    <button class="strategy-next-btn" id="strategyNextBtn" disabled>→ 进入第二步：拆解财务成本</button>
+                </div>
+            </div>
         </div>
 
         <!-- ============================================================ -->
@@ -2246,6 +3012,232 @@
         <!-- ============================================================ -->
         <!-- ===== 系统结构总览（新增可视化结构图） ===== -->
         <!-- ============================================================ -->
+
+        <!-- ============================================================ -->
+        <!-- ===== 第二步 ② 拆解财务成本 · 数据转化层 ===== -->
+        <!-- ============================================================ -->
+        <div class="section-anchor" id="section-step2"></div>
+        <div class="step-header" id="step2Header">
+            <div class="step-header-number">②</div>
+            <div class="step-header-content">
+                <h2>拆解财务成本</h2>
+                <p class="step-header-desc">数据转化层 · 商业模式选择 × 成本结构双视图 × 对标模式切换</p>
+            </div>
+            <div class="step-header-status" id="step2HeaderStatus">🔒 请先选择策略</div>
+        </div>
+
+        <!-- ===== 商业模式选择器 ===== -->
+        <div class="business-selector" id="businessSelector">
+            <div class="business-title">🏢 选择你的商业模式</div>
+            <div class="business-grid">
+                <div class="business-card" data-business="compute" onclick="selectBusiness('compute')">
+                    <div class="business-icon">🖥️</div>
+                    <div class="business-name">算力虚拟经济</div>
+                    <div class="business-desc">AI模型 · SaaS · 固定成本高</div>
+                    <div class="business-tags">
+                        <span class="business-tag">高研发</span>
+                        <span class="business-tag">低边际</span>
+                    </div>
+                    <div class="business-check"><span>✓</span></div>
+                </div>
+                <div class="business-card" data-business="traffic" onclick="selectBusiness('traffic')">
+                    <div class="business-icon">📱</div>
+                    <div class="business-name">流量媒体</div>
+                    <div class="business-desc">抖音/TikTok · 博客 · 快传播</div>
+                    <div class="business-tags">
+                        <span class="business-tag">高流量</span>
+                        <span class="business-tag">快迭代</span>
+                    </div>
+                    <div class="business-check"><span>✓</span></div>
+                </div>
+                <div class="business-card" data-business="ip" onclick="selectBusiness('ip')">
+                    <div class="business-icon">🎭</div>
+                    <div class="business-name">IP品牌</div>
+                    <div class="business-desc">泡泡玛特 · 漫威 · 线上线下联动</div>
+                    <div class="business-tags">
+                        <span class="business-tag">高溢价</span>
+                        <span class="business-tag">强IP</span>
+                    </div>
+                    <div class="business-check"><span>✓</span></div>
+                </div>
+                <div class="business-card" data-business="hardware" onclick="selectBusiness('hardware')">
+                    <div class="business-icon">🚁</div>
+                    <div class="business-name">硬科技落地</div>
+                    <div class="business-desc">低空经济 · 无人机 · 应用科学</div>
+                    <div class="business-tags">
+                        <span class="business-tag">高壁垒</span>
+                        <span class="business-tag">重资产</span>
+                    </div>
+                    <div class="business-check"><span>✓</span></div>
+                </div>
+            </div>
+            <div class="business-selection" id="businessSelection">
+                <span class="business-selected-label">已选模式：</span>
+                <span class="business-selected-value" id="businessValue">未选择</span>
+            </div>
+        </div>
+
+        <!-- ===== 成本拆解双视图 ===== -->
+        <div class="cost-view" id="costView">
+            <div class="cost-view-tabs">
+                <button class="cost-tab active" data-tab="methodology" onclick="switchCostTab('methodology')">📊 按方法论拆解</button>
+                <button class="cost-tab" data-tab="nature" onclick="switchCostTab('nature')">💰 按成本性质拆解</button>
+            </div>
+
+            <!-- 按方法论拆解视图 -->
+            <div class="cost-tab-content active" id="costMethodologyView">
+                <div class="cost-grid">
+                    <div class="cost-item cost-one">
+                        <div class="cost-item-header">
+                            <span class="cost-item-icon">🎯</span>
+                            <span class="cost-item-name">价值主张（一）</span>
+                        </div>
+                        <div class="cost-item-body">
+                            <div class="cost-value">¥<span id="costOneVal">0</span></div>
+                            <div class="cost-percent"><span id="costOnePct">0</span>%</div>
+                        </div>
+                        <div class="cost-item-desc">品牌溢价 / 研发摊销 / 知识产权</div>
+                        <div class="cost-slider">
+                            <input type="range" id="costOneSlider" min="0" max="100" step="1" value="0" />
+                        </div>
+                    </div>
+                    <div class="cost-item cost-two">
+                        <div class="cost-item-header">
+                            <span class="cost-item-icon">⚡</span>
+                            <span class="cost-item-name">增长杠杆（二）</span>
+                        </div>
+                        <div class="cost-item-body">
+                            <div class="cost-value">¥<span id="costTwoVal">0</span></div>
+                            <div class="cost-percent"><span id="costTwoPct">0</span>%</div>
+                        </div>
+                        <div class="cost-item-desc">渠道费用 / 销售佣金 / 流量投放</div>
+                        <div class="cost-slider">
+                            <input type="range" id="costTwoSlider" min="0" max="100" step="1" value="0" />
+                        </div>
+                    </div>
+                    <div class="cost-item cost-three">
+                        <div class="cost-item-header">
+                            <span class="cost-item-icon">🎨</span>
+                            <span class="cost-item-name">客群细分（三）</span>
+                        </div>
+                        <div class="cost-item-body">
+                            <div class="cost-value">¥<span id="costThreeVal">0</span></div>
+                            <div class="cost-percent"><span id="costThreePct">0</span>%</div>
+                        </div>
+                        <div class="cost-item-desc">定价权 / 支付意愿 / 价格歧视空间</div>
+                        <div class="cost-slider">
+                            <input type="range" id="costThreeSlider" min="0" max="100" step="1" value="0" />
+                        </div>
+                    </div>
+                </div>
+                <div class="cost-summary">
+                    <div class="cost-summary-item">
+                        <span class="cost-summary-label">三流分发合计</span>
+                        <span class="cost-summary-value">¥<span id="costTotal">0</span></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 按成本性质拆解视图 -->
+            <div class="cost-tab-content" id="costNatureView">
+                <div class="cost-grid">
+                    <div class="cost-item cost-sunk">
+                        <div class="cost-item-header">
+                            <span class="cost-item-icon">⚓</span>
+                            <span class="cost-item-name">沉没成本</span>
+                        </div>
+                        <div class="cost-item-body">
+                            <div class="cost-value">¥<span id="costSunkVal">0</span></div>
+                            <div class="cost-percent"><span id="costSunkPct">0</span>%</div>
+                        </div>
+                        <div class="cost-item-desc">已投入 · 不可回收 · 定价时暂不考虑</div>
+                        <div class="cost-slider">
+                            <input type="range" id="costSunkSlider" min="0" max="100" step="1" value="0" />
+                        </div>
+                    </div>
+                    <div class="cost-item cost-opportunity">
+                        <div class="cost-item-header">
+                            <span class="cost-item-icon">🔮</span>
+                            <span class="cost-item-name">机会成本</span>
+                        </div>
+                        <div class="cost-item-body">
+                            <div class="cost-value">¥<span id="costOppVal">0</span></div>
+                            <div class="cost-percent"><span id="costOppPct">0</span>%</div>
+                        </div>
+                        <div class="cost-item-desc">放弃的其他选择 · 资源配置效率关键</div>
+                        <div class="cost-slider">
+                            <input type="range" id="costOppSlider" min="0" max="100" step="1" value="0" />
+                        </div>
+                    </div>
+                    <div class="cost-item cost-variable">
+                        <div class="cost-item-header">
+                            <span class="cost-item-icon">📈</span>
+                            <span class="cost-item-name">可变成本</span>
+                        </div>
+                        <div class="cost-item-body">
+                            <div class="cost-value">¥<span id="costVarVal">0</span></div>
+                            <div class="cost-percent"><span id="costVarPct">0</span>%</div>
+                        </div>
+                        <div class="cost-item-desc">随销量变化 · 边际成本 · 定价下限</div>
+                        <div class="cost-slider">
+                            <input type="range" id="costVarSlider" min="0" max="100" step="1" value="0" />
+                        </div>
+                    </div>
+                </div>
+                <div class="cost-summary">
+                    <div class="cost-summary-item">
+                        <span class="cost-summary-label">总成本</span>
+                        <span class="cost-summary-value">¥<span id="costTotalNature">0</span></span>
+                    </div>
+                    <div class="cost-summary-item">
+                        <span class="cost-summary-label">边际成本（定价下限）</span>
+                        <span class="cost-summary-value gold">¥<span id="costMarginal">0</span></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== 对标模式切换 ===== -->
+        <div class="benchmark-toggle" id="benchmarkToggle">
+            <button class="benchmark-btn" id="benchmarkBtn" onclick="toggleBenchmark()">🔄 开启对标模式：瑞幸9.9</button>
+            <div class="benchmark-compare" id="benchmarkCompare" style="display: none;">
+                <div class="benchmark-compare-left">
+                    <div class="benchmark-title">📊 我的成本结构</div>
+                    <div class="benchmark-item"><span class="benchmark-label">单位成本：</span><span class="benchmark-value">¥<span id="myUnitCost">0</span></span></div>
+                    <div class="benchmark-item"><span class="benchmark-label">信息分发：</span><span class="benchmark-value"><span id="myInfoPct">0</span>%</span></div>
+                    <div class="benchmark-item"><span class="benchmark-label">流量分发：</span><span class="benchmark-value"><span id="myTrafficPct">0</span>%</span></div>
+                    <div class="benchmark-item"><span class="benchmark-label">物理分发：</span><span class="benchmark-value"><span id="myLogiPct">0</span>%</span></div>
+                </div>
+                <div class="benchmark-compare-arrow">VS</div>
+                <div class="benchmark-compare-right">
+                    <div class="benchmark-title">☕ 瑞幸9.9成本结构</div>
+                    <div class="benchmark-item"><span class="benchmark-label">单位成本：</span><span class="benchmark-value">¥<span id="luckinUnitCost">9.9</span></span></div>
+                    <div class="benchmark-item"><span class="benchmark-label">信息分发：</span><span class="benchmark-value"><span id="luckinInfoPct">40</span>%</span></div>
+                    <div class="benchmark-item"><span class="benchmark-label">流量分发：</span><span class="benchmark-value"><span id="luckinTrafficPct">30</span>%</span></div>
+                    <div class="benchmark-item"><span class="benchmark-label">物理分发：</span><span class="benchmark-value"><span id="luckinLogiPct">30</span>%</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== 数据就绪提示 ===== -->
+        <div class="data-ready" id="dataReady" style="display: none;">
+            <div class="data-ready-icon">✅</div>
+            <div class="data-ready-text">数据已就绪，可进入第三步运行精算模型</div>
+            <button class="data-ready-btn" onclick="goToStep3()">→ 进入第三步：运行精算模型</button>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- ===== 第三步 ③ 运行精算模型 · 金融精算输出层 ===== -->
+        <!-- ============================================================ -->
+        <div class="section-anchor" id="section-step3"></div>
+        <div class="step-header" id="step3Header">
+            <div class="step-header-number">③</div>
+            <div class="step-header-content">
+                <h2>运行精算模型</h2>
+                <p class="step-header-desc">金融精算输出层 · 风险向量 × 资本定价 × 仓位配置 × 风控熔断</p>
+            </div>
+            <div class="step-header-status" id="step3HeaderStatus">🔒 请先完成成本拆解</div>
+        </div>
 
         <!-- ============================================================ -->
         <!-- ===== 金融估值精算（独立通道） ===== -->
@@ -5090,6 +6082,186 @@
                     applyFunnelToVector(funnel);
                 }, 200);
             }
+        })();
+
+        // ================================================================
+        // ===== 三步决策引擎 · 交互逻辑 =====
+        // ================================================================
+        (function() {
+            let currentStrategy = null;
+            let currentBusiness = null;
+            let currentStep = 1;
+
+            const strategyNames = {
+                'douyin': '抖音模式',
+                'xiaohongshu': '小红书模式',
+                'blog': '博客模式'
+            };
+
+            const businessNames = {
+                'compute': '算力虚拟经济',
+                'traffic': '流量媒体',
+                'ip': 'IP品牌',
+                'hardware': '硬科技落地'
+            };
+
+            function selectStrategy(strategy) {
+                currentStrategy = strategy;
+                document.querySelectorAll('.strategy-card').forEach(card => {
+                    card.classList.toggle('selected', card.dataset.strategy === strategy);
+                });
+                document.getElementById('strategyValue').textContent = strategyNames[strategy] || '未选择';
+                document.getElementById('strategyNextBtn').disabled = false;
+                document.getElementById('step1Status').textContent = '✅ 已选择';
+                document.getElementById('step1HeaderStatus').textContent = '✅ 已选择';
+                updateStepProgress(1);
+            }
+
+            function selectBusiness(business) {
+                currentBusiness = business;
+                document.querySelectorAll('.business-card').forEach(card => {
+                    card.classList.toggle('selected', card.dataset.business === business);
+                });
+                document.getElementById('businessValue').textContent = businessNames[business] || '未选择';
+                enableCostView();
+                fillDefaultCosts(business);
+                document.getElementById('step2Status').textContent = '📋 成本拆解中';
+                document.getElementById('step2HeaderStatus').textContent = '📋 成本拆解中';
+                updateStepProgress(2);
+            }
+
+            function enableCostView() {
+                document.getElementById('step2Status').classList.remove('locked');
+                document.getElementById('step2HeaderStatus').classList.remove('locked');
+            }
+
+            function fillDefaultCosts(business) {
+                const defaults = {
+                    'compute': { one: 60, two: 25, three: 15, sunk: 70, opp: 20, var: 10 },
+                    'traffic': { one: 30, two: 50, three: 20, sunk: 20, opp: 60, var: 20 },
+                    'ip': { one: 50, two: 30, three: 20, sunk: 40, opp: 30, var: 30 },
+                    'hardware': { one: 40, two: 25, three: 35, sunk: 55, opp: 25, var: 20 }
+                };
+                const vals = defaults[business] || { one: 33, two: 33, three: 34, sunk: 33, opp: 33, var: 34 };
+                
+                updateCostSlider('costOne', vals.one);
+                updateCostSlider('costTwo', vals.two);
+                updateCostSlider('costThree', vals.three);
+                updateCostSlider('costSunk', vals.sunk);
+                updateCostSlider('costOpp', vals.opp);
+                updateCostSlider('costVar', vals.var);
+                
+                updateCostSummary();
+            }
+
+            function updateCostSlider(prefix, value) {
+                const slider = document.getElementById(prefix + 'Slider');
+                const val = document.getElementById(prefix + 'Val');
+                const pct = document.getElementById(prefix + 'Pct');
+                if (slider) {
+                    slider.value = value;
+                }
+                if (val) {
+                    val.textContent = value;
+                }
+                if (pct) {
+                    pct.textContent = value;
+                }
+            }
+
+            function updateCostSummary() {
+                const one = parseInt(document.getElementById('costOneVal').textContent) || 0;
+                const two = parseInt(document.getElementById('costTwoVal').textContent) || 0;
+                const three = parseInt(document.getElementById('costThreeVal').textContent) || 0;
+                const total = one + two + three;
+                document.getElementById('costTotal').textContent = total;
+
+                const sunk = parseInt(document.getElementById('costSunkVal').textContent) || 0;
+                const opp = parseInt(document.getElementById('costOppVal').textContent) || 0;
+                const vars = parseInt(document.getElementById('costVarVal').textContent) || 0;
+                document.getElementById('costTotalNature').textContent = sunk + opp + vars;
+                document.getElementById('costMarginal').textContent = vars;
+
+                document.getElementById('myUnitCost').textContent = total;
+                document.getElementById('myInfoPct').textContent = Math.round((one / total) * 100) || 0;
+                document.getElementById('myTrafficPct').textContent = Math.round((two / total) * 100) || 0;
+                document.getElementById('myLogiPct').textContent = Math.round((three / total) * 100) || 0;
+
+                if (total > 0) {
+                    document.getElementById('dataReady').style.display = 'flex';
+                    document.getElementById('step2Status').textContent = '✅ 数据就绪';
+                    document.getElementById('step2HeaderStatus').textContent = '✅ 数据就绪';
+                    updateStepProgress(2);
+                }
+            }
+
+            function switchCostTab(tab) {
+                document.querySelectorAll('.cost-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
+                document.querySelectorAll('.cost-tab-content').forEach(c => c.classList.toggle('active', c.id === 'cost' + (tab === 'methodology' ? 'Methodology' : 'Nature') + 'View'));
+            }
+
+            function toggleBenchmark() {
+                const compare = document.getElementById('benchmarkCompare');
+                const btn = document.getElementById('benchmarkBtn');
+                if (compare.style.display === 'none') {
+                    compare.style.display = 'flex';
+                    btn.textContent = '🔄 关闭对标模式';
+                } else {
+                    compare.style.display = 'none';
+                    btn.textContent = '🔄 开启对标模式：瑞幸9.9';
+                }
+            }
+
+            function goToStep3() {
+                document.getElementById('step3Status').textContent = '▶️ 运行中';
+                document.getElementById('step3HeaderStatus').textContent = '▶️ 运行中';
+                updateStepProgress(3);
+                document.getElementById('section-step3').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+
+            function updateStepProgress(step) {
+                currentStep = step;
+                const progress = ((step - 1) / 2) * 100;
+                document.getElementById('stepProgress').style.width = progress + '%';
+
+                document.querySelectorAll('.step-nav-item').forEach((item, idx) => {
+                    const itemStep = idx + 1;
+                    if (itemStep < step) {
+                        item.classList.add('completed');
+                        item.classList.remove('active', 'locked');
+                    } else if (itemStep === step) {
+                        item.classList.add('active');
+                        item.classList.remove('completed', 'locked');
+                    } else {
+                        item.classList.add('locked');
+                        item.classList.remove('completed', 'active');
+                    }
+                });
+            }
+
+            document.getElementById('strategyNextBtn').addEventListener('click', function() {
+                document.getElementById('section-step2').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+
+            document.querySelectorAll('.cost-slider input').forEach(slider => {
+                slider.addEventListener('input', function() {
+                    const prefix = this.id.replace('Slider', '');
+                    const val = document.getElementById(prefix + 'Val');
+                    const pct = document.getElementById(prefix + 'Pct');
+                    if (val) val.textContent = this.value;
+                    if (pct) pct.textContent = this.value;
+                    updateCostSummary();
+                });
+            });
+
+            document.querySelectorAll('.step-nav-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    const target = this.dataset.target;
+                    if (target) {
+                        document.getElementById(target).scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                });
+            });
         })();
 
     </script>
