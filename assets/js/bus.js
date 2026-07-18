@@ -198,6 +198,26 @@
                 mispricingSignal: 'fair',
                 timestamp: 0
             }
+        },
+        poker: {
+            storageKey: 'pokerEggState',
+            eventName: 'poker-egg-update',
+            defaultValue: {
+                stage: 'preflop',
+                equity: 0,
+                kellyFraction: 0,
+                kellyAction: 'FOLD',
+                groundTruth: 0.68,
+                coneState: 'calm',
+                gamma: 0,
+                pot: 0,
+                stack: 1000,
+                pnl: 0,
+                handsPlayed: 0,
+                dcfPassed: true,
+                brandVolume: 0,
+                timestamp: 0
+            }
         }
     };
 

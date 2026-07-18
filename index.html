@@ -5,8 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Y.Mine · 自动化决策系统</title>
     <link rel="stylesheet" href="assets/css/base.css">
+    <link rel="stylesheet" href="assets/css/poker-egg.css">
     <script src="assets/js/bus.js"></script>
     <script src="assets/js/sidebar.js"></script>
+    <script src="assets/js/poker-egg.js"></script>
     <style>
 
         /* ===== 一休头像 ===== */
@@ -724,6 +726,133 @@
 
     </div>
 
+    <!-- ===== 德州扑克彩蛋 · 入口按钮 ===== -->
+    <button id="pokerEggTrigger" class="poker-egg-trigger" title="德州扑克·圆锥博弈上帝视角">
+        ♠
+        <span class="egg-hint">🎴 扑克彩蛋 · 圆锥博弈上帝视角</span>
+    </button>
+
+    <!-- ===== 德州扑克彩蛋 · Modal窗口 ===== -->
+    <div id="pokerModal" class="poker-modal-mask">
+        <div class="poker-modal">
+            <div class="poker-modal-header">
+                <div class="poker-modal-title">
+                    🎴 德州扑克 · 圆锥博弈上帝视角
+                    <span class="sub">表理映射 · 凯利双核 · DCF熔断</span>
+                </div>
+                <button class="poker-close" id="pokerClose">✕</button>
+            </div>
+            <div class="poker-modal-body">
+
+                <!-- 结算横幅 -->
+                <div id="pokerSettleBanner" class="poker-settle-banner"></div>
+
+                <!-- 凯利四仪表 -->
+                <div class="poker-meters">
+                    <div class="poker-meter">
+                        <div class="label">胜率 Equity (p)</div>
+                        <div class="value win" id="meterWin">--%</div>
+                        <div class="sub" id="meterWinSub">蒙特卡洛 1500次</div>
+                    </div>
+                    <div class="poker-meter kelly-rec">
+                        <div class="label">凯利最优 f*</div>
+                        <div class="value kelly" id="meterKelly">--%</div>
+                        <div class="kelly-bar"><div class="kelly-bar-fill" id="kellyBarFill" style="width:0%"></div></div>
+                    </div>
+                    <div class="poker-meter gt-meter">
+                        <div class="label">GT引力中心</div>
+                        <div class="value" id="meterGT">0.68</div>
+                        <div class="sub" id="meterGTSub">底牌→内在价值</div>
+                    </div>
+                    <div class="poker-meter" id="meterDCF">
+                        <div class="label">DCF风控</div>
+                        <div class="value" id="meterDCFVal">--</div>
+                        <div class="sub" id="meterDCFSub">底池赔率/内在价值</div>
+                    </div>
+                </div>
+
+                <!-- 牌桌 -->
+                <div class="poker-table">
+                    <div class="poker-pot">POT 底池 <span class="amt" id="potAmt">15</span></div>
+                    <div class="poker-board-area" id="boardArea"></div>
+                    <div class="poker-hole-area" id="holeArea"></div>
+                </div>
+
+                <!-- 玩家信息 -->
+                <div class="poker-player-bar">
+                    <div class="me">
+                        <div class="avatar-dot">♠</div>
+                        <div>
+                            <div>YOU</div>
+                            <div style="font-size:10px;color:rgba(255,255,255,0.4);font-weight:400;">
+                                手牌 <span id="handCount">0</span> · 胜率 <span id="runningWR">--</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <span class="poker-stage-tag" id="stageTag">等待发牌</span>
+                    </div>
+                    <div class="chips">💰 <span id="stackAmt">1000</span></div>
+                </div>
+
+                <!-- 操作按钮 -->
+                <div class="poker-deal-row">
+                    <button class="poker-btn new-hand" id="btnNewHand">🎲 新一手 (DEAL)</button>
+                    <button class="poker-btn next-street" id="btnNextStreet" disabled>下一条街 →</button>
+                </div>
+                <div class="poker-actions">
+                    <button class="poker-btn fold" id="btnFold" disabled>FOLD 弃牌</button>
+                    <button class="poker-btn call" id="btnCheck" disabled>CHECK</button>
+                    <button class="poker-btn call" id="btnCall" disabled>CALL 跟注</button>
+                    <button class="poker-btn raise" id="btnRaise" disabled>RAISE 加注</button>
+                    <button class="poker-btn allin" id="btnAllIn" disabled>ALL-IN</button>
+                </div>
+
+                <!-- DCF熔断告警 -->
+                <div id="dcfAlert" class="poker-dcf-alert">
+                    ⚠️ <span id="dcfAlertText">DCF风控熔断</span>
+                </div>
+
+                <!-- 表理映射面板（里） -->
+                <div class="poker-bridge-panel">
+                    <div class="poker-bridge-title">
+                        ⚡ 表理映射 · 圆锥博弈实时状态
+                    </div>
+                    <div class="poker-bridge-grid">
+                        <div class="bridge-item">
+                            <div class="b-label">圆锥状态</div>
+                            <div class="b-value" id="bConeState">calm</div>
+                        </div>
+                        <div class="bridge-item">
+                            <div class="b-label">反脆弱γ</div>
+                            <div class="b-value" id="bGamma">0.00</div>
+                        </div>
+                        <div class="bridge-item">
+                            <div class="b-label">σ冲击注入</div>
+                            <div class="b-value" id="bShock">0.00</div>
+                        </div>
+                        <div class="bridge-item">
+                            <div class="b-label">凯利建议动作</div>
+                            <div class="b-value" id="bKellyAction">FOLD</div>
+                        </div>
+                        <div class="bridge-item">
+                            <div class="b-label">TAC映射投放</div>
+                            <div class="b-value" id="bTAC">¥0</div>
+                        </div>
+                        <div class="bridge-item">
+                            <div class="b-label">品牌圆柱ΔV</div>
+                            <div class="b-value" id="bBrandDV">+0.000</div>
+                        </div>
+                    </div>
+                    <div class="poker-log" id="pokerLog">
+                        <div class="sys">[系统] 点击"新一手"开始牌局。底牌=GT引力中心，胜率p/赔率b→凯利f*，盈亏→圆锥σ冲击。</div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
     <script>
         // ===== 精算系统数据流状态灯 =====
         // 读取 localStorage 数据总线，实时反映各模块状态
@@ -804,6 +933,348 @@
 
         // 本页自身可能修改 localStorage 时也要刷新（storage 事件不触发同页）
         window.addEventListener('funnel-bus-update', updateFlowStatus);
+
+        // ================================================================
+        // ===== 德州扑克彩蛋 · 表层控制器（Surface Controller）===========
+        // ================================================================
+        (function () {
+            const PE = (typeof YMinePokerEgg !== 'undefined') ? YMinePokerEgg : null;
+            if (!PE) { console.warn('[PokerEgg] 引擎未加载'); return; }
+
+            // -------- 初始化引擎 --------
+            const engine = new PE.PokerEggEngine({
+                simulations: 800,
+                startingStack: 1000,
+                bigBlind: 10,
+                totalTAC: 100000,
+                kellyFraction: 0.5
+            });
+            let brandVolume = 0;
+            let bettingRound = 0;
+
+            // -------- DOM引用 --------
+            const $ = (id) => document.getElementById(id);
+            const modal = $('pokerModal');
+            const trigger = $('pokerEggTrigger');
+            const closeBtn = $('pokerClose');
+            const btnNewHand = $('btnNewHand');
+            const btnNextStreet = $('btnNextStreet');
+            const btnFold = $('btnFold');
+            const btnCheck = $('btnCheck');
+            const btnCall = $('btnCall');
+            const btnRaise = $('btnRaise');
+            const btnAllIn = $('btnAllIn');
+            const boardArea = $('boardArea');
+            const holeArea = $('holeArea');
+            const settleBanner = $('pokerSettleBanner');
+            const dcfAlert = $('dcfAlert');
+            const logEl = $('pokerLog');
+
+            // -------- Modal控制 --------
+            function openModal()  { modal.classList.add('open'); render(); }
+            function closeModal() { modal.classList.remove('open'); }
+            trigger.addEventListener('click', openModal);
+            closeBtn.addEventListener('click', closeModal);
+            modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+            document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+
+            // -------- 日志 --------
+            function log(msg, cls='') {
+                const div = document.createElement('div');
+                if (cls) div.className = cls;
+                const ts = new Date().toLocaleTimeString('zh-CN', {hour12:false});
+                div.textContent = `[${ts}] ${msg}`;
+                logEl.appendChild(div);
+                logEl.scrollTop = logEl.scrollHeight;
+            }
+
+            // -------- 卡牌渲染 --------
+            function renderCard(card, targetArea, isBack=false) {
+                const el = document.createElement('div');
+                el.className = 'poker-card dealing ' + (isBack ? 'back' : (card.suit === '♥' || card.suit === '♦' ? 'red' : 'black'));
+                if (isBack) { el.classList.add('back'); targetArea.appendChild(el); return; }
+                el.innerHTML = `
+                    <div class="corner-tl">${card.rank}<br>${card.suit}</div>
+                    <div class="center-suit">${card.suit}</div>
+                    <div class="corner-br">${card.rank}<br>${card.suit}</div>
+                `;
+                targetArea.appendChild(el);
+            }
+            function renderSlot(text) {
+                const el = document.createElement('div');
+                el.className = 'poker-card slot';
+                el.textContent = text;
+                return el;
+            }
+
+            // -------- 主渲染 --------
+            function render() {
+                const s = engine._snapshot();
+
+                // 公牌区
+                boardArea.innerHTML = '';
+                const needBoard = 5 - s.board.length;
+                s.board.forEach(c => renderCard(c, boardArea));
+                for (let i = 0; i < needBoard; i++) boardArea.appendChild(renderSlot('?'));
+
+                // 手牌区
+                holeArea.innerHTML = '';
+                if (s.hole.length === 0) {
+                    holeArea.appendChild(renderSlot('🎴'));
+                    holeArea.appendChild(renderSlot('🎴'));
+                } else {
+                    s.hole.forEach(c => renderCard(c, holeArea));
+                }
+
+                // 仪表
+                $('meterWin').textContent = (s.odds.equity * 100).toFixed(1) + '%';
+                $('meterKelly').textContent = (s.kelly.f_star * 100).toFixed(1) + '%';
+                $('kellyBarFill').style.width = (s.kelly.f_star * 100) + '%';
+                $('meterGT').textContent = s.gt.toFixed(3);
+                $('meterGTSub').textContent = s.hole.length === 2 ? describeHand(s.hole) : '底牌→内在价值';
+                $('potAmt').textContent = Math.round(s.pot);
+                $('stackAmt').textContent = Math.round(s.stack);
+                $('handCount').textContent = engine.handsPlayed;
+                $('runningWR').textContent = engine.handsPlayed > 0 ? (engine.runningWinRate*100).toFixed(0)+'%' : '--';
+
+                // 阶段标签
+                const stageTag = $('stageTag');
+                stageTag.textContent = stageName(s.stage) + (s.lastAction && s.lastAction !== 'SETTLED' ? ' · ' + s.lastAction : '');
+                stageTag.className = 'poker-stage-tag state-' + s.cone.state;
+
+                // DCF风控
+                const dcf = engine.checkDCFConstraint(s.odds);
+                const meterDCF = $('meterDCF');
+                if (s.hole.length === 0) {
+                    $('meterDCFVal').textContent = '--';
+                    meterDCF.classList.remove('dcf-warn');
+                    dcfAlert.classList.remove('show');
+                } else if (dcf.allowed) {
+                    $('meterDCFVal').textContent = '✓ 通过';
+                    $('meterDCFVal').style.color = '#86efac';
+                    meterDCF.classList.remove('dcf-warn');
+                    dcfAlert.classList.remove('show');
+                } else {
+                    $('meterDCFVal').textContent = '⚠ 熔断';
+                    $('meterDCFVal').style.color = '#fca5a5';
+                    meterDCF.classList.add('dcf-warn');
+                    $('dcfAlertText').textContent = dcf.reason + ' —— ALL-IN被风控熔断！';
+                    dcfAlert.classList.add('show');
+                }
+
+                // 表理映射面板
+                $('bConeState').textContent = s.cone.state;
+                $('bConeState').className = 'b-value ' + stateColor(s.cone.state);
+                $('bGamma').textContent = s.cone.gamma.toFixed(2);
+                $('bShock').textContent = s.cone.shock.toFixed(2);
+                $('bKellyAction').textContent = s.kelly.action;
+                $('bTAC').textContent = '¥' + Math.round(s.budget.marketingSpend).toLocaleString();
+                $('bBrandDV').textContent = '+' + brandVolume.toFixed(3);
+
+                // 按钮状态
+                const inHand = s.hole.length === 2 && s.stage !== 'showdown';
+                btnFold.disabled = !inHand;
+                btnCheck.disabled = !inHand || s.toCall > 0;
+                btnCall.disabled = !inHand || s.toCall <= 0 || s.stack <= 0;
+                btnRaise.disabled = !inHand || s.stack < s.toCall * 2;
+                btnAllIn.disabled = !inHand || s.stack <= 0 || !dcf.allowed;
+                btnCall.textContent = s.toCall > 0 ? `CALL ${Math.min(Math.round(s.toCall), s.stack)}` : 'CALL';
+                btnNextStreet.disabled = !inHand || bettingRound === 0;
+
+                btnNewHand.textContent = s.stage === 'showdown' ? '🎲 再来一手' : '🎲 新一手 (DEAL)';
+
+                // 注入圆锥博弈场（如存在）
+                injectToConeField(s);
+                publishToBus(s);
+            }
+
+            function stageName(st) {
+                return { preflop:'PREFLOP', flop:'FLOP', turn:'TURN', river:'RIVER', showdown:'SHOWDOWN' }[st] || st;
+            }
+            function stateColor(st) {
+                return { calm:'good', tension:'', extreme:'warn', black_swan:'warn', meltdown:'bad' }[st] || '';
+            }
+            function describeHand(hole) {
+                const [c1, c2] = hole;
+                if (c1.rank === c2.rank) return c1.rank + c1.rank + '（口袋对子）';
+                const suited = c1.suit === c2.suit ? 's' : 'o';
+                const hi = PE.RANK_VALUE[c1.rank] >= PE.RANK_VALUE[c2.rank] ? c1.rank : c2.rank;
+                const lo = PE.RANK_VALUE[c1.rank] >= PE.RANK_VALUE[c2.rank] ? c2.rank : c1.rank;
+                return hi + lo + suited;
+            }
+
+            // -------- 把扑克信号注入圆锥博弈场（如已存在）--------
+            function injectToConeField(s) {
+                try {
+                    if (typeof window._coneGameField === 'undefined' || !window._coneGameField) return;
+                    const field = window._coneGameField;
+                    // 1. 底牌→GT引力中心（在非showdown阶段持续生效）
+                    if (s.hole.length === 2 && s.stage !== 'showdown' && typeof field.setValuationAnchor === 'function') {
+                        field.setValuationAnchor({
+                            blendedValue: s.gt,
+                            wacc: 0.095,
+                            hurdleRate: 0.08,
+                            npv: s.odds.expectedValue * 1000,
+                            irr: 0.10 + s.kelly.f_star * 0.4,
+                            strategicNPV: s.odds.expectedValue * 1500,
+                            waitOptVal: Math.max(0, (0.5 - s.odds.equity)) * 10000,
+                            expandOptVal: s.odds.equity > 0.6 ? s.odds.expectedValue * 800 : 0,
+                            abandonOptVal: s.odds.equity < 0.4 ? 5000 : 0,
+                            gravityStrength: 0.35
+                        });
+                    }
+                    // 2. σ冲击注入（ALL-IN结算后）
+                    if (s.cone.shock !== 0 && typeof field.tick === 'function') {
+                        field.tick(s.cone.shock);
+                    }
+                } catch (e) { /* 静默：圆锥场不在时不报错 */ }
+            }
+
+            function publishToBus(s) {
+                try {
+                    if (typeof YBus !== 'undefined' && YBus.publish) {
+                        YBus.publish('poker', {
+                            stage: s.stage,
+                            equity: s.odds.equity,
+                            kellyFraction: s.kelly.f_star,
+                            kellyAction: s.kelly.action,
+                            groundTruth: s.gt,
+                            coneState: s.cone.state,
+                            gamma: s.cone.gamma,
+                            pot: s.pot,
+                            stack: s.stack,
+                            pnl: engine.totalPnL,
+                            handsPlayed: engine.handsPlayed,
+                            dcfPassed: engine.dcfConstraintPassed,
+                            brandVolume,
+                            timestamp: Date.now()
+                        });
+                    }
+                    // localStorage总线
+                    localStorage.setItem('pokerEggState', JSON.stringify({
+                        equity: s.odds.equity,
+                        kelly: s.kelly.f_star,
+                        gt: s.gt,
+                        state: s.cone.state,
+                        pnl: engine.totalPnL,
+                        brandVolume,
+                        timestamp: Date.now()
+                    }));
+                } catch (e) {}
+            }
+
+            // -------- 牌局流程控制 --------
+            function newHand() {
+                engine.reset();
+                bettingRound = 0;
+                settleBanner.className = 'poker-settle-banner';
+                settleBanner.textContent = '';
+                const pre = engine.dealHole();
+                log(`发底牌 ${pre.hole.map(c=>c.rank+c.suit).join(' ')} → GT=${pre.gt.toFixed(3)}, 胜率${(pre.odds.win*100).toFixed(1)}%, 凯利建议${pre.kelly.action}`, 'sys');
+                if (pre.kelly.action === 'FOLD') log('⚠️ 凯利建议弃牌：胜率不足覆盖底池赔率', 'lose');
+                bettingRound = 1;
+                btnNextStreet.disabled = false;
+                render();
+            }
+
+            function nextStreet() {
+                const s = engine._snapshot();
+                // 简化流程：CALL后进入下一条街
+                if (s.stage === 'preflop') { engine.act('CALL'); engine.dealFlop(); log('→ FLOP 翻牌', 'sys'); bettingRound++; }
+                else if (s.stage === 'flop') { engine.act('CALL'); engine.dealTurn(); log('→ TURN 转牌', 'sys'); bettingRound++; }
+                else if (s.stage === 'turn') { engine.act('CALL'); engine.dealRiver(); log('→ RIVER 河牌', 'sys'); bettingRound++; }
+                else if (s.stage === 'river') {
+                    engine.act('CALL');
+                    const result = engine._settle((Math.random() < s.odds.equity ? 1 : -1) * engine.pot * 0.5);
+                    showSettle(result);
+                    return;
+                }
+                render();
+            }
+
+            function doFold() {
+                const r = engine.act('FOLD');
+                log('弃牌 -' + Math.round(engine.currentBet) + ' 筹码', 'lose');
+                showSettle(r);
+            }
+            function doCheck() { log('CHECK'); engine.act('CHECK'); render(); }
+            function doCall() {
+                const s = engine._snapshot();
+                const amt = Math.min(Math.round(s.toCall), s.stack);
+                engine.act('CALL');
+                log(`CALL ${amt} · 底池→${Math.round(engine.pot)}`);
+                bettingRound = 1;
+                btnNextStreet.disabled = false;
+                render();
+            }
+            function doRaise() {
+                const s = engine._snapshot();
+                const raiseAmt = Math.max(engine.bigBlind * 3, Math.round(s.pot * 0.5));
+                engine.act('RAISE', raiseAmt);
+                log(`RAISE +${raiseAmt} · 底池→${Math.round(engine.pot)} · 凯利f*=${(engine.kellyState.f_star*100).toFixed(1)}%`);
+                bettingRound = 0;
+                render();
+            }
+            function doAllIn() {
+                const s = engine._snapshot();
+                const dcf = engine.checkDCFConstraint(s.odds);
+                if (!dcf.allowed) {
+                    log('🚫 ALL-IN被DCF风控熔断：' + dcf.reason, 'lose');
+                    render();
+                    return;
+                }
+                log(`🔥 ALL-IN ${Math.round(s.stack)} 筹码！圆锥状态→meltdown，γ=${engine.bridge.computeGamma(s.stage,'ALL_IN').toFixed(2)}`, 'lose');
+                engine.act('RAISE', s.stack);
+                const settle = engine.act('ALL_IN');
+                showSettle(settle);
+            }
+
+            function showSettle(result) {
+                const won = result.won;
+                if (won) {
+                    settleBanner.className = 'poker-settle-banner win';
+                    settleBanner.innerHTML = `<span class="big">+${result.pnl} 筹码 🏆</span>圆锥注入σ=${result.injectedShock.toFixed(2)} · γ=${result.antiFragilityGamma.toFixed(2)} · 品牌ΔV=+${result.brandVolumeIncrement.toFixed(3)}`;
+                    log(`✅ 赢 +${result.pnl} (${result.pnlInBB.toFixed(1)}BB) · σ=${result.injectedShock.toFixed(2)} · γ=${result.antiFragilityGamma.toFixed(2)}`, 'win');
+                } else {
+                    settleBanner.className = 'poker-settle-banner lose';
+                    settleBanner.innerHTML = `<span class="big">${result.pnl} 筹码 💀</span>圆锥注入σ=${result.injectedShock.toFixed(2)} · γ=${result.antiFragilityGamma.toFixed(2)}`;
+                    log(`❌ 输 ${result.pnl} (${result.pnlInBB.toFixed(1)}BB) · σ=${result.injectedShock.toFixed(2)} · 反脆弱对冲γ=${result.antiFragilityGamma.toFixed(2)}`, 'lose');
+                }
+                brandVolume += result.brandVolumeIncrement;
+                btnNextStreet.disabled = true;
+                render();
+            }
+
+            // -------- 按钮绑定 --------
+            btnNewHand.addEventListener('click', newHand);
+            btnNextStreet.addEventListener('click', nextStreet);
+            btnFold.addEventListener('click', doFold);
+            btnCheck.addEventListener('click', doCheck);
+            btnCall.addEventListener('click', doCall);
+            btnRaise.addEventListener('click', doRaise);
+            btnAllIn.addEventListener('click', doAllIn);
+
+            // -------- 键盘快捷键 --------
+            document.addEventListener('keydown', (e) => {
+                if (!modal.classList.contains('open')) return;
+                if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+                switch (e.key.toLowerCase()) {
+                    case 'n': if (!btnNewHand.disabled) newHand(); break;
+                    case 'f': if (!btnFold.disabled) doFold(); break;
+                    case 'c': if (!btnCheck.disabled) doCheck(); else if (!btnCall.disabled) doCall(); break;
+                    case 'r': if (!btnRaise.disabled) doRaise(); break;
+                    case 'a': if (!btnAllIn.disabled) doAllIn(); break;
+                    case ' ': if (!btnNextStreet.disabled) { e.preventDefault(); nextStreet(); } break;
+                }
+            });
+
+            // -------- 外部联动：监听其他页面状态变化 --------
+            window.addEventListener('storage', (e) => {
+                if (e.key === 'pokerEggState' && modal.classList.contains('open')) render();
+            });
+
+            log('引擎就绪 · 快捷键：N=新牌 F=弃牌 C=跟注 R=加注 A=ALL-IN 空格=下一条街', 'sys');
+        })();
     </script>
 
 </body>
