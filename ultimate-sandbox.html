@@ -964,8 +964,8 @@ function initKline(){
 function drawKline(opts={}){
   const canvas = $('klineCanvas');
   const vcanvas = $('volCanvas');
-  if(!canvas.parentElement) return;
-  const W = canvas.parentElement.clientWidth - 16;
+  if(!canvas || !canvas.parentElement) return;
+  const W = Math.max(200, canvas.parentElement.clientWidth - 16);
   const H = 340 - 16;
   const VH = 50;
   const dpr = window.devicePixelRatio || 1;
@@ -1474,6 +1474,10 @@ window.addEventListener('storage', e=>{
 /* ---------- 初始化 ---------- */
 setStage(STAGE.IDLE);
 updateStacks();
+// 初始状态就画一组默认K线（箱体震荡），避免右侧黑空
+setTimeout(()=>{
+  try{ initKline(); }catch(e){ console.warn('initKline on load skipped:',e); }
+},50);
 log('终极模拟沙盘已就绪 · 点击 [开始模拟] 体验人机合一决策流','machine');
 log('三层架构：左=人性(扑克+诈唬+噪音) | 中=机器(Kelly+DCF+圆锥) | 右=市场(K线+箱体突破)','machine');
 
