@@ -1,5 +1,5 @@
 /**
- * Y.Mine 数据总线 v1.5
+ * Y.Mine 数据总线 v1.6
  * 统一管理localStorage跨页同步、事件发布订阅、状态初始化
  * @namespace YBus
  */
@@ -56,6 +56,26 @@
             storageKey: 'riskFuseState',
             eventName: 'risk-fuse-trigger',
             defaultValue: { status: 'idle', warnings: [] }
+        },
+        marketingFinance: {
+            storageKey: 'marketingFinance',
+            eventName: 'marketing-finance-update',
+            defaultValue: {
+                C1: 30, C2: 25, C3: 20,
+                r1: 0.6, r2: 0.4, r3: 0.85,
+                MC_total: 0,
+                OC_total: 0,
+                TAC: 0,
+                N_expected: 0,
+                TAC_per_unit: 0,
+                realUnitCost: 0,
+                ROMI: 0,
+                DOL: 0,
+                totalLeverage: 0,
+                realROI: 0,
+                status: 'idle',
+                timestamp: 0
+            }
         }
     };
 

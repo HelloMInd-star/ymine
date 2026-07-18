@@ -2195,6 +2195,101 @@
         </div>
 
         <!-- ============================================================ -->
+        <!-- ===== 模拟器新增：业财融合 · 营销成本精算 ===== -->
+        <!-- ============================================================ -->
+        <div class="section-anchor" id="section-mc"></div>
+        <div class="simulator-section" style="border-color:rgba(34,211,238,0.15); background:rgba(34,211,238,0.02);">
+            <div class="sim-title">📊 业财融合 · 营销成本精算 <span class="tag" style="background:rgba(34,211,238,0.1); color:#22d3ee; border-color:rgba(34,211,238,0.2);">业财打通 v1.6</span></div>
+            <div class="sim-sub">
+                营销三维度（<span style="color:#f472b6;">品牌认知</span> → <span style="color:#34d399;">市场转化</span> → <span style="color:#22d3ee;">履约交付</span>）→ 真实财务成本 · 含机会成本递减
+            </div>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:14px;">
+                <div style="background:rgba(255,255,255,0.02); border-radius:10px; padding:14px 16px; border:1px solid rgba(255,255,255,0.03);">
+                    <div style="font-size:11px; font-weight:600; color:rgba(255,255,255,0.25); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:10px;">💸 营销投入 · 直接成本</div>
+                    <div class="sim-grid" style="grid-template-columns:1fr; gap:10px;">
+                        <div class="ctrl" style="margin:0;">
+                            <label>📢 认知投放 C₁ <span id="mcC1Val">30</span><span style="font-size:11px; color:rgba(255,255,255,0.2);">元</span></label>
+                            <input type="range" id="mcC1Input" min="0" max="200" step="1" value="30" />
+                            <span class="sub-hint">内容制作+渠道投放 · 信息分发</span>
+                        </div>
+                        <div class="ctrl" style="margin:0;">
+                            <label>🎯 转化投入 C₂ <span id="mcC2Val">25</span><span style="font-size:11px; color:rgba(255,255,255,0.2);">元</span></label>
+                            <input type="range" id="mcC2Input" min="0" max="200" step="1" value="25" />
+                            <span class="sub-hint">促销+KOL佣金+运营 · 流量分发</span>
+                        </div>
+                        <div class="ctrl" style="margin:0;">
+                            <label>🚚 履约投入 C₃ <span id="mcC3Val">20</span><span style="font-size:11px; color:rgba(255,255,255,0.2);">元</span></label>
+                            <input type="range" id="mcC3Input" min="0" max="200" step="1" value="20" />
+                            <span class="sub-hint">物流+售后+客服 · 物理分发</span>
+                        </div>
+                    </div>
+                </div>
+                <div style="background:rgba(255,255,255,0.02); border-radius:10px; padding:14px 16px; border:1px solid rgba(255,255,255,0.03);">
+                    <div style="font-size:11px; font-weight:600; color:rgba(255,255,255,0.25); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:10px;">📡 营销效率 · 转化率</div>
+                    <div class="sim-grid" style="grid-template-columns:1fr; gap:10px;">
+                        <div class="ctrl" style="margin:0;">
+                            <label>📡 触达效率 r₁ <span id="mcR1Val">0.60</span></label>
+                            <input type="range" id="mcR1Input" min="0.1" max="1.0" step="0.01" value="0.60" />
+                            <span class="sub-hint">信息有效触达比例</span>
+                        </div>
+                        <div class="ctrl" style="margin:0;">
+                            <label>🔄 转化效率 r₂ <span id="mcR2Val">0.40</span></label>
+                            <input type="range" id="mcR2Input" min="0.1" max="1.0" step="0.01" value="0.40" />
+                            <span class="sub-hint">触达→成交转化率</span>
+                        </div>
+                        <div class="ctrl" style="margin:0;">
+                            <label>✅ 履约效率 r₃ <span id="mcR3Val">0.85</span></label>
+                            <input type="range" id="mcR3Input" min="0.5" max="1.0" step="0.01" value="0.85" />
+                            <span class="sub-hint">成交→完成履约比例</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="result-panel" style="grid-template-columns:repeat(3, 1fr);">
+                <div class="metric">
+                    <div class="ml">💰 总获客成本 TAC</div>
+                    <div class="mv" id="mcTAC" style="color:#22d3ee;">—</div>
+                    <div class="sub-hint">直接成本 + 机会成本</div>
+                </div>
+                <div class="metric">
+                    <div class="ml">📦 真实单位成本</div>
+                    <div class="mv highlight" id="mcRealCost">—</div>
+                    <div class="sub-hint">基础成本 + TAC/单</div>
+                </div>
+                <div class="metric">
+                    <div class="ml">📊 预期单量 N</div>
+                    <div class="mv" id="mcNExpected">—</div>
+                    <div class="sub-hint">1000 × r₁ × r₂ × r₃</div>
+                </div>
+                <div class="metric">
+                    <div class="ml">💹 营销ROI (ROMI)</div>
+                    <div class="mv" id="mcROMI" style="color:#22c55e;">—</div>
+                    <div class="sub-hint">营销投入回报率</div>
+                </div>
+                <div class="metric">
+                    <div class="ml">⚖️ 经营杠杆 DOL</div>
+                    <div class="mv" id="mcDOL" style="color:#facc15;">—</div>
+                    <div class="sub-hint">边际贡献/营业利润</div>
+                </div>
+                <div class="metric">
+                    <div class="ml">🚀 真实ROI（杠杆后）</div>
+                    <div class="mv gold" id="mcRealROI">—</div>
+                    <div class="sub-hint">ROMI × 综合杠杆</div>
+                </div>
+            </div>
+
+            <div class="advice-box" id="mcAdvice" style="border-left-color:#22d3ee;">
+                💡 调整营销投入和效率参数，查看真实财务成本与杠杆ROI
+            </div>
+
+            <div style="margin-top:10px; font-size:10px; color:rgba(255,255,255,0.12); text-align:center; font-family:'Courier New',monospace;">
+                TAC = (C₁+C₂+C₃) + (C₁·r₁·Rf + C₂·r₂·DIM + C₃·r₃·MDD) &nbsp;|&nbsp; ROMI = (收入-总投入)/总投入 &nbsp;|&nbsp; 真实ROI = ROMI × DOL × L
+            </div>
+        </div>
+
+        <!-- ============================================================ -->
         <!-- ===== 模拟器2：定价模型 ===== -->
         <!-- ============================================================ -->
         <div class="section-anchor" id="section-pricing"></div>
@@ -3895,11 +3990,19 @@
             const ctx = canvas.getContext('2d');
 
             function updatePricing() {
-                const cost = parseFloat(costInput.value);
+                let cost = parseFloat(costInput.value);
                 const premium = parseFloat(premiumInput.value);
                 const elasticity = parseFloat(elasticityInput.value);
+                const baseCost = cost;
 
-                costVal.textContent = cost;
+                const mcData = window._marketingFinanceData;
+                let realCostNote = '';
+                if (mcData && mcData.realUnitCost && mcData.realUnitCost > baseCost) {
+                    cost = mcData.realUnitCost;
+                    realCostNote = ' <span style="font-size:9px;color:#22d3ee;">(含营销摊销+' + (cost - baseCost).toFixed(0) + '元)</span>';
+                }
+
+                costVal.innerHTML = baseCost + realCostNote;
                 premiumVal.textContent = premium.toFixed(2);
                 elasticityVal.textContent = elasticity.toFixed(2);
 
@@ -4016,6 +4119,331 @@
             updatePricing();
 
             window.addEventListener('resize', () => { updatePricing(); });
+
+            window.updatePricing = updatePricing;
+        })();
+
+        // ================================================================
+        // ===== 业财融合 · 营销成本精算引擎（v1.6新增）=====
+        // ================================================================
+        (function() {
+            'use strict';
+
+            const mcC1Input = document.getElementById('mcC1Input');
+            const mcC2Input = document.getElementById('mcC2Input');
+            const mcC3Input = document.getElementById('mcC3Input');
+            const mcR1Input = document.getElementById('mcR1Input');
+            const mcR2Input = document.getElementById('mcR2Input');
+            const mcR3Input = document.getElementById('mcR3Input');
+
+            const mcC1Val = document.getElementById('mcC1Val');
+            const mcC2Val = document.getElementById('mcC2Val');
+            const mcC3Val = document.getElementById('mcC3Val');
+            const mcR1Val = document.getElementById('mcR1Val');
+            const mcR2Val = document.getElementById('mcR2Val');
+            const mcR3Val = document.getElementById('mcR3Val');
+
+            const mcTACEl = document.getElementById('mcTAC');
+            const mcRealCostEl = document.getElementById('mcRealCost');
+            const mcNExpectedEl = document.getElementById('mcNExpected');
+            const mcROMIEl = document.getElementById('mcROMI');
+            const mcDOLEl = document.getElementById('mcDOL');
+            const mcRealROIEl = document.getElementById('mcRealROI');
+            const mcAdviceEl = document.getElementById('mcAdvice');
+
+            const BASE_REACH = 1000;
+
+            /**
+             * 获取当前无风险利率Rf（百分比，如3.8代表3.8%）
+             * @returns {number}
+             */
+            function getCurrentRf() {
+                const rfEl = document.getElementById('riskFreeRateDisplay');
+                if (rfEl) {
+                    const val = parseFloat(rfEl.textContent);
+                    if (!isNaN(val)) return val;
+                }
+                return 3.80;
+            }
+
+            /**
+             * 获取当前边际递减率DIM
+             * @returns {number}
+             */
+            function getCurrentDIM() {
+                const dimEl = document.getElementById('dimVal');
+                if (dimEl) {
+                    const val = parseFloat(dimEl.textContent);
+                    if (!isNaN(val)) return val;
+                }
+                const dimInput = document.getElementById('dimInput');
+                if (dimInput) return parseFloat(dimInput.value);
+                return 0.50;
+            }
+
+            /**
+             * 获取当前最大回撤MDD
+             * @returns {number}
+             */
+            function getCurrentMDD() {
+                const mddEl = document.getElementById('mddVal');
+                if (mddEl) {
+                    const val = parseFloat(mddEl.textContent);
+                    if (!isNaN(val)) return val;
+                }
+                const mddInput = document.getElementById('mddInput');
+                if (mddInput) return parseFloat(mddInput.value);
+                return 0.25;
+            }
+
+            /**
+             * 获取当前财务杠杆L
+             * @returns {number}
+             */
+            function getCurrentLeverage() {
+                const levEl = document.getElementById('leverageVal');
+                if (levEl) {
+                    const txt = levEl.textContent.replace('x', '');
+                    const val = parseFloat(txt);
+                    if (!isNaN(val)) return val;
+                }
+                const levInput = document.getElementById('leverageInput');
+                if (levInput) return parseFloat(levInput.value);
+                return 2.0;
+            }
+
+            /**
+             * 获取当前定价模型数据（基础成本、溢价、弹性、建议定价、利润率）
+             * @returns {{baseCost: number, premium: number, elasticity: number, price: number, margin: number}}
+             */
+            function getCurrentPricing() {
+                const costInput = document.getElementById('costInput');
+                const premiumInput = document.getElementById('premiumInput');
+                const elasticityInput = document.getElementById('elasticityInput');
+                const suggestedPrice = document.getElementById('suggestedPrice');
+
+                const baseCost = costInput ? parseFloat(costInput.value) : 100;
+                const premium = premiumInput ? parseFloat(premiumInput.value) : 1.5;
+                const elasticity = elasticityInput ? parseFloat(elasticityInput.value) : 1.0;
+
+                let price = baseCost * premium * (1 + elasticity * 0.2);
+                if (suggestedPrice) {
+                    const parsed = parseFloat(suggestedPrice.textContent);
+                    if (!isNaN(parsed) && parsed > 0) price = parsed;
+                }
+
+                return { baseCost, premium, elasticity, price };
+            }
+
+            /**
+             * 业财融合核心计算
+             * @returns {void}
+             */
+            function updateMarketingFinance() {
+                const C1 = parseFloat(mcC1Input.value);
+                const C2 = parseFloat(mcC2Input.value);
+                const C3 = parseFloat(mcC3Input.value);
+                const r1 = parseFloat(mcR1Input.value);
+                const r2 = parseFloat(mcR2Input.value);
+                const r3 = parseFloat(mcR3Input.value);
+
+                mcC1Val.textContent = C1;
+                mcC2Val.textContent = C2;
+                mcC3Val.textContent = C3;
+                mcR1Val.textContent = r1.toFixed(2);
+                mcR2Val.textContent = r2.toFixed(2);
+                mcR3Val.textContent = r3.toFixed(2);
+
+                const Rf = getCurrentRf() / 100;
+                const DIM = getCurrentDIM();
+                const MDD = getCurrentMDD();
+                const L = getCurrentLeverage();
+
+                const MC_total = C1 + C2 + C3;
+                const OC1 = C1 * r1 * Rf;
+                const OC2 = C2 * r2 * DIM;
+                const OC3 = C3 * r3 * MDD;
+                const OC_total = OC1 + OC2 + OC3;
+                const TAC_per_unit = MC_total + OC_total;
+
+                const N_expected = Math.round(BASE_REACH * r1 * r2 * r3);
+                const TAC = TAC_per_unit * N_expected;
+
+                const pricing = getCurrentPricing();
+                const realUnitCost = pricing.baseCost + TAC_per_unit;
+
+                const price = realUnitCost * pricing.premium * (1 + pricing.elasticity * 0.2);
+                const CM = price - realUnitCost;
+                const grossMargin = price > 0 ? CM / price : 0;
+                const DOL = grossMargin > 0 ? 1 / grossMargin : 0;
+
+                const ROMI = TAC_per_unit > 0 ? CM / TAC_per_unit : 0;
+
+                const totalLeverage = L;
+                const realROI = ROMI > 0 ? ROMI * totalLeverage / (1 + DOL * 0.1) : 0;
+
+                mcTACEl.innerHTML = TAC.toFixed(1) + '<span class="unit">元</span>';
+                mcRealCostEl.innerHTML = realUnitCost.toFixed(1) + '<span class="unit">元</span>';
+                mcNExpectedEl.innerHTML = N_expected + '<span class="unit">单</span>';
+                mcROMIEl.innerHTML = (ROMI * 100).toFixed(1) + '<span class="unit">%</span>';
+                mcDOLEl.innerHTML = DOL.toFixed(2) + '<span class="unit">x</span>';
+                mcRealROIEl.innerHTML = (realROI * 100).toFixed(1) + '<span class="unit">%</span>';
+
+                let status = 'idle';
+                let advice = '';
+                let adviceColor = '#22d3ee';
+
+                const RfPct = Rf * 100;
+                const romiPct = ROMI * 100;
+
+                if (romiPct < 0) {
+                    status = 'loss';
+                    adviceColor = '#ef4444';
+                    advice = '🚫 <strong>营销投入亏损！</strong>ROMI为负，建议立即暂停投放、重新评估渠道组合。';
+                } else if (romiPct < RfPct) {
+                    status = 'underperform';
+                    adviceColor = '#facc15';
+                    advice = '⚠️ <strong>跑不赢无风险利率：</strong>当前营销回报低于' + RfPct.toFixed(1) + '%的资金成本，建议缩减低效投放。';
+                } else if (romiPct >= RfPct && romiPct < 100) {
+                    status = 'healthy';
+                    adviceColor = '#22c55e';
+                    advice = '🟢 <strong>健康区间：</strong>营销回报跑赢无风险利率，经营杠杆DOL=' + DOL.toFixed(2) + 'x，可持续投放。';
+                } else if (realROI > 3.0) {
+                    status = 'fuse';
+                    adviceColor = '#ef4444';
+                    advice = '🔥 <strong>杠杆后ROI超过300%过热线！</strong>高收益伴随极高杠杆风险，建议按凯利公式半仓操作。';
+                } else {
+                    status = 'efficient';
+                    adviceColor = '#a78bfa';
+                    advice = '🚀 <strong>高效区间！</strong>真实ROI=' + (realROI * 100).toFixed(1) + '%，综合杠杆=' + totalLeverage.toFixed(2) + 'x。';
+                }
+
+                mcAdviceEl.innerHTML = '💡 ' + advice;
+                mcAdviceEl.style.borderLeftColor = adviceColor;
+
+                const data = {
+                    C1, C2, C3, r1, r2, r3,
+                    MC_total: Math.round(MC_total * 100) / 100,
+                    OC_total: Math.round(OC_total * 100) / 100,
+                    TAC: Math.round(TAC * 100) / 100,
+                    N_expected,
+                    TAC_per_unit: Math.round(TAC_per_unit * 100) / 100,
+                    realUnitCost: Math.round(realUnitCost * 100) / 100,
+                    ROMI: Math.round(ROMI * 10000) / 10000,
+                    DOL: Math.round(DOL * 100) / 100,
+                    totalLeverage: Math.round(totalLeverage * 100) / 100,
+                    realROI: Math.round(realROI * 10000) / 10000,
+                    Rf: RfPct,
+                    DIM, MDD, L,
+                    price: Math.round(price * 100) / 100,
+                    baseCost: pricing.baseCost,
+                    premium: pricing.premium,
+                    elasticity: pricing.elasticity,
+                    status,
+                    timestamp: Date.now()
+                };
+
+                if (typeof YBus !== 'undefined' && YBus.publish) {
+                    YBus.publish('marketingFinance', data);
+                }
+
+                window._marketingFinanceData = data;
+                notifyPricingUpdate();
+                notifyRiskVectorUpdate();
+                notifyCAPMUpdate();
+            }
+
+            /**
+             * 通知定价模型重新计算（由定价模型内部读取window._marketingFinanceData）
+             * @returns {void}
+             */
+            function notifyPricingUpdate() {
+                if (typeof window.updatePricing === 'function') {
+                    window.updatePricing();
+                }
+            }
+
+            /**
+             * 通知6维风险向量引擎同步机会成本OC
+             * @returns {void}
+             */
+            function notifyRiskVectorUpdate() {
+                const data = window._marketingFinanceData;
+                if (!data) return;
+                const ocInput = document.getElementById('ocInput');
+                if (ocInput) {
+                    const normalizedOC = Math.min(0.70, Math.max(0.05, data.OC_total / (data.MC_total + 1) * 0.5));
+                    const clampedOC = Math.min(parseFloat(ocInput.max), Math.max(parseFloat(ocInput.min), normalizedOC));
+                    if (Math.abs(parseFloat(ocInput.value) - clampedOC) > 0.01) {
+                        ocInput.value = clampedOC.toFixed(2);
+                        ocInput.dispatchEvent(new Event('input', { bubbles: true }));
+                    }
+                }
+            }
+
+            /**
+             * 通知CAPM引擎用ROMI修正风险溢价Rp
+             * @returns {void}
+             */
+            function notifyCAPMUpdate() {
+                if (typeof window.updateFormula === 'function') {
+                    window.updateFormula();
+                }
+            }
+
+            mcC1Input.addEventListener('input', updateMarketingFinance);
+            mcC2Input.addEventListener('input', updateMarketingFinance);
+            mcC3Input.addEventListener('input', updateMarketingFinance);
+            mcR1Input.addEventListener('input', updateMarketingFinance);
+            mcR2Input.addEventListener('input', updateMarketingFinance);
+            mcR3Input.addEventListener('input', updateMarketingFinance);
+
+            const pricingObserver = new MutationObserver(function() {
+                clearTimeout(window._mcTimer);
+                window._mcTimer = setTimeout(function() {
+                    updateMarketingFinance();
+                }, 80);
+            });
+            const suggestedPriceEl = document.getElementById('suggestedPrice');
+            if (suggestedPriceEl) {
+                pricingObserver.observe(suggestedPriceEl, { childList: true, characterData: true, subtree: true });
+            }
+
+            const costInput = document.getElementById('costInput');
+            const premiumInput = document.getElementById('premiumInput');
+            const elasticityInput = document.getElementById('elasticityInput');
+            if (costInput) costInput.addEventListener('input', function() {
+                clearTimeout(window._mcTimer2);
+                window._mcTimer2 = setTimeout(updateMarketingFinance, 80);
+            });
+            if (premiumInput) premiumInput.addEventListener('input', function() {
+                clearTimeout(window._mcTimer2);
+                window._mcTimer2 = setTimeout(updateMarketingFinance, 80);
+            });
+            if (elasticityInput) elasticityInput.addEventListener('input', function() {
+                clearTimeout(window._mcTimer2);
+                window._mcTimer2 = setTimeout(updateMarketingFinance, 80);
+            });
+
+            const dimInput = document.getElementById('dimInput');
+            const mddInput = document.getElementById('mddInput');
+            const leverageInput = document.getElementById('leverageInput');
+            const bondYieldInput = document.getElementById('bondYieldInput');
+            const policyRateInput = document.getElementById('policyRateInput');
+            [dimInput, mddInput, leverageInput, bondYieldInput, policyRateInput].forEach(function(inp) {
+                if (inp) inp.addEventListener('input', function() {
+                    clearTimeout(window._mcTimer3);
+                    window._mcTimer3 = setTimeout(updateMarketingFinance, 100);
+                });
+            });
+
+            YBus.ready(function() {
+                setTimeout(function() {
+                    updateMarketingFinance();
+                }, 300);
+            });
+
+            window.updateMarketingFinance = updateMarketingFinance;
         })();
 
         // ================================================================
@@ -4150,7 +4578,20 @@
                 aiContribution.textContent = ai.toFixed(2) + '%';
                 practiceContribution.textContent = practice.toFixed(2) + '%';
 
-                let baseSuccess = theory + ai * practice;
+                let romiFactor = 1.0;
+                const mcData = window._marketingFinanceData;
+                if (!funnel && mcData && mcData.status !== 'idle' && typeof mcData.ROMI === 'number') {
+                    const ROMI = mcData.ROMI;
+                    romiFactor = 1 + (1 - Math.min(2.5, Math.max(-0.5, ROMI))) * 0.15;
+                    romiFactor = Math.min(1.2, Math.max(0.8, romiFactor));
+                    if (mcData.status === 'loss') romiFactor = 1.2;
+                }
+
+                let baseSuccess = theory + ai * practice * romiFactor;
+
+                if (mcData && mcData.status !== 'idle' && romiFactor !== 1.0 && !funnel) {
+                    aiContribution.innerHTML = ai.toFixed(2) + '% <span style="font-size:9px;color:#22d3ee;">×' + romiFactor.toFixed(2) + '</span>';
+                }
 
                 let concentration = 0.50;
                 if (typeof window.getConcentration === 'function') {
