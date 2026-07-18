@@ -560,6 +560,20 @@
                 </div>
             </div>
 
+            <!-- ===== 上帝视角演示入口（七层漏斗穿透+凯利ALL-IN）===== -->
+            <a href="funnel-penetration.html" style="text-decoration:none;display:block;margin-bottom:28px;">
+                <div style="background: linear-gradient(135deg, rgba(239,68,68,0.15) 0%, rgba(167,139,250,0.15) 50%, rgba(34,211,238,0.1) 100%); border: 1px solid rgba(239,68,68,0.35); border-radius: 14px; padding: 16px 22px; display: flex; align-items: center; gap: 18px; position: relative; overflow: hidden; transition: all .3s;">
+                    <div style="font-size: 38px; filter: drop-shadow(0 0 12px rgba(239,68,68,0.6));">🎰</div>
+                    <div style="flex:1;">
+                        <div style="font-size: 14px; font-weight: 700; color: #fff; letter-spacing: 1px;">◈ 七层筛选漏斗 · 上帝视角演示 ◈</div>
+                        <div style="font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 4px; letter-spacing: 0.5px;">立体漏斗穿透动画 · L1宏观→L7凯利 · 自动触发ALL-IN买入结算</div>
+                    </div>
+                    <div style="font-size: 22px; color: rgba(255,255,255,0.5);">▶</div>
+                    <div style="position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.05),transparent);transform:translateX(-100%);animation:godScan 3s linear infinite;pointer-events:none;"></div>
+                </div>
+            </a>
+            <style>@keyframes godScan{to{transform:translateX(100%);}}</style>
+
             <!-- ===== 系统架构图 ===== -->
             <div class="section-label">🏗️ 系统架构 · 四层金字塔</div>
             <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04); border-radius: 16px; padding: 22px 26px; margin-bottom: 28px;">
@@ -919,6 +933,18 @@
             } catch(e) {
                 setLight('flowStatusEvidence', '○ 待启动', 'rgba(255,255,255,0.15)');
             }
+
+            // 七层漏斗演示：检查funnelBuySignal
+            try {
+                const buy = JSON.parse(localStorage.getItem('funnelBuySignal') || 'null');
+                if (buy && (buy.action === 'ALL_IN' || buy.kellyFraction > 0.3)) {
+                    const ageMin = (Date.now() - buy.timestamp)/60000;
+                    if (ageMin < 60) {
+                        const trig = document.getElementById('pokerEggTrigger');
+                        if (trig) trig.style.boxShadow = '0 0 30px rgba(239,68,68,0.8),0 0 60px rgba(239,68,68,0.4)';
+                    }
+                }
+            } catch(e) {}
         }
 
         // 初始渲染
