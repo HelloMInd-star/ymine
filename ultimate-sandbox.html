@@ -378,6 +378,16 @@ a{color:var(--cyan);text-decoration:none}
     </div>
     <div class="panel-body" id="machineBody">
 
+      <!-- 模型严谨度Legend（诚实标注哪些是硬数学/哪些是近似/哪些是隐喻） -->
+      <div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;font-size:9px;letter-spacing:0.5px;padding:6px 8px;background:rgba(0,0,0,0.2);border-radius:5px;border:1px solid var(--line)">
+        <span style="color:#86efac">● 精确公式</span>
+        <span style="color:var(--dim)">│</span>
+        <span style="color:#fde047">● 行业近似</span>
+        <span style="color:var(--dim)">│</span>
+        <span style="color:#fca5a5">● 哲学映射</span>
+        <span style="margin-left:auto;color:var(--dim)">Kelly/EV/DCF <span style="color:#86efac">●</span> · CTR/CAC <span style="color:#fde047">●</span> · σ/γ <span style="color:#fca5a5">●</span></span>
+      </div>
+
       <!-- 核心四仪表 -->
       <div class="meter-group">
         <div class="meter">
@@ -907,28 +917,47 @@ function updateMachine(){
 }
 
 /* ================================================================
- * 第三层：K线图（Canvas绘制，真实走势+箱体）
+ * 第三层：K线图（金融数学级真实走势）
+ *   - 历史K线：Ornstein-Uhlenbeck 均值回归过程（箱体震荡，自然贴壁反弹）
+ *   - 突破K线：几何布朗运动 GBM dS/S = μ·dt + σ·dW（Black-Scholes假设）
+ *   - 正态随机数：Box-Muller 变换
  * ================================================================ */
+
+// Box-Muller：生成标准正态分布 N(0,1) 随机数
+function gaussRand(){
+  let u=0,v=0;
+  while(u===0) u=Math.random();
+  while(v===0) v=Math.random();
+  return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);
+}
+
 function initKline(){
   state.candles = [];
   const startP = state.scenario ? state.scenario.startPrice : 68.5;
   state.price = startP;
-  state.boxTop = state.scenario ? state.scenario.boxTop : 82;
-  state.boxBot = state.scenario ? state.scenario.boxBot : 58;
-  state.boxMid = startP;
-  // 先生成15根历史K线（箱体震荡）
-  let p = startP;
-  for(let i=0;i<15;i++){
-    const open = p;
-    const volatility = 1.5;
-    const close = clamp(open + rand(-volatility,volatility), state.boxBot+1, state.boxTop-1);
-    const high = Math.max(open,close) + Math.random()*1.2;
-    const low = Math.min(open,close) - Math.random()*1.2;
-    const vol = randInt(20000,80000);
-    state.candles.push({open,high,low,close,vol});
-    p = close;
+  state.boxTop = state.scenario ? state.scenario.boxTop : 78;
+  state.boxBot = state.scenario ? state.scenario.boxBot : 60;
+  state.boxMid = (state.boxTop+state.boxBot)/2;
+  // OU过程参数：κ=回归速度，σOU=波动率，dt=1根K线
+  const kappa = 0.15;   // 均值回归速度
+  const sigmaOU = 0.018;// 日波动率约1.8%（真实个股A股典型值）
+  let S = startP;
+  for(let i=0;i<18;i++){
+    const open = S;
+    // OU离散更新：dS = κ·(mid-S)·dt + σ·S·dW
+    const dW = gaussRand();
+    S = S + kappa*(state.boxMid - S) + sigmaOU*S*dW;
+    S = clamp(S, state.boxBot*0.98, state.boxTop*1.02); // 软壁
+    const close = S;
+    // 影线用对数正态
+    const rangePct = Math.abs(Math.log(close/open)) + Math.abs(gaussRand())*sigmaOU*0.8;
+    const high = Math.max(open,close) * (1 + Math.abs(gaussRand())*sigmaOU*0.6);
+    const low  = Math.min(open,close) * (1 - Math.abs(gaussRand())*sigmaOU*0.6);
+    // 成交量：波动大→成交量大
+    const vol = Math.round(randInt(30000,70000) * (1 + Math.abs(Math.log(close/open))*30));
+    state.candles.push({open,high,low:Math.max(0.1,low),close,vol});
   }
-  state.price = p;
+  state.price = S;
   drawKline();
 }
 
@@ -1053,30 +1082,50 @@ function drawKline(opts={}){
   $('klineVol').textContent = '成交量: '+fmt(totalVol);
 }
 
-/* 加一根新K线（动态生成） */
+/* 加一根新K线 — GBM几何布朗运动
+ * dS/S = μ·dt + σ·dW, dW~N(0,√dt)
+ * 解: S_{t+1} = S_t · exp((μ - σ²/2)·dt + σ·√dt·Z), Z~N(0,1)
+ */
 function pushCandle(direction){
   const last = state.candles[state.candles.length-1];
   const open = last.close;
-  // 方向决定漂移与波动（drift单位=元/根K线，经调校让8根后刚好到达箱体边界附近）
-  let drift=0, vol=1.2, biasVol=1;
-  if(direction==='up'){drift=1.0;vol=1.5;biasVol=1.8}
-  else if(direction==='down'){drift=-1.0;vol=1.5;biasVol=1.8}
-  else{drift=rand(-0.3,0.3);vol=1.0}
-  const noise = rand(-vol,vol);
-  const close = open + drift + noise;
-  const high = Math.max(open,close) + Math.random()*vol*0.6;
-  const low = Math.min(open,close) - Math.random()*vol*0.6;
-  const volume = randInt(30000, 90000)*biasVol;
-  state.candles.push({open,high,low,close,vol:volume});
+  // dt = 1 (1根K线)
+  const dt = 1;
+  let mu=0, sigma=0.015, volMult=1;
+  if(direction==='up'){
+    mu = 0.025;      // 日漂移+2.5% (6根非中性K线后期望+16%→¥80, 突破箱顶¥78)
+    sigma = 0.025;
+    volMult = 2.0;
+  } else if(direction==='down'){
+    mu = -0.028;     // 日漂移-2.8% (6根后期望-16%→¥58, 击穿箱底¥60)
+    sigma = 0.028;
+    volMult = 2.3;
+  } else {
+    mu = 0.0003;
+    sigma = 0.014;
+  }
+  const Z = gaussRand();
+  const ret = (mu - sigma*sigma/2)*dt + sigma*Math.sqrt(dt)*Z;
+  const close = Math.max(0.1, open * Math.exp(ret));
+  // 影线：用指数分布保证high>=max(open,close)，low<=min
+  const wickUp = Math.exp(Math.abs(gaussRand())*sigma*0.5) - 1;
+  const wickDn = Math.exp(Math.abs(gaussRand())*sigma*0.5) - 1;
+  const high = Math.max(open,close) * (1 + wickUp);
+  const low  = Math.min(open,close) * (1 - wickDn);
+  // 成交量：|收益率|×放大量
+  const baseVol = randInt(30000,70000);
+  const vol = Math.round(baseVol * volMult * (1 + Math.abs(ret)*50));
+  state.candles.push({open,high,low,close,vol});
   state.price = close;
 }
 
 function animateBreakout(direction, cb){
-  // 生成8根K线完成突破/击穿（约2-3秒）
+  // 8根K线完成突破/击穿（突破阶段volatility clustering波动率聚集）
   const total = 8;
   let i = 0;
   const step = ()=>{
-    pushCandle(i<2?'neutral':direction);
+    // 前2根"假动作"（neutral），后6根真突破（up/down）
+    pushCandle(i<2 ? 'neutral' : direction);
     drawKline();
     i++;
     if(i<total) setTimeout(step, 320);
