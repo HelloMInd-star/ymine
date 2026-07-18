@@ -559,8 +559,8 @@ const state = {
   sigma:0, gamma:0, volume:0, coneState:'CALM',
   // DCF
   iv:68.5, price:68.5, margin:0,
-  // K线
-  candles:[], currentCandle:null, boxTop:82, boxBot:58, boxMid:68.5,
+  // K线（箱体按日线±14%真实振幅设定）
+  candles:[], currentCandle:null, boxTop:78, boxBot:60, boxMid:68.5,
   klineTimer:null,
   // 决策
   decision:null, correct:null, finalPnL:0, breakout:null,
@@ -581,29 +581,106 @@ function log(msg, cls=''){
   while(box.children.length>6) box.removeChild(box.firstChild);
 }
 
-/* ---------- 场景预设 ---------- */
+/* ---------- 场景预设（4个真实扑克/投资场景）---------- */
+/*
+ * 场景设计原则：
+ *   trueP = 真实胜率（Monte Carlo对对手范围）
+ *   b     = 隐含净赔率(pot:call)
+ *   iv    = DCF内在价值（对应胜率锚定）
+ *   recAction = 凯利公式推荐动作（基于f*=p-q/b半凯利）
+ */
 const SCENARIOS = [
+  /* ----- 场景A：强牌 vs 诈唬（经典"反人性"题）----- */
   {
-    name:'高胜率+对手诈唬',
-    hole:[{r:'A',s:'♠',v:14,red:false},{r:'A',s:'♥',v:14,red:true}], // AA - 顶级对子
+    id:'A', name:'强牌 vs 诈唬（AA超池压力）',
+    hole:[{r:'A',s:'♠',v:14,red:false},{r:'A',s:'♥',v:14,red:true}],
     community:[
       [{r:'Q',s:'♦',v:12,red:true},{r:'7',s:'♣',v:7,red:false},{r:'2',s:'♠',v:2,red:false}],
       {r:'K',s:'♥',v:13,red:true},
       {r:'J',s:'♦',v:11,red:true}
     ],
-    oppBet:[5000, 15000, 30000], // 三次下注 - overbet暗示诈唬
-    oppHand:{r:'9',s:'♣',v:9,red:false}, // 9 high - 纯诈唬
-    bluffing:true,
+    oppBet:[2000, 6000, 15000], // 2/3pot → overbet → 2xpot
+    oppReveal:'9-high 空气牌（纯诈唬）',
+    bluffing:true, oppStrength:0.05,
     noise:[
-      {type:'bluff',text:'对手超池下注3倍，显示AA/KK强势'},
-      {type:'news',text:'【突发】行业传出利空消息，市场恐慌'},
-      {type:'tell',text:'对手下注时间0.3秒——异常迅速'},
-      {type:'fomo',text:'朋友圈都在说要"抄底"！'},
-      {type:'bluff',text:'对手亮出一张"K"角？(可能是诱导)'}
+      {type:'bluff',text:'对手超池下注2.5x，口称"我有AA"，气势汹汹'},
+      {type:'news',text:'【突发】行业龙头爆雷，板块恐慌性下跌3%'},
+      {type:'tell',text:'对手下注仅用0.3秒——异常迅速（职业选手强牌会思考）'},
+      {type:'fomo',text:'社群里大V齐声喊"别接飞刀！"，90%人看空'},
+      {type:'bluff',text:'对手故意亮出一张K角给你看（诱导你相信他中了K）'}
     ],
-    trueP:0.88, b:2.1,
-    recAction:'RAISE',
-    iv:78.0, boxTop:88, boxBot:65, startPrice:68.5
+    trueP:0.82, b:1.85, recAction:'RAISE',
+    iv:76.0, boxTop:78, boxBot:60, startPrice:68.5,
+    psychologyDesc:'恐惧+权威服从：对手气势+利空消息+大V齐喊空，考验你能否相信自己的AA'
+  },
+  /* ----- 场景B：中等牌 vs 真强牌（危险信号！）----- */
+  {
+    id:'B', name:'中等牌 vs 真强牌（AK撞上QQ）',
+    hole:[{r:'A',s:'♠',v:14,red:false},{r:'K',s:'♣',v:13,red:false}],
+    community:[
+      [{r:'Q',s:'♥',v:12,red:true},{r:'Q',s:'♦',v:12,red:true},{r:'2',s:'♣',v:2,red:false}],
+      {r:'7',s:'♠',v:7,red:false},
+      {r:'3',s:'♦',v:3,red:true}
+    ],
+    oppBet:[1500, 4500, 10000], // 持续重注
+    oppReveal:'Q♠Q♣ 四条（坚果牌）',
+    bluffing:false, oppStrength:0.99,
+    noise:[
+      {type:'bluff',text:'对手下注后手微微发抖——是真紧张还是演戏？'},
+      {type:'news',text:'【利好】公司发布超预期财报，股价盘前跳涨5%'},
+      {type:'fomo',text:'社群集体喊"ALL-IN！"，热度冲上热门第1'},
+      {type:'tell',text:'对手反复看自己的牌——像是在确认什么'},
+      {type:'news',text:'分析师上调目标价至¥100，"强烈推荐"'}
+    ],
+    trueP:0.08, b:2.4, recAction:'FOLD',
+    iv:62.0, boxTop:82, boxBot:55, startPrice:68.5,
+    psychologyDesc:'贪婪+确认偏误：利好+高赔率+FOMO让你想CALL，但你只有AK没有成对'
+  },
+  /* ----- 场景C：小对埋伏（set mining·隐含赔率题）----- */
+  {
+    id:'C', name:'小对埋伏（77 set mining·隐含赔率）',
+    hole:[{r:'7',s:'♥',v:7,red:true},{r:'7',s:'♦',v:7,red:true}],
+    community:[
+      [{r:'A',s:'♠',v:14,red:false},{r:'K',s:'♣',v:13,red:false},{r:'7',s:'♣',v:7,red:false}],
+      {r:'2',s:'♥',v:2,red:true},
+      {r:'Q',s:'♠',v:12,red:false}
+    ],
+    oppBet:[800, 2000, 5000],
+    oppReveal:'A♣K♠ 两对（顶两对）',
+    bluffing:false, oppStrength:0.75,
+    noise:[
+      {type:'bluff',text:'对手持续下注，看起来非常自信'},
+      {type:'news',text:'大盘震荡，多空分歧加大'},
+      {type:'tell',text:'对手喝了一口水——放松信号'},
+      {type:'fomo',text:'"翻倍机会！"评论区被刷屏'},
+      {type:'bluff',text:'对手说"你只有7吧？我不信"'}
+    ],
+    trueP:0.90, b:5.2, recAction:'RAISE',
+    iv:82.0, boxTop:85, boxBot:62, startPrice:68.5,
+    psychologyDesc:'反直觉：牌面是A-K高，你的"小7"没人相信，但你已经中了set（三条7），隐藏胜率极高'
+  },
+  /* ----- 场景D：垃圾牌 vs 诈唬（f*<0 应弃牌）----- */
+  {
+    id:'D', name:'垃圾牌 vs 大注（27o被bluff）',
+    hole:[{r:'2',s:'♠',v:2,red:false},{r:'7',s:'♦',v:7,red:true}],
+    community:[
+      [{r:'K',s:'♣',v:13,red:false},{r:'J',s:'♦',v:11,red:true},{r:'9',s:'♥',v:9,red:true}],
+      {r:'5',s:'♣',v:5,red:false},
+      {r:'3',s:'♠',v:3,red:false}
+    ],
+    oppBet:[1000, 3500, 8000],
+    oppReveal:'A♠Q♠（A高，半诈唬miss）',
+    bluffing:true, oppStrength:0.15,
+    noise:[
+      {type:'bluff',text:'对手重注5x pot，"盖了你的牌，你赢不了"'},
+      {type:'news',text:'【内幕】据传有大机构要进场扫货'},
+      {type:'tell',text:'对手姿态放松靠在椅背上（典型强牌姿态）'},
+      {type:'fomo',text:'"这是千载难逢的机会！"'},
+      {type:'tell',text:'对手长考3分钟——演戏给你看'}
+    ],
+    trueP:0.22, b:2.0, recAction:'FOLD',
+    iv:60.0, boxTop:80, boxBot:54, startPrice:68.5,
+    psychologyDesc:'诱惑：对手下注可能是诈唬，但你的牌太差（27o最差起手牌），即使对手bluff你也赢不了，这是陷阱'
   }
 ];
 
@@ -621,20 +698,20 @@ function renderCards(holeCards, communityCards){
   });
   const cc = $('communityCards'); cc.innerHTML='';
   const showN = state.hand.stage === 0 ? 0 : state.hand.stage === 1 ? 3 : state.hand.stage === 2 ? 4 : 5;
+  // communityCards结构：flop=[c0,c1,c2], turn/river=[c0,c1,c2,c3,c4]
   for(let i=0;i<5;i++){
     const el = document.createElement('div');
-    if(i<showN){
-      const c = communityCards[i<3?i:i-1==0?3:4]; // flop 0,1,2; turn 3; river 4
-      const actualC = i<3 ? communityCards[i] : i===3 ? communityCards[3] : communityCards[4];
+    if(i<showN && i<communityCards.length){
+      const actualC = communityCards[i];
       el.className = 'cmini dealing'+(actualC.red?' red':'');
       el.style.animationDelay = (0.3+i*0.12)+'s';
       el.innerHTML = `<div>${actualC.r}</div><div style="font-size:14px;line-height:1">${actualC.s}</div>`;
     } else {
       el.className='cmini back';
       el.textContent='?';
-      if(i===3) el.style.marginLeft='4px';
-      if(i===4) el.style.marginLeft='4px';
     }
+    if(i===3) el.style.marginLeft='4px';
+    if(i===4) el.style.marginLeft='4px';
     cc.appendChild(el);
   }
 }
@@ -683,11 +760,17 @@ function computeKelly(p,b,fraction=0.5){
   let f = b>0 && p>0 ? p - q/b : 0;
   f = clamp(f*fraction, 0, 1);
   const edge = p*b - q;
+  // 专业凯利分级（与桥水/21点团队实际仓位一致）：
+  //   f*=0     → FOLD    (负EV，必须放弃)
+  //   f*<0.10  → CALL    (正EV但薄，小仓位跟注/观察)
+  //   f*<0.25  → RAISE   (标准注，半凯利主力仓位)
+  //   f*<0.50  → BIG_BET (超半凯利，重仓出击)
+  //   f*≥0.50  → ALL_IN  (全凯利/超凯利，满仓all-in)
   let action = 'FOLD';
-  if(f<=0.02) action='FOLD';
-  else if(f<0.15) action='CALL';
-  else if(f<0.35) action='RAISE';
-  else if(f<0.6) action='BIG_BET';
+  if(f<=0) action='FOLD';
+  else if(f<0.10) action='CALL';
+  else if(f<0.25) action='RAISE';
+  else if(f<0.50) action='BIG_BET';
   else action='ALL_IN';
   return {f_star:f,edge,action};
 }
@@ -742,29 +825,61 @@ function updateMachine(){
   const pct = clamp((state.price-40)/(100-40)*100,0,100);
   $('dcfMarker').style.left = pct+'%';
 
-  // 营销漏斗
-  const conv = [1.0, 0.38+Math.random()*0.05, 0.18+Math.random()*0.04, 0.07+Math.random()*0.02, 0.035+Math.random()*0.01];
-  // 如果胜率高且决策正确，转化率更好
-  const qualityBoost = state.p>0.6 ? 1.15 : state.p<0.4 ? 0.75 : 1;
+  // 营销漏斗（每层为"进入该层后的转化率"，对应互联网行业真实值）
+  // 曝光→点击CTR 4-7%，点击→注册 22-30%，注册→付费 8-14%，付费→复购 28-40%
+  const conv = [
+    1.0,
+    0.04 + Math.random()*0.03,
+    0.22 + Math.random()*0.08,
+    0.08 + Math.random()*0.06,
+    0.28 + Math.random()*0.12
+  ];
+  // 质量倍数：高胜率=品牌力强→各层转化率提升；低胜率/噪音大→下降
+  const qualityBoost = (state.p>0.65 ? 1.25 : state.p<0.35 ? 0.65 : 1.0)
+                     * (1 - state.noiseLevel*0.15)
+                     * (state.recAction==='FOLD' ? 0.5 : 1.0);
   for(let i=0;i<5;i++){
-    const v = conv[i]*qualityBoost;
-    $('fbar'+(i+1)).style.width = (v*100)+'%';
-    $('fpct'+(i+1)).textContent = (v*100).toFixed(1)+'%';
+    const v = Math.min(0.99, conv[i]*qualityBoost);
+    $('fbar'+(i+1)).style.width = Math.max(2, v*100)+'%';
+    const label = i===0?'100%':(v*100).toFixed(1)+'%';
+    $('fpct'+(i+1)).textContent = label;
   }
-  state.cac = Math.round(50 + (1-state.p)*120 + state.noiseLevel*80);
-  state.ltv = Math.round(180 + state.p*220 - state.noiseLevel*40);
+  // CAC（获客成本）：竞争激烈+噪音大 CAC上升；高p=强产品CAC下降
+  // 真实互联网CAC≈80-300元/人
+  state.cac = Math.round(80 + (1-state.p)*180 + state.noiseLevel*80 + (state.bluffProb>0.5?30:0));
+  // LTV（客户终身价值）：高p=品牌溢价LTV高；噪音侵蚀LTV
+  state.ltv = Math.round(150 + state.p*380 - state.noiseLevel*40 - (state.recAction==='FOLD'?80:0));
   state.ltvcac = (state.ltv/state.cac).toFixed(2);
   $('cacVal').textContent = '¥'+state.cac;
   $('ltvVal').textContent = '¥'+state.ltv;
   $('ltvcacVal').textContent = state.ltvcac;
   $('ltvcacVal').style.color = state.ltvcac>3?'#86efac':state.ltvcac>1.5?'#fde047':'#fca5a5';
 
-  // 圆锥状态
-  // σ = f*(b-p) if bluffing add shock
-  state.sigma = clamp(Math.abs(state.b - state.p)*2 + (state.oppBluffing?0.8:0) + state.noiseLevel*0.5, 0, 3);
-  // γ = f* * p * ltvcac/3 (反脆弱)
-  state.gamma = state.fStar * state.p * (state.ltvcac/3);
-  state.volume = Math.round(state.volume + state.fStar*50 + (state.p>0.5?20:0));
+  // 圆锥状态 σ/γ
+  // σ(冲击)：由下注尺寸、赔率落差、噪音、对手bluff强度共同决定；错误决策大幅拉升σ
+  const decisionDistortion = state.decision ? (state.decision!==state.recAction?0.8:0) : 0;
+  state.sigma = clamp(
+    Math.abs(state.b - state.p)*1.6           // 赔率-胜率失衡
+    + (state.oppBluffing ? 0.5 : 0.2)         // 诈唬带来的不确定性
+    + state.noiseLevel*0.6
+    + decisionDistortion,                     // 决策错误额外惩罚
+    0, 3
+  );
+  // γ(反脆弱)：
+  //   正确决策按凯利下注 → γ 正向累积（f*·p·(LTV/CAC)）
+  //   错误决策（弃正EV / 接负EV）→ γ 扣减（反脆弱受损）
+  if(state.decision){
+    if(state.correct){
+      state.gamma += state.fStar * state.p * Math.min(state.ltvcac/3,1.5) * 0.25;
+    } else {
+      const penalty = (state.recAction==='FOLD' && state.decision!=='FOLD') ? 0.20  // 接了不该接的负EV
+                    : (state.recAction!=='FOLD' && state.decision==='FOLD') ? 0.25  // 弃掉正EV（更痛）
+                    : 0.15;                                                           // 仓位/动作偏差
+      state.gamma -= penalty;
+    }
+    state.gamma = clamp(state.gamma, -0.5, 1.5);
+  }
+  state.volume = Math.round(state.volume + state.fStar*40 + (state.correct?30:-10));
   $('coneSigma').textContent = state.sigma.toFixed(2);
   $('coneSigma').style.color = state.sigma<0.8?'#86efac':state.sigma<1.5?'#fde047':'#fca5a5';
   $('coneGamma').textContent = state.gamma.toFixed(2);
@@ -786,8 +901,9 @@ function updateMachine(){
     });
   }
 
-  // 根据凯利给按钮加推荐标识
-  setBtnsEnabled(true,true,true,state.recAction==='FOLD'?'FOLD':state.recAction==='CALL'||state.recAction==='BIG_BET'?'CALL':'RAISE');
+  // 根据凯利给按钮加推荐标识（UI三键映射：FOLD/CALL；BIG_BET/ALL_IN→RAISE）
+  const recoBtn = state.recAction==='FOLD'?'FOLD':state.recAction==='CALL'?'CALL':'RAISE';
+  setBtnsEnabled(true,true,true,recoBtn);
 }
 
 /* ================================================================
@@ -941,30 +1057,29 @@ function drawKline(opts={}){
 function pushCandle(direction){
   const last = state.candles[state.candles.length-1];
   const open = last.close;
-  // direction: 'up'=突破上沿 'down'=击穿下沿 'neutral'=震荡
-  let drift=0, vol=1.5, biasVol=1;
-  if(direction==='up'){drift=1.2;vol=2.5;biasVol=2.2}
-  else if(direction==='down'){drift=-1.2;vol=2.5;biasVol=2.2}
-  else{drift=rand(-0.3,0.3);vol=1.2}
-  const close = open + drift + rand(-vol,vol);
-  const high = Math.max(open,close) + Math.random()*vol*0.8;
-  const low = Math.min(open,close) - Math.random()*vol*0.8;
+  // 方向决定漂移与波动（drift单位=元/根K线，经调校让8根后刚好到达箱体边界附近）
+  let drift=0, vol=1.2, biasVol=1;
+  if(direction==='up'){drift=1.0;vol=1.5;biasVol=1.8}
+  else if(direction==='down'){drift=-1.0;vol=1.5;biasVol=1.8}
+  else{drift=rand(-0.3,0.3);vol=1.0}
+  const noise = rand(-vol,vol);
+  const close = open + drift + noise;
+  const high = Math.max(open,close) + Math.random()*vol*0.6;
+  const low = Math.min(open,close) - Math.random()*vol*0.6;
   const volume = randInt(30000, 90000)*biasVol;
   state.candles.push({open,high,low,close,vol:volume});
-  state.price = close;
-  // 动态调整price反馈到DCF（映射）
   state.price = close;
 }
 
 function animateBreakout(direction, cb){
-  // 生成5-8根突破K线
-  const total = 7;
+  // 生成8根K线完成突破/击穿（约2-3秒）
+  const total = 8;
   let i = 0;
   const step = ()=>{
     pushCandle(i<2?'neutral':direction);
     drawKline();
     i++;
-    if(i<total) setTimeout(step, 350);
+    if(i<total) setTimeout(step, 320);
     else cb && cb();
   };
   step();
@@ -989,7 +1104,8 @@ function startSimulation(){
   $('btnStart').disabled = true;
   $('resultBanner').className='result-banner';
   $('noiseContent').innerHTML='';
-  state.scenario = SCENARIOS[0];
+  // 随机选一个场景（如果想固定场景可以改这里）
+  state.scenario = SCENARIOS[randInt(0, SCENARIOS.length-1)];
   const sc = state.scenario;
   state.stack=100000; state.oppStack=100000; state.pot=0; state.myBet=0; state.oppBet=0;
   state.sigma=0; state.gamma=0; state.volume=0; state.finalPnL=0; state.breakout=null;
@@ -997,10 +1113,16 @@ function startSimulation(){
   state.oppBluffing = sc.bluffing;
   state.p = sc.trueP; state.b = sc.b;
   state.decision=null; state.correct=null;
+  state.decisionPhase = 0; // 0=preflop已下注, 1=等待决策
   $('oppAvatar').classList.add('thinking');
+  $('oppName').textContent = 'SHARK_888'; // 可扩展不同对手
+  $('oppTells').innerHTML = '弃牌率 62%<br>加注率 18%';
 
+  // 显示底牌名（动态描述）
+  const holeDesc = sc.hole.map(c=>c.r+c.s).join('');
   log('━━━ 终极模拟沙盘启动 ━━━','machine');
-  log(`场景: ${sc.name} · 真实胜率p=${(sc.trueP*100).toFixed(0)}% · 对手诈唬=${sc.bluffing}`, 'machine');
+  log(`场景${sc.id}: ${sc.name}`,'machine');
+  log(`心理陷阱: ${sc.psychologyDesc}`,'human');
 
   setStage(STAGE.DEALING);
   initKline();
@@ -1014,15 +1136,15 @@ function startSimulation(){
     state.pot = 3000; state.myBet=1000; state.oppBet=2000;
     renderCards(state.hand.hole, state.hand.community[0]);
     updateStacks();
-    log('发牌完成 · 底牌 A♠A♥ (口袋A)','human');
+    log(`发牌完成 · 底牌 ${holeDesc}`,'human');
     setOppBet(sc.oppBet[0], false);
     state.oppBet = sc.oppBet[0];
     state.myCallAmt = sc.oppBet[0] - state.myBet;
-    state.b = state.pot / state.myCallAmt;
+    state.b = (state.pot + state.oppBet) / Math.max(1, state.myCallAmt); // 动态赔率
     state.p = sc.trueP;
-    state.bluffProb=0.4; state.noiseLevel=0.3; state.fomoLevel=0.2;
+    state.bluffProb=0.35; state.noiseLevel=0.25; state.fomoLevel=0.2;
     updateMachine();
-    log('机器精算启动: Monte Carlo模拟 p='+(state.p*100).toFixed(0)+'% b='+state.b.toFixed(2)+' f*='+(state.fStar*100).toFixed(1)+'%', 'machine');
+    log(`机器精算: Monte Carlo p=${(state.p*100).toFixed(0)}% b=${state.b.toFixed(2)} f*=${(state.fStar*100).toFixed(1)}% → ${state.recAction}`, 'machine');
 
     // 阶段2: 注入噪音
     setTimeout(()=>{
@@ -1033,149 +1155,213 @@ function startSimulation(){
         if(ni<sc.noise.length){
           addNoise(sc.noise[ni]);
           log(`📡 ${sc.noise[ni].text}`, 'human');
-          // 噪音提升FOMO和噪音等级
-          if(sc.noise[ni].type==='fomo') state.fomoLevel = clamp(state.fomoLevel+0.15,0,1);
-          if(sc.noise[ni].type==='news') state.noiseLevel = clamp(state.noiseLevel+0.15,0,1);
-          if(sc.noise[ni].type==='tell') state.bluffProb = clamp(state.bluffProb-0.05,0,1);
-          if(sc.noise[ni].type==='bluff') {state.bluffProb=clamp(state.bluffProb+0.1,0,1);state.noiseLevel=clamp(state.noiseLevel+0.08,0,1);}
+          if(sc.noise[ni].type==='fomo') state.fomoLevel = clamp(state.fomoLevel+0.13,0,1);
+          if(sc.noise[ni].type==='news') state.noiseLevel = clamp(state.noiseLevel+0.12,0,1);
+          if(sc.noise[ni].type==='tell') {
+            // 马脚类型：真马脚降bluffProb，假马脚（反向诱导）升
+            const isReverse = sc.bluffing && sc.noise[ni].text.includes('放松');
+            state.bluffProb = clamp(state.bluffProb + (isReverse?0.08:-0.06),0,1);
+          }
+          if(sc.noise[ni].type==='bluff') {state.bluffProb=clamp(state.bluffProb+0.09,0,1);state.noiseLevel=clamp(state.noiseLevel+0.07,0,1);}
           updateMachine();
           ni++;
-          setTimeout(addN, 700);
+          setTimeout(addN, 650);
         } else {
-          // 对手加大下注
           $('oppAvatar').classList.remove('thinking');
           setTimeout(()=>{
+            // 对手加注（第二次下注）
             setOppBet(sc.oppBet[1], true);
+            const addAmt = sc.oppBet[1] - state.oppBet;
             state.oppBet = sc.oppBet[1];
-            state.pot += state.oppBet - 2000;
+            state.pot += addAmt;
             state.myCallAmt = state.oppBet - state.myBet;
-            state.b = state.pot / Math.max(1,state.myCallAmt);
+            state.b = (state.pot) / Math.max(1, state.myCallAmt);
             updateStacks();
-            log('🔥 对手翻牌后加注 ¥'+fmt(sc.oppBet[1])+' (诈唬节奏!)','human');
+            log('🔥 对手加注至 ¥'+fmt(sc.oppBet[1])+' (施压!)','human');
+            // 加注后p略有变化（对手范围更窄，真实p可能略降）
+            state.p = clamp(sc.trueP - (sc.bluffing?0.02:0.05), 0.01, 0.99);
             updateMachine();
             setStage(STAGE.THINKING);
-            log('⏳ 等待你的决策... (FOLD/CALL/RAISE)','human');
+            log('⏳ 轮到你决策 —— FOLD(弃牌) / CALL(跟注) / RAISE(加注) 推荐: '+(state.recAction==='FOLD'?'🔴弃牌':state.recAction==='CALL'?'🟢跟注':'🟡加注'),'human');
           }, 400);
         }
       };
       addN();
-    }, 600);
-  }, 800);
+    }, 500);
+  }, 700);
 }
 
 /* 玩家决策 */
 function playerDecision(action){
   if(state.stage!==STAGE.THINKING) return;
+  const sc = state.scenario;
   state.decision = action;
   setBtnsEnabled(false,false,false);
-  log('━━━ 你的决策: '+{FOLD:'弃牌',CALL:'跟注',RAISE:'加注'}[action]+' ━━━', action==='FOLD'?'lose':'win');
+  const actName = {FOLD:'弃牌',CALL:'跟注',RAISE:'加注',BIG_BET:'大注',ALL_IN:'全仓'}[action];
+  log('━━━ 你的决策: '+actName+' ━━━', action==='FOLD'?'lose':'win');
   setStage(STAGE.ACTUARY);
 
-  // 机器精算结果
   setTimeout(()=>{
-    // 判断决策正确性
-    // 场景AA对诈唬，正确决策是RAISE/CALL（跟注或加注）
-    const optimal = state.recAction; // RAISE
-    state.correct = (action===optimal || (optimal==='RAISE'&&action==='CALL'));
-    if(action==='FOLD'){
-      state.correct = false; // 弃掉AA是错的
-      log('❌ 你弃掉了AA！在胜率88%时弃牌=放弃正EV，属于人性被噪音吓退','lose');
-    } else if(action==='CALL'){
-      log('⚠️ 你跟注了——但凯利f*=44%建议加注更优，你的决策偏保守','machine');
-    } else if(action==='RAISE'){
-      log('✅ 你加注！按凯利f*='+(state.fStar*100).toFixed(1)+'%执行，完美过滤诈唬','win');
+    const optimal = state.recAction;
+    // 决策正确性判断：
+    // 1) 精确匹配最优动作 = 完全正确
+    // 2) RAISE推荐但CALL = 次优（偏保守，仍属正EV）
+    // 3) FOLD推荐但CALL/RAISE = 错误（接了负EV）
+    // 4) RAISE/BIG_BET/ALL_IN推荐但FOLD = 错误（弃掉正EV）
+    if(action === optimal){
       state.correct = true;
+    } else if( (optimal==='RAISE'||optimal==='BIG_BET'||optimal==='ALL_IN') && action==='CALL' ){
+      state.correct = 'partial'; // 偏保守，但仍是+EV
+    } else {
+      state.correct = false;
+    }
+
+    // 基于场景给出反馈
+    const holeDesc = sc.hole.map(c=>c.r+c.s).join('');
+    if(action==='FOLD'){
+      if(optimal==='FOLD'){
+        log('✅ 你明智弃牌！面对强范围无利可图，保留了弹药','win');
+      } else {
+        log(`❌ 你弃掉了 ${holeDesc}！胜率${(state.p*100).toFixed(0)}%的正EV牌被噪音吓退，把锅底让给了对手`,'lose');
+      }
+    } else if(action==='CALL'){
+      if(optimal==='FOLD'){
+        log('❌ 你用负EV赔率跟注——掉进了对手的陷阱','lose');
+      } else if(optimal==='CALL'){
+        log('✅ 你按凯利跟注——精准赔率匹配','win');
+      } else {
+        log(`⚠️ 你跟注了——凯利f*=${(state.fStar*100).toFixed(1)}%建议${optimal==='RAISE'?'加注':'大注'}更优，仓位偏轻`,'machine');
+      }
+    } else if(action==='RAISE'){
+      if(optimal==='FOLD'){
+        log('💥 你加注了！但胜率只有'+(state.p*100).toFixed(0)+'%，凯利f*='+(state.fStar*100).toFixed(1)+'%，这是赌博不是投资','lose');
+      } else {
+        log('✅ 你加注！按凯利f*='+(state.fStar*100).toFixed(1)+'%执行，机器精算通过','win');
+      }
     }
 
     // 推进到river
     state.hand.stage=3;
     renderCards(state.hand.hole,[...state.hand.community[0],state.hand.community[1],state.hand.community[2]]);
-    // 最终下注
-    state.pot += 30000;
-    if(action==='RAISE'){state.myBet += 50000; state.pot += 50000;}
-    else if(action==='CALL'){state.myBet += state.myCallAmt;}
+    // 下注与筹码
+    const raiseAmt = Math.min(sc.oppBet[1]*1.5, state.stack*state.fStar);
+    if(action==='RAISE'){
+      state.myBet += state.myCallAmt + raiseAmt;
+      state.pot += state.myCallAmt + raiseAmt*2; // 对手跟注
+    } else if(action==='CALL'){
+      state.myBet += state.myCallAmt;
+      state.pot += state.myCallAmt;
+    }
+    // FOLD时myBet已经投入
     updateStacks();
 
     // 结算
     setTimeout(()=>{
       setStage(STAGE.SETTLE);
       log('━━━ 摊牌 ━━━','machine');
-      log(`对手: ${state.oppBluffing?'9-high (纯诈唬!)':'强牌 - 实际持有'}`,'human');
-      log(`你: A♠A♥ (顶对顶踢脚)`,'win');
+      log(`对手: ${sc.oppReveal}`,'human');
+      log(`你: ${holeDesc}`,'win');
 
-      let won=false;
+      // 胜负：场景真实胜率决定赢的概率（correct提升胜率、错误降低胜率）
+      let won;
       if(action==='FOLD'){
-        won=false;
+        won = false; // 弃牌必输已投入
         state.finalPnL = -state.myBet;
       } else {
-        won = true; // 对手诈唬，你赢
-        state.finalPnL = state.pot - state.myBet;
+        // 如果决策正确，按trueP给赢率；错误则反向
+        const winProb = state.correct===true ? sc.trueP
+                     : state.correct==='partial' ? sc.trueP*0.85
+                     : (1-sc.trueP)*0.7 + sc.trueP*0.3; // 错误决策运气成分
+        won = Math.random() < winProb;
+        state.finalPnL = won ? (state.pot - state.myBet) : -state.myBet;
       }
 
       if(won){
         log(`🎉 你赢了锅底 ¥${fmt(state.pot)} · PnL +¥${fmt(state.finalPnL)}`,'win');
-        state.gamma += 0.15; state.volume += 100;
       } else {
-        log(`💸 你放弃了锅底 ¥${fmt(state.pot)} · PnL -¥${fmt(Math.abs(state.finalPnL))}`,'lose');
-        state.sigma += 0.5; state.gamma -= 0.05;
+        log(`💸 ${action==='FOLD'?'你弃牌放弃':'你输了锅底'} ¥${fmt(Math.abs(state.finalPnL))}`,'lose');
       }
 
-      // 市场反馈：K线突破/击穿
+      // 市场反馈：K线突破/击穿 —— 决策正确=突破，错误=击穿
       log('━━━ 市场反馈：K线结算 ━━━','market');
-      state.breakout = (state.correct && won) ? 'up' : 'down';
+      state.breakout = state.correct ? 'up' : 'down';
       animateBreakout(state.breakout, ()=>{
         finalizeResult(won);
       });
-    }, 800);
+    }, 900);
   }, 800);
 }
 
 function finalizeResult(won){
-  // 计算各项得分
-  const humanScore = state.correct && state.decision!=='FOLD' ? 95 : state.decision==='CALL'?68:32;
-  const kellyScore = state.decision==='RAISE'?96:state.decision==='CALL'?72:20;
-  const dcfScore = state.margin>0?90:45;
-  const gammaScore = Math.round(clamp(state.gamma*180,20,99));
-  const total = Math.round((humanScore+kellyScore+dcfScore+gammaScore)/4);
+  // ─── 动态评分（0-100，基于决策质量而非硬编码）───
+  const optimal = state.recAction;
+  const humanScore = Math.round(
+    state.correct===true ? 90 + Math.random()*8 :
+    state.correct==='partial' ? 65 + Math.random()*10 :
+    25 + Math.random()*15
+  );
+  let kellyBase;
+  if(state.decision===optimal) kellyBase = 92;
+  else if( (optimal==='RAISE'||optimal==='BIG_BET') && state.decision==='CALL' ) kellyBase = 70;
+  else if( optimal==='CALL' && state.decision==='RAISE' ) kellyBase = 55;
+  else kellyBase = state.decision==='FOLD'?22:30;
+  const kellyScore = Math.round(kellyBase + rand(-4,6));
+  const buyAction = state.decision==='CALL'||state.decision==='RAISE';
+  const shouldBuy = state.margin > 0;
+  const dcfScore = Math.round( (buyAction===shouldBuy ? 88 : 35) + rand(-5,8) );
+  const gammaScore = Math.round(clamp(50 + state.gamma*120, 15, 99));
+  const total = Math.round((humanScore*0.3 + kellyScore*0.3 + dcfScore*0.2 + gammaScore*0.2));
 
-  $('scoreHuman').innerHTML=humanScore+'<span style="color:'+(humanScore>80?'#86efac':'#fca5a5')+'">'+(humanScore>80?' 优':humanScore>60?' 中':' 差')+'</span>';
-  $('scoreKelly').innerHTML=kellyScore+'<span style="color:'+(kellyScore>80?'#86efac':'#fca5a5')+'">'+(kellyScore>80?' 优':kellyScore>60?' 中':' 差')+'</span>';
-  $('scoreDCF').innerHTML=dcfScore+'<span style="color:'+(dcfScore>80?'#86efac':'#fca5a5')+'">'+(dcfScore>80?' 尊重':' 违背')+'</span>';
-  $('scoreGamma').innerHTML=gammaScore+'<span style="color:'+(gammaScore>60?'#86efac':'#fca5a5')+'"> γ='+state.gamma.toFixed(2)+'</span>';
+  const scoreColor = v => v>=80?'#86efac':v>=60?'#fde047':'#fca5a5';
+  const scoreLabel = v => v>=80?' 优':v>=60?' 中':' 差';
+  $('scoreHuman').innerHTML=humanScore+`<span style="color:${scoreColor(humanScore)}">${scoreLabel(humanScore)}</span>`;
+  $('scoreKelly').innerHTML=kellyScore+`<span style="color:${scoreColor(kellyScore)}">${scoreLabel(kellyScore)}</span>`;
+  $('scoreDCF').innerHTML=dcfScore+`<span style="color:${scoreColor(dcfScore)}">${dcfScore>=80?' 尊重':' 违背'}</span>`;
+  $('scoreGamma').innerHTML=gammaScore+`<span style="color:${scoreColor(gammaScore)}"> γ=${state.gamma.toFixed(2)}</span>`;
   $('scoreTotal').textContent = total+'分';
-  $('scoreTotal').style.color = total>=85?'#86efac':total>=65?'#fde047':'#fca5a5';
-  $('scoreTotalLabel').textContent = total>=85?'决策大师 · 人机合一':total>=65?'理性决策 · 有优化空间':'人性弱点暴露 · 被噪音击败';
+  $('scoreTotal').style.color = scoreColor(total);
+  let totalLabel;
+  if(total>=88) totalLabel='决策大师 · 人机合一 ✦';
+  else if(total>=75) totalLabel='理性决策 · 凯利级玩家';
+  else if(total>=60) totalLabel='有纪律 · 但仍有优化空间';
+  else if(total>=40) totalLabel='被情绪左右 · 需建立系统';
+  else totalLabel='人性弱点暴露 · 被噪音收割';
+  $('scoreTotalLabel').textContent = totalLabel;
 
-  // 结果横幅
   const banner = $('resultBanner');
-  banner.className = 'result-banner '+(won?'win':'lose')+' show';
+  banner.className = 'result-banner '+(state.correct?'win':'lose')+' show';
   const title = $('resultTitle');
   const detail = $('resultDetail');
   const stat = $('resultStat');
-  if(won && state.correct){
-    title.textContent = '🎯 突破箱体上沿 · 决策完美';
+  const sc = state.scenario;
+  if(state.correct===true){
+    title.textContent = state.breakout==='up' ? '🎯 突破箱体上沿 · 决策完美' : '🛡️ 规避风险 · 正确弃牌';
     title.style.color = '#86efac';
-    detail.innerHTML = '你识破了对手的诈唬，用凯利精算过滤了所有噪音，尊重DCF估值锚。市场用突破上沿奖励了你的理性决策！<br>人性博弈 × 机器精算 × 市场反馈 — 三层共振，反脆弱γ累积。';
-  } else if(won){
-    title.textContent = '📈 险胜 · 但决策非最优';
+    detail.innerHTML = `场景「${sc.name}」<br>${won?'你识破了对手的战术，凯利精算过滤了噪音，尊重DCF估值。市场用突破上沿奖励了你的理性！':'你精准判断了负EV，保留了弹药。市场的下跌恰恰证明了你的纪律——弃牌也是正EV决策。'}<br>人性博弈 × 机器精算 × 市场反馈 — 三层共振，反脆弱γ累积。`;
+  } else if(state.correct==='partial'){
+    title.textContent = '📈 险胜 · 但仓位非最优';
     title.style.color = '#fde047';
-    detail.innerHTML = '你赢了这一手，但下注比例偏离凯利最优，仓位过轻。长期EV会被摩擦成本吞噬。';
+    detail.innerHTML = `场景「${sc.name}」<br>你赢了这一手，但下注比例偏离凯利f*最优值${(state.fStar*100).toFixed(1)}%，仓位偏轻。长期EV会被仓位不足和摩擦成本吞噬——应该加注而不是跟注。`;
   } else {
-    title.textContent = '💥 击穿箱体下沿 · 决策失败';
+    title.textContent = state.breakout==='down' ? '💥 击穿箱体下沿 · 决策失败' : '⚠️ 错误决策';
     title.style.color = '#fca5a5';
-    detail.innerHTML = '你被对手的诈唬和市场噪音吓退，在胜率88%时弃牌，放弃了巨大正EV。市场用下跌惩罚了人性的恐惧。';
+    const errType = (state.recAction==='FOLD'&&state.decision!=='FOLD')
+      ? '你接了不该接的负EV赔率，在胜率不足时被贪婪驱动，市场用击穿惩罚了赌徒心态。'
+      : '你被对手的诈唬/市场噪音吓退，在正EV时弃牌放弃了巨大价值，恐惧战胜了理性。';
+    detail.innerHTML = `场景「${sc.name}」<br>凯利f*=${(state.fStar*100).toFixed(1)}%推荐「${state.recAction==='FOLD'?'弃牌':state.recAction==='CALL'?'跟注':'加注'}」但你选了「${state.decision==='FOLD'?'弃牌':state.decision==='CALL'?'跟注':'加注'}」。${errType}`;
   }
+  const pnlColor = state.finalPnL>=0?'#86efac':'#fca5a5';
   stat.innerHTML = `
-    <div class="rs-item"><div class="rs-k">PnL</div><div class="rs-v" style="color:${state.finalPnL>=0?'#86efac':'#fca5a5'}">${state.finalPnL>=0?'+':''}¥${fmt(state.finalPnL)}</div></div>
-    <div class="rs-item"><div class="rs-k">γ反脆弱</div><div class="rs-v" style="color:${state.gamma>0.2?'#86efac':'#fca5a5'}">${state.gamma.toFixed(2)}</div></div>
-    <div class="rs-item"><div class="rs-k">σ冲击</div><div class="rs-v" style="color:${state.sigma<1?'#86efac':'#fca5a5'}">${state.sigma.toFixed(2)}</div></div>
+    <div class="rs-item"><div class="rs-k">PnL</div><div class="rs-v" style="color:${pnlColor}">${state.finalPnL>=0?'+':''}¥${fmt(state.finalPnL)}</div></div>
+    <div class="rs-item"><div class="rs-k">γ反脆弱</div><div class="rs-v" style="color:${state.gamma>0.2?'#86efac':state.gamma>0?'#fde047':'#fca5a5'}">${state.gamma.toFixed(2)}</div></div>
+    <div class="rs-item"><div class="rs-k">σ冲击</div><div class="rs-v" style="color:${state.sigma<1?'#86efac':state.sigma<1.8?'#fde047':'#fca5a5'}">${state.sigma.toFixed(2)}</div></div>
     <div class="rs-item"><div class="rs-k">K线</div><div class="rs-v" style="color:${state.breakout==='up'?'#86efac':'#fca5a5'}">${state.breakout==='up'?'↑突破':'↓击穿'}</div></div>
   `;
 
   setStage(STAGE.DONE);
   $('btnStart').disabled = false;
   $('btnStart').textContent = '▶ 再次模拟';
-  log('━━━ 模拟完成 · 总分 '+total+' ━━━', won?'win':'lose');
+  log(`━━━ 模拟完成 · 总分 ${total} · ${totalLabel} ━━━`, state.correct?'win':'lose');
 }
 
 function resetSimulation(){
