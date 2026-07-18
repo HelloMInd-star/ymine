@@ -4,71 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Y.Mine · EvolveMind 进阶思维认知系统</title>
+    <link rel="stylesheet" href="assets/css/base.css">
+    <script src="assets/js/bus.js"></script>
+    <script src="assets/js/sidebar.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            background: #0b0b1a;
-            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-            min-height: 100vh;
-            padding: 40px 24px 40px 280px;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            overflow-x: hidden;
-            cursor: default;
-        }
-
-        #glow {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 0;
-            background: radial-gradient(600px circle at var(--x, 50%) var(--y, 50%), rgba(120, 80, 255, 0.06), transparent 80%);
-            transition: background 0.1s;
-        }
-
-        /* ===== 全局侧边栏导航 ===== */
-        .sidebar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 260px;
-            min-height: 100vh;
-            padding: 32px 16px 24px;
-            background: rgba(11, 11, 26, 0.85);
-            backdrop-filter: blur(12px);
-            border-right: 1px solid rgba(255, 255, 255, 0.04);
-            flex-shrink: 0;
-            overflow-y: auto;
-            z-index: 1000;
-            display: flex;
-            flex-direction: column;
-        }
-        .sidebar::-webkit-scrollbar { width: 3px; }
-        .sidebar::-webkit-scrollbar-track { background: transparent; }
-        .sidebar::-webkit-scrollbar-thumb { background: rgba(167, 139, 250, 0.15); border-radius: 4px; }
-        .sidebar .logo { font-size: 16px; font-weight: 700; color: #f1f5f9; margin-bottom: 4px; letter-spacing: -0.3px; }
-        .sidebar .logo span { color: #a78bfa; }
-        .sidebar .logo-sub { font-size: 11px; color: rgba(255,255,255,0.15); margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.04); padding-bottom: 14px; }
-        .nav-group { margin-bottom: 16px; }
-        .nav-group .group-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.8px; color: rgba(255,255,255,0.1); padding: 0 12px; margin-bottom: 4px; }
-        .nav-item { display: flex; align-items: center; gap: 10px; padding: 7px 12px; border-radius: 8px; text-decoration: none; color: rgba(255,255,255,0.3); font-size: 13px; font-weight: 500; transition: all 0.25s ease; cursor: pointer; border-left: 2px solid transparent; }
-        .nav-item:hover { background: rgba(255,255,255,0.03); color: rgba(255,255,255,0.6); border-left-color: rgba(167,139,250,0.2); }
-        .nav-item.active { color: #f1f5f9; background: rgba(167,139,250,0.05); border-left-color: #a78bfa; }
-        .nav-item .icon { font-size: 14px; width: 24px; text-align: center; flex-shrink: 0; }
-        .nav-item .level-tag { font-size: 9px; color: rgba(255,255,255,0.1); background: rgba(255,255,255,0.03); padding: 0 8px; border-radius: 8px; margin-left: auto; }
-        .nav-item .level-tag.active-tag { color: #a78bfa; background: rgba(167,139,250,0.08); }
-        .nav-divider { border: none; border-top: 1px solid rgba(255,255,255,0.03); margin: 8px 12px; }
-        .sidebar .footer-nav { margin-top: auto; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.03); font-size: 11px; color: rgba(255,255,255,0.08); text-align: center; }
-
         .container {
             max-width: 1100px;
             width: 100%;
@@ -81,41 +20,6 @@
             overflow: hidden;
             z-index: 1;
             backdrop-filter: blur(2px);
-        }
-
-        .container::before {
-            content: '';
-            position: absolute;
-            top: -100px;
-            right: -100px;
-            width: 400px;
-            height: 400px;
-            background: radial-gradient(circle, rgba(80, 30, 140, 0.15), transparent 70%);
-            border-radius: 50%;
-            pointer-events: none;
-            animation: floatBg 12s ease-in-out infinite alternate;
-        }
-
-        .container::after {
-            content: '';
-            position: absolute;
-            bottom: -80px;
-            left: -80px;
-            width: 350px;
-            height: 350px;
-            background: radial-gradient(circle, rgba(30, 60, 150, 0.1), transparent 70%);
-            border-radius: 50%;
-            pointer-events: none;
-            animation: floatBg 10s ease-in-out infinite alternate-reverse;
-        }
-
-        @keyframes floatBg {
-            0% {
-                transform: translate(0, 0) scale(1);
-            }
-            100% {
-                transform: translate(30px, -20px) scale(1.1);
-            }
         }
 
         /* ===== 头部 ===== */
@@ -361,7 +265,7 @@
             box-shadow: 0 0 12px rgba(34, 197, 94, 0.2);
         }
 
-        /* ===== 底部返回链接（新增） ===== */
+        /* ===== 底部返回链接 ===== */
         .back-bottom {
             text-align: center;
             margin-top: 30px;
@@ -415,39 +319,9 @@
         }
     </style>
 </head>
-<body>
+<body class="layout-fixed">
 
-    <div id="glow"></div>
-
-    <!-- ===== 全局侧边栏导航 ===== -->
-    <div class="sidebar">
-        <div class="logo">Y.<span>Mine</span></div>
-        <div class="logo-sub">自动化决策系统</div>
-        <div class="nav-group">
-            <div class="group-label">⚙️ 核心系统</div>
-            <a href="index.html" class="nav-item"><span class="icon">🏠</span> 总控台<span class="level-tag">首页</span></a>
-            <a href="circle-lab.html" class="nav-item"><span class="icon">🧪</span> 画圈实验<span class="level-tag">方法论</span></a>
-            <a href="gamemind.html" class="nav-item"><span class="icon">🎯</span> 博弈论底座<span class="level-tag">策略</span></a>
-            <a href="moodmind.html" class="nav-item"><span class="icon">📊</span> 估值底座<span class="level-tag">估值</span></a>
-            <a href="evolvemind.html" class="nav-item active"><span class="icon">🧠</span> EvolveMind<span class="level-tag active-tag">认知</span></a>
-        </div>
-        <hr class="nav-divider" />
-        <div class="nav-group">
-            <div class="group-label">🔗 证据链</div>
-            <a href="cross-domain-mapping.html" class="nav-item"><span class="icon">⚡</span> 跨领域吞噬<span class="level-tag">验证</span></a>
-            <a href="marketing-reinvented.html" class="nav-item"><span class="icon">🔍</span> 营销学重构<span class="level-tag">重构</span></a>
-            <a href="business-learning-evidence.html" class="nav-item"><span class="icon">📊</span> 商业证据链<span class="level-tag">闭环</span></a>
-            <a href="value-pyramid.html" class="nav-item"><span class="icon">📐</span> 价值金字塔<span class="level-tag">分层</span></a>
-        </div>
-        <hr class="nav-divider" />
-        <div class="nav-group">
-            <div class="group-label">🛠️ 工具</div>
-            <a href="language-mapping-evidence.html" class="nav-item"><span class="icon">🌐</span> 语言映射<span class="level-tag">迁移</span></a>
-            <a href="general-game-os.html" class="nav-item"><span class="icon">🚁</span> 低空经济<span class="level-tag">应用</span></a>
-            <a href="binary-solver.html" class="nav-item"><span class="icon">🧩</span> 二元拆分<span class="level-tag">工具</span></a>
-        </div>
-        <div class="footer-nav">v1.0 · 系统运行中</div>
-    </div>
+    <div id="glow"></div><div class="sidebar"></div>
 
     <div class="container">
 
@@ -537,15 +411,6 @@
     </div>
 
     <script>
-        // ===== 鼠标跟随光晕 =====
-        const glow = document.getElementById('glow');
-        document.addEventListener('mousemove', (e) => {
-            const x = e.clientX / window.innerWidth * 100;
-            const y = e.clientY / window.innerHeight * 100;
-            glow.style.setProperty('--x', x + '%');
-            glow.style.setProperty('--y', y + '%');
-        });
-
         // ===== 卡片点击反馈 =====
         document.querySelectorAll('.card').forEach(card => {
             card.addEventListener('click', function(e) {
