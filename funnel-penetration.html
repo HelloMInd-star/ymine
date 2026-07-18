@@ -501,7 +501,10 @@ html,body{background:var(--bg);color:var(--text);font-family:-apple-system,'SF P
     <div class="allin-stat"><div class="n g" id="aiEV">¥0</div><div class="l">期望收益</div></div>
     <div class="allin-stat"><div class="n r" id="aiAmt">¥0</div><div class="l">建议买入</div></div>
   </div>
-  <button class="allin-btn" id="aiClose">继续观察 / 关闭</button>
+  <div style="display:flex;gap:14px;margin-top:40px;z-index:2;animation:fadeUp 1s 1.3s both;">
+    <button class="allin-btn" id="aiPoker">🎴 在扑克桌验证此决策</button>
+    <button class="allin-btn" id="aiClose">继续观察 / 关闭</button>
+  </div>
 </div>
 
 <script>
@@ -988,6 +991,27 @@ html,body{background:var(--bg);color:var(--text);font-family:-apple-system,'SF P
   btnStep.addEventListener('click', stepDemo);
   btnReset.addEventListener('click', resetDemo);
   $('aiClose').addEventListener('click', ()=> allinOverlay.classList.remove('show'));
+
+  // -------- 扑克桌联动桥接 --------
+  $('aiPoker').addEventListener('click', ()=>{
+    // 写入手牌数据（胜率p=68.5%, 净赔率b=1.85, f*=37.8%, 对应"中强牌"≈AKs或TT）
+    const handover = {
+      source:'funnel',
+      ticker:'NXNE',
+      p: state.p,
+      b: state.b,
+      kellyF: state.kellyF,
+      action: 'BIG_BET',
+      buyAmount: Math.round(state.totalCapital * state.kellyF),
+      ev: Math.round(state.totalCapital * state.kellyF * 0.32),
+      gt: 0.76,
+      timestamp: Date.now()
+    };
+    try{
+      sessionStorage.setItem('pokerFunnelHandover', JSON.stringify(handover));
+    }catch(e){}
+    window.location.href = 'index.html?pokerAuto=1';
+  });
 
   // -------- 初始化 --------
   function init(){
