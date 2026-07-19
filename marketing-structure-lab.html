@@ -1,0 +1,2967 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Game-OS 营销结构实证实验室・三流分发元架构推演平台</title>
+    <link rel="stylesheet" href="assets/css/base.css">
+    <script src="assets/js/bus.js"></script>
+    <script src="assets/js/sidebar.js"></script>
+    <style>
+
+        /* ===== 页面内导航 ===== */
+        .page-nav {
+            position: fixed;
+            top: 0;
+            left: 260px;
+            width: 100px;
+            height: 100vh;
+            padding: 32px 8px 24px;
+            background: rgba(11, 11, 26, 0.7);
+            backdrop-filter: blur(12px);
+            border-right: 1px solid rgba(255, 255, 255, 0.04);
+            overflow-y: auto;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+        }
+        .page-nav .pn-label { font-size: 10px; color: rgba(255,255,255,0.1); text-transform: uppercase; letter-spacing: 0.5px; padding: 0 8px; margin-bottom: 12px; }
+        .page-nav .pn-item { display: flex; align-items: center; gap: 6px; padding: 6px 8px; margin-bottom: 2px; border-radius: 8px; color: rgba(255,255,255,0.25); font-size: 11px; font-weight: 500; text-decoration: none; transition: all 0.25s ease; cursor: pointer; border-left: 2px solid transparent; }
+        .page-nav .pn-item:hover { background: rgba(255,255,255,0.03); color: rgba(255,255,255,0.6); border-left-color: rgba(167,139,250,0.3); }
+        .page-nav .pn-item.active { color: #f1f5f9; background: rgba(167,139,250,0.06); border-left-color: #a78bfa; }
+        .page-nav .pn-item .icon { font-size: 12px; }
+        .page-nav .pn-divider { border: none; border-top: 1px solid rgba(255,255,255,0.03); margin: 6px 0; }
+
+        /* ===== 布局修正：为双侧边栏留足空间 ===== */
+        body.layout-fixed {
+            padding-left: 380px;
+        }
+
+        /* ===== 主容器 ===== */
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            background: radial-gradient(ellipse at 30% 30%, #120b24, #0b0b1a 70%, #05030a);
+            border-radius: 32px;
+            padding: 52px 52px 44px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            box-shadow: 0 30px 80px rgba(40, 10, 80, 0.4);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+            backdrop-filter: blur(2px);
+        }
+
+        /* ===== 头部 ===== */
+        .header {
+            text-align: center;
+            margin-bottom: 16px;
+            opacity: 0;
+            animation: fadeInUp 0.8s ease forwards;
+        }
+
+        .badge {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 13px;
+            padding: 4px 16px;
+            border-radius: 20px;
+            letter-spacing: 0.3px;
+            margin-bottom: 12px;
+        }
+
+        .header h1 {
+            font-size: 32px;
+            font-weight: 700;
+            color: #f1f5f9;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #f1f5f9, #a78bfa, #60a5fa, #f1f5f9);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradientFlow 6s ease-in-out infinite;
+        }
+
+        .header .sub {
+            font-size: 15px;
+            color: rgba(255, 255, 255, 0.35);
+            font-weight: 300;
+            margin-top: 4px;
+        }
+
+        /* ===== 使用说明 ===== */
+        .usage-guide {
+            margin-bottom: 20px;
+            opacity: 0;
+            animation: fadeInUp 0.6s ease 0.04s forwards;
+        }
+        .usage-guide details {
+            background: rgba(167, 139, 250, 0.03);
+            border: 1px solid rgba(167, 139, 250, 0.06);
+            border-radius: 12px;
+            padding: 12px 18px;
+        }
+        .usage-guide details summary {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 13px;
+            font-weight: 500;
+            list-style: none;
+            user-select: none;
+        }
+        .usage-guide details summary::-webkit-details-marker {
+            display: none;
+        }
+        .usage-guide details summary .arrow {
+            margin-left: auto;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.1);
+        }
+        .usage-guide details .guide-body {
+            padding-top: 12px;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px 24px;
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.35);
+            line-height: 1.7;
+        }
+        .usage-guide details .guide-body strong {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* ===== 价值主张 ===== */
+        .value-prop {
+            background: rgba(167, 139, 250, 0.04);
+            border-left: 3px solid #a78bfa;
+            border-radius: 0 16px 16px 0;
+            padding: 18px 24px;
+            margin-bottom: 28px;
+            opacity: 0;
+            animation: fadeInUp 0.6s ease 0.03s forwards;
+        }
+
+        .value-prop p {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 15px;
+            line-height: 1.7;
+            margin-bottom: 0;
+        }
+
+        .value-prop p strong {
+            color: #a78bfa;
+            font-weight: 600;
+        }
+
+        .value-prop p .highlight {
+            color: #facc15;
+            font-weight: 600;
+        }
+
+        /* ===== 核心结论锚点 ===== */
+        .key-takeaways {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 32px;
+            opacity: 0;
+            animation: fadeInUp 0.6s ease 0.06s forwards;
+        }
+
+        .key-takeaways .kt-item {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 12px;
+            padding: 14px 16px;
+            text-align: center;
+        }
+
+        .key-takeaways .kt-item .kt-icon {
+            font-size: 24px;
+            margin-bottom: 4px;
+        }
+
+        .key-takeaways .kt-item .kt-text {
+            font-size: 13px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.6);
+            line-height: 1.4;
+        }
+
+        .key-takeaways .kt-item .kt-text .hl {
+            color: #facc15;
+        }
+
+        /* ===== 验证元数据 ===== */
+        .meta-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 32px;
+            opacity: 0;
+            animation: fadeInUp 0.6s ease 0.08s forwards;
+        }
+
+        .meta-item {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 12px;
+            padding: 12px 16px;
+        }
+
+        .meta-item .ml {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: rgba(255, 255, 255, 0.2);
+            font-weight: 600;
+        }
+
+        .meta-item .mv {
+            font-size: 14px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.7);
+            margin-top: 2px;
+            line-height: 1.5;
+        }
+
+        .meta-item .mv .hl {
+            color: #a78bfa;
+        }
+
+        .meta-item .mv .hl-gold {
+            color: #facc15;
+        }
+
+        .meta-item .mv .sub {
+            color: rgba(255, 255, 255, 0.25);
+            font-size: 12px;
+            font-weight: 400;
+        }
+
+        /* ============================================================ */
+        /* ===== 模拟器通用样式 ===== */
+        /* ============================================================ */
+        .simulator-section {
+            background: rgba(167, 139, 250, 0.04);
+            border: 1px solid rgba(167, 139, 250, 0.10);
+            border-radius: 16px;
+            padding: 28px 32px 24px;
+            margin-bottom: 36px;
+            opacity: 0;
+            animation: fadeInUp 0.6s ease 0.1s forwards;
+            scroll-margin-top: 20px;
+        }
+
+        .simulator-section .sim-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .simulator-section .sim-title .tag {
+            font-size: 11px;
+            font-weight: 500;
+            color: #a78bfa;
+            background: rgba(167, 139, 250, 0.12);
+            padding: 2px 12px;
+            border-radius: 20px;
+        }
+
+        .simulator-section .sim-sub {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.2);
+            margin-bottom: 18px;
+            line-height: 1.6;
+        }
+
+        .simulator-section .sim-sub .hl {
+            color: #a78bfa;
+        }
+
+        .simulator-section .sim-sub .hl-blue {
+            color: #60a5fa;
+        }
+
+        .simulator-section .sim-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .simulator-section .sim-grid .ctrl {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .simulator-section .sim-grid .ctrl label {
+            font-size: 12px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.35);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .simulator-section .sim-grid .ctrl label span {
+            color: #a78bfa;
+        }
+
+        .simulator-section .sim-grid .ctrl .sub-hint {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.08);
+        }
+
+        .simulator-section .sim-grid .ctrl input[type="range"] {
+            width: 100%;
+            accent-color: #a78bfa;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 4px;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        .simulator-section .sim-grid .ctrl input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #a78bfa;
+            cursor: pointer;
+            box-shadow: 0 0 20px rgba(167, 139, 250, 0.15);
+        }
+
+        .simulator-section .result-panel {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 12px;
+            padding: 14px 16px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            margin-bottom: 14px;
+        }
+
+        .simulator-section .result-panel .metric {
+            text-align: center;
+        }
+
+        .simulator-section .result-panel .metric .ml {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.15);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .simulator-section .result-panel .metric .mv {
+            font-size: 22px;
+            font-weight: 700;
+            color: #f1f5f9;
+            margin-top: 2px;
+        }
+
+        .simulator-section .result-panel .metric .mv .unit {
+            font-size: 14px;
+            font-weight: 400;
+            color: rgba(255, 255, 255, 0.2);
+        }
+
+        .simulator-section .result-panel .metric .mv.highlight {
+            color: #a78bfa;
+        }
+
+        .simulator-section .result-panel .metric .mv.gold {
+            color: #facc15;
+        }
+
+        .simulator-section .result-panel .metric .mv.green {
+            color: #22c55e;
+        }
+
+        .simulator-section .result-panel .metric .sub-hint {
+            font-size: 9px;
+            color: rgba(255, 255, 255, 0.08);
+        }
+
+        .simulator-section .advice-box {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 10px;
+            padding: 12px 16px;
+            border-left: 3px solid #a78bfa;
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 14px;
+            line-height: 1.7;
+            min-height: 48px;
+        }
+
+        .simulator-section .advice-box strong {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .simulator-section .advice-box .highlight {
+            color: #facc15;
+        }
+
+        .simulator-section .canvas-wrap {
+            margin-top: 14px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            padding: 10px;
+        }
+
+        .simulator-section .canvas-wrap canvas {
+            display: block;
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+        }
+
+        .simulator-section .canvas-caption {
+            text-align: center;
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.1);
+            margin-top: 6px;
+        }
+
+        /* ===== 漏斗状态条 ===== */
+        .funnel-status-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(167, 139, 250, 0.06);
+            border: 1px solid rgba(167, 139, 250, 0.15);
+            border-radius: 12px;
+            padding: 12px 20px;
+            margin-bottom: 20px;
+            opacity: 0;
+            animation: fadeInUp 0.6s ease 0.02s forwards;
+        }
+        .funnel-status-bar.active {
+            border-color: rgba(167, 139, 250, 0.3);
+            background: rgba(167, 139, 250, 0.08);
+        }
+        .fsb-left { display: flex; align-items: center; gap: 10px; }
+        .fsb-icon { font-size: 18px; }
+        .fsb-text { font-size: 13px; color: rgba(255,255,255,0.5); font-weight: 500; }
+        .fsb-right { display: flex; align-items: center; gap: 10px; }
+        .fsb-tag { font-size: 11px; color: rgba(255,255,255,0.3); background: rgba(255,255,255,0.03); padding: 3px 10px; border-radius: 20px; font-weight: 500; }
+        .fsb-tag.active { color: #a78bfa; background: rgba(167,139,250,0.12); }
+        .fsb-toggle {
+            background: rgba(167, 139, 250, 0.1);
+            border: 1px solid rgba(167, 139, 250, 0.2);
+            color: #a78bfa;
+            font-size: 11px;
+            padding: 4px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .fsb-toggle:hover { background: rgba(167,139,250,0.2); }
+
+        /* ===== 精算流程总览 ===== */
+        .flow-overview {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.04);
+            border-radius: 16px;
+            padding: 20px 24px;
+            margin-bottom: 20px;
+            opacity: 0;
+            animation: fadeInUp 0.6s ease 0.03s forwards;
+        }
+        .fo-title { font-size: 14px; font-weight: 600; color: rgba(255,255,255,0.5); margin-bottom: 14px; }
+        .fo-steps { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+        .fo-step {
+            flex: 1;
+            text-align: center;
+            padding: 12px 8px;
+            background: rgba(167,139,250,0.04);
+            border-radius: 10px;
+            border: 1px solid rgba(167,139,250,0.08);
+        }
+        .fo-step-icon { font-size: 22px; margin-bottom: 4px; }
+        .fo-step-name { font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.6); margin-bottom: 2px; }
+        .fo-step-desc { font-size: 10px; color: rgba(255,255,255,0.2); }
+        .fo-arrow { font-size: 18px; color: rgba(255,255,255,0.15); flex-shrink: 0; }
+
+        /* ============================================================ */
+        /* ===== 圈层收敛模型板块 ===== */
+        /* ============================================================ */
+        .cone-section {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 16px;
+            padding: 32px 36px 28px;
+            margin-bottom: 36px;
+            opacity: 0;
+            animation: fadeInUp 0.6s ease 0.15s forwards;
+            scroll-margin-top: 20px;
+        }
+
+        .cone-section .cone-title {
+            font-size: 22px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .cone-section .cone-title .tag {
+            font-size: 11px;
+            font-weight: 500;
+            color: #a78bfa;
+            background: rgba(167, 139, 250, 0.12);
+            padding: 2px 12px;
+            border-radius: 20px;
+        }
+
+        .cone-section .cone-sub {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.2);
+            margin-bottom: 18px;
+        }
+
+        .cone-section .cone-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px 24px;
+            margin-bottom: 18px;
+        }
+
+        .cone-section .cone-grid .cone-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 12px;
+            padding: 14px 16px;
+        }
+
+        .cone-section .cone-grid .cone-card .cc-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: rgba(255, 255, 255, 0.15);
+            font-weight: 600;
+        }
+
+        .cone-section .cone-grid .cone-card .cc-value {
+            font-size: 14px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.7);
+            margin-top: 2px;
+            line-height: 1.6;
+        }
+
+        .cone-section .cone-grid .cone-card .cc-value .hl {
+            color: #a78bfa;
+        }
+
+        .cone-section .cone-grid .cone-card .cc-value .gold {
+            color: #facc15;
+        }
+
+        .cone-section .cone-grid .cone-card .cc-value .green {
+            color: #22c55e;
+        }
+
+        .cone-section .cone-grid .cone-card .cc-value .sub {
+            color: rgba(255, 255, 255, 0.25);
+            font-size: 12px;
+            font-weight: 400;
+        }
+
+        .cone-section .cone-canvas-wrap {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 12px;
+            padding: 10px;
+            margin: 10px 0 14px;
+        }
+
+        .cone-section .cone-canvas-wrap canvas {
+            display: block;
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+        }
+
+        .cone-section .cone-caption {
+            text-align: center;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.12);
+            margin-top: 6px;
+        }
+
+        .cone-section .cone-note {
+            margin-top: 12px;
+            padding: 12px 16px;
+            background: rgba(167, 139, 250, 0.03);
+            border-left: 3px solid #a78bfa;
+            border-radius: 0 10px 10px 0;
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 13px;
+            line-height: 1.7;
+        }
+
+        .cone-section .cone-note strong {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .cone-section .cone-note .hl {
+            color: #facc15;
+        }
+
+        .cone-section .cone-note .hl-purple {
+            color: #a78bfa;
+        }
+
+        /* ===== 通用板块 ===== */
+        .section {
+            margin-bottom: 36px;
+            opacity: 0;
+            animation: fadeInUp 0.6s ease forwards;
+        }
+
+        .section:nth-child(6) { animation-delay: 0.2s; }
+        .section:nth-child(7) { animation-delay: 0.25s; }
+        .section:nth-child(8) { animation-delay: 0.3s; }
+        .section:nth-child(9) { animation-delay: 0.35s; }
+        .section:nth-child(10) { animation-delay: 0.4s; }
+        .section:nth-child(11) { animation-delay: 0.45s; }
+        .section:nth-child(12) { animation-delay: 0.5s; }
+        .section:nth-child(13) { animation-delay: 0.55s; }
+        .section:nth-child(14) { animation-delay: 0.6s; }
+
+        .section h2 {
+            font-size: 20px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            padding-bottom: 10px;
+        }
+
+        .section h2 .tag {
+            font-size: 11px;
+            font-weight: 500;
+            color: #a78bfa;
+            background: rgba(167, 139, 250, 0.12);
+            padding: 2px 12px;
+            border-radius: 20px;
+        }
+
+        .section h3 {
+            font-size: 16px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 6px;
+            margin-top: 14px;
+        }
+
+        .section p {
+            color: rgba(255, 255, 255, 0.5);
+            line-height: 1.8;
+            font-size: 15px;
+            margin-bottom: 8px;
+        }
+
+        .section p strong {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .section ul {
+            list-style: none;
+            padding: 0;
+            margin-bottom: 10px;
+        }
+
+        .section ul li {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 14px;
+            line-height: 1.7;
+            padding: 5px 0 5px 24px;
+            position: relative;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+        }
+
+        .section ul li:last-child {
+            border-bottom: none;
+        }
+
+        .section ul li::before {
+            content: "▸";
+            color: #a78bfa;
+            position: absolute;
+            left: 2px;
+            font-weight: 700;
+        }
+
+        .section ul li strong {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .highlight-box {
+            background: rgba(167, 139, 250, 0.04);
+            border-left: 3px solid #facc15;
+            border-radius: 0 10px 10px 0;
+            padding: 14px 18px;
+            margin: 10px 0 14px;
+        }
+
+        .highlight-box p {
+            margin-bottom: 0;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .highlight-box p strong {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .highlight-box.purple {
+            border-left-color: #a78bfa;
+        }
+
+        /* ===== 元架构映射对照表 ===== */
+        .mapping-table-wrap {
+            margin-top: 14px;
+            padding: 12px 14px;
+            background: rgba(167, 139, 250, 0.03);
+            border-radius: 10px;
+            border: 1px solid rgba(167, 139, 250, 0.06);
+        }
+
+        .mapping-table-wrap .mt-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: #a78bfa;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .mapping-table-wrap .mt-label::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, rgba(167, 139, 250, 0.15), transparent);
+        }
+
+        .mapping-table-wrap table {
+            font-size: 13px;
+        }
+
+        .mapping-table-wrap th {
+            background: rgba(167, 139, 250, 0.06);
+            color: rgba(255, 255, 255, 0.4);
+            font-weight: 600;
+            font-size: 11px;
+            padding: 6px 10px;
+            border-bottom: 1px solid rgba(167, 139, 250, 0.08);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .mapping-table-wrap td {
+            color: rgba(255, 255, 255, 0.5);
+            padding: 6px 10px;
+            font-size: 13px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+        }
+
+        .mapping-table-wrap td:first-child {
+            color: rgba(255, 255, 255, 0.6);
+            font-weight: 500;
+        }
+
+        .mapping-table-wrap td .tool {
+            color: #a78bfa;
+            font-weight: 500;
+        }
+
+        .mapping-table-wrap td .corr {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .mapping-table-wrap td .neuron {
+            color: #facc15;
+            font-weight: 400;
+        }
+
+        .mapping-table-wrap tr:last-child td {
+            border-bottom: none;
+        }
+
+        .mapping-table-wrap .mt-note {
+            margin-top: 8px;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.2);
+            font-style: italic;
+            padding-top: 6px;
+            border-top: 1px solid rgba(255, 255, 255, 0.02);
+        }
+
+        /* ===== 表格通用 ===== */
+        .table-wrap {
+            overflow-x: auto;
+            margin: 10px 0 14px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        th {
+            background: rgba(255, 255, 255, 0.03);
+            color: rgba(255, 255, 255, 0.5);
+            font-weight: 600;
+            padding: 8px 12px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        td {
+            color: rgba(255, 255, 255, 0.45);
+            padding: 8px 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            vertical-align: top;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        td strong {
+            color: rgba(255, 255, 255, 0.65);
+        }
+
+        /* ============================================================ */
+        /* ===== 系统结构总览（可视化结构图） ===== */
+        /* ============================================================ */
+        .structure-section {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 16px;
+            padding: 32px 36px 28px;
+            margin-bottom: 36px;
+            opacity: 0;
+            animation: fadeInUp 0.6s ease 0.5s forwards;
+            scroll-margin-top: 20px;
+        }
+
+        .structure-section .struct-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .structure-section .struct-title .tag {
+            font-size: 11px;
+            font-weight: 500;
+            color: #facc15;
+            background: rgba(250, 204, 21, 0.08);
+            padding: 2px 12px;
+            border-radius: 20px;
+        }
+
+        .structure-section .struct-sub {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.2);
+            margin-bottom: 18px;
+        }
+
+        .struct-flow {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            padding: 10px 0;
+        }
+
+        .struct-flow .level {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            width: 100%;
+            max-width: 900px;
+            padding: 10px 16px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            transition: border-color 0.3s ease;
+        }
+
+        .struct-flow .level:hover {
+            border-color: rgba(255, 255, 255, 0.08);
+        }
+
+        .struct-flow .level .l-badge {
+            font-size: 10px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.15);
+            min-width: 44px;
+            text-align: center;
+            font-family: 'Courier New', monospace;
+        }
+
+        .struct-flow .level .l-content {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .struct-flow .level .l-content .l-icon {
+            font-size: 18px;
+        }
+
+        .struct-flow .level .l-content .l-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .struct-flow .level .l-content .l-desc {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.25);
+            line-height: 1.4;
+        }
+
+        .struct-flow .level .l-content .l-desc .hl {
+            color: #a78bfa;
+        }
+
+        .struct-flow .level .l-content .l-desc .gold {
+            color: #facc15;
+        }
+
+        .struct-flow .level .l-content .l-desc .green {
+            color: #22c55e;
+        }
+
+        .struct-flow .level .l-content .l-desc .orange {
+            color: #fb923c;
+        }
+
+        .struct-flow .level .l-content .l-desc .red {
+            color: #ef4444;
+        }
+
+        .struct-flow .level .l-arrow {
+            color: rgba(255, 255, 255, 0.04);
+            font-size: 16px;
+            font-weight: 300;
+            padding: 0 4px;
+        }
+
+        .struct-flow .level .l-tag {
+            font-size: 9px;
+            font-weight: 500;
+            padding: 1px 10px;
+            border-radius: 12px;
+            background: rgba(167, 139, 250, 0.06);
+            color: rgba(167, 139, 250, 0.3);
+            white-space: nowrap;
+        }
+
+        .struct-flow .level .l-tag.active {
+            background: rgba(167, 139, 250, 0.12);
+            color: #a78bfa;
+        }
+
+        .struct-flow .level .l-tag.gold-tag {
+            background: rgba(250, 204, 21, 0.08);
+            color: #facc15;
+        }
+
+        .struct-flow .level .l-tag.green-tag {
+            background: rgba(34, 197, 94, 0.08);
+            color: #22c55e;
+        }
+
+        .struct-flow .level .l-tag.orange-tag {
+            background: rgba(251, 146, 60, 0.08);
+            color: #fb923c;
+        }
+
+        .struct-flow .level .l-tag.red-tag {
+            background: rgba(239, 68, 68, 0.08);
+            color: #ef4444;
+        }
+
+        .struct-flow .divider-line {
+            width: 2px;
+            height: 12px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 2px;
+        }
+
+        .struct-flow .level.prominent {
+            border-color: rgba(167, 139, 250, 0.12);
+            background: rgba(167, 139, 250, 0.03);
+        }
+
+        .struct-flow .level.prominent .l-name {
+            color: #a78bfa;
+        }
+
+        .struct-flow .level.bottom-line {
+            border-color: rgba(250, 204, 21, 0.08);
+        }
+
+        .struct-flow .level.bottom-line .l-name {
+            color: #facc15;
+        }
+
+        .struct-flow .level.capstone {
+            border-color: rgba(34, 197, 94, 0.12);
+            background: rgba(34, 197, 94, 0.03);
+        }
+
+        .struct-flow .level.capstone .l-name {
+            color: #22c55e;
+        }
+
+        .struct-summary {
+            margin-top: 16px;
+            padding: 14px 20px;
+            background: rgba(167, 139, 250, 0.03);
+            border-radius: 10px;
+            border: 1px solid rgba(167, 139, 250, 0.06);
+            text-align: center;
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.3);
+            line-height: 1.7;
+        }
+
+        .struct-summary strong {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .struct-summary .hl {
+            color: #a78bfa;
+        }
+
+        .struct-summary .gold {
+            color: #facc15;
+        }
+
+        .struct-summary .green {
+            color: #22c55e;
+        }
+
+        /* ===== 基础测试说明 ===== */
+        .test-section {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 16px;
+            padding: 22px 28px 20px;
+            margin-bottom: 36px;
+            opacity: 0;
+            animation: fadeInUp 0.6s ease 0.45s forwards;
+            scroll-margin-top: 20px;
+        }
+
+        .test-section .test-title {
+            font-size: 17px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .test-section .test-title .tag {
+            font-size: 11px;
+            font-weight: 500;
+            color: #facc15;
+            background: rgba(250, 204, 21, 0.08);
+            padding: 2px 12px;
+            border-radius: 20px;
+        }
+
+        .test-section .test-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        .test-section .test-grid .test-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 12px;
+            padding: 14px 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .test-section .test-grid .test-card:hover {
+            border-color: rgba(255, 255, 255, 0.08);
+        }
+
+        .test-section .test-grid .test-card .tc-icon {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+
+        .test-section .test-grid .test-card .tc-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .test-section .test-grid .test-card .tc-desc {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.25);
+            line-height: 1.5;
+            margin-top: 4px;
+        }
+
+        .test-section .test-grid .test-card .tc-method {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.15);
+            margin-top: 6px;
+            padding-top: 6px;
+            border-top: 1px solid rgba(255, 255, 255, 0.02);
+        }
+
+        .test-section .test-grid .test-card .tc-method strong {
+            color: rgba(255, 255, 255, 0.25);
+        }
+
+        /* ===== 延伸方向 ===== */
+        .extension-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin: 10px 0 14px;
+        }
+
+        .extension-grid .ext-item {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 12px;
+            padding: 14px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.3s ease;
+            cursor: default;
+        }
+
+        .extension-grid .ext-item .ext-info .ext-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .extension-grid .ext-item .ext-info .ext-desc {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.2);
+            margin-top: 2px;
+        }
+
+        .extension-grid .ext-item .ext-lock {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.12);
+            padding: 4px 12px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .extension-grid .ext-item .ext-lock .lock-icon {
+            margin-right: 4px;
+        }
+
+        .extension-grid .ext-item .ext-lock.unlocked {
+            color: rgba(167, 139, 250, 0.2);
+            border-color: rgba(167, 139, 250, 0.08);
+        }
+
+        /* ===== 底部 ===== */
+        .back-bottom {
+            text-align: center;
+            margin-top: 32px;
+            padding-top: 16px;
+            border-top: 1px solid rgba(255, 255, 255, 0.03);
+            opacity: 0;
+            animation: fadeInUp 0.6s ease 0.55s forwards;
+        }
+
+        .back-bottom a {
+            color: rgba(255, 255, 255, 0.2);
+            text-decoration: none;
+            font-size: 13px;
+            transition: color 0.3s ease;
+        }
+
+        .back-bottom a:hover {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        /* ===== 圆锥博弈场 · 上帝视角板块 ===== */
+        .game-theory-section {
+            background: linear-gradient(135deg, rgba(167,139,250,0.08), rgba(96,165,250,0.05));
+            border: 1px solid rgba(167,139,250,0.2);
+            border-radius: 20px;
+            padding: 36px 36px 32px;
+            margin-bottom: 36px;
+            opacity: 0;
+            animation: fadeInUp 0.7s ease 0.15s forwards;
+            scroll-margin-top: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        .game-theory-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(167,139,250,0.15), transparent 70%);
+            pointer-events: none;
+        }
+        .gt-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: #f1f5f9;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .gt-title .gt-tag {
+            font-size: 10px;
+            font-weight: 600;
+            color: #dc2626;
+            background: rgba(220,38,38,0.15);
+            padding: 3px 12px;
+            border-radius: 20px;
+            letter-spacing: 0.5px;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+        .gt-subtitle {
+            font-size: 13px;
+            color: rgba(255,255,255,0.3);
+            margin-bottom: 24px;
+            line-height: 1.7;
+        }
+        .gt-subtitle .god {
+            color: #facc15;
+            font-weight: 600;
+        }
+        .gt-subtitle .sigma {
+            color: #a78bfa;
+            font-weight: 600;
+        }
+        .gt-status-bar {
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            gap: 16px;
+            align-items: center;
+            background: rgba(0,0,0,0.3);
+            border-radius: 14px;
+            padding: 16px 20px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+        .gt-state-indicator {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .gt-state-dot {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #22c55e;
+            box-shadow: 0 0 20px currentColor;
+            animation: statePulse 1.5s infinite;
+        }
+        @keyframes statePulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.7; }
+        }
+        .gt-state-text {
+            font-size: 18px;
+            font-weight: 700;
+        }
+        .gt-state-desc {
+            font-size: 11px;
+            color: rgba(255,255,255,0.4);
+        }
+        .gt-gravity-bar {
+            height: 10px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 5px;
+            position: relative;
+            overflow: hidden;
+        }
+        .gt-gravity-band1 {
+            position: absolute;
+            top: 0;
+            height: 100%;
+            background: rgba(34,197,94,0.2);
+            border-radius: 5px;
+        }
+        .gt-gravity-begin {
+            position: absolute;
+            top: -4px;
+            width: 2px;
+            height: 18px;
+            background: #ef4444;
+        }
+        .gt-price-marker {
+            position: absolute;
+            top: -6px;
+            width: 4px;
+            height: 22px;
+            background: #facc15;
+            border-radius: 2px;
+            box-shadow: 0 0 10px #facc15;
+            transition: left 0.3s ease;
+        }
+        .gt-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .gt-stat-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 10px;
+            padding: 12px 10px;
+            text-align: center;
+        }
+        .gt-stat-label {
+            font-size: 9px;
+            color: rgba(255,255,255,0.25);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+        .gt-stat-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: #f1f5f9;
+        }
+        .gt-stat-value.green { color: #22c55e; }
+        .gt-stat-value.yellow { color: #facc15; }
+        .gt-stat-value.orange { color: #fb923c; }
+        .gt-stat-value.red { color: #ef4444; }
+        .gt-stat-value.purple { color: #a78bfa; }
+        .gt-canvas-area {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+        .gt-canvas-wrap {
+            background: rgba(0,0,0,0.25);
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.04);
+            padding: 12px;
+        }
+        .gt-canvas-wrap canvas {
+            display: block;
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+        }
+        .gt-canvas-caption {
+            text-align: center;
+            font-size: 10px;
+            color: rgba(255,255,255,0.15);
+            margin-top: 8px;
+        }
+        .gt-decision-box {
+            background: rgba(0,0,0,0.35);
+            border-radius: 14px;
+            padding: 20px 24px;
+            border-left: 4px solid #22c55e;
+            margin-bottom: 16px;
+            transition: all 0.4s ease;
+        }
+        .gt-decision-box.calm { border-left-color: #22c55e; }
+        .gt-decision-box.tension { border-left-color: #facc15; }
+        .gt-decision-box.extreme { border-left-color: #fb923c; }
+        .gt-decision-box.black_swan { border-left-color: #ef4444; }
+        .gt-decision-box.meltdown { border-left-color: #dc2626; }
+        .gt-decision-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+        .gt-decision-action {
+            font-size: 16px;
+            font-weight: 700;
+            color: #f1f5f9;
+        }
+        .gt-decision-kelly {
+            font-size: 12px;
+            color: rgba(255,255,255,0.4);
+        }
+        .gt-decision-kelly .val {
+            color: #facc15;
+            font-weight: 700;
+            font-size: 14px;
+        }
+        .gt-decision-msg {
+            font-size: 14px;
+            color: rgba(255,255,255,0.6);
+            line-height: 1.7;
+            margin-bottom: 12px;
+        }
+        .gt-orders {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .gt-order {
+            font-size: 11px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            background: rgba(255,255,255,0.05);
+            color: rgba(255,255,255,0.5);
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+        .gt-controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .gt-btn {
+            padding: 8px 18px;
+            border-radius: 8px;
+            border: none;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+        .gt-btn-start {
+            background: linear-gradient(135deg, #a78bfa, #7c3aed);
+            color: white;
+        }
+        .gt-btn-start:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(167,139,250,0.3);
+        }
+        .gt-btn-start.running {
+            background: rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.5);
+        }
+        .gt-btn-shock {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+        }
+        .gt-btn-shock:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(239,68,68,0.3);
+        }
+        .gt-btn-reset {
+            background: rgba(255,255,255,0.06);
+            color: rgba(255,255,255,0.5);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .gt-btn-reset:hover {
+            background: rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.8);
+        }
+        .gt-axioms {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-top: 16px;
+        }
+        .gt-axiom {
+            background: rgba(255,255,255,0.02);
+            border-radius: 8px;
+            padding: 10px 12px;
+            border-left: 2px solid rgba(167,139,250,0.3);
+        }
+        .gt-axiom-num {
+            font-size: 10px;
+            color: #a78bfa;
+            font-weight: 700;
+            margin-bottom: 2px;
+        }
+        .gt-axiom-text {
+            font-size: 10px;
+            color: rgba(255,255,255,0.3);
+            line-height: 1.5;
+        }
+
+        /* ===== 响应式 ===== */
+        @media (max-width: 1024px) {
+            .container {
+                max-width: 100%;
+                padding: 36px 28px 32px;
+            }
+        }
+
+        @media (max-width: 900px) {
+            .page-nav {
+                display: none;
+            }
+            body.layout-fixed {
+                padding-left: 0;
+            }
+            .container {
+                padding: 28px 20px 24px;
+                border-radius: 0;
+            }
+            .meta-grid {
+                grid-template-columns: 1fr;
+            }
+            .key-takeaways {
+                grid-template-columns: 1fr;
+            }
+            .extension-grid {
+                grid-template-columns: 1fr;
+            }
+            .test-section .test-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            .cone-section .cone-grid {
+                grid-template-columns: 1fr;
+            }
+            .mapping-table-wrap table {
+                font-size: 12px;
+            }
+            .mapping-table-wrap th,
+            .mapping-table-wrap td {
+                padding: 4px 6px;
+            }
+            .simulator-section .sim-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            .simulator-section .result-panel {
+                grid-template-columns: 1fr 1fr;
+            }
+            .usage-guide details .guide-body {
+                grid-template-columns: 1fr;
+            }
+            .struct-flow .level {
+                flex-wrap: wrap;
+                gap: 6px;
+            }
+            .struct-flow .level .l-arrow {
+                display: none;
+            }
+            .gt-stats-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            .gt-canvas-area {
+                grid-template-columns: 1fr;
+            }
+            .gt-axioms {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 700px) {
+            .container {
+                padding: 20px 16px 18px;
+            }
+            .header h1 {
+                font-size: 24px;
+            }
+            .section h2 {
+                font-size: 17px;
+            }
+            .section p,
+            .section ul li,
+            td {
+                font-size: 13px;
+            }
+            table {
+                font-size: 12px;
+            }
+            th,
+            td {
+                padding: 6px 8px;
+            }
+            .value-prop p {
+                font-size: 14px;
+            }
+            .test-section .test-grid {
+                grid-template-columns: 1fr;
+            }
+            .cone-section {
+                padding: 20px 16px 18px;
+            }
+            .cone-section .cone-grid {
+                grid-template-columns: 1fr;
+            }
+            .mapping-table-wrap {
+                padding: 8px 10px;
+            }
+            .mapping-table-wrap table {
+                font-size: 11px;
+            }
+            .mapping-table-wrap th,
+            .mapping-table-wrap td {
+                padding: 3px 4px;
+            }
+            .simulator-section {
+                padding: 18px 14px 16px;
+            }
+            .simulator-section .sim-grid {
+                grid-template-columns: 1fr;
+            }
+            .simulator-section .result-panel {
+                grid-template-columns: 1fr 1fr;
+            }
+            .simulator-section .result-panel .metric .mv {
+                font-size: 18px;
+            }
+            .structure-section {
+                padding: 20px 16px 18px;
+            }
+            .struct-flow .level .l-content {
+                gap: 6px;
+            }
+            .struct-flow .level .l-content .l-desc {
+                font-size: 11px;
+            }
+            .struct-flow .level .l-content .l-name {
+                font-size: 13px;
+            }
+            /* 资本定价三列→一列适配 */
+            .cone-section [style*="grid-template-columns:"] {
+                grid-template-columns: 1fr !important;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 16px 12px 14px;
+            }
+            .header h1 {
+                font-size: 20px;
+            }
+            .meta-item .mv {
+                font-size: 12px;
+            }
+            .key-takeaways .kt-item .kt-text {
+                font-size: 12px;
+            }
+            .simulator-section .result-panel {
+                grid-template-columns: 1fr;
+            }
+            .usage-guide details {
+                padding: 10px 12px;
+            }
+            .usage-guide details .guide-body {
+                font-size: 12px;
+                gap: 4px 12px;
+            }
+            .struct-flow .level {
+                padding: 8px 10px;
+            }
+        }
+
+        /* ===== 新增模块：价值地基体系 ===== */
+        .prism-container, .pyramid-container {
+            display: flex;
+            gap: 24px;
+            align-items: flex-start;
+            flex-wrap: wrap;
+        }
+        .canvas-3d-wrap {
+            position: relative;
+            background: radial-gradient(ellipse at center, rgba(167,139,250,0.08) 0%, rgba(11,11,26,0.95) 70%);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 12px;
+            padding: 12px;
+            overflow: hidden;
+        }
+        .canvas-3d-wrap canvas {
+            display: block;
+            border-radius: 8px;
+            cursor: grab;
+        }
+        .canvas-3d-wrap canvas:active {
+            cursor: grabbing;
+        }
+        .prism-ctrl-panel {
+            flex: 1;
+            min-width: 280px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .layer-breakdown {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 10px;
+            margin-top: 16px;
+        }
+        .layer-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 10px;
+            padding: 12px;
+            transition: all 0.3s ease;
+        }
+        .layer-card:hover {
+            background: rgba(167,139,250,0.08);
+            border-color: rgba(167,139,250,0.3);
+            transform: translateY(-2px);
+        }
+        .layer-card.active {
+            background: rgba(167,139,250,0.12);
+            border-color: rgba(167,139,250,0.5);
+            box-shadow: 0 0 20px rgba(167,139,250,0.2);
+        }
+        .layer-card .ly-name {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #f1f5f9;
+        }
+        .layer-card .ly-metric {
+            font-size: 11px;
+            color: rgba(255,255,255,0.5);
+            margin: 4px 0;
+            display: flex;
+            justify-content: space-between;
+        }
+        .layer-card .ly-metric span:last-child {
+            color: #a78bfa;
+            font-weight: 600;
+        }
+        .face-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+            margin-top: 20px;
+        }
+        .face-card {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 12px;
+            padding: 16px;
+        }
+        .face-card.product { border-top: 3px solid #22d3ee; }
+        .face-card.brand { border-top: 3px solid #a78bfa; }
+        .face-card.channel { border-top: 3px solid #facc15; }
+        .face-card .fc-title {
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .face-card.product .fc-title { color: #22d3ee; }
+        .face-card.brand .fc-title { color: #a78bfa; }
+        .face-card.channel .fc-title { color: #facc15; }
+        .face-card .fc-score {
+            font-size: 24px;
+            font-weight: 800;
+            text-align: center;
+            margin: 8px 0;
+        }
+        .face-card.product .fc-score { color: #22d3ee; }
+        .face-card.brand .fc-score { color: #a78bfa; }
+        .face-card.channel .fc-score { color: #facc15; }
+        .face-card .slider-group {
+            margin-top: 12px;
+        }
+        .face-card .slider-group label {
+            display: block;
+            font-size: 11px;
+            color: rgba(255,255,255,0.6);
+            margin-bottom: 4px;
+        }
+        .face-card .slider-group input[type="range"] {
+            width: 100%;
+            height: 4px;
+            -webkit-appearance: none;
+            background: rgba(255,255,255,0.1);
+            border-radius: 2px;
+            outline: none;
+        }
+        .face-card.product .slider-group input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #22d3ee;
+            cursor: pointer;
+            box-shadow: 0 0 8px rgba(34,211,238,0.5);
+        }
+        .face-card.brand .slider-group input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #a78bfa;
+            cursor: pointer;
+            box-shadow: 0 0 8px rgba(167,139,250,0.5);
+        }
+        .face-card.channel .slider-group input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #facc15;
+            cursor: pointer;
+            box-shadow: 0 0 8px rgba(250,204,21,0.5);
+        }
+        .prism-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 12px;
+        }
+        .prism-btn {
+            flex: 1;
+            padding: 10px 16px;
+            border: 1px solid rgba(167,139,250,0.3);
+            background: rgba(167,139,250,0.08);
+            color: #a78bfa;
+            border-radius: 8px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .prism-btn:hover {
+            background: rgba(167,139,250,0.2);
+            border-color: rgba(167,139,250,0.6);
+        }
+
+        /* 多棱锥 */
+        .pyramid-ctrl {
+            flex: 1;
+            min-width: 280px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .dim-toggles {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .dim-toggle {
+            padding: 8px 14px;
+            border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.03);
+            color: rgba(255,255,255,0.6);
+            border-radius: 20px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            user-select: none;
+        }
+        .dim-toggle.active {
+            background: rgba(167,139,250,0.15);
+            border-color: rgba(167,139,250,0.5);
+            color: #a78bfa;
+            box-shadow: 0 0 12px rgba(167,139,250,0.2);
+        }
+        .pyramid-metrics {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 10px;
+            padding: 16px;
+        }
+        .pyramid-metrics .pm-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+        }
+        .pyramid-metrics .pm-row:last-child {
+            border-bottom: none;
+        }
+        .pyramid-metrics .pm-label {
+            font-size: 12px;
+            color: rgba(255,255,255,0.5);
+        }
+        .pyramid-metrics .pm-value {
+            font-size: 16px;
+            font-weight: 700;
+            color: #f1f5f9;
+        }
+        .pyramid-metrics .pm-value.highlight {
+            color: #22c55e;
+            text-shadow: 0 0 10px rgba(34,197,94,0.4);
+        }
+        .flow-up-indicator {
+            background: linear-gradient(180deg, rgba(34,197,94,0.15) 0%, rgba(34,197,94,0.02) 100%);
+            border: 1px solid rgba(34,197,94,0.3);
+            border-radius: 10px;
+            padding: 14px;
+            text-align: center;
+        }
+        .flow-up-indicator .arrow-up {
+            font-size: 24px;
+            color: #22c55e;
+            animation: bounceUp 1.5s ease infinite;
+        }
+        @keyframes bounceUp {
+            0%, 100% { transform: translateY(0); opacity: 0.6; }
+            50% { transform: translateY(-6px); opacity: 1; }
+        }
+        .flow-up-indicator .flow-text {
+            font-size: 12px;
+            color: rgba(255,255,255,0.6);
+            margin-top: 6px;
+        }
+        .flow-up-indicator .flow-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: #22c55e;
+            margin-top: 4px;
+        }
+
+        /* 国学向量 */
+        .guoxue-layout {
+            display: grid;
+            grid-template-columns: 1fr 320px;
+            gap: 24px;
+        }
+        .guoxue-sliders {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .gx-slider-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 10px;
+            padding: 12px 16px;
+            transition: all 0.3s ease;
+        }
+        .gx-slider-row:hover {
+            background: rgba(255,255,255,0.04);
+        }
+        .gx-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+        .gx-slider-row.confucian .gx-icon { background: rgba(167,139,250,0.2); color: #a78bfa; }
+        .gx-slider-row.legalist .gx-icon { background: rgba(96,165,250,0.2); color: #60a5fa; }
+        .gx-slider-row.daoist .gx-icon { background: rgba(34,211,238,0.2); color: #22d3ee; }
+        .gx-slider-row.yinyang .gx-icon { background: rgba(244,114,182,0.2); color: #f472b6; }
+        .gx-slider-row.bingjia .gx-icon { background: rgba(239,68,68,0.2); color: #ef4444; }
+        .gx-slider-row.zongheng .gx-icon { background: rgba(250,204,21,0.2); color: #facc15; }
+        .gx-info {
+            flex: 1;
+            min-width: 0;
+        }
+        .gx-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #f1f5f9;
+        }
+        .gx-desc {
+            font-size: 11px;
+            color: rgba(255,255,255,0.4);
+            margin-top: 2px;
+        }
+        .gx-slider-wrap {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 200px;
+            flex-shrink: 0;
+        }
+        .gx-slider-wrap input[type="range"] {
+            flex: 1;
+            height: 4px;
+            -webkit-appearance: none;
+            background: rgba(255,255,255,0.1);
+            border-radius: 2px;
+            outline: none;
+        }
+        .gx-slider-row.confucian input[type="range"]::-webkit-slider-thumb { -webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:#a78bfa;cursor:pointer;box-shadow:0 0 8px rgba(167,139,250,0.5);}
+        .gx-slider-row.legalist input[type="range"]::-webkit-slider-thumb { -webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:#60a5fa;cursor:pointer;box-shadow:0 0 8px rgba(96,165,250,0.5);}
+        .gx-slider-row.daoist input[type="range"]::-webkit-slider-thumb { -webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:#22d3ee;cursor:pointer;box-shadow:0 0 8px rgba(34,211,238,0.5);}
+        .gx-slider-row.yinyang input[type="range"]::-webkit-slider-thumb { -webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:#f472b6;cursor:pointer;box-shadow:0 0 8px rgba(244,114,182,0.5);}
+        .gx-slider-row.bingjia input[type="range"]::-webkit-slider-thumb { -webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:#ef4444;cursor:pointer;box-shadow:0 0 8px rgba(239,68,68,0.5);}
+        .gx-slider-row.zongheng input[type="range"]::-webkit-slider-thumb { -webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:#facc15;cursor:pointer;box-shadow:0 0 8px rgba(250,204,21,0.5);}
+        .gx-val {
+            width: 36px;
+            text-align: right;
+            font-size: 14px;
+            font-weight: 700;
+            color: #f1f5f9;
+        }
+        .guoxue-right {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .radar-wrap {
+            background: radial-gradient(ellipse at center, rgba(167,139,250,0.06) 0%, rgba(11,11,26,0.95) 70%);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 12px;
+            padding: 12px;
+            text-align: center;
+        }
+        .radar-wrap canvas {
+            display: block;
+            margin: 0 auto;
+        }
+        .gx-metrics {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 10px;
+            padding: 14px;
+        }
+        .gx-metric-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 7px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+        }
+        .gx-metric-row:last-child { border-bottom: none; }
+        .gx-metric-label { font-size: 11px; color: rgba(255,255,255,0.5); }
+        .gx-metric-value { font-size: 14px; font-weight: 700; }
+        .gx-face-map {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid rgba(255,255,255,0.06);
+        }
+        .gx-face-map-title {
+            font-size: 11px;
+            color: rgba(255,255,255,0.4);
+            margin-bottom: 8px;
+        }
+        .gx-face-item {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            padding: 4px 0;
+        }
+        .gx-face-item .fi-label { color: rgba(255,255,255,0.6); }
+        .gx-face-item .fi-val { font-weight: 600; }
+        .gx-face-item.product .fi-val { color: #22d3ee; }
+        .gx-face-item.brand .fi-val { color: #a78bfa; }
+        .gx-face-item.channel .fi-val { color: #facc15; }
+        .gx-presets {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 12px;
+        }
+        .gx-preset-btn {
+            padding: 6px 12px;
+            border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.03);
+            color: rgba(255,255,255,0.6);
+            border-radius: 16px;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .gx-preset-btn:hover, .gx-preset-btn.active {
+            background: rgba(239,68,68,0.1);
+            border-color: rgba(239,68,68,0.4);
+            color: #fca5a5;
+        }
+        .private-engine-notice {
+            background: rgba(239,68,68,0.08);
+            border: 1px solid rgba(239,68,68,0.2);
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: 11px;
+            color: rgba(252,165,165,0.8);
+            margin-top: 12px;
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+        .private-engine-notice .lock-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+
+        /* 粒子流 */
+        .flow-canvas-wrap {
+            background: radial-gradient(ellipse at center, rgba(167,139,250,0.05) 0%, rgba(11,11,26,0.98) 80%);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 12px;
+            padding: 16px;
+            position: relative;
+            overflow: hidden;
+        }
+        .flow-canvas-wrap canvas {
+            display: block;
+            width: 100%;
+            border-radius: 8px;
+        }
+        .flow-controls {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+        .flow-play-btn {
+            padding: 12px 28px;
+            border: none;
+            background: linear-gradient(135deg, #a78bfa 0%, #7c3aed 100%);
+            color: white;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(167,139,250,0.3);
+        }
+        .flow-play-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 28px rgba(167,139,250,0.4);
+        }
+        .flow-play-btn.paused {
+            background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+            box-shadow: 0 4px 20px rgba(96,165,250,0.3);
+        }
+        .flow-status {
+            font-size: 13px;
+            color: rgba(255,255,255,0.5);
+        }
+        .flow-status .active-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #22c55e;
+            margin-right: 6px;
+            animation: pulse 2s ease infinite;
+        }
+        .flow-status.stopped .active-dot {
+            background: #64748b;
+            animation: none;
+        }
+
+        /* 新section入场动画 */
+        #section-prism, #section-pyramid, #section-guoxue, #section-flow {
+            opacity: 0;
+            animation: fadeInUp 0.6s ease forwards;
+        }
+        #section-prism { animation-delay: 0.1s; }
+        #section-pyramid { animation-delay: 0.2s; }
+        #section-guoxue { animation-delay: 0.3s; }
+        #section-flow { animation-delay: 0.4s; }
+
+        .red-tag {
+            background: rgba(239,68,68,0.15) !important;
+            color: #fca5a5 !important;
+            border: 1px solid rgba(239,68,68,0.3) !important;
+        }
+
+        @media (max-width: 900px) {
+            .prism-container, .pyramid-container {
+                flex-direction: column;
+            }
+            .canvas-3d-wrap {
+                width: 100%;
+            }
+            .canvas-3d-wrap canvas {
+                width: 100% !important;
+                height: auto !important;
+            }
+            .face-cards {
+                grid-template-columns: 1fr;
+            }
+            .guoxue-layout {
+                grid-template-columns: 1fr;
+            }
+            .gx-slider-wrap {
+                width: 140px;
+            }
+            .layer-breakdown {
+                grid-template-columns: 1fr 1fr;
+            }
+            .flow-canvas-wrap canvas {
+                height: 280px !important;
+            }
+        }
+    
+    </style>
+</head>
+<body class="layout-fixed">
+
+    <div id="glow"></div><div class="sidebar"></div>
+
+    <!-- ===== 页面内导航 ===== -->
+    <div class="page-nav" id="sidebar">
+        <div class="pn-label">🎯 营销实证实验室</div>
+        <a class="pn-item" data-target="section-layer1"><span class="icon">🌀</span><span class="label">一/二/三</span></a>
+        <a class="pn-item" data-target="section-layer2"><span class="icon">🔄</span><span class="label">A/B对照</span></a>
+        <a class="pn-item" data-target="section-layer3"><span class="icon">🎯</span><span class="label">核心比喻</span></a>
+        <a class="pn-item" data-target="section-layer4"><span class="icon">📐</span><span class="label">三维评估</span></a>
+        <a class="pn-item" data-target="section-layer5"><span class="icon">📋</span><span class="label">理论对照</span></a>
+        <a class="pn-item" data-target="section-layer6"><span class="icon">💡</span><span class="label">学习真相</span></a>
+        <a class="pn-item" data-target="section-test"><span class="icon">🧪</span><span class="label">验证方法</span></a>
+        <a class="pn-item" data-target="section-dispatch-efficiency"><span class="icon">⚡</span><span class="label">三流效率</span></a>
+        <a class="pn-item" data-target="section-output"><span class="icon">📦</span><span class="label">最终产出</span></a>
+    </div>
+
+    <!-- ===== 主容器 ===== -->
+    <div class="container">
+
+        <!-- ===== 头部 ===== -->
+        <div class="header">
+            <div class="badge">🧪 三流分发元架构推演 · 认知系统学术研究</div>
+            <h1>Game-OS 营销结构实证实验室</h1>
+            <div class="sub">基于全域圈层范式重构分发链路认知体系</div>
+        </div>
+
+        <!-- ===== 科研声明 ===== -->
+        <div style="margin: 0 0 24px; padding: 20px 24px; background: linear-gradient(135deg, rgba(244,114,182,0.04), rgba(167,139,250,0.04)); border: 1px solid rgba(255,255,255,0.06); border-radius: 16px;">
+            <div style="font-size: 12px; font-weight: 600; color: #a78bfa; margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
+                <span>🔬</span>
+                <span>科研声明</span>
+            </div>
+            <p style="color: rgba(255,255,255,0.5); font-size: 14px; line-height: 1.8; margin-bottom: 0;">
+                本实验室依托 Game-OS 底层圈层收敛公理，搭建三流统一分发元架构，通过分组对照、神经科学映射、跨场景案例完成传播系统规律推演；全部推导范式为自主原创，仅使用公共数理、脑科学通用词汇，不照搬传统营销学科成套理论；内容仅用于认知系统学术推演，不构成商业运营实操指导。
+            </p>
+        </div>
+
+<!-- ============================================================ -->
+        <!-- ===== 三流分发元架构推演平台 ===== -->
+        <!-- ============================================================ -->
+        <div style="margin: 0 0 24px; padding: 20px 24px; background: linear-gradient(135deg, rgba(244,114,182,0.06), rgba(167,139,250,0.06)); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; text-align: center;">
+            <div style="font-size: 18px; font-weight: 700; color: #f472b6; margin-bottom: 6px; letter-spacing: 0.3px;">🎯 三流分发元架构推演平台</div>
+            <div style="font-size: 13px; color: rgba(255,255,255,0.4);">传播系统底层统一范式：信息圈层扰动（传播层）、认知流量传导（运营层）、实体载体输送（履约层）；依托自研一/二/三元架构，独立完成全链路分发系统规则推演。</div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- ===== 第一层 ===== -->
+        <!-- ============================================================ -->
+        <div class="section-anchor" id="section-layer1"></div>
+        <div class="section">
+            <h2>第一层 <span class="tag">带着“一”进入对话</span></h2>
+            <p><strong>背景：</strong>隐形冠军圈层控制权案例 → 一个早已成型的、可迁移的底层操作系统。</p>
+            <ul>
+                <li><strong>证据：</strong>主动用 <strong>“一生二，二生三，三生万物”</strong> 拆解隐形冠军圈层控制权模型</li>
+                <li><strong>意义：</strong>用哲学语言独立定义了分发链路最核心的概念——信息圈层扰动（传播层）·认知流量传导（运营层）·实体载体输送（履约层）</li>
+                <li><strong>突破：</strong>揭示“用户的逻辑是反着来的”——万物→三→二→一，独立推导出 <strong>用户旅程</strong> 模型</li>
+            </ul>
+
+            <!-- 三流分发总览：传播/运营/履约统一为「分发」 -->
+            <div style="background:linear-gradient(135deg, rgba(244,114,182,0.05), rgba(34,211,238,0.05)); border:1px solid rgba(255,255,255,0.06); border-radius:12px; padding:14px 18px; margin-bottom:14px;">
+                <div style="font-size:12px; font-weight:600; color:#f472b6; margin-bottom:10px;">📡 三流分发统一框架 · 传播·运营·履约 本质都是「分发」</div>
+                <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; font-size:12px;">
+                    <div style="padding:10px 12px; background:rgba(244,114,182,0.07); border-radius:8px; border-left:2px solid #f472b6;">
+                        <strong style="color:#f472b6;">信息圈层扰动（传播层）</strong><br>
+                        <span style="color:rgba(255,255,255,0.45);">传播推广 · 让客群「知道」</span><br>
+                        <span style="color:rgba(255,255,255,0.25); font-size:11px;">对照：泡泡玛特 vs 漫威IP</span>
+                    </div>
+                    <div style="padding:10px 12px; background:rgba(52,211,153,0.07); border-radius:8px; border-left:2px solid #34d399;">
+                        <strong style="color:#34d399;">认知流量传导（运营层）</strong><br>
+                        <span style="color:rgba(255,255,255,0.45);">内容平台 · 让客群「参与」</span><br>
+                        <span style="color:rgba(255,255,255,0.25); font-size:11px;">对照：抖音/TikTok·小红书·博客</span>
+                    </div>
+                    <div style="padding:10px 12px; background:rgba(34,211,238,0.07); border-radius:8px; border-left:2px solid #22d3ee;">
+                        <strong style="color:#22d3ee;">实体载体输送（履约层）</strong><br>
+                        <span style="color:rgba(255,255,255,0.45);">供应链 · 让产品「到达」</span><br>
+                        <span style="color:rgba(255,255,255,0.25); font-size:11px;">对照：瑞幸供应链</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr><th style="width:30%;">分发链路术语</th><th style="width:70%;">元架构翻译</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>价值主张</td><td><strong>“一”</strong></td></tr>
+                        <tr><td>增长杠杆</td><td><strong>“二”</strong></td></tr>
+                        <tr><td>客群细分</td><td><strong>“三梯度”</strong></td></tr>
+                        <tr><td>用户旅程</td><td>反向的 <strong>“万物→三→二→一”</strong></td></tr>
+                        <tr><td>公私域联动</td><td>设计流与反馈流的 <strong>闭环飞轮</strong></td></tr>
+                        <tr><td>内容支柱</td><td><strong>圈层收敛模型</strong>（见下一层）</td></tr>
+                        <tr><td>圈层控制权三类信息扰动源</td><td>拆解 MCN 权力结构，揭示 <strong>“一”的控制权归属</strong></td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="mapping-table-wrap">
+                <div class="mt-label">🧩 元架构映射 · 颗粒度拉满</div>
+                <table>
+                    <thead>
+                        <tr><th style="width:25%;">分发链路推导</th><th style="width:25%;">元架构工具</th><th style="width:25%;">神经科学对应</th><th style="width:25%;">具体对应</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>价值主张 = “一”</td><td><span class="tool">“3→1→1→3→100”</span></td><td><span class="neuron">前额叶 · 收敛决策</span></td><td><span class="corr">从三个方向收敛到核心均衡点</span></td></tr>
+                        <tr><td>增长杠杆 = “二”</td><td><span class="tool">“3→1→1→3→100”</span></td><td><span class="neuron">前额叶 · 策略路径</span></td><td><span class="corr">可迁移架构，承载从“一”到“三”的转化</span></td></tr>
+                        <tr><td>客群细分 = “三梯度”</td><td><span class="tool">“3→1→1→3→100”</span></td><td><span class="neuron">边缘系统 · 模式识别</span></td><td><span class="corr">三个交付维度在传播场景中的具象化</span></td></tr>
+                        <tr><td>用户旅程 = 万物→三→二→一</td><td><span class="tool">画圈实验 · 反向逼近</span></td><td><span class="neuron">前额叶+边缘系统 · 协同收敛</span></td><td><span class="corr">从外圈向内圈收敛，对应“逼近认知均衡”</span></td></tr>
+                    </tbody>
+                </table>
+                <div class="mt-note">💡 隐形冠军圈层控制权拆解是“3→1→1→3→100”框架在商业案例中的一次完整预演</div>
+            </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- ===== 第二层：A/B对照测试 ===== -->
+        <!-- ============================================================ -->
+        <div class="section-anchor" id="section-layer2"></div>
+        <div class="section">
+            <h2>第二层 <span class="tag">A/B对照测试 · 传统学习 vs 元架构推演</span></h2>
+            <p><strong>验证设计：</strong>同一认知任务（重构分发链路）下，两种方法的对照实验。</p>
+
+            <!-- 对照组 -->
+            <div style="background: rgba(255,255,255,0.02); border-radius: 12px; padding: 14px 18px; margin: 10px 0 14px; border-left: 3px solid rgba(255,255,255,0.06);">
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                    <span style="background: rgba(255,255,255,0.04); padding: 0 10px; border-radius: 12px; font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.2);">对照组 A</span>
+                    <span style="font-size: 15px; font-weight: 600; color: rgba(255,255,255,0.5);">归纳式外部知识吸收路径（依赖既有学科体系输入）</span>
+                </div>
+                <p style="color: rgba(255,255,255,0.35); font-size: 14px; line-height: 1.7; margin-bottom: 4px;">
+                    阅读教材 · 记忆概念 · 案例学习 · 被动接收
+                </p>
+                <div style="display: flex; gap: 12px; flex-wrap: wrap; font-size: 12px; color: rgba(255,255,255,0.15); margin-top: 4px;">
+                    <span>📖 依赖外部知识输入</span>
+                    <span>⏱️ 需要大量时间积累</span>
+                    <span>🔒 结果固化在特定场景</span>
+                </div>
+            </div>
+
+            <!-- 实验组 -->
+            <div style="background: rgba(167,139,250,0.03); border-radius: 12px; padding: 14px 18px; margin: 10px 0 14px; border-left: 3px solid #a78bfa;">
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                    <span style="background: rgba(167,139,250,0.12); padding: 0 10px; border-radius: 12px; font-size: 11px; font-weight: 600; color: #a78bfa;">实验组 B</span>
+                    <span style="font-size: 15px; font-weight: 600; color: rgba(255,255,255,0.5);">元架构推演方式</span>
+                </div>
+                <p style="color: rgba(255,255,255,0.35); font-size: 14px; line-height: 1.7; margin-bottom: 4px;">
+                    隐形冠军案例 → 一/二/三结构 → 自行推导传播系统框架 → 与标准对照
+                </p>
+                <div style="display: flex; gap: 12px; flex-wrap: wrap; font-size: 12px; color: rgba(255,255,255,0.2); margin-top: 4px;">
+                    <span style="color: #a78bfa;">🧠 依赖内部认知推演</span>
+                    <span style="color: #a78bfa;">⚡ 单场对话即可完成</span>
+                    <span style="color: #a78bfa;">🔓 结果可跨领域迁移</span>
+                </div>
+            </div>
+
+            <!-- 对比结果 -->
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width:20%;">测试维度</th>
+                            <th style="width:40%;">对照组 A（传统学习）</th>
+                            <th style="width:40%;">实验组 B（元架构推演）</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>认知路径</strong></td>
+                            <td>归纳法：从大量案例中总结规律</td>
+                            <td style="color:#a78bfa;">演绎法：从原理中推导出结论</td>
+                        </tr>
+                        <tr>
+                            <td><strong>时间效率</strong></td>
+                            <td>需数月到数年积累</td>
+                            <td style="color:#a78bfa;">单场对话（约2-4小时）</td>
+                        </tr>
+                        <tr>
+                            <td><strong>结构清晰度</strong></td>
+                            <td>依赖教材编排，可能碎片化</td>
+                            <td style="color:#a78bfa;">自洽的“一/二/三”层级结构</td>
+                        </tr>
+                        <tr>
+                            <td><strong>可迁移性</strong></td>
+                            <td>知识固着于传播系统认知体系</td>
+                            <td style="color:#a78bfa;">元架构可迁移到任何学科</td>
+                        </tr>
+                        <tr>
+                            <td><strong>神经科学对应</strong></td>
+                            <td>前额叶 · 记忆编码（被动存储）</td>
+                            <td style="color:#a78bfa;">前额叶+边缘系统 · 协同推演（主动建构）</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 测试结论 -->
+            <div class="highlight-box purple" style="margin-top: 10px;">
+                <p><strong>🧪 测试结论：</strong>实验组B在<strong>时间效率、结构清晰度、可迁移性</strong>三个维度上显著优于对照组A。元架构推演不是“学得更快”，而是<strong>换了认知路径</strong>——从“记忆”切换到“建构”。</p>
+            </div>
+
+            <div class="mapping-table-wrap">
+                <div class="mt-label">🧩 元架构映射 · 颗粒度拉满</div>
+                <table>
+                    <thead>
+                        <tr><th style="width:25%;">测试动作</th><th style="width:25%;">元架构工具</th><th style="width:25%;">神经科学对应</th><th style="width:25%;">具体对应</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>以隐形冠军案例为起点</td><td><span class="tool">画圈实验 · 感知</span></td><td><span class="neuron">前额叶 · 工作记忆提取</span></td><td><span class="corr">识别已有认知中的可迁移结构</span></td></tr>
+                        <tr><td>反向推导分发概念</td><td><span class="tool">画圈实验 · 推理</span></td><td><span class="neuron">前额叶 · 逻辑推演</span></td><td><span class="corr">用元架构“重新发明”分发链路</span></td></tr></tr>
+                        <tr><td>与已知框架对照</td><td><span class="tool">画圈实验 · 验证</span></td><td><span class="neuron">边缘系统 · 模式匹配</span></td><td><span class="corr">推演结果与标准分发框架对比</span></td></tr></tr>
+                        <tr><td>吸收进自己的体系</td><td><span class="tool">画圈实验 · 记忆</span></td><td><span class="neuron">海马体 · 记忆编码</span></td><td><span class="corr">建构式学习，非被动存储</span></td></tr>
+                    </tbody>
+                </table>
+                <div class="mt-note">💡 对照组A是“存储知识”，实验组B是“建构知识”——两者在神经层面激活的脑区不同</div>
+            </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- ===== 第三层 ===== -->
+        <!-- ============================================================ -->
+        <div class="section-anchor" id="section-layer3"></div>
+        <div class="section">
+            <h2>第三层 <span class="tag">用日常比喻揭示分发困境的本质</span></h2>
+            <ul>
+                <li><strong>外部信息圈层扰动失效</strong> → “交通堵塞”</li>
+                <li><strong>知识付费乱象</strong> → “只卖三，不提供二”</li>
+                <li><strong>乐高说明书</strong> → “从一到三”产品哲学</li>
+            </ul>
+
+            <div class="mapping-table-wrap">
+                <div class="mt-label">🧩 元架构映射 · 颗粒度拉满</div>
+                <table>
+                    <thead>
+                        <tr><th style="width:25%;">分发链路推导</th><th style="width:25%;">元架构工具</th><th style="width:25%;">神经科学对应</th><th style="width:25%;">具体对应</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>“交通堵塞”比喻</td><td><span class="tool">跨领域迁移类比</span></td><td><span class="neuron">边缘系统 · 联想记忆</span></td><td><span class="corr">用一个领域已理解的概念翻译另一个领域的陌生现象</span></td></tr>
+                        <tr><td>“只卖三”诊断</td><td><span class="tool">“3→1→1→3→100”</span></td><td><span class="neuron">前额叶 · 结构分析</span></td><td><span class="corr">只交付结果，没有提供从一到三的路径</span></td></tr>
+                        <tr><td>“乐高说明书”哲学</td><td><span class="tool">画圈实验 · 路径设计</span></td><td><span class="neuron">前额叶+边缘系统 · 协同规划</span></td><td><span class="corr">好产品是让用户自己走向结果的旅程</span></td></tr>
+                    </tbody>
+                </table>
+                <div class="mt-note">💡 元架构的本质：用一个领域已经理解的概念去翻译另一个领域</div>
+            </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- ===== 第四层：神经数学 · 三维评估 ===== -->
+        <!-- ============================================================ -->
+        <div class="section-anchor" id="section-layer4"></div>
+        <div class="section">
+            <h2>第四层 <span class="tag">神经数学 · 三维评估</span></h2>
+
+            <!-- 过渡衔接 -->
+            <div style="background: rgba(167,139,250,0.02); border-radius: 8px; padding: 10px 14px; margin-bottom: 12px; border-left: 2px solid rgba(167,139,250,0.15);">
+                <p style="font-size: 13px; color: rgba(255,255,255,0.3); margin-bottom: 0; line-height: 1.6;">
+                    💧 把液体浓度翻译成数学语言：<strong style="color: rgba(255,255,255,0.5);">浓度 = 向量空间的量度</strong> —— 两个脑区的信号用向量表示，评估它们的协同程度。
+                </p>
+            </div>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width:25%;">评估维度</th>
+                            <th style="width:25%;">数学定义</th>
+                            <th style="width:25%;">神经科学对应</th>
+                            <th style="width:25%;">分发链路映射</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>余弦相似度</strong></td>
+                            <td><span style="color:#a78bfa;">cos(θ) = (A·B)/(||A||·||B||)</span></td>
+                            <td>前额叶与边缘系统的<strong>方向一致性</strong></td>
+                            <td>策略与直觉是否对齐</td>
+                        </tr>
+                        <tr>
+                            <td><strong>欧氏距离</strong></td>
+                            <td><span style="color:#60a5fa;">d = √Σ(Aᵢ − Bᵢ)²</span></td>
+                            <td>两个脑区激活<strong>强度的差异度</strong></td>
+                            <td>分析能力与判断能力的匹配度</td>
+                        </tr>
+                        <tr>
+                            <td><strong>点积距离</strong></td>
+                            <td><span style="color:#facc15;">A·B = Σ(Aᵢ × Bᵢ)</span></td>
+                            <td>两个脑区的<strong>整体协同度</strong></td>
+                            <td>理性与直觉的综合匹配程度</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 三维评估可视化 -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 14px 0 12px;">
+                <div style="background: rgba(255,255,255,0.02); border-radius: 10px; padding: 12px 14px; border: 1px solid rgba(255,255,255,0.04);">
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; color: rgba(255,255,255,0.2);">
+                        <span>余弦相似度</span>
+                        <span style="color:#a78bfa;" id="cosineScore">0.72</span>
+                    </div>
+                    <div style="background: rgba(255,255,255,0.04); border-radius: 4px; height: 4px; margin-top: 4px; overflow: hidden;">
+                        <div style="width:72%; height:100%; background: linear-gradient(90deg, #4f46e5, #a78bfa); border-radius: 4px;" id="cosineBar"></div>
+                    </div>
+                    <div style="font-size: 10px; color: rgba(255,255,255,0.08); margin-top: 2px; text-align: right;">方向一致性</div>
+                </div>
+                <div style="background: rgba(255,255,255,0.02); border-radius: 10px; padding: 12px 14px; border: 1px solid rgba(255,255,255,0.04);">
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; color: rgba(255,255,255,0.2);">
+                        <span>欧氏距离</span>
+                        <span style="color:#60a5fa;" id="euclideanScore">0.38</span>
+                    </div>
+                    <div style="background: rgba(255,255,255,0.04); border-radius: 4px; height: 4px; margin-top: 4px; overflow: hidden;">
+                        <div style="width:38%; height:100%; background: linear-gradient(90deg, #2563eb, #60a5fa); border-radius: 4px;" id="euclideanBar"></div>
+                    </div>
+                    <div style="font-size: 10px; color: rgba(255,255,255,0.08); margin-top: 2px; text-align: right;">强度差异度</div>
+                </div>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin: 6px 0 14px;">
+                <div style="background: rgba(255,255,255,0.02); border-radius: 10px; padding: 12px 14px; border: 1px solid rgba(255,255,255,0.04); text-align: center;">
+                    <div style="font-size: 10px; color: rgba(255,255,255,0.1); text-transform: uppercase; letter-spacing: 0.3px;">点积距离</div>
+                    <div style="font-size: 20px; font-weight: 700; color: #facc15;" id="dotScore">0.52</div>
+                </div>
+                <div style="background: rgba(255,255,255,0.02); border-radius: 10px; padding: 12px 14px; border: 1px solid rgba(255,255,255,0.04); text-align: center;">
+                    <div style="font-size: 10px; color: rgba(255,255,255,0.1); text-transform: uppercase; letter-spacing: 0.3px;">综合评估值</div>
+                    <div style="font-size: 20px; font-weight: 700; color: #a78bfa;" id="compositeScore">0.000</div>
+                </div>
+                <div style="background: rgba(255,255,255,0.02); border-radius: 10px; padding: 12px 14px; border: 1px solid rgba(255,255,255,0.04); text-align: center;">
+                    <div style="font-size: 10px; color: rgba(255,255,255,0.1); text-transform: uppercase; letter-spacing: 0.3px;">模型精准度</div>
+                    <div style="font-size: 20px; font-weight: 700; color: #22c55e;" id="precisionScore">0.000</div>
+                </div>
+            </div>
+
+            <!-- 交互控制 -->
+            <div style="background: rgba(255,255,255,0.02); border-radius: 10px; padding: 14px 18px; border: 1px solid rgba(255,255,255,0.04);">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px 20px;">
+                    <div>
+                        <label style="color: rgba(255,255,255,0.25); font-size: 12px; display: flex; justify-content: space-between;">
+                            前额叶激活强度
+                            <span style="color:#a78bfa;" id="pfcVal">0.70</span>
+                        </label>
+                        <input type="range" id="pfcInput" min="0.1" max="1.0" step="0.01" value="0.70" style="width:100%; accent-color:#a78bfa; height:3px; background:rgba(255,255,255,0.06); border-radius:4px; -webkit-appearance:none; appearance:none;" />
+                    </div>
+                    <div>
+                        <label style="color: rgba(255,255,255,0.25); font-size: 12px; display: flex; justify-content: space-between;">
+                            边缘系统激活强度
+                            <span style="color:#60a5fa;" id="limbicVal">0.70</span>
+                        </label>
+                        <input type="range" id="limbicInput" min="0.1" max="1.0" step="0.01" value="0.70" style="width:100%; accent-color:#60a5fa; height:3px; background:rgba(255,255,255,0.06); border-radius:4px; -webkit-appearance:none; appearance:none;" />
+                    </div>
+                </div>
+                <div style="margin-top: 8px;">
+                    <label style="color: rgba(255,255,255,0.25); font-size: 12px; display: flex; justify-content: space-between;">
+                        向量夹角偏移 (θ)
+                        <span style="color:#facc15;" id="angleVal">15°</span>
+                    </label>
+                    <input type="range" id="angleInput" min="0" max="45" step="1" value="15" style="width:100%; accent-color:#facc15; height:3px; background:rgba(255,255,255,0.06); border-radius:4px; -webkit-appearance:none; appearance:none;" />
+                </div>
+            </div>
+
+            <div class="highlight-box purple" style="margin-top: 14px;">
+                <p><strong>🧪 评估结论：</strong>当 <strong>余弦相似度 > 0.7</strong> 且 <strong>欧氏距离 < 0.4</strong> 时，前额叶与边缘系统处于<strong>高效协同状态</strong>，模型精准度达到 <strong id="precisionConclusion">0.00</strong>，对应认知协同系数 <strong id="marketingConclusion">0.00</strong>。</p>
+                <p style="margin-top:4px; color:rgba(255,255,255,0.3); font-size:13px; margin-bottom:0;">
+                    三维评估值 = 余弦相似度 × (1 − 欧氏距离) × (1 + 点积距离) — 三个维度共同决定认知协同系数的精准度。
+                </p>
+            </div>
+
+            <div class="mapping-table-wrap">
+                <div class="mt-label">🧩 元架构映射 · 颗粒度拉满</div>
+                <table>
+                    <thead>
+                        <tr><th style="width:25%;">评估维度</th><th style="width:25%;">元架构工具</th><th style="width:25%;">神经科学对应</th><th style="width:25%;">分发链路映射</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>余弦相似度</td><td><span class="tool">向量方向度量</span></td><td><span class="neuron">前额叶 ↔ 边缘系统 方向一致性</span></td><td><span class="corr">策略与直觉是否对齐</span></td></tr>
+                        <tr><td>欧氏距离</td><td><span class="tool">向量模长差异</span></td><td><span class="neuron">两个脑区激活强度匹配度</span></td><td><span class="corr">分析力与判断力是否匹配 → 认知收敛强度系数</span></td></tr>
+                        <tr><td>点积距离</td><td><span class="tool">向量乘积值</span></td><td><span class="neuron">两个脑区整体协同度</span></td><td><span class="corr">理性与直觉综合匹配程度</span></td></tr>
+                    </tbody>
+                </table>
+                <div class="mt-note">💡 三个维度合成三维评估值，量化认知协同度，欧氏距离直接对应认知收敛强度系数</div>
+            </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- ===== 第五层：理论元素对照 ===== -->
+        <!-- ============================================================ -->
+        <div class="section-anchor" id="section-layer5"></div>
+        <div class="section">
+            <h2>第五层 <span class="tag">理论元素对照</span></h2>
+            <p><strong>元架构理论内部的模块对应关系 —— 每一组概念都在体系内有明确映射。</strong></p>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width:35%;">🧩 理论元素 A</th>
+                            <th style="width:65%;">🧩 理论元素 B</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>前额叶 · 数字思维</strong><br><span style="color:rgba(255,255,255,0.25);font-size:12px;">逻辑 · 分析 · 计算 · 规则学习</span></td>
+                            <td><span style="color:#a78bfa;">策略贡献（可量化、可训练的系统）</span><br><span style="color:rgba(255,255,255,0.3);font-size:12px;">对应资本定价公式中的“α”</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>边缘系统 · 商业思维</strong><br><span style="color:rgba(255,255,255,0.25);font-size:12px;">直觉 · 判断 · 模式识别 · 情境感知</span></td>
+                            <td><span style="color:#60a5fa;">择时贡献（依赖经验的直觉系统）</span><br><span style="color:rgba(255,255,255,0.3);font-size:12px;">对应资本定价公式中的“β系数”</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>“一生二，二生三，三生万物”</strong><br><span style="color:rgba(255,255,255,0.25);font-size:12px;">哲学框架的商业化拆解</span></td>
+                            <td><span style="color:#facc15;">“3→1→1→3→100”框架的案例预演</span><br><span style="color:rgba(255,255,255,0.3);font-size:12px;">在真实商业场景中验证收敛-发散结构的有效性</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>“一/二/三”结构</strong><br><span style="color:rgba(255,255,255,0.25);font-size:12px;">价值主张 → 增长杠杆 → 客群细分</span></td>
+                            <td><span style="color:#facc15;">“3→1→1→3→100”的实战落地</span><br><span style="color:rgba(255,255,255,0.3);font-size:12px;">把框架用在自我表达上，验证理论到实践的闭环</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>传播 × 技术</strong><br><span style="color:rgba(255,255,255,0.25);font-size:12px;">传播策略 × 自研AI架构</span></td>
+                            <td><span style="color:#a78bfa;">元架构可迁移性验证</span><br><span style="color:rgba(255,255,255,0.3);font-size:12px;">同一套认知体系同时驾驭两个看似无关的领域</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>“学习 = 翻译”</strong><br><span style="color:rgba(255,255,255,0.25);font-size:12px;">认知建构的核心机制</span></td>
+                            <td><span style="color:#a78bfa;">元认知 → 认知架构师</span><br><span style="color:rgba(255,255,255,0.3);font-size:12px;">从“知识接收者”到“认知建构者”的跃迁</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="mapping-table-wrap">
+                <div class="mt-label">🧩 元架构映射 · 颗粒度拉满</div>
+                <table>
+                    <thead>
+                        <tr><th style="width:25%;">理论元素 A</th><th style="width:25%;">元架构工具</th><th style="width:25%;">神经科学对应</th><th style="width:25%;">理论元素 B</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>数字思维</td><td><span class="tool">数理建模 · 策略因子</span></td><td><span class="neuron">前额叶 · 量化计算</span></td><td><span class="corr">策略贡献 · 可学习的理性系统</span></td></tr>
+                        <tr><td>商业思维</td><td><span class="tool">数理建模 · 择时因子</span></td><td><span class="neuron">边缘系统 · 模式匹配</span></td><td><span class="corr">择时贡献 · 依赖经验的直觉系统</span></td></tr>
+                        <tr><td>“一/二/三”</td><td><span class="tool">“3→1→1→3→100”</span></td><td><span class="neuron">前额叶+边缘系统 · 协同收敛</span></td><td><span class="corr">隐形冠军案例的框架预演</span></td></tr>
+                        <tr><td>自我表达</td><td><span class="tool">“3→1→1→3→100”</span></td><td><span class="neuron">前额叶 · 结构化表达</span></td><td><span class="corr">理论在真实场景中的落地验证</span></td></tr>
+                        <tr><td>传播 × 技术</td><td><span class="tool">跨领域迁移类比</span></td><td><span class="neuron">前额叶+边缘系统 · 全脑协同</span></td><td><span class="corr">元架构可迁移性的实战验证</span></td></tr>
+                        <tr><td>学习 = 翻译</td><td><span class="tool">元认知</span></td><td><span class="neuron">前额叶 · 元认知监控</span></td><td><span class="corr">从“学习者”到“认知架构师”的跃迁</span></td></tr>
+                    </tbody>
+                </table>
+                <div class="mt-note">💡 元架构理论内部的模块之间完全自洽，每一组对应关系都是可追溯的</div>
+            </div>
+
+            <div class="highlight-box purple" style="margin-top:10px;">
+                <p><strong>🧪 对照结论：</strong>元架构的每一个理论模块都在体系内找到了对应位置。整个框架不是外部的知识堆砌，而是一个<strong>自洽的认知操作系统</strong>——所有模块相互映射、相互支撑。</p>
+            </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- ===== 第六层 ===== -->
+        <!-- ============================================================ -->
+        <div class="section-anchor" id="section-layer6"></div>
+        <div class="section">
+            <h2>第六层 <span class="tag">发现“学习”的真相</span></h2>
+            <div class="highlight-box">
+                <p><strong>“其实我脑子里都已经学会了。”</strong></p>
+                <p style="margin-top:6px; color:rgba(255,255,255,0.45);">当元架构足够强大时，“学习”一个新领域，不过是把它已有的知识翻译成自己的语言。</p>
+            </div>
+
+            <div class="mapping-table-wrap">
+                <div class="mt-label">🧩 元架构映射 · 颗粒度拉满</div>
+                <table>
+                    <thead>
+                        <tr><th style="width:25%;">推导结论</th><th style="width:25%;">元架构工具</th><th style="width:25%;">神经科学对应</th><th style="width:25%;">具体对应</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>“学习=翻译已有知识”</td><td><span class="tool">元认知</span></td><td><span class="neuron">前额叶 · 元认知监控</span></td><td><span class="corr">学习的本质不是“输入”，而是“翻译”</span></td></tr>
+                        <tr><td>“不需要背诵，只需要对接”</td><td><span class="tool">元架构 · 知识对接</span></td><td><span class="neuron">海马体 · 记忆关联</span></td><td><span class="corr">元架构提供的是“对接器”</span></td></tr>
+                        <tr><td>“从学习者到认知架构师”</td><td><span class="tool">画圈实验 · 认知均衡</span></td><td><span class="neuron">全脑整合 · 认知闭环</span></td><td><span class="corr">最高阶状态：从“学习”到“已经会了”</span></td></tr>
+                    </tbody>
+                </table>
+                <div class="mt-note">💡 元架构提供的不是知识量，而是一套翻译器</div>
+            </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- ===== 验证方法 ===== -->
+        <!-- ============================================================ -->
+        <!-- ============================================================ -->
+        <!-- ===== 基础测试说明 ===== -->
+        <!-- ============================================================ -->
+        <div class="section-anchor" id="section-test"></div>
+        <div class="test-section">
+            <div class="test-title">🧪 模型基础测试 <span class="tag">验证方法</span></div>
+            <p style="color:rgba(255,255,255,0.35); font-size:14px; line-height:1.7; margin-bottom:4px;">
+                以下三种测试方法可交叉验证 <strong style="color:#a78bfa;">认知协同评估模型</strong> 的有效性。
+            </p>
+
+            <div class="test-grid">
+                <div class="test-card">
+                    <div class="tc-icon">🧠</div>
+                    <div class="tc-label">行为测试 · 决策观察</div>
+                    <div class="tc-desc">
+                        在相同商业问题下，观察不同用户的决策反应和理由。
+                    </div>
+                    <div class="tc-method">
+                        <strong>方法：</strong>让用户面对同一传播场景，记录其决策过程。<br>
+                        <span style="color:rgba(255,255,255,0.1);font-size:10px;">
+                            ✅ 前额叶主导 → 算法化、结构化、有量化依据<br>
+                            ✅ 边缘系统主导 → 直觉化、情境化、依赖经验判断
+                        </span>
+                    </div>
+                </div>
+
+                <div class="test-card">
+                    <div class="tc-icon">📊</div>
+                    <div class="tc-label">神经科学对照</div>
+                    <div class="tc-desc">
+                        引用脑区功能分工研究，验证模型与现有神经科学文献的一致性。
+                    </div>
+                    <div class="tc-method">
+                        <strong>方法：</strong>对照以下经典研究：<br>
+                        <span style="color:rgba(255,255,255,0.1);font-size:10px;">
+                            📌 DLPFC → 工作记忆、规则学习、算法推理（Miller & Cohen, 2001）<br>
+                            📌 vmPFC → 价值判断、情感整合、风险感知（Bechara et al., 2000）<br>
+                            📌 杏仁核 → 直觉判断、威胁检测、快速反应（LeDoux, 2000）
+                        </span>
+                    </div>
+                </div>
+
+                <div class="test-card">
+                    <div class="tc-icon">🎯</div>
+                    <div class="tc-label">决策实验 · 协同验证</div>
+                    <div class="tc-desc">
+                        在模拟传播场景中，比较“纯理性分析”、“纯直觉判断”、“两者协同”三种模式的决策质量。
+                    </div>
+                    <div class="tc-method">
+                        <strong>方法：</strong>设置三种实验条件：<br>
+                        <span style="color:rgba(255,255,255,0.1);font-size:10px;">
+                            🔹 纯前额叶 → 禁止使用直觉，只允许数据分析<br>
+                            🔹 纯边缘系统 → 禁止分析，只允许凭感觉决策<br>
+                            🔹 协同模式 → 允许两者同时参与
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top:14px; padding-top:10px; border-top:1px solid rgba(255,255,255,0.02); text-align:center; font-size:12px; color:rgba(255,255,255,0.12);">
+                ⚡ 预期结果：协同模式下的决策质量 &gt; 单一模式下的决策质量
+            </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- ===== 三流分发效率对照（运营对照组） ===== -->
+        <!-- ============================================================ -->
+        <div class="section-anchor" id="section-dispatch-efficiency"></div>
+        <div class="section">
+            <h2>三流分发效率对照 <span class="tag">运营对照组</span></h2>
+            <p style="color:rgba(255,255,255,0.35); font-size:14px; line-height:1.7; margin-bottom:14px;">
+                <strong style="color:#34d399;">分发效率 = 触达率 × 转化率 × 履约率</strong> · 三流缺一即堵。以下对照抖音/TikTok、小红书、博客三类运营平台的分发效率结构。
+            </p>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width:16%;">运营平台</th>
+                            <th style="width:21%;">触达率 <span style="color:#f472b6; font-size:10px;">信息分发</span></th>
+                            <th style="width:21%;">转化率 <span style="color:#34d399; font-size:10px;">流量分发</span></th>
+                            <th style="width:21%;">履约率 <span style="color:#22d3ee; font-size:10px;">物理分发</span></th>
+                            <th style="width:21%;">分发效率特征</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>抖音/TikTok</strong></td>
+                            <td style="color:#22c55e;">★★★★★ 算法推荐</td>
+                            <td style="color:#facc15;">★★★ 冲动消费</td>
+                            <td style="color:#f87171;">★★ 货架弱</td>
+                            <td><strong>高触达·低履约</strong></td>
+                        </tr>
+                        <tr>
+                            <td><strong>小红书</strong></td>
+                            <td style="color:#facc15;">★★★ 种草</td>
+                            <td style="color:#22c55e;">★★★★★ 决策</td>
+                            <td style="color:#facc15;">★★★ 闭环中</td>
+                            <td><strong>种草→决策闭环</strong></td>
+                        </tr>
+                        <tr>
+                            <td><strong>博客/自有阵地</strong></td>
+                            <td style="color:#f87171;">★★ 长尾</td>
+                            <td style="color:#22c55e;">★★★★★ 深度</td>
+                            <td style="color:#22c55e;">★★★★★ 自有</td>
+                            <td><strong>低触达·高履约</strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="highlight-box" style="border-color:#34d399;">
+                <p><strong>💡 洞察：</strong>没有一种平台能同时打满三流。抖音赢触达、小红书赢转化、博客赢履约。<strong>真正的圈层控制权 = 三流组合拳</strong>，而非单平台押注。</p>
+            </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- ===== 最终产出 ===== -->
+        <!-- ============================================================ -->
+        <div class="section-anchor" id="section-output"></div>
+        <div class="section">
+            <h2>最终产出 <span class="tag">原创推导内容资产汇总</span></h2>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr><th style="width:50%;">内容资产</th><th style="width:50%;">潜在用途</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>隐形冠军圈层控制权的 <strong>“一/二/三”拆解</strong></td><td>认知推演视频脚本</td></tr>
+                        <tr><td><strong>“付费就是交通堵塞”</strong> 比喻</td><td>分发链路核心洞察</td></tr>
+                        <tr><td>知识付费 <strong>“切片陷阱”</strong> 诊断</td><td>知识付费产品设计哲学</td></tr>
+                        <tr><td><strong>乐高说明书</strong> 产品哲学</td><td>产品经理课程经典案例</td></tr>
+                        <tr><td><strong>三流分发元架构</strong></td><td>传播系统认知框架与推演工具</td></tr>
+                        <tr><td><strong>“认知协同度量化”</strong></td><td>思想体系的数理化表达</td></tr>
+                        <tr><td><strong>简历</strong></td><td>自我分发的实战作品</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="highlight-box purple">
+                <p><strong>💡 总结：</strong>不是学完传播系统理论的。是用自己的元架构，把认知收敛的骨架拆开，然后用自己的语言重新组装了一遍。从一开始就不是一个学习者，而是一个 <strong>认知架构师</strong>。</p>
+            </div>
+        </div>
+
+        
+
+        <!-- ===== 底部 ===== -->
+        <div class="back-bottom">
+            <a href="index.html">← 返回总控台</a>
+        </div>
+
+    </div>
+
+    <script>
+        // ===== 左侧导航栏交互 =====
+        const navItems = document.querySelectorAll('.pn-item');
+        const sections = [
+            document.getElementById('section-layer1'),
+            document.getElementById('section-layer2'),
+            document.getElementById('section-layer3'),
+            document.getElementById('section-layer4'),
+            document.getElementById('section-layer5'),
+            document.getElementById('section-layer6'),
+            document.getElementById('section-test'),
+            document.getElementById('section-dispatch-efficiency'),
+            document.getElementById('section-output')
+        ].filter(Boolean);
+
+        navItems.forEach((item, index) => {
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = sections[index];
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+                navItems.forEach(el => el.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        function updateActiveNav() {
+            let currentIndex = 0;
+            sections.forEach((section, i) => {
+                if (section) {
+                    const rect = section.getBoundingClientRect();
+                    if (rect.top <= 120) {
+                        currentIndex = i;
+                    }
+                }
+            });
+            navItems.forEach((el, i) => {
+                el.classList.toggle('active', i === currentIndex);
+            });
+        }
+
+        window.addEventListener('scroll', updateActiveNav);
+        window.addEventListener('load', updateActiveNav);
+
+        // ===== 第四层：三维评估引擎 =====
+        // ================================================================
+        (function() {
+            const pfcInput = document.getElementById('pfcInput');
+            const limbicInput = document.getElementById('limbicInput');
+            const angleInput = document.getElementById('angleInput');
+            const pfcVal = document.getElementById('pfcVal');
+            const limbicVal = document.getElementById('limbicVal');
+            const angleVal = document.getElementById('angleVal');
+            const cosineScore = document.getElementById('cosineScore');
+            const cosineBar = document.getElementById('cosineBar');
+            const euclideanScore = document.getElementById('euclideanScore');
+            const euclideanBar = document.getElementById('euclideanBar');
+            const dotScore = document.getElementById('dotScore');
+            const compositeScore = document.getElementById('compositeScore');
+            const precisionScore = document.getElementById('precisionScore');
+            const precisionConclusion = document.getElementById('precisionConclusion');
+            const marketingConclusion = document.getElementById('marketingConclusion');
+
+            function updateEvaluation() {
+                const pfc = parseFloat(pfcInput.value);
+                const limbic = parseFloat(limbicInput.value);
+                const angleDeg = parseFloat(angleInput.value);
+                const angleRad = angleDeg * Math.PI / 180;
+
+                pfcVal.textContent = pfc.toFixed(2);
+                limbicVal.textContent = limbic.toFixed(2);
+                angleVal.textContent = angleDeg + '°';
+
+                const cosTheta = Math.cos(angleRad);
+                const euclid = Math.abs(pfc - limbic);
+                const dot = pfc * limbic * cosTheta;
+
+                const composite = cosTheta * (1 - euclid) * (1 + dot * 0.5);
+                const precision = Math.min(1, Math.max(0, composite * 0.8 + 0.2));
+
+                cosineScore.textContent = cosTheta.toFixed(3);
+                cosineBar.style.width = (cosTheta * 100) + '%';
+                euclideanScore.textContent = euclid.toFixed(3);
+                euclideanBar.style.width = (euclid * 100) + '%';
+                dotScore.textContent = dot.toFixed(3);
+                compositeScore.textContent = composite.toFixed(3);
+                precisionScore.textContent = (precision * 100).toFixed(1) + '%';
+
+                precisionConclusion.textContent = (precision * 100).toFixed(1) + '%';
+                const marketingRate = precision * 0.95 + 0.05;
+                marketingConclusion.textContent = (marketingRate * 100).toFixed(1) + '%';
+            }
+
+            pfcInput.addEventListener('input', updateEvaluation);
+            limbicInput.addEventListener('input', updateEvaluation);
+            angleInput.addEventListener('input', updateEvaluation);
+            updateEvaluation();
+        })();
+
+        // ================================================================
+    </script>
+
+</body>
+</html>

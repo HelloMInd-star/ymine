@@ -17,7 +17,6 @@
             items: [
                 { href: 'info-funnel.html', icon: '🔭', text: '信息漏斗', tag: '前置', activeTag: true },
                 { href: 'ymine-studio.html', icon: '🏛️', text: '投资工作室', tag: '十步闭环', activeTag: true },
-                { href: 'marketing-reinvented.html', icon: '🧪', text: '金融估值模拟器', tag: '精算' },
                 { href: 'ai-pricing-benchmark.html', icon: '📡', text: 'AI 定价基准库', tag: '基准' },
                 { href: 'case-library.html', icon: '🗂️', text: '案例向量库', tag: '案例' }
             ]
@@ -39,6 +38,8 @@
             items: [
                 { href: 'circle-lab.html', icon: '🧠', text: '认知画圈实验', tag: '底层引擎', activeTag: true },
                 { href: 'business-learning-evidence.html', icon: '📊', text: '市场证据实验室', tag: '上层实证', activeTag: true },
+                { href: 'marketing-structure-lab.html', icon: '📡', text: '营销实证实验室', tag: '上层实证', activeTag: true },
+                { href: 'finance-risk-simulator.html', icon: '🧪', text: '金融精算模拟器', tag: '数理工具', activeTag: true },
                 { href: 'value-pyramid.html', icon: '📐', text: 'Game-OS 六层科研价值金字塔', tag: '分层' }
             ]
         },
