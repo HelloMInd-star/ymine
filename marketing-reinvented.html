@@ -1700,6 +1700,536 @@
                 padding: 8px 10px;
             }
         }
+
+        /* ===== 新增模块：价值地基体系 ===== */
+        .prism-container, .pyramid-container {
+            display: flex;
+            gap: 24px;
+            align-items: flex-start;
+            flex-wrap: wrap;
+        }
+        .canvas-3d-wrap {
+            position: relative;
+            background: radial-gradient(ellipse at center, rgba(167,139,250,0.08) 0%, rgba(11,11,26,0.95) 70%);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 12px;
+            padding: 12px;
+            overflow: hidden;
+        }
+        .canvas-3d-wrap canvas {
+            display: block;
+            border-radius: 8px;
+            cursor: grab;
+        }
+        .canvas-3d-wrap canvas:active {
+            cursor: grabbing;
+        }
+        .prism-ctrl-panel {
+            flex: 1;
+            min-width: 280px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .layer-breakdown {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 10px;
+            margin-top: 16px;
+        }
+        .layer-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 10px;
+            padding: 12px;
+            transition: all 0.3s ease;
+        }
+        .layer-card:hover {
+            background: rgba(167,139,250,0.08);
+            border-color: rgba(167,139,250,0.3);
+            transform: translateY(-2px);
+        }
+        .layer-card.active {
+            background: rgba(167,139,250,0.12);
+            border-color: rgba(167,139,250,0.5);
+            box-shadow: 0 0 20px rgba(167,139,250,0.2);
+        }
+        .layer-card .ly-name {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #f1f5f9;
+        }
+        .layer-card .ly-metric {
+            font-size: 11px;
+            color: rgba(255,255,255,0.5);
+            margin: 4px 0;
+            display: flex;
+            justify-content: space-between;
+        }
+        .layer-card .ly-metric span:last-child {
+            color: #a78bfa;
+            font-weight: 600;
+        }
+        .face-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+            margin-top: 20px;
+        }
+        .face-card {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 12px;
+            padding: 16px;
+        }
+        .face-card.product { border-top: 3px solid #22d3ee; }
+        .face-card.brand { border-top: 3px solid #a78bfa; }
+        .face-card.channel { border-top: 3px solid #facc15; }
+        .face-card .fc-title {
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .face-card.product .fc-title { color: #22d3ee; }
+        .face-card.brand .fc-title { color: #a78bfa; }
+        .face-card.channel .fc-title { color: #facc15; }
+        .face-card .fc-score {
+            font-size: 24px;
+            font-weight: 800;
+            text-align: center;
+            margin: 8px 0;
+        }
+        .face-card.product .fc-score { color: #22d3ee; }
+        .face-card.brand .fc-score { color: #a78bfa; }
+        .face-card.channel .fc-score { color: #facc15; }
+        .face-card .slider-group {
+            margin-top: 12px;
+        }
+        .face-card .slider-group label {
+            display: block;
+            font-size: 11px;
+            color: rgba(255,255,255,0.6);
+            margin-bottom: 4px;
+        }
+        .face-card .slider-group input[type="range"] {
+            width: 100%;
+            height: 4px;
+            -webkit-appearance: none;
+            background: rgba(255,255,255,0.1);
+            border-radius: 2px;
+            outline: none;
+        }
+        .face-card.product .slider-group input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #22d3ee;
+            cursor: pointer;
+            box-shadow: 0 0 8px rgba(34,211,238,0.5);
+        }
+        .face-card.brand .slider-group input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #a78bfa;
+            cursor: pointer;
+            box-shadow: 0 0 8px rgba(167,139,250,0.5);
+        }
+        .face-card.channel .slider-group input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #facc15;
+            cursor: pointer;
+            box-shadow: 0 0 8px rgba(250,204,21,0.5);
+        }
+        .prism-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 12px;
+        }
+        .prism-btn {
+            flex: 1;
+            padding: 10px 16px;
+            border: 1px solid rgba(167,139,250,0.3);
+            background: rgba(167,139,250,0.08);
+            color: #a78bfa;
+            border-radius: 8px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .prism-btn:hover {
+            background: rgba(167,139,250,0.2);
+            border-color: rgba(167,139,250,0.6);
+        }
+
+        /* 多棱锥 */
+        .pyramid-ctrl {
+            flex: 1;
+            min-width: 280px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .dim-toggles {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .dim-toggle {
+            padding: 8px 14px;
+            border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.03);
+            color: rgba(255,255,255,0.6);
+            border-radius: 20px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            user-select: none;
+        }
+        .dim-toggle.active {
+            background: rgba(167,139,250,0.15);
+            border-color: rgba(167,139,250,0.5);
+            color: #a78bfa;
+            box-shadow: 0 0 12px rgba(167,139,250,0.2);
+        }
+        .pyramid-metrics {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 10px;
+            padding: 16px;
+        }
+        .pyramid-metrics .pm-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+        }
+        .pyramid-metrics .pm-row:last-child {
+            border-bottom: none;
+        }
+        .pyramid-metrics .pm-label {
+            font-size: 12px;
+            color: rgba(255,255,255,0.5);
+        }
+        .pyramid-metrics .pm-value {
+            font-size: 16px;
+            font-weight: 700;
+            color: #f1f5f9;
+        }
+        .pyramid-metrics .pm-value.highlight {
+            color: #22c55e;
+            text-shadow: 0 0 10px rgba(34,197,94,0.4);
+        }
+        .flow-up-indicator {
+            background: linear-gradient(180deg, rgba(34,197,94,0.15) 0%, rgba(34,197,94,0.02) 100%);
+            border: 1px solid rgba(34,197,94,0.3);
+            border-radius: 10px;
+            padding: 14px;
+            text-align: center;
+        }
+        .flow-up-indicator .arrow-up {
+            font-size: 24px;
+            color: #22c55e;
+            animation: bounceUp 1.5s ease infinite;
+        }
+        @keyframes bounceUp {
+            0%, 100% { transform: translateY(0); opacity: 0.6; }
+            50% { transform: translateY(-6px); opacity: 1; }
+        }
+        .flow-up-indicator .flow-text {
+            font-size: 12px;
+            color: rgba(255,255,255,0.6);
+            margin-top: 6px;
+        }
+        .flow-up-indicator .flow-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: #22c55e;
+            margin-top: 4px;
+        }
+
+        /* 国学向量 */
+        .guoxue-layout {
+            display: grid;
+            grid-template-columns: 1fr 320px;
+            gap: 24px;
+        }
+        .guoxue-sliders {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .gx-slider-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 10px;
+            padding: 12px 16px;
+            transition: all 0.3s ease;
+        }
+        .gx-slider-row:hover {
+            background: rgba(255,255,255,0.04);
+        }
+        .gx-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+        .gx-slider-row.confucian .gx-icon { background: rgba(167,139,250,0.2); color: #a78bfa; }
+        .gx-slider-row.legalist .gx-icon { background: rgba(96,165,250,0.2); color: #60a5fa; }
+        .gx-slider-row.daoist .gx-icon { background: rgba(34,211,238,0.2); color: #22d3ee; }
+        .gx-slider-row.yinyang .gx-icon { background: rgba(244,114,182,0.2); color: #f472b6; }
+        .gx-slider-row.bingjia .gx-icon { background: rgba(239,68,68,0.2); color: #ef4444; }
+        .gx-slider-row.zongheng .gx-icon { background: rgba(250,204,21,0.2); color: #facc15; }
+        .gx-info {
+            flex: 1;
+            min-width: 0;
+        }
+        .gx-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #f1f5f9;
+        }
+        .gx-desc {
+            font-size: 11px;
+            color: rgba(255,255,255,0.4);
+            margin-top: 2px;
+        }
+        .gx-slider-wrap {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 200px;
+            flex-shrink: 0;
+        }
+        .gx-slider-wrap input[type="range"] {
+            flex: 1;
+            height: 4px;
+            -webkit-appearance: none;
+            background: rgba(255,255,255,0.1);
+            border-radius: 2px;
+            outline: none;
+        }
+        .gx-slider-row.confucian input[type="range"]::-webkit-slider-thumb { -webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:#a78bfa;cursor:pointer;box-shadow:0 0 8px rgba(167,139,250,0.5);}
+        .gx-slider-row.legalist input[type="range"]::-webkit-slider-thumb { -webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:#60a5fa;cursor:pointer;box-shadow:0 0 8px rgba(96,165,250,0.5);}
+        .gx-slider-row.daoist input[type="range"]::-webkit-slider-thumb { -webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:#22d3ee;cursor:pointer;box-shadow:0 0 8px rgba(34,211,238,0.5);}
+        .gx-slider-row.yinyang input[type="range"]::-webkit-slider-thumb { -webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:#f472b6;cursor:pointer;box-shadow:0 0 8px rgba(244,114,182,0.5);}
+        .gx-slider-row.bingjia input[type="range"]::-webkit-slider-thumb { -webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:#ef4444;cursor:pointer;box-shadow:0 0 8px rgba(239,68,68,0.5);}
+        .gx-slider-row.zongheng input[type="range"]::-webkit-slider-thumb { -webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:#facc15;cursor:pointer;box-shadow:0 0 8px rgba(250,204,21,0.5);}
+        .gx-val {
+            width: 36px;
+            text-align: right;
+            font-size: 14px;
+            font-weight: 700;
+            color: #f1f5f9;
+        }
+        .guoxue-right {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .radar-wrap {
+            background: radial-gradient(ellipse at center, rgba(167,139,250,0.06) 0%, rgba(11,11,26,0.95) 70%);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 12px;
+            padding: 12px;
+            text-align: center;
+        }
+        .radar-wrap canvas {
+            display: block;
+            margin: 0 auto;
+        }
+        .gx-metrics {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 10px;
+            padding: 14px;
+        }
+        .gx-metric-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 7px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+        }
+        .gx-metric-row:last-child { border-bottom: none; }
+        .gx-metric-label { font-size: 11px; color: rgba(255,255,255,0.5); }
+        .gx-metric-value { font-size: 14px; font-weight: 700; }
+        .gx-face-map {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid rgba(255,255,255,0.06);
+        }
+        .gx-face-map-title {
+            font-size: 11px;
+            color: rgba(255,255,255,0.4);
+            margin-bottom: 8px;
+        }
+        .gx-face-item {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            padding: 4px 0;
+        }
+        .gx-face-item .fi-label { color: rgba(255,255,255,0.6); }
+        .gx-face-item .fi-val { font-weight: 600; }
+        .gx-face-item.product .fi-val { color: #22d3ee; }
+        .gx-face-item.brand .fi-val { color: #a78bfa; }
+        .gx-face-item.channel .fi-val { color: #facc15; }
+        .gx-presets {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 12px;
+        }
+        .gx-preset-btn {
+            padding: 6px 12px;
+            border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.03);
+            color: rgba(255,255,255,0.6);
+            border-radius: 16px;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .gx-preset-btn:hover, .gx-preset-btn.active {
+            background: rgba(239,68,68,0.1);
+            border-color: rgba(239,68,68,0.4);
+            color: #fca5a5;
+        }
+        .private-engine-notice {
+            background: rgba(239,68,68,0.08);
+            border: 1px solid rgba(239,68,68,0.2);
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: 11px;
+            color: rgba(252,165,165,0.8);
+            margin-top: 12px;
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+        .private-engine-notice .lock-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+
+        /* 粒子流 */
+        .flow-canvas-wrap {
+            background: radial-gradient(ellipse at center, rgba(167,139,250,0.05) 0%, rgba(11,11,26,0.98) 80%);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 12px;
+            padding: 16px;
+            position: relative;
+            overflow: hidden;
+        }
+        .flow-canvas-wrap canvas {
+            display: block;
+            width: 100%;
+            border-radius: 8px;
+        }
+        .flow-controls {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+        .flow-play-btn {
+            padding: 12px 28px;
+            border: none;
+            background: linear-gradient(135deg, #a78bfa 0%, #7c3aed 100%);
+            color: white;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(167,139,250,0.3);
+        }
+        .flow-play-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 28px rgba(167,139,250,0.4);
+        }
+        .flow-play-btn.paused {
+            background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+            box-shadow: 0 4px 20px rgba(96,165,250,0.3);
+        }
+        .flow-status {
+            font-size: 13px;
+            color: rgba(255,255,255,0.5);
+        }
+        .flow-status .active-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #22c55e;
+            margin-right: 6px;
+            animation: pulse 2s ease infinite;
+        }
+        .flow-status.stopped .active-dot {
+            background: #64748b;
+            animation: none;
+        }
+
+        /* 新section入场动画 */
+        #section-prism, #section-pyramid, #section-guoxue, #section-flow {
+            opacity: 0;
+            animation: fadeInUp 0.6s ease forwards;
+        }
+        #section-prism { animation-delay: 0.1s; }
+        #section-pyramid { animation-delay: 0.2s; }
+        #section-guoxue { animation-delay: 0.3s; }
+        #section-flow { animation-delay: 0.4s; }
+
+        .red-tag {
+            background: rgba(239,68,68,0.15) !important;
+            color: #fca5a5 !important;
+            border: 1px solid rgba(239,68,68,0.3) !important;
+        }
+
+        @media (max-width: 900px) {
+            .prism-container, .pyramid-container {
+                flex-direction: column;
+            }
+            .canvas-3d-wrap {
+                width: 100%;
+            }
+            .canvas-3d-wrap canvas {
+                width: 100% !important;
+                height: auto !important;
+            }
+            .face-cards {
+                grid-template-columns: 1fr;
+            }
+            .guoxue-layout {
+                grid-template-columns: 1fr;
+            }
+            .gx-slider-wrap {
+                width: 140px;
+            }
+            .layer-breakdown {
+                grid-template-columns: 1fr 1fr;
+            }
+            .flow-canvas-wrap canvas {
+                height: 280px !important;
+            }
+        }
     </style>
 </head>
 <body class="layout-fixed">
@@ -1720,6 +2250,12 @@
         <a class="pn-item" data-target="section-output"><span class="icon">📦</span><span class="label">最终产出</span></a>
         <div class="pn-divider"></div>
         <div class="pn-label">🏦 金融估值精算 · 独立通道</div>
+        <div class="pn-divider"></div>
+        <div class="pn-label">🏛️ 价值地基 · 新增体系</div>
+        <a class="pn-item" data-target="section-prism"><span class="icon">🔷</span><span class="label">三棱柱地基</span></a>
+        <a class="pn-item" data-target="section-pyramid"><span class="icon">🔺</span><span class="label">多棱锥聚合</span></a>
+        <a class="pn-item" data-target="section-guoxue"><span class="icon">☯️</span><span class="label">国学向量</span></a>
+        <a class="pn-item" data-target="section-flow"><span class="icon">🌊</span><span class="label">价值流</span></a>
         <a class="pn-item" data-target="section-riskvector"><span class="icon">📊</span><span class="label">风险向量</span></a>
         <a class="pn-item" data-target="section-cone"><span class="icon">🔺</span><span class="label">圆锥浓度</span></a>
         <a class="pn-item" data-target="section-gametheory"><span class="icon">👁️</span><span class="label">上帝视角</span></a>
@@ -2445,6 +2981,315 @@
             <div class="meta-item" style="grid-column:1/-1;">
                 <div class="ml">💡 核心结论</div>
                 <div class="mv">风险向量精算可在分钟级产出与传统估值模型<span class="hl-gold">同等精度</span>、但<span class="hl">动态性更强、可跨领域迁移</span>的估值结果</div>
+            </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- ===== 新增模块1：正三棱柱·业务价值地基 ===== -->
+        <!-- ============================================================ -->
+        <div class="section-anchor" id="section-prism"></div>
+        <div class="simulator-section">
+            <div class="sim-title">🔷 正三棱柱·业务价值地基 <span class="tag">固定基底·全局基准</span></div>
+            <div class="sim-sub">
+                三大固定立面(<span style="color:#22d3ee;">产品硬价值</span>/<span style="color:#a78bfa;">品牌软价值</span>/<span style="color:#facc15;">三流渠道价值</span>) · 纵向分层 · 3D可旋转
+            </div>
+
+            <div class="prism-container">
+                <div class="canvas-3d-wrap">
+                    <canvas id="prismCanvas" width="500" height="400"></canvas>
+                </div>
+                <div class="prism-ctrl-panel">
+                    <div class="prism-actions">
+                        <button class="prism-btn" id="prismDeconstruct">3→1 拆解动画</button>
+                        <button class="prism-btn" id="prismReconstruct">1→3 重构动画</button>
+                    </div>
+                    <div class="layer-breakdown" id="prismLayerBreakdown">
+                    </div>
+                    <div class="flow-up-indicator">
+                        <div class="arrow-up">↑</div>
+                        <div class="flow-text">三棱柱价值输出 → 汇入棱锥聚合</div>
+                        <div class="flow-value" id="prismTotalOutput">V = 0</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="face-cards">
+                <div class="face-card product">
+                    <div class="fc-title">🔧 产品硬价值</div>
+                    <div class="fc-score" id="productScore">0</div>
+                    <div class="slider-group">
+                        <label>成本结构 <span id="productCostVal">50</span></label>
+                        <input type="range" id="productCost" min="0" max="100" value="50" />
+                    </div>
+                    <div class="slider-group">
+                        <label>工艺水平 <span id="productCraftVal">60</span></label>
+                        <input type="range" id="productCraft" min="0" max="100" value="60" />
+                    </div>
+                    <div class="slider-group">
+                        <label>技术壁垒 <span id="productTechVal">70</span></label>
+                        <input type="range" id="productTech" min="0" max="100" value="70" />
+                    </div>
+                    <div class="slider-group">
+                        <label>功能完备 <span id="productFuncVal">65</span></label>
+                        <input type="range" id="productFunc" min="0" max="100" value="65" />
+                    </div>
+                    <div class="slider-group">
+                        <label>品质纯度 <span id="productPureVal">55</span></label>
+                        <input type="range" id="productPure" min="0" max="100" value="55" />
+                    </div>
+                </div>
+                <div class="face-card brand">
+                    <div class="fc-title">💜 品牌软价值</div>
+                    <div class="fc-score" id="brandScore">0</div>
+                    <div class="slider-group">
+                        <label>IP资产 <span id="brandIpVal">45</span></label>
+                        <input type="range" id="brandIp" min="0" max="100" value="45" />
+                    </div>
+                    <div class="slider-group">
+                        <label>心智占领 <span id="brandMindVal">55</span></label>
+                        <input type="range" id="brandMind" min="0" max="100" value="55" />
+                    </div>
+                    <div class="slider-group">
+                        <label>口碑传播 <span id="brandRepVal">60</span></label>
+                        <input type="range" id="brandRep" min="0" max="100" value="60" />
+                    </div>
+                    <div class="slider-group">
+                        <label>认知溢价 <span id="brandPremVal">50</span></label>
+                        <input type="range" id="brandPrem" min="0" max="100" value="50" />
+                    </div>
+                </div>
+                <div class="face-card channel">
+                    <div class="fc-title">📡 三流渠道价值</div>
+                    <div class="fc-score" id="channelScore">0</div>
+                    <div class="slider-group">
+                        <label>信息分发 <span id="channelInfoVal">70</span></label>
+                        <input type="range" id="channelInfo" min="0" max="100" value="70" />
+                    </div>
+                    <div class="slider-group">
+                        <label>流量分发 <span id="channelFlowVal">65</span></label>
+                        <input type="range" id="channelFlow" min="0" max="100" value="65" />
+                    </div>
+                    <div class="slider-group">
+                        <label>物理分发 <span id="channelPhysVal">60</span></label>
+                        <input type="range" id="channelPhys" min="0" max="100" value="60" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- ===== 新增模块2：自适应多棱锥·多维价值聚合 ===== -->
+        <!-- ============================================================ -->
+        <div class="section-anchor" id="section-pyramid"></div>
+        <div class="simulator-section">
+            <div class="sim-title">🔺 自适应多棱锥·多维价值聚合 <span class="tag">N维自动升维</span></div>
+            <div class="sim-sub">
+                有效价值维度数N自动切换几何体 → N=3三棱锥(默认), N=4四棱锥, N=5五棱锥, N≥6六棱锥
+            </div>
+
+            <div class="pyramid-container">
+                <div class="canvas-3d-wrap">
+                    <canvas id="pyramidCanvas" width="400" height="400"></canvas>
+                </div>
+                <div class="pyramid-ctrl">
+                    <div>
+                        <div style="font-size:13px;color:rgba(255,255,255,0.6);margin-bottom:10px;">🎛️ 价值维度开关（点击切换维度激活状态）</div>
+                        <div class="dim-toggles" id="dimToggles">
+                            <div class="dim-toggle active" data-dim="0" data-color="#22d3ee">产品硬价值</div>
+                            <div class="dim-toggle active" data-dim="1" data-color="#a78bfa">品牌软价值</div>
+                            <div class="dim-toggle active" data-dim="2" data-color="#facc15">三流渠道</div>
+                            <div class="dim-toggle" data-dim="3" data-color="#fb923c">技术壁垒</div>
+                            <div class="dim-toggle" data-dim="4" data-color="#60a5fa">团队治理</div>
+                            <div class="dim-toggle" data-dim="5" data-color="#22c55e">网络效应</div>
+                            <div class="dim-toggle" data-dim="6" data-color="#f472b6">生态壁垒</div>
+                            <div class="dim-toggle" data-dim="7" data-color="#ef4444">政策红利</div>
+                        </div>
+                    </div>
+                    <div class="pyramid-metrics">
+                        <div class="pm-row">
+                            <span class="pm-label">当前维度数 N</span>
+                            <span class="pm-value" id="pyramidN">3</span>
+                        </div>
+                        <div class="pm-row">
+                            <span class="pm-label">几何体类型</span>
+                            <span class="pm-value" id="pyramidType">三棱锥</span>
+                        </div>
+                        <div class="pm-row">
+                            <span class="pm-label">底面积 S</span>
+                            <span class="pm-value" id="pyramidBaseArea">0</span>
+                        </div>
+                        <div class="pm-row">
+                            <span class="pm-label">棱锥体积 V = (1/3)·S·h</span>
+                            <span class="pm-value highlight" id="pyramidVolume">0</span>
+                        </div>
+                    </div>
+                    <div class="flow-up-indicator">
+                        <div class="arrow-up">↑</div>
+                        <div class="flow-text">汇入上层圆锥（溶质质量 m）</div>
+                        <div class="flow-value" id="pyramidMSolute">m = 0</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- ===== 新增模块3：六维国学高维向量引擎 ===== -->
+        <!-- ============================================================ -->
+        <div class="section-anchor" id="section-guoxue"></div>
+        <div class="simulator-section">
+            <div class="sim-title">☯️ 六维国学高维向量引擎 <span class="tag red-tag">私有核心资产</span></div>
+            <div class="sim-sub">
+                V = [<span style="color:#a78bfa;">儒</span>,<span style="color:#60a5fa;">法</span>,<span style="color:#22d3ee;">道</span>,<span style="color:#f472b6;">阴阳</span>,<span style="color:#ef4444;">兵</span>,<span style="color:#facc15;">纵横</span>] · 企业品牌&治理高维空间向量 · 余弦相似度/欧氏距离/向量点积
+            </div>
+
+            <div class="guoxue-layout">
+                <div class="guoxue-sliders">
+                    <div class="gx-slider-row confucian">
+                        <div class="gx-icon">儒</div>
+                        <div class="gx-info">
+                            <div class="gx-name">儒家</div>
+                            <div class="gx-desc">秩序·信誉·履约·组织·长期主义</div>
+                        </div>
+                        <div class="gx-slider-wrap">
+                            <input type="range" id="gxConfucian" min="0" max="100" value="75" />
+                            <span class="gx-val" id="gxConfucianVal">75</span>
+                        </div>
+                    </div>
+                    <div class="gx-slider-row legalist">
+                        <div class="gx-icon">法</div>
+                        <div class="gx-info">
+                            <div class="gx-name">法家</div>
+                            <div class="gx-desc">制度·风控·约束·标准化·合规红线</div>
+                        </div>
+                        <div class="gx-slider-wrap">
+                            <input type="range" id="gxLegalist" min="0" max="100" value="70" />
+                            <span class="gx-val" id="gxLegalistVal">70</span>
+                        </div>
+                    </div>
+                    <div class="gx-slider-row daoist">
+                        <div class="gx-icon">道</div>
+                        <div class="gx-info">
+                            <div class="gx-name">道家</div>
+                            <div class="gx-desc">周期·留白·生态·反脆弱·克制扩张</div>
+                        </div>
+                        <div class="gx-slider-wrap">
+                            <input type="range" id="gxDaoist" min="0" max="100" value="60" />
+                            <span class="gx-val" id="gxDaoistVal">60</span>
+                        </div>
+                    </div>
+                    <div class="gx-slider-row yinyang">
+                        <div class="gx-icon">阴阳</div>
+                        <div class="gx-info">
+                            <div class="gx-name">阴阳</div>
+                            <div class="gx-desc">供需平衡·冷热对冲·盈亏互补·动态均衡</div>
+                        </div>
+                        <div class="gx-slider-wrap">
+                            <input type="range" id="gxYinyang" min="0" max="100" value="65" />
+                            <span class="gx-val" id="gxYinyangVal">65</span>
+                        </div>
+                    </div>
+                    <div class="gx-slider-row bingjia">
+                        <div class="gx-icon">兵</div>
+                        <div class="gx-info">
+                            <div class="gx-name">兵家</div>
+                            <div class="gx-desc">竞争·攻防·卡位·定价博弈·市场掠夺</div>
+                        </div>
+                        <div class="gx-slider-wrap">
+                            <input type="range" id="gxBingjia" min="0" max="100" value="55" />
+                            <span class="gx-val" id="gxBingjiaVal">55</span>
+                        </div>
+                    </div>
+                    <div class="gx-slider-row zongheng">
+                        <div class="gx-icon">纵横</div>
+                        <div class="gx-info">
+                            <div class="gx-name">纵横</div>
+                            <div class="gx-desc">联盟·资源·政企·跨界·生态杠杆</div>
+                        </div>
+                        <div class="gx-slider-wrap">
+                            <input type="range" id="gxZongheng" min="0" max="100" value="50" />
+                            <span class="gx-val" id="gxZonghengVal">50</span>
+                        </div>
+                    </div>
+                    <div style="margin-top:8px;">
+                        <div style="font-size:12px;color:rgba(255,255,255,0.5);margin-bottom:8px;">🏢 企业原型预设</div>
+                        <div class="gx-presets" id="gxPresets">
+                            <button class="gx-preset-btn active" data-preset="balanced">均衡型全能企业</button>
+                            <button class="gx-preset-btn" data-preset="confucian">儒家型稳健企业</button>
+                            <button class="gx-preset-btn" data-preset="legalist">法家型合规企业</button>
+                            <button class="gx-preset-btn" data-preset="daoist">道家型生态企业</button>
+                            <button class="gx-preset-btn" data-preset="bingjia">兵家型激进企业</button>
+                            <button class="gx-preset-btn" data-preset="zongheng">纵横型平台企业</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="guoxue-right">
+                    <div class="radar-wrap">
+                        <canvas id="gxRadarCanvas" width="280" height="280"></canvas>
+                    </div>
+                    <div class="gx-metrics">
+                        <div class="gx-metric-row">
+                            <span class="gx-metric-label">向量模长 ||V||（品牌软实力）</span>
+                            <span class="gx-metric-value" id="gxMagnitude" style="color:#a78bfa;">0</span>
+                        </div>
+                        <div class="gx-metric-row">
+                            <span class="gx-metric-label">维度均衡度（协同系数）</span>
+                            <span class="gx-metric-value" id="gxBalance" style="color:#22c55e;">0</span>
+                        </div>
+                        <div class="gx-metric-row">
+                            <span class="gx-metric-label">与理想向量余弦相似度</span>
+                            <span class="gx-metric-value" id="gxCosine" style="color:#60a5fa;">0</span>
+                        </div>
+                        <div class="gx-metric-row">
+                            <span class="gx-metric-label">β系数影响值</span>
+                            <span class="gx-metric-value" id="gxBetaAdj" style="color:#fb923c;">0</span>
+                        </div>
+                        <div class="gx-metric-row">
+                            <span class="gx-metric-label">Rp风险溢价修正</span>
+                            <span class="gx-metric-value" id="gxRpAdj" style="color:#f472b6;">0%</span>
+                        </div>
+                        <div class="gx-face-map">
+                            <div class="gx-face-map-title">🔗 三棱柱立面映射</div>
+                            <div class="gx-face-item product">
+                                <span class="fi-label">产品立面（法家+兵家）</span>
+                                <span class="fi-val" id="gxFaceProduct">0</span>
+                            </div>
+                            <div class="gx-face-item brand">
+                                <span class="fi-label">品牌立面（儒家+道家）</span>
+                                <span class="fi-val" id="gxFaceBrand">0</span>
+                            </div>
+                            <div class="gx-face-item channel">
+                                <span class="fi-label">渠道立面（阴阳+纵横）</span>
+                                <span class="fi-val" id="gxFaceChannel">0</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="private-engine-notice">
+                        <span class="lock-icon">🔒</span>
+                        <span>六维权重/校准矩阵/行业标尺存放于 <strong>traditional-culture-vector-private-engine</strong> 私有仓库，需授权访问</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- ===== 新增模块4：全链路价值流动态总视图 ===== -->
+        <!-- ============================================================ -->
+        <div class="section-anchor" id="section-flow"></div>
+        <div class="simulator-section">
+            <div class="sim-title">🌊 全链路价值流动闭环 <span class="tag">棱柱→棱锥→圆锥→CAPM→凯利→熔断</span></div>
+            <div class="sim-sub">
+                从业务地基到风控熔断的全链路价值传递 · 粒子实时流动 · 数据随滑块动态更新
+            </div>
+
+            <div class="flow-canvas-wrap">
+                <canvas id="flowCanvas" width="900" height="350"></canvas>
+            </div>
+            <div class="flow-controls">
+                <button class="flow-play-btn" id="flowPlayBtn">▶ 启动价值流</button>
+                <div class="flow-status stopped" id="flowStatus">
+                    <span class="active-dot"></span>
+                    <span id="flowStatusText">价值流未启动</span>
+                </div>
             </div>
         </div>
 
@@ -6733,6 +7578,910 @@
             });
 
             resetGame();
+        })();
+
+        /* ============================================================
+           ===== 新增模块：价值地基体系 - 三棱柱/多棱锥/国学向量/粒子流 =====
+           ============================================================ */
+        (function() {
+            'use strict';
+
+            // ========== 3D 数学工具 ==========
+            function rotateX(p, a) {
+                var c = Math.cos(a), s = Math.sin(a);
+                return { x: p.x, y: p.y * c - p.z * s, z: p.y * s + p.z * c };
+            }
+            function rotateY(p, a) {
+                var c = Math.cos(a), s = Math.sin(a);
+                return { x: p.x * c + p.z * s, y: p.y, z: -p.x * s + p.z * c };
+            }
+            function rotateZ(p, a) {
+                var c = Math.cos(a), s = Math.sin(a);
+                return { x: p.x * c - p.y * s, y: p.x * s + p.y * c, z: p.z };
+            }
+            function project(p, w, h, fov, dist) {
+                var scale = fov / (dist + p.z);
+                return { x: p.x * scale + w / 2, y: p.y * scale + h / 2, s: scale };
+            }
+            function lerpColor(c1, c2, t) {
+                var r1 = parseInt(c1.slice(1,3),16), g1 = parseInt(c1.slice(3,5),16), b1 = parseInt(c1.slice(5,7),16);
+                var r2 = parseInt(c2.slice(1,3),16), g2 = parseInt(c2.slice(3,5),16), b2 = parseInt(c2.slice(5,7),16);
+                var r = Math.round(r1+(r2-r1)*t), g = Math.round(g1+(g2-g1)*t), b = Math.round(b1+(b2-b1)*t);
+                return 'rgb('+r+','+g+','+b+')';
+            }
+            function parseColorRgb(hex) {
+                var r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
+                return {r:r,g:g,b:b};
+            }
+
+            // 星空背景粒子
+            function createStarfield(count, w, h) {
+                var stars = [];
+                for (var i = 0; i < count; i++) {
+                    stars.push({
+                        x: Math.random() * w,
+                        y: Math.random() * h,
+                        r: Math.random() * 1.5 + 0.3,
+                        a: Math.random() * 0.6 + 0.2,
+                        tw: Math.random() * Math.PI * 2
+                    });
+                }
+                return stars;
+            }
+            function drawStarfield(ctx, stars, w, h, t) {
+                for (var i = 0; i < stars.length; i++) {
+                    var s = stars[i];
+                    var alpha = s.a * (0.5 + 0.5 * Math.sin(t * 0.002 + s.tw));
+                    ctx.beginPath();
+                    ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+                    ctx.fillStyle = 'rgba(255,255,255,' + alpha + ')';
+                    ctx.fill();
+                }
+            }
+
+            // ========== 模块1：三棱柱 ==========
+            var prismCanvas = document.getElementById('prismCanvas');
+            if (prismCanvas) {
+                var pctx = prismCanvas.getContext('2d');
+                var pw = prismCanvas.width, ph = prismCanvas.height;
+                var pRotX = 0.3, pRotY = 0.5, pRotZ = 0;
+                var pAutoRot = true;
+                var pDragging = false, pLastX, pLastY;
+                var pStars = createStarfield(80, pw, ph);
+                var pActiveLayer = -1;
+                var pAnimMode = 0;
+                var pAnimT = 0;
+
+                var pLayers = [
+                    { name: '基础成本层', ratio: 0.25, costRate: 0.6, premRate: 0.05, distCost: 0.15, purity: 0.3 },
+                    { name: '功能价值层', ratio: 0.25, costRate: 0.4, premRate: 0.15, distCost: 0.12, purity: 0.5 },
+                    { name: '品质溢价层', ratio: 0.20, costRate: 0.3, premRate: 0.30, distCost: 0.10, purity: 0.7 },
+                    { name: '品牌势能层', ratio: 0.18, costRate: 0.15, premRate: 0.50, distCost: 0.08, purity: 0.85 },
+                    { name: '生态壁垒层', ratio: 0.12, costRate: 0.05, premRate: 0.70, distCost: 0.05, purity: 0.95 }
+                ];
+
+                var faceColors = ['#22d3ee', '#a78bfa', '#facc15'];
+                var pState = {
+                    product: { cost:50, craft:60, tech:70, func:65, pure:55 },
+                    brand: { ip:45, mind:55, rep:60, prem:50 },
+                    channel: { info:70, flow:65, phys:60 }
+                };
+
+                function getPrismVerts(layerTop, layerBot) {
+                    var r = 100, h = layerTop - layerBot;
+                    var yTop = layerTop, yBot = layerBot;
+                    var top = [], bot = [];
+                    for (var i = 0; i < 3; i++) {
+                        var ang = i * Math.PI * 2 / 3 - Math.PI / 2;
+                        top.push({x: Math.cos(ang)*r, y: yTop, z: Math.sin(ang)*r});
+                        bot.push({x: Math.cos(ang)*r, y: yBot, z: Math.sin(ang)*r});
+                    }
+                    return { top: top, bot: bot };
+                }
+
+                function transformVerts(verts) {
+                    var out = [];
+                    for (var i = 0; i < verts.length; i++) {
+                        var p = verts[i];
+                        p = rotateX(p, pRotX);
+                        p = rotateY(p, pRotY);
+                        p = rotateZ(p, pRotZ);
+                        out.push(project(p, pw, ph, 400, 400));
+                    }
+                    return out;
+                }
+
+                function drawPoly(ctx, pts, color, alpha) {
+                    if (pts.length < 3) return;
+                    ctx.beginPath();
+                    ctx.moveTo(pts[0].x, pts[0].y);
+                    for (var i = 1; i < pts.length; i++) ctx.lineTo(pts[i].x, pts[i].y);
+                    ctx.closePath();
+                    var c = parseColorRgb(color);
+                    var grad = ctx.createLinearGradient(pts[0].x, pts[0].y, pts[2] ? pts[2].x : pts[0].x, pts[2] ? pts[2].y : pts[0].y);
+                    grad.addColorStop(0, 'rgba('+c.r+','+c.g+','+c.b+','+(alpha*0.8)+')');
+                    grad.addColorStop(1, 'rgba('+c.r+','+c.g+','+c.b+','+(alpha*0.3)+')');
+                    ctx.fillStyle = grad;
+                    ctx.fill();
+                    ctx.strokeStyle = 'rgba('+c.r+','+c.g+','+c.b+','+(alpha+0.3)+')';
+                    ctx.lineWidth = 1.5;
+                    ctx.stroke();
+                }
+
+                function faceNormalAvgZ(facePts3D) {
+                    var avg = 0;
+                    for (var i = 0; i < facePts3D.length; i++) avg += facePts3D[i].z;
+                    return avg / facePts3D.length;
+                }
+
+                function calcPrismValues() {
+                    var p = pState.product;
+                    var b = pState.brand;
+                    var c = pState.channel;
+                    var pv = (p.cost*0.15 + p.craft*0.2 + p.tech*0.3 + p.func*0.2 + p.pure*0.15);
+                    var bv = (b.ip*0.25 + b.mind*0.3 + b.rep*0.2 + b.prem*0.25);
+                    var cv = (c.info*0.35 + c.flow*0.35 + c.phys*0.3);
+                    var total = pv*0.4 + bv*0.3 + cv*0.3;
+                    return { product: pv, brand: bv, channel: cv, total: total };
+                }
+
+                function updatePrismUI() {
+                    var v = calcPrismValues();
+                    document.getElementById('productScore').textContent = v.product.toFixed(1);
+                    document.getElementById('brandScore').textContent = v.brand.toFixed(1);
+                    document.getElementById('channelScore').textContent = v.channel.toFixed(1);
+                    document.getElementById('prismTotalOutput').textContent = 'V = ' + v.total.toFixed(1);
+
+                    var html = '';
+                    var totalH = 200;
+                    var curY = -totalH/2;
+                    for (var i = 0; i < pLayers.length; i++) {
+                        var l = pLayers[i];
+                        var lh = l.ratio * totalH;
+                        var active = pActiveLayer === i ? ' active' : '';
+                        html += '<div class="layer-card'+active+'" data-layer="'+i+'">';
+                        html += '<div class="ly-name">'+l.name+'</div>';
+                        html += '<div class="ly-metric"><span>成本占比</span><span>'+(l.costRate*100).toFixed(0)+'%</span></div>';
+                        html += '<div class="ly-metric"><span>溢价率</span><span>'+(l.premRate*100).toFixed(0)+'%</span></div>';
+                        html += '<div class="ly-metric"><span>渠道费用</span><span>'+(l.distCost*100).toFixed(0)+'%</span></div>';
+                        html += '<div class="ly-metric"><span>价值纯度</span><span>'+(l.purity*100).toFixed(0)+'%</span></div>';
+                        html += '</div>';
+                        curY += lh;
+                    }
+                    var bd = document.getElementById('prismLayerBreakdown');
+                    if (bd) bd.innerHTML = html;
+
+                    window._prismOutput = {
+                        productValue: v.product,
+                        brandValue: v.brand,
+                        channelValue: v.channel,
+                        layerDetails: pLayers,
+                        totalValue: v.total
+                    };
+
+                    if (typeof window.updateConcentrationDisplay === 'function') {
+                        try { window.updateConcentrationDisplay(); } catch(e){}
+                    }
+                    if (window._pyramidUpdateUI) {
+                        try { window._pyramidUpdateUI(); } catch(e){}
+                    }
+                }
+
+                function drawPrism(t) {
+                    pctx.clearRect(0,0,pw,ph);
+                    drawStarfield(pctx, pStars, pw, ph, t);
+
+                    var totalH = 200;
+                    var curY = -totalH/2;
+                    var v = calcPrismValues();
+                    var faceValMult = [v.product/100, v.brand/100, v.channel/100];
+
+                    var animOffset = 0, animSpread = 0;
+                    if (pAnimMode === 1) {
+                        animSpread = Math.sin(pAnimT) * 80;
+                    } else if (pAnimMode === 2) {
+                        animSpread = Math.cos(pAnimT) * 80;
+                    }
+
+                    var facesToDraw = [];
+
+                    for (var li = 0; li < pLayers.length; li++) {
+                        var l = pLayers[li];
+                        var lh = l.ratio * totalH;
+                        var layerTop = curY + lh;
+                        var layerBot = curY;
+                        var layerAlpha = 0.3 + l.purity * 0.5;
+
+                        var vts = getPrismVerts(layerTop, layerBot);
+
+                        for (var fi = 0; fi < 3; fi++) {
+                            var ni = (fi+1)%3;
+                            var spread = animSpread * (fi-1) * 0.5;
+                            var quad3D = [
+                                {x:vts.top[fi].x+spread, y:vts.top[fi].y, z:vts.top[fi].z},
+                                {x:vts.top[ni].x+spread, y:vts.top[ni].y, z:vts.top[ni].z},
+                                {x:vts.bot[ni].x+spread, y:vts.bot[ni].y, z:vts.bot[ni].z},
+                                {x:vts.bot[fi].x+spread, y:vts.bot[fi].y, z:vts.bot[fi].z}
+                            ];
+                            var avgZ = faceNormalAvgZ(quad3D);
+                            var q2d = transformVerts(quad3D);
+                            facesToDraw.push({z:avgZ, pts:q2d, color:faceColors[fi], alpha:layerAlpha*faceValMult[fi]*(pActiveLayer===li?1.3:1), glow:pActiveLayer===li});
+                        }
+
+                        var top3D = vts.top.map(function(p){return {x:p.x,y:p.y,z:p.z};});
+                        var bot3D = vts.bot.map(function(p){return {x:p.x,y:p.y,z:p.z};});
+                        facesToDraw.push({z:faceNormalAvgZ(top3D)+50, pts:transformVerts(top3D), color:'#ffffff', alpha:layerAlpha*0.3, glow:false});
+                        facesToDraw.push({z:faceNormalAvgZ(bot3D)-50, pts:transformVerts(bot3D), color:'#a78bfa', alpha:layerAlpha*0.4, glow:false});
+
+                        curY += lh;
+                    }
+
+                    facesToDraw.sort(function(a,b){return a.z - b.z;});
+                    for (var fi = 0; fi < facesToDraw.length; fi++) {
+                        var f = facesToDraw[fi];
+                        if (f.glow) {
+                            pctx.shadowColor = f.color;
+                            pctx.shadowBlur = 20;
+                        } else {
+                            pctx.shadowBlur = 0;
+                        }
+                        drawPoly(pctx, f.pts, f.color, Math.min(0.9, f.alpha));
+                    }
+                    pctx.shadowBlur = 0;
+
+                    pctx.fillStyle = 'rgba(255,255,255,0.7)';
+                    pctx.font = '12px sans-serif';
+                    pctx.textAlign = 'center';
+                    pctx.fillText('🔧 产品硬价值', pw*0.25, ph-20);
+                    pctx.fillStyle = '#a78bfa';
+                    pctx.fillText('💜 品牌软价值', pw*0.5, 30);
+                    pctx.fillStyle = '#facc15';
+                    pctx.fillText('📡 三流渠道', pw*0.75, ph-20);
+                }
+
+                prismCanvas.addEventListener('mousedown', function(e) {
+                    pDragging = true; pAutoRot = false;
+                    var rect = prismCanvas.getBoundingClientRect();
+                    pLastX = e.clientX - rect.left; pLastY = e.clientY - rect.top;
+                });
+                prismCanvas.addEventListener('mousemove', function(e) {
+                    if (!pDragging) return;
+                    var rect = prismCanvas.getBoundingClientRect();
+                    var mx = e.clientX - rect.left, my = e.clientY - rect.top;
+                    pRotY += (mx - pLastX) * 0.01;
+                    pRotX += (my - pLastY) * 0.01;
+                    pLastX = mx; pLastY = my;
+                });
+                prismCanvas.addEventListener('mouseup', function(){ pDragging = false; });
+                prismCanvas.addEventListener('mouseleave', function(){ pDragging = false; });
+
+                document.getElementById('prismDeconstruct').addEventListener('click', function(){
+                    pAnimMode = 1; pAnimT = 0; pAutoRot = false;
+                });
+                document.getElementById('prismReconstruct').addEventListener('click', function(){
+                    pAnimMode = 2; pAnimT = Math.PI;
+                });
+
+                Object.keys(pState.product).forEach(function(k){
+                    var el = document.getElementById('product'+k.charAt(0).toUpperCase()+k.slice(1));
+                    if (el) el.addEventListener('input', function(){
+                        pState.product[k] = +this.value;
+                        document.getElementById('product'+k.charAt(0).toUpperCase()+k.slice(1)+'Val').textContent = this.value;
+                        updatePrismUI();
+                    });
+                });
+                Object.keys(pState.brand).forEach(function(k){
+                    var el = document.getElementById('brand'+k.charAt(0).toUpperCase()+k.slice(1));
+                    if (el) el.addEventListener('input', function(){
+                        pState.brand[k] = +this.value;
+                        document.getElementById('brand'+k.charAt(0).toUpperCase()+k.slice(1)+'Val').textContent = this.value;
+                        updatePrismUI();
+                    });
+                });
+                Object.keys(pState.channel).forEach(function(k){
+                    var el = document.getElementById('channel'+k.charAt(0).toUpperCase()+k.slice(1));
+                    if (el) el.addEventListener('input', function(){
+                        pState.channel[k] = +this.value;
+                        document.getElementById('channel'+k.charAt(0).toUpperCase()+k.slice(1)+'Val').textContent = this.value;
+                        updatePrismUI();
+                    });
+                });
+
+                document.getElementById('prismLayerBreakdown').addEventListener('click', function(e){
+                    var card = e.target.closest('.layer-card');
+                    if (card) {
+                        var idx = +card.dataset.layer;
+                        pActiveLayer = pActiveLayer === idx ? -1 : idx;
+                        updatePrismUI();
+                    }
+                });
+
+                function prismLoop(t) {
+                    if (pAutoRot) pRotY += 0.005;
+                    if (pAnimMode !== 0) {
+                        pAnimT += pAnimMode===1 ? 0.05 : -0.05;
+                        if (pAnimMode===1 && pAnimT >= Math.PI) { pAnimT = Math.PI; pAnimMode = 0; }
+                        if (pAnimMode===2 && pAnimT <= 0) { pAnimT = 0; pAnimMode = 0; pAutoRot = true; }
+                    }
+                    drawPrism(t);
+                    requestAnimationFrame(prismLoop);
+                }
+                updatePrismUI();
+                requestAnimationFrame(prismLoop);
+            }
+
+            // ========== 模块2：多棱锥 ==========
+            var pyCanvas = document.getElementById('pyramidCanvas');
+            if (pyCanvas) {
+                var yctx = pyCanvas.getContext('2d');
+                var yw = pyCanvas.width, yh = pyCanvas.height;
+                var yRotX = 0.4, yRotY = 0.6;
+                var yAutoRot = true;
+                var yDragging = false, yLastX, yLastY;
+                var yStars = createStarfield(60, yw, yh);
+                var activeDims = [true, true, true, false, false, false, false, false];
+                var dimColors = ['#22d3ee','#a78bfa','#facc15','#fb923c','#60a5fa','#22c55e','#f472b6','#ef4444'];
+                var dimNames = ['产品硬价值','品牌软价值','三流渠道','技术壁垒','团队治理','网络效应','生态壁垒','政策红利'];
+                var dimWeights = [0.6, 0.55, 0.5, 0.7, 0.6, 0.75, 0.65, 0.5];
+                var PY_REF_VOLUME = 800000;
+
+                function syncDimWeights() {
+                    var prism = window._prismOutput;
+                    var gx = window._guoxueOutput;
+                    if (prism) {
+                        dimWeights[0] = Math.max(0.1, Math.min(1.0, prism.productValue / 100));
+                        dimWeights[1] = Math.max(0.1, Math.min(1.0, prism.brandValue / 100));
+                        dimWeights[2] = Math.max(0.1, Math.min(1.0, prism.channelValue / 100));
+                    }
+                    if (gx) {
+                        var gv = gx.vector;
+                        var prodBoost = (gv[1] + gv[4]) / 200;
+                        var brandBoost = (gv[0] + gv[2]) / 200;
+                        var chanBoost = (gv[3] + gv[5]) / 200;
+                        dimWeights[0] = Math.min(1.0, dimWeights[0] * 0.6 + prodBoost * 0.4);
+                        dimWeights[1] = Math.min(1.0, dimWeights[1] * 0.6 + brandBoost * 0.4);
+                        dimWeights[2] = Math.min(1.0, dimWeights[2] * 0.6 + chanBoost * 0.4);
+                    }
+                }
+                window._pyramidSyncWeights = syncDimWeights;
+                window._pyramidUpdateUI = function() { updatePyramidUI(); };
+
+                function getActiveCount() {
+                    var n = 0;
+                    for (var i = 0; i < activeDims.length; i++) if (activeDims[i]) n++;
+                    return Math.max(3, n);
+                }
+
+                function getPyramidType(n) {
+                    var types = {3:'三棱锥',4:'四棱锥',5:'五棱锥',6:'六棱锥',7:'七棱锥',8:'八棱锥'};
+                    return types[n] || n+'棱锥';
+                }
+
+                function calcPyramidVals() {
+                    var n = getActiveCount();
+                    var r = 120;
+                    var baseArea = 0;
+                    var activeIdx = [];
+                    for (var i = 0; i < activeDims.length; i++) if (activeDims[i]) activeIdx.push(i);
+                    var totalWeight = 0;
+                    for (var i = 0; i < activeIdx.length; i++) totalWeight += dimWeights[activeIdx[i]];
+                    for (var i = 0; i < n; i++) {
+                        var a1 = i * Math.PI*2/n - Math.PI/2;
+                        var a2 = (i+1) * Math.PI*2/n - Math.PI/2;
+                        var w = dimWeights[activeIdx[i%activeIdx.length]] / totalWeight;
+                        baseArea += 0.5 * r * r * Math.sin(Math.PI*2/n) * (0.5 + w);
+                    }
+                    var height = 150 + totalWeight * 80;
+                    var volume = (1/3) * baseArea * height;
+                    var m_norm = Math.min(1.0, volume / PY_REF_VOLUME);
+                    var m_solute = 0.4 + m_norm * 0.5;
+                    return { N:n, baseArea:baseArea, height:height, volume:volume, m_solute: m_solute, volumeK: volume/1000 };
+                }
+
+                function updatePyramidUI() {
+                    syncDimWeights();
+                    var v = calcPyramidVals();
+                    document.getElementById('pyramidN').textContent = v.N;
+                    document.getElementById('pyramidType').textContent = getPyramidType(v.N);
+                    document.getElementById('pyramidBaseArea').textContent = v.baseArea.toFixed(0);
+                    document.getElementById('pyramidVolume').textContent = v.volumeK.toFixed(0) + 'K';
+                    document.getElementById('pyramidMSolute').textContent = 'm = ' + v.m_solute.toFixed(3);
+
+                    window._pyramidOutput = {
+                        N: v.N,
+                        volume: v.volume,
+                        volumeK: v.volumeK,
+                        m_solute: v.m_solute
+                    };
+                }
+
+                function getPyramidVerts() {
+                    var n = getActiveCount();
+                    var r = 120;
+                    var apex = {x:0, y:-100, z:0};
+                    var base = [];
+                    var activeIdx = [];
+                    for (var i = 0; i < activeDims.length; i++) if (activeDims[i]) activeIdx.push(i);
+                    var totalWeight = 0;
+                    for (var i = 0; i < activeIdx.length; i++) totalWeight += dimWeights[activeIdx[i]];
+                    for (var i = 0; i < n; i++) {
+                        var ang = i * Math.PI*2/n - Math.PI/2;
+                        var w = dimWeights[activeIdx[i%activeIdx.length]] / totalWeight;
+                        var adjR = r * (0.7 + w*0.6);
+                        base.push({x:Math.cos(ang)*adjR, y:80, z:Math.sin(ang)*adjR});
+                    }
+                    return {apex:apex, base:base, activeIdx:activeIdx};
+                }
+
+                function drawPyramid(t) {
+                    yctx.clearRect(0,0,yw,yh);
+                    drawStarfield(yctx, yStars, yw, yh, t);
+
+                    var pv = getPyramidVerts();
+                    var apexT = rotateZ(rotateY(rotateX(pv.apex, yRotX), yRotY), 0);
+                    var apexP = project(apexT, yw, yh, 400, 400);
+                    var baseP = [];
+                    for (var i = 0; i < pv.base.length; i++) {
+                        var bp = rotateZ(rotateY(rotateX(pv.base[i], yRotX), yRotY), 0);
+                        baseP.push(project(bp, yw, yh, 400, 400));
+                    }
+
+                    var faces = [];
+                    for (var i = 0; i < pv.base.length; i++) {
+                        var ni = (i+1)%pv.base.length;
+                        var dimIdx = pv.activeIdx[i%pv.activeIdx.length];
+                        var a = pv.base[i], b = pv.base[ni];
+                        var midZ = (a.z + b.z + pv.apex.z)/3;
+                        faces.push({
+                            z: midZ,
+                            pts: [apexP, baseP[ni], baseP[i]],
+                            color: dimColors[dimIdx],
+                            dimIdx: dimIdx
+                        });
+                    }
+                    var baseAvgZ = pv.base.reduce(function(s,p){return s+p.z;},0)/pv.base.length;
+                    faces.push({z:baseAvgZ, pts:baseP.slice(), color:'#7c3aed', isBase:true});
+
+                    faces.sort(function(a,b){return a.z - b.z;});
+
+                    for (var fi = 0; fi < faces.length; fi++) {
+                        var f = faces[fi];
+                        yctx.beginPath();
+                        yctx.moveTo(f.pts[0].x, f.pts[0].y);
+                        for (var j = 1; j < f.pts.length; j++) yctx.lineTo(f.pts[j].x, f.pts[j].y);
+                        yctx.closePath();
+                        var c = parseColorRgb(f.color);
+                        var alpha = f.isBase ? 0.25 : 0.5;
+                        var grad;
+                        if (f.isBase) {
+                            grad = yctx.createRadialGradient(yw/2, yh/2+40, 10, yw/2, yh/2+40, 150);
+                            grad.addColorStop(0, 'rgba('+c.r+','+c.g+','+c.b+',0.4)');
+                            grad.addColorStop(1, 'rgba('+c.r+','+c.g+','+c.b+',0.05)');
+                        } else {
+                            grad = yctx.createLinearGradient(f.pts[0].x, f.pts[0].y, f.pts[2]?f.pts[2].x:f.pts[0].x, f.pts[2]?f.pts[2].y:f.pts[0].y);
+                            grad.addColorStop(0, 'rgba('+c.r+','+c.g+','+c.b+','+(alpha*0.9)+')');
+                            grad.addColorStop(1, 'rgba('+c.r+','+c.g+','+c.b+','+(alpha*0.3)+')');
+                        }
+                        yctx.fillStyle = grad;
+                        yctx.fill();
+                        yctx.strokeStyle = 'rgba('+c.r+','+c.g+','+c.b+',0.6)';
+                        yctx.lineWidth = 1.2;
+                        yctx.stroke();
+                    }
+
+                    yctx.fillStyle = '#22c55e';
+                    yctx.beginPath();
+                    yctx.arc(apexP.x, apexP.y, 5, 0, Math.PI*2);
+                    yctx.fill();
+                    yctx.shadowColor = '#22c55e';
+                    yctx.shadowBlur = 15;
+                    yctx.fill();
+                    yctx.shadowBlur = 0;
+
+                    yctx.fillStyle = 'rgba(255,255,255,0.5)';
+                    yctx.font = '11px sans-serif';
+                    yctx.textAlign = 'center';
+                    yctx.fillText('N='+pv.base.length+' '+getPyramidType(pv.base.length), yw/2, yh-15);
+                }
+
+                pyCanvas.addEventListener('mousedown', function(e){
+                    yDragging=true; yAutoRot=false;
+                    var rect=pyCanvas.getBoundingClientRect();
+                    yLastX=e.clientX-rect.left; yLastY=e.clientY-rect.top;
+                });
+                pyCanvas.addEventListener('mousemove', function(e){
+                    if(!yDragging)return;
+                    var rect=pyCanvas.getBoundingClientRect();
+                    var mx=e.clientX-rect.left,my=e.clientY-rect.top;
+                    yRotY+=(mx-yLastX)*0.01; yRotX+=(my-yLastY)*0.01;
+                    yLastX=mx;yLastY=my;
+                });
+                pyCanvas.addEventListener('mouseup',function(){yDragging=false;});
+                pyCanvas.addEventListener('mouseleave',function(){yDragging=false;});
+
+                document.querySelectorAll('.dim-toggle').forEach(function(toggle){
+                    toggle.addEventListener('click', function(){
+                        var idx = +this.dataset.dim;
+                        activeDims[idx] = !activeDims[idx];
+                        this.classList.toggle('active', activeDims[idx]);
+                        var activeCount = activeDims.filter(function(a){return a;}).length;
+                        if (activeCount < 3) {
+                            activeDims[idx] = true;
+                            this.classList.add('active');
+                            return;
+                        }
+                        updatePyramidUI();
+                    });
+                });
+
+                function pyLoop(t) {
+                    if (yAutoRot) yRotY += 0.006;
+                    drawPyramid(t);
+                    requestAnimationFrame(pyLoop);
+                }
+                updatePyramidUI();
+                requestAnimationFrame(pyLoop);
+            }
+
+            // ========== 模块3：国学向量 ==========
+            var gxCanvas = document.getElementById('gxRadarCanvas');
+            var GX_PRESETS = {
+                balanced: { name:'均衡型全能企业', v:[75,75,75,75,75,75], desc:'儒法道阴阳兵纵横均衡发展' },
+                confucian: { name:'儒家型稳健企业', v:[95,70,60,70,40,65], desc:'强秩序信誉，稳扎稳打' },
+                legalist: { name:'法家型合规企业', v:[65,95,50,55,60,50], desc:'制度严密，风控极强' },
+                daoist: { name:'道家型生态企业', v:[60,50,95,80,30,70], desc:'顺应周期，生态布局' },
+                bingjia: { name:'兵家型激进企业', v:[40,60,30,40,95,55], desc:'强竞争攻击性，掠夺市场' },
+                zongheng: { name:'纵横型平台企业', v:[70,55,65,60,60,95], desc:'强联盟资源整合' }
+            };
+            var gxIdeal = [75,75,75,75,75,75];
+            var gxVector = [75,70,60,65,55,50];
+            var gxLabels = ['儒','法','道','阴阳','兵','纵横'];
+            var gxColors = ['#a78bfa','#60a5fa','#22d3ee','#f472b6','#ef4444','#facc15'];
+            var gxIds = ['gxConfucian','gxLegalist','gxDaoist','gxYinyang','gxBingjia','gxZongheng'];
+
+            function vecMagnitude(v) { return Math.sqrt(v.reduce(function(s,x){return s+x*x;},0)); }
+            function cosineSimilarity(a, b) {
+                var dot = a.reduce(function(s,x,i){return s+x*b[i];},0);
+                return dot / (vecMagnitude(a) * vecMagnitude(b));
+            }
+            function euclideanDistance(a, b) {
+                return Math.sqrt(a.reduce(function(s,x,i){return s+(x-b[i])*(x-b[i]);},0));
+            }
+            function dotProduct(a, b) { return a.reduce(function(s,x,i){return s+x*b[i];},0); }
+
+            function calcGx() {
+                var mag = vecMagnitude(gxVector);
+                var mean = gxVector.reduce(function(s,x){return s+x;},0)/gxVector.length;
+                var stdDev = Math.sqrt(gxVector.reduce(function(s,x){return s+(x-mean)*(x-mean);},0)/gxVector.length);
+                var balance = 1 - stdDev/mean;
+                var cosSim = cosineSimilarity(gxVector, gxIdeal);
+                var eucDist = euclideanDistance(gxVector, gxIdeal);
+                var maxDist = euclideanDistance([0,0,0,0,0,0],[100,100,100,100,100,100]);
+                var betaAdj = 1 + (eucDist/maxDist) * 0.3;
+                var rpAdj = (balance - 0.7) * 0.5;
+                var faceProd = (gxVector[1] + gxVector[4]) / 2;
+                var faceBrand = (gxVector[0] + gxVector[2]) / 2;
+                var faceChan = (gxVector[3] + gxVector[5]) / 2;
+                return {
+                    vector: gxVector.slice(),
+                    magnitude: mag,
+                    balanceScore: balance,
+                    cosineSim: cosSim,
+                    euclideanDist: eucDist,
+                    betaAdjustment: betaAdj,
+                    rpAdjustment: rpAdj,
+                    faceMappings: { product: faceProd, brand: faceBrand, channel: faceChan }
+                };
+            }
+
+            function updateGxUI() {
+                var r = calcGx();
+                document.getElementById('gxMagnitude').textContent = r.magnitude.toFixed(1);
+                document.getElementById('gxBalance').textContent = (r.balanceScore*100).toFixed(1)+'%';
+                document.getElementById('gxCosine').textContent = r.cosineSim.toFixed(3);
+                document.getElementById('gxBetaAdj').textContent = 'β×'+r.betaAdjustment.toFixed(3);
+                document.getElementById('gxRpAdj').textContent = (r.rpAdjustment>=0?'+':'')+(r.rpAdjustment*100).toFixed(1)+'%';
+                document.getElementById('gxFaceProduct').textContent = r.faceMappings.product.toFixed(1);
+                document.getElementById('gxFaceBrand').textContent = r.faceMappings.brand.toFixed(1);
+                document.getElementById('gxFaceChannel').textContent = r.faceMappings.channel.toFixed(1);
+
+                window._guoxueOutput = r;
+
+                if (window._pyramidUpdateUI) {
+                    try { window._pyramidUpdateUI(); } catch(e){}
+                }
+            }
+
+            function drawRadar() {
+                if (!gxCanvas) return;
+                var ctx = gxCanvas.getContext('2d');
+                var cw = gxCanvas.width, ch = gxCanvas.height;
+                var cx = cw/2, cy = ch/2;
+                var maxR = 110;
+                ctx.clearRect(0,0,cw,ch);
+
+                ctx.strokeStyle = 'rgba(167,139,250,0.1)';
+                ctx.lineWidth = 1;
+                for (var ring = 1; ring <= 5; ring++) {
+                    ctx.beginPath();
+                    for (var i = 0; i < 6; i++) {
+                        var ang = i*Math.PI*2/6 - Math.PI/2;
+                        var r = maxR * ring/5;
+                        var px = cx+Math.cos(ang)*r, py = cy+Math.sin(ang)*r;
+                        if (i===0) ctx.moveTo(px,py); else ctx.lineTo(px,py);
+                    }
+                    ctx.closePath();
+                    ctx.stroke();
+                }
+
+                for (var i = 0; i < 6; i++) {
+                    var ang = i*Math.PI*2/6 - Math.PI/2;
+                    ctx.beginPath();
+                    ctx.moveTo(cx,cy);
+                    ctx.lineTo(cx+Math.cos(ang)*maxR, cy+Math.sin(ang)*maxR);
+                    ctx.strokeStyle = 'rgba(167,139,250,0.15)';
+                    ctx.stroke();
+
+                    var lx = cx+Math.cos(ang)*(maxR+20);
+                    var ly = cy+Math.sin(ang)*(maxR+20);
+                    ctx.fillStyle = gxColors[i];
+                    ctx.font = 'bold 13px sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(gxLabels[i], lx, ly);
+                }
+
+                ctx.beginPath();
+                for (var i = 0; i < 6; i++) {
+                    var ang = i*Math.PI*2/6 - Math.PI/2;
+                    var val = gxVector[i]/100;
+                    var r = maxR * val;
+                    var px = cx+Math.cos(ang)*r, py = cy+Math.sin(ang)*r;
+                    if (i===0) ctx.moveTo(px,py); else ctx.lineTo(px,py);
+                }
+                ctx.closePath();
+                var grad = ctx.createRadialGradient(cx,cy,0,cx,cy,maxR);
+                grad.addColorStop(0,'rgba(167,139,250,0.3)');
+                grad.addColorStop(1,'rgba(167,139,250,0.05)');
+                ctx.fillStyle = grad;
+                ctx.fill();
+                ctx.strokeStyle = '#a78bfa';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                for (var i = 0; i < 6; i++) {
+                    var ang = i*Math.PI*2/6 - Math.PI/2;
+                    var val = gxVector[i]/100;
+                    var r = maxR * val;
+                    var px = cx+Math.cos(ang)*r, py = cy+Math.sin(ang)*r;
+                    ctx.beginPath();
+                    ctx.arc(px,py,4,0,Math.PI*2);
+                    ctx.fillStyle = gxColors[i];
+                    ctx.shadowColor = gxColors[i];
+                    ctx.shadowBlur = 10;
+                    ctx.fill();
+                }
+                ctx.shadowBlur = 0;
+            }
+
+            if (gxCanvas) {
+                gxIds.forEach(function(id, idx){
+                    var el = document.getElementById(id);
+                    if (el) el.addEventListener('input', function(){
+                        gxVector[idx] = +this.value;
+                        document.getElementById(id+'Val').textContent = this.value;
+                        document.querySelectorAll('.gx-preset-btn').forEach(function(b){b.classList.remove('active');});
+                        updateGxUI();
+                        drawRadar();
+                    });
+                });
+                document.querySelectorAll('.gx-preset-btn').forEach(function(btn){
+                    btn.addEventListener('click', function(){
+                        var key = this.dataset.preset;
+                        var p = GX_PRESETS[key];
+                        if (!p) return;
+                        gxVector = p.v.slice();
+                        gxIds.forEach(function(id, idx){
+                            var el = document.getElementById(id);
+                            if (el) el.value = gxVector[idx];
+                            var valEl = document.getElementById(id+'Val');
+                            if (valEl) valEl.textContent = gxVector[idx];
+                        });
+                        document.querySelectorAll('.gx-preset-btn').forEach(function(b){b.classList.remove('active');});
+                        this.classList.add('active');
+                        updateGxUI();
+                        drawRadar();
+                    });
+                });
+                updateGxUI();
+                drawRadar();
+            }
+
+            // ========== 模块4：粒子流动画 ==========
+            var flowCanvas = document.getElementById('flowCanvas');
+            if (flowCanvas) {
+                var fctx = flowCanvas.getContext('2d');
+                var fw = flowCanvas.width, fh = flowCanvas.height;
+                var flowActive = false;
+                var flowParticles = [];
+                var flowStars = createStarfield(50, fw, fh);
+
+                var layers = [
+                    {name:'三棱柱·业务地基', y:fh-50, h:60, color:'#a78bfa', label:'产品/品牌/渠道'},
+                    {name:'多棱锥·多维聚合', y:fh-120, h:50, color:'#22c55e', label:'m溶质'},
+                    {name:'圆锥·浓度模型', y:fh-185, h:50, color:'#60a5fa', label:'浓度C'},
+                    {name:'CAPM定价', y:fh-245, h:45, color:'#facc15', label:'Re/Rp'},
+                    {name:'凯利配置', y:fh-295, h:40, color:'#fb923c', label:'f*仓位'},
+                    {name:'0.68风控熔断', y:fh-335, h:35, color:'#ef4444', label:'actual'}
+                ];
+
+                var flowPlayBtn = document.getElementById('flowPlayBtn');
+                var flowStatus = document.getElementById('flowStatus');
+                var flowStatusText = document.getElementById('flowStatusText');
+
+                function spawnParticle() {
+                    return {
+                        x: fw/2 + (Math.random()-0.5)*60,
+                        y: fh - 20,
+                        vx: (Math.random()-0.5)*0.5,
+                        vy: -1.5 - Math.random()*1.5,
+                        size: 2 + Math.random()*3,
+                        life: 1,
+                        layerIdx: 0,
+                        color: layers[0].color,
+                        trail: []
+                    };
+                }
+
+                function updateFlowMetrics() {
+                    if (window._pyramidSyncWeights) window._pyramidSyncWeights();
+                    if (window._pyramidUpdateUI) window._pyramidUpdateUI();
+                    var prismV = window._prismOutput ? window._prismOutput.totalValue : 60;
+                    var pyV = window._pyramidOutput ? window._pyramidOutput.m_solute : 0.65;
+                    var gxV = window._guoxueOutput ? window._guoxueOutput.magnitude : 154;
+                    var betaAdj = window._guoxueOutput ? window._guoxueOutput.betaAdjustment : 1.0;
+                    var rpAdj = window._guoxueOutput ? window._guoxueOutput.rpAdjustment : 0;
+                    var h = 0.5;
+                    var coneHInput = document.getElementById('coneHInput');
+                    if (coneHInput) h = parseFloat(coneHInput.value);
+                    var normV = Math.pow(1-h, 2) * h;
+                    var rho = 1.0;
+                    var coneRhoEl = document.getElementById('coneRhoVal');
+                    if (coneRhoEl) rho = parseFloat(coneRhoEl.textContent) || 1.0;
+                    var coneC = (pyV * rho) / Math.max(normV, 0.01);
+                    var Re = 8 + rpAdj * 100;
+                    var kellyF = Math.max(0, Math.min(1, 0.25 + (0.68 - coneC/10) * 0.3));
+                    var displayedC = coneC;
+                    var coneCEl = document.getElementById('coneCVal');
+                    if (coneCEl) {
+                        var parsed = parseFloat(coneCEl.textContent);
+                        if (!isNaN(parsed)) displayedC = parsed;
+                    }
+                    layers[0].metric = 'V='+prismV.toFixed(0);
+                    layers[1].metric = 'm='+pyV.toFixed(2);
+                    layers[2].metric = 'C='+displayedC.toFixed(2);
+                    layers[3].metric = 'Re='+Re.toFixed(1)+'%';
+                    layers[4].metric = 'f*='+kellyF.toFixed(2);
+                    layers[5].metric = displayedC >= 0.68 ? '⚠熔断' : '0.68';
+                }
+
+                function drawFlow(t) {
+                    fctx.clearRect(0,0,fw,fh);
+                    drawStarfield(fctx, flowStars, fw, fh, t);
+
+                    for (var i = layers.length-1; i >= 0; i--) {
+                        var l = layers[i];
+                        var c = parseColorRgb(l.color);
+                        fctx.fillStyle = 'rgba('+c.r+','+c.g+','+c.b+',0.08)';
+                        fctx.fillRect(60, l.y-l.h, fw-120, l.h);
+                        fctx.strokeStyle = 'rgba('+c.r+','+c.g+','+c.b+',0.3)';
+                        fctx.lineWidth = 1;
+                        fctx.strokeRect(60, l.y-l.h, fw-120, l.h);
+
+                        fctx.fillStyle = l.color;
+                        fctx.font = 'bold 12px sans-serif';
+                        fctx.textAlign = 'left';
+                        fctx.fillText(l.name, 75, l.y-l.h+18);
+                        fctx.fillStyle = 'rgba(255,255,255,0.5)';
+                        fctx.font = '11px sans-serif';
+                        fctx.fillText(l.label, 75, l.y-l.h+35);
+                        if (l.metric) {
+                            fctx.fillStyle = l.color;
+                            fctx.font = 'bold 14px sans-serif';
+                            fctx.textAlign = 'right';
+                            fctx.fillText(l.metric, fw-75, l.y-l.h/2+5);
+                        }
+                    }
+
+                    for (var i = 0; i < layers.length-1; i++) {
+                        var l1 = layers[i], l2 = layers[i+1];
+                        var ax = fw/2, ay = l1.y-l1.h;
+                        var bx = fw/2, by = l2.y;
+                        fctx.beginPath();
+                        fctx.moveTo(ax, ay);
+                        fctx.lineTo(bx, by);
+                        var c = parseColorRgb(l1.color);
+                        fctx.strokeStyle = 'rgba('+c.r+','+c.g+','+c.b+',0.2)';
+                        fctx.lineWidth = 2;
+                        fctx.setLineDash([4,4]);
+                        fctx.stroke();
+                        fctx.setLineDash([]);
+                    }
+
+                    if (flowActive) {
+                        if (Math.random() < 0.3) flowParticles.push(spawnParticle());
+                        for (var i = flowParticles.length-1; i >= 0; i--) {
+                            var p = flowParticles[i];
+                            p.trail.push({x:p.x,y:p.y,a:1});
+                            if (p.trail.length > 8) p.trail.shift();
+                            p.x += p.vx + Math.sin(t*0.01+i)*0.3;
+                            p.y += p.vy;
+                            p.life -= 0.003;
+
+                            for (var li = 0; li < layers.length; li++) {
+                                if (p.y < layers[li].y && p.y > layers[li].y-layers[li].h) {
+                                    p.color = layers[li].color;
+                                    p.vy *= 0.98;
+                                }
+                            }
+
+                            for (var ti = 0; ti < p.trail.length; ti++) {
+                                var tp = p.trail[ti];
+                                var ta = (ti/p.trail.length) * p.life * 0.5;
+                                var tc = parseColorRgb(p.color);
+                                fctx.beginPath();
+                                fctx.arc(tp.x, tp.y, p.size*(ti/p.trail.length), 0, Math.PI*2);
+                                fctx.fillStyle = 'rgba('+tc.r+','+tc.g+','+tc.b+','+ta+')';
+                                fctx.fill();
+                            }
+
+                            fctx.beginPath();
+                            fctx.arc(p.x, p.y, p.size, 0, Math.PI*2);
+                            var pc = parseColorRgb(p.color);
+                            fctx.fillStyle = 'rgba('+pc.r+','+pc.g+','+pc.b+','+p.life+')';
+                            fctx.shadowColor = p.color;
+                            fctx.shadowBlur = 12;
+                            fctx.fill();
+                            fctx.shadowBlur = 0;
+
+                            if (p.life <= 0 || p.y < 10) flowParticles.splice(i,1);
+                        }
+                    }
+
+                    fctx.fillStyle = 'rgba(255,255,255,0.3)';
+                    fctx.font = '11px sans-serif';
+                    fctx.textAlign = 'center';
+                    fctx.fillText('价值流从底部三棱柱向上传递，经过多层聚合/定价/配置最终到达顶层风控熔断', fw/2, 15);
+                }
+
+                flowPlayBtn.addEventListener('click', function(){
+                    flowActive = !flowActive;
+                    window._valueFlowActive = flowActive;
+                    if (flowActive) {
+                        flowPlayBtn.textContent = '⏸ 暂停价值流';
+                        flowPlayBtn.classList.add('paused');
+                        flowStatus.classList.remove('stopped');
+                        flowStatusText.textContent = '价值流运行中 · 粒子数: '+flowParticles.length;
+                    } else {
+                        flowPlayBtn.textContent = '▶ 启动价值流';
+                        flowPlayBtn.classList.remove('paused');
+                        flowStatus.classList.add('stopped');
+                        flowStatusText.textContent = '价值流已暂停';
+                    }
+                });
+
+                function flowLoop(t) {
+                    updateFlowMetrics();
+                    drawFlow(t);
+                    if (flowActive && flowStatusText) {
+                        flowStatusText.textContent = '价值流运行中 · 粒子数: '+flowParticles.length;
+                    }
+                    requestAnimationFrame(flowLoop);
+                }
+                window._valueFlowActive = false;
+                requestAnimationFrame(flowLoop);
+            }
+
         })();
 
     </script>
