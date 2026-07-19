@@ -1,0 +1,101 @@
+{
+  "_doc": "Low-Altitude Economy · Three-Party Airspace Gaming Module - Private Configuration",
+  "_instruction": "ALL low-altitude private values (drone scrap rate, battery energy, manufacturer slopes, airspace tier params) must be filled here. Core does NOT read any private value directly. Fill blank fields during business logic development.",
+
+  "moduleId": "lowalt-economy",
+  "moduleName": "低空经济三方空域博弈",
+  "moduleVersion": "0.1.0-skeleton",
+
+  "apiConfig": {
+    "apiVersion": "1.0.0",
+    "coreApiPath": "../../core-engine/common-api.js"
+  },
+
+  "privateParams": {
+    "_doc": "All private numeric values go below. Pass them as payload to GameOS_API.invoke().",
+
+    "kellyConfig": {
+      "_doc": "Airspace resource allocation via Kelly framework",
+      "winRateRange": [null, null],
+      "winLossRatioRange": [null, null],
+      "defaultScalingFactor": null,
+      "businessAdjustmentMultiplier": null
+    },
+
+    "circleBoundaryConfig": {
+      "_doc": "Airspace circle dynamic constraints; radius/slope are private",
+      "factorWeights": [],
+      "boundarySlope": null,
+      "volatilityBaseline": null,
+      "resistanceCoefficient": null,
+      "criticalDeviation": null,
+      "airspaceTiers": {
+        "lowAltitudeCeiling": null,
+        "midAltitudeCeiling": null,
+        "highAltitudeCeiling": null,
+        "noFlyZone": null
+      }
+    },
+
+    "fuseThresholds": {
+      "_doc": "Airspace conflict fuse; 0.6 baseline CORE-LOCKED",
+      "warn": null,
+      "caution": null,
+      "_halt": "0.6 (CORE LOCKED)",
+      "cooldownPeriodMs": null,
+      "businessCustomTriggers": [
+        "droneScrapRateBreach",
+        "batteryCritical",
+        "midairConflictImminent"
+      ]
+    },
+
+    "controlLayerThresholds": {
+      "_doc": "Airspace dispatch four-layer permissions",
+      "L1toL2": null,
+      "L2toL3": null,
+      "_L3toL4": "0.6 (CORE LOCKED)",
+      "approvalMatrix": {
+        "L1": null,
+        "L2": null,
+        "L3": null,
+        "L4": null
+      }
+    },
+
+    "fatLeanConfig": {
+      "_doc": "Peak/off-peak season fat-lean bands",
+      "fatThreshold": null,
+      "leanThreshold": null,
+      "fatLoosenessFactor": null,
+      "leanTightnessFactor": null,
+      "smoothingFactor": null,
+      "seasonParams": {
+        "peakSeasonMonths": [],
+        "offSeasonMonths": []
+      }
+    },
+
+    "elevenLayerConfig": {
+      "_doc": "Low-altitude 11-layer pipeline step handlers (to be implemented in private-logic/)",
+      "stepHandlers": [],
+      "auditNodeNames": []
+    },
+
+    "industrySpecific": {
+      "_doc": "Low-altitude exclusive private parameters - fill during business dev",
+      "droneScrapRate": null,
+      "batteryEnergyCurve": null,
+      "manufacturerSlopes": {},
+      "threePartyPayoffMatrix": null,
+      "airspaceConflictCost": null,
+      "params": {}
+    }
+  },
+
+  "auditConfig": {
+    "moduleAuditNodes": [],
+    "logToConsole": true,
+    "persistAudit": false
+  }
+}

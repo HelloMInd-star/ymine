@@ -1,0 +1,110 @@
+{
+  "_doc": "MCN Non-Standard Asset Valuation Module - Private Configuration",
+  "_instruction": "ALL MCN private values (influencer monetization metrics, non-standard asset pricing params, traffic season params) must be filled here. Core does NOT read any private value directly. Fill blank fields during business logic development.",
+
+  "moduleId": "mcn-valuation",
+  "moduleName": "MCN非标资产估值",
+  "moduleVersion": "0.1.0-skeleton",
+
+  "apiConfig": {
+    "apiVersion": "1.0.0",
+    "coreApiPath": "../../core-engine/common-api.js"
+  },
+
+  "privateParams": {
+    "_doc": "All private numeric values go below. Pass them as payload to GameOS_API.invoke().",
+
+    "kellyConfig": {
+      "_doc": "Influencer IP valuation budget allocation via Kelly framework",
+      "winRateRange": [null, null],
+      "winLossRatioRange": [null, null],
+      "defaultScalingFactor": null,
+      "businessAdjustmentMultiplier": null
+    },
+
+    "circleBoundaryConfig": {
+      "_doc": "IP risk circle concentration (fan base concentration, monetization channel risk)",
+      "factorWeights": [],
+      "boundarySlope": null,
+      "volatilityBaseline": null,
+      "resistanceCoefficient": null,
+      "criticalDeviation": null,
+      "pricingCoefficients": {
+        "fanConcentrationWeight": null,
+        "monetizationDiversityWeight": null,
+        "contractRiskWeight": null
+      }
+    },
+
+    "fuseThresholds": {
+      "_doc": "Influencer scandal/cancel-culture fuse; 0.6 baseline CORE-LOCKED",
+      "warn": null,
+      "caution": null,
+      "_halt": "0.6 (CORE LOCKED)",
+      "cooldownPeriodMs": null,
+      "businessCustomTriggers": [
+        "influencerScandal",
+        "contractBreach",
+        "platformPolicyChange",
+        "trafficCollapse"
+      ]
+    },
+
+    "controlLayerThresholds": {
+      "_doc": "Contract signing four-layer approval",
+      "L1toL2": null,
+      "L2toL3": null,
+      "_L3toL4": "0.6 (CORE LOCKED)",
+      "approvalMatrix": {
+        "L1": null,
+        "L2": null,
+        "L3": null,
+        "L4": null
+      }
+    },
+
+    "fatLeanConfig": {
+      "_doc": "Traffic high/low season fat-lean bands",
+      "fatThreshold": null,
+      "leanThreshold": null,
+      "fatLoosenessFactor": null,
+      "leanTightnessFactor": null,
+      "smoothingFactor": null,
+      "seasonParams": {
+        "trafficPeakMonths": [],
+        "trafficLowMonths": [],
+        "platformPromotionSeasons": []
+      }
+    },
+
+    "elevenLayerConfig": {
+      "_doc": "MCN valuation 11-layer pipeline step handlers (to be implemented in private-logic/)",
+      "stepHandlers": [],
+      "auditNodeNames": []
+    },
+
+    "industrySpecific": {
+      "_doc": "MCN exclusive private parameters - fill during business dev",
+      "monetizationMetrics": {
+        "liveCommerceConversion": null,
+        "adCPMRate": null,
+        "shortVideoCompletionRate": null,
+        "fanLTV": null
+      },
+      "nonStandardAssetPricing": {
+        "accountBaseValue": null,
+        "ipMultiplierRange": [null, null],
+        "contractTermDiscount": null,
+        "exclusivityPremium": null
+      },
+      "platformParams": {},
+      "params": {}
+    }
+  },
+
+  "auditConfig": {
+    "moduleAuditNodes": [],
+    "logToConsole": true,
+    "persistAudit": false
+  }
+}

@@ -1,0 +1,160 @@
+{
+  "_doc": "Wall Street 11-Step Investment Studio Module - Private Configuration",
+  "_instruction": "ALL finance-private values (11-step information pipeline, cone valuation params, funnel hierarchy params, individual stock position variables, red/blue ocean financial params) must be filled here. Core provides ONLY generic math/control/fuse skeletons. Fill blank fields during business logic development.",
+
+  "moduleId": "wall-street-11step",
+  "moduleName": "华尔街11步投资分析工作室",
+  "moduleVersion": "0.1.0-skeleton",
+
+  "apiConfig": {
+    "apiVersion": "1.0.0",
+    "coreApiPath": "../../core-engine/common-api.js"
+  },
+
+  "privateParams": {
+    "_doc": "All private numeric values go below. Pass them as payload to GameOS_API.invoke().",
+
+    "kellyConfig": {
+      "_doc": "Trading position sizing via Kelly framework - winRate/odds computed by private financial logic",
+      "winRateRange": [null, null],
+      "winLossRatioRange": [null, null],
+      "defaultScalingFactor": null,
+      "businessAdjustmentMultiplier": null,
+      "regimeAdjustment": {
+        "redOcean": null,
+        "blueOcean": null
+      }
+    },
+
+    "circleBoundaryConfig": {
+      "_doc": "Financial cone valuation; the circle math comes from Core circle-boundary, weights/slopes are private",
+      "factorWeights": [],
+      "boundarySlope": null,
+      "volatilityBaseline": null,
+      "resistanceCoefficient": null,
+      "criticalDeviation": null,
+      "factorWeightPresets": {
+        "value": null,
+        "growth": null,
+        "quality": null,
+        "momentum": null,
+        "sentiment": null
+      }
+    },
+
+    "fuseThresholds": {
+      "_doc": "Finance industry-level circuit breaker; 0.6 baseline CORE-LOCKED. Finance-specific thresholds here.",
+      "warn": null,
+      "caution": null,
+      "_halt": "0.6 (CORE LOCKED)",
+      "cooldownPeriodMs": null,
+      "businessCustomTriggers": [
+        "blackSwan",
+        "systemicCollapse",
+        "maxDrawdown",
+        "emotionalTilt",
+        "valuationExtreme",
+        "manualKillSwitch"
+      ]
+    },
+
+    "controlLayerThresholds": {
+      "_doc": "Trader/fund-manager four-layer approval",
+      "L1toL2": null,
+      "L2toL3": null,
+      "_L3toL4": "0.6 (CORE LOCKED)",
+      "approvalMatrix": {
+        "L1": null,
+        "L2": null,
+        "L3": null,
+        "L4": null
+      }
+    },
+
+    "fatLeanConfig": {
+      "_doc": "Bull/bear market fat-lean bands",
+      "fatThreshold": null,
+      "leanThreshold": null,
+      "fatLoosenessFactor": null,
+      "leanTightnessFactor": null,
+      "smoothingFactor": null,
+      "regimeParams": {
+        "redOcean": null,
+        "blueOcean": null
+      }
+    },
+
+    "elevenLayerConfig": {
+      "_doc": "Wall Street 11-step investment pipeline - the FULL pipeline business logic is PRIVATE and goes to private-logic/. Core only provides the 11-step skeleton/transition framework.",
+      "stepHandlers": [
+        "SCOPE_FUNNEL",
+        "DATA_INGESTION",
+        "DATA_ETL",
+        "CORE_PRICING",
+        "VALUATION",
+        "DECISION_SIMULATION",
+        "DYNAMIC_PROJECTION",
+        "HUMAN_RATIONALITY",
+        "HEDGING_CONTROL",
+        "FUSE_GATING",
+        "LOOPBACK"
+      ],
+      "auditNodeNames": [
+        "宏观漏斗与海选",
+        "信息摄入",
+        "数据ETL",
+        "核心定价(CAPM)",
+        "估值计算",
+        "决策推演(蒙特卡洛)",
+        "动态K线生成",
+        "德州扑克人性测试",
+        "动态对冲与配置",
+        "熔断门控",
+        "返回总控"
+      ]
+    },
+
+    "industrySpecific": {
+      "_doc": "Finance-exclusive private parameters - fill during business dev",
+      "pipelineStepConfig": {
+        "macroFunnel": {
+          "universeSize": null,
+          "minScore": null,
+          "rfRateRange": [null, null]
+        },
+        "factorLibrary": {},
+        "valuation": {
+          "waccPremium": null,
+          "dcfHorizonYears": null,
+          "marginOfSafety": null
+        },
+        "simulation": {
+          "monteCarloRuns": null,
+          "simulationDays": null,
+          "stressScenarios": []
+        },
+        "pokerRationality": {
+          "handCount": null,
+          "tiltThreshold": null,
+          "gtoDeviationWeight": null
+        },
+        "hedging": {
+          "stopLossAtrMultiplier": null,
+          "takeProfitRMultiplier": null
+        }
+      },
+      "regimeConfig": {
+        "RED_OCEAN": {},
+        "BLUE_OCEAN": {}
+      },
+      "stockUniverse": [],
+      "params": {}
+    }
+  },
+
+  "auditConfig": {
+    "moduleAuditNodes": [],
+    "logToConsole": true,
+    "persistAudit": false
+  }
+}

@@ -1,0 +1,77 @@
+{
+  "_doc": "Game-OS Business Module Private Configuration Template",
+  "_instruction": "ALL industry-private values must be filled here. Core does NOT read any private value directly. Fill in blank fields (__FILL__) during business logic development. DO NOT modify core-engine/ source code.",
+
+  "moduleId": "__FILL_MODULE_ID__",
+  "moduleName": "__FILL_MODULE_NAME__",
+  "moduleVersion": "0.1.0-skeleton",
+
+  "apiConfig": {
+    "apiVersion": "1.0.0",
+    "coreApiPath": "../../core-engine/common-api.js"
+  },
+
+  "privateParams": {
+    "_doc": "All private numeric values go below this section. Core engine NEVER reads these directly; they are passed as payload to GameOS_API.invoke().",
+
+    "kellyConfig": {
+      "_doc": "Kelly Criterion business-private parameters",
+      "winRateRange": [null, null],
+      "winLossRatioRange": [null, null],
+      "defaultScalingFactor": null,
+      "businessAdjustmentMultiplier": null
+    },
+
+    "circleBoundaryConfig": {
+      "_doc": "Dynamic circle/cone business-private parameters",
+      "factorWeights": [],
+      "boundarySlope": null,
+      "volatilityBaseline": null,
+      "resistanceCoefficient": null,
+      "criticalDeviation": null
+    },
+
+    "fuseThresholds": {
+      "_doc": "Fuse thresholds. WARNING: fuse baseline 0.6 is CORE-LOCKED and cannot be overridden here.",
+      "warn": null,
+      "caution": null,
+      "_halt": "0.6 (CORE LOCKED - do not modify)",
+      "cooldownPeriodMs": null,
+      "businessCustomTriggers": []
+    },
+
+    "controlLayerThresholds": {
+      "_doc": "Four-layer control business-private thresholds",
+      "L1toL2": null,
+      "L2toL3": null,
+      "_L3toL4": "0.6 (CORE LOCKED - derived from fuse baseline)",
+      "approvalMatrix": {}
+    },
+
+    "fatLeanConfig": {
+      "_doc": "Fat-lean band business-private parameters",
+      "fatThreshold": null,
+      "leanThreshold": null,
+      "fatLoosenessFactor": null,
+      "leanTightnessFactor": null,
+      "smoothingFactor": null
+    },
+
+    "elevenLayerConfig": {
+      "_doc": "11-layer pipeline business-private step implementations (private-logic/)",
+      "stepHandlers": [],
+      "auditNodeNames": []
+    },
+
+    "industrySpecific": {
+      "_doc": "Industry-specific private parameters unique to this business module. Fill during business development.",
+      "params": {}
+    }
+  },
+
+  "auditConfig": {
+    "moduleAuditNodes": [],
+    "logToConsole": true,
+    "persistAudit": false
+  }
+}

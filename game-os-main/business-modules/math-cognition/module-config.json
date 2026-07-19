@@ -1,0 +1,113 @@
+{
+  "_doc": "Math Olympiad Cognitive Mapping Module - Private Configuration",
+  "_instruction": "ALL math-cognition private values (language grammar structure params, problem-type specific mapping rules, difficulty tier params, learning progress fat/lean params) must be filled here. Core does NOT read any private value directly. Fill blank fields during business logic development.",
+
+  "moduleId": "math-cognition",
+  "moduleName": "奥数认知映射",
+  "moduleVersion": "0.1.0-skeleton",
+
+  "apiConfig": {
+    "apiVersion": "1.0.0",
+    "coreApiPath": "../../core-engine/common-api.js"
+  },
+
+  "privateParams": {
+    "_doc": "All private numeric values go below. Pass them as payload to GameOS_API.invoke().",
+
+    "kellyConfig": {
+      "_doc": "Study time/energy allocation via Kelly framework",
+      "winRateRange": [null, null],
+      "winLossRatioRange": [null, null],
+      "defaultScalingFactor": null,
+      "businessAdjustmentMultiplier": null
+    },
+
+    "circleBoundaryConfig": {
+      "_doc": "Knowledge point mastery circle concentration",
+      "factorWeights": [],
+      "boundarySlope": null,
+      "volatilityBaseline": null,
+      "resistanceCoefficient": null,
+      "criticalDeviation": null,
+      "knowledgeDomainWeights": {
+        "algebra": null,
+        "geometry": null,
+        "numberTheory": null,
+        "combinatorics": null
+      }
+    },
+
+    "fuseThresholds": {
+      "_doc": "Cognitive overload fuse; 0.6 baseline CORE-LOCKED",
+      "warn": null,
+      "caution": null,
+      "_halt": "0.6 (CORE LOCKED)",
+      "cooldownPeriodMs": null,
+      "businessCustomTriggers": [
+        "cognitiveOverload",
+        "fatigueCritical",
+        "conceptDependencyBreach"
+      ]
+    },
+
+    "controlLayerThresholds": {
+      "_doc": "Learning guidance four-layer tiers (self-directed→hints→explanation→fallback)",
+      "L1toL2": null,
+      "L2toL3": null,
+      "_L3toL4": "0.6 (CORE LOCKED)",
+      "approvalMatrix": {
+        "L1": null,
+        "L2": null,
+        "L3": null,
+        "L4": null
+      }
+    },
+
+    "fatLeanConfig": {
+      "_doc": "Learning progress fat/lean bands (fast-paced review vs. slow new concepts)",
+      "fatThreshold": null,
+      "leanThreshold": null,
+      "fatLoosenessFactor": null,
+      "leanTightnessFactor": null,
+      "smoothingFactor": null
+    },
+
+    "elevenLayerConfig": {
+      "_doc": "Math cognition 11-layer pipeline step handlers (to be implemented in private-logic/)",
+      "stepHandlers": [],
+      "auditNodeNames": []
+    },
+
+    "industrySpecific": {
+      "_doc": "Math-cognition exclusive private parameters - fill during business dev",
+      "languageParams": {
+        "supportedLanguages": [],
+        "grammarStructureProfiles": {},
+        "syntaxComplexityWeights": {}
+      },
+      "problemTypeMapping": {
+        "mappingRules": [],
+        "isomorphismPatterns": [],
+        "languageToMathHints": {}
+      },
+      "difficultyTiers": {
+        "beginner": null,
+        "intermediate": null,
+        "advanced": null,
+        "olympiad": null
+      },
+      "cognitiveModel": {
+        "workingMemoryCapacity": null,
+        "fatigueDecayRate": null,
+        "spacedRepetitionInterval": null
+      },
+      "params": {}
+    }
+  },
+
+  "auditConfig": {
+    "moduleAuditNodes": [],
+    "logToConsole": true,
+    "persistAudit": false
+  }
+}
