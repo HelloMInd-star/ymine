@@ -28,7 +28,6 @@
             items: [
                 { href: 'index.html', icon: '🏠', text: '总控台', tag: '首页', activeTag: true },
                 { href: 'game-os-main/total-index.html', icon: '🏛️', text: 'Game-OS', tag: '新架构', activeTag: true },
-                { href: 'circle-lab.html', icon: '🧠', text: '认知画圈基础实验', tag: '基座', activeTag: true },
                 { href: 'gamemind.html', icon: '🎯', text: 'GameMind', tag: '策略' },
                 { href: 'moodmind.html', icon: '📊', text: 'MoodMind', tag: '估值' },
                 { href: 'evolvemind.html', icon: '🧬', text: 'EvolveMind', tag: '演化' }
@@ -36,11 +35,18 @@
         },
         { divider: true },
         {
-            label: '🔗 证据链',
+            label: '🔬 认知科研实验组',
             items: [
-                { href: 'cross-domain-mapping.html', icon: '🧱', text: '跨域同构积木映射引擎', tag: 'v2.1' },
-                { href: 'business-learning-evidence.html', icon: '📊', text: '商业证据链', tag: '闭环' },
+                { href: 'circle-lab.html', icon: '🧠', text: '认知画圈实验', tag: '底层引擎', activeTag: true },
+                { href: 'business-learning-evidence.html', icon: '📊', text: '市场证据实验室', tag: '上层实证', activeTag: true },
                 { href: 'value-pyramid.html', icon: '📐', text: 'Game-OS 六层科研价值金字塔', tag: '分层' }
+            ]
+        },
+        { divider: true },
+        {
+            label: '🔗 跨域映射',
+            items: [
+                { href: 'cross-domain-mapping.html', icon: '🧱', text: '跨域同构积木映射引擎', tag: 'v2.1' }
             ]
         },
         { divider: true },
