@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Y.Mine · 乐高积木拼装台 · 同构映射引擎</title>
+    <link rel="stylesheet" href="assets/css/base.css">
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            background: #0b0b1a;
+            color: #fff;
+            font-family: -apple-system, 'Microsoft YaHei', sans-serif;
+            min-height: 100vh;
+        }
+        .builder-header {
+            padding: 36px 40px 0;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .builder-badge {
+            display: inline-block;
+            padding: 6px 16px;
+            background: rgba(250,204,21,0.1);
+            border: 1px solid rgba(250,204,21,0.3);
+            border-radius: 20px;
+            font-size: 12px;
+            color: #facc15;
+            margin-bottom: 16px;
+        }
+        .builder-title {
+            font-size: 32px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            margin: 0;
+        }
+        .builder-sub {
+            font-size: 13px;
+            color: rgba(255,255,255,0.4);
+            margin-top: 8px;
+        }
+        .fuse-bar {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin: 20px 0 28px;
+            padding: 14px 20px;
+            background: rgba(239,68,68,0.06);
+            border: 1px solid rgba(239,68,68,0.2);
+            border-radius: 12px;
+        }
+        .fuse-label { font-size: 12px; color: rgba(255,255,255,0.5); white-space: nowrap; }
+        .fuse-track { flex: 1; height: 8px; background: rgba(255,255,255,0.08); border-radius: 4px; position: relative; overflow: hidden; }
+        .fuse-redline { position: absolute; left: 60%; top: 0; bottom: 0; width: 2px; background: #ef4444; z-index: 2; }
+        .fuse-redline::before { content: 'C=0.6 红线'; position: absolute; left: -26px; top: -20px; font-size: 10px; color: #ef4444; white-space: nowrap; }
+        .fuse-fill { position: absolute; left: 0; top: 0; bottom: 0; width: 0%; background: linear-gradient(90deg, #22c55e, #facc15, #ef4444); border-radius: 4px; transition: width 0.5s, background 0.3s; }
+        .fuse-value { font-size: 18px; font-weight: 800; min-width: 56px; text-align: right; }
+        .fuse-status {
+            padding: 6px 14px; border-radius: 16px; font-size: 11px; font-weight: 700; white-space: nowrap;
+        }
+        .fuse-ok { background: rgba(34,197,94,0.15); color: #22c55e; border: 1px solid rgba(34,197,94,0.3); }
+        .fuse-warn { background: rgba(250,204,21,0.15); color: #facc15; border: 1px solid rgba(250,204,21,0.3); }
+        .fuse-fail { background: rgba(239,68,68,0.15); color: #ef4444; border: 1px solid rgba(239,68,68,0.3); animation: pulse-red 1s infinite; }
+        @keyframes pulse-red { 0%,100%{opacity:1} 50%{opacity:0.6} }
+        .builder-main {
+            display: grid;
+            grid-template-columns: 280px 1fr 280px;
+            gap: 20px;
+            padding: 0 40px 40px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .panel {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 16px;
+            padding: 20px;
+            min-height: 500px;
+        }
+        .panel-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: rgba(255,255,255,0.45);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 0 0 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+        .block-library { display: flex; flex-direction: column; gap: 10px; }
+        .domain-block {
+            padding: 12px 14px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            cursor: grab;
+            transition: all 0.2s;
+            user-select: none;
+            position: relative;
+        }
+        .domain-block:hover { background: rgba(255,255,255,0.08); border-color: rgba(250,204,21,0.3); transform: translateX(2px); }
+        .domain-block.dragging { opacity: 0.5; cursor: grabbing; }
+        .block-emoji { font-size: 20px; margin-right: 8px; }
+        .block-name { font-size: 13px; font-weight: 600; }
+        .block-tag { font-size: 10px; color: rgba(255,255,255,0.35); margin-top: 3px; }
+        .assembly-canvas {
+            position: relative;
+            background:
+                radial-gradient(circle at 50% 50%, rgba(250,204,21,0.03) 0%, transparent 70%),
+                repeating-linear-gradient(0deg, rgba(255,255,255,0.02) 0px, rgba(255,255,255,0.02) 1px, transparent 1px, transparent 30px),
+                repeating-linear-gradient(90deg, rgba(255,255,255,0.02) 0px, rgba(255,255,255,0.02) 1px, transparent 1px, transparent 30px);
+            border: 2px dashed rgba(255,255,255,0.1);
+            border-radius: 16px;
+            min-height: 560px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+        .assembly-canvas.drag-over { border-color: rgba(250,204,21,0.5); background-color: rgba(250,204,21,0.03); }
+        .canvas-empty {
+            flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            color: rgba(255,255,255,0.25); text-align: center;
+        }
+        .canvas-empty .emoji { font-size: 48px; margin-bottom: 12px; }
+        .canvas-empty .hint { font-size: 13px; }
+        .canvas-empty .sub { font-size: 11px; margin-top: 6px; }
+        .assembly-chain { display: flex; flex-direction: column; gap: 8px; }
+        .assembled-row { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+        .assembled-block {
+            flex: 1;
+            padding: 14px 16px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: blockIn 0.3s ease;
+        }
+        @keyframes blockIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+        .assembled-block .emoji { font-size: 22px; }
+        .assembled-block .info .name { font-size: 13px; font-weight: 700; }
+        .assembled-block .info .desc { font-size: 10px; opacity: 0.65; margin-top: 2px; }
+        .assembled-block .remove-btn {
+            margin-left: auto;
+            width: 24px; height: 24px; border-radius: 50%;
+            background: rgba(255,255,255,0.1); border: none; color: rgba(255,255,255,0.5);
+            cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s;
+        }
+        .assembled-block .remove-btn:hover { background: rgba(239,68,68,0.3); color: #fff; }
+        .connector {
+            display: flex; align-items: center; justify-content: center; padding: 2px 0;
+            font-size: 11px; gap: 8px;
+        }
+        .connector-line { flex: 1; height: 2px; background: rgba(255,255,255,0.08); border-radius: 1px; }
+        .connector-score { font-weight: 700; min-width: 48px; text-align: center; }
+        .connector-label { font-size: 9px; color: rgba(255,255,255,0.35); }
+        .result-panel { display: flex; flex-direction: column; gap: 12px; }
+        .result-item {
+            padding: 12px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 10px;
+            border-left: 3px solid #333;
+        }
+        .result-item.ok { border-left-color: #22c55e; }
+        .result-item.warn { border-left-color: #facc15; }
+        .result-item.fail { border-left-color: #ef4444; }
+        .result-item .ri-label { font-size: 10px; color: rgba(255,255,255,0.4); margin-bottom: 4px; }
+        .result-item .ri-value { font-size: 13px; font-weight: 700; }
+        .action-btns { display: flex; gap: 8px; margin-top: 16px; }
+        .action-btn {
+            flex: 1; padding: 10px; border-radius: 10px; border: 1px solid;
+            font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s;
+            text-align: center; text-decoration: none;
+        }
+        .btn-primary {
+            background: rgba(250,204,21,0.12); border-color: rgba(250,204,21,0.3); color: #facc15;
+        }
+        .btn-primary:hover { background: rgba(250,204,21,0.2); }
+        .btn-ghost {
+            background: transparent; border-color: rgba(255,255,255,0.1); color: rgba(255,255,255,0.5);
+        }
+        .btn-ghost:hover { border-color: rgba(255,255,255,0.25); color: #fff; }
+        .back-link {
+            display: inline-block; margin: 20px 40px 0; color: rgba(255,255,255,0.4);
+            font-size: 12px; text-decoration: none; transition: color 0.2s;
+        }
+        .back-link:hover { color: #facc15; }
+        .domain-b1 { background: rgba(59,130,246,0.12); border-color: rgba(59,130,246,0.3); }
+        .domain-b2 { background: rgba(239,68,68,0.12); border-color: rgba(239,68,68,0.3); }
+        .domain-b3 { background: rgba(250,204,21,0.12); border-color: rgba(250,204,21,0.3); }
+        .domain-b4 { background: rgba(34,197,94,0.12); border-color: rgba(34,197,94,0.3); }
+        .domain-b5 { background: rgba(168,85,247,0.12); border-color: rgba(168,85,247,0.3); }
+        .domain-b6 { background: rgba(236,72,153,0.12); border-color: rgba(236,72,153,0.3); }
+        .domain-b7 { background: rgba(20,184,166,0.12); border-color: rgba(20,184,166,0.3); }
+        .domain-b8 { background: rgba(99,102,241,0.12); border-color: rgba(99,102,241,0.3); }
+        .domain-b9 { background: rgba(249,115,22,0.12); border-color: rgba(249,115,22,0.3); }
+        @media (max-width: 1100px) {
+            .builder-main { grid-template-columns: 1fr; }
+        }
+        .big-alert {
+            padding: 24px; border-radius: 14px; text-align: center; margin-top: 16px;
+            animation: alertPulse 0.6s ease;
+        }
+        @keyframes alertPulse { 0%{transform:scale(0.9);opacity:0} 100%{transform:scale(1);opacity:1} }
+        .big-alert.fail {
+            background: rgba(239,68,68,0.1); border: 2px solid rgba(239,68,68,0.4);
+        }
+        .big-alert.ok {
+            background: rgba(34,197,94,0.08); border: 2px solid rgba(34,197,94,0.3);
+        }
+        .big-alert .alert-icon { font-size: 40px; }
+        .big-alert .alert-title { font-size: 18px; font-weight: 800; margin-top: 8px; }
+        .big-alert .alert-desc { font-size: 12px; color: rgba(255,255,255,0.5); margin-top: 6px; line-height: 1.6; }
+    </style>
+</head>
+<body>
+    <a href="cross-domain-mapping.html" class="back-link">← 返回跨域同构积木映射引擎</a>
+
+    <div class="builder-header">
+        <div class="builder-badge">🧩 可视化拼装演示台 · 公开版</div>
+        <h1 class="builder-title">🧱 乐高积木同构拼装台</h1>
+        <p class="builder-sub">拖拽左侧领域模组块到中央画布进行拼接，系统自动计算兼容度C值，C&lt;0.6触发熔断拦截</p>
+        <div class="fuse-bar">
+            <div class="fuse-label">兼容度 C</div>
+            <div class="fuse-track">
+                <div class="fuse-fill" id="fuseFill"></div>
+                <div class="fuse-redline"></div>
+            </div>
+            <div class="fuse-value" id="fuseValue" style="color:rgba(255,255,255,0.3)">—</div>
+            <div class="fuse-status fuse-warn" id="fuseStatus">等待拼装</div>
+        </div>
+    </div>
+
+    <div class="builder-main">
+        <!-- 左侧积木库 -->
+        <div class="panel">
+            <div class="panel-title">📦 领域积木模组库</div>
+            <div class="block-library" id="blockLibrary"></div>
+            <div style="margin-top:16px;padding:10px;background:rgba(255,255,255,0.03);border-radius:8px;font-size:10px;color:rgba(255,255,255,0.35);line-height:1.7;">
+                💡 <strong>提示：</strong>精细权重系数与匹配阈值参数存放于<strong>私有引擎库</strong>，演示版使用公开通用兼容度矩阵。
+            </div>
+        </div>
+
+        <!-- 中央拼装画布 -->
+        <div class="assembly-canvas" id="canvas">
+            <div class="canvas-empty" id="canvasEmpty">
+                <div class="emoji">🧱</div>
+                <div class="hint">拖拽左侧积木到此处开始拼装</div>
+                <div class="sub">按照「拆零件 → 找接口 → 重新拼装 → 验证运行」四步法顺序拼接</div>
+            </div>
+            <div class="assembly-chain" id="assemblyChain"></div>
+            <div id="alertArea"></div>
+        </div>
+
+        <!-- 右侧结果面板 -->
+        <div class="panel">
+            <div class="panel-title">📊 拼装验证结果</div>
+            <div class="result-panel" id="resultPanel">
+                <div class="result-item">
+                    <div class="ri-label">已拼接积木数</div>
+                    <div class="ri-value" id="rCount">0 块</div>
+                </div>
+                <div class="result-item">
+                    <div class="ri-label">最低接口兼容度</div>
+                    <div class="ri-value" id="rMinScore" style="color:rgba(255,255,255,0.3)">—</div>
+                </div>
+                <div class="result-item">
+                    <div class="ri-label">整体链路状态</div>
+                    <div class="ri-value" id="rChainStatus" style="color:rgba(255,255,255,0.3)">未拼装</div>
+                </div>
+                <div class="result-item">
+                    <div class="ri-label">拼装结论</div>
+                    <div class="ri-value" id="rConclusion" style="color:rgba(255,255,255,0.3);font-size:11px;font-weight:500;line-height:1.6;">将积木按顺序拼装后自动生成结构同构验证结论。完整深度推演需调用私有引擎数据包。</div>
+                </div>
+            </div>
+            <div class="action-btns">
+                <button class="action-btn btn-ghost" onclick="clearAssembly()">🔄 清空画布</button>
+                <button class="action-btn btn-primary" onclick="runVerify()">▶ 验证运行</button>
+            </div>
+            <div style="margin-top:16px;padding:10px;background:rgba(239,68,68,0.06);border-radius:8px;font-size:10px;color:rgba(255,255,255,0.4);line-height:1.7;border-left:2px solid #ef4444;">
+                ⚠️ <strong>熔断机制：</strong>任意相邻积木接口兼容度 &lt; 0.6，系统<strong>红色告警拦截</strong>，拼装链路不通过。
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const domains = [
+            { id: 'finance', emoji: '💰', name: '财务', desc: '会计科目·复式记账·现金流', color: 'b1', interfaces: ['accounting', 'balance', 'reporting'] },
+            { id: 'cad', emoji: '📐', name: 'CAD 工程', desc: '图层·装配体·约束关系', color: 'b2', interfaces: ['layer', 'assembly', 'constraint'] },
+            { id: 'lego', emoji: '🧱', name: '乐高', desc: '积木零件·凹凸接口·模块化拼装', color: 'b3', interfaces: ['brick', 'stud', 'module'] },
+            { id: 'battery', emoji: '🔋', name: '电池', desc: '单体组合·串并联·能量密度', color: 'b4', interfaces: ['cell', 'series', 'energy'] },
+            { id: 'garden', emoji: '🌱', name: '园林', desc: '生长周期·生态搭配·景观层次', color: 'b5', interfaces: ['growth', 'ecosystem', 'landscape'] },
+            { id: 'ops', emoji: '⚙️', name: '运营', desc: 'PDCA循环·流程优化·闭环管理', color: 'b6', interfaces: ['pdca', 'process', 'loop'] },
+            { id: 'pdca', emoji: '🔄', name: 'PDCA', desc: '计划-执行-检查-处理·持续改进', color: 'b7', interfaces: ['pdca', 'iteration', 'improve'] },
+            { id: 'llm', emoji: '🤖', name: '大模型', desc: 'Token·注意力机制·上下文窗口', color: 'b8', interfaces: ['token', 'attention', 'context'] },
+            { id: 'geo', emoji: '🛰️', name: '低空地质', desc: '低空勘探·地质层构·遥感数据', color: 'b9', interfaces: ['survey', 'stratum', 'remote'] }
+        ];
+
+        const compatibilityMatrix = {
+            'finance-cad': 0.85, 'cad-finance': 0.85,
+            'cad-lego': 0.92, 'lego-cad': 0.92,
+            'lego-battery': 0.72, 'battery-lego': 0.72,
+            'battery-cad': 0.78, 'cad-battery': 0.78,
+            'garden-finance': 0.65, 'finance-garden': 0.65,
+            'ops-pdca': 0.95, 'pdca-ops': 0.95,
+            'ops-cad': 0.62, 'cad-ops': 0.62,
+            'pdca-llm': 0.88, 'llm-pdca': 0.88,
+            'llm-geo': 0.58, 'geo-llm': 0.58,
+            'geo-cad': 0.70, 'cad-geo': 0.70,
+            'lego-ops': 0.55, 'ops-lego': 0.55,
+            'battery-garden': 0.35, 'garden-battery': 0.35,
+            'finance-lego': 0.80, 'lego-finance': 0.80,
+            'ops-llm': 0.82, 'llm-ops': 0.82,
+            'cad-llm': 0.50, 'llm-cad': 0.50,
+            'finance-llm': 0.45, 'llm-finance': 0.45,
+            'garden-lego': 0.60, 'lego-garden': 0.60,
+            'battery-ops': 0.42, 'ops-battery': 0.42,
+            'pdca-cad': 0.75, 'cad-pdca': 0.75
+        };
+
+        let assembled = [];
+
+        function renderLibrary() {
+            const lib = document.getElementById('blockLibrary');
+            lib.innerHTML = domains.map(d => `
+                <div class="domain-block domain-${d.color}" draggable="true" data-id="${d.id}">
+                    <span class="block-emoji">${d.emoji}</span>
+                    <span class="block-name">${d.name}</span>
+                    <div class="block-tag">${d.desc}</div>
+                </div>
+            `).join('');
+            lib.querySelectorAll('.domain-block').forEach(el => {
+                el.addEventListener('dragstart', e => {
+                    e.dataTransfer.setData('text/plain', el.dataset.id);
+                    el.classList.add('dragging');
+                });
+                el.addEventListener('dragend', () => el.classList.remove('dragging'));
+            });
+        }
+
+        const canvas = document.getElementById('canvas');
+        canvas.addEventListener('dragover', e => { e.preventDefault(); canvas.classList.add('drag-over'); });
+        canvas.addEventListener('dragleave', () => canvas.classList.remove('drag-over'));
+        canvas.addEventListener('drop', e => {
+            e.preventDefault();
+            canvas.classList.remove('drag-over');
+            const id = e.dataTransfer.getData('text/plain');
+            const d = domains.find(x => x.id === id);
+            if (d && !assembled.find(x => x.id === id)) {
+                assembled.push(d);
+                renderAssembly();
+            }
+        });
+
+        function renderAssembly() {
+            const chain = document.getElementById('assemblyChain');
+            const empty = document.getElementById('canvasEmpty');
+            if (assembled.length === 0) {
+                empty.style.display = 'flex';
+                chain.innerHTML = '';
+                updateFuse(0, null);
+                updateResults();
+                document.getElementById('alertArea').innerHTML = '';
+                return;
+            }
+            empty.style.display = 'none';
+            let html = '';
+            let scores = [];
+            let fuseFired = false;
+            for (let i = 0; i < assembled.length; i++) {
+                const d = assembled[i];
+                html += `
+                    <div class="assembled-block domain-${d.color}">
+                        <span class="emoji">${d.emoji}</span>
+                        <div class="info"><div class="name">${d.name}</div><div class="desc">${d.desc}</div></div>
+                        <button class="remove-btn" onclick="removeBlock(${i})">×</button>
+                    </div>`;
+                if (i < assembled.length - 1) {
+                    const key = `${d.id}-${assembled[i+1].id}`;
+                    let score = compatibilityMatrix[key];
+                    if (score === undefined) score = 0.55 + Math.random() * 0.3;
+                    scores.push(score);
+                    const pass = score >= 0.6;
+                    if (!pass) fuseFired = true;
+                    const color = pass ? '#22c55e' : '#ef4444';
+                    html += `
+                        <div class="connector">
+                            <div class="connector-line" style="background:${color}40"></div>
+                            <div class="connector-score" style="color:${color}">C=${(score*100).toFixed(0)}</div>
+                            <div class="connector-line" style="background:${color}40"></div>
+                        </div>
+                        <div style="text-align:center;font-size:10px;color:${pass?'rgba(34,197,94,0.6)':'rgba(239,68,68,0.8)'};margin:-4px 0 4px;">
+                            ${pass ? '✓ 接口兼容' : '✗ 兼容度不足 · 熔断拦截'}
+                        </div>`;
+                }
+            }
+            chain.innerHTML = html;
+            const minScore = scores.length ? Math.min(...scores) : 1;
+            updateFuse(minScore, fuseFired);
+            updateResults(scores, fuseFired);
+        }
+
+        function updateFuse(score, fired) {
+            const fill = document.getElementById('fuseFill');
+            const val = document.getElementById('fuseValue');
+            const status = document.getElementById('fuseStatus');
+            if (assembled.length < 2) {
+                fill.style.width = '0%';
+                val.textContent = assembled.length === 0 ? '—' : '待拼接';
+                val.style.color = 'rgba(255,255,255,0.3)';
+                status.className = 'fuse-status fuse-warn';
+                status.textContent = assembled.length === 0 ? '等待拼装' : '继续添加';
+                return;
+            }
+            const pct = score * 100;
+            fill.style.width = pct + '%';
+            val.textContent = 'C=' + pct.toFixed(0);
+            if (fired || score < 0.6) {
+                val.style.color = '#ef4444';
+                fill.style.background = '#ef4444';
+                status.className = 'fuse-status fuse-fail';
+                status.textContent = '🔴 熔断拦截';
+            } else if (score < 0.75) {
+                val.style.color = '#facc15';
+                fill.style.background = 'linear-gradient(90deg, #22c55e, #facc15)';
+                status.className = 'fuse-status fuse-warn';
+                status.textContent = '🟡 可通过 · 建议优化';
+            } else {
+                val.style.color = '#22c55e';
+                fill.style.background = '#22c55e';
+                status.className = 'fuse-status fuse-ok';
+                status.textContent = '🟢 拼装通过';
+            }
+        }
+
+        function updateResults(scores, fuseFired) {
+            document.getElementById('rCount').textContent = assembled.length + ' 块';
+            const rMin = document.getElementById('rMinScore');
+            const rChain = document.getElementById('rChainStatus');
+            const rConcl = document.getElementById('rConclusion');
+            const alertArea = document.getElementById('alertArea');
+
+            if (!scores || scores.length === 0) {
+                rMin.textContent = '—';
+                rMin.style.color = 'rgba(255,255,255,0.3)';
+                rChain.textContent = assembled.length <= 1 ? '待拼装' : '拼接中...';
+                rChain.style.color = 'rgba(255,255,255,0.3)';
+                rConcl.textContent = assembled.length <= 1 ? '至少需要2块积木才能评估兼容度。' : '继续添加相邻积木以评估链路。';
+                alertArea.innerHTML = '';
+                return;
+            }
+            const min = Math.min(...scores);
+            rMin.textContent = 'C=' + (min*100).toFixed(0);
+            if (fuseFired || min < 0.6) {
+                rMin.style.color = '#ef4444';
+                rChain.textContent = '🔴 熔断 · 拼装失败';
+                rChain.style.color = '#ef4444';
+                rConcl.innerHTML = '存在接口兼容度低于0.6的相邻积木，<strong style="color:#ef4444">红色告警拦截</strong>，无法通过验证。请调整积木顺序或更换模块。完整解决方案需调用私有引擎权重参数。';
+                rConcl.style.color = 'rgba(239,68,68,0.8)';
+                alertArea.innerHTML = `
+                    <div class="big-alert fail">
+                        <div class="alert-icon">🚫</div>
+                        <div class="alert-title" style="color:#ef4444">兼容度熔断触发</div>
+                        <div class="alert-desc">最低接口兼容度 C=${(min*100).toFixed(0)} &lt; 0.6 红线阈值<br>拼装链路被系统拦截，禁止进入验证运行阶段</div>
+                    </div>`;
+            } else {
+                rMin.style.color = min >= 0.75 ? '#22c55e' : '#facc15';
+                rChain.textContent = min >= 0.75 ? '🟢 链路完整' : '🟡 基本通过';
+                rChain.style.color = min >= 0.75 ? '#22c55e' : '#facc15';
+                rConcl.innerHTML = `所有相邻接口兼容度均 ≥ 0.6，<strong style="color:#22c55e">拼装通过</strong>，可进入验证运行阶段。完整深度推演与商用落地验证需加载<strong>私有引擎数据包</strong>。`;
+                rConcl.style.color = 'rgba(255,255,255,0.6)';
+                if (assembled.length >= 3) {
+                    alertArea.innerHTML = `
+                        <div class="big-alert ok">
+                            <div class="alert-icon">✅</div>
+                            <div class="alert-title" style="color:#22c55e">拼装通过验证</div>
+                            <div class="alert-desc">整体链路兼容度 C=${(min*100).toFixed(0)} ≥ 0.6 阈值<br>积木模组完成结构同构拼装，可进入验证运行阶段</div>
+                        </div>`;
+                } else {
+                    alertArea.innerHTML = '';
+                }
+            }
+        }
+
+        function removeBlock(i) {
+            assembled.splice(i, 1);
+            renderAssembly();
+        }
+
+        function clearAssembly() {
+            assembled = [];
+            renderAssembly();
+        }
+
+        function runVerify() {
+            if (assembled.length < 2) {
+                alert('请至少拼装2块积木后再进行验证');
+                return;
+            }
+            renderAssembly();
+            document.getElementById('alertArea').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        renderLibrary();
+        renderAssembly();
+    </script>
+</body>
+</html>

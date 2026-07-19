@@ -38,7 +38,7 @@
         {
             label: '🔗 证据链',
             items: [
-                { href: 'cross-domain-mapping.html', icon: '⚡', text: '跨领域吞噬', tag: '验证' },
+                { href: 'cross-domain-mapping.html', icon: '🧱', text: '跨域同构积木映射引擎', tag: 'v2.1' },
                 { href: 'business-learning-evidence.html', icon: '📊', text: '商业证据链', tag: '闭环' },
                 { href: 'value-pyramid.html', icon: '📐', text: '价值金字塔', tag: '分层' }
             ]
