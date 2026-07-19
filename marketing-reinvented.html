@@ -9,6 +9,7 @@
     <script src="assets/js/sidebar.js"></script>
     <script src="assets/js/cone-game-theory.js"></script>
     <script src="assets/js/valuation-engine.js"></script>
+    <script src="assets/js/risk-circuit-breaker.js"></script>
     <style>
         /* ===== 页面内导航 ===== */
         .page-nav {
@@ -4034,6 +4035,15 @@
                 const C = calculateConcentration();
                 coneCVal.textContent = C.toFixed(2);
 
+                if (typeof YMineRiskCB !== 'undefined' && YMineRiskCB.update) {
+                    YMineRiskCB.update({ coneC: C });
+                }
+
+                if (typeof window.updateKelly === 'function') {
+                    clearTimeout(window._coneKellyTimer);
+                    window._coneKellyTimer = setTimeout(window.updateKelly, 80);
+                }
+
                 if (C >= 0.68) {
                     coneRiskStatus.textContent = '⚠️ 熔断风险';
                     coneRiskStatus.style.background = 'rgba(239,68,68,0.1)';
@@ -4907,6 +4917,32 @@
                         ocInput.dispatchEvent(new Event('input', { bubbles: true }));
                     }
                 }
+                const dimInput = document.getElementById('dimInput');
+                if (dimInput) {
+                    const tacRatio = data.TAC ? (data.TAC / (data.P0 + 1)) : 0;
+                    const dimFromFinance = Math.min(0.95, Math.max(0.05, tacRatio * 0.8 + (data.DOL > 2 ? 0.15 : 0)));
+                    if (Math.abs(parseFloat(dimInput.value) - dimFromFinance) > 0.03) {
+                        dimInput.value = dimFromFinance.toFixed(2);
+                        dimInput.dispatchEvent(new Event('input', { bubbles: true }));
+                    }
+                }
+                const leverageInput = document.getElementById('leverageInput');
+                if (leverageInput) {
+                    const levFromFinance = Math.min(3.0, Math.max(0.2, data.DOL || 1.0));
+                    if (Math.abs(parseFloat(leverageInput.value) - levFromFinance) > 0.1) {
+                        leverageInput.value = levFromFinance.toFixed(1);
+                        leverageInput.dispatchEvent(new Event('input', { bubbles: true }));
+                    }
+                }
+                const mddInput = document.getElementById('mddInput');
+                if (mddInput) {
+                    const romiPenalty = data.ROMI && data.ROMI < 1 ? (1 - data.ROMI) * 0.4 : 0;
+                    const mddFromFinance = Math.min(0.80, Math.max(0.05, 0.20 + romiPenalty));
+                    if (Math.abs(parseFloat(mddInput.value) - mddFromFinance) > 0.03) {
+                        mddInput.value = mddFromFinance.toFixed(2);
+                        mddInput.dispatchEvent(new Event('input', { bubbles: true }));
+                    }
+                }
             }
 
             /**
@@ -5196,7 +5232,7 @@
                 bDisplay2.innerHTML = b.toFixed(2) + '<span class="unit">x</span>';
                 fDisplay.innerHTML = (f_star * 100).toFixed(1) + '<span class="unit">%</span>';
 
-                let actualRatio = 0;
+                let zoneRatio = 0;
                 let adviceText = '';
                 let statusColor = '#22c55e';
                 let statusText = '';
@@ -5204,32 +5240,56 @@
                 let barWidth = 0;
 
                 if (p >= 0.48 && p <= 0.50) {
-                    actualRatio = f_star;
-                    adviceText = '🎯 <strong>保本中轴线（0.48~0.50）：</strong>市场处于精准均衡，可<strong style="color:#22c55e;">主力重仓</strong>，建议使用完整凯利仓位。';
+                    zoneRatio = f_star;
+                    adviceText = '🎯 <strong>保本中轴线（0.48~0.50）：</strong>市场处于精准均衡，可使用凯利仓位推演，最终仓位由熔断系统裁定。';
                     statusText = '🟢 主力重仓区';
                     barColor = '#22c55e';
                     barWidth = 50;
                 } else if (p > 0.50 && p <= 0.68) {
-                    actualRatio = f_star * 0.5;
+                    zoneRatio = f_star * 0.5;
                     adviceText = '📉 <strong>边际效用递减（0.50~0.68）：</strong>胜率提升但收益边际下降，建议<strong style="color:#facc15;">缩减50%</strong>投放规模。';
                     statusText = '🟡 边际递减区';
                     barColor = '#facc15';
                     barWidth = 68;
                 } else if (p > 0.68) {
-                    actualRatio = 0;
-                    adviceText = '🚫 <strong>二进制熔断（>0.68）：</strong>系统判定风险过热，<strong style="color:#ef4444;">禁止新增</strong>任何资源，凯利结果失效。';
-                    statusText = '🔴 熔断禁区';
-                    barColor = '#ef4444';
-                    barWidth = 100;
+                    zoneRatio = f_star * 0.2;
+                    adviceText = '⚠️ <strong>高胜率过热区（>0.68）：</strong>胜率异常偏高，强压力区，仓位由熔断系统裁定。';
+                    statusText = '🟠 高压警戒区';
+                    barColor = '#f97316';
+                    barWidth = 85;
                 } else {
-                    actualRatio = f_star * 0.2;
+                    zoneRatio = f_star * 0.2;
                     adviceText = '📊 <strong>低胜率区间（<0.48）：</strong>建议<strong style="color:#60a5fa;">观望</strong>，仅以极小仓位验证市场。';
                     statusText = '🔵 观望试探区';
                     barColor = '#60a5fa';
                     barWidth = Math.max(10, p * 100);
                 }
 
-                if (actualRatio < 0.01) actualRatio = 0;
+                let actualRatio = zoneRatio;
+                let fuseDetail = null;
+
+                if (typeof YMineRiskCB !== 'undefined' && YMineRiskCB.enforce) {
+                    fuseDetail = YMineRiskCB.enforce(zoneRatio);
+                    actualRatio = fuseDetail.actual;
+                    if (fuseDetail.halted) {
+                        const fuseReasons = fuseDetail.fuseIds.map(function(id) {
+                            return fuseDetail.activeFuses[id] ? fuseDetail.activeFuses[id].reason : id;
+                        }).join('；');
+                        adviceText = '🚫 <strong>【熔断触发】' + fuseReasons + '：</strong>风控系统强制归零仓位，<strong style="color:#ef4444;">禁止新增任何资源</strong>。';
+                        statusText = '🔴 熔断触发';
+                        barColor = '#ef4444';
+                        barWidth = 100;
+                    } else if (fuseDetail.reductions && fuseDetail.reductions.length > 0) {
+                        const tensionReduction = fuseDetail.reductions.find(function(r) { return r.reason === 'TENSION_ZONE'; });
+                        if (tensionReduction) {
+                            const pct = Math.round(tensionReduction.factor * 100);
+                            adviceText += '<br>⚡ <strong>紧张区缩减至' + pct + '%</strong>：距0.68熔断线仅' + fuseDetail.coneDistanceToFuse.toFixed(2) + '，系统自动降仓。';
+                            barColor = '#facc15';
+                        }
+                    }
+                }
+
+                if (actualRatio < 0.005) actualRatio = 0;
                 if (isNaN(actualRatio)) actualRatio = 0;
 
                 actualDisplay.innerHTML = (actualRatio * 100).toFixed(1) + '<span class="unit">%</span>';
@@ -5245,7 +5305,9 @@
                 if (typeof YBus !== 'undefined' && YBus.publish) {
                     YBus.publish('kellyConfig', {
                         p: p, q: q, b: b, f_star: f_star,
+                        requestedRatio: zoneRatio,
                         actualRatio: actualRatio,
+                        fuseDetail: fuseDetail,
                         winZone: statusText,
                         budgetMultiplier: actualRatio / Math.max(f_star, 0.01),
                         timestamp: Date.now()
@@ -5358,6 +5420,10 @@
 
                 vecAdvice.innerHTML = '💡 ' + advice;
                 vecAdvice.style.borderLeftColor = adviceColor;
+
+                if (typeof YMineRiskCB !== 'undefined' && YMineRiskCB.update) {
+                    YMineRiskCB.update({ mdd: mdd });
+                }
 
                 if (typeof updateConeFromVector === 'function') {
                     updateConeFromVector(magV);
@@ -5670,7 +5736,19 @@
 
                 if (!riskConc) return;
 
-                const C = window.getConcentration();
+                let C, zScore, halted = false, fuseReasons = [], coneDistance = 1;
+                if (typeof YMineRiskCB !== 'undefined' && YMineRiskCB.getState) {
+                    const cbState = YMineRiskCB.getState();
+                    C = cbState.state.coneC;
+                    zScore = cbState.state.zScore;
+                    halted = cbState.isHalted;
+                    fuseReasons = Object.values(cbState.activeFuses).map(function(f){ return f.reason; });
+                    coneDistance = Math.max(0, 0.68 - C);
+                } else {
+                    C = window.getConcentration();
+                    zScore = 0;
+                }
+
                 const practiceInput = document.getElementById('practiceInput');
                 let beta = 1.0;
                 if (practiceInput) beta = parseFloat(practiceInput.value);
@@ -5686,11 +5764,21 @@
                 let position = '';
                 let advice = '';
 
-                if (C > 0.68) {
+                if (halted) {
                     status = '🔴 熔断';
-                    statusColor = '#f87171';
+                    statusColor = '#ef4444';
                     position = '0%';
-                    advice = '🚫 <strong>浓度超过0.68熔断线！</strong>基于正态分布1σ临界值，浓度必然扩散回落。立即停止新增资源，等待自然回落至安全区间。';
+                    advice = '🚫 <strong>【代码级熔断已触发】</strong>' + fuseReasons.join('；') + '。<strong style="color:#ef4444;">凯利仓位已被强制归零</strong>，禁止新增任何资源。';
+                } else if (coneDistance < 0.02) {
+                    status = '🔴 临界';
+                    statusColor = '#ef4444';
+                    position = '0~7%';
+                    advice = '🚨 <strong>距熔断线仅' + coneDistance.toFixed(2) + '！</strong>系统已自动缩减至' + Math.round(0.3*100) + '%仓位，任何冲击将触发熔断。';
+                } else if (coneDistance < 0.10) {
+                    status = '🟠 紧张';
+                    statusColor = '#f97316';
+                    position = '50%→12%';
+                    advice = '⚠️ <strong>紧张区：距熔断线' + coneDistance.toFixed(2) + '。</strong>系统自动缩减至50%仓位，对冲蓄水池建议配置15%。';
                 } else if (C >= 0.50) {
                     status = '🟡 警告';
                     statusColor = '#facc15';
@@ -5699,12 +5787,12 @@
                 } else if (C >= 0.48) {
                     status = '🟢 安全';
                     statusColor = '#22c55e';
-                    position = '100%';
-                    advice = '🎯 <strong>浓度处于保本中轴线区间。</strong>市场均衡状态最佳，可主力重仓，按计划投放资源。';
+                    position = '≤25%';
+                    advice = '🎯 <strong>浓度处于保本中轴线区间。</strong>市场均衡状态最佳，系统按半凯利上限25%配置仓位。';
                 } else {
                     status = '🔵 过低';
                     statusColor = '#60a5fa';
-                    position = '20%';
+                    position = '极小';
                     advice = '📊 <strong>浓度低于保本线。</strong>市场参与度不足，建议小仓位试探，观察市场反应后再决定是否加仓。';
                 }
 
@@ -5720,6 +5808,17 @@
             }
 
             window.updateRiskFuse = updateRiskFuseDisplay;
+
+            if (typeof YMineRiskCB !== 'undefined' && YMineRiskCB.on) {
+                YMineRiskCB.on(function() {
+                    clearTimeout(window._riskFuseTimer);
+                    window._riskFuseTimer = setTimeout(updateRiskFuseDisplay, 50);
+                    if (typeof window.updateKelly === 'function') {
+                        clearTimeout(window._fuseKellyTimer);
+                        window._fuseKellyTimer = setTimeout(window.updateKelly, 80);
+                    }
+                });
+            }
 
             const targetNode = document.getElementById('coneCVal');
             if (targetNode) {
@@ -6051,6 +6150,11 @@
                 zScoreEl.textContent = snapshot.zScore.toFixed(2) + 'σ';
                 zScoreEl.style.color = s.color;
 
+                if (typeof YMineRiskCB !== 'undefined' && YMineRiskCB.update) {
+                    const effectiveC = Math.min(1.0, 0.50 + Math.abs(snapshot.zScore) * 0.09 + snapshot.coneCollapse * 0.15);
+                    YMineRiskCB.update({ zScore: snapshot.zScore, drawdown: snapshot.drawdown || 0, coneC: effectiveC });
+                }
+
                 const pricePercent = Math.max(5, Math.min(95, ((snapshot.price - 0.2) / 0.8) * 100));
                 priceMarker.style.left = pricePercent + '%';
 
@@ -6252,13 +6356,12 @@
                         const mult = snapshot.decision.budgetMultiplier;
                         if (financeData._lastMult === undefined || Math.abs(financeData._lastMult - mult) > 0.05) {
                             financeData._lastMult = mult;
-                            const mcC1 = document.getElementById('mcC1');
-                            const mcC2 = document.getElementById('mcC2');
-                            const mcC3 = document.getElementById('mcC3');
-                            if (mcC1) mcC1.value = Math.round(financeData.C1 * mult);
-                            if (mcC2) mcC2.value = Math.round(financeData.C2 * mult);
-                            if (mcC3) mcC3.value = Math.round(financeData.C3 * mult);
-                            window.updateMarketingFinance();
+                            const mcC1 = document.getElementById('mcC1Input');
+                            const mcC2 = document.getElementById('mcC2Input');
+                            const mcC3 = document.getElementById('mcC3Input');
+                            if (mcC1) { mcC1.value = Math.round(financeData.C1 * mult); mcC1.dispatchEvent(new Event('input', { bubbles: true })); }
+                            if (mcC2) { mcC2.value = Math.round(financeData.C2 * mult); mcC2.dispatchEvent(new Event('input', { bubbles: true })); }
+                            if (mcC3) { mcC3.value = Math.round(financeData.C3 * mult); mcC3.dispatchEvent(new Event('input', { bubbles: true })); }
                         }
                     }
                 }
@@ -6537,6 +6640,9 @@
                     clearInterval(tickInterval);
                     startBtn.textContent = '▶ 启动博弈推演';
                     startBtn.classList.remove('running');
+                    if (typeof updateConcentrationDisplay === 'function') {
+                        setTimeout(updateConcentrationDisplay, 100);
+                    }
                 } else {
                     isRunning = true;
                     startBtn.textContent = '⏸ 暂停推演';
@@ -6566,6 +6672,9 @@
                 updateUI(initial);
                 drawConeGame(initial);
                 drawGravity(initial);
+                if (typeof updateConcentrationDisplay === 'function') {
+                    updateConcentrationDisplay();
+                }
             }
 
             if (startBtn) startBtn.addEventListener('click', startGame);

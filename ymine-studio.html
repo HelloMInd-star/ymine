@@ -1,0 +1,2035 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Y.Mine · 投资分析工作室</title>
+    <link rel="stylesheet" href="assets/css/base.css">
+    <script src="assets/js/bus.js"></script>
+    <script src="assets/js/sidebar.js"></script>
+    <script src="assets/js/cone-game-theory.js"></script>
+    <script src="assets/js/valuation-engine.js"></script>
+    <script src="assets/js/risk-circuit-breaker.js"></script>
+    <script src="assets/js/mcn-alpha-engine.js"></script>
+    <style>
+        body {
+            background: #0b0b1a;
+        }
+        .main-content {
+            padding: 0;
+            max-width: none;
+            width: calc(100vw - 260px - 40px);
+            margin: 0 20px;
+        }
+        .studio-container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            background: radial-gradient(ellipse at 30% 0%, #150d2a, #0b0b1a 60%, #05030a);
+            border-radius: 24px;
+            padding: 32px 36px 28px;
+            border: 1px solid rgba(167,139,250,0.10);
+            box-shadow: 0 20px 60px rgba(40,10,80,0.5);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+        .studio-header {
+            text-align: center;
+            margin-bottom: 24px;
+            position: relative;
+            z-index: 2;
+        }
+        .studio-header .badge {
+            display: inline-block;
+            background: linear-gradient(135deg, rgba(167,139,250,0.15), rgba(96,165,250,0.1));
+            border: 1px solid rgba(167,139,250,0.2);
+            color: #a78bfa;
+            font-size: 11px;
+            padding: 4px 14px;
+            border-radius: 20px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        .studio-header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            color: #f1f5f9;
+            letter-spacing: -0.3px;
+            background: linear-gradient(135deg, #f1f5f9, #a78bfa, #60a5fa);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradientFlow 5s ease-in-out infinite;
+            margin-bottom: 4px;
+        }
+        .studio-header .sub {
+            font-size: 13px;
+            color: rgba(255,255,255,0.3);
+            font-weight: 300;
+        }
+
+        .stepper {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(167,139,250,0.04);
+            border: 1px solid rgba(167,139,250,0.08);
+            border-radius: 14px;
+            padding: 16px 24px;
+            margin-bottom: 24px;
+            position: relative;
+            z-index: 2;
+        }
+        .stepper::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 10%;
+            right: 10%;
+            height: 2px;
+            background: rgba(255,255,255,0.05);
+            transform: translateY(-50%);
+            z-index: 0;
+        }
+        .step-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            position: relative;
+            z-index: 1;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .step-num {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.04);
+            border: 2px solid rgba(255,255,255,0.08);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 700;
+            color: rgba(255,255,255,0.3);
+            transition: all 0.3s ease;
+        }
+        .step-label {
+            font-size: 11px;
+            color: rgba(255,255,255,0.25);
+            font-weight: 500;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+        .step-item.active .step-num {
+            background: linear-gradient(135deg, #a78bfa, #7c3aed);
+            border-color: #a78bfa;
+            color: #fff;
+            box-shadow: 0 0 20px rgba(167,139,250,0.4);
+        }
+        .step-item.active .step-label {
+            color: #a78bfa;
+        }
+        .step-item.completed .step-num {
+            background: rgba(34,197,94,0.15);
+            border-color: rgba(34,197,94,0.4);
+            color: #22c55e;
+        }
+        .step-item.completed .step-label {
+            color: rgba(34,197,94,0.7);
+        }
+        .step-connector {
+            flex: 1;
+            height: 2px;
+            background: rgba(255,255,255,0.05);
+            margin: 0 8px;
+            position: relative;
+            z-index: 1;
+        }
+        .step-connector.active {
+            background: linear-gradient(90deg, #a78bfa, rgba(167,139,250,0.3));
+        }
+
+        .workspace {
+            position: relative;
+            z-index: 2;
+        }
+        .panel {
+            display: none;
+            background: rgba(255,255,255,0.015);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 16px;
+            padding: 24px 28px;
+            margin-bottom: 20px;
+            animation: fadeInUp 0.4s ease forwards;
+        }
+        .panel.active {
+            display: block;
+        }
+        .panel-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: rgba(255,255,255,0.8);
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .panel-title .tag {
+            font-size: 10px;
+            font-weight: 600;
+            color: #a78bfa;
+            background: rgba(167,139,250,0.1);
+            padding: 2px 10px;
+            border-radius: 20px;
+            letter-spacing: 0.5px;
+        }
+        .panel-sub {
+            font-size: 12px;
+            color: rgba(255,255,255,0.25);
+            margin-bottom: 18px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 14px;
+            margin-bottom: 16px;
+        }
+        .form-grid.two-col {
+            grid-template-columns: 1fr 1fr;
+        }
+        .form-ctrl {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .form-ctrl label {
+            font-size: 11px;
+            font-weight: 500;
+            color: rgba(255,255,255,0.3);
+            display: flex;
+            justify-content: space-between;
+        }
+        .form-ctrl label span {
+            color: #a78bfa;
+            font-weight: 600;
+        }
+        .form-ctrl input[type="number"],
+        .form-ctrl select,
+        .form-ctrl input[type="text"] {
+            background: rgba(0,0,0,0.25);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 8px;
+            padding: 8px 12px;
+            color: #f1f5f9;
+            font-size: 13px;
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .form-ctrl input[type="number"]:focus,
+        .form-ctrl select:focus,
+        .form-ctrl input[type="text"]:focus {
+            border-color: rgba(167,139,250,0.4);
+        }
+        .form-ctrl input[type="range"] {
+            width: 100%;
+            accent-color: #a78bfa;
+            height: 4px;
+            background: rgba(255,255,255,0.06);
+            border-radius: 4px;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+        .form-ctrl input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #a78bfa;
+            cursor: pointer;
+            box-shadow: 0 0 12px rgba(167,139,250,0.3);
+        }
+        .form-ctrl .hint {
+            font-size: 10px;
+            color: rgba(255,255,255,0.1);
+        }
+        .btn {
+            background: linear-gradient(135deg, #a78bfa, #7c3aed);
+            border: none;
+            color: #fff;
+            padding: 9px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 12px;
+            font-family: inherit;
+            transition: all 0.2s;
+        }
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 16px rgba(167,139,250,0.3);
+        }
+        .btn-outline {
+            background: transparent;
+            border: 1px solid rgba(167,139,250,0.3);
+            color: #a78bfa;
+        }
+        .btn-outline:hover {
+            background: rgba(167,139,250,0.08);
+            box-shadow: none;
+        }
+        .btn-danger {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+        }
+        .btn-danger:hover {
+            box-shadow: 0 4px 16px rgba(239,68,68,0.3);
+        }
+        .btn-success {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+        }
+        .btn-success:hover {
+            box-shadow: 0 4px 16px rgba(34,197,94,0.3);
+        }
+        .btn-warning {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+        }
+        .btn-warning:hover {
+            box-shadow: 0 4px 16px rgba(245,158,11,0.3);
+        }
+        .btn-sm {
+            padding: 6px 14px;
+            font-size: 11px;
+        }
+        .btn-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 14px;
+            flex-wrap: wrap;
+        }
+
+        .metric-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin: 14px 0;
+        }
+        .metric-grid.five {
+            grid-template-columns: repeat(5, 1fr);
+        }
+        .metric-grid.six {
+            grid-template-columns: repeat(6, 1fr);
+        }
+        .metric-card {
+            background: rgba(0,0,0,0.2);
+            border: 1px solid rgba(255,255,255,0.04);
+            border-radius: 10px;
+            padding: 12px 14px;
+            text-align: center;
+        }
+        .metric-card .ml {
+            font-size: 9px;
+            color: rgba(255,255,255,0.2);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            margin-bottom: 4px;
+        }
+        .metric-card .mv {
+            font-size: 20px;
+            font-weight: 700;
+            color: #f1f5f9;
+        }
+        .metric-card .mv.purple { color: #a78bfa; }
+        .metric-card .mv.gold { color: #facc15; }
+        .metric-card .mv.green { color: #22c55e; }
+        .metric-card .mv.red { color: #ef4444; }
+        .metric-card .mv.blue { color: #60a5fa; }
+        .metric-card .mv.orange { color: #fb923c; }
+        .metric-card .sub {
+            font-size: 9px;
+            color: rgba(255,255,255,0.1);
+            margin-top: 2px;
+        }
+
+        .risk-vector-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin: 14px 0;
+        }
+        .rv-card {
+            background: rgba(0,0,0,0.2);
+            border: 1px solid rgba(255,255,255,0.04);
+            border-radius: 10px;
+            padding: 12px 14px;
+        }
+        .rv-card .rv-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+        .rv-card .rv-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: rgba(255,255,255,0.5);
+        }
+        .rv-card .rv-source {
+            font-size: 9px;
+            padding: 1px 6px;
+            border-radius: 6px;
+            background: rgba(167,139,250,0.1);
+            color: #a78bfa;
+        }
+        .rv-card .rv-source.manual {
+            background: rgba(245,158,11,0.1);
+            color: #f59e0b;
+        }
+        .rv-card .rv-value {
+            font-size: 22px;
+            font-weight: 700;
+            color: #f1f5f9;
+            margin-bottom: 4px;
+        }
+        .rv-card input[type="range"] {
+            width: 100%;
+            accent-color: #a78bfa;
+            height: 3px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 3px;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+        .rv-card input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #a78bfa;
+            cursor: pointer;
+        }
+        .rv-card .rv-desc {
+            font-size: 10px;
+            color: rgba(255,255,255,0.2);
+            margin-top: 2px;
+        }
+
+        .slider-card {
+            background: rgba(0,0,0,0.2);
+            border: 1px solid rgba(255,255,255,0.04);
+            border-radius: 12px;
+            padding: 14px 16px;
+            margin-bottom: 10px;
+        }
+        .slider-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .slider-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: rgba(255,255,255,0.6);
+        }
+        .slider-amount {
+            font-size: 14px;
+            font-weight: 700;
+            color: #a78bfa;
+        }
+        .slider-sub {
+            display: flex;
+            justify-content: space-between;
+            font-size: 10px;
+            color: rgba(255,255,255,0.2);
+            margin-bottom: 6px;
+        }
+        .slider-card input[type="range"] {
+            width: 100%;
+            accent-color: #a78bfa;
+            height: 5px;
+            background: rgba(255,255,255,0.06);
+            border-radius: 5px;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+        .slider-card input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #a78bfa;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(167,139,250,0.3);
+        }
+
+        .canvas-container {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.04);
+            border-radius: 12px;
+            padding: 16px;
+            margin: 14px 0;
+            text-align: center;
+        }
+        .canvas-container canvas {
+            display: inline-block;
+            max-width: 100%;
+            border-radius: 8px;
+        }
+        .canvas-caption {
+            font-size: 11px;
+            color: rgba(255,255,255,0.15);
+            margin-top: 8px;
+        }
+
+        .advice-box {
+            background: rgba(0,0,0,0.2);
+            border-radius: 10px;
+            padding: 14px 18px;
+            border-left: 3px solid #a78bfa;
+            color: rgba(255,255,255,0.4);
+            font-size: 13px;
+            line-height: 1.7;
+            margin-top: 14px;
+        }
+        .advice-box strong {
+            color: rgba(255,255,255,0.6);
+        }
+        .advice-box .hl {
+            color: #facc15;
+        }
+        .advice-box.green { border-left-color: #22c55e; }
+        .advice-box.yellow { border-left-color: #facc15; }
+        .advice-box.red { border-left-color: #ef4444; }
+
+        .dcf-table {
+            width: 100%;
+            margin: 12px 0;
+            font-size: 12px;
+        }
+        .dcf-table th {
+            background: rgba(167,139,250,0.06);
+            color: rgba(255,255,255,0.4);
+            font-weight: 600;
+            padding: 8px 10px;
+            text-align: right;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            font-size: 11px;
+        }
+        .dcf-table th:first-child { text-align: left; }
+        .dcf-table td {
+            padding: 7px 10px;
+            text-align: right;
+            color: rgba(255,255,255,0.5);
+            border-bottom: 1px solid rgba(255,255,255,0.02);
+        }
+        .dcf-table td:first-child {
+            text-align: left;
+            color: rgba(255,255,255,0.6);
+            font-weight: 500;
+        }
+        .dcf-table tr:last-child td {
+            border-bottom: none;
+            font-weight: 700;
+            color: #a78bfa;
+            background: rgba(167,139,250,0.04);
+        }
+
+        .position-display {
+            text-align: center;
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(167,139,250,0.08), rgba(96,165,250,0.04));
+            border: 1px solid rgba(167,139,250,0.15);
+            border-radius: 16px;
+            margin: 16px 0;
+        }
+        .position-label {
+            font-size: 12px;
+            color: rgba(255,255,255,0.3);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+        .position-value {
+            font-size: 56px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #a78bfa, #60a5fa, #22c55e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1;
+        }
+        .position-value.halted {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .position-sub {
+            font-size: 12px;
+            color: rgba(255,255,255,0.25);
+            margin-top: 6px;
+        }
+        .position-compare {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 12px;
+            font-size: 12px;
+        }
+        .position-compare .req {
+            color: rgba(255,255,255,0.35);
+        }
+        .position-compare .req span {
+            color: #fb923c;
+            font-weight: 700;
+        }
+        .position-compare .act {
+            color: rgba(255,255,255,0.35);
+        }
+        .position-compare .act span {
+            color: #22c55e;
+            font-weight: 700;
+        }
+
+        .fuse-panel {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(239,68,68,0.15);
+            border-radius: 12px;
+            padding: 14px 18px;
+            margin: 14px 0;
+        }
+        .fuse-panel.calm {
+            border-color: rgba(34,197,94,0.15);
+        }
+        .fuse-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #ef4444;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .fuse-panel.calm .fuse-title { color: #22c55e; }
+        .fuse-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+        .fuse-item {
+            background: rgba(255,255,255,0.02);
+            border-radius: 8px;
+            padding: 8px 10px;
+        }
+        .fuse-item .fi-label {
+            font-size: 9px;
+            color: rgba(255,255,255,0.2);
+            text-transform: uppercase;
+        }
+        .fuse-item .fi-value {
+            font-size: 15px;
+            font-weight: 700;
+            color: #f1f5f9;
+        }
+        .fuse-item .fi-value.danger { color: #ef4444; }
+        .fuse-item .fi-value.warn { color: #facc15; }
+        .fuse-item .fi-value.safe { color: #22c55e; }
+        .active-fuses {
+            margin-top: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .fuse-tag {
+            font-size: 10px;
+            padding: 3px 10px;
+            border-radius: 20px;
+            background: rgba(239,68,68,0.15);
+            color: #ef4444;
+            font-weight: 500;
+        }
+        .no-fuses {
+            font-size: 11px;
+            color: rgba(34,197,94,0.6);
+            margin-top: 8px;
+        }
+
+        .health-bar {
+            position: fixed;
+            bottom: 0;
+            left: 260px;
+            right: 0;
+            background: rgba(11,11,26,0.95);
+            backdrop-filter: blur(12px);
+            border-top: 1px solid rgba(255,255,255,0.05);
+            padding: 8px 24px;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+        .health-node {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 10px;
+            color: rgba(255,255,255,0.25);
+            padding: 3px 8px;
+            border-radius: 6px;
+            background: rgba(255,255,255,0.02);
+            transition: all 0.3s;
+        }
+        .health-node.ok {
+            color: rgba(34,197,94,0.7);
+            background: rgba(34,197,94,0.06);
+        }
+        .health-node.error {
+            color: #ef4444;
+            background: rgba(239,68,68,0.1);
+            border: 1px solid rgba(239,68,68,0.2);
+        }
+        .health-arrow {
+            color: rgba(255,255,255,0.1);
+            font-size: 10px;
+        }
+
+        .collapsible-panel {
+            background: linear-gradient(135deg, rgba(239,68,68,0.05), rgba(250,204,21,0.03));
+            border: 1px solid rgba(239,68,68,0.1);
+            border-radius: 14px;
+            padding: 18px 22px;
+            margin-top: 16px;
+        }
+        .collapsible-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+        }
+        .collapsible-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: rgba(255,255,255,0.7);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .collapsible-title .gt-tag {
+            font-size: 9px;
+            font-weight: 700;
+            color: #dc2626;
+            background: rgba(220,38,38,0.15);
+            padding: 2px 8px;
+            border-radius: 20px;
+            letter-spacing: 0.5px;
+        }
+        .collapsible-toggle {
+            font-size: 18px;
+            color: rgba(255,255,255,0.2);
+            transition: transform 0.3s;
+        }
+        .collapsible-panel.open .collapsible-toggle {
+            transform: rotate(180deg);
+        }
+        .collapsible-body {
+            display: none;
+            margin-top: 14px;
+        }
+        .collapsible-panel.open .collapsible-body {
+            display: block;
+        }
+
+        .gt-status-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin: 12px 0;
+        }
+        .gt-stat {
+            background: rgba(0,0,0,0.25);
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+        }
+        .gt-stat .gs-label {
+            font-size: 9px;
+            color: rgba(255,255,255,0.2);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        .gt-stat .gs-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: #f1f5f9;
+            margin-top: 2px;
+        }
+        .gt-stat .gs-value.green { color: #22c55e; }
+        .gt-stat .gs-value.yellow { color: #facc15; }
+        .gt-stat .gs-value.red { color: #ef4444; }
+        .gt-stat .gs-value.purple { color: #a78bfa; }
+
+        body.layout-flex {
+            padding-bottom: 50px;
+        }
+
+        @media (max-width: 1200px) {
+            .main-content { width: calc(100vw - 260px - 20px); margin: 0 10px; }
+            .metric-grid.six { grid-template-columns: repeat(3, 1fr); }
+            .risk-vector-grid { grid-template-columns: repeat(2, 1fr); }
+            .gt-status-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 900px) {
+            .main-content { width: 100%; margin: 0; padding: 0 12px 60px; }
+            .studio-container { padding: 20px 16px; border-radius: 0; }
+            .form-grid { grid-template-columns: 1fr 1fr; }
+            .metric-grid { grid-template-columns: repeat(2, 1fr); }
+            .metric-grid.five { grid-template-columns: repeat(2, 1fr); }
+            .fuse-grid { grid-template-columns: 1fr 1fr; }
+            .health-bar { left: 0; padding: 8px 12px; gap: 4px; }
+            .health-node { font-size: 9px; padding: 2px 6px; }
+        }
+        @media (max-width: 600px) {
+            .form-grid, .form-grid.two-col { grid-template-columns: 1fr; }
+            .stepper { padding: 10px 12px; gap: 4px; }
+            .step-label { font-size: 9px; }
+            .step-num { width: 28px; height: 28px; font-size: 12px; }
+            .position-value { font-size: 40px; }
+        }
+    </style>
+</head>
+<body class="layout-flex">
+    <div id="glow"></div>
+    <div class="sidebar"></div>
+
+    <div class="main-content">
+        <div class="studio-container">
+            <div class="studio-header">
+                <div class="badge">💎 Y.Mine Professional</div>
+                <h1>投资分析工作室</h1>
+                <div class="sub">资产定义 → 决策推演 → 估值定价 → 交易执行 · 四步线性工作流</div>
+            </div>
+
+            <div class="stepper" id="stepper">
+                <div class="step-item active" data-step="1">
+                    <div class="step-num">1</div>
+                    <div class="step-label">资产定义</div>
+                </div>
+                <div class="step-connector"></div>
+                <div class="step-item" data-step="2">
+                    <div class="step-num">2</div>
+                    <div class="step-label">决策推演</div>
+                </div>
+                <div class="step-connector"></div>
+                <div class="step-item" data-step="3">
+                    <div class="step-num">3</div>
+                    <div class="step-label">估值定价</div>
+                </div>
+                <div class="step-connector"></div>
+                <div class="step-item" data-step="4">
+                    <div class="step-num">4</div>
+                    <div class="step-label">交易执行</div>
+                </div>
+            </div>
+
+            <div class="workspace">
+                <div class="panel active" id="panel-asset">
+                    <div class="panel-title">📥 第一步：资产定义 <span class="tag">AssetPanel</span></div>
+                    <div class="panel-sub">选择标的资产并配置基础财务参数，一键加载预设案例</div>
+
+                    <div class="form-grid two-col">
+                        <div class="form-ctrl">
+                            <label>标的选择 <span id="assetNameDisplay">自定义</span></label>
+                            <select id="assetSelect">
+                                <option value="">— 选择内置案例 —</option>
+                                <option value="luckin">瑞幸9.9</option>
+                                <option value="haitian">海天味业</option>
+                                <option value="bull">公牛集团</option>
+                                <option value="fuyao">福耀玻璃</option>
+                                <option value="hikvision">海康威视</option>
+                                <option value="sanhua">三花智控</option>
+                                <option value="haiguang">海光信息</option>
+                                <option value="naura">北方华创</option>
+                                <option value="openai">OpenAI GPT-5</option>
+                                <option value="nvidia">英伟达AI</option>
+                                <option value="tesla">特斯拉</option>
+                                <option value="moutai">茅台</option>
+                                <option value="byd">比亚迪</option>
+                                <option value="catl">宁德时代</option>
+                                <option value="pdd_shein">拼多多SHEIN</option>
+                                <option value="mixue">蜜雪冰城</option>
+                                <option value="popmart">泡泡玛特</option>
+                                <option value="marvel">漫威宇宙</option>
+                                <option value="douyin">抖音</option>
+                                <option value="xiaohongshu">小红书</option>
+                                <option value="blog">博客模式</option>
+                            </select>
+                        </div>
+                        <div class="form-ctrl">
+                            <label>自定义标的名称</label>
+                            <input type="text" id="customAssetName" placeholder="输入自定义标的名称" />
+                        </div>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-ctrl">
+                            <label>无风险利率 Rf <span id="rfVal">2.0%</span></label>
+                            <input type="number" id="rfInput" value="2" step="0.1" min="0" max="10" />
+                            <div class="hint">默认2%（10年期国债）</div>
+                        </div>
+                        <div class="form-ctrl">
+                            <label>β 系数 <span id="betaVal">1.00</span></label>
+                            <input type="number" id="betaInput" value="1.0" step="0.05" min="0" max="3" />
+                            <div class="hint">系统性风险度量</div>
+                        </div>
+                        <div class="form-ctrl">
+                            <label>税率 <span id="taxVal">25%</span></label>
+                            <input type="number" id="taxInput" value="25" step="1" min="0" max="50" />
+                            <div class="hint">企业所得税率</div>
+                        </div>
+                        <div class="form-ctrl">
+                            <label>债务资本比 <span id="debtVal">30%</span></label>
+                            <input type="number" id="debtInput" value="30" step="1" min="0" max="100" />
+                            <div class="hint">D/(D+E)</div>
+                        </div>
+                        <div class="form-ctrl">
+                            <label>基础成本 P0 <span id="p0Val">100</span></label>
+                            <input type="number" id="p0Input" value="100" step="1" min="0" />
+                            <div class="hint">当前价格/成本基础</div>
+                        </div>
+                        <div class="form-ctrl">
+                            <label>目标售价 P1 <span id="p1Val">200</span></label>
+                            <input type="number" id="p1Input" value="200" step="1" min="0" />
+                            <div class="hint">期望目标价</div>
+                        </div>
+                    </div>
+
+                    <div class="btn-row">
+                        <button class="btn" id="loadCaseBtn">📂 加载案例</button>
+                        <button class="btn btn-outline" id="resetAssetBtn">↺ 重置默认</button>
+                        <button class="btn btn-success" id="toStep2Btn" style="margin-left:auto;">下一步：决策推演 →</button>
+                    </div>
+
+                    <div class="advice-box" id="assetAdvice">
+                        💡 选择标的后点击「加载案例」自动填充对应参数，或手动调整财务参数。P0为当前价格基础，P1为目标价格预期。
+                    </div>
+                </div>
+
+                <div class="panel" id="panel-sandbox">
+                    <div class="panel-title">🧪 第二步：决策推演 <span class="tag">SandboxPanel</span></div>
+                    <div class="panel-sub">三流分发沙盘 × 财务精算 × 6维风险向量，实时推演业财融合效果</div>
+
+                    <div style="font-size:12px; font-weight:600; color:rgba(255,255,255,0.4); margin-bottom:10px;">📡 三流分发沙盘（总预算：¥<span id="totalBudget">1,000,000</span>）</div>
+                    <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:6px;">
+                        <div style="text-align:center; font-size:10px; color:#f472b6; font-weight:600;">信息分发 C1（营销）</div>
+                        <div style="text-align:center; font-size:10px; color:#34d399; font-weight:600;">流量分发 C2（运营）</div>
+                        <div style="text-align:center; font-size:10px; color:#22d3ee; font-weight:600;">物理分发 C3（物流）</div>
+                    </div>
+                    <div class="slider-card" style="border-left:3px solid #f472b6;">
+                        <div class="slider-head">
+                            <span class="slider-name">📢 信息分发占比</span>
+                            <span class="slider-amount" id="c1Amount">¥150,000</span>
+                        </div>
+                        <div class="slider-sub">
+                            <span>占比: <strong id="c1Pct">15%</strong></span>
+                            <span>转化率 r1: <strong id="c1r">0.60</strong></span>
+                        </div>
+                        <input type="range" id="c1Slider" min="0" max="100" value="15" />
+                    </div>
+                    <div class="slider-card" style="border-left:3px solid #34d399;">
+                        <div class="slider-head">
+                            <span class="slider-name">🔄 流量分发占比</span>
+                            <span class="slider-amount" id="c2Amount">¥100,000</span>
+                        </div>
+                        <div class="slider-sub">
+                            <span>占比: <strong id="c2Pct">10%</strong></span>
+                            <span>转化率 r2: <strong id="c2r">0.40</strong></span>
+                        </div>
+                        <input type="range" id="c2Slider" min="0" max="100" value="10" />
+                    </div>
+                    <div class="slider-card" style="border-left:3px solid #22d3ee;">
+                        <div class="slider-head">
+                            <span class="slider-name">🚚 物理分发占比</span>
+                            <span class="slider-amount" id="c3Amount">¥50,000</span>
+                        </div>
+                        <div class="slider-sub">
+                            <span>占比: <strong id="c3Pct">5%</strong></span>
+                            <span>转化率 r3: <strong id="c3r">0.85</strong></span>
+                        </div>
+                        <input type="range" id="c3Slider" min="0" max="100" value="5" />
+                    </div>
+
+                    <div style="font-size:12px; font-weight:600; color:rgba(255,255,255,0.4); margin:18px 0 10px;">💰 财务精算卡（实时更新）</div>
+                    <div class="metric-grid five">
+                        <div class="metric-card">
+                            <div class="ml">TAC 真实获客成本</div>
+                            <div class="mv blue" id="mcTAC">—</div>
+                            <div class="sub">元/单</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="ml">CM 单位贡献毛利</div>
+                            <div class="mv purple" id="mcCM">—</div>
+                            <div class="sub">元</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="ml">DOL 经营杠杆</div>
+                            <div class="mv gold" id="mcDOL">—</div>
+                            <div class="sub">倍</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="ml">ROMI 营销回报率</div>
+                            <div class="mv green" id="mcROMI">—</div>
+                            <div class="sub">%</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="ml">真实 ROI</div>
+                            <div class="mv" id="mcRealROI">—</div>
+                            <div class="sub">%</div>
+                        </div>
+                    </div>
+
+                    <div style="font-size:12px; font-weight:600; color:rgba(255,255,255,0.4); margin:18px 0 10px;">📊 6维风险向量（自动推导，可手动微调）</div>
+                    <div class="risk-vector-grid">
+                        <div class="rv-card">
+                            <div class="rv-head">
+                                <span class="rv-label">f* 凯利系数</span>
+                                <span class="rv-source" id="kellySrc">自动</span>
+                            </div>
+                            <div class="rv-value" id="rvKelly">0.00</div>
+                            <input type="range" id="rvKellyInput" min="0" max="100" value="15" />
+                            <div class="rv-desc">最优仓位比例</div>
+                        </div>
+                        <div class="rv-card">
+                            <div class="rv-head">
+                                <span class="rv-label">L 杠杆率</span>
+                                <span class="rv-source" id="levSrc">自动</span>
+                            </div>
+                            <div class="rv-value" id="rvLev">1.00x</div>
+                            <input type="range" id="rvLevInput" min="0" max="300" value="100" />
+                            <div class="rv-desc">财务杠杆倍数</div>
+                        </div>
+                        <div class="rv-card">
+                            <div class="rv-head">
+                                <span class="rv-label">SR 夏普比率</span>
+                                <span class="rv-source" id="srSrc">自动</span>
+                            </div>
+                            <div class="rv-value" id="rvSR">0.00</div>
+                            <input type="range" id="rvSRInput" min="-100" max="300" value="80" />
+                            <div class="rv-desc">风险调整收益</div>
+                        </div>
+                        <div class="rv-card">
+                            <div class="rv-head">
+                                <span class="rv-label">MDD 最大回撤</span>
+                                <span class="rv-source" id="mddSrc">自动</span>
+                            </div>
+                            <div class="rv-value" id="rvMDD">25%</div>
+                            <input type="range" id="rvMDDInput" min="0" max="80" value="25" />
+                            <div class="rv-desc">历史最大亏损</div>
+                        </div>
+                        <div class="rv-card">
+                            <div class="rv-head">
+                                <span class="rv-label">DIM 边际递减</span>
+                                <span class="rv-source" id="dimSrc">自动</span>
+                            </div>
+                            <div class="rv-value" id="rvDIM">0.50</div>
+                            <input type="range" id="rvDIMInput" min="0" max="100" value="50" />
+                            <div class="rv-desc">投放效率衰减</div>
+                        </div>
+                        <div class="rv-card">
+                            <div class="rv-head">
+                                <span class="rv-label">OC 机会成本</span>
+                                <span class="rv-source" id="ocSrc">自动</span>
+                            </div>
+                            <div class="rv-value" id="rvOC">0.15</div>
+                            <input type="range" id="rvOCInput" min="0" max="100" value="15" />
+                            <div class="rv-desc">资金替代成本</div>
+                        </div>
+                    </div>
+
+                    <div class="btn-row">
+                        <button class="btn btn-outline" id="backTo1Btn">← 返回资产定义</button>
+                        <button class="btn btn-success" id="toStep3Btn" style="margin-left:auto;">下一步：估值定价 →</button>
+                    </div>
+                    <div class="advice-box" id="sandboxAdvice">
+                        💡 调整三流分发比例观察TAC/ROMI/ROI变化。风险向量自动从财务数据推导，点击滑块可手动覆盖（标签变黄色）。
+                    </div>
+                </div>
+
+                <div class="panel" id="panel-valuation">
+                    <div class="panel-title">📐 第三步：估值与定价 <span class="tag">ValuationPanel</span></div>
+                    <div class="panel-sub">圆锥浓度可视化 × CAPM资本定价 × DCF现金流折现，计算内在价值</div>
+
+                    <div style="font-size:12px; font-weight:600; color:rgba(255,255,255,0.4); margin-bottom:10px;">🔺 圆锥浓度 C 可视化</div>
+                    <div class="canvas-container">
+                        <canvas id="coneCanvas" width="320" height="280"></canvas>
+                        <div class="canvas-caption">当前C值: <strong id="coneCValue" style="color:#a78bfa;">0.50</strong> · 红线: 0.68 (1σ熔断边界)</div>
+                    </div>
+
+                    <div style="font-size:12px; font-weight:600; color:rgba(255,255,255,0.4); margin:18px 0 10px;">💹 CAPM 资本资产定价模型</div>
+                    <div class="metric-grid">
+                        <div class="metric-card">
+                            <div class="ml">Rp 风险溢价</div>
+                            <div class="mv purple" id="capmRp">—</div>
+                            <div class="sub">= C × β × (Rm-Rf)</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="ml">Re 权益成本</div>
+                            <div class="mv gold" id="capmRe">—</div>
+                            <div class="sub">= Rf + Rp</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="ml">Rd 税后债务成本</div>
+                            <div class="mv blue" id="capmRd">—</div>
+                            <div class="sub">= Rd × (1-T)</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="ml">WACC 加权资本成本</div>
+                            <div class="mv green" id="capmWacc">—</div>
+                            <div class="sub">加权平均</div>
+                        </div>
+                    </div>
+
+                    <div style="font-size:12px; font-weight:600; color:rgba(255,255,255,0.4); margin:18px 0 10px;">📊 DCF 简化估值（5年现金流折现）</div>
+                    <div style="overflow-x:auto;">
+                        <table class="dcf-table" id="dcfTable">
+                            <thead>
+                                <tr>
+                                    <th>年份</th>
+                                    <th>Y1</th>
+                                    <th>Y2</th>
+                                    <th>Y3</th>
+                                    <th>Y4</th>
+                                    <th>Y5</th>
+                                    <th>终值TV</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dcfBody">
+                                <tr><td colspan="7" style="text-align:center; color:rgba(255,255,255,0.2);">加载中...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="metric-grid">
+                        <div class="metric-card">
+                            <div class="ml">PV(FCF) 现金流现值</div>
+                            <div class="mv blue" id="dcfPvFcf">—</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="ml">PV(TV) 终值现值</div>
+                            <div class="mv orange" id="dcfPvTv">—</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="ml">内在价值</div>
+                            <div class="mv gold" id="dcfIv">—</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="ml">安全边际价(25%)</div>
+                            <div class="mv green" id="dcfMos">—</div>
+                        </div>
+                    </div>
+
+                    <div class="btn-row">
+                        <button class="btn btn-outline" id="backTo2Btn">← 返回决策推演</button>
+                        <button class="btn btn-success" id="toStep4Btn" style="margin-left:auto;">下一步：交易执行 →</button>
+                    </div>
+                    <div class="advice-box" id="valuationAdvice">
+                        💡 圆锥浓度C由风险向量综合计算，0.68为1σ正态分布临界值。CAPM输出WACC作为DCF折现率，内在价值为长期公允价格锚定。
+                    </div>
+                </div>
+
+                <div class="panel" id="panel-execution">
+                    <div class="panel-title">🎯 第四步：交易执行 <span class="tag">ExecutionDesk</span></div>
+                    <div class="panel-sub">凯利公式计算仓位 → RCB强制门控 → 最终执行建议</div>
+
+                    <div class="position-display" id="positionDisplay">
+                        <div class="position-label">🎯 最终建议仓位</div>
+                        <div class="position-value" id="finalPosition">0%</div>
+                        <div class="position-sub" id="positionSub">等待计算...</div>
+                        <div class="position-compare">
+                            <div class="req">请求仓位: <span id="reqPosition">0%</span></div>
+                            <div class="act">实际仓位: <span id="actPosition">0%</span></div>
+                        </div>
+                    </div>
+
+                    <div class="metric-grid">
+                        <div class="metric-card">
+                            <div class="ml">p 胜率(综合评分)</div>
+                            <div class="mv blue" id="kellyP">—</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="ml">b 赔率(风险回报比)</div>
+                            <div class="mv gold" id="kellyB">—</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="ml">q 败率</div>
+                            <div class="mv orange" id="kellyQ">—</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="ml">f* 凯利原始</div>
+                            <div class="mv purple" id="kellyFStar">—</div>
+                        </div>
+                    </div>
+
+                    <div class="fuse-panel calm" id="fusePanel">
+                        <div class="fuse-title">🛡️ 熔断状态面板</div>
+                        <div class="fuse-grid">
+                            <div class="fuse-item">
+                                <div class="fi-label">距0.68熔断线</div>
+                                <div class="fi-value safe" id="cbDist">—</div>
+                            </div>
+                            <div class="fuse-item">
+                                <div class="fi-label">当前C值</div>
+                                <div class="fi-value" id="cbC">—</div>
+                            </div>
+                            <div class="fuse-item">
+                                <div class="fi-label">zScore</div>
+                                <div class="fi-value" id="cbZ">0.00</div>
+                            </div>
+                            <div class="fuse-item">
+                                <div class="fi-label">MDD</div>
+                                <div class="fi-value" id="cbMdd">—</div>
+                            </div>
+                            <div class="fuse-item">
+                                <div class="fi-label">对冲蓄水池建议</div>
+                                <div class="fi-value" id="hedgeReservoir">0%</div>
+                            </div>
+                            <div class="fuse-item">
+                                <div class="fi-label">系统状态</div>
+                                <div class="fi-value safe" id="cbStatus">正常</div>
+                            </div>
+                        </div>
+                        <div class="active-fuses" id="activeFuses"></div>
+                        <div class="no-fuses" id="noFuses">✅ 所有熔断开关正常，无触发项</div>
+                    </div>
+
+                    <div style="font-size:12px; font-weight:600; color:rgba(255,255,255,0.4); margin:14px 0 10px;">⚡ 操作面板</div>
+                    <div class="btn-row">
+                        <button class="btn btn-success" id="btnOpen">📈 建仓</button>
+                        <button class="btn btn-warning" id="btnHalf">🔻 减半</button>
+                        <button class="btn btn-outline" id="btnClose">💰 清仓</button>
+                        <button class="btn btn-danger" id="btnHalt">🚨 紧急停机</button>
+                        <button class="btn btn-outline" id="backTo3Btn" style="margin-left:auto;">← 返回估值</button>
+                    </div>
+
+                    <div class="collapsible-panel" id="gtPanel">
+                        <div class="collapsible-header" id="gtToggle">
+                            <div class="collapsible-title">
+                                👁️ 圆锥博弈场 <span class="gt-tag">GOD MODE</span>
+                            </div>
+                            <div class="collapsible-toggle">▼</div>
+                        </div>
+                        <div class="collapsible-body">
+                            <div class="gt-status-grid">
+                                <div class="gt-stat">
+                                    <div class="gs-label">博弈状态</div>
+                                    <div class="gs-value green" id="gtState">稳态</div>
+                                </div>
+                                <div class="gt-stat">
+                                    <div class="gs-label">隐含价格</div>
+                                    <div class="gs-value purple" id="gtPrice">0.68</div>
+                                </div>
+                                <div class="gt-stat">
+                                    <div class="gs-label">zScore</div>
+                                    <div class="gs-value" id="gtZ">0.00</div>
+                                </div>
+                                <div class="gt-stat">
+                                    <div class="gs-label">波动率</div>
+                                    <div class="gs-value yellow" id="gtVol">0.00</div>
+                                </div>
+                            </div>
+                            <div style="display:flex; gap:10px; margin-top:12px; flex-wrap:wrap;">
+                                <button class="btn btn-sm" id="gtStartBtn">▶️ 启动博弈</button>
+                                <button class="btn btn-sm btn-danger" id="gtShockBtn">💥 注入冲击</button>
+                                <button class="btn btn-sm btn-outline" id="gtResetBtn">↺ 重置</button>
+                            </div>
+                            <div class="canvas-container" style="margin-top:12px;">
+                                <canvas id="gtCanvas" width="600" height="200"></canvas>
+                                <div class="canvas-caption">实时价格轨迹 · 红线为0.68引力中心</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="advice-box" id="executionAdvice">
+                        💡 所有仓位请求必须经过YMineRiskCB.enforce()强制门控。熔断触发时仓位自动归零，紧急停机按钮调用setManualHalt(true)。
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="health-bar" id="healthBar">
+        <div class="health-node ok" data-node="asset">资产✓</div>
+        <div class="health-arrow">→</div>
+        <div class="health-node" data-node="sandbox">沙盘</div>
+        <div class="health-arrow">→</div>
+        <div class="health-node" data-node="risk">风险向量</div>
+        <div class="health-arrow">→</div>
+        <div class="health-node" data-node="valuation">估值</div>
+        <div class="health-arrow">→</div>
+        <div class="health-node" data-node="capm">CAPM</div>
+        <div class="health-arrow">→</div>
+        <div class="health-node" data-node="kelly">凯利</div>
+        <div class="health-arrow">→</div>
+        <div class="health-node" data-node="fuse">熔断</div>
+    </div>
+
+    <script>
+    (function() {
+        'use strict';
+
+        var CASE_LIBRARY = {
+            luckin:      { name:'瑞幸9.9',      rf:2.5, beta:1.8, tax:15, debt:20, p0:9.9,  p1:15,  c1:40, c2:25, c3:35, growth:0.25 },
+            haitian:     { name:'海天味业',     rf:3.0, beta:0.5, tax:25, debt:15, p0:38,   p1:55,  c1:15, c2:10, c3:20, growth:0.08 },
+            bull:        { name:'公牛集团',     rf:3.0, beta:0.4, tax:25, debt:10, p0:120,  p1:180, c1:12, c2:8,  c3:25, growth:0.10 },
+            fuyao:       { name:'福耀玻璃',     rf:3.0, beta:1.0, tax:25, debt:25, p0:35,   p1:55,  c1:10, c2:8,  c3:30, growth:0.12 },
+            hikvision:   { name:'海康威视',     rf:3.0, beta:1.1, tax:15, debt:20, p0:32,   p1:50,  c1:15, c2:12, c3:18, growth:0.10 },
+            sanhua:      { name:'三花智控',     rf:3.0, beta:0.9, tax:15, debt:20, p0:25,   p1:42,  c1:12, c2:10, c3:22, growth:0.15 },
+            haiguang:    { name:'海光信息',     rf:2.5, beta:1.6, tax:15, debt:15, p0:60,   p1:120, c1:25, c2:20, c3:10, growth:0.40 },
+            naura:       { name:'北方华创',     rf:2.5, beta:1.7, tax:15, debt:20, p0:280,  p1:450, c1:22, c2:18, c3:12, growth:0.35 },
+            openai:      { name:'OpenAI GPT-5', rf:2.0, beta:2.0, tax:15, debt:5,  p0:80,   p1:200, c1:35, c2:40, c3:5,  growth:0.60 },
+            nvidia:      { name:'英伟达AI',     rf:2.0, beta:1.8, tax:15, debt:10, p0:400,  p1:800, c1:30, c2:35, c3:8,  growth:0.50 },
+            tesla:       { name:'特斯拉',       rf:2.0, beta:2.0, tax:15, debt:30, p0:250,  p1:400, c1:35, c2:30, c3:20, growth:0.30 },
+            moutai:      { name:'茅台',         rf:3.0, beta:0.6, tax:25, debt:5,  p0:1680, p1:2200,c1:5,  c2:5,  c3:15, growth:0.10 },
+            byd:         { name:'比亚迪',       rf:2.5, beta:1.3, tax:15, debt:40, p0:240,  p1:380, c1:20, c2:25, c3:28, growth:0.25 },
+            catl:        { name:'宁德时代',     rf:2.5, beta:1.5, tax:15, debt:35, p0:180,  p1:300, c1:18, c2:22, c3:25, growth:0.20 },
+            pdd_shein:   { name:'拼多多SHEIN',  rf:2.0, beta:1.8, tax:15, debt:20, p0:120,  p1:220, c1:45, c2:35, c3:12, growth:0.35 },
+            mixue:       { name:'蜜雪冰城',     rf:2.5, beta:1.2, tax:25, debt:30, p0:8,    p1:18,  c1:20, c2:15, c3:45, growth:0.20 },
+            popmart:     { name:'泡泡玛特',     rf:2.5, beta:1.4, tax:25, debt:10, p0:16,   p1:35,  c1:30, c2:35, c3:15, growth:0.30 },
+            marvel:      { name:'漫威宇宙',     rf:2.5, beta:1.2, tax:25, debt:25, p0:50,   p1:100, c1:40, c2:20, c3:10, growth:0.15 },
+            douyin:      { name:'抖音',         rf:2.0, beta:1.5, tax:15, debt:10, p0:100,  p1:180, c1:20, c2:55, c3:10, growth:0.35 },
+            xiaohongshu: { name:'小红书',       rf:2.0, beta:1.3, tax:15, debt:10, p0:60,   p1:120, c1:25, c2:50, c3:8,  growth:0.30 },
+            blog:        { name:'博客模式',     rf:3.0, beta:0.7, tax:25, debt:5,  p0:100,  p1:150, c1:5,  c2:10, c3:5,  growth:0.05 }
+        };
+
+        var state = {
+            currentStep: 1,
+            assetName: '自定义',
+            rf: 2, beta: 1.0, tax: 25, debt: 30, p0: 100, p1: 200,
+            budget: 1000000,
+            c1: 15, c2: 10, c3: 5,
+            r1: 0.60, r2: 0.40, r3: 0.85,
+            rvOverrides: { kelly:false, lev:false, sr:false, mdd:false, dim:false, oc:false },
+            growth: 0.15,
+            gtRunning: false,
+            gtField: null,
+            gtTimer: null,
+            gtPriceHistory: []
+        };
+
+        var riskManual = { kelly:false, lev:false, sr:false, mdd:false, dim:false, oc:false };
+
+        function $(id) { return document.getElementById(id); }
+
+        function fmt(n, d) {
+            d = d || 0;
+            if (isNaN(n) || !isFinite(n)) return '—';
+            return n.toFixed(d);
+        }
+        function fmtMoney(n) {
+            if (isNaN(n) || !isFinite(n)) return '—';
+            return '¥' + Math.round(n).toLocaleString('zh-CN');
+        }
+        function fmtPct(n, d) {
+            d = d || 1;
+            if (isNaN(n) || !isFinite(n)) return '—';
+            return (n*100).toFixed(d) + '%';
+        }
+
+        function goToStep(step) {
+            state.currentStep = step;
+            document.querySelectorAll('.panel').forEach(function(p) { p.classList.remove('active'); });
+            document.querySelectorAll('.step-item').forEach(function(s) {
+                s.classList.remove('active', 'completed');
+                var sNum = parseInt(s.dataset.step);
+                if (sNum === step) s.classList.add('active');
+                else if (sNum < step) s.classList.add('completed');
+            });
+            document.querySelectorAll('.step-connector').forEach(function(c, i) {
+                c.classList.toggle('active', i < step - 1);
+            });
+            var panels = ['panel-asset','panel-sandbox','panel-valuation','panel-execution'];
+            $(panels[step-1]).classList.add('active');
+            updateHealth();
+            if (step === 2) recalcSandbox();
+            if (step === 3) recalcValuation();
+            if (step === 4) recalcExecution();
+        }
+
+        function updateHealth() {
+            var nodes = ['asset','sandbox','risk','valuation','capm','kelly','fuse'];
+            var ok = { asset: true, sandbox: state.currentStep>=2, risk: state.currentStep>=2, valuation: state.currentStep>=3, capm: state.currentStep>=3, kelly: state.currentStep>=4, fuse: state.currentStep>=4 };
+            nodes.forEach(function(n) {
+                var el = document.querySelector('.health-node[data-node="'+n+'"]');
+                if (!el) return;
+                el.classList.remove('ok','error');
+                if (state.currentStep >= ['asset','sandbox','risk','valuation','capm','kelly','fuse'].indexOf(n)+1) {
+                    el.classList.add('ok');
+                    el.innerHTML = el.innerHTML.replace(/[✓×]/, '✓');
+                    var names = {asset:'资产',sandbox:'沙盘',risk:'风险向量',valuation:'估值',capm:'CAPM',kelly:'凯利',fuse:'熔断'};
+                    if (el.textContent.indexOf('✓') === -1 && el.textContent.indexOf('×') === -1) {
+                        el.textContent = names[n] + '✓';
+                    } else {
+                        el.innerHTML = names[n] + '✓';
+                    }
+                } else {
+                    var names2 = {asset:'资产',sandbox:'沙盘',risk:'风险向量',valuation:'估值',capm:'CAPM',kelly:'凯利',fuse:'熔断'};
+                    el.innerHTML = names2[n];
+                }
+            });
+        }
+
+        function loadCase(key) {
+            var c = CASE_LIBRARY[key];
+            if (!c) return;
+            state.assetName = c.name;
+            state.rf = c.rf; state.beta = c.beta; state.tax = c.tax; state.debt = c.debt;
+            state.p0 = c.p0; state.p1 = c.p1;
+            state.c1 = c.c1; state.c2 = c.c2; state.c3 = c.c3;
+            state.growth = c.growth;
+            syncAssetInputs();
+            syncSandboxInputs();
+            $('assetNameDisplay').textContent = c.name;
+            $('assetAdvice').innerHTML = '✅ 已加载案例: <strong>'+c.name+'</strong> · β='+c.beta+' · 预期增长'+(c.growth*100).toFixed(0)+'%';
+            $('assetAdvice').style.borderLeftColor = '#22c55e';
+        }
+
+        function syncAssetInputs() {
+            $('rfInput').value = state.rf; $('rfVal').textContent = state.rf.toFixed(1)+'%';
+            $('betaInput').value = state.beta; $('betaVal').textContent = state.beta.toFixed(2);
+            $('taxInput').value = state.tax; $('taxVal').textContent = state.tax+'%';
+            $('debtInput').value = state.debt; $('debtVal').textContent = state.debt+'%';
+            $('p0Input').value = state.p0; $('p0Val').textContent = state.p0;
+            $('p1Input').value = state.p1; $('p1Val').textContent = state.p1;
+        }
+        function syncSandboxInputs() {
+            $('c1Slider').value = state.c1;
+            $('c2Slider').value = state.c2;
+            $('c3Slider').value = state.c3;
+            $('totalBudget').textContent = state.budget.toLocaleString('zh-CN');
+        }
+
+        function readAssetInputs() {
+            state.rf = parseFloat($('rfInput').value) || 2;
+            state.beta = parseFloat($('betaInput').value) || 1;
+            state.tax = parseFloat($('taxInput').value) || 25;
+            state.debt = parseFloat($('debtInput').value) || 30;
+            state.p0 = parseFloat($('p0Input').value) || 100;
+            state.p1 = parseFloat($('p1Input').value) || 200;
+            var customName = $('customAssetName').value.trim();
+            if (customName) state.assetName = customName;
+        }
+
+        function calcConcentration() {
+            var kelly = parseFloat($('rvKellyInput').value)/100;
+            var lev = parseFloat($('rvLevInput').value)/100;
+            var mdd = parseFloat($('rvMDDInput').value)/100;
+            var dim = parseFloat($('rvDIMInput').value)/100;
+            var oc = parseFloat($('rvOCInput').value)/100;
+            var sr = parseFloat($('rvSRInput').value)/100;
+            var romi = 0;
+            try { romi = parseFloat($('mcROMI').textContent)/100; } catch(e){}
+            var C = 0.25 + kelly*0.25 + Math.abs(lev-1)*0.15 + mdd*0.20 + dim*0.15 + oc*0.15;
+            if (romi > 0 && romi < 1) C += (1-romi)*0.1;
+            C = Math.max(0.1, Math.min(0.95, C));
+            return C;
+        }
+
+        function recalcSandbox() {
+            var C1 = parseFloat($('c1Slider').value)/100;
+            var C2 = parseFloat($('c2Slider').value)/100;
+            var C3 = parseFloat($('c3Slider').value)/100;
+            state.c1 = C1*100; state.c2 = C2*100; state.c3 = C3*100;
+
+            $('c1Pct').textContent = (C1*100).toFixed(0)+'%';
+            $('c2Pct').textContent = (C2*100).toFixed(0)+'%';
+            $('c3Pct').textContent = (C3*100).toFixed(0)+'%';
+            $('c1Amount').textContent = fmtMoney(state.budget * C1);
+            $('c2Amount').textContent = fmtMoney(state.budget * C2);
+            $('c3Amount').textContent = fmtMoney(state.budget * C3);
+
+            var r1 = state.r1, r2 = state.r2, r3 = state.r3;
+            var Rf = state.rf / 100;
+            var L = parseFloat($('rvLevInput').value)/100;
+            var DIM = parseFloat($('rvDIMInput').value)/100;
+            var MDD = parseFloat($('rvMDDInput').value)/100;
+
+            var MC_total = (C1 + C2 + C3) * state.p0;
+            var OC1 = C1 * state.p0 * r1 * Rf;
+            var OC2 = C2 * state.p0 * r2 * DIM;
+            var OC3 = C3 * state.p0 * r3 * MDD;
+            var OC_total = OC1 + OC2 + OC3;
+            var TAC_per_unit = MC_total + OC_total;
+
+            var N_expected = Math.round(1000 * r1 * r2 * r3);
+            var TAC = TAC_per_unit;
+
+            var price = state.p1;
+            var realUnitCost = state.p0 + TAC_per_unit;
+            var CM = price - realUnitCost;
+            var grossMargin = price > 0 ? CM / price : 0;
+            var DOL = grossMargin > 0 ? 1 / grossMargin : 0;
+            var ROMI = TAC_per_unit > 0 ? CM / TAC_per_unit : 0;
+            var realROI = ROMI > 0 ? ROMI * L / (1 + DOL * 0.1) : 0;
+
+            $('mcTAC').textContent = fmt(TAC_per_unit, 1);
+            $('mcCM').textContent = fmt(CM, 1);
+            $('mcDOL').textContent = fmt(DOL, 2);
+            $('mcROMI').textContent = fmt(ROMI*100, 1);
+            var roiEl = $('mcRealROI');
+            roiEl.textContent = fmt(realROI*100, 1);
+            roiEl.className = 'mv ' + (realROI > 1 ? 'green' : realROI > 0.3 ? 'gold' : realROI > 0 ? 'orange' : 'red');
+
+            if (!riskManual.kelly) {
+                var kellyCalc = ROMI > 0 ? Math.min(0.5, Math.max(0, (CM/(state.p1) - TAC_per_unit/(state.p1)) * 0.5)) : 0;
+                $('rvKellyInput').value = Math.round(kellyCalc*100);
+                $('rvKelly').textContent = kellyCalc.toFixed(2);
+                $('kellySrc').textContent = '自动'; $('kellySrc').classList.remove('manual');
+            } else {
+                $('rvKelly').textContent = (parseFloat($('rvKellyInput').value)/100).toFixed(2);
+            }
+            if (!riskManual.lev) {
+                var levCalc = Math.max(0.5, Math.min(2.5, DOL));
+                $('rvLevInput').value = Math.round(levCalc*100);
+                $('rvLev').textContent = levCalc.toFixed(2)+'x';
+                $('levSrc').textContent = '自动'; $('levSrc').classList.remove('manual');
+            } else {
+                $('rvLev').textContent = (parseFloat($('rvLevInput').value)/100).toFixed(2)+'x';
+            }
+            if (!riskManual.sr) {
+                var srCalc = Math.max(-0.5, Math.min(2.5, (ROMI - Rf) / Math.max(0.1, MDD+0.1)));
+                $('rvSRInput').value = Math.round(srCalc*100);
+                $('rvSR').textContent = srCalc.toFixed(2);
+                $('srSrc').textContent = '自动'; $('srSrc').classList.remove('manual');
+            } else {
+                $('rvSR').textContent = (parseFloat($('rvSRInput').value)/100).toFixed(2);
+            }
+            if (!riskManual.mdd) {
+                var mddCalc = Math.max(0.1, Math.min(0.6, 0.20 + (ROMI < 1 ? (1-ROMI)*0.3 : 0)));
+                $('rvMDDInput').value = Math.round(mddCalc*100);
+                $('rvMDD').textContent = (mddCalc*100).toFixed(0)+'%';
+                $('mddSrc').textContent = '自动'; $('mddSrc').classList.remove('manual');
+            } else {
+                $('rvMDD').textContent = parseFloat($('rvMDDInput').value)+'%';
+            }
+            if (!riskManual.dim) {
+                var dimCalc = Math.max(0.1, Math.min(0.8, TAC_per_unit/(state.p0+1)*0.8 + (DOL>2?0.15:0)));
+                $('rvDIMInput').value = Math.round(dimCalc*100);
+                $('rvDIM').textContent = dimCalc.toFixed(2);
+                $('dimSrc').textContent = '自动'; $('dimSrc').classList.remove('manual');
+            } else {
+                $('rvDIM').textContent = (parseFloat($('rvDIMInput').value)/100).toFixed(2);
+            }
+            if (!riskManual.oc) {
+                var ocCalc = Math.max(0.05, Math.min(0.5, OC_total/(MC_total+1)*0.5));
+                $('rvOCInput').value = Math.round(ocCalc*100);
+                $('rvOC').textContent = ocCalc.toFixed(2);
+                $('ocSrc').textContent = '自动'; $('ocSrc').classList.remove('manual');
+            } else {
+                $('rvOC').textContent = (parseFloat($('rvOCInput').value)/100).toFixed(2);
+            }
+
+            var adviceColor = '#22c55e';
+            var adviceText = '';
+            if (ROMI < 0) { adviceColor = '#ef4444'; adviceText = '🚫 <strong>营销投入亏损！</strong>建议立即缩减投放。'; }
+            else if (ROMI*100 < state.rf) { adviceColor = '#facc15'; adviceText = '⚠️ ROMI跑不赢无风险利率，建议优化渠道组合。'; }
+            else if (realROI > 2) { adviceColor = '#ef4444'; adviceText = '🔥 <strong>ROI过热！</strong>杠杆过高，建议半凯利操作。'; }
+            else { adviceText = '🟢 <strong>健康区间。</strong>TAC='+TAC_per_unit.toFixed(1)+'元, ROMI='+(ROMI*100).toFixed(1)+'%, DOL='+DOL.toFixed(2)+'x。'; }
+            $('sandboxAdvice').innerHTML = '💡 ' + adviceText;
+            $('sandboxAdvice').style.borderLeftColor = adviceColor;
+        }
+
+        function drawCone() {
+            var canvas = $('coneCanvas');
+            if (!canvas) return;
+            var ctx = canvas.getContext('2d');
+            var w = canvas.width, h = canvas.height;
+            ctx.clearRect(0,0,w,h);
+
+            var C = calcConcentration();
+            $('coneCValue').textContent = C.toFixed(3);
+
+            var cx = w/2, cy = h - 30;
+            var coneH = h - 60;
+            var coneR = 100;
+            var currentH = coneH * C;
+            var currentR = coneR * C;
+
+            var grad = ctx.createLinearGradient(cx-coneR, cy-coneH, cx+coneR, cy);
+            grad.addColorStop(0, 'rgba(167,139,250,0.05)');
+            grad.addColorStop(1, 'rgba(167,139,250,0.2)');
+            ctx.beginPath();
+            ctx.moveTo(cx, cy - coneH);
+            ctx.lineTo(cx - coneR, cy);
+            ctx.lineTo(cx + coneR, cy);
+            ctx.closePath();
+            ctx.fillStyle = grad;
+            ctx.strokeStyle = 'rgba(167,139,250,0.2)';
+            ctx.lineWidth = 1;
+            ctx.fill();
+            ctx.stroke();
+
+            var redH = coneH * 0.68;
+            var redR = coneR * 0.68;
+            ctx.beginPath();
+            ctx.moveTo(cx, cy - redH);
+            ctx.lineTo(cx - redR, cy);
+            ctx.lineTo(cx + redR, cy);
+            ctx.closePath();
+            ctx.strokeStyle = 'rgba(239,68,68,0.5)';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([4,4]);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            var fillGrad = ctx.createLinearGradient(cx-currentR, cy-currentH, cx+currentR, cy);
+            fillGrad.addColorStop(0, 'rgba(167,139,250,0.4)');
+            fillGrad.addColorStop(1, 'rgba(124,58,237,0.7)');
+            ctx.beginPath();
+            ctx.moveTo(cx, cy - currentH);
+            ctx.lineTo(cx - currentR, cy);
+            ctx.lineTo(cx + currentR, cy);
+            ctx.closePath();
+            ctx.fillStyle = fillGrad;
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.arc(cx, cy - currentH, 5, 0, Math.PI*2);
+            ctx.fillStyle = C >= 0.68 ? '#ef4444' : '#a78bfa';
+            ctx.fill();
+            ctx.shadowColor = ctx.fillStyle;
+            ctx.shadowBlur = 15;
+            ctx.fill();
+            ctx.shadowBlur = 0;
+
+            ctx.font = '11px system-ui';
+            ctx.fillStyle = 'rgba(239,68,68,0.7)';
+            ctx.fillText('0.68 红线', cx + redR + 8, cy - redH*0.5);
+            ctx.fillStyle = C >= 0.68 ? '#ef4444' : '#a78bfa';
+            ctx.fillText('C='+C.toFixed(3), cx + currentR + 8, cy - currentH);
+        }
+
+        function recalcValuation() {
+            readAssetInputs();
+            var C = calcConcentration();
+            var Rf = state.rf / 100;
+            var beta = state.beta;
+            var tax = state.tax / 100;
+            var debtW = state.debt / 100;
+            var equityW = 1 - debtW;
+            var marketPremium = 0.06;
+            var Rd = 0.06;
+
+            var Rp = C * beta * marketPremium;
+            var Re = Rf + Rp;
+            var afterTaxRd = Rd * (1 - tax);
+            var WACC = equityW * Re + debtW * afterTaxRd;
+
+            $('capmRp').textContent = (Rp*100).toFixed(2)+'%';
+            $('capmRe').textContent = (Re*100).toFixed(2)+'%';
+            $('capmRd').textContent = (afterTaxRd*100).toFixed(2)+'%';
+            $('capmWacc').textContent = (WACC*100).toFixed(2)+'%';
+
+            var baseFCF = state.p0 * 0.15;
+            var growth = state.growth;
+            var tg = 0.025;
+            var fcfs = [];
+            var pvFCFs = [];
+            var totalPV = 0;
+            for (var t = 1; t <= 5; t++) {
+                var fcf = baseFCF * Math.pow(1 + growth, t);
+                fcfs.push(fcf);
+                var pv = fcf / Math.pow(1 + WACC, t);
+                pvFCFs.push(pv);
+                totalPV += pv;
+            }
+            var finalFCF = fcfs[4];
+            var TV = 0;
+            if (WACC > tg + 0.03) {
+                TV = finalFCF * (1 + tg) / (WACC - tg);
+            } else {
+                TV = finalFCF * 10;
+            }
+            var pvTV = TV / Math.pow(1 + WACC, 5);
+            var EV = totalPV + pvTV;
+            var perShare = state.p0;
+            var ivPerShare = perShare * (EV / (baseFCF*5 + 1));
+            ivPerShare = state.p0 * (0.5 + C*0.3 + (state.p1/state.p0 - 1)*0.3 + ROMIScore()*0.2);
+            var mos = ivPerShare * 0.75;
+
+            $('dcfPvFcf').textContent = fmtMoney(totalPV * state.budget / 1000);
+            $('dcfPvTv').textContent = fmtMoney(pvTV * state.budget / 1000);
+            $('dcfIv').textContent = fmtMoney(ivPerShare);
+            $('dcfMos').textContent = fmtMoney(mos);
+
+            var tbody = $('dcfBody');
+            var rowHtml = '<tr><td>FCF(¥)</td>';
+            for (var i = 0; i < 5; i++) rowHtml += '<td>'+fmtMoney(fcfs[i])+'</td>';
+            rowHtml += '<td>'+fmtMoney(TV)+'</td></tr>';
+            rowHtml += '<tr><td>PV(¥)</td>';
+            for (var i = 0; i < 5; i++) rowHtml += '<td>'+fmtMoney(pvFCFs[i])+'</td>';
+            rowHtml += '<td>'+fmtMoney(pvTV)+'</td></tr>';
+            rowHtml += '<tr><td>内在价值</td><td colspan="6" style="text-align:right;">'+fmtMoney(ivPerShare)+' (安全边际价: '+fmtMoney(mos)+')</td></tr>';
+            tbody.innerHTML = rowHtml;
+
+            drawCone();
+
+            var adviceText = '';
+            if (C >= 0.68) {
+                adviceText = '🚨 <strong>C='+C.toFixed(3)+'已击穿0.68红线！</strong>风险溢价Rp='+(Rp*100).toFixed(2)+'%过高，建议观望。';
+                $('valuationAdvice').style.borderLeftColor = '#ef4444';
+            } else if (WACC > 0.15) {
+                adviceText = '⚠️ WACC='+(WACC*100).toFixed(2)+'%偏高，折现率过高压制估值。内在价值'+fmtMoney(ivPerShare)+'。';
+                $('valuationAdvice').style.borderLeftColor = '#facc15';
+            } else {
+                adviceText = '🟢 估值完成。WACC='+(WACC*100).toFixed(2)+'%, 内在价值'+fmtMoney(ivPerShare)+', 安全边际买入价'+fmtMoney(mos)+'。';
+                $('valuationAdvice').style.borderLeftColor = '#22c55e';
+            }
+            $('valuationAdvice').innerHTML = '💡 ' + adviceText;
+        }
+
+        function ROMIScore() {
+            try {
+                var romiText = $('mcROMI').textContent;
+                var romi = parseFloat(romiText)/100;
+                return Math.max(0, Math.min(1, romi/2));
+            } catch(e) { return 0.5; }
+        }
+
+        function recalcExecution() {
+            var C = calcConcentration();
+            var MDD = parseFloat($('rvMDDInput').value)/100;
+            var sr = parseFloat($('rvSRInput').value)/100;
+            var dim = parseFloat($('rvDIMInput').value)/100;
+            var oc = parseFloat($('rvOCInput').value)/100;
+            var DOL = 0;
+            try { DOL = parseFloat($('mcDOL').textContent); } catch(e){ DOL = 1.5; }
+            var ROMI = 0;
+            try { ROMI = parseFloat($('mcROMI').textContent)/100; } catch(e){ ROMI = 0.5; }
+
+            var p = Math.max(0.1, Math.min(0.9, 0.35 + ROMI*0.2 + sr*0.15 + (1-MDD)*0.15 + (0.68-C)*0.5));
+            var b = Math.max(0.3, (state.p1 - state.p0) / Math.max(1, state.p0) * (1 + DOL*0.2));
+            var q = 1 - p;
+            var fStar = b > 0 ? (b*p - q) / b : 0;
+            fStar = Math.max(0, Math.min(0.5, fStar));
+
+            $('kellyP').textContent = (p*100).toFixed(1)+'%';
+            $('kellyB').textContent = b.toFixed(2);
+            $('kellyQ').textContent = (q*100).toFixed(1)+'%';
+            $('kellyFStar').textContent = (fStar*100).toFixed(1)+'%';
+
+            if (typeof YMineRiskCB !== 'undefined') {
+                YMineRiskCB.update({
+                    coneC: C,
+                    zScore: state.gtField ? (state.gtField.priceHistory.length ? (state.gtField.priceHistory[state.gtField.priceHistory.length-1] - 0.68)/0.13 : 0) : 0,
+                    mdd: MDD,
+                    npvNegative: ROMI < 0,
+                    irrBelowHurdle: ROMI > 0 && ROMI < state.rf/100
+                });
+            }
+
+            var cbResult;
+            if (typeof YMineRiskCB !== 'undefined') {
+                cbResult = YMineRiskCB.enforce(fStar);
+            } else {
+                cbResult = { requested: fStar, actual: Math.min(fStar, 0.25), halted: false, hedgingRequired: 0, coneDistanceToFuse: 0.68-C };
+            }
+
+            var reqPct = (cbResult.requested*100).toFixed(1)+'%';
+            var actPct = (cbResult.actual*100).toFixed(1)+'%';
+            $('reqPosition').textContent = reqPct;
+            $('actPosition').textContent = actPct;
+
+            var posVal = $('finalPosition');
+            var posSub = $('positionSub');
+            if (cbResult.halted) {
+                posVal.textContent = '0%';
+                posVal.classList.add('halted');
+                posSub.textContent = '🚫 熔断触发·仓位强制归零';
+                $('btnOpen').disabled = true;
+            } else {
+                posVal.textContent = actPct;
+                posVal.classList.remove('halted');
+                var hedge = (cbResult.hedgingRequired*100).toFixed(0)+'%';
+                $('hedgeReservoir').textContent = hedge;
+                posSub.textContent = '对冲蓄水池建议: '+hedge;
+                $('btnOpen').disabled = false;
+            }
+
+            var fusePanel = $('fusePanel');
+            var cbDist = Math.max(0, 0.68 - C);
+            $('cbDist').textContent = cbDist.toFixed(3);
+            $('cbDist').className = 'fi-value ' + (cbDist < 0.02 ? 'danger' : cbDist < 0.1 ? 'warn' : 'safe');
+            $('cbC').textContent = C.toFixed(3);
+            $('cbC').className = 'fi-value ' + (C >= 0.68 ? 'danger' : C >= 0.5 ? 'warn' : 'safe');
+            var gtZ = 0;
+            if (state.gtField && state.gtField.priceHistory.length) {
+                gtZ = (state.gtField.priceHistory[state.gtField.priceHistory.length-1] - 0.68)/0.13;
+            }
+            $('cbZ').textContent = gtZ.toFixed(2);
+            $('cbZ').className = 'fi-value ' + (Math.abs(gtZ)>=2 ? 'danger' : Math.abs(gtZ)>=1 ? 'warn' : 'safe');
+            $('cbMdd').textContent = (MDD*100).toFixed(0)+'%';
+            $('cbMdd').className = 'fi-value ' + (MDD>=0.5 ? 'danger' : MDD>=0.25 ? 'warn' : 'safe');
+            $('cbStatus').textContent = cbResult.halted ? '🚨 熔断' : '✅ 正常';
+            $('cbStatus').className = 'fi-value ' + (cbResult.halted ? 'danger' : 'safe');
+
+            var activeFuseBox = $('activeFuses');
+            var noFusesBox = $('noFuses');
+            if (cbResult.halted && cbResult.fuseIds && cbResult.fuseIds.length > 0) {
+                fusePanel.classList.remove('calm');
+                var fuseHtml = '';
+                cbResult.fuseIds.forEach(function(fid) {
+                    var reason = cbResult.activeFuses[fid] ? cbResult.activeFuses[fid].reason : fid;
+                    fuseHtml += '<span class="fuse-tag">🚨 '+reason+'</span>';
+                });
+                activeFuseBox.innerHTML = fuseHtml;
+                activeFuseBox.style.display = 'flex';
+                noFusesBox.style.display = 'none';
+            } else {
+                fusePanel.classList.add('calm');
+                activeFuseBox.style.display = 'none';
+                noFusesBox.style.display = 'block';
+            }
+
+            if (!cbResult.halted && cbResult.reductions && cbResult.reductions.length > 0) {
+                $('executionAdvice').innerHTML = '💡 ⚠️ 张力区仓位缩减: 请求'+reqPct+'→实际'+actPct+'。'+cbResult.reductions.map(function(r){return r.reason;}).join('; ');
+                $('executionAdvice').style.borderLeftColor = '#facc15';
+            } else if (cbResult.halted) {
+                $('executionAdvice').innerHTML = '🚫 <strong style="color:#ef4444;">熔断已触发！</strong>所有建仓操作被禁止。原因: '+Object.values(cbResult.activeFuses).map(function(f){return f.reason;}).join('; ');
+                $('executionAdvice').style.borderLeftColor = '#ef4444';
+            } else {
+                $('executionAdvice').innerHTML = '💡 建议仓位'+actPct+'，严格执行YMineRiskCB门控。凯利公式f*=('+b.toFixed(2)+'×'+p.toFixed(2)+'-'+q.toFixed(2)+')/'+b.toFixed(2)+'='+fStar.toFixed(3);
+                $('executionAdvice').style.borderLeftColor = '#22c55e';
+            }
+        }
+
+        function initGT() {
+            if (typeof YMineConeGame === 'undefined') return;
+            state.gtField = YMineConeGame.createField({ gravityCenter: 0.68 });
+            state.gtPriceHistory = [0.68];
+        }
+
+        function drawGT() {
+            var canvas = $('gtCanvas');
+            if (!canvas || !state.gtField) return;
+            var ctx = canvas.getContext('2d');
+            var w = canvas.width, h = canvas.height;
+            ctx.clearRect(0,0,w,h);
+
+            ctx.strokeStyle = 'rgba(239,68,68,0.3)';
+            ctx.lineWidth = 1;
+            ctx.setLineDash([4,4]);
+            ctx.beginPath();
+            var y068 = h/2;
+            ctx.moveTo(0, y068);
+            ctx.lineTo(w, y068);
+            ctx.stroke();
+            ctx.setLineDash([]);
+            ctx.fillStyle = 'rgba(239,68,68,0.5)';
+            ctx.font = '10px system-ui';
+            ctx.fillText('0.68引力中心', w-80, y068-4);
+
+            var hist = state.gtPriceHistory;
+            if (hist.length < 2) return;
+            ctx.strokeStyle = '#a78bfa';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            var n = Math.min(hist.length, 120);
+            var start = hist.length - n;
+            for (var i = 0; i < n; i++) {
+                var x = (i / (n-1)) * w;
+                var price = hist[start + i];
+                var y = h - (price - 0.3) / 0.7 * h;
+                y = Math.max(4, Math.min(h-4, y));
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+            ctx.stroke();
+
+            var lastPrice = hist[hist.length-1];
+            var ly = h - (lastPrice - 0.3) / 0.7 * h;
+            ly = Math.max(4, Math.min(h-4, ly));
+            ctx.beginPath();
+            ctx.arc(w-4, ly, 4, 0, Math.PI*2);
+            ctx.fillStyle = lastPrice > 0.68+0.13 ? '#ef4444' : lastPrice < 0.68-0.13 ? '#ef4444' : '#a78bfa';
+            ctx.fill();
+        }
+
+        function gtTick() {
+            if (!state.gtField || !state.gtRunning) return;
+            var snap = state.gtField.tick(0);
+            state.gtPriceHistory.push(snap.price);
+            if (state.gtPriceHistory.length > 150) state.gtPriceHistory.shift();
+            $('gtState').textContent = snap.state.name;
+            $('gtState').className = 'gs-value ' + (snap.state.id==='calm'?'green':snap.state.id==='tension'?'yellow':'red');
+            $('gtPrice').textContent = snap.price.toFixed(3);
+            $('gtZ').textContent = snap.zScore.toFixed(2);
+            $('gtZ').className = 'gs-value ' + (Math.abs(snap.zScore)>=2?'red':Math.abs(snap.zScore)>=1?'yellow':'green');
+            $('gtVol').textContent = snap.volatility.toFixed(3);
+
+            if (typeof YMineRiskCB !== 'undefined') {
+                YMineRiskCB.update({ zScore: snap.zScore, coneC: snap.price });
+            }
+            drawGT();
+            if (state.currentStep === 4) recalcExecution();
+        }
+
+        function bindEvents() {
+            document.querySelectorAll('.step-item').forEach(function(s) {
+                s.addEventListener('click', function() {
+                    goToStep(parseInt(s.dataset.step));
+                });
+            });
+
+            $('loadCaseBtn').addEventListener('click', function() {
+                var sel = $('assetSelect').value;
+                if (sel) { loadCase(sel); }
+                else {
+                    readAssetInputs();
+                    $('assetNameDisplay').textContent = state.assetName;
+                }
+            });
+            $('resetAssetBtn').addEventListener('click', function() {
+                state.rf=2; state.beta=1.0; state.tax=25; state.debt=30; state.p0=100; state.p1=200;
+                state.c1=15; state.c2=10; state.c3=5; state.growth=0.15;
+                state.assetName='自定义';
+                $('assetSelect').value=''; $('customAssetName').value='';
+                syncAssetInputs(); syncSandboxInputs();
+                $('assetNameDisplay').textContent='自定义';
+            });
+            $('toStep2Btn').addEventListener('click', function() { readAssetInputs(); goToStep(2); });
+
+            ['c1Slider','c2Slider','c3Slider'].forEach(function(id) {
+                $(id).addEventListener('input', recalcSandbox);
+            });
+
+            var rvInputs = ['rvKellyInput','rvLevInput','rvSRInput','rvMDDInput','rvDIMInput','rvOCInput'];
+            var rvKeys = ['kelly','lev','sr','mdd','dim','oc'];
+            var rvMultipliers = [1,1,1,1,1,1];
+            rvInputs.forEach(function(id, idx) {
+                $(id).addEventListener('input', function() {
+                    riskManual[rvKeys[idx]] = true;
+                    var srcEl = $(rvKeys[idx]+'Src');
+                    srcEl.textContent = '手动'; srcEl.classList.add('manual');
+                    var val = parseFloat($(id).value)/100;
+                    var valEl;
+                    if (rvKeys[idx]==='kelly') { valEl=$('rvKelly'); valEl.textContent=val.toFixed(2); }
+                    if (rvKeys[idx]==='lev') { valEl=$('rvLev'); valEl.textContent=val.toFixed(2)+'x'; }
+                    if (rvKeys[idx]==='sr') { valEl=$('rvSR'); valEl.textContent=val.toFixed(2); }
+                    if (rvKeys[idx]==='mdd') { valEl=$('rvMDD'); valEl.textContent=(val*100).toFixed(0)+'%'; }
+                    if (rvKeys[idx]==='dim') { valEl=$('rvDIM'); valEl.textContent=val.toFixed(2); }
+                    if (rvKeys[idx]==='oc') { valEl=$('rvOC'); valEl.textContent=val.toFixed(2); }
+                    recalcSandbox();
+                });
+            });
+
+            $('rfInput').addEventListener('input', function() { $('rfVal').textContent=parseFloat(this.value).toFixed(1)+'%'; recalcSandbox(); });
+            $('betaInput').addEventListener('input', function() { $('betaVal').textContent=parseFloat(this.value).toFixed(2); recalcSandbox(); });
+            $('taxInput').addEventListener('input', function() { $('taxVal').textContent=parseFloat(this.value)+'%'; recalcSandbox(); });
+            $('debtInput').addEventListener('input', function() { $('debtVal').textContent=parseFloat(this.value)+'%'; recalcSandbox(); });
+            $('p0Input').addEventListener('input', function() { $('p0Val').textContent=this.value; recalcSandbox(); });
+            $('p1Input').addEventListener('input', function() { $('p1Val').textContent=this.value; recalcSandbox(); });
+
+            $('backTo1Btn').addEventListener('click', function() { goToStep(1); });
+            $('toStep3Btn').addEventListener('click', function() { goToStep(3); });
+            $('backTo2Btn').addEventListener('click', function() { goToStep(2); });
+            $('toStep4Btn').addEventListener('click', function() { goToStep(4); });
+            $('backTo3Btn').addEventListener('click', function() { goToStep(3); });
+
+            $('btnOpen').addEventListener('click', function() {
+                if (typeof YMineRiskCB !== 'undefined') YMineRiskCB.update({});
+                recalcExecution();
+                $('executionAdvice').innerHTML = '📈 <strong style="color:#22c55e;">建仓指令已发送！</strong>按门控后实际仓位执行。';
+                $('executionAdvice').style.borderLeftColor = '#22c55e';
+            });
+            $('btnHalf').addEventListener('click', function() {
+                var curAct = parseFloat($('actPosition').textContent)/100;
+                var halfPos = curAct / 2;
+                if (typeof YMineRiskCB !== 'undefined') {
+                    var res = YMineRiskCB.enforce(halfPos);
+                    $('actPosition').textContent = (res.actual*100).toFixed(1)+'%';
+                }
+                $('executionAdvice').innerHTML = '🔻 <strong style="color:#f59e0b;">仓位减半！</strong>当前仓位已缩减50%。';
+                $('executionAdvice').style.borderLeftColor = '#f59e0b';
+            });
+            $('btnClose').addEventListener('click', function() {
+                $('finalPosition').textContent = '0%';
+                $('actPosition').textContent = '0%';
+                $('executionAdvice').innerHTML = '💰 <strong>清仓完成。</strong>所有风险资产已平仓。';
+                $('executionAdvice').style.borderLeftColor = '#60a5fa';
+            });
+            $('btnHalt').addEventListener('click', function() {
+                if (typeof YMineRiskCB !== 'undefined') YMineRiskCB.setManualHalt(true);
+                recalcExecution();
+                $('executionAdvice').innerHTML = '🚨 <strong style="color:#ef4444;">紧急停机已启动！</strong>所有交易活动被强制终止。';
+                $('executionAdvice').style.borderLeftColor = '#ef4444';
+            });
+
+            $('gtToggle').addEventListener('click', function() {
+                $('gtPanel').classList.toggle('open');
+            });
+            $('gtStartBtn').addEventListener('click', function() {
+                state.gtRunning = !state.gtRunning;
+                this.textContent = state.gtRunning ? '⏸️ 暂停博弈' : '▶️ 启动博弈';
+                if (state.gtRunning) {
+                    state.gtTimer = setInterval(gtTick, 500);
+                } else {
+                    clearInterval(state.gtTimer);
+                }
+            });
+            $('gtShockBtn').addEventListener('click', function() {
+                if (!state.gtField) return;
+                if (!state.gtRunning) {
+                    state.gtRunning = true;
+                    $('gtStartBtn').textContent = '⏸️ 暂停博弈';
+                    state.gtTimer = setInterval(gtTick, 500);
+                }
+                state.gtField.injectShock(2.5 + Math.random());
+                gtTick();
+            });
+            $('gtResetBtn').addEventListener('click', function() {
+                if (!state.gtField) return;
+                state.gtField.reset();
+                state.gtPriceHistory = [0.68];
+                if (typeof YMineRiskCB !== 'undefined') YMineRiskCB.update({ zScore:0, coneC:0.5, manualHalt:false });
+                state.gtRunning = false;
+                clearInterval(state.gtTimer);
+                $('gtStartBtn').textContent = '▶️ 启动博弈';
+                drawGT();
+                recalcExecution();
+            });
+        }
+
+        function init() {
+            bindEvents();
+            initGT();
+            syncAssetInputs();
+            syncSandboxInputs();
+            recalcSandbox();
+            updateHealth();
+            if (typeof YMineRiskCB !== 'undefined') {
+                YMineRiskCB.on(function() {
+                    if (state.currentStep === 4) {
+                        clearTimeout(window._execTimer);
+                        window._execTimer = setTimeout(recalcExecution, 50);
+                    }
+                });
+            }
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+    })();
+    </script>
+</body>
+</html>
