@@ -16,7 +16,7 @@
             label: '🧮 精算系统',
             items: [
                 { href: 'info-funnel.html', icon: '🔭', text: '信息漏斗', tag: '前置', activeTag: true },
-                { href: 'ymine-studio.html', icon: '🏛️', text: 'Y.Mine 投资工作室', tag: 'v2.0', activeTag: true },
+                { href: 'ymine-studio.html', icon: '🏛️', text: '投资工作室', tag: '十步闭环', activeTag: true },
                 { href: 'marketing-reinvented.html', icon: '🧪', text: '金融估值模拟器', tag: '精算' },
                 { href: 'ai-pricing-benchmark.html', icon: '📡', text: 'AI 定价基准库', tag: '基准' },
                 { href: 'case-library.html', icon: '🗂️', text: '案例向量库', tag: '案例' }
@@ -27,6 +27,7 @@
             label: '⚙️ 核心系统',
             items: [
                 { href: 'index.html', icon: '🏠', text: '总控台', tag: '首页', activeTag: true },
+                { href: 'game-os-main/total-index.html', icon: '🏛️', text: 'Game-OS', tag: '新架构', activeTag: true },
                 { href: 'circle-lab.html', icon: '🧪', text: '画圈实验', tag: '方法论' },
                 { href: 'gamemind.html', icon: '🎯', text: 'GameMind', tag: '策略' },
                 { href: 'moodmind.html', icon: '📊', text: 'MoodMind', tag: '估值' },
@@ -93,7 +94,7 @@
         let html = '';
 
         html += '<div class="logo">Y.<span>Mine</span></div>';
-        html += '<div class="logo-sub">自动化决策系统</div>';
+        html += '<div class="logo-sub">数理操作系统</div>';
 
         NAV_CONFIG.forEach(function(group) {
             if (group.divider) {
@@ -108,7 +109,7 @@
             html += '</div>';
         });
 
-        html += '<div class="footer-nav">v1.5 · 重构版</div>';
+        html += '<div class="footer-nav">v2.1 · Game-OS</div>';
 
         container.innerHTML = html;
     }
