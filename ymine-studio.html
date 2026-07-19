@@ -85,7 +85,7 @@
         .health-dot { width: 8px; height: 8px; border-radius: 50%; background: #22c55e; box-shadow: 0 0 8px #22c55e; }
 
         .pipeline-grid {
-            display: grid; grid-template-columns: repeat(9, 1fr); gap: 8px;
+            display: grid; grid-template-columns: repeat(10, 1fr); gap: 6px;
             margin-bottom: 16px; position: relative; z-index: 2;
         }
         .pipeline-step {
@@ -117,10 +117,26 @@
             border-color: rgba(239,68,68,0.5); animation: pulseRed 1s ease-in-out infinite;
         }
         .pipeline-step.halted .step-name { color: #fca5a5; }
+        #step-9.completed {
+            background: linear-gradient(135deg, rgba(139,92,246,0.25), rgba(59,130,246,0.15));
+            border-color: rgba(139,92,246,0.6);
+            box-shadow: 0 0 20px rgba(139,92,246,0.4);
+            animation: pulsePurple 2s ease-in-out infinite;
+        }
+        #step-9.completed .step-name { color: #c4b5fd; font-weight: 700; }
+        #step-9.active {
+            background: linear-gradient(135deg, rgba(139,92,246,0.2), rgba(59,130,246,0.1));
+            border-color: rgba(139,92,246,0.5);
+            animation: pulsePurple 0.8s ease-in-out infinite;
+        }
 
         @keyframes pulseRed {
             0%, 100% { box-shadow: 0 0 10px rgba(239,68,68,0.2); }
             50% { box-shadow: 0 0 25px rgba(239,68,68,0.5); }
+        }
+        @keyframes pulsePurple {
+            0%, 100% { box-shadow: 0 0 10px rgba(139,92,246,0.2); }
+            50% { box-shadow: 0 0 25px rgba(139,92,246,0.5); }
         }
 
         .content-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; position: relative; z-index: 2; }
@@ -306,7 +322,8 @@
         { id: 5, icon: '🔮', name: '决策推演' },
         { id: 6, icon: '📈', name: '动态K线' },
         { id: 7, icon: '🃏', name: '人性测试' },
-        { id: 8, icon: '🛡️', name: '对冲配置' }
+        { id: 8, icon: '🛡️', name: '对冲配置' },
+        { id: 9, icon: '🏛️', name: '返回总控' }
     ];
 
     let currentRegime = 'RED_OCEAN';
@@ -378,6 +395,7 @@
     }
 
     function safe(v, def) { return (v === undefined || v === null || (typeof v === 'number' && isNaN(v))) ? def : v; }
+    function safeNum(v, def) { return typeof v === 'number' && !isNaN(v) ? v : (def || 0); }
     function fmtPct(v, d) { d = d || 1; var n = safe(v, 0); return (n * 100).toFixed(d) + '%'; }
     function fmtNum(v, d) { d = d || 2; var n = safe(v, 0); return Number(n).toFixed(d); }
     function so(v) { return safe(v, {}); }
@@ -685,6 +703,64 @@
             html += '<div class="card card-wide"><div class="card-title"><span class="dot" style="background:#22c55e"></span>🛡️ Step 8 · 最终执行指令</div><div class="placeholder" style="padding:20px;font-size:11px;">等待执行...</div></div>';
         }
 
+        const eo = results.engineOutput;
+        if (eo) {
+            const eoFd = so(eo.finalDecision);
+            const eoKm = so(eo.keyMetrics);
+            const eoLb = so(eo.loopback);
+            const eoFlags = sa(eo.riskFlags);
+            const eoAudit = sa(eo.auditTrail);
+            const isHalted = eo.status === 'HALTED' || eoFd.circuitBreakerTriggered;
+            const statusColor = isHalted ? '#ef4444' : (eo.status === 'ERROR' ? '#f97316' : '#22c55e');
+            const statusText = isHalted ? '🚨 熔断已执行' : (eo.status === 'ERROR' ? '❌ 异常返回' : '✅ 闭环返回');
+            const actionMap = {
+                'MONITOR_ENTRY': { icon: '👀', label: '监控入场机会', color: '#22c55e' },
+                'EXIT_POSITION': { icon: '🚪', label: '退出当前仓位', color: '#ef4444' },
+                'WAIT_AND_OBSERVE': { icon: '⏸', label: '观望等待信号', color: '#facc15' },
+                'RESTART_PIPELINE': { icon: '🔄', label: '重启引擎流水线', color: '#f97316' }
+            };
+            const act = actionMap[eoLb.recommendedAction] || actionMap['WAIT_AND_OBSERVE'];
+            html += '<div class="card card-wide" style="border-color:' + statusColor + '40;background:linear-gradient(135deg,rgba(0,0,0,0.4),rgba(' + (isHalted?'239,68,68':'34,197,94') + ',0.08));">';
+            html += '<div class="card-title"><span class="dot" style="background:' + statusColor + ';box-shadow:0 0 12px ' + statusColor + ';"></span>🏛️ Step 9 · 总控回执（Loopback）</div>';
+            html += '<div class="exec-header" style="margin-bottom:10px;">';
+            html += '<div class="exec-signal ' + (isHalted?'sell':'hold') + '" style="font-size:13px;">' + statusText + '</div>';
+            html += '<div style="text-align:right;"><div style="font-size:10px;opacity:0.5;">Pipeline ID</div><div style="font-size:10px;font-family:monospace;opacity:0.7;">' + safeStr(eo.pipelineId, '-') + '</div></div>';
+            html += '</div>';
+            html += '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px;">';
+            html += '<div style="background:rgba(255,255,255,0.04);border-radius:6px;padding:8px;text-align:center;"><div style="font-size:9px;opacity:0.5;text-transform:uppercase;">标的</div><div style="font-size:13px;font-weight:700;margin-top:2px;">' + safeStr(eo.ticker, '-') + '</div></div>';
+            html += '<div style="background:rgba(255,255,255,0.04);border-radius:6px;padding:8px;text-align:center;"><div style="font-size:9px;opacity:0.5;text-transform:uppercase;">环境</div><div style="font-size:13px;font-weight:700;margin-top:2px;">' + (eo.regime === 'BLUE_OCEAN' ? '🔵蓝海' : '🔴红海') + '</div></div>';
+            html += '<div style="background:rgba(255,255,255,0.04);border-radius:6px;padding:8px;text-align:center;"><div style="font-size:9px;opacity:0.5;text-transform:uppercase;">信号</div><div style="font-size:13px;font-weight:700;margin-top:2px;color:' + (eoFd.signal==='BUY'?'#22c55e':(eoFd.signal==='SELL'?'#ef4444':'#facc15')) + ';">' + safeStr(eoFd.signal, 'HOLD') + '</div></div>';
+            html += '<div style="background:rgba(255,255,255,0.04);border-radius:6px;padding:8px;text-align:center;"><div style="font-size:9px;opacity:0.5;text-transform:uppercase;">耗时</div><div style="font-size:13px;font-weight:700;margin-top:2px;">' + (eo.durationMs/1000).toFixed(1) + 's</div></div>';
+            html += '</div>';
+            html += '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;font-size:10px;margin-bottom:10px;">';
+            html += '<div><span style="opacity:0.5;">β </span><span style="font-weight:600;">' + fmtNum(eoKm.dynamicBeta, 2) + '</span></div>';
+            html += '<div><span style="opacity:0.5;">理性 </span><span style="font-weight:600;">' + Math.round(safe(eoKm.rationalityScore, 50)) + '</span></div>';
+            html += '<div><span style="opacity:0.5;">Kelly× </span><span style="font-weight:600;">' + fmtNum(eoKm.kellyMultiplier, 2) + '</span></div>';
+            html += '<div><span style="opacity:0.5;">夏普 </span><span style="font-weight:600;">' + fmtNum(eoKm.sharpeRatio, 2) + '</span></div>';
+            html += '</div>';
+            html += '<div style="background:rgba(255,255,255,0.06);border-radius:8px;padding:10px;margin-bottom:10px;border-left:3px solid ' + act.color + ';">';
+            html += '<div style="font-size:9px;opacity:0.5;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">总控建议动作 (Loopback Action)</div>';
+            html += '<div style="font-size:14px;font-weight:700;color:' + act.color + ';">' + act.icon + ' ' + act.label + '</div>';
+            html += '</div>';
+            if (eoFlags.length > 0) {
+                html += '<div class="warnings-box" style="margin-bottom:8px;">';
+                eoFlags.forEach(function(f) {
+                    const fs = safeStr(f);
+                    const isD = fs.indexOf('🔴') >= 0 || fs.indexOf('熔断') >= 0;
+                    html += '<div class="warning-item' + (isD?' danger':'') + '">' + fs + '</div>';
+                });
+                html += '</div>';
+            }
+            html += '<div style="display:flex;align-items:center;gap:6px;font-size:10px;opacity:0.6;">';
+            html += '<span style="color:' + (eoLb.feedbackReady?'#22c55e':'#facc15') + ';">●</span>';
+            html += '<span>反馈回路' + (eoLb.feedbackReady?'已就绪':'未就绪') + ' · canRerun=' + eoLb.canRerun + '</span>';
+            html += '<span style="margin-left:auto;">审计链 ' + eoAudit.length + ' 步</span>';
+            html += '</div>';
+            html += '</div>';
+        } else if (exec && !results.engineOutput) {
+            html += '<div class="card card-wide" style="opacity:0.4;"><div class="card-title"><span class="dot" style="background:#6b7280;"></span>🏛️ Step 9 · 返回总控</div><div class="placeholder" style="padding:16px;font-size:11px;">正在汇总结果返回总控...</div></div>';
+        }
+
         area.innerHTML = html;
 
         if (simKline.length > 0) {
@@ -728,7 +804,8 @@
             let input = null;
             const pipeline = {
                 macroFunnel: null, factorLibrary: null, valuationV2: null,
-                simulationResult: null, rationalityScore: null, executionOrder: null
+                simulationResult: null, rationalityScore: null, executionOrder: null,
+                startedAt: Date.now()
             };
             const ctx = {
                 config: config, regime: currentRegime, pipeline: pipeline
@@ -757,8 +834,88 @@
                 }
             }
 
-            const finalHalted = results.executionOrder && results.executionOrder.riskStatus.halted;
-            setHealth(finalHalted ? 'halted' : 'ok', finalHalted ? '🚨 熔断已触发' : '✅ 闭环完成');
+            const endTime = Date.now();
+            const execOrder = so(results.executionOrder);
+            const simResult = so(results.simulationResult);
+            const ratScore = so(results.rationalityScore);
+            const valResult = so(results.valuationV2);
+            const flResult = so(results.factorLibrary);
+            const mfResult = so(results.macroFunnel);
+            const simMc = so(simResult.monteCarlo);
+            const execHp = so(execOrder.hedgingPlan);
+            const execSig = so(execOrder.signal);
+            const valPricing = so(valResult.pricing);
+            const flRisk = so(flResult.riskFactors);
+            const valWacc = so(valResult.wacc);
+            const ratAdj = so(ratScore.positionAdjustment);
+            const execAudit = so(execOrder.auditTrail);
+            const auditSteps = sa(execAudit.stepsCompleted);
+            const signalDir = safeStr(execSig.direction, 'HOLD');
+            const isHaltedReturn = !!(execOrder.riskStatus && execOrder.riskStatus.halted) || safeNum(execOrder.position, 0) === 0;
+
+            const startedAt = pipeline.startedAt || (endTime - 2000);
+            const selectedTickerFinal = safeStr(config.initialTicker) ||
+                safeStr(mfResult.selectedTicker) ||
+                (mfResult.topPicks && mfResult.topPicks[0] && mfResult.topPicks[0].ticker) || 'AUTO';
+
+            const auditTrailFormatted = auditSteps.map(function(sid) {
+                var si = YMineQuantEngine.STEPS.find(function(s){return s.id===sid;});
+                return { step: sid, name: si?si.name:'Step '+sid, channel: si?si.channel:null };
+            });
+
+            const engineOutput = {
+                pipelineId: 'q_' + startedAt.toString(36),
+                version: '2.1.0',
+                regime: currentRegime,
+                status: isHaltedReturn ? 'HALTED' : 'COMPLETED',
+                startedAt: startedAt,
+                completedAt: endTime,
+                durationMs: endTime - startedAt,
+                ticker: selectedTickerFinal,
+                finalDecision: {
+                    signal: signalDir,
+                    position: safeNum(execOrder.position, 0),
+                    rawKelly: safeNum(execOrder.rawKelly, 0),
+                    circuitBreakerTriggered: isHaltedReturn,
+                    enforcedBy: safeStr(execOrder.enforcedBy, isHaltedReturn ? '0.68_IRON_LAW' : 'NONE'),
+                    stopLoss: safeNum(execHp.stopLoss, 0),
+                    targetPrice: safeNum(execHp.targetPrice, 0)
+                },
+                keyMetrics: {
+                    dynamicBeta: safeNum(valPricing.dynamicBeta, 1.0),
+                    rationalityScore: safeNum(ratScore.overallScore, 50),
+                    kellyMultiplier: safeNum(ratAdj.kellyMultiplier, 1.0),
+                    coneC: safeNum(flRisk.coneC, 0.4),
+                    sharpeRatio: safeNum(simMc.sharpeRatio || (simMc.statistics && simMc.statistics.meanSharpeRatio), 0),
+                    haltProbability: safeNum(simMc.haltProbability || (simMc.statistics && simMc.statistics.fuseTriggerProbability), 0),
+                    wacc: safeNum(valWacc.wacc, 0)
+                },
+                riskFlags: sa(execOrder.riskFlags || (execOrder.riskStatus && execOrder.riskStatus.warnings)),
+                auditTrail: auditTrailFormatted,
+                channels: {
+                    macroFunnel: mfResult,
+                    factorLibrary: flResult,
+                    valuationV2: valResult,
+                    simulationResult: simResult,
+                    rationalityScore: ratScore,
+                    executionOrder: execOrder
+                },
+                loopback: {
+                    canRerun: true,
+                    feedbackReady: true,
+                    recommendedAction: signalDir === 'BUY' ? 'MONITOR_ENTRY' :
+                                      signalDir === 'SELL' ? 'EXIT_POSITION' : 'WAIT_AND_OBSERVE'
+                }
+            };
+
+            results.engineOutput = engineOutput;
+            setStepStatus(9, 'active');
+            YBus.publish('engineOutput', engineOutput);
+            await new Promise(function(r) { setTimeout(r, 200); });
+            setStepStatus(9, 'completed');
+
+            const finalHalted = !!(execOrder.riskStatus && execOrder.riskStatus.halted);
+            setHealth(finalHalted ? 'halted' : 'ok', finalHalted ? '🚨 熔断已触发·返回总控' : '✅ 闭环完成·返回总控');
             renderContent();
         } catch (e) {
             console.error(e);

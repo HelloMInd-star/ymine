@@ -1,8 +1,10 @@
 /**
- * Y.Mine 机构级量化投研十步闭环引擎 v2.0.1
+ * Y.Mine 机构级量化投研十步闭环引擎 v2.1.0
  * 
  * 核心铁律：Step 8 最终仓位必须且只能调用 YMineRiskCB.enforce() 进行强制门控
  * 熔断触发时 actual=0，不可绕过
+ * 
+ * 闭环返回：Step 8 完成后组装 EngineOutput → engineOutput 通道 → 总控台
  * 
  * @namespace YMineQuantEngine
  */
@@ -973,11 +975,107 @@
                     if (global.YBus && global.YBus.publish) global.YBus.publish('quantPipeline', pipeline);
                 }
             }
-            return context.pipeline.executionOrder;
+
+            var endTime = Date.now();
+            var execOrder = safeObj(context.pipeline.executionOrder, {});
+            var simResult = safeObj(context.pipeline.simulationResult, {});
+            var ratScore = safeObj(context.pipeline.rationalityScore, {});
+            var valResult = safeObj(context.pipeline.valuationV2, {});
+            var flResult = safeObj(context.pipeline.factorLibrary, {});
+            var mfResult = safeObj(context.pipeline.macroFunnel, {});
+            var execSig = safeObj(execOrder.signal, {});
+            var ratAdj = safeObj(ratScore.positionAdjustment, { kellyMultiplier: 1 });
+            var execAudit = safeObj(execOrder.auditTrail, {});
+            var auditSteps = safeArr(execAudit.stepsCompleted, pipeline.completedSteps);
+            var signalDir = safeStr(execSig.direction, 'HOLD');
+            var isHaltedReturn = !!(execOrder.riskStatus && execOrder.riskStatus.halted) || safeNum(execOrder.position, 0) === 0;
+
+            var auditFormatted = auditSteps.map(function(sid) {
+                var si = STEPS.find(function(s){ return s.id===sid; });
+                return { step: sid, name: si?si.name:'Step '+sid, channel: si?si.channel:null };
+            });
+
+            var engineOutput = {
+                pipelineId: context.pipelineId,
+                version: '2.1.0',
+                regime: regime,
+                status: isHaltedReturn ? 'HALTED' : (pipeline.halted ? 'HALTED' : 'COMPLETED'),
+                startedAt: pipeline.startedAt,
+                completedAt: endTime,
+                durationMs: endTime - (pipeline.startedAt || endTime),
+                ticker: config.ticker || (mfResult.selectedTicker || (mfResult.topPicks && mfResult.topPicks[0] && mfResult.topPicks[0].ticker) || 'AUTO'),
+                finalDecision: {
+                    signal: signalDir,
+                    position: safeNum(execOrder.position, 0),
+                    rawKelly: safeNum(execOrder.rawKelly, 0),
+                    circuitBreakerTriggered: isHaltedReturn,
+                    enforcedBy: safeStr(execOrder.enforcedBy, isHaltedReturn ? '0.68_IRON_LAW' : 'NONE'),
+                    stopLoss: safeNum(execOrder.hedgingPlan && execOrder.hedgingPlan.stopLoss, 0),
+                    targetPrice: safeNum(execOrder.hedgingPlan && execOrder.hedgingPlan.targetPrice, 0)
+                },
+                keyMetrics: {
+                    dynamicBeta: safeNum(valResult.pricing && valResult.pricing.dynamicBeta, 1.0),
+                    rationalityScore: safeNum(ratScore.overallScore, 50),
+                    kellyMultiplier: safeNum(ratAdj.kellyMultiplier, 1.0),
+                    coneC: safeNum(flResult.riskFactors && flResult.riskFactors.coneC, 0.4),
+                    sharpeRatio: safeNum(simResult.monteCarlo && (simResult.monteCarlo.sharpeRatio || (simResult.monteCarlo.statistics && simResult.monteCarlo.statistics.meanSharpeRatio)), 0),
+                    haltProbability: safeNum(simResult.monteCarlo && (simResult.monteCarlo.haltProbability || (simResult.monteCarlo.statistics && simResult.monteCarlo.statistics.fuseTriggerProbability)), 0),
+                    wacc: safeNum(valResult.wacc && valResult.wacc.wacc, 0)
+                },
+                riskFlags: safeArr(execOrder.riskFlags || (execOrder.riskStatus && execOrder.riskStatus.warnings), []),
+                auditTrail: auditFormatted,
+                channels: {
+                    macroFunnel: mfResult,
+                    factorLibrary: flResult,
+                    valuationV2: valResult,
+                    simulationResult: simResult,
+                    rationalityScore: ratScore,
+                    executionOrder: execOrder
+                },
+                loopback: {
+                    canRerun: true,
+                    feedbackReady: true,
+                    recommendedAction: signalDir === 'BUY' ? 'MONITOR_ENTRY' :
+                                      signalDir === 'SELL' ? 'EXIT_POSITION' : 'WAIT_AND_OBSERVE'
+                }
+            };
+
+            pipeline.status = engineOutput.status;
+            pipeline.engineOutput = engineOutput;
+            pipeline.completedAt = endTime;
+            pipeline.durationMs = engineOutput.durationMs;
+            pipeline.currentStep = 9;
+
+            if (global.YBus && global.YBus.publish) {
+                global.YBus.publish('engineOutput', engineOutput);
+                global.YBus.publish('quantPipeline', pipeline);
+            }
+
+            return engineOutput;
         } catch (e) {
             pipeline.halted = true;
             pipeline.haltReason = '引擎异常: ' + e.message;
-            if (global.YBus && global.YBus.publish) global.YBus.publish('quantPipeline', pipeline);
+            pipeline.status = 'ERROR';
+            var errorOutput = {
+                pipelineId: context.pipelineId,
+                version: '2.1.0',
+                regime: regime,
+                status: 'ERROR',
+                startedAt: pipeline.startedAt,
+                completedAt: Date.now(),
+                error: e.message,
+                finalDecision: { signal: 'HOLD', position: 0, circuitBreakerTriggered: true, enforcedBy: 'ERROR_GUARD' },
+                keyMetrics: {},
+                riskFlags: ['🔴 引擎异常：' + e.message],
+                auditTrail: [],
+                channels: context.pipeline || {},
+                loopback: { canRerun: true, feedbackReady: false, recommendedAction: 'RESTART_PIPELINE' }
+            };
+            pipeline.engineOutput = errorOutput;
+            if (global.YBus && global.YBus.publish) {
+                global.YBus.publish('engineOutput', errorOutput);
+                global.YBus.publish('quantPipeline', pipeline);
+            }
             console.error('[QuantEngine] Pipeline failed:', e);
             throw e;
         }
@@ -1050,7 +1148,7 @@
     }
 
     var YMineQuantEngine = {
-        version: '2.0.1',
+        version: '2.1.0',
         STEPS: STEPS,
         PRESET_ASSETS: PRESET_ASSETS,
         switchRegime: switchRegime,

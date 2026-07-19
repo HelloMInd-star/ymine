@@ -1,7 +1,8 @@
 /**
- * Y.Mine 数据总线 v2.0
+ * Y.Mine 数据总线 v2.1
  * 统一管理localStorage跨页同步、事件发布订阅、状态初始化
- * 十步闭环引擎新增通道：macroFunnel/factorLibrary/valuationV2/simulationResult/rationalityScore/executionOrder/regimeState
+ * 十步闭环引擎通道：macroFunnel/factorLibrary/valuationV2/simulationResult/rationalityScore/executionOrder/regimeState/quantPipeline/engineOutput
+ * engineOutput：十步闭环完成后汇总返回总控的最终输出
  * @namespace YBus
  */
 (function(global) {
@@ -348,6 +349,46 @@
                 halted: false,
                 haltReason: ''
             }
+        },
+        engineOutput: {
+            storageKey: 'engineOutput',
+            eventName: 'engine-output-update',
+            defaultValue: {
+                pipelineId: '',
+                version: '2.1.0',
+                regime: 'RED_OCEAN',
+                status: 'IDLE',
+                startedAt: 0,
+                completedAt: 0,
+                durationMs: 0,
+                ticker: '',
+                finalDecision: {
+                    signal: 'HOLD',
+                    position: 0,
+                    rawKelly: 0,
+                    circuitBreakerTriggered: false,
+                    enforcedBy: 'NONE',
+                    stopLoss: 0,
+                    targetPrice: 0
+                },
+                keyMetrics: {
+                    dynamicBeta: 1.0,
+                    rationalityScore: 50,
+                    kellyMultiplier: 1.0,
+                    coneC: 0.4,
+                    sharpeRatio: 0,
+                    haltProbability: 0,
+                    wacc: 0
+                },
+                riskFlags: [],
+                auditTrail: [],
+                channels: {},
+                loopback: {
+                    canRerun: true,
+                    feedbackReady: false,
+                    recommendedAction: 'WAIT_AND_OBSERVE'
+                }
+            }
         }
     };
 
@@ -401,7 +442,7 @@
 
     /**
      * 发布数据到指定通道
-     * @param {string} channelName - 通道名 (funnel|circle|aiPricing|caseLibrary|pricing|capmAuto|simulator|founder|riskFuse|marketingFinance|coneGame|kellyConfig|distribution|systemHealth|brandVolume|hedgeReservoir|pokerEgg|valuation|macroFunnel|factorLibrary|valuationV2|simulationResult|rationalityScore|executionOrder|regimeState|quantPipeline)
+     * @param {string} channelName - 通道名 (funnel|circle|aiPricing|caseLibrary|pricing|capmAuto|simulator|founder|riskFuse|marketingFinance|coneGame|kellyConfig|distribution|systemHealth|brandVolume|hedgeReservoir|pokerEgg|valuation|macroFunnel|factorLibrary|valuationV2|simulationResult|rationalityScore|executionOrder|regimeState|quantPipeline|engineOutput)
      * @param {*} data - 要发布的数据
      * @returns {boolean} 发布成功返回true
      */
