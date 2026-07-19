@@ -28,7 +28,7 @@
             items: [
                 { href: 'index.html', icon: '🏠', text: '总控台', tag: '首页', activeTag: true },
                 { href: 'game-os-main/total-index.html', icon: '🏛️', text: 'Game-OS', tag: '新架构', activeTag: true },
-                { href: 'circle-lab.html', icon: '🧠', text: '画圈实验', tag: '认知引擎', activeTag: true },
+                { href: 'circle-lab.html', icon: '🧠', text: '认知画圈基础实验', tag: '基座', activeTag: true },
                 { href: 'gamemind.html', icon: '🎯', text: 'GameMind', tag: '策略' },
                 { href: 'moodmind.html', icon: '📊', text: 'MoodMind', tag: '估值' },
                 { href: 'evolvemind.html', icon: '🧬', text: 'EvolveMind', tag: '演化' }
