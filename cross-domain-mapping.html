@@ -8,6 +8,13 @@
     <script src="assets/js/bus.js"></script>
     <script src="assets/js/sidebar.js"></script>
     <style>
+        /* 为左右页面内索引栏预留空间（仅大屏>900px生效，小屏由媒体查询重置） */
+        @media (min-width: 901px) {
+            body.layout-fixed {
+                padding: 24px 100px 24px 352px;
+            }
+        }
+
         /* ===== 页面内索引 ===== */
         .sidebar-index {
             position: fixed;
@@ -116,7 +123,7 @@
 
         /* ===== 主容器 ===== */
         .container {
-            max-width: 1000px;
+            max-width: 900px;
             width: 100%;
             background: radial-gradient(ellipse at 30% 30%, #120b24, #0b0b1a 70%, #05030a);
             border-radius: 32px;
@@ -127,6 +134,7 @@
             overflow: hidden;
             z-index: 1;
             backdrop-filter: blur(2px);
+            margin: 0 auto;
         }
 
         /* ===== 头部 ===== */
@@ -1074,10 +1082,87 @@
             color: rgba(255, 255, 255, 0.6);
         }
 
+        /* ===== 新增：引擎入口条 ===== */
+        .engine-entry {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 12px;
+            align-items: center;
+            margin-bottom: 24px;
+            opacity: 0;
+            animation: fadeInUp 0.6s ease 0.04s forwards;
+        }
+        .engine-entry-card {
+            background: rgba(250,204,21,0.06);
+            border: 1px solid rgba(250,204,21,0.18);
+            border-radius: 12px;
+            padding: 12px 18px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .engine-entry-btn {
+            padding: 10px 22px;
+            background: rgba(250,204,21,0.1);
+            border: 1px solid rgba(250,204,21,0.3);
+            border-radius: 20px;
+            color: #facc15;
+            font-size: 13px;
+            font-weight: 600;
+            text-decoration: none;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+        .engine-entry-btn:hover { background: rgba(250,204,21,0.2); }
+
+        /* ===== 新增：公私双引擎 ===== */
+        .dual-engine-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-top: 16px;
+        }
+        .engine-box-public {
+            background: rgba(250,204,21,0.04);
+            border: 1px solid rgba(250,204,21,0.18);
+            border-radius: 14px;
+            padding: 20px;
+        }
+        .engine-box-private {
+            background: rgba(239,68,68,0.05);
+            border: 1px solid rgba(239,68,68,0.2);
+            border-radius: 14px;
+            padding: 20px;
+        }
+        .engine-linkage-note {
+            margin-top: 14px;
+            padding: 12px 16px;
+            background: rgba(99,102,241,0.08);
+            border-left: 3px solid #818cf8;
+            border-radius: 8px;
+            font-size: 12px;
+            color: rgba(255,255,255,0.5);
+        }
+
+        /* ===== 新增：熔断机制区块 ===== */
+        .fuse-rules {
+            margin-top: 12px;
+            padding: 14px 18px;
+            background: rgba(239,68,68,0.06);
+            border: 1px solid rgba(239,68,68,0.2);
+            border-radius: 10px;
+            font-size: 12px;
+            color: rgba(255,255,255,0.6);
+            line-height: 1.9;
+        }
+
         /* ===== 响应式 ===== */
         @media (max-width: 900px) {
-            body {
-                padding: 24px 16px 24px 16px;
+            body.layout-fixed {
+                padding: 0;
+            }
+            .sidebar-index {
+                display: none;
             }
             .sidebar-nav {
                 display: none;
@@ -1137,6 +1222,15 @@
                 grid-column: 1 / 3;
                 grid-row: 3;
                 justify-self: center;
+            }
+            .dual-engine-grid {
+                grid-template-columns: 1fr;
+            }
+            .engine-entry {
+                grid-template-columns: 1fr;
+            }
+            .engine-entry-btn {
+                text-align: center;
             }
         }
 
@@ -1291,15 +1385,15 @@
         </div>
 
         <!-- ===== 引擎入口条 ===== -->
-        <div style="display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;margin-bottom:24px;opacity:0;animation: fadeInUp 0.6s ease 0.04s forwards;">
-            <div style="background:rgba(250,204,21,0.06);border:1px solid rgba(250,204,21,0.18);border-radius:12px;padding:12px 18px;display:flex;align-items:center;gap:14px;">
+        <div class="engine-entry">
+            <div class="engine-entry-card">
                 <div style="font-size:24px;">🧩</div>
                 <div>
                     <div style="font-size:13px;font-weight:600;color:rgba(255,255,255,0.75);">乐高积木可视化拼装演示</div>
                     <div style="font-size:11px;color:rgba(255,255,255,0.35);margin-top:2px;">依托七大领域模组，可拖拽积木块进行同构拼装验证 · 0.6 兼容度熔断</div>
                 </div>
             </div>
-            <a href="isomorphism-block-demo.html" style="padding:10px 22px;background:rgba(250,204,21,0.1);border:1px solid rgba(250,204,21,0.3);border-radius:20px;color:#facc15;font-size:13px;font-weight:600;text-decoration:none;white-space:nowrap;transition:all 0.2s;" onmouseover="this.style.background='rgba(250,204,21,0.2)'" onmouseout="this.style.background='rgba(250,204,21,0.1)'">🧱 进入拼装台 →</a>
+            <a href="isomorphism-block-demo.html" class="engine-entry-btn">🧱 进入拼装台 →</a>
         </div>
 
         <!-- ===== 验证快照 ===== -->
@@ -1693,8 +1787,8 @@
         <!-- ===== 公私双引擎架构说明 ===== -->
         <div class="section">
             <h2>🔧 公私双引擎架构 <span class="tag">公开演示 · 私有内核物理隔离</span></h2>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px;">
-                <div style="background:rgba(250,204,21,0.04);border:1px solid rgba(250,204,21,0.18);border-radius:14px;padding:20px;">
+            <div class="dual-engine-grid">
+                <div class="engine-box-public">
                     <div style="font-size:14px;font-weight:700;color:#facc15;margin-bottom:10px;">📦 isomorphism-block-engine（公开仓库）</div>
                     <ul style="margin:0;padding-left:18px;color:rgba(255,255,255,0.6);font-size:12px;line-height:2;">
                         <li>改造升级后的整套静态 HTML 展示页</li>
@@ -1704,7 +1798,7 @@
                         <li><span style="color:#ef4444;">不含精细阈值、完整私密推导原稿</span></li>
                     </ul>
                 </div>
-                <div style="background:rgba(239,68,68,0.05);border:1px solid rgba(239,68,68,0.2);border-radius:14px;padding:20px;">
+                <div class="engine-box-private">
                     <div style="font-size:14px;font-weight:700;color:#ef4444;margin-bottom:10px;">🔒 isomorphism-block-private-engine（私有内核）</div>
                     <ul style="margin:0;padding-left:18px;color:rgba(255,255,255,0.6);font-size:12px;line-height:2;">
                         <li>9大领域全部完整版原始详细推导文稿</li>
@@ -1715,7 +1809,7 @@
                     </ul>
                 </div>
             </div>
-            <div style="margin-top:14px;padding:12px 16px;background:rgba(99,102,241,0.08);border-left:3px solid #818cf8;border-radius:8px;font-size:12px;color:rgba(255,255,255,0.5);">
+            <div class="engine-linkage-note">
                 <strong style="color:#818cf8;">联动逻辑：</strong>公开页面仅做展示与基础结构演示；高精度量化运算、完整深度推演需要调用私有引擎数据包。缺失私有库时仅能做基础结构演示，无法商用落地。
             </div>
         </div>
@@ -1723,7 +1817,7 @@
         <!-- ===== 0.6兼容度熔断机制 ===== -->
         <div class="section">
             <h2>⚖️ 积木拼接风险浓度熔断 <span class="tag" style="background:rgba(239,68,68,0.15);color:#fca5a5;">C=0.6 红线</span></h2>
-            <div style="margin-top:12px;padding:14px 18px;background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.2);border-radius:10px;font-size:12px;color:rgba(255,255,255,0.6);line-height:1.9;">
+            <div class="fuse-rules">
                 <span style="color:#ef4444;font-weight:700;">🔴 熔断规则：</span>沿用全局 0.6 风险浓度阈值机制 —— 当两块积木（领域模组）拼接兼容度低于 0.6 时，系统红色告警拦截，禁止拼装通过。<br>
                 <span style="color:#facc15;font-weight:700;">🟡 兼容度计算：</span>接口匹配度 × 结构同构度 × 权重系数 = 兼容度C（精细权重与阈值参数位于私有引擎库，<strong>【私有引擎配置填充位】</strong>）。<br>
                 <span style="color:#22c55e;font-weight:700;">🟢 通过条件：</span>C ≥ 0.6 → 拼装通过，允许进入验证运行阶段；C &lt; 0.6 → 红色拦截，需重新拆解匹配。
