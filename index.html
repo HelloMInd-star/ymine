@@ -6,9 +6,17 @@
     <title>Y.Mine · 数理操作系统总控台</title>
     <link rel="stylesheet" href="assets/css/base.css?v=2">
     <link rel="stylesheet" href="assets/css/poker-egg.css?v=2">
-    <script src="assets/js/bus.js?v=2"></script>
-    <script src="assets/js/sidebar.js?v=2"></script>
-    <script src="assets/js/poker-egg.js?v=2"></script>
+    <script src="assets/js/bus.js?v=3"></script>
+    <script src="assets/js/sidebar.js?v=3"></script>
+    <script src="assets/js/poker-egg.js?v=3"></script>
+    <script src="models/common/normalizer.js?v=3"></script>
+    <script src="models/calc/calc-config.js?v=3"></script>
+    <script src="models/gamemind/gamemind-config.js?v=3"></script>
+    <script src="models/compute/compute-config.js?v=3"></script>
+    <script src="models/calc/calc-model.js?v=3"></script>
+    <script src="models/gamemind/gamemind-model.js?v=3"></script>
+    <script src="models/compute/compute-model.js?v=3"></script>
+    <script src="assets/js/triangle-audit.js?v=3"></script>
     <style>
 
         /* ===== 一休头像 ===== */
@@ -485,6 +493,62 @@
         }
         .container::before,.container::after{display:none;}
 
+        /* 阈值三色说明条 */
+        .threshold-bar{
+            display:flex;gap:14px;justify-content:center;flex-wrap:wrap;
+            margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.04);
+        }
+        .threshold-bar .th-item{display:flex;align-items:center;gap:6px;font-size:10px;font-family:'SF Mono',ui-monospace,monospace;}
+        .threshold-bar .th-dot{width:8px;height:8px;border-radius:50%;}
+        .threshold-bar .th-dot.green{background:#22c55e;box-shadow:0 0 8px rgba(34,197,94,0.4);}
+        .threshold-bar .th-dot.gold{background:#fbbf24;box-shadow:0 0 8px rgba(251,191,36,0.4);}
+        .threshold-bar .th-dot.red{background:#f87171;box-shadow:0 0 8px rgba(248,113,113,0.4);}
+
+        /* 审计状态指示器 */
+        .audit-status{
+            display:inline-flex;align-items:center;gap:6px;
+            font-size:10px;padding:3px 10px;border-radius:12px;
+            background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);color:#4ade80;
+        }
+        .audit-status.warn{background:rgba(251,191,36,0.08);border-color:rgba(251,191,36,0.2);color:#fbbf24;}
+        .audit-status.danger{background:rgba(248,113,113,0.08);border-color:rgba(248,113,113,0.2);color:#f87171;}
+        .audit-status .audit-dot{width:6px;height:6px;border-radius:50%;background:currentColor;animation:auditPulse 2s infinite;}
+        @keyframes auditPulse{0%,100%{opacity:1;}50%{opacity:0.3;}}
+
+        /* 三大心智品牌区 */
+        .mind-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px;}
+        .mind-card{
+            background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);
+            border-radius:14px;padding:20px;text-decoration:none;display:block;transition:all .3s;position:relative;overflow:hidden;
+        }
+        .mind-card:hover{transform:translateY(-3px);box-shadow:0 12px 32px rgba(0,0,0,0.3);}
+        .mind-card.gamemind{border-color:rgba(248,113,113,0.25);background:linear-gradient(135deg,rgba(248,113,113,0.08),rgba(0,0,0,0.1));}
+        .mind-card.gamemind:hover{border-color:rgba(248,113,113,0.5);}
+        .mind-card.moodmind{border-color:rgba(167,139,250,0.25);background:linear-gradient(135deg,rgba(167,139,250,0.08),rgba(0,0,0,0.1));}
+        .mind-card.moodmind:hover{border-color:rgba(167,139,250,0.5);}
+        .mind-card.evolvemind{border-color:rgba(34,211,238,0.25);background:linear-gradient(135deg,rgba(34,211,238,0.08),rgba(0,0,0,0.1));}
+        .mind-card.evolvemind:hover{border-color:rgba(34,211,238,0.5);}
+        .mind-card .micon{font-size:36px;margin-bottom:10px;display:block;}
+        .mind-card .mname{font-size:15px;font-weight:700;color:#f1f5f9;margin-bottom:4px;}
+        .mind-card .msub{font-size:11px;color:rgba(255,255,255,0.45);line-height:1.6;}
+        .mind-card .mrow{display:flex;align-items:center;justify-content:space-between;margin-top:12px;}
+        .mind-card .mtag{font-size:9px;padding:2px 8px;border-radius:4px;border:1px solid currentColor;background:rgba(0,0,0,0.2);color:inherit;}
+        .mind-card.gamemind .mtag{color:#fca5a5;}
+        .mind-card.moodmind .mtag{color:#c4b5fd;}
+        .mind-card.evolvemind .mtag{color:#67e8f9;}
+        .mind-card .marrow{font-size:18px;opacity:0.4;transition:all .3s;}
+        .mind-card:hover .marrow{opacity:1;transform:translateX(3px);}
+
+        /* 核心基座特性卡 */
+        .core-features{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px;}
+        .core-feat{
+            background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.05);
+            border-radius:8px;padding:10px 12px;font-size:10px;text-align:center;
+        }
+        .core-feat .cf-icon{font-size:18px;margin-bottom:4px;display:block;}
+        .core-feat .cf-label{color:rgba(255,255,255,0.5);font-weight:600;}
+        .core-feat .cf-desc{color:rgba(255,255,255,0.25);font-size:9px;margin-top:2px;}
+
         .dashboard-top{
             display:grid;
             grid-template-columns:auto 1fr auto;
@@ -877,166 +941,187 @@
                     </div>
                     <div class="dash-title">
                         <h1>Y.Mine 总控台</h1>
-                        <div class="sub">数理操作系统 · 机构级量化投研 · 三层刚性架构</div>
+                        <div class="sub">机构级量化投研 · 三角冗余审计 · 全域数据总线</div>
                     </div>
                 </div>
                 <div class="dash-stats">
-                    <div class="dash-stat"><div class="v green" id="statCore">0.6</div><div class="l">熔断基准</div></div>
-                    <div class="dash-stat"><div class="v" id="statLayers">11</div><div class="l">公理层数</div></div>
-                    <div class="dash-stat"><div class="v yellow" id="statSteps">10</div><div class="l">闭环步骤</div></div>
-                    <div class="dash-stat"><div class="v green" id="statFuse">OK</div><div class="l">熔断状态</div></div>
-                    <div class="dash-stat"><div class="v">5</div><div class="l">业务模块</div></div>
+                    <div class="dash-stat"><div class="v green" id="statCore">11</div><div class="l">公理</div></div>
+                    <div class="dash-stat"><div class="v" id="statLayers">10</div><div class="l">闭环</div></div>
+                    <div class="dash-stat"><div class="v yellow" id="statSteps">0.68</div><div class="l">熔断</div></div>
+                    <div class="dash-stat"><div class="v green" id="statFuse">5</div><div class="l">模块</div></div>
                 </div>
-                <div class="dash-ver">v2.1 · GAME-OS</div>
+                <div class="dash-ver">V2.1 · INSTITUTIONAL QUANT ENGINE</div>
             </div>
 
-            <!-- ===== 双主入口卡片 ===== -->
-            <div class="primary-grid">
-                <a href="game-os-main/total-index.html" class="primary-card gameos">
-                    <span class="picon">🏛️</span>
-                    <div class="pbody">
-                        <div class="ptitle">Game-OS 数理操作系统</div>
-                        <div class="psub">Core公理引擎锁死 · 统一API通道 · 业务模块完全解耦 · 三角冗余审计</div>
-                        <div class="ptags">
-                            <span class="ptag core">🧮 Core公理锁死</span>
-                            <span class="ptag api">🔌 API唯一通道</span>
-                            <span class="ptag fuse">🛡️ 0.6熔断</span>
+            <!-- 全局三色阈值说明 -->
+            <div class="threshold-bar">
+                <div class="th-item"><span class="th-dot green"></span><span>0.48 保本底线</span></div>
+                <div class="th-item"><span class="th-dot gold"></span><span>0.50 稳态中轴线</span></div>
+                <div class="th-item"><span class="th-dot red"></span><span>0.68 熔断警戒线</span></div>
+                <div class="audit-status" id="auditStatus"><span class="audit-dot"></span><span id="auditStatusText">三角审计待命</span></div>
+            </div>
+
+            <!-- ===== 第一板块：Game-OS 核心基座（最高权重）===== -->
+            <div class="section-group" style="margin-top:24px;">
+                <div class="section-label">🏛️ 第一板块 · Game-OS 核心基座</div>
+
+                <!-- 核心四特性：公理锁死·唯一API·三角审计·双引擎 -->
+                <div class="core-features">
+                    <div class="core-feat"><span class="cf-icon">🔒</span><div class="cf-label">公理锁死</div><div class="cf-desc">11条底层公理不可篡改</div></div>
+                    <div class="core-feat"><span class="cf-icon">🔌</span><div class="cf-label">唯一API</div><div class="cf-desc">统一总线读写通道</div></div>
+                    <div class="core-feat"><span class="cf-icon">🔺</span><div class="cf-label">三角冗余审计</div><div class="cf-desc">三模型并行±0.02校验</div></div>
+                    <div class="core-feat"><span class="cf-icon">⚡</span><div class="cf-label">双核心引擎</div><div class="cf-desc">认知画圈+几何算力</div></div>
+                </div>
+
+                <!-- 双主入口卡片 -->
+                <div class="primary-grid">
+                    <a href="game-os-main/total-index.html" class="primary-card gameos">
+                        <span class="picon">🏛️</span>
+                        <div class="pbody">
+                            <div class="ptitle">Game-OS 数理操作系统</div>
+                            <div class="psub">Core公理引擎锁死 · 统一API通道 · 业务模块完全解耦 · 三角冗余审计</div>
+                            <div class="ptags">
+                                <span class="ptag core">🧮 Core公理锁死</span>
+                                <span class="ptag api">🔌 API唯一通道</span>
+                                <span class="ptag fuse">🛡️ 0.68熔断</span>
+                            </div>
                         </div>
-                    </div>
-                    <span class="parrow">▶</span>
-                </a>
-                <a href="ymine-studio.html" class="primary-card engine">
-                    <span class="picon">⚡</span>
-                    <div class="pbody">
-                        <div class="ptitle">十步闭环量化引擎</div>
-                        <div class="psub">宏观海选→CAPM定价→动态K线→德州人性测试→对冲配置→返回总控</div>
-                        <div class="ptags">
-                            <span class="ptag kline">📈 动态K线</span>
-                            <span class="ptag poker">🃏 人性测试</span>
-                            <span class="ptag gate">🛡️ 熔断门控</span>
+                        <span class="parrow">▶</span>
+                    </a>
+                    <a href="ymine-studio.html" class="primary-card engine">
+                        <span class="picon">⚡</span>
+                        <div class="pbody">
+                            <div class="ptitle">十步闭环量化引擎</div>
+                            <div class="psub">宏观海选→信息清洗ETL→核心定价估值→沙盘决策推演→动态周期观测→人性偏差校验→熔断风控对冲→全局闭环同步</div>
+                            <div class="ptags">
+                                <span class="ptag kline">📈 动态K线</span>
+                                <span class="ptag poker">🃏 人性测试</span>
+                                <span class="ptag gate">🛡️ 熔断门控</span>
+                            </div>
                         </div>
+                        <span class="parrow">▶</span>
+                    </a>
+                </div>
+
+                <!-- 双核心引擎：认知画圈 + 几何算力底座 -->
+                <div class="mind-grid" style="grid-template-columns:1fr 1fr;">
+                    <a href="circle-lab.html" class="mind-card" style="border-color:rgba(34,211,238,0.25);background:linear-gradient(135deg,rgba(34,211,238,0.08),rgba(0,0,0,0.1));">
+                        <span class="micon">🧠</span>
+                        <div class="mname" style="color:#67e8f9;">认知画圈实验</div>
+                        <div class="msub">全域圈层稳态认知引擎 · 运动-认知耦合·3→1→1→3→100架构·圈层挤压仿真·偏差对照</div>
+                        <div class="mrow"><span class="mtag" style="color:#67e8f9;">核心数理引擎</span><span class="marrow" style="color:#67e8f9;">★</span></div>
+                    </a>
+                    <a href="geom-compute-base.html" class="mind-card" style="border-color:rgba(34,211,238,0.25);background:linear-gradient(135deg,rgba(34,211,238,0.08),rgba(0,0,0,0.1));">
+                        <span class="micon">🏗️</span>
+                        <div class="mname" style="color:#67e8f9;">几何心智算力底座</div>
+                        <div class="msub">全域大模型算力错峰调度 · V/S/L几何算力模型 · 0.48/0.5/0.68全局阈值 · 二进制硬件落地</div>
+                        <div class="mrow"><span class="mtag" style="color:#67e8f9;">底层物理基座</span><span class="marrow" style="color:#67e8f9;">★</span></div>
+                    </a>
+                </div>
+
+                <!-- 控制按钮：启动/停机 + 红蓝市场标签 -->
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:12px;">
+                    <div style="display:flex;gap:10px;">
+                        <button id="btnStartPipeline" class="lab-btn primary" style="background:linear-gradient(135deg,rgba(34,197,94,0.25),rgba(34,211,238,0.15));border-color:rgba(34,197,94,0.5);color:#4ade80;font-weight:600;">🚀 启动十步闭环</button>
+                        <button id="btnEmergencyStop" class="lab-btn" style="background:linear-gradient(135deg,rgba(239,68,68,0.2),rgba(248,113,113,0.1));border-color:rgba(239,68,68,0.4);color:#fca5a5;font-weight:600;">🛑 紧急停机</button>
                     </div>
-                    <span class="parrow">▶</span>
-                </a>
-            </div>
-
-            <!-- ===== Game-OS 四大业务模块快捷入口 ===== -->
-            <div class="section-label">📦 Game-OS · 上层业务模块</div>
-            <div class="biz-grid">
-                <a href="game-os-main/business-modules/wall-street-11step/index.html" class="biz-card wallstreet">
-                    <span class="bicon">📈</span>
-                    <div class="bname">华尔街11步</div>
-                    <div class="bdesc">量化投研·CAPM·蒙特卡洛·德州人性测试·熔断门控</div>
-                    <span class="bstatus live">引擎已上线</span>
-                </a>
-                <a href="game-os-main/business-modules/lowalt-economy/index.html" class="biz-card lowalt">
-                    <span class="bicon">🛩️</span>
-                    <div class="bname">低空经济</div>
-                    <div class="bdesc">无人机·通航·民航三方空域博弈·航线熔断·峰谷调度</div>
-                    <span class="bstatus soon">骨架就绪</span>
-                </a>
-                <a href="game-os-main/business-modules/mcn-valuation/index.html" class="biz-card mcn">
-                    <span class="bicon">🎬</span>
-                    <div class="bname">MCN非标估值</div>
-                    <div class="bdesc">网红IP·账号·合约定价·舆情熔断·签约分级审批</div>
-                    <span class="bstatus soon">骨架就绪</span>
-                </a>
-                <a href="game-os-main/business-modules/math-cognition/index.html" class="biz-card mathcog">
-                    <span class="bicon">🧮</span>
-                    <div class="bname">奥数认知映射</div>
-                    <div class="bdesc">语言→数学算法同构映射·知识点圈层·认知过载熔断</div>
-                    <span class="bstatus soon">骨架就绪</span>
-                </a>
-                <a href="circle-lab.html" class="biz-card circle">
-                    <span class="bicon">🧠</span>
-                    <div class="bname">认知画圈实验</div>
-                    <div class="bdesc">全域圈层稳态认知引擎 · 运动-认知耦合·3→1→1→3→100架构·圈层挤压仿真·偏差对照·轨迹采集</div>
-                    <span class="bstatus live">底层引擎已上线</span>
-                </a>
-            </div>
-
-            <!-- ===== 十步闭环流水线可视化 ===== -->
-            <div class="pipeline-bar">
-                <div class="pipeline-title">
-                    ⚡ 十步闭环引擎流水线
-                    <span class="pline"></span>
-                    <span style="font-size:9px;color:rgba(255,255,255,0.2);font-weight:400;letter-spacing:0.5px;">STEP 0 → STEP 9</span>
+                    <div style="display:flex;gap:10px;align-items:center;font-size:11px;">
+                        <span style="display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:8px;background:rgba(248,113,113,0.08);border:1px solid rgba(248,113,113,0.2);color:#fca5a5;"><span style="width:8px;height:8px;border-radius:50%;background:#f87171;box-shadow:0 0 8px rgba(248,113,113,0.5);"></span>🔴 红海存量</span>
+                        <span style="display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:8px;background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.2);color:#93c5fd;"><span style="width:8px;height:8px;border-radius:50%;background:#3b82f6;box-shadow:0 0 8px rgba(59,130,246,0.5);"></span>🔵 蓝海增量</span>
+                    </div>
                 </div>
-                <div class="pipeline-steps">
-                    <a href="ymine-studio.html" class="pipe-step"><span class="pnum">S0</span><span class="pico">🌊</span><span class="plabel">宏观海选</span></a>
-                    <span class="pipe-arrow">→</span>
-                    <a href="ymine-studio.html" class="pipe-step"><span class="pnum">S1</span><span class="pico">📥</span><span class="plabel">信息摄入</span></a>
-                    <span class="pipe-arrow">→</span>
-                    <a href="ymine-studio.html" class="pipe-step"><span class="pnum">S2</span><span class="pico">⚗️</span><span class="plabel">数据ETL</span></a>
-                    <span class="pipe-arrow">→</span>
-                    <a href="ymine-studio.html" class="pipe-step"><span class="pnum">S3</span><span class="pico">⚖️</span><span class="plabel">核心定价</span></a>
-                    <span class="pipe-arrow hot">⇢</span>
-                    <a href="ymine-studio.html" class="pipe-step hot"><span class="pnum">S4</span><span class="pico">📐</span><span class="plabel">估值计算</span></a>
-                    <span class="pipe-arrow hot">⇢</span>
-                    <a href="ymine-studio.html" class="pipe-step hot"><span class="pnum">S5</span><span class="pico">🔮</span><span class="plabel">决策推演</span></a>
-                    <span class="pipe-arrow hot">→</span>
-                    <a href="ymine-studio.html" class="pipe-step hot"><span class="pnum">S6</span><span class="pico">📈</span><span class="plabel">动态K线</span></a>
-                    <span class="pipe-arrow hot">→</span>
-                    <a href="ymine-studio.html" class="pipe-step hot"><span class="pnum">S7</span><span class="pico">🃏</span><span class="plabel">人性测试</span></a>
-                    <span class="pipe-arrow hot">→</span>
-                    <a href="ymine-studio.html" class="pipe-step hot"><span class="pnum">S8</span><span class="pico">🛡️</span><span class="plabel">对冲配置</span></a>
-                    <span class="pipe-arrow hot">→</span>
-                    <a href="ymine-studio.html" class="pipe-step hot"><span class="pnum">S9</span><span class="pico">🏛️</span><span class="plabel">返回总控</span></a>
+
+                <!-- 十步闭环流水线 -->
+                <div class="pipeline-bar">
+                    <div class="pipeline-title">
+                        ⚡ 十步闭环引擎流水线
+                        <span class="pline"></span>
+                        <span style="font-size:9px;color:rgba(255,255,255,0.2);font-weight:400;letter-spacing:0.5px;">S0 → S9 完整闭环</span>
+                    </div>
+                    <div class="pipeline-steps" style="grid-template-columns:repeat(10,1fr);">
+                        <a href="ymine-studio.html" class="pipe-step"><span class="pnum">S0</span><span class="pico">🌊</span><span class="plabel">宏观海选</span></a>
+                        <span class="pipe-arrow">→</span>
+                        <a href="ymine-studio.html" class="pipe-step"><span class="pnum">S1</span><span class="pico">🧹</span><span class="plabel">信息清洗ETL</span></a>
+                        <span class="pipe-arrow">→</span>
+                        <a href="ymine-studio.html" class="pipe-step"><span class="pnum">S2</span><span class="pico">⚖️</span><span class="plabel">核心定价估值</span></a>
+                        <span class="pipe-arrow">→</span>
+                        <a href="ymine-studio.html" class="pipe-step"><span class="pnum">S3</span><span class="pico">🔮</span><span class="plabel">沙盘决策推演</span></a>
+                        <span class="pipe-arrow">→</span>
+                        <a href="ymine-studio.html" class="pipe-step"><span class="pnum">S4</span><span class="pico">📈</span><span class="plabel">动态周期观测</span></a>
+                        <span class="pipe-arrow">→</span>
+                        <a href="ymine-studio.html" class="pipe-step"><span class="pnum">S5</span><span class="pico">🧠</span><span class="plabel">人性偏差校验</span></a>
+                        <span class="pipe-arrow hot">⇢</span>
+                        <a href="ymine-studio.html" class="pipe-step hot"><span class="pnum">S6</span><span class="pico">🔧</span><span class="plabel">人工调参确认</span></a>
+                        <span class="pipe-arrow hot">⇢</span>
+                        <a href="ymine-studio.html" class="pipe-step hot"><span class="pnum">S7</span><span class="pico">🔍</span><span class="plabel">审计复核</span></a>
+                        <span class="pipe-arrow hot">⇢</span>
+                        <a href="ymine-studio.html" class="pipe-step hot"><span class="pnum">S8</span><span class="pico">🛡️</span><span class="plabel">熔断风控对冲</span></a>
+                        <span class="pipe-arrow hot">⇢</span>
+                        <a href="#top" class="pipe-step hot" id="pipeStepS9"><span class="pnum">S9</span><span class="pico">🔄</span><span class="plabel">返回总控台 · 全局数据同步闭环出口</span></a>
+                    </div>
+                    <div class="pipeline-note"><strong style="color:#22d3ee;">S0–S4：机器自动化数据流水线</strong> &nbsp;·&nbsp; <strong style="color:#fbbf24;">S5–S8：人工可调参决策驾驶舱</strong> &nbsp;·&nbsp; <strong style="color:#f87171;">S9：全局数据同步闭环出口（审计 + 总线分发 + 归档）</strong></div>
                 </div>
-                <div class="pipeline-note">前半段(S0-S4)机器流水线 → 后半段(S5-S8)人类驾驶舱 → S9闭环返回EngineOutput · localStorage数据总线跨页同步</div>
             </div>
 
-            <!-- ===== 经典工具导航 ===== -->
+            <!-- ===== 第二板块：三大心智个人品牌引擎 ===== -->
             <div class="section-group">
-                <div class="section-label">🧮 精算系统工具</div>
-                <div class="nav-grid">
-                    <a href="info-funnel.html" class="nav-card">
-                        <span class="icon">🔭</span> 信息漏斗 · 七层前置筛选
-                        <span class="arrow">→</span>
+                <div class="section-label">🧬 第二板块 · 三大心智个人品牌引擎</div>
+                <div class="mind-grid">
+                    <a href="gamemind.html" class="mind-card gamemind">
+                        <span class="micon">🎯</span>
+                        <div class="mname">GameMind 博弈底座</div>
+                        <div class="msub">纳什均衡 · 红蓝市场博弈 · 策略迭代 · 多方竞争演化模型</div>
+                        <div class="mrow"><span class="mtag">博弈论引擎</span><span class="marrow">→</span></div>
                     </a>
-                    <a href="ymine-studio.html" class="nav-card hot">
-                        <span class="icon">🏛️</span> 投资工作室 · 十步闭环
-                        <span class="arrow">★</span>
+                    <a href="moodmind.html" class="mind-card moodmind">
+                        <span class="micon">📊</span>
+                        <div class="mname">MoodMind 非标估值</div>
+                        <div class="msub">情绪资产定价 · 品牌情绪浓度 · 非标资产估值模型 · 舆情熔断</div>
+                        <div class="mrow"><span class="mtag">非标估值引擎</span><span class="marrow">→</span></div>
                     </a>
-                    <a href="ai-pricing-benchmark.html" class="nav-card">
-                        <span class="icon">📡</span> AI定价基准库
-                        <span class="arrow">→</span>
-                    </a>
-                    <a href="case-library.html" class="nav-card">
-                        <span class="icon">🗂️</span> 案例向量库
-                        <span class="arrow">→</span>
-                    </a>
-                    <a href="funnel-penetration.html" class="nav-card warn">
-                        <span class="icon">🎰</span> 七层漏斗上帝视角演示
-                        <span class="arrow">→</span>
+                    <a href="evolvemind.html" class="mind-card evolvemind">
+                        <span class="micon">🧠</span>
+                        <div class="mname">EvolveMind 认知演化</div>
+                        <div class="msub">多层认知叠加 · 认知升级路径 · 思维演化模型 · 知识转译链路</div>
+                        <div class="mrow"><span class="mtag">认知演化引擎</span><span class="marrow">→</span></div>
                     </a>
                 </div>
             </div>
 
+            <!-- ===== 第三板块：上层落地业务模块 ===== -->
             <div class="section-group">
-                <div class="section-label">⚙️ 核心方法论系统</div>
-                <div class="nav-grid">
-                    <a href="circle-lab.html" class="nav-card hot">
-                        <span class="icon">🧠</span> 认知画圈实验 · 全域圈层稳态引擎
-                        <span class="arrow">★</span>
+                <div class="section-label">📦 第三板块 · 上层落地业务模块</div>
+                <div class="biz-grid">
+                    <a href="game-os-main/business-modules/wall-street-11step/index.html" class="biz-card wallstreet">
+                        <span class="bicon">📈</span>
+                        <div class="bname">量化投研</div>
+                        <div class="bdesc">华尔街11步·CAPM·蒙特卡洛·人性测试·熔断门控</div>
+                        <span class="bstatus live">引擎已上线</span>
                     </a>
-                    <a href="gamemind.html" class="nav-card">
-                        <span class="icon">🎯</span> GameMind · 博弈论底座
-                        <span class="arrow">→</span>
+                    <a href="game-os-main/business-modules/lowalt-economy/index.html" class="biz-card lowalt">
+                        <span class="bicon">🛩️</span>
+                        <div class="bname">低空经济</div>
+                        <div class="bdesc">无人机·通航·民航三方空域博弈·航线熔断·峰谷调度</div>
+                        <span class="bstatus soon">骨架就绪</span>
                     </a>
-                    <a href="moodmind.html" class="nav-card">
-                        <span class="icon">📊</span> MoodMind · 非标资产估值
-                        <span class="arrow">→</span>
+                    <a href="game-os-main/business-modules/mcn-valuation/index.html" class="biz-card mcn">
+                        <span class="bicon">🎬</span>
+                        <div class="bname">MCN估值</div>
+                        <div class="bdesc">网红IP·账号·合约定价·舆情熔断·签约分级审批</div>
+                        <span class="bstatus soon">骨架就绪</span>
                     </a>
-                    <a href="evolvemind.html" class="nav-card">
-                        <span class="icon">🧠</span> EvolveMind · 进阶思维认知
-                        <span class="arrow">→</span>
+                    <a href="game-os-main/business-modules/math-cognition/index.html" class="biz-card mathcog">
+                        <span class="bicon">🧮</span>
+                        <div class="bname">奥数认知映射</div>
+                        <div class="bdesc">语言→数学算法同构映射·知识点圈层·认知过载熔断</div>
+                        <span class="bstatus soon">骨架就绪</span>
                     </a>
                 </div>
             </div>
 
+            <!-- ===== 第四板块：认知科研实验组 ===== -->
             <div class="section-group">
-                <div class="section-label">🔬 认知科研实验组</div>
+                <div class="section-label">🔬 第四板块 · 认知科研实验组</div>
                 <div class="nav-grid">
                     <a href="geom-compute-base.html" class="nav-card cyan hot">
                         <span class="icon">🏗️</span> 几何心智空间・全域大模型算力错峰调度与二进制底层执行底座
@@ -1069,19 +1154,43 @@
                 </div>
             </div>
 
+            <!-- ===== 第五板块：精算工具链 ===== -->
             <div class="section-group">
-                <div class="section-label">🛠️ 应用工具</div>
+                <div class="section-label">🧮 第五板块 · 精算工具链</div>
+                <div class="nav-grid">
+                    <a href="info-funnel.html" class="nav-card">
+                        <span class="icon">🔭</span> 信息漏斗 · 七层前置筛选
+                        <span class="arrow">→</span>
+                    </a>
+                    <a href="ymine-studio.html" class="nav-card hot">
+                        <span class="icon">🏛️</span> 投资工作室 · 十步闭环
+                        <span class="arrow">★</span>
+                    </a>
+                    <a href="ai-pricing-benchmark.html" class="nav-card">
+                        <span class="icon">📡</span> AI定价基准库
+                        <span class="arrow">→</span>
+                    </a>
+                    <a href="case-library.html" class="nav-card">
+                        <span class="icon">🗂️</span> 案例向量库
+                        <span class="arrow">→</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- ===== 第六板块：通用应用工具 ===== -->
+            <div class="section-group">
+                <div class="section-label">🛠️ 第六板块 · 通用应用工具</div>
                 <div class="nav-grid">
                     <a href="language-mapping-evidence.html" class="nav-card">
                         <span class="icon">🌐</span> 语言映射 · 结构化学习验证
                         <span class="arrow">→</span>
                     </a>
-                    <a href="general-game-os.html" class="nav-card">
-                        <span class="icon">🚁</span> 低空经济 · 完整架构演示
-                        <span class="arrow">→</span>
-                    </a>
                     <a href="binary-solver.html" class="nav-card">
                         <span class="icon">🧩</span> 二元拆分解题器
+                        <span class="arrow">→</span>
+                    </a>
+                    <a href="funnel-penetration.html" class="nav-card warn">
+                        <span class="icon">🎰</span> 七层漏斗上帝视角演示
                         <span class="arrow">→</span>
                     </a>
                     <a href="ultimate-sandbox.html" class="nav-card cyan">
@@ -1173,7 +1282,7 @@
             </style>
 
             <div class="section-group lab-section">
-                <div class="section-label">🧪 实验实验室 · 29项控制论/认知/博弈/信道实验</div>
+                <div class="section-label">🧪 第七板块 · 29项仿真实验室</div>
                 <div class="lab-intro">
                     <strong style="color:rgba(255,255,255,0.7);">📐 全局阈值体系：</strong>所有实验共享统一安全阈值 — 数值轴均归一化至 [0,1] 区间
                     <div class="threshold-legend">

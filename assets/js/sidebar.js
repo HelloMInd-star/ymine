@@ -1,5 +1,5 @@
 /**
- * Y.Mine 侧边栏渲染 v2.0
+ * Y.Mine 侧边栏渲染 v2.1
  * JSON配置驱动的侧边栏动态渲染 + 鼠标跟随光晕效果
  * @namespace YSidebar
  */

@@ -85,7 +85,7 @@
         .health-dot { width: 8px; height: 8px; border-radius: 50%; background: #22c55e; box-shadow: 0 0 8px #22c55e; }
 
         .pipeline-grid {
-            display: grid; grid-template-columns: repeat(10, 1fr); gap: 6px;
+            display: grid; grid-template-columns: repeat(8, 1fr); gap: 6px;
             margin-bottom: 16px; position: relative; z-index: 2;
         }
         .pipeline-step {
@@ -117,14 +117,14 @@
             border-color: rgba(239,68,68,0.5); animation: pulseRed 1s ease-in-out infinite;
         }
         .pipeline-step.halted .step-name { color: #fca5a5; }
-        #step-9.completed {
+        #step-7.completed {
             background: linear-gradient(135deg, rgba(139,92,246,0.25), rgba(59,130,246,0.15));
             border-color: rgba(139,92,246,0.6);
             box-shadow: 0 0 20px rgba(139,92,246,0.4);
             animation: pulsePurple 2s ease-in-out infinite;
         }
-        #step-9.completed .step-name { color: #c4b5fd; font-weight: 700; }
-        #step-9.active {
+        #step-7.completed .step-name { color: #c4b5fd; font-weight: 700; }
+        #step-7.active {
             background: linear-gradient(135deg, rgba(139,92,246,0.2), rgba(59,130,246,0.1));
             border-color: rgba(139,92,246,0.5);
             animation: pulsePurple 0.8s ease-in-out infinite;
@@ -279,9 +279,9 @@
                 <a href="game-os-main/business-modules/wall-street-11step/index.html">🏛️ Game-OS · 华尔街11步</a>
             </div>
             <div class="studio-header">
-                <div class="badge">v2.0 · Institutional Quant Engine</div>
+                <div class="badge">V2.1 · INSTITUTIONAL QUANT ENGINE</div>
                 <h1>机构级量化投研 · 十步闭环引擎</h1>
-                <div class="sub">宏观海选 → 因子提取 → 核心定价 → 沙盘推演 → 人性测试 → 熔断门控 → 最终执行</div>
+                <div class="sub">宏观海选 → 信息清洗ETL → 核心定价估值 → 沙盘决策推演 → 动态周期观测 → 人性偏差校验 → 熔断风控对冲 → 全局闭环同步</div>
             </div>
 
             <div class="control-bar">
@@ -322,15 +322,13 @@
 (function() {
     const STEPS = [
         { id: 0, icon: '🌊', name: '宏观海选' },
-        { id: 1, icon: '📥', name: '信息摄入' },
-        { id: 2, icon: '⚗️', name: '数据ETL' },
-        { id: 3, icon: '⚖️', name: '核心定价' },
-        { id: 4, icon: '📐', name: '估值计算' },
-        { id: 5, icon: '🔮', name: '决策推演' },
-        { id: 6, icon: '📈', name: '动态K线' },
-        { id: 7, icon: '🃏', name: '人性测试' },
-        { id: 8, icon: '🛡️', name: '对冲配置' },
-        { id: 9, icon: '🏛️', name: '返回总控' }
+        { id: 1, icon: '🧹', name: '信息清洗ETL' },
+        { id: 2, icon: '⚖️', name: '核心定价估值' },
+        { id: 3, icon: '🔮', name: '沙盘决策推演' },
+        { id: 4, icon: '📈', name: '动态周期观测' },
+        { id: 5, icon: '🧠', name: '人性偏差校验' },
+        { id: 6, icon: '🛡️', name: '熔断风控对冲' },
+        { id: 7, icon: '🔄', name: '全局闭环同步' }
     ];
 
     let currentRegime = 'RED_OCEAN';
@@ -668,7 +666,7 @@
             const isHalted = execRisk.halted || enforcedPos === 0;
             const sigClass = sigDir === 'BUY' ? 'buy' : (sigDir === 'SELL' ? 'sell' : 'hold');
             const sigText = sigDir === 'BUY' ? '📈 买入' : (sigDir === 'SELL' ? '🔴 卖出' : '⏸ 持有');
-            html += '<div class="card card-wide"><div class="card-title"><span class="dot" style="background:' + (isHalted ? '#ef4444' : '#22c55e') + '"></span>🛡️ Step 8 · 最终执行指令（熔断门控后）</div>';
+            html += '<div class="card card-wide"><div class="card-title"><span class="dot" style="background:' + (isHalted ? '#ef4444' : '#22c55e') + '"></span>🛡️ Step 6 · 熔断风控对冲</div>';
             html += '<div class="execution-panel' + (isHalted ? ' halted' : '') + '">';
             html += '<div class="exec-header"><div class="exec-signal ' + sigClass + '">' + sigText + '</div>';
             html += '<div class="exec-pos"><div class="exec-pos-label">实际仓位（熔断后）</div>';
@@ -707,7 +705,7 @@
             html += '</div>';
             html += '</div></div>';
         } else {
-            html += '<div class="card card-wide"><div class="card-title"><span class="dot" style="background:#22c55e"></span>🛡️ Step 8 · 最终执行指令</div><div class="placeholder" style="padding:20px;font-size:11px;">等待执行...</div></div>';
+            html += '<div class="card card-wide"><div class="card-title"><span class="dot" style="background:#22c55e"></span>🛡️ Step 6 · 熔断风控对冲</div><div class="placeholder" style="padding:20px;font-size:11px;">等待执行...</div></div>';
         }
 
         const eo = results.engineOutput;
@@ -728,7 +726,7 @@
             };
             const act = actionMap[eoLb.recommendedAction] || actionMap['WAIT_AND_OBSERVE'];
             html += '<div class="card card-wide" style="border-color:' + statusColor + '40;background:linear-gradient(135deg,rgba(0,0,0,0.4),rgba(' + (isHalted?'239,68,68':'34,197,94') + ',0.08));">';
-            html += '<div class="card-title"><span class="dot" style="background:' + statusColor + ';box-shadow:0 0 12px ' + statusColor + ';"></span>🏛️ Step 9 · 总控回执（Loopback）</div>';
+            html += '<div class="card-title"><span class="dot" style="background:' + statusColor + ';box-shadow:0 0 12px ' + statusColor + ';"></span>🔄 Step 7 · 返回总控台 · 全局数据同步闭环出口</div>';
             html += '<div class="exec-header" style="margin-bottom:10px;">';
             html += '<div class="exec-signal ' + (isHalted?'sell':'hold') + '" style="font-size:13px;">' + statusText + '</div>';
             html += '<div style="text-align:right;"><div style="font-size:10px;opacity:0.5;">Pipeline ID</div><div style="font-size:10px;font-family:monospace;opacity:0.7;">' + safeStr(eo.pipelineId, '-') + '</div></div>';
@@ -765,7 +763,7 @@
             html += '</div>';
             html += '</div>';
         } else if (exec && !results.engineOutput) {
-            html += '<div class="card card-wide" style="opacity:0.4;"><div class="card-title"><span class="dot" style="background:#6b7280;"></span>🏛️ Step 9 · 返回总控</div><div class="placeholder" style="padding:16px;font-size:11px;">正在汇总结果返回总控...</div></div>';
+            html += '<div class="card card-wide" style="opacity:0.4;"><div class="card-title"><span class="dot" style="background:#6b7280;"></span>🔄 Step 7 · 全局数据同步闭环出口</div><div class="placeholder" style="padding:16px;font-size:11px;">三角冗余审计中...审计通过后同步至全局总线</div></div>';
         }
 
         area.innerHTML = html;
@@ -916,13 +914,13 @@
             };
 
             results.engineOutput = engineOutput;
-            setStepStatus(9, 'active');
+            setStepStatus(7, 'active');
             YBus.publish('engineOutput', engineOutput);
             await new Promise(function(r) { setTimeout(r, 200); });
-            setStepStatus(9, 'completed');
+            setStepStatus(7, 'completed');
 
             const finalHalted = !!(execOrder.riskStatus && execOrder.riskStatus.halted);
-            setHealth(finalHalted ? 'halted' : 'ok', finalHalted ? '🚨 熔断已触发·返回总控' : '✅ 闭环完成·返回总控');
+            setHealth(finalHalted ? 'halted' : 'ok', finalHalted ? '🚨 熔断已触发·全局同步出口' : '✅ 闭环完成·全局数据同步');
             renderContent();
         } catch (e) {
             console.error(e);

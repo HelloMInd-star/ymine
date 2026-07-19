@@ -12,15 +12,15 @@
     'use strict';
 
     var STEPS = [
-        { id: 0, name: '宏观漏斗与海选', icon: '🌊', channel: 'macroFunnel' },
-        { id: 1, name: '信息摄入', icon: '📥', channel: null },
-        { id: 2, name: '数据ETL', icon: '⚗️', channel: 'factorLibrary' },
-        { id: 3, name: '核心定价', icon: '⚖️', channel: null },
-        { id: 4, name: '估值计算', icon: '📐', channel: 'valuationV2' },
-        { id: 5, name: '决策推演', icon: '🔮', channel: null },
-        { id: 6, name: '动态K线', icon: '📈', channel: 'simulationResult' },
-        { id: 7, name: '人性压力测试', icon: '🃏', channel: 'rationalityScore' },
-        { id: 8, name: '动态对冲配置', icon: '🛡️', channel: 'executionOrder' }
+        { id: 0, name: '宏观海选', icon: '🌊', channel: 'macroFunnel' },
+        { id: 1, name: '信息清洗ETL', icon: '🧹', channel: null },
+        { id: 2, name: '信息清洗ETL', icon: '⚗️', channel: 'factorLibrary' },
+        { id: 3, name: '核心定价估值', icon: '⚖️', channel: null },
+        { id: 4, name: '核心定价估值', icon: '📐', channel: 'valuationV2' },
+        { id: 5, name: '沙盘决策推演', icon: '🔮', channel: null },
+        { id: 6, name: '动态周期观测', icon: '📈', channel: 'simulationResult' },
+        { id: 7, name: '人性偏差校验', icon: '🧠', channel: 'rationalityScore' },
+        { id: 8, name: '熔断风控对冲', icon: '🛡️', channel: 'executionOrder' }
     ];
 
     var PRESET_ASSETS = [
