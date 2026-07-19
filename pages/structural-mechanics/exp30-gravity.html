@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>#30 万有引力多构型物体受力均衡变速仿真实验</title>
+    <link rel="stylesheet" href="../../assets/css/base.css">
+    <script src="../../assets/js/bus.js"></script>
+    <style>
+        body{background:#05030a;min-height:100vh;}
+        body.layout-fixed{padding-left:0;}
+        .wrap{max-width:1180px;margin:0 auto;padding:40px 28px 60px;}
+        .container{
+            background:radial-gradient(ellipse at 30% 20%,#120b24,#0b0b1a 70%,#05030a);
+            border-radius:28px;padding:44px 44px 36px;border:1px solid rgba(255,255,255,0.06);
+            box-shadow:0 30px 80px rgba(40,10,80,0.4);position:relative;overflow:hidden;
+        }
+        .header{text-align:center;margin-bottom:14px;opacity:0;animation:fadeInUp 0.8s ease forwards;}
+        .badge{display:inline-block;background:rgba(34,211,238,0.08);border:1px solid rgba(34,211,238,0.2);color:rgba(34,211,238,0.8);font-size:12px;padding:4px 16px;border-radius:20px;letter-spacing:0.5px;margin-bottom:12px;font-weight:600;}
+        .header h1{font-size:26px;font-weight:700;color:#f1f5f9;letter-spacing:-0.3px;background:linear-gradient(135deg,#f1f5f9,#22d3ee,#60a5fa,#f1f5f9);background-size:300% 300%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:gradientFlow 6s ease-in-out infinite;margin:0;}
+        .header .sub{font-size:14px;color:rgba(255,255,255,0.35);font-weight:300;margin-top:6px;}
+        .breadcrumb{display:flex;align-items:center;gap:7px;font-size:11px;color:rgba(255,255,255,0.3);margin-bottom:18px;flex-wrap:wrap;}
+        .breadcrumb a{color:rgba(255,255,255,0.4);text-decoration:none;transition:color .2s;}
+        .breadcrumb a:hover{color:#67e8f9;}
+        .breadcrumb .sep{color:rgba(255,255,255,0.12);}
+        .breadcrumb .cur{color:#22d3ee;font-weight:600;}
+        .meta-bar{display:flex;justify-content:center;gap:18px;flex-wrap:wrap;margin:10px 0 18px;font-size:11px;color:rgba(255,255,255,0.3);}
+        .meta-bar span{display:inline-flex;align-items:center;gap:5px;}
+        .meta-bar .v{color:#22d3ee;font-family:'SF Mono',monospace;font-weight:600;}
+        .th-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:14px 0 20px;}
+        .th-item{padding:12px;border-radius:10px;text-align:center;border:1px solid;}
+        .th-item.g{background:rgba(34,197,94,0.05);border-color:rgba(34,197,94,0.2);}
+        .th-item.c{background:rgba(34,211,238,0.05);border-color:rgba(34,211,238,0.2);}
+        .th-item.y{background:rgba(250,204,21,0.05);border-color:rgba(250,204,21,0.2);}
+        .th-item.r{background:rgba(248,113,113,0.05);border-color:rgba(248,113,113,0.2);}
+        .th-item .tv{font-size:22px;font-weight:700;font-family:'SF Mono',monospace;}
+        .th-item.g .tv{color:#4ade80;} .th-item.c .tv{color:#22d3ee;}
+        .th-item.y .tv{color:#facc15;} .th-item.r .tv{color:#f87171;}
+        .th-item .tl{font-size:10px;color:rgba(255,255,255,0.3);margin-top:3px;}
+        .sec{margin-bottom:28px;opacity:0;animation:fadeInUp 0.6s ease forwards;}
+        .sec:nth-child(odd){animation-delay:.05s;} .sec:nth-child(even){animation-delay:.1s;}
+        .sec h2{font-size:18px;font-weight:700;color:#f1f5f9;margin:0 0 10px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+        .sec h2 .tag{font-size:10px;font-weight:600;color:#22d3ee;background:rgba(34,211,238,0.1);padding:2px 10px;border-radius:20px;}
+        .sec p{color:rgba(255,255,255,0.55);font-size:13px;line-height:1.8;margin:0 0 8px;}
+        .sec p strong{color:rgba(255,255,255,0.8);}
+        .sec p .c{color:#22d3ee;font-weight:600;} .sec p .g{color:#4ade80;font-weight:600;}
+        .sec p .y{color:#facc15;font-weight:600;} .sec p .r{color:#f87171;font-weight:600;}
+        .sec p .p{color:#c4b5fd;font-weight:600;}
+        .hbox{background:rgba(34,211,238,0.04);border:1px solid rgba(34,211,238,0.12);border-radius:10px;padding:14px 18px;margin:10px 0;}
+        .hbox.g{background:rgba(34,197,94,0.04);border-color:rgba(34,197,94,0.15);}
+        .hbox.y{background:rgba(250,204,21,0.04);border-color:rgba(250,204,21,0.15);}
+        .hbox.p{background:rgba(167,139,250,0.04);border-color:rgba(167,139,250,0.15);}
+        .hbox p{margin-bottom:4px;}
+        .sim-panel{background:linear-gradient(135deg,rgba(34,211,238,0.05),rgba(59,130,246,0.04));border:1.5px solid rgba(34,211,238,0.2);border-radius:16px;padding:22px 24px;margin:16px 0;}
+        .sim-panel .sp-t{font-size:17px;font-weight:700;color:#67e8f9;display:flex;align-items:center;gap:8px;margin-bottom:4px;}
+        .sim-panel .sp-s{font-size:12px;color:rgba(255,255,255,0.35);margin-bottom:14px;line-height:1.5;}
+        .env-row,.mod-row{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;}
+        .env-btn,.mod-btn{padding:8px 16px;border-radius:10px;cursor:pointer;font-size:12px;font-weight:600;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);color:rgba(255,255,255,0.45);transition:all .25s;display:inline-flex;align-items:center;gap:6px;}
+        .env-btn:hover,.mod-btn:hover{border-color:rgba(34,211,238,0.3);color:rgba(255,255,255,0.75);}
+        .env-btn.on{background:rgba(34,211,238,0.12);border-color:rgba(34,211,238,0.45);color:#67e8f9;box-shadow:0 0 16px rgba(34,211,238,0.12);}
+        .env-btn.vac.on{background:rgba(167,139,250,0.12);border-color:rgba(167,139,250,0.45);color:#c4b5fd;box-shadow:0 0 16px rgba(167,139,250,0.12);}
+        .mod-btn.on{background:rgba(34,211,238,0.1);border-color:rgba(34,211,238,0.4);color:#67e8f9;}
+        .canvas-wrap{position:relative;width:100%;height:440px;margin:12px 0;background:linear-gradient(180deg,#0a0a1a 0%,#0f1a2e 40%,#1a2744 100%);border-radius:12px;border:1px solid rgba(255,255,255,0.05);overflow:hidden;}
+        .canvas-wrap.atm{background:linear-gradient(180deg,#050510 0%,#0d1525 30%,#1a2d4a 60%,#2d4a6e 100%);}
+        .canvas-wrap canvas{width:100%;height:100%;display:block;}
+        .c-ov{position:absolute;top:10px;left:10px;right:10px;display:flex;justify-content:space-between;pointer-events:none;z-index:5;}
+        .c-label{padding:5px 10px;border-radius:6px;font-size:10px;font-weight:600;background:rgba(0,0,0,0.5);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,0.1);}
+        .c-label.v{color:#c4b5fd;border-color:rgba(167,139,250,0.3);}
+        .c-label.a{color:#67e8f9;border-color:rgba(34,211,238,0.3);}
+        .c-h{padding:5px 10px;border-radius:6px;font-size:10px;font-family:'SF Mono',monospace;background:rgba(0,0,0,0.5);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.6);}
+        .c-legend{position:absolute;bottom:8px;left:10px;display:flex;gap:10px;flex-wrap:wrap;pointer-events:none;z-index:5;}
+        .c-legend .li{display:flex;align-items:center;gap:4px;font-size:9px;color:rgba(255,255,255,0.35);}
+        .c-legend .dot{width:7px;height:7px;border-radius:50%;}
+        .data-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:14px 0;}
+        .dc{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.05);border-radius:10px;padding:12px;text-align:center;position:relative;overflow:hidden;}
+        .dc::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--cc,#22d3ee);opacity:0.7;}
+        .dc.g{--cc:#4ade80;} .dc.y{--cc:#facc15;} .dc.r{--cc:#f87171;} .dc.c{--cc:#22d3ee;}
+        .dc .dl{font-size:9px;color:rgba(255,255,255,0.25);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;}
+        .dc .dv{font-size:22px;font-weight:700;font-family:'SF Mono',monospace;color:#f1f5f9;transition:color .3s;}
+        .dc.g .dv{color:#4ade80;} .dc.y .dv{color:#facc15;}
+        .dc.r .dv{color:#f87171;animation:pulseD 1s infinite;} .dc.c .dv{color:#22d3ee;}
+        .dc .db{height:3px;background:rgba(255,255,255,0.05);border-radius:2px;margin-top:6px;overflow:hidden;}
+        .dc .db-f{height:100%;border-radius:2px;transition:width .3s,background .3s;background:var(--cc,#22d3ee);}
+        @keyframes pulseD{0%,100%{opacity:1}50%{opacity:0.5}}
+        .status{display:flex;align-items:center;gap:10px;padding:10px 16px;border-radius:10px;font-size:12px;font-weight:600;transition:all .3s;}
+        .status.safe{background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);color:#4ade80;}
+        .status.warn{background:rgba(250,204,21,0.08);border:1px solid rgba(250,204,21,0.2);color:#facc15;}
+        .status.danger{background:rgba(248,113,113,0.08);border:1px solid rgba(248,113,113,0.2);color:#f87171;animation:pulseD 1.5s infinite;}
+        .status .si{font-size:18px;}
+        .ctrl-row{display:flex;gap:10px;margin:12px 0 0;flex-wrap:wrap;}
+        .c-btn{padding:8px 18px;border-radius:8px;cursor:pointer;font-size:12px;font-weight:600;transition:all .2s;}
+        .c-btn.go{background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.3);color:#4ade80;}
+        .c-btn.go:hover{background:rgba(34,197,94,0.18);}
+        .c-btn.pause{background:rgba(250,204,21,0.08);border:1px solid rgba(250,204,21,0.25);color:#facc15;}
+        .c-btn.pause:hover{background:rgba(250,204,21,0.15);}
+        .c-btn.rst{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.5);}
+        .c-btn.rst:hover{background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.8);}
+        .grp-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:14px 0;}
+        .grp{background:rgba(255,255,255,0.015);border:1px solid rgba(255,255,255,0.05);border-radius:10px;padding:14px 16px;cursor:pointer;transition:all .25s;}
+        .grp:hover{border-color:rgba(34,211,238,0.3);background:rgba(34,211,238,0.03);}
+        .grp.on{border-color:rgba(34,211,238,0.5);background:rgba(34,211,238,0.06);}
+        .grp.s{border-color:rgba(34,197,94,0.25);} .grp.w{border-color:rgba(250,204,21,0.25);} .grp.d{border-color:rgba(248,113,113,0.25);}
+        .grp.on.s{border-color:rgba(34,197,94,0.5);background:rgba(34,197,94,0.06);}
+        .grp.on.w{border-color:rgba(250,204,21,0.5);background:rgba(250,204,21,0.06);}
+        .grp.on.d{border-color:rgba(248,113,113,0.5);background:rgba(248,113,113,0.06);}
+        .grp .n{font-family:'SF Mono',monospace;font-size:10px;color:rgba(255,255,255,0.2);margin-bottom:3px;}
+        .grp .t{font-size:13px;font-weight:700;color:#f1f5f9;margin-bottom:5px;}
+        .grp .d{font-size:11px;color:rgba(255,255,255,0.45);line-height:1.6;margin-bottom:6px;}
+        .grp .r{font-family:'SF Mono',monospace;font-size:11px;font-weight:600;padding:2px 8px;border-radius:5px;display:inline-block;}
+        .grp.s .r{background:rgba(34,197,94,0.1);color:#4ade80;}
+        .grp.w .r{background:rgba(250,204,21,0.1);color:#facc15;}
+        .grp.d .r{background:rgba(248,113,113,0.1);color:#f87171;}
+        .map{background:rgba(255,255,255,0.012);border:1px solid rgba(255,255,255,0.04);border-radius:12px;padding:16px 18px;margin:10px 0;}
+        .map .mt{font-size:13px;font-weight:700;color:#f1f5f9;margin-bottom:8px;display:flex;align-items:center;gap:7px;}
+        .map ul{margin:0;padding-left:18px;}
+        .map li{color:rgba(255,255,255,0.55);font-size:12px;line-height:1.8;margin-bottom:2px;}
+        .map li strong{color:rgba(255,255,255,0.8);}
+        .boundary{margin-top:20px;padding:14px 18px;border-radius:10px;background:rgba(255,255,255,0.015);border:1px solid rgba(255,255,255,0.04);}
+        .boundary .bt{font-size:11px;font-weight:700;color:rgba(255,255,255,0.35);margin-bottom:8px;letter-spacing:0.5px;text-transform:uppercase;}
+        .boundary .b-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+        .boundary .bc{font-size:11px;line-height:1.7;color:rgba(255,255,255,0.3);}
+        .boundary .bc.ok{color:rgba(74,222,128,0.55);} .boundary .bc.no{color:rgba(248,113,113,0.5);}
+        .boundary .bc strong{font-size:11px;display:block;margin-bottom:3px;}
+        .back-btns{text-align:center;margin-top:30px;padding-top:20px;border-top:1px solid rgba(255,255,255,0.04);display:flex;justify-content:center;gap:16px;flex-wrap:wrap;}
+        .back-btns a{color:rgba(255,255,255,0.25);text-decoration:none;font-size:13px;transition:color .3s;padding:8px 16px;border-radius:8px;border:1px solid rgba(255,255,255,0.05);}
+        .back-btns a:hover{color:#67e8f9;border-color:rgba(34,211,238,0.2);}
+        .conf{margin-top:16px;padding:10px 14px;border-radius:8px;background:rgba(250,204,21,0.02);border:1px solid rgba(250,204,21,0.08);font-size:10px;color:rgba(255,255,255,0.2);text-align:center;}
+        @keyframes fadeInUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+        @keyframes gradientFlow{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+        @media(max-width:860px){
+            .container{padding:28px 18px 22px;border-radius:18px;}
+            .th-grid,.data-grid{grid-template-columns:1fr 1fr;}
+            .grp-grid{grid-template-columns:1fr;}
+            .canvas-wrap{height:340px;}
+            .boundary .b-row{grid-template-columns:1fr;}
+        }
+        @media(max-width:480px){
+            .th-grid,.data-grid{grid-template-columns:1fr;}
+            .header h1{font-size:20px;}
+        }
+    </style>
+</head>
+<body>
+    <div id="glow"></div>
+    <div class="wrap">
+    <div class="container">
+        <div class="breadcrumb">
+            <a href="../../index.html">Y.Mine 总控台</a><span class="sep">›</span>
+            <a href="../../index.html">仿真实验室</a><span class="sep">›</span>
+            <a href="../../index.html">🏗️ 结构力学与冗余安全类</a><span class="sep">›</span>
+            <span class="cur">#30 万有引力多构型落体均衡仿真</span>
+        </div>
+
+        <div class="header">
+            <div class="badge">🧪 #30 · 🏗️ 结构力学与冗余安全类 · 宏观力学</div>
+            <h1>万有引力多构型物体<br>受力均衡变速仿真实验</h1>
+            <div class="sub">真空理想力学 vs 真实大气对流 · 四构型对照 · 三层同构映射</div>
+        </div>
+
+        <div class="meta-bar">
+            <span>📋 编号 <b class="v">#30</b></span>
+            <span>🏛️ 归属 <b class="v">Game-OS V2.1</b></span>
+            <span>🔒 密级 <b class="v">公开演示版</b></span>
+            <span>📐 误差 <b class="v">±0.02</b></span>
+        </div>
+
+        <div class="th-grid">
+            <div class="th-item g"><div class="tv">0.48</div><div class="tl">保本安全线</div></div>
+            <div class="th-item c"><div class="tv">0.50</div><div class="tl">标准稳态中轴线</div></div>
+            <div class="th-item y"><div class="tv">±0.02</div><div class="tl">审计允许误差</div></div>
+            <div class="th-item r"><div class="tv">0.68</div><div class="tl">结构熔断红线</div></div>
+        </div>
+
+        <div class="sec">
+            <h2>🔬 实验核心 <span class="tag">研究目的</span></h2>
+            <p>以经典牛顿自由落体为基底，区分<span class="p">「真空理想力学环境」</span>与<span class="c">「真实大气对流环境」</span>两套模型；通过<strong>实心、空心、半注水、不规则异形</strong>四类构型对照，验证内部质量分布、外部轮廓对称性、大气压差、温度分层对运动稳态的影响；并完成<strong>自然科学→工程系统→低空产业</strong>三层闭环映射。</p>
+            <div class="hbox p">
+                <p><strong>底层公理：</strong>受力越均匀、约束越对称、结构越闭环，系统稳态越强；单点偏心、压差失衡、结构异形，系统扰动越大、越易触发<span class="r">0.68熔断</span>。</p>
+            </div>
+        </div>
+
+        <div class="sec">
+            <h2>⚛️ 物理原理简述</h2>
+            <div class="hbox">
+                <p><strong class="c">4.1 真空理想落体：</strong>完美正圆实心均质物体（实心苹果模型），无空气阻力、无对流、无温差，仅受恒定万有引力产生匀加速运动，四面八方压强均等，数值牢牢收敛于 <span class="c">0.5 绝对稳态</span>。</p>
+            </div>
+            <div class="hbox">
+                <p><strong class="c">4.2 大气分层对流：</strong>近地高温稠密空气上升、高空低温稀薄空气下沉形成纵向对流；规则圆形轮廓压强均衡，不规则轮廓各迎风面受力不均、内外压差震荡、重心偏移、运动失稳。</p>
+            </div>
+            <div class="hbox y">
+                <p><strong class="y">4.3 内部腔体结构：</strong><span class="g">实心均质</span>重心锁死抗扰动最强；<span class="y">空心空腔</span>惯性小易偏移；<span class="r">半注水腔体</span>液体流动动态偏移重心，属高不稳定结构。</p>
+            </div>
+        </div>
+
+        <div class="sec">
+            <h2>🎛️ 交互仿真面板 <span class="tag">双环境 · 四构型</span></h2>
+            <div class="sim-panel">
+                <div class="sp-t">🌍 万有引力落体仿真器</div>
+                <div class="sp-s">一键切换真空/大气模式，选择不同构型物体，观察受力均衡性与稳态数值变化</div>
+
+                <div class="env-row">
+                    <button class="env-btn vac on" data-e="vac" onclick="setEnv('vac')">🌌 真空理想模式</button>
+                    <button class="env-btn" data-e="atm" onclick="setEnv('atm')">🌍 真实大气对流模式</button>
+                </div>
+                <div class="mod-row">
+                    <button class="mod-btn on" data-m="solid" onclick="setMod('solid')">🍎 实心苹果球体</button>
+                    <button class="mod-btn" data-m="hollow" onclick="setMod('hollow')">🫧 空心薄壁圆球</button>
+                    <button class="mod-btn" data-m="water" onclick="setMod('water')">💧 半注水腔体球</button>
+                    <button class="mod-btn" data-m="irr" onclick="setMod('irr')">🪨 不规则异形体</button>
+                </div>
+
+                <div class="canvas-wrap" id="cwrap">
+                    <canvas id="cv"></canvas>
+                    <div class="c-ov">
+                        <div class="c-label v" id="envLbl">🌌 真空理想环境</div>
+                        <div class="c-h" id="hInd">高度: 1000m</div>
+                    </div>
+                    <div class="c-legend">
+                        <div class="li"><span class="dot" style="background:#22d3ee"></span>冷空气下沉</div>
+                        <div class="li"><span class="dot" style="background:#f97316"></span>暖空气上升</div>
+                        <div class="li"><span class="dot" style="background:#a78bfa"></span>运动轨迹</div>
+                        <div class="li"><span class="dot" style="background:#f87171"></span>压差扰动</div>
+                    </div>
+                </div>
+
+                <div class="data-grid">
+                    <div class="dc c" id="dcScore"><div class="dl">稳态归一值</div><div class="dv" id="vScore">0.500</div><div class="db"><div class="db-f" id="bScore" style="width:50%"></div></div></div>
+                    <div class="dc" id="dcTurb"><div class="dl">扰动强度</div><div class="dv" id="vTurb">0.00</div><div class="db"><div class="db-f" id="bTurb" style="width:0%;background:#4ade80"></div></div></div>
+                    <div class="dc" id="dcCoM"><div class="dl">重心偏移量</div><div class="dv" id="vCoM">0.00</div><div class="db"><div class="db-f" id="bCoM" style="width:0%;background:#4ade80"></div></div></div>
+                    <div class="dc" id="dcPres"><div class="dl">内外压差</div><div class="dv" id="vPres">0.00</div><div class="db"><div class="db-f" id="bPres" style="width:0%;background:#4ade80"></div></div></div>
+                </div>
+
+                <div class="status safe" id="status">
+                    <span class="si">✓</span><span id="stxt">稳态安全：匀加速自由落体，无抖动无偏移</span>
+                </div>
+
+                <div class="ctrl-row">
+                    <button class="c-btn go" onclick="startSim()" id="btnGo">▶ 开始下落</button>
+                    <button class="c-btn pause" onclick="togglePause()" id="btnPause">⏸ 暂停</button>
+                    <button class="c-btn rst" onclick="resetSim()">↺ 重置</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="sec">
+            <h2>🧪 四组对照组可视化 <span class="tag">稳态区间</span></h2>
+            <div class="grp-grid">
+                <div class="grp s on" onclick="setMod('solid')"><div class="n">对照组 1</div><div class="t">🍎 真空 · 实心正圆均质</div><div class="d">通体实心、轮廓正圆、质量100%均匀对称；无空气阻力、无对流、无温差；标准匀加速，无抖动无偏移。</div><div class="r">0.49 ~ 0.51 极致稳态</div></div>
+                <div class="grp w" onclick="setMod('hollow')"><div class="n">对照组 2</div><div class="t">🫧 大气 · 空心薄壁圆球</div><div class="d">外壳轻薄、内部空仓、整体质量极轻；承受高低空温差对流、横向气流扰动；惯性不足，轻微气流即摆动。</div><div class="r">0.53 ~ 0.59 小幅波动</div></div>
+                <div class="grp w" onclick="setMod('water')"><div class="n">对照组 3</div><div class="t">💧 大气 · 半注水腔体球</div><div class="d">外部圆形、内部液态可流动介质；液体晃动、重心持续动态偏移，加速度忽快忽慢，轨迹摇摆不定。</div><div class="r">0.60 ~ 0.66 临近熔断</div></div>
+                <div class="grp d" onclick="setMod('irr')"><div class="n">对照组 4</div><div class="t">🪨 大气 · 不规则异形体</div><div class="d">轮廓不对称、迎风面面积不均；外部大气压强四面八方不均，内外压差持续震荡，轨迹紊乱严重失稳。</div><div class="r">> 0.68 极易熔断</div></div>
+            </div>
+        </div>
+
+        <div class="sec">
+            <h2>🔗 三层同构映射</h2>
+            <div class="map">
+                <div class="mt">⚛️ 物理层规律</div>
+                <ul>
+                    <li><strong>结构对称度越高、内部质量越均匀、内外压差越平衡，落体运动越稳态；</strong></li>
+                    <li>腔体空化、介质流动、轮廓异形、大气对流扰动，会持续放大系统不稳定性。</li>
+                </ul>
+            </div>
+            <div class="map">
+                <div class="mt">🏛️ 系统架构层规律</div>
+                <ul>
+                    <li><strong>约束分布均匀、重心锁定、多点制衡的系统，抗扰动、抗风险能力极强；</strong></li>
+                    <li>架构中空、核心变量浮动、结构不对称的系统，微小外部扰动即可触发大幅震荡。</li>
+                </ul>
+            </div>
+            <div class="map">
+                <div class="mt">🛩️ 低空产业层规律</div>
+                <ul>
+                    <li>无人机机身越圆润对称，高低空温差对流环境下飞行越平稳；</li>
+                    <li><strong>整机动力、配重、结构越均衡，越能抵御高空乱流与气压扰动；</strong></li>
+                    <li>空域高低温、疏密空气对流差对应不同圈层风控阈值，高空稀薄空域容错更低、更易触发风险熔断。</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="boundary">
+            <div class="bt">🛩️ 无人机迁移边界说明（严谨工程边界）</div>
+            <div class="b-row">
+                <div class="bc ok">
+                    <strong>✅ 可迁移规律</strong>
+                    稳态区间规律、重心稳定性逻辑、空心结构刚度短板、对流扰动模型、对称冗余架构理论、压差失衡熔断机制。
+                </div>
+                <div class="bc no">
+                    <strong>❌ 不可迁移参数</strong>
+                    球体下落绝对加速度数值、玻璃/球体材料物理参数、具体形变毫米值、真空实验室理想环境常数、地表重力绝对值。
+                </div>
+            </div>
+        </div>
+
+        <div class="conf">🔒 公开演示版 · 本页面仅展示物理规律与区间稳态，不嵌入涉密精算参数，严格公私分离</div>
+
+        <div class="back-btns">
+            <a href="../../index.html">← 返回总控台</a>
+            <a href="../../index.html">← 返回分类列表</a>
+        </div>
+    </div>
+    </div>
+
+<script>
+(function(){
+    'use strict';
+    const TH={B:0.48,S:0.5,F:0.68,E:0.02};
+    let env='vac',mod='solid',run=false,pause=false,aid=null,t=0;
+    const cv=document.getElementById('cv'),cx=cv.getContext('2d'),wrap=document.getElementById('cwrap');
+    let obj=null,trail=[],parts=[];
+    const CFG={
+        solid:{m:1,sym:1,slosh:0,drag:.015,base:.5,range:.01,name:'实心苹果'},
+        hollow:{m:.3,sym:.95,slosh:0,drag:.07,base:.56,range:.03,name:'空心圆球'},
+        water:{m:.7,sym:.9,slosh:.6,drag:.05,base:.63,range:.03,name:'半注水球'},
+        irr:{m:.8,sym:.55,slosh:.2,drag:.14,base:.72,range:.05,name:'异形体'}
+    };
+    function rsz(){const r=wrap.getBoundingClientRect();cv.width=r.width*devicePixelRatio;cv.height=r.height*devicePixelRatio;cx.scale(devicePixelRatio,devicePixelRatio);}
+    function initP(){parts=[];if(env!=='atm')return;const w=wrap.clientWidth,h=wrap.clientHeight;for(let i=0;i<50;i++)parts.push({x:Math.random()*w,y:Math.random()*h,vx:(Math.random()-.5)*.25,vy:(Math.random()>.5?1:-1)*(.3+Math.random()*.4),sz:1+Math.random()*2,a:.08+Math.random()*.15});}
+    function initO(){const w=wrap.clientWidth;const c=CFG[mod];obj={x:w/2,y:50,vx:0,vy:0,r:20,rot:0,rs:0,wo:{x:0,y:0},cfg:c,pres:0,com:{x:0,y:0}};trail=[];t=0;}
+    function stars(){const w=wrap.clientWidth,h=wrap.clientHeight;cx.fillStyle='rgba(255,255,255,0.35)';for(let i=0;i<40;i++){const sx=(i*137.5)%w,sy=(i*73.3)%(h*.6),sr=.5+(i%3)*.3;cx.beginPath();cx.arc(sx,sy,sr,0,Math.PI*2);cx.fill();}}
+    function layers(){const w=wrap.clientWidth,h=wrap.clientHeight;if(env==='vac')return;for(let i=0;i<8;i++){const y=h/8*i,rat=i/8,a=.02+rat*.04;cx.fillStyle=`rgba(${20+rat*40|0},${40+rat*60|0},${80+rat*60|0},${a})`;cx.fillRect(0,y,w,h/8+1);}cx.font='9px SF Mono,monospace';for(let i=0;i<=4;i++){const y=26+(h-52)*(i/4),al=Math.round(1000-i*250),tp=Math.round(15-i*12);cx.fillStyle=`rgba(255,255,255,${.06+(1-i/4)*.07})`;cx.fillText(`${al}m ${tp}°C`,w-70,y);}}
+    function conv(){if(env!=='atm')return;const w=wrap.clientWidth,h=wrap.clientHeight,tt=t*.02;cx.strokeStyle='rgba(34,211,238,0.1)';cx.lineWidth=1.5;for(let i=0;i<5;i++){const bx=w/6*(i+1)+Math.sin(tt+i)*12;cx.beginPath();for(let y=h;y>20;y-=8){cx.lineTo(bx+Math.sin(y*.015+tt+i*.7)*8,y);}cx.stroke();}cx.strokeStyle='rgba(249,115,22,0.08)';for(let i=0;i<4;i++){const bx=w/5*(i+1)-18+Math.cos(tt*.8+i)*10;cx.beginPath();for(let y=20;y<h;y+=8){cx.lineTo(bx+Math.sin(y*.012+tt*.9+i*1.1)*9,y);}cx.stroke();}}
+    function pstep(){if(env!=='atm')return;parts.forEach(p=>{p.x+=p.vx+Math.sin(t*.05+p.y*.01)*.15;p.y+=p.vy;const w=wrap.clientWidth,h=wrap.clientHeight;if(p.y<0){p.y=h;p.x=Math.random()*w;}if(p.y>h){p.y=0;p.x=Math.random()*w;}if(p.x<0)p.x=w;if(p.x>w)p.x=0;cx.beginPath();cx.arc(p.x,p.y,p.sz,0,Math.PI*2);cx.fillStyle=p.vy<0?`rgba(34,211,238,${p.a})`:`rgba(249,115,22,${p.a*.7})`;cx.fill();});}
+    function ground(){const w=wrap.clientWidth,h=wrap.clientHeight,gy=h-26;const g=cx.createLinearGradient(0,gy,0,h);g.addColorStop(0,'rgba(100,80,60,0.35)');g.addColorStop(1,'rgba(60,40,20,0.55)');cx.fillStyle=g;cx.fillRect(0,gy,w,26);cx.strokeStyle='rgba(255,255,255,0.07)';cx.lineWidth=1;cx.beginPath();cx.moveTo(0,gy);cx.lineTo(w,gy);cx.stroke();}
+    function dtrail(){if(trail.length<2)return;cx.beginPath();cx.strokeStyle='rgba(167,139,250,0.4)';cx.lineWidth=2;cx.moveTo(trail[0].x,trail[0].y);for(let i=1;i<trail.length;i++)cx.lineTo(trail[i].x,trail[i].y);cx.stroke();}
+    function pvecs(){if(!obj||env!=='atm')return;const c=obj.cfg,asym=1-c.sym;for(let i=0;i<8;i++){const a=Math.PI*2/8*i+obj.rot,l=obj.r+4,fx=obj.x+Math.cos(a)*l,fy=obj.y+Math.sin(a)*l,fd={x:Math.cos(a),y:Math.sin(a)},pt=asym*(.5+Math.sin(t*.1+i*2.3)*.5),fl=3+pt*12,al=.15+pt*.35;cx.strokeStyle=`rgba(248,113,113,${al})`;cx.lineWidth=1.5;cx.beginPath();cx.moveTo(fx,fy);cx.lineTo(fx+fd.x*fl,fy+fd.y*fl);cx.stroke();cx.beginPath();cx.arc(fx+fd.x*fl,fy+fd.y*fl,2,0,Math.PI*2);cx.fillStyle=`rgba(248,113,113,${al})`;cx.fill();}}
+    function dobj(){if(!obj)return;const c=obj.cfg;cx.save();cx.translate(obj.x,obj.y);cx.rotate(obj.rotation);
+    if(mod==='solid'){const g=cx.createRadialGradient(-5,-5,2,0,0,obj.r);g.addColorStop(0,'#ff6b6b');g.addColorStop(.7,'#dc2626');g.addColorStop(1,'#991b1b');cx.fillStyle=g;cx.beginPath();cx.arc(0,0,obj.r,0,Math.PI*2);cx.fill();cx.strokeStyle='rgba(255,255,255,0.25)';cx.lineWidth=1;cx.stroke();cx.fillStyle='#166534';cx.beginPath();cx.ellipse(2,-obj.r-3,3,6,.3,0,Math.PI*2);cx.fill();}
+    else if(mod==='hollow'){cx.strokeStyle='rgba(147,197,253,0.7)';cx.lineWidth=2.5;cx.fillStyle='rgba(147,197,253,0.05)';cx.beginPath();cx.arc(0,0,obj.r,0,Math.PI*2);cx.fill();cx.stroke();const hg=cx.createRadialGradient(-6,-6,1,0,0,obj.r*.7);hg.addColorStop(0,'rgba(255,255,255,0.15)');hg.addColorStop(1,'rgba(255,255,255,0)');cx.fillStyle=hg;cx.beginPath();cx.arc(0,0,obj.r,0,Math.PI*2);cx.fill();}
+    else if(mod==='water'){cx.strokeStyle='rgba(96,165,250,0.7)';cx.lineWidth=2;cx.fillStyle='rgba(96,165,250,0.05)';cx.beginPath();cx.arc(0,0,obj.r,0,Math.PI*2);cx.fill();cx.stroke();cx.save();cx.beginPath();cx.arc(0,0,obj.r-2,0,Math.PI*2);cx.clip();const wo=obj.wo,wl=obj.r*.55,wg=cx.createLinearGradient(0,-wl,0,obj.r);wg.addColorStop(0,'rgba(59,130,246,0.4)');wg.addColorStop(1,'rgba(30,64,175,0.6)');cx.fillStyle=wg;cx.beginPath();cx.moveTo(-obj.r,wl+wo.y);for(let wx=-obj.r;wx<=obj.r;wx+=3){cx.lineTo(wx,wl+wo.y+Math.sin(wx*.15+t*.12)*4+wo.x*.3);}cx.lineTo(obj.r,obj.r+5);cx.lineTo(-obj.r,obj.r+5);cx.closePath();cx.fill();cx.restore();}
+    else{cx.fillStyle='#6b7280';cx.strokeStyle='rgba(255,255,255,0.2)';cx.lineWidth=1.5;cx.beginPath();for(let i=0;i<=9;i++){const a=Math.PI*2/9*i,n=.4+Math.sin(a*3+12345)*.3+Math.cos(a*5+12345*.7)*.2,r=obj.r*(.6+n*.7),px=Math.cos(a)*r,py=Math.sin(a)*r;i?cx.lineTo(px,py):cx.moveTo(px,py);}cx.closePath();cx.fill();cx.stroke();}
+    if(env==='atm'&&mod!=='solid'){cx.strokeStyle='rgba(248,113,113,0.45)';cx.setLineDash([3,3]);cx.lineWidth=1;cx.beginPath();cx.moveTo(0,0);cx.lineTo(obj.com.x*14,obj.com.y*14);cx.stroke();cx.setLineDash([]);cx.fillStyle='rgba(248,113,113,0.8)';cx.beginPath();cx.arc(obj.com.x*14,obj.com.y*14,3,0,Math.PI*2);cx.fill();}
+    cx.restore();}
+    function phys(){if(!obj)return;const c=obj.cfg,w=wrap.clientWidth,h=wrap.clientHeight,gy=h-26-obj.r,g=.32;obj.vy+=g*c.m;
+    if(env==='atm'){const ht=obj.y/h,df=.3+ht*.7,drg=c.drag*df;obj.vy*=(1-drg*.03);const tx=(Math.sin(t*.08)+Math.sin(t*.13+1.5)*.6)*(.3+(1-c.sym)*1.5)*df,ty=(Math.cos(t*.06+.8)+Math.sin(t*.11+2.1)*.4)*(.1+(1-c.sym)*.5)*df;obj.vx+=tx*.07;obj.vy+=ty*.035;if(c.slosh>0){obj.wo.x=obj.wo.x*.92+(obj.vx*.3+Math.sin(t*.1)*2)*c.slosh*.3;obj.wo.y=obj.wo.y*.92+(obj.vy*.1+Math.cos(t*.08)*1.5)*c.slosh*.2;obj.vx+=obj.wo.x*.012;obj.vy+=obj.wo.y*.006;obj.com.x=obj.wo.x*.3;obj.com.y=obj.wo.y*.3;}else{obj.com.x=Math.sin(t*.05)*.3*(1-c.sym);obj.com.y=Math.cos(t*.07)*.2*(1-c.sym);}obj.rs+=obj.vx*.002+(1-c.sym)*Math.sin(t*.04)*.008;obj.rs*=.98;obj.rotation+=obj.rs;obj.vx*=.96;}else{obj.wo={x:0,y:0};obj.com={x:0,y:0};obj.rs=0;obj.vx*=.99;}
+    obj.x+=obj.vx;obj.y+=obj.vy;if(obj.x<obj.r){obj.x=obj.r;obj.vx=Math.abs(obj.vx)*.3;}if(obj.x>w-obj.r){obj.x=w-obj.r;obj.vx=-Math.abs(obj.vx)*.3;}trail.push({x:obj.x,y:obj.y});if(trail.length>80)trail.shift();if(obj.y>=gy){obj.y=gy;obj.vy=-obj.vy*.2;obj.vx*=.7;if(Math.abs(obj.vy)<.4){obj.vy=0;run=false;}}}
+    function calc(){if(!obj)return;const c=obj.cfg,w=wrap.clientWidth,h=wrap.clientHeight,ht=Math.max(0,1-obj.y/(h-50));let ed=env==='vac'?0:(.07+(1-ht)*.03),sp=(1-c.sym)*.12,sl=c.slosh*(.07+Math.abs(obj.wo.x)*.02+Math.abs(obj.wo.y)*.01),pp=env==='atm'?((1-c.sym)*.055+Math.abs(obj.vx)*.018):0,vp=Math.abs(obj.vx)*.008+Math.abs(obj.rs)*2;let dev=ed+sp+sl+pp+vp,score=c.base+dev;if(env==='vac'&&mod==='solid'){score=.5+Math.sin(t*.02)*.005;dev=Math.abs(score-.5);ed=0;pp=0;}score=Math.max(.3,Math.min(.85,score));const com=Math.sqrt(obj.com.x*obj.com.x+obj.com.y*obj.com.y)*.6+Math.abs(obj.vx)*.08;upd(score,dev,com,pp+ed*2,ed*3+Math.abs(obj.vx)*.45);}
+    function upd(score,dev,com,pres,turb){const vs=document.getElementById('vScore'),vd=document.getElementById('vTurb'),vc=document.getElementById('vCoM'),vp=document.getElementById('vPres');const bs=document.getElementById('bScore'),bd=document.getElementById('bTurb'),bc=document.getElementById('bCoM'),bp=document.getElementById('bPres');const dcs=document.getElementById('dcScore'),dcd=document.getElementById('dcTurb'),dcc=document.getElementById('dcCoM'),dcp=document.getElementById('dcPres');const sj=document.getElementById('status'),st=document.getElementById('stxt'),hi=document.getElementById('hInd');vs.textContent=score.toFixed(3);vd.textContent=turb.toFixed(2);vc.textContent=com.toFixed(3);vp.textContent=pres.toFixed(2);bs.style.width=Math.min(100,Math.max(0,((score-.3)/.6)*100))+'%';bd.style.width=Math.min(100,turb*75)+'%';bc.style.width=Math.min(100,com*120)+'%';bp.style.width=Math.min(100,pres*90)+'%';[dcs,dcd,dcc,dcp].forEach(x=>x.classList.remove('g','y','r','c'));
+    if(score>=TH.F){dcs.classList.add('r');bs.style.background='#f87171';sj.className='status danger';sj.innerHTML='<span class="si">🚨</span><span>熔断告警：稳态突破0.68红线！结构严重失稳，触发系统熔断</span>';}else if(score>TH.S+TH.E+.04){dcs.classList.add('y');bs.style.background='#facc15';sj.className='status warn';sj.innerHTML='<span class="si">⚠</span><span>'+(mod==='water'?'高危波动：液态介质晃动致重心持续偏移，临近熔断边缘':'波动预警：气流扰动导致轨迹抖动，抗扰动能力不足')+'</span>';}else if(dev<=TH.E){dcs.classList.add('g');bs.style.background='#4ade80';sj.className='status safe';sj.innerHTML='<span class="si">✓</span><span>'+(env==='vac'?'极致稳态：真空匀加速自由落体，误差＜±0.02，完美收敛0.5中轴线':'稳态安全：对称结构受力均衡，扰动控制在允许范围内')+'</span>';}else{dcs.classList.add('y');bs.style.background='#facc15';sj.className='status warn';sj.innerHTML='<span class="si">⚠</span><span>波动预警：存在小幅偏差，结构对称性待优化</span>';}
+    dcd.classList.add(turb>.5?'r':turb>.18?'y':'g');dcc.classList.add(com>.3?'r':com>.1?'y':'g');dcp.classList.add(pres>.35?'r':pres>.13?'y':'g');bd.style.background=turb>.5?'#f87171':turb>.18?'#facc15':'#4ade80';bc.style.background=com>.3?'#f87171':com>.1?'#facc15':'#4ade80';bp.style.background=pres>.35?'#f87171':pres>.13?'#facc15':'#4ade80';if(obj){hi.textContent='高度: '+Math.max(0,Math.round((1-obj.y/(h()-50))*1000))+'m';}}
+    function h(){return wrap.clientHeight;}
+    function render(){const w=wrap.clientWidth,hh=wrap.clientHeight;cx.clearRect(0,0,w,hh);wrap.classList.toggle('atm',env==='atm');stars();layers();conv();pstep();ground();dtrail();pvecs();dobj();}
+    function loop(){if(!pause&&run)phys(),t++;calc();render();aid=requestAnimationFrame(loop);}
+    window.setEnv=function(e){env=e;document.querySelectorAll('.env-btn').forEach(b=>{b.classList.toggle('on',b.dataset.e===e);b.classList.toggle('vac',e==='vac'&&b.dataset.e==='vac');});const el=document.getElementById('envLbl');el.className='c-label '+(e==='vac'?'v':'a');el.textContent=e==='vac'?'🌌 真空理想环境':'🌍 真实大气对流环境';initP();if(!run)initO();};
+    window.setMod=function(m){mod=m;document.querySelectorAll('.mod-btn').forEach(b=>b.classList.toggle('on',b.dataset.m===m));document.querySelectorAll('.grp').forEach((g,i)=>g.classList.toggle('on',['solid','hollow','water','irr'][i]===m));initO();};
+    window.startSim=function(){initO();run=true;pause=false;document.getElementById('btnGo').textContent='▶ 重新下落';document.getElementById('btnPause').textContent='⏸ 暂停';};
+    window.togglePause=function(){pause=!pause;document.getElementById('btnPause').textContent=pause?'▶ 继续':'⏸ 暂停';};
+    window.resetSim=function(){run=false;pause=false;initO();document.getElementById('btnGo').textContent='▶ 开始下落';document.getElementById('btnPause').textContent='⏸ 暂停';};
+    function init(){rsz();initO();initP();loop();window.addEventListener('resize',rsz);}
+    document.readyState==='loading'?document.addEventListener('DOMContentLoaded',init):init();
+})();
+</script>
+</body>
+</html>
