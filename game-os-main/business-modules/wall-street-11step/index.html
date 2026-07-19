@@ -19,8 +19,19 @@
   .v.warn{color:#ffaa44}
   .notice{margin-top:24px;padding:16px;background:#0d1a2e;border-left:3px solid #4488ff;border-radius:4px;font-size:12px;line-height:1.8;color:#88aadd}
   .notice b{color:#66aaff}
-  .back{position:fixed;top:20px;left:20px;color:#667799;text-decoration:none;font-size:13px;padding:8px 16px;border:1px solid #1a2540;border-radius:4px}
+  .back{position:fixed;top:20px;left:20px;color:#667799;text-decoration:none;font-size:13px;padding:8px 16px;border:1px solid #1a2540;border-radius:4px;z-index:10}
   .back:hover{color:#aaccee;border-color:#4488ff}
+  .entry-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:24px}
+  .entry-card{background:linear-gradient(135deg,rgba(255,68,102,.08),rgba(255,68,102,.02));border:1px solid rgba(255,68,102,.3);border-radius:8px;padding:20px;text-decoration:none;display:block;transition:all .25s;position:relative;overflow:hidden}
+  .entry-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#ff4466,transparent);opacity:0;transition:opacity .25s}
+  .entry-card:hover{border-color:#ff4466;transform:translateY(-2px);box-shadow:0 8px 24px rgba(255,68,102,.2)}
+  .entry-card:hover::before{opacity:1}
+  .entry-card .eicon{font-size:26px;margin-bottom:8px;display:block}
+  .entry-card .ename{font-size:14px;color:#ff8899;font-weight:500;margin-bottom:6px;letter-spacing:1px}
+  .entry-card .edesc{font-size:11px;color:#667799;line-height:1.6}
+  .entry-card.soon{opacity:.4;cursor:not-allowed;pointer-events:none}
+  .entry-card.soon::after{content:'SOON';position:absolute;top:10px;right:10px;font-size:10px;color:#ffaa44;border:1px solid #ffaa44;padding:2px 6px;border-radius:3px;letter-spacing:1px}
+  .section-label{font-size:11px;color:#4a6a9a;letter-spacing:3px;margin-top:28px;margin-bottom:4px;text-transform:uppercase}
 </style>
 </head>
 <body>
@@ -41,6 +52,30 @@
     · 禁止直接 require/import core-engine/ 下除 common-api.js 之外的任何文件<br>
     · 行业私有参数全部配置在 module-config.json，由后期填入<br>
     · 模块私有业务逻辑写入 private-logic/ 目录
+  </div>
+
+  <div class="section-label">已上线引擎入口</div>
+  <div class="entry-grid">
+    <a class="entry-card" href="../../../ymine-studio.html">
+      <span class="eicon">⚡</span>
+      <div class="ename">十步闭环量化引擎</div>
+      <div class="edesc">宏观漏斗→CAPM定价→动态K线→人性测试→对冲配置→返回总控 · v2.1.0</div>
+    </a>
+    <a class="entry-card soon" href="javascript:void(0)">
+      <span class="eicon">📊</span>
+      <div class="ename">11步信息筛选流水线</div>
+      <div class="edesc">行业专属信息漏斗层级参数 · 待接入Core API</div>
+    </a>
+    <a class="entry-card soon" href="javascript:void(0)">
+      <span class="eicon">🎯</span>
+      <div class="ename">圆锥估值模型V2</div>
+      <div class="edesc">个股仓位私有变量 · 待接入Core API</div>
+    </a>
+    <a class="entry-card soon" href="javascript:void(0)">
+      <span class="eicon">🛡️</span>
+      <div class="ename">行业级熔断业务逻辑</div>
+      <div class="edesc">金融专属熔断阈值 · 待接入Core API</div>
+    </a>
   </div>
 </div>
 <script src="../../core-engine/_internal.js"></script>
