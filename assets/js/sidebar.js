@@ -1,5 +1,5 @@
 /**
- * Y.Mine 侧边栏渲染 v1.5
+ * Y.Mine 侧边栏渲染 v2.0
  * JSON配置驱动的侧边栏动态渲染 + 鼠标跟随光晕效果
  * @namespace YSidebar
  */
@@ -16,7 +16,7 @@
             label: '🧮 精算系统',
             items: [
                 { href: 'info-funnel.html', icon: '🔭', text: '信息漏斗', tag: '前置', activeTag: true },
-                { href: 'ymine-studio.html', icon: '🏛️', text: 'Y.Mine 投资工作室', tag: '专业', activeTag: true },
+                { href: 'ymine-studio.html', icon: '🏛️', text: 'Y.Mine 投资工作室', tag: 'v2.0', activeTag: true },
                 { href: 'marketing-reinvented.html', icon: '🧪', text: '金融估值模拟器', tag: '精算' },
                 { href: 'ai-pricing-benchmark.html', icon: '📡', text: 'AI 定价基准库', tag: '基准' },
                 { href: 'case-library.html', icon: '🗂️', text: '案例向量库', tag: '案例' }

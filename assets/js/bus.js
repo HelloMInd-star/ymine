@@ -1,6 +1,7 @@
 /**
- * Y.Mine 数据总线 v1.6
+ * Y.Mine 数据总线 v2.0
  * 统一管理localStorage跨页同步、事件发布订阅、状态初始化
+ * 十步闭环引擎新增通道：macroFunnel/factorLibrary/valuationV2/simulationResult/rationalityScore/executionOrder/regimeState
  * @namespace YBus
  */
 (function(global) {
@@ -174,6 +175,7 @@
                 gtAdjustment: 0,
                 kellyAdjustment: 0,
                 bigBlind: 10,
+                rationalityScore: null,
                 timestamp: 0
             }
         },
@@ -199,24 +201,152 @@
                 timestamp: 0
             }
         },
-        poker: {
-            storageKey: 'pokerEggState',
-            eventName: 'poker-egg-update',
+
+        // ============================================================
+        // v2.0 十步闭环引擎新增通道
+        // ============================================================
+        macroFunnel: {
+            storageKey: 'macroFunnelOutput',
+            eventName: 'macro-funnel-update',
             defaultValue: {
-                stage: 'preflop',
-                equity: 0,
-                kellyFraction: 0,
-                kellyAction: 'FOLD',
-                groundTruth: 0.68,
-                coneState: 'calm',
-                gamma: 0,
-                pot: 0,
-                stack: 1000,
-                pnl: 0,
+                generationId: '',
+                timestamp: 0,
+                regime: 'RED_OCEAN',
+                assets: [],
+                totalScreened: 0,
+                totalPassed: 0,
+                selectedAsset: null
+            }
+        },
+        factorLibrary: {
+            storageKey: 'factorLibrary',
+            eventName: 'factor-library-update',
+            defaultValue: {
+                assetId: '',
+                processedAt: 0,
+                regime: 'RED_OCEAN',
+                valueFactors: null,
+                growthFactors: null,
+                qualityFactors: null,
+                momentumFactors: null,
+                sentimentFactors: null,
+                riskFactors: null,
+                compositeScore: 0
+            }
+        },
+        valuationV2: {
+            storageKey: 'valuationV2Result',
+            eventName: 'valuation-v2-update',
+            defaultValue: {
+                assetId: '',
+                timestamp: 0,
+                regime: 'RED_OCEAN',
+                currentPrice: 0,
+                wacc: null,
+                dcf: null,
+                relativeValuation: null,
+                pricing: {
+                    targetPriceRange: { bear: 0, base: 0, bull: 0 },
+                    expectedReturn: 0,
+                    riskPremium: 0,
+                    dynamicBeta: 0,
+                    valuationGap: 0,
+                    valuationSignal: 'NEUTRAL',
+                    marginOfSafety: 0
+                },
+                valuationRisk: null
+            }
+        },
+        simulationResult: {
+            storageKey: 'simulationResult',
+            eventName: 'simulation-result-update',
+            defaultValue: {
+                simulationId: '',
+                timestamp: 0,
+                config: null,
+                assetId: '',
+                baselineKLine: [],
+                monteCarlo: null,
+                stressTests: [],
+                threeFlow: null,
+                simulationRisk: null,
+                sandboxRecommendation: null
+            }
+        },
+        rationalityScore: {
+            storageKey: 'rationalityScore',
+            eventName: 'rationality-score-update',
+            defaultValue: {
+                sessionId: '',
+                timestamp: 0,
                 handsPlayed: 0,
-                dcfPassed: true,
-                brandVolume: 0,
-                timestamp: 0
+                overallScore: 50,
+                rationalityState: 'BALANCED',
+                subScores: null,
+                biases: null,
+                behavioralSignals: null,
+                positionAdjustment: {
+                    kellyMultiplier: 1.0,
+                    hedgingAdjustment: 0,
+                    forceDefensiveMode: false,
+                    riskAssetCap: 1.0,
+                    riskFreeAllocation: 0
+                },
+                tiltSignals: { tiltLevel: 0, coneC: 0, zScore: 0 }
+            }
+        },
+        executionOrder: {
+            storageKey: 'executionOrder',
+            eventName: 'execution-order-update',
+            defaultValue: {
+                orderId: '',
+                timestamp: 0,
+                assetId: '',
+                regime: 'RED_OCEAN',
+                fuseCheck: null,
+                signal: null,
+                kelly: null,
+                priceLevels: null,
+                allocation: null,
+                hedgingPlan: null,
+                riskStatus: { halted: false, activeFuses: [], warnings: [] },
+                auditTrail: null
+            }
+        },
+        regimeState: {
+            storageKey: 'regimeState',
+            eventName: 'regime-state-update',
+            defaultValue: {
+                regime: 'RED_OCEAN',
+                switchReason: 'initial',
+                switchedAt: 0,
+                redOceanParams: {
+                    preferredPE: [5, 15],
+                    preferredPB: [0.5, 2],
+                    fcfFocus: 0.8,
+                    growthPenalty: 0.3,
+                    valuationDiscount: 0.7
+                },
+                blueOceanParams: {
+                    preferredGrowth: [0.3, 1.0],
+                    preferredMomentum: [0.3, 1.0],
+                    growthPremium: 1.3,
+                    valueRelaxation: 0.5,
+                    betaAmplifier: 1.2
+                }
+            }
+        },
+        quantPipeline: {
+            storageKey: 'quantPipelineState',
+            eventName: 'quant-pipeline-update',
+            defaultValue: {
+                pipelineId: '',
+                currentStep: -1,
+                completedSteps: [],
+                startedAt: 0,
+                lastUpdatedAt: 0,
+                halted: false,
+                haltReason: ''
             }
         }
     };
@@ -271,7 +401,7 @@
 
     /**
      * 发布数据到指定通道
-     * @param {string} channelName - 通道名 (funnel|circle|aiPricing|caseLibrary|pricing|capmAuto|simulator|founder|riskFuse)
+     * @param {string} channelName - 通道名 (funnel|circle|aiPricing|caseLibrary|pricing|capmAuto|simulator|founder|riskFuse|marketingFinance|coneGame|kellyConfig|distribution|systemHealth|brandVolume|hedgeReservoir|pokerEgg|valuation|macroFunnel|factorLibrary|valuationV2|simulationResult|rationalityScore|executionOrder|regimeState|quantPipeline)
      * @param {*} data - 要发布的数据
      * @returns {boolean} 发布成功返回true
      */
