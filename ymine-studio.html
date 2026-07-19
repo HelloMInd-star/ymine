@@ -377,30 +377,40 @@
         else if (status === 'halted') { dot.style.background = '#ef4444'; dot.style.boxShadow = '0 0 10px #ef4444'; }
     }
 
-    function fmtPct(v, d) { d = d || 1; return (v * 100).toFixed(d) + '%'; }
-    function fmtNum(v, d) { d = d || 2; return Number(v).toFixed(d); }
+    function safe(v, def) { return (v === undefined || v === null || (typeof v === 'number' && isNaN(v))) ? def : v; }
+    function fmtPct(v, d) { d = d || 1; var n = safe(v, 0); return (n * 100).toFixed(d) + '%'; }
+    function fmtNum(v, d) { d = d || 2; var n = safe(v, 0); return Number(n).toFixed(d); }
+    function so(v) { return safe(v, {}); }
+    function sa(v) { return Array.isArray(v) ? v : []; }
     function colorVal(v, goodHigh) {
-        if (goodHigh) return v > 0.6 ? 'good' : (v > 0.3 ? 'warn' : 'bad');
-        return v < 0.3 ? 'good' : (v < 0.6 ? 'warn' : 'bad');
+        var n = safe(v, 0);
+        if (goodHigh) return n > 0.6 ? 'good' : (n > 0.3 ? 'warn' : 'bad');
+        return n < 0.3 ? 'good' : (n < 0.6 ? 'warn' : 'bad');
     }
 
     function drawKline(klineData) {
-        const wrap = document.querySelector('.kline-canvas-wrap');
+        const wrap = document.getElementById('klineWrap') || document.querySelector('.kline-canvas-wrap');
         if (!wrap || !klineData || klineData.length === 0) return;
         wrap.innerHTML = '<canvas id="klineCanvas"></canvas>';
         const canvas = $('klineCanvas');
         klineCanvas = canvas;
         const w = wrap.clientWidth;
         const h = wrap.clientHeight;
+        if (w <= 0 || h <= 0) return;
         canvas.width = w; canvas.height = h;
         const ctx = canvas.getContext('2d');
-        const prices = klineData.map(function(k) { return [k.low, k.high]; }).flat();
+        const prices = [];
+        klineData.forEach(function(k) {
+            if (typeof k.low === 'number') prices.push(k.low);
+            if (typeof k.high === 'number') prices.push(k.high);
+        });
+        if (prices.length === 0) return;
         const minP = Math.min.apply(null, prices) * 0.98;
         const maxP = Math.max.apply(null, prices) * 1.02;
         const padL = 30, padR = 10, padT = 10, padB = 20;
         const plotW = w - padL - padR, plotH = h - padT - padB;
         const n = klineData.length;
-        const cw = plotW / n;
+        const cw = n > 0 ? plotW / n : 1;
         const cy = padT + plotH;
         const scale = function(p) { return cy - (p - minP) / (maxP - minP) * plotH; };
 
@@ -411,7 +421,7 @@
             ctx.beginPath(); ctx.moveTo(padL, y); ctx.lineTo(w - padR, y); ctx.stroke();
         });
 
-        const gravityCenter = klineData[0].gravityCenter;
+        var gravityCenter = safe(klineData[0].gravityCenter, (minP + maxP) / 2);
         const gy = scale(gravityCenter);
         ctx.strokeStyle = 'rgba(167,139,250,0.5)'; ctx.setLineDash([4, 4]);
         ctx.beginPath(); ctx.moveTo(padL, gy); ctx.lineTo(w - padR, gy); ctx.stroke();
@@ -419,12 +429,13 @@
         ctx.fillStyle = 'rgba(167,139,250,0.7)'; ctx.font = '9px sans-serif';
         ctx.fillText('引力 ' + fmtNum(gravityCenter, 1), padL + 2, gy - 4);
 
-        for (let i = 0; i < n; i++) {
+        for (var i = 0; i < n; i++) {
             const k = klineData[i];
+            if (!k || typeof k.open !== 'number') continue;
             const x = padL + i * cw + cw / 2;
             const bh = cw * 0.6;
             const up = k.close >= k.open;
-            const color = k.coneC >= 0.68 ? '#ef4444' : (up ? '#22c55e' : '#ef4444');
+            const color = safe(k.coneC, 0) >= 0.68 ? '#ef4444' : (up ? '#22c55e' : '#ef4444');
             ctx.strokeStyle = color; ctx.fillStyle = color; ctx.lineWidth = 1;
             ctx.beginPath(); ctx.moveTo(x, scale(k.high)); ctx.lineTo(x, scale(k.low)); ctx.stroke();
             const by1 = scale(k.open), by2 = scale(k.close);
@@ -450,21 +461,66 @@
             return;
         }
 
+        const mfMacro = so(mf.macroIndicators);
+        const mfAssets = sa(mf.assets);
+        const mfSel = so(mf.selectedAsset);
+        const flVal = so(fl && fl.valueFactors);
+        const flGrow = so(fl && fl.growthFactors);
+        const flQual = so(fl && fl.qualityFactors);
+        const flMom = so(fl && fl.momentumFactors);
+        const flSent = so(fl && fl.sentimentFactors);
+        const flRisk = so(fl && fl.riskFactors);
+        const flZScores = so(fl && fl.factorZScores);
+        const valWacc = so(val && val.wacc);
+        const valWaccCapm = so(valWacc.details && valWacc.details.capm);
+        const valPricing = so(val && val.pricing);
+        const valTgt = so(valPricing.targetPriceRange);
+        const valDCF = so(val && val.dcf);
+        const valRel = so(val && val.relativeValuation);
+        const valRisk = so(val && val.valuationRisk);
+        const simConfig = so(sim && sim.config);
+        const simMC = so(sim && sim.monteCarlo);
+        const simMCStats = so(simMC.statistics);
+        const simRisk = so(sim && sim.simulationRisk);
+        const simRec = so(sim && sim.sandboxRecommendation);
+        const simEntry = so(simRec.optimalEntryZone);
+        const simExit = so(simRec.optimalExitZone);
+        const simStress = sa(sim && sim.stressTests);
+        const simKline = sa(sim && sim.baselineKLine);
+        const ratSub = so(rat && rat.subScores);
+        const ratBiases = so(rat && rat.biases);
+        const ratBehav = so(rat && rat.behavioralSignals);
+        const ratAdj = so(rat && rat.positionAdjustment);
+        const ratTilt = so(rat && rat.tiltSignals);
+        const execFuse = so(exec && exec.fuseCheck);
+        const execSignal = so(exec && exec.signal);
+        const execKelly = so(exec && exec.kelly);
+        const execPrices = so(exec && exec.priceLevels);
+        const execEntry = so(execPrices.entryZone);
+        const execAlloc = so(exec && exec.allocation);
+        const execHedge = so(exec && exec.hedgingPlan);
+        const execHedgeInst = sa(execHedge.instruments);
+        const execRisk = so(exec && exec.riskStatus);
+        const execWarns = sa(execRisk.warnings);
+        const execAudit = so(exec && exec.auditTrail);
+        const execAuditSteps = sa(execAudit.stepsCompleted);
+
         let html = '';
 
         html += '<div class="card"><div class="card-title"><span class="dot" style="background:#60a5fa"></span>🌊 Step 0 · 宏观漏斗与海选</div>';
         html += '<div class="kv-grid" style="margin-bottom:10px;">';
         html += '<div class="kv-key">当前环境</div><div class="kv-val">' + (mf.regime === 'BLUE_OCEAN' ? '🔵 蓝海·增量资金' : '🔴 红海·存量博弈') + '</div>';
-        html += '<div class="kv-key">筛选总数</div><div class="kv-val">' + mf.totalScreened + ' → ' + mf.totalPassed + ' 只</div>';
-        html += '<div class="kv-key">无风险利率</div><div class="kv-val">' + fmtPct(mf.macroIndicators.riskFreeRate, 1) + '</div>';
-        html += '<div class="kv-key">VIX恐慌指数</div><div class="kv-val ' + (mf.macroIndicators.vix > 25 ? 'bad' : 'good') + '">' + fmtNum(mf.macroIndicators.vix, 0) + '</div>';
-        html += '<div class="kv-key">市场情绪</div><div class="kv-val">' + fmtNum(mf.macroIndicators.marketSentiment, 0) + '/100</div>';
+        html += '<div class="kv-key">筛选总数</div><div class="kv-val">' + safe(mf.totalScreened, 0) + ' → ' + safe(mf.totalPassed, 0) + ' 只</div>';
+        html += '<div class="kv-key">无风险利率</div><div class="kv-val">' + fmtPct(mfMacro.riskFreeRate, 1) + '</div>';
+        html += '<div class="kv-key">VIX恐慌指数</div><div class="kv-val ' + (safe(mfMacro.vix, 20) > 25 ? 'bad' : 'good') + '">' + fmtNum(mfMacro.vix, 0) + '</div>';
+        html += '<div class="kv-key">市场情绪</div><div class="kv-val">' + fmtNum(mfMacro.marketSentiment, 0) + '/100</div>';
         html += '</div>';
         html += '<div class="card-title" style="margin-top:8px; font-size:10px;">精选标的池</div>';
         html += '<div class="asset-pool">';
-        (mf.assets || []).slice(0, 10).forEach(function(a) {
-            const sel = mf.selectedAsset && a.ticker === mf.selectedAsset.ticker ? ' selected' : '';
-            html += '<div class="asset-chip' + sel + '">' + a.ticker + ' · ' + a.name + ' <span style="opacity:0.6;font-size:10px;">' + Math.round(a.screeningScore) + '分</span></div>';
+        mfAssets.slice(0, 10).forEach(function(a) {
+            const aObj = so(a);
+            const sel = mfSel.ticker && aObj.ticker === mfSel.ticker ? ' selected' : '';
+            html += '<div class="asset-chip' + sel + '">' + safeStr(aObj.ticker) + ' · ' + safeStr(aObj.name) + ' <span style="opacity:0.6;font-size:10px;">' + Math.round(safe(aObj.screeningScore, 0)) + '分</span></div>';
         });
         html += '</div></div>';
 
@@ -472,11 +528,11 @@
             html += '<div class="card"><div class="card-title"><span class="dot" style="background:#a78bfa"></span>📥⚗️ Step 1-2 · 因子库提取</div>';
             html += '<div class="factor-bars">';
             const factors = [
-                { label: '价值', val: fl.factorZScores ? (fl.factorZScores.value || 0.5) : 0.5 },
-                { label: '成长', val: fl.factorZScores ? (fl.factorZScores.growth || 0.5) : 0.5 },
-                { label: '质量', val: fl.factorZScores ? (fl.factorZScores.quality || 0.5) : 0.5 },
-                { label: '动量', val: fl.factorZScores ? (fl.factorZScores.momentum || 0.5) : 0.5 },
-                { label: '情绪', val: fl.factorZScores ? (fl.factorZScores.sentiment || 0.5) : 0.5 }
+                { label: '价值', val: flZScores.value || 0.5 },
+                { label: '成长', val: flZScores.growth || 0.5 },
+                { label: '质量', val: flZScores.quality || 0.5 },
+                { label: '动量', val: flZScores.momentum || 0.5 },
+                { label: '情绪', val: flZScores.sentiment || 0.5 }
             ];
             factors.forEach(function(f) {
                 const pct = Math.round(clamp01(f.val) * 100);
@@ -486,13 +542,12 @@
                 html += '<div class="factor-val">' + pct + '</div></div>';
             });
             html += '</div>';
-            if (fl.riskFactors) {
-                html += '<div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.05);" class="kv-grid">';
-                html += '<div class="kv-key">圆锥浓度C</div><div class="kv-val ' + (fl.riskFactors.coneC >= 0.68 ? 'bad' : (fl.riskFactors.coneC >= 0.55 ? 'warn' : 'good')) + '">' + fmtNum(fl.riskFactors.coneC, 3) + '</div>';
-                html += '<div class="kv-key">动态β</div><div class="kv-val">' + fmtNum(fl.riskFactors.beta, 2) + '</div>';
-                html += '<div class="kv-key">30日波动率</div><div class="kv-val">' + fmtPct(fl.riskFactors.volatility30d) + '</div>';
-                html += '</div>';
-            }
+            html += '<div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.05);" class="kv-grid">';
+            html += '<div class="kv-key">圆锥浓度C</div><div class="kv-val ' + (safe(flRisk.coneC, 0) >= 0.68 ? 'bad' : (safe(flRisk.coneC, 0) >= 0.55 ? 'warn' : 'good')) + '">' + fmtNum(flRisk.coneC, 3) + '</div>';
+            html += '<div class="kv-key">动态β</div><div class="kv-val">' + fmtNum(flRisk.beta, 2) + '</div>';
+            html += '<div class="kv-key">30日波动率</div><div class="kv-val">' + fmtPct(flRisk.volatility30d) + '</div>';
+            html += '<div class="kv-key">综合评分</div><div class="kv-val">' + fmtNum(fl.compositeScore, 0) + '</div>';
+            html += '</div>';
             html += '</div>';
         } else {
             html += '<div class="card"><div class="card-title"><span class="dot" style="background:#a78bfa"></span>📥⚗️ Step 1-2 · 因子库提取</div><div class="placeholder" style="padding:20px;font-size:11px;">等待执行...</div></div>';
@@ -502,20 +557,19 @@
             html += '<div class="card"><div class="card-title"><span class="dot" style="background:#facc15"></span>⚖️📐 Step 3-4 · 核心定价与估值</div>';
             html += '<div class="kv-grid">';
             html += '<div class="kv-key">当前价格</div><div class="kv-val">' + fmtNum(val.currentPrice, 2) + '</div>';
-            html += '<div class="kv-key">WACC</div><div class="kv-val">' + fmtPct(val.wacc.wacc, 2) + '</div>';
-            html += '<div class="kv-key">动态β</div><div class="kv-val">' + fmtNum(val.pricing.dynamicBeta, 2) + '</div>';
-            html += '<div class="kv-key">估值信号</div><div class="kv-val ' + (val.pricing.valuationSignal === 'BULLISH' ? 'good' : (val.pricing.valuationSignal === 'BEARISH' ? 'bad' : 'warn')) + '">' + val.pricing.valuationSignal + '</div>';
-            html += '<div class="kv-key">安全边际</div><div class="kv-val ' + (val.pricing.marginOfSafety > 0.1 ? 'good' : 'bad') + '">' + fmtPct(val.pricing.marginOfSafety) + '</div>';
-            if (val.dcf) {
-                html += '<div class="kv-key">NPV</div><div class="kv-val ' + (val.dcf.npvNegative ? 'bad' : 'good') + '">' + fmtNum(val.dcf.npv, 0) + '</div>';
-            }
+            html += '<div class="kv-key">WACC</div><div class="kv-val">' + fmtPct(valWacc.wacc, 2) + '</div>';
+            html += '<div class="kv-key">动态β</div><div class="kv-val">' + fmtNum(valPricing.dynamicBeta, 2) + '</div>';
+            html += '<div class="kv-key">估值信号</div><div class="kv-val ' + (valPricing.valuationSignal === 'BULLISH' ? 'good' : (valPricing.valuationSignal === 'BEARISH' ? 'bad' : 'warn')) + '">' + safeStr(valPricing.valuationSignal, 'NEUTRAL') + '</div>';
+            html += '<div class="kv-key">安全边际</div><div class="kv-val ' + (safe(valPricing.marginOfSafety, 0) > 0.1 ? 'good' : 'bad') + '">' + fmtPct(valPricing.marginOfSafety) + '</div>';
+            html += '<div class="kv-key">NPV</div><div class="kv-val ' + (valDCF.npvNegative ? 'bad' : 'good') + '">' + fmtNum(valDCF.npv, 0) + '</div>';
+            html += '<div class="kv-key">预期回报</div><div class="kv-val ' + (safe(valPricing.expectedReturn, 0) > 0.05 ? 'good' : 'bad') + '">' + fmtPct(valPricing.expectedReturn) + '</div>';
             html += '</div>';
             html += '<div class="price-target">';
-            html += '<div class="price-col"><div class="price-label">悲观目标</div><div class="price-val" style="color:#ef4444;">' + fmtNum(val.pricing.targetPriceRange.bear, 1) + '</div></div>';
+            html += '<div class="price-col"><div class="price-label">悲观目标</div><div class="price-val" style="color:#ef4444;">' + fmtNum(valTgt.bear, 1) + '</div></div>';
             html += '<div class="price-arrow">←</div>';
-            html += '<div class="price-col"><div class="price-label">中性目标</div><div class="price-val" style="color:#facc15;">' + fmtNum(val.pricing.targetPriceRange.base, 1) + '</div></div>';
+            html += '<div class="price-col"><div class="price-label">中性目标</div><div class="price-val" style="color:#facc15;">' + fmtNum(valTgt.base, 1) + '</div></div>';
             html += '<div class="price-arrow">→</div>';
-            html += '<div class="price-col"><div class="price-label">乐观目标</div><div class="price-val" style="color:#22c55e;">' + fmtNum(val.pricing.targetPriceRange.bull, 1) + '</div></div>';
+            html += '<div class="price-col"><div class="price-label">乐观目标</div><div class="price-val" style="color:#22c55e;">' + fmtNum(valTgt.bull, 1) + '</div></div>';
             html += '</div></div>';
         } else {
             html += '<div class="card"><div class="card-title"><span class="dot" style="background:#facc15"></span>⚖️📐 Step 3-4 · 核心定价与估值</div><div class="placeholder" style="padding:20px;font-size:11px;">等待执行...</div></div>';
@@ -526,20 +580,23 @@
             html += '<div class="kline-canvas-wrap" id="klineWrap"></div>';
             html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px;">';
             html += '<div class="kv-grid" style="font-size:11px;">';
-            html += '<div class="kv-key">蒙特卡洛路径</div><div class="kv-val">' + sim.monteCarlo.runs + '次</div>';
-            html += '<div class="kv-key">熔断触发概率</div><div class="kv-val ' + (sim.monteCarlo.statistics.fuseTriggerProbability > 0.3 ? 'bad' : 'good') + '">' + fmtPct(sim.monteCarlo.statistics.fuseTriggerProbability) + '</div>';
-            html += '<div class="kv-key">平均最大回撤</div><div class="kv-val ' + (sim.monteCarlo.statistics.meanMaxDrawdown > 0.3 ? 'bad' : 'good') + '">' + fmtPct(sim.monteCarlo.statistics.meanMaxDrawdown) + '</div>';
-            html += '<div class="kv-key">夏普比率</div><div class="kv-val good">' + fmtNum(sim.monteCarlo.statistics.meanSharpeRatio, 2) + '</div>';
-            html += '<div class="kv-key">入场区间</div><div class="kv-val">' + fmtNum(sim.sandboxRecommendation.optimalEntryZone.low,1) + ' - ' + fmtNum(sim.sandboxRecommendation.optimalEntryZone.high,1) + '</div>';
-            html += '<div class="kv-key">预警等级</div><div class="kv-val ' + (sim.sandboxRecommendation.warningLevel === 'LOW' ? 'good' : (sim.sandboxRecommendation.warningLevel === 'EXTREME' ? 'bad' : 'warn')) + '">' + sim.sandboxRecommendation.warningLevel + '</div>';
+            html += '<div class="kv-key">蒙特卡洛路径</div><div class="kv-val">' + safe(simMC.runs, 0) + '次</div>';
+            html += '<div class="kv-key">熔断触发概率</div><div class="kv-val ' + (safe(simMCStats.fuseTriggerProbability, 0) > 0.3 ? 'bad' : 'good') + '">' + fmtPct(simMCStats.fuseTriggerProbability) + '</div>';
+            html += '<div class="kv-key">平均最大回撤</div><div class="kv-val ' + (safe(simMCStats.meanMaxDrawdown, 0) > 0.3 ? 'bad' : 'good') + '">' + fmtPct(simMCStats.meanMaxDrawdown) + '</div>';
+            html += '<div class="kv-key">夏普比率</div><div class="kv-val good">' + fmtNum(simMCStats.meanSharpeRatio, 2) + '</div>';
+            html += '<div class="kv-key">入场区间</div><div class="kv-val">' + fmtNum(simEntry.low, 1) + ' - ' + fmtNum(simEntry.high, 1) + '</div>';
+            html += '<div class="kv-key">止损</div><div class="kv-val bad">' + fmtNum(simRec.stopLoss, 2) + '</div>';
+            html += '<div class="kv-key">预警等级</div><div class="kv-val ' + (simRec.warningLevel === 'LOW' ? 'good' : (simRec.warningLevel === 'EXTREME' ? 'bad' : 'warn')) + '">' + safeStr(simRec.warningLevel, 'LOW') + '</div>';
+            html += '<div class="kv-key">游戏状态</div><div class="kv-val ' + (simRisk.gameState === 'CALM' ? 'good' : (simRisk.gameState === 'BLACK_SWAN' || simRisk.gameState === 'MELTDOWN' ? 'bad' : 'warn')) + '">' + safeStr(simRisk.gameState, 'CALM') + '</div>';
             html += '</div>';
             html += '<div class="stress-grid">';
-            sim.stressTests.forEach(function(s) {
-                const pnlColor = s.pnlPercent < -0.2 ? '#ef4444' : (s.pnlPercent < -0.1 ? '#facc15' : '#22c55e');
-                html += '<div class="stress-item" style="border-left-color:' + (s.fuseTriggered ? '#ef4444' : '#facc15') + '">';
-                html += '<div class="stress-name">' + s.name + '</div>';
-                html += '<div class="stress-pnl" style="color:' + pnlColor + '">' + fmtPct(s.pnlPercent) + '</div>';
-                if (s.fuseTriggered) html += '<div style="font-size:9px;color:#fca5a5;margin-top:1px;">⚠ 熔断触发</div>';
+            simStress.forEach(function(s) {
+                const sObj = so(s);
+                const pnlColor = safe(sObj.pnlPercent, 0) < -20 ? '#ef4444' : (safe(sObj.pnlPercent, 0) < -10 ? '#facc15' : '#22c55e');
+                html += '<div class="stress-item" style="border-left-color:' + (sObj.fuseTriggered ? '#ef4444' : '#facc15') + '">';
+                html += '<div class="stress-name">' + safeStr(sObj.name) + '</div>';
+                html += '<div class="stress-pnl" style="color:' + pnlColor + '">' + fmtPct(sObj.pnlPercent / 100) + '</div>';
+                if (sObj.fuseTriggered) html += '<div style="font-size:9px;color:#fca5a5;margin-top:1px;">⚠ 熔断触发</div>';
                 html += '</div>';
             });
             html += '</div></div></div>';
@@ -548,23 +605,24 @@
         }
 
         if (rat) {
-            const scoreColor = rat.overallScore >= 85 ? '#22c55e' : (rat.overallScore >= 60 ? '#facc15' : (rat.overallScore >= 30 ? '#f97316' : '#ef4444'));
+            const score = safe(rat.overallScore, 50);
+            const scoreColor = score >= 85 ? '#22c55e' : (score >= 60 ? '#facc15' : (score >= 30 ? '#f97316' : '#ef4444'));
             const dashArray = 2 * Math.PI * 34;
-            const dashOffset = dashArray * (1 - rat.overallScore / 100);
+            const dashOffset = dashArray * (1 - score / 100);
             html += '<div class="card"><div class="card-title"><span class="dot" style="background:#ec4899"></span>🃏 Step 7 · 人性压力测试</div>';
             html += '<div class="rationality-gauge">';
             html += '<div class="gauge-circle">';
             html += '<svg width="80" height="80"><circle cx="40" cy="40" r="34" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="6"/>';
             html += '<circle cx="40" cy="40" r="34" fill="none" stroke="' + scoreColor + '" stroke-width="6" stroke-linecap="round" stroke-dasharray="' + dashArray + '" stroke-dashoffset="' + dashOffset + '"/></svg>';
-            html += '<div class="gauge-score" style="color:' + scoreColor + '">' + rat.overallScore + '</div>';
+            html += '<div class="gauge-score" style="color:' + scoreColor + '">' + Math.round(score) + '</div>';
             html += '</div>';
             html += '<div class="bias-list">';
             html += '<div style="font-size:12px;font-weight:700;color:' + scoreColor + ';margin-bottom:3px;">' + stateLabel(rat.rationalityState) + '</div>';
             const biasItems = [
-                { name: '过度攻击', val: rat.biases.overAggressionFactor - 1, max: 1 },
-                { name: '损失厌恶', val: rat.biases.lossAversionFactor - 1, max: 1 },
-                { name: '过度自信', val: rat.biases.overconfidenceFactor - 1, max: 1 },
-                { name: '追损倾向', val: rat.biases.chasingFactor - 1, max: 1 }
+                { name: '过度攻击', val: safe(ratBiases.overAggressionFactor, 1) - 1, max: 1 },
+                { name: '损失厌恶', val: safe(ratBiases.lossAversionFactor, 1) - 1, max: 1 },
+                { name: '过度自信', val: safe(ratBiases.overconfidenceFactor, 1) - 1, max: 1 },
+                { name: '追损倾向', val: safe(ratBiases.chasingFactor, 1) - 1, max: 1 }
             ];
             biasItems.forEach(function(b) {
                 const p = clamp01(b.val / b.max) * 100;
@@ -572,49 +630,53 @@
                 html += '<div class="bias-row"><div class="bias-name">' + b.name + '</div>';
                 html += '<div class="bias-bar-bg"><div class="bias-bar" style="width:' + p + '%;background:' + c + '"></div></div></div>';
             });
-            html += '<div style="font-size:10px;color:rgba(255,255,255,0.5);margin-top:4px;">仓位乘数: <strong style="color:' + scoreColor + '">×' + fmtNum(rat.positionAdjustment.kellyMultiplier, 2) + '</strong>' + (rat.positionAdjustment.forceDefensiveMode ? ' · 🛡 防御模式' : '') + '</div>';
+            html += '<div style="font-size:10px;color:rgba(255,255,255,0.5);margin-top:4px;">仓位乘数: <strong style="color:' + scoreColor + '">×' + fmtNum(ratAdj.kellyMultiplier, 2) + '</strong>' + (ratAdj.forceDefensiveMode ? ' · 🛡 防御模式' : '') + '</div>';
+            html += '<div style="font-size:10px;color:rgba(255,255,255,0.4);">TILT水平: ' + fmtNum(ratTilt.tiltLevel, 2) + ' · 手数: ' + safe(rat.handsPlayed, 0) + '</div>';
             html += '</div></div></div>';
         } else {
             html += '<div class="card"><div class="card-title"><span class="dot" style="background:#ec4899"></span>🃏 Step 7 · 人性压力测试</div><div class="placeholder" style="padding:20px;font-size:11px;">等待执行...</div></div>';
         }
 
         if (exec) {
-            const isHalted = exec.riskStatus.halted || exec.kelly.enforcedPosition === 0;
-            const sig = exec.signal.direction;
-            const sigClass = sig === 'BUY' ? 'buy' : (sig === 'SELL' ? 'sell' : 'hold');
-            const sigText = sig === 'BUY' ? '📈 买入' : (sig === 'SELL' ? '🔴 卖出' : '⏸ 持有');
+            const sigDir = safeStr(execSignal.direction, 'HOLD');
+            const enforcedPos = safe(execKelly.enforcedPosition, 0);
+            const isHalted = execRisk.halted || enforcedPos === 0;
+            const sigClass = sigDir === 'BUY' ? 'buy' : (sigDir === 'SELL' ? 'sell' : 'hold');
+            const sigText = sigDir === 'BUY' ? '📈 买入' : (sigDir === 'SELL' ? '🔴 卖出' : '⏸ 持有');
             html += '<div class="card card-wide"><div class="card-title"><span class="dot" style="background:' + (isHalted ? '#ef4444' : '#22c55e') + '"></span>🛡️ Step 8 · 最终执行指令（熔断门控后）</div>';
             html += '<div class="execution-panel' + (isHalted ? ' halted' : '') + '">';
             html += '<div class="exec-header"><div class="exec-signal ' + sigClass + '">' + sigText + '</div>';
             html += '<div class="exec-pos"><div class="exec-pos-label">实际仓位（熔断后）</div>';
-            html += '<div class="exec-pos-val' + (isHalted ? ' halted' : '') + '">' + fmtPct(exec.kelly.enforcedPosition) + '</div></div></div>';
+            html += '<div class="exec-pos-val' + (isHalted ? ' halted' : '') + '">' + fmtPct(enforcedPos) + '</div></div></div>';
             html += '<div class="exec-meta">';
-            html += '<div class="exec-meta-item"><div class="exec-meta-label">原始凯利</div><div class="exec-meta-val" style="color:rgba(255,255,255,0.4);text-decoration:line-through;">' + fmtPct(exec.kelly.rawKelly) + '</div></div>';
-            html += '<div class="exec-meta-item"><div class="exec-meta-label">止损</div><div class="exec-meta-val">' + fmtNum(exec.priceLevels.stopLoss, 2) + '</div></div>';
-            html += '<div class="exec-meta-item"><div class="exec-meta-label">目标价</div><div class="exec-meta-val good">' + fmtNum(exec.priceLevels.targetPrice, 2) + '</div></div>';
-            html += '<div class="exec-meta-item"><div class="exec-meta-label">盈亏比</div><div class="exec-meta-val good">' + fmtNum(exec.priceLevels.riskRewardRatio, 2) + ':1</div></div>';
+            html += '<div class="exec-meta-item"><div class="exec-meta-label">原始凯利</div><div class="exec-meta-val" style="color:rgba(255,255,255,0.4);text-decoration:line-through;">' + fmtPct(execKelly.rawKelly) + '</div></div>';
+            html += '<div class="exec-meta-item"><div class="exec-meta-label">止损</div><div class="exec-meta-val">' + fmtNum(execPrices.stopLoss, 2) + '</div></div>';
+            html += '<div class="exec-meta-item"><div class="exec-meta-label">目标价</div><div class="exec-meta-val good">' + fmtNum(execPrices.targetPrice, 2) + '</div></div>';
+            html += '<div class="exec-meta-item"><div class="exec-meta-label">盈亏比</div><div class="exec-meta-val good">' + fmtNum(execPrices.riskRewardRatio, 2) + ':1</div></div>';
             html += '</div>';
 
-            if (exec.riskStatus.warnings && exec.riskStatus.warnings.length > 0) {
+            if (execWarns.length > 0) {
                 html += '<div class="warnings-box">';
-                exec.riskStatus.warnings.forEach(function(w) {
-                    const isDanger = w.indexOf('🔴') >= 0 || w.indexOf('熔断') >= 0;
-                    html += '<div class="warning-item' + (isDanger ? ' danger' : '') + '">' + w + '</div>';
+                execWarns.forEach(function(w) {
+                    const ws = safeStr(w);
+                    const isDanger = ws.indexOf('🔴') >= 0 || ws.indexOf('熔断') >= 0 || ws.indexOf('熔断已触发') >= 0;
+                    html += '<div class="warning-item' + (isDanger ? ' danger' : '') + '">' + ws + '</div>';
                 });
                 html += '</div>';
             }
 
-            if (exec.hedgingPlan.instruments && exec.hedgingPlan.instruments.length > 0) {
-                html += '<div style="margin-top:10px;"><div style="font-size:10px;color:rgba(255,255,255,0.4;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">对冲工具</div>';
+            if (execHedgeInst.length > 0 || execHedge.required) {
+                html += '<div style="margin-top:10px;"><div style="font-size:10px;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">对冲工具</div>';
                 html += '<div class="hedge-list">';
-                exec.hedgingPlan.instruments.forEach(function(h) {
-                    html += '<div class="hedge-chip">' + h.name + ' ' + fmtPct(h.hedgeRatio, 0) + '</div>';
+                execHedgeInst.forEach(function(h) {
+                    const hObj = so(h);
+                    html += '<div class="hedge-chip">' + safeStr(hObj.name) + ' ' + fmtPct(safe(hObj.hedgeRatio, 0), 0) + '</div>';
                 });
                 html += '</div></div>';
             }
 
             html += '<div class="audit-trail">审计链：';
-            (exec.auditTrail ? exec.auditTrail.stepsCompleted : []).forEach(function(s) {
+            execAuditSteps.forEach(function(s) {
                 html += '<span class="audit-step">Step ' + s + '</span>';
             });
             html += '</div>';
@@ -625,12 +687,13 @@
 
         area.innerHTML = html;
 
-        if (sim && sim.baselineKLine && sim.baselineKLine.length > 0) {
-            setTimeout(function() { drawKline(sim.baselineKLine); }, 50);
+        if (simKline.length > 0) {
+            setTimeout(function() { drawKline(simKline); }, 60);
         }
     }
 
-    function clamp01(v) { return Math.max(0, Math.min(1, v)); }
+    function safeStr(v, def) { return typeof v === 'string' ? v : (def || ''); }
+    function clamp01(v) { return Math.max(0, Math.min(1, safe(v, 0))); }
 
     function stateLabel(s) {
         return {
@@ -638,7 +701,7 @@
             'BALANCED': '⚖️ 平衡状态',
             'LIMBIC_TILT': '😤 情绪上头 · 边缘系统激活',
             'EXTREME_TILT': '🔥 极度TILT · 强制防御'
-        }[s] || s;
+        }[s] || (s || '评估中');
     }
 
     async function runFullPipeline() {
@@ -677,11 +740,13 @@
                 await new Promise(function(r) { setTimeout(r, 150 + Math.random() * 200); });
                 const moduleFn = YMineQuantEngine.modules[sid];
                 const result = moduleFn(input, ctx);
-                const channelMap = { 0:'macroFunnel', 1:'factorLibrary', 2:'factorLibrary', 3:'valuationV2', 4:'valuationV2', 5:'simulationResult', 6:'simulationResult', 7:'rationalityScore', 8:'executionOrder' };
+                const channelMap = { 0:'macroFunnel', 1:null, 2:'factorLibrary', 3:null, 4:'valuationV2', 5:null, 6:'simulationResult', 7:'rationalityScore', 8:'executionOrder' };
                 const ch = channelMap[sid];
-                pipeline[ch] = result;
-                results[ch] = result;
-                YBus.publish(ch, result);
+                if (ch) {
+                    pipeline[ch] = result;
+                    results[ch] = result;
+                    YBus.publish(ch, result);
+                }
                 input = result;
                 setStepStatus(sid, 'completed');
                 renderContent();
