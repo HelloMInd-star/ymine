@@ -102,6 +102,36 @@
         }
 
         /* ===== 板块1 · 案例卡片矩阵 ===== */
+        .filter-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 14px;
+            position: relative;
+            z-index: 1;
+        }
+        .filter-btn {
+            font-size: 10px;
+            font-weight: 600;
+            padding: 4px 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.06);
+            background: rgba(255,255,255,0.02);
+            color: rgba(255,255,255,0.4);
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: system-ui;
+        }
+        .filter-btn:hover {
+            border-color: rgba(167,139,250,0.3);
+            color: rgba(255,255,255,0.7);
+            background: rgba(167,139,250,0.05);
+        }
+        .filter-btn.active {
+            background: rgba(167,139,250,0.12);
+            border-color: rgba(167,139,250,0.4);
+            color: #c4b5fd;
+        }
         .case-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -764,6 +794,22 @@
 
             <!-- ===== 板块 1 · 案例卡片矩阵 ===== -->
             <div class="section-label">📋 板块 1 · 案例卡片矩阵（21 案例 · 4 列网格）</div>
+            <div class="filter-bar" id="filterBar">
+                <button class="filter-btn active" data-filter="all">全部 · 21</button>
+                <button class="filter-btn" data-filter="price-war">价格战反例</button>
+                <button class="filter-btn" data-filter="defensive">防御型基础</button>
+                <button class="filter-btn" data-filter="b2b">B2B隐形冠军</button>
+                <button class="filter-btn" data-filter="premium">高端定制</button>
+                <button class="filter-btn" data-filter="ai-flagship">AI旗舰</button>
+                <button class="filter-btn" data-filter="ai-value">AI性价比</button>
+                <button class="filter-btn" data-filter="ai-mainstream">AI主流</button>
+                <button class="filter-btn" data-filter="ai-compute">AI算力</button>
+                <button class="filter-btn" data-filter="info-ip">IP溢价</button>
+                <button class="filter-btn" data-filter="info-eco">IP生态</button>
+                <button class="filter-btn" data-filter="traffic-algo">算法推荐</button>
+                <button class="filter-btn" data-filter="traffic-decide">决策闭环</button>
+                <button class="filter-btn" data-filter="traffic-owned">深度自有</button>
+            </div>
             <div class="case-grid" id="caseGrid"></div>
 
             <!-- ===== 板块 2 · 案例对比表 ===== -->
@@ -793,19 +839,23 @@
             <div class="section-label">🎯 板块 3 · 向量相似度匹配（创始人画像圈映射）</div>
             <div class="match-area">
                 <div class="match-sliders">
-                    <h3>🎛️ 你的 6 维向量 <span class="hint">滑块范围 0-1</span></h3>
+                    <h3>🎛️ 你的 6 维向量 <span class="hint">滑块归一化 0-1</span></h3>
+                    <div style="font-size:9px;color:rgba(255,255,255,0.25);margin-bottom:12px;line-height:1.5;">
+                        f*凯利(0~0.7) · L杠杆(0~2.0x) · SR夏普(0~2.0)<br>
+                        mdd回撤(0~0.6) · DIM边际(0~0.8) · OC机会(0~0.7)
+                    </div>
                     <div class="slider-row">
                         <div class="s-label">凯利 f*<span class="s-sub">Kelly fraction</span></div>
                         <input type="range" id="s0" min="0" max="1" step="0.01" value="0.40" data-idx="0" />
                         <div class="s-value" id="v0">0.40</div>
                     </div>
                     <div class="slider-row">
-                        <div class="s-label">杠杆 L<span class="s-sub">Leverage</span></div>
+                        <div class="s-label">杠杆 L<span class="s-sub">Leverage 0~2x</span></div>
                         <input type="range" id="s1" min="0" max="1" step="0.01" value="0.50" data-idx="1" />
                         <div class="s-value" id="v1">0.50</div>
                     </div>
                     <div class="slider-row">
-                        <div class="s-label">夏普 SR<span class="s-sub">Sharpe Ratio</span></div>
+                        <div class="s-label">夏普 SR<span class="s-sub">Sharpe 0~2.0</span></div>
                         <input type="range" id="s2" min="0" max="1" step="0.01" value="0.50" data-idx="2" />
                         <div class="s-value" id="v2">0.50</div>
                     </div>
@@ -860,7 +910,7 @@
                 </div>
                 <div class="footer-status">
                     <span class="dot"></span>
-                    <span>案例库运行中 · v1.3<span class="bus-status" id="busStatus">○ 总线待写入</span></span>
+                    <span>案例库运行中 · v2.1<span class="bus-status" id="busStatus">○ 总线待写入</span></span>
                 </div>
             </div>
 
@@ -870,55 +920,72 @@
 
     <script>
         // ============================================================
-        // 16 案例数据 · 6 维向量 [f*, L, SR, mdd, dim, oc]
+        // 21 案例数据 · 6 维原始向量 [f*, L, SR, mdd, dim, oc]
+        // 归一化上界：根据21案例最大值取整，用于余弦相似度公平计算
+        // f*∈[0,0.7]  L∈[0,2.0]  SR∈[0,2.0]  mdd∈[0,0.6]  dim∈[0,0.8]  oc∈[0,0.7]
         // ============================================================
-        const CASES = [
-            // 瑞幸 + 隐形冠军（8 个）
-            { id: 'CASE_001', name: '瑞幸 9.9 价格战', type: '价格战反例', typeKey: 'price-war',
-              vector: [0.08, 1.8, 0.4, 0.5, 0.7, 0.3], C: 0.32, pe: 8, beta: 1.8, fstar: 0.08 },
-            { id: 'CASE_002', name: '海天味业', type: '防御型基础', typeKey: 'defensive',
-              vector: [0.22, 0.5, 1.2, 0.15, 0.4, 0.2], C: 0.48, pe: 15 },
-            { id: 'CASE_003', name: '公牛集团', type: '防御型基础', typeKey: 'defensive',
-              vector: [0.20, 0.4, 1.3, 0.18, 0.4, 0.2], C: 0.50, pe: 16 },
-            { id: 'CASE_004', name: '福耀玻璃', type: 'B2B 隐形冠军', typeKey: 'b2b',
-              vector: [0.32, 1.0, 1.1, 0.30, 0.5, 0.4], C: 0.58, pe: 22 },
-            { id: 'CASE_005', name: '海康威视', type: 'B2B 隐形冠军', typeKey: 'b2b',
-              vector: [0.35, 1.1, 1.2, 0.32, 0.5, 0.4], C: 0.60, pe: 24 },
-            { id: 'CASE_006', name: '三花智控', type: 'B2B 隐形冠军', typeKey: 'b2b',
-              vector: [0.30, 0.9, 1.0, 0.28, 0.5, 0.4], C: 0.56, pe: 21 },
-            { id: 'CASE_007', name: '海光信息', type: '高端定制', typeKey: 'premium',
-              vector: [0.55, 1.6, 1.5, 0.45, 0.7, 0.6], C: 0.68, pe: 35 },
-            { id: 'CASE_008', name: '北方华创', type: '高端定制', typeKey: 'premium',
-              vector: [0.58, 1.7, 1.6, 0.48, 0.7, 0.6], C: 0.70, pe: 38 },
-            // AI 行业（8 个）
-            { id: 'CASE_009', name: 'OpenAI GPT-5', type: 'AI 旗舰', typeKey: 'ai-flagship',
-              vector: [0.65, 2.0, 1.8, 0.55, 0.6, 0.5], C: 0.75, pe: 45 },
-            { id: 'CASE_010', name: 'Anthropic Claude 4.5', type: 'AI 旗舰', typeKey: 'ai-flagship',
-              vector: [0.60, 1.8, 1.7, 0.50, 0.6, 0.5], C: 0.72, pe: 42 },
-            { id: 'CASE_011', name: 'Google Gemini 2.5 Pro', type: 'AI 旗舰', typeKey: 'ai-flagship',
-              vector: [0.50, 1.5, 1.6, 0.45, 0.5, 0.4], C: 0.65, pe: 32 },
-            { id: 'CASE_012', name: 'DeepSeek V3.5', type: 'AI 性价比', typeKey: 'ai-value',
-              vector: [0.18, 1.2, 1.4, 0.40, 0.5, 0.3], C: 0.42, pe: 18 },
-            { id: 'CASE_013', name: '字节豆包', type: 'AI 性价比', typeKey: 'ai-value',
-              vector: [0.20, 1.3, 1.5, 0.42, 0.5, 0.3], C: 0.44, pe: 20 },
-            { id: 'CASE_014', name: '阿里 Qwen3-Max', type: 'AI 主流', typeKey: 'ai-mainstream',
-              vector: [0.30, 1.4, 1.3, 0.35, 0.5, 0.4], C: 0.50, pe: 24 },
-            { id: 'CASE_015', name: 'AWS H100 算力', type: 'AI 算力头部', typeKey: 'ai-compute',
-              vector: [0.45, 1.5, 1.2, 0.30, 0.4, 0.5], C: 0.62, pe: 30 },
-            { id: 'CASE_016', name: 'Lambda H100 算力', type: 'AI 算力裸金属', typeKey: 'ai-compute',
-              vector: [0.15, 0.8, 0.9, 0.20, 0.4, 0.2], C: 0.40, pe: 14 },
-            // 三流分发（5 个）
-            { id: 'CASE_017', name: '泡泡玛特 IP 盲盒', type: '信息分发·IP溢价', typeKey: 'info-ip',
-              vector: [0.42, 0.6, 1.4, 0.25, 0.6, 0.5], C: 0.62, pe: 32 },
-            { id: 'CASE_018', name: '漫威 IP 宇宙', type: '信息分发·IP生态', typeKey: 'info-eco',
-              vector: [0.50, 0.8, 1.6, 0.30, 0.5, 0.6], C: 0.68, pe: 40 },
-            { id: 'CASE_019', name: '抖音/TikTok 算法', type: '流量分发·算法推荐', typeKey: 'traffic-algo',
-              vector: [0.55, 1.8, 1.7, 0.45, 0.7, 0.5], C: 0.70, pe: 42 },
-            { id: 'CASE_020', name: '小红书种草', type: '流量分发·决策闭环', typeKey: 'traffic-decide',
-              vector: [0.35, 1.0, 1.3, 0.30, 0.5, 0.4], C: 0.56, pe: 25 },
-            { id: 'CASE_021', name: '博客/自有阵地', type: '流量分发·深度自有', typeKey: 'traffic-owned',
-              vector: [0.25, 0.5, 1.1, 0.18, 0.4, 0.3], C: 0.48, pe: 20 }
+        const VEC_NORM_MAX = [0.7, 2.0, 2.0, 0.6, 0.8, 0.7];
+        const VEC_FULL_LABELS = [
+            { short: 'f*',  full: '凯利f*' },
+            { short: 'L',   full: '杠杆L' },
+            { short: 'SR',  full: '夏普SR' },
+            { short: 'mdd', full: '回撤MDD' },
+            { short: 'dim', full: '边际DIM' },
+            { short: 'oc',  full: '机会OC' }
         ];
+
+        const CASES = [
+            { id: 'CASE_001', name: '瑞幸 9.9 价格战', type: '价格战反例', typeKey: 'price-war',
+              vector: [0.08, 1.80, 0.40, 0.50, 0.70, 0.30], C: 0.32, pe: 8, beta: 1.8 },
+            { id: 'CASE_002', name: '海天味业', type: '防御型基础', typeKey: 'defensive',
+              vector: [0.22, 0.50, 1.20, 0.15, 0.40, 0.20], C: 0.48, pe: 15 },
+            { id: 'CASE_003', name: '公牛集团', type: '防御型基础', typeKey: 'defensive',
+              vector: [0.20, 0.40, 1.30, 0.18, 0.40, 0.20], C: 0.50, pe: 16 },
+            { id: 'CASE_004', name: '福耀玻璃', type: 'B2B 隐形冠军', typeKey: 'b2b',
+              vector: [0.32, 1.00, 1.10, 0.30, 0.50, 0.40], C: 0.58, pe: 22 },
+            { id: 'CASE_005', name: '海康威视', type: 'B2B 隐形冠军', typeKey: 'b2b',
+              vector: [0.35, 1.10, 1.20, 0.32, 0.50, 0.40], C: 0.60, pe: 24 },
+            { id: 'CASE_006', name: '三花智控', type: 'B2B 隐形冠军', typeKey: 'b2b',
+              vector: [0.30, 0.90, 1.00, 0.28, 0.50, 0.40], C: 0.56, pe: 21 },
+            { id: 'CASE_007', name: '海光信息', type: '高端定制', typeKey: 'premium',
+              vector: [0.55, 1.60, 1.50, 0.45, 0.70, 0.60], C: 0.68, pe: 35 },
+            { id: 'CASE_008', name: '北方华创', type: '高端定制', typeKey: 'premium',
+              vector: [0.58, 1.70, 1.60, 0.48, 0.70, 0.60], C: 0.70, pe: 38 },
+            { id: 'CASE_009', name: 'OpenAI GPT-5', type: 'AI 旗舰', typeKey: 'ai-flagship',
+              vector: [0.65, 2.00, 1.80, 0.55, 0.60, 0.50], C: 0.75, pe: 45 },
+            { id: 'CASE_010', name: 'Anthropic Claude 4.5', type: 'AI 旗舰', typeKey: 'ai-flagship',
+              vector: [0.60, 1.80, 1.70, 0.50, 0.60, 0.50], C: 0.72, pe: 42 },
+            { id: 'CASE_011', name: 'Google Gemini 2.5 Pro', type: 'AI 旗舰', typeKey: 'ai-flagship',
+              vector: [0.50, 1.50, 1.60, 0.45, 0.50, 0.40], C: 0.65, pe: 32 },
+            { id: 'CASE_012', name: 'DeepSeek V3.5', type: 'AI 性价比', typeKey: 'ai-value',
+              vector: [0.18, 1.20, 1.40, 0.40, 0.50, 0.30], C: 0.42, pe: 18 },
+            { id: 'CASE_013', name: '字节豆包', type: 'AI 性价比', typeKey: 'ai-value',
+              vector: [0.20, 1.30, 1.50, 0.42, 0.50, 0.30], C: 0.44, pe: 20 },
+            { id: 'CASE_014', name: '阿里 Qwen3-Max', type: 'AI 主流', typeKey: 'ai-mainstream',
+              vector: [0.30, 1.40, 1.30, 0.35, 0.50, 0.40], C: 0.50, pe: 24 },
+            { id: 'CASE_015', name: 'AWS H100 算力', type: 'AI 算力头部', typeKey: 'ai-compute',
+              vector: [0.45, 1.50, 1.20, 0.30, 0.40, 0.50], C: 0.62, pe: 30 },
+            { id: 'CASE_016', name: 'Lambda H100 算力', type: 'AI 算力裸金属', typeKey: 'ai-compute',
+              vector: [0.15, 0.80, 0.90, 0.20, 0.40, 0.20], C: 0.40, pe: 14 },
+            { id: 'CASE_017', name: '泡泡玛特 IP 盲盒', type: '信息分发·IP溢价', typeKey: 'info-ip',
+              vector: [0.42, 0.60, 1.40, 0.25, 0.60, 0.50], C: 0.62, pe: 32 },
+            { id: 'CASE_018', name: '漫威 IP 宇宙', type: '信息分发·IP生态', typeKey: 'info-eco',
+              vector: [0.50, 0.80, 1.60, 0.30, 0.50, 0.60], C: 0.68, pe: 40 },
+            { id: 'CASE_019', name: '抖音/TikTok 算法', type: '流量分发·算法推荐', typeKey: 'traffic-algo',
+              vector: [0.55, 1.80, 1.70, 0.45, 0.70, 0.50], C: 0.70, pe: 42 },
+            { id: 'CASE_020', name: '小红书种草', type: '流量分发·决策闭环', typeKey: 'traffic-decide',
+              vector: [0.35, 1.00, 1.30, 0.30, 0.50, 0.40], C: 0.56, pe: 25 },
+            { id: 'CASE_021', name: '博客/自有阵地', type: '流量分发·深度自有', typeKey: 'traffic-owned',
+              vector: [0.25, 0.50, 1.10, 0.18, 0.40, 0.30], C: 0.48, pe: 20 }
+        ];
+
+        // 计算归一化向量（用于余弦相似度）
+        CASES.forEach(c => {
+            c.normVector = c.vector.map((v, i) => Math.min(1, v / VEC_NORM_MAX[i]));
+        });
+
+        // 当前筛选类型
+        let currentFilter = 'all';
 
         // ============================================================
         // 类型颜色映射（价格战红/防御型绿/B2B 蓝/高端紫/AI 旗舰橙/AI 性价比黄/AI 算力青/AI 主流粉）
@@ -954,12 +1021,23 @@
             return Number(n).toFixed(2);
         }
 
+        function getFilteredCases() {
+            if (currentFilter === 'all') return CASES;
+            return CASES.filter(c => c.typeKey === currentFilter);
+        }
+
+        function getFilterTypeCount(key) {
+            if (key === 'all') return CASES.length;
+            return CASES.filter(c => c.typeKey === key).length;
+        }
+
         // ============================================================
         // 板块 1 · 渲染案例卡片矩阵
         // ============================================================
         function renderCards() {
             const grid = document.getElementById('caseGrid');
-            grid.innerHTML = CASES.map(c => {
+            const cases = getFilteredCases();
+            grid.innerHTML = cases.map(c => {
                 const st = TYPE_STYLES[c.typeKey];
                 const cg = cGrade(c.C);
                 const vCells = c.vector.map((v, i) => `
@@ -994,7 +1072,8 @@
         // ============================================================
         function renderTable() {
             const body = document.getElementById('cmpBody');
-            body.innerHTML = CASES.map(c => {
+            const cases = getFilteredCases();
+            body.innerHTML = cases.map(c => {
                 const st = TYPE_STYLES[c.typeKey];
                 const cg = cGrade(c.C);
                 return `
@@ -1040,9 +1119,10 @@
             const uv = getUserVector();
             document.getElementById('uvDisplay').textContent = '[' + uv.map(fmt).join(', ') + ']';
 
+            // 使用归一化向量做余弦相似度，确保各维度权重公平
             const scored = CASES.map(c => ({
                 ...c,
-                sim: cosineSim(uv, c.vector)
+                sim: cosineSim(uv, c.normVector)
             })).sort((a, b) => b.sim - a.sim);
 
             // Top 3
@@ -1095,6 +1175,32 @@
             }
         }
 
+        // 绑定类型筛选按钮
+        function bindFilters() {
+            const btns = document.querySelectorAll('.filter-btn');
+            btns.forEach(btn => {
+                const key = btn.dataset.filter;
+                btn.addEventListener('click', () => {
+                    currentFilter = key;
+                    btns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    renderCards();
+                    renderTable();
+                    renderScatter();
+                });
+            });
+            // 更新按钮显示数量
+            btns.forEach(btn => {
+                const key = btn.dataset.filter;
+                if (key === 'all') {
+                    btn.textContent = '全部 · ' + CASES.length;
+                } else {
+                    const cnt = getFilterTypeCount(key);
+                    if (cnt === 0) btn.style.display = 'none';
+                }
+            });
+        }
+
         // ============================================================
         // 板块 4 · 浓度-估值散点图
         // ============================================================
@@ -1107,14 +1213,19 @@
             // 图例
             const legend = document.getElementById('scatterLegend');
             const legendTypes = [
-                { key: 'price-war', label: '价格战' },
-                { key: 'defensive', label: '防御型' },
-                { key: 'b2b', label: 'B2B 隐形冠军' },
+                { key: 'price-war', label: '价格战反例' },
+                { key: 'defensive', label: '防御型基础' },
+                { key: 'b2b', label: 'B2B隐形冠军' },
                 { key: 'premium', label: '高端定制' },
-                { key: 'ai-flagship', label: 'AI 旗舰' },
-                { key: 'ai-value', label: 'AI 性价比' },
-                { key: 'ai-mainstream', label: 'AI 主流' },
-                { key: 'ai-compute', label: 'AI 算力' }
+                { key: 'ai-flagship', label: 'AI旗舰' },
+                { key: 'ai-value', label: 'AI性价比' },
+                { key: 'ai-mainstream', label: 'AI主流' },
+                { key: 'ai-compute', label: 'AI算力' },
+                { key: 'info-ip', label: 'IP溢价' },
+                { key: 'info-eco', label: 'IP生态' },
+                { key: 'traffic-algo', label: '算法推荐' },
+                { key: 'traffic-decide', label: '决策闭环' },
+                { key: 'traffic-owned', label: '深度自有' }
             ];
             legend.innerHTML = legendTypes.map(t => {
                 const st = TYPE_STYLES[t.key];
@@ -1139,7 +1250,8 @@
             // 清除旧的 dot
             plot.querySelectorAll('.scatter-dot').forEach(d => d.remove());
 
-            CASES.forEach(c => {
+            const cases = getFilteredCases();
+            cases.forEach(c => {
                 const st = TYPE_STYLES[c.typeKey];
                 const xPct = (c.C - SCATTER.xMin) / (SCATTER.xMax - SCATTER.xMin) * 100;
                 const yPct = (c.pe - SCATTER.yMin) / (SCATTER.yMax - SCATTER.yMin) * 100;
@@ -1188,6 +1300,7 @@
         // 初始化
         // ============================================================
         function init() {
+            bindFilters();
             renderCards();
             renderTable();
             bindSliders();
