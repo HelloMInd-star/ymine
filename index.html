@@ -7,7 +7,6 @@
     <link rel="stylesheet" href="assets/css/base.css?v=2">
     <link rel="stylesheet" href="assets/css/poker-egg.css?v=2">
     <script src="assets/js/bus.js?v=3"></script>
-    <script src="assets/js/sidebar.js?v=3"></script>
     <script src="assets/js/poker-egg.js?v=3"></script>
     <script src="models/common/normalizer.js?v=3"></script>
     <script src="models/calc/calc-config.js?v=3"></script>
@@ -18,6 +17,18 @@
     <script src="models/compute/compute-model.js?v=3"></script>
     <script src="assets/js/triangle-audit.js?v=3"></script>
     <style>
+
+        /* ===== 全屏布局（无侧边栏） ===== */
+        body {
+            padding: 20px;
+        }
+        .main-content {
+            max-width: 1500px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 0;
+            min-height: 100vh;
+        }
 
         /* ===== 一休头像 ===== */
         .avatar-wrapper {
@@ -987,28 +998,7 @@
         }
 
         /* ===== 响应式（页面独有部分） ===== */
-        /* 覆盖base.css的900px断点，保持横排直到680px */
-        @media (min-width: 681px) and (max-width: 900px) {
-            body.layout-flex{
-                flex-direction:row;
-                padding:16px 16px 16px 0;
-            }
-            .layout-flex .sidebar{
-                position:sticky;
-                top:0;
-                height:100vh;
-                width:200px;
-                flex-direction:column;
-                padding:20px 10px;
-            }
-            .sidebar .logo,.sidebar .logo-sub,.sidebar .footer-nav{display:block;}
-            .sidebar .nav-group{margin-bottom:12px;}
-            .sidebar .nav-group .group-label{display:block;}
-            .sidebar .nav-item{padding:6px 10px;font-size:12px;border-left:2px solid transparent;border-bottom:none;}
-            .sidebar .nav-divider{display:block;}
-            .main-content{padding:0 20px 20px;}
-        }
-        /* 中等屏幕：保持侧边栏+主内容，但收缩元素 */
+        /* 中等屏幕：收缩元素 */
         @media (max-width: 1100px) {
             .primary-grid{grid-template-columns:1fr;}
             .biz-grid{grid-template-columns:repeat(2,1fr);}
@@ -1110,13 +1100,10 @@
         }
     </style>
 </head>
-<body class="layout-flex">
+<body>
 
     <!-- ===== 鼠标跟随光晕 ===== -->
     <div id="glow"></div>
-
-    <!-- ===== 左侧导航栏（JS动态渲染） ===== -->
-    <div class="sidebar"></div>
 
     <!-- ===== 主内容 ===== -->
     <div class="main-content">
