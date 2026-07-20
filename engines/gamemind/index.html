@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>⚡ GameMind · 全域通用博弈总基座</title>
+    <title>⚡ GameMind · 全域通用博弈总基座 V2.2</title>
     <link rel="stylesheet" href="../../assets/css/base.css">
     <script src="../../assets/js/bus.js"></script>
     <style>
@@ -866,59 +866,221 @@
             }
         }
 
+        /* ============================================================ */
+        /* ===== Tab 切换 + 版本铭牌 + 新版三维圆锥博弈样式 ===== */
+        /* ============================================================ */
+        .version-plate {
+            position: fixed; top: 16px; right: 20px; z-index: 100;
+            background: rgba(248,113,113,0.12); border: 1px solid rgba(248,113,113,0.35);
+            padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 700;
+            color: #fca5a5; font-family: monospace; letter-spacing: 0.3px;
+            backdrop-filter: blur(12px);
+        }
+        .baseplate-note {
+            position: absolute; bottom: 8px; right: 12px;
+            font-size: 9px; color: rgba(255,255,255,0.18); font-family: monospace;
+            letter-spacing: 0.2px; line-height: 1.5; text-align: right; white-space: nowrap;
+        }
+        .tab-bar {
+            display: flex; gap: 4px; margin-bottom: 20px;
+            background: rgba(255,255,255,0.02); border-radius: 12px;
+            padding: 4px; border: 1px solid rgba(255,255,255,0.05);
+        }
+        .tab-btn {
+            flex: 1; padding: 10px 16px; border: none; background: transparent;
+            color: rgba(255,255,255,0.35); font-size: 13px; font-weight: 600;
+            border-radius: 9px; cursor: pointer; transition: all .3s;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        .tab-btn:hover { background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.6); }
+        .tab-btn.active {
+            background: linear-gradient(135deg, rgba(248,113,113,0.18), rgba(167,139,250,0.12));
+            color: #fca5a5; border: 1px solid rgba(248,113,113,0.25);
+            box-shadow: 0 4px 20px rgba(248,113,113,0.08);
+        }
+        .tab-btn.active.legacy {
+            background: linear-gradient(135deg, rgba(148,163,184,0.15), rgba(100,116,139,0.1));
+            color: #cbd5e1; border-color: rgba(148,163,184,0.25);
+            box-shadow: 0 4px 20px rgba(148,163,184,0.06);
+        }
+        .tab-btn .tab-ver {
+            font-size: 10px; opacity: 0.6; font-family: monospace; font-weight: 500;
+        }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        /* ===== 新版三维圆锥博弈通用样式 ===== */
+        .new-section {
+            background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 18px; padding: 24px 28px; margin-bottom: 20px; position: relative;
+        }
+        .new-section .sec-title {
+            font-size: 17px; font-weight: 700; color: #f1f5f9; margin-bottom: 4px;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .new-section .sec-sub {
+            font-size: 12px; color: rgba(255,255,255,0.25); margin-bottom: 16px;
+        }
+        /* 第一层：三维圆锥 */
+        .cone-wrapper {
+            position: relative; background: radial-gradient(ellipse at 50% 80%, rgba(167,139,250,0.08), rgba(11,11,26,0) 60%);
+            border-radius: 14px; border: 1px solid rgba(167,139,250,0.1);
+            padding: 16px; margin-bottom: 8px; min-height: 380px;
+            overflow: hidden;
+        }
+        .cone-wrapper canvas { display: block; width: 100%; height: 360px; cursor: grab; border-radius: 10px; }
+        .cone-wrapper canvas:active { cursor: grabbing; }
+        .cone-legend {
+            display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;
+            margin-top: 10px; font-size: 11px;
+        }
+        .cone-legend .leg-item { display: flex; align-items: center; gap: 6px; color: rgba(255,255,255,0.4); }
+        .cone-legend .leg-dot { width: 10px; height: 10px; border-radius: 50%; }
+        .cone-volume {
+            position: absolute; top: 16px; left: 20px;
+            background: rgba(0,0,0,0.4); border: 1px solid rgba(167,139,250,0.2);
+            padding: 8px 14px; border-radius: 10px; font-size: 11px; color: rgba(255,255,255,0.5);
+            font-family: monospace;
+        }
+        .cone-volume .vol-num { font-size: 16px; color: #a78bfa; font-weight: 700; display: block; }
+        .cone-tooltip {
+            position: absolute; background: rgba(20,20,40,0.95); border: 1px solid rgba(167,139,250,0.3);
+            padding: 8px 12px; border-radius: 8px; font-size: 11px; color: rgba(255,255,255,0.7);
+            pointer-events: none; z-index: 20; display: none; max-width: 200px; line-height: 1.5;
+            backdrop-filter: blur(8px);
+        }
+        .cone-tooltip .tt-title { font-weight: 700; color: #a78bfa; margin-bottom: 2px; }
+
+        /* 第二层：四层空间切换 */
+        .space-switcher { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; margin-bottom: 12px; }
+        .space-btn {
+            padding: 12px 10px; border-radius: 12px; border: 1.5px solid rgba(255,255,255,0.06);
+            background: rgba(255,255,255,0.02); cursor: pointer; transition: all .3s;
+            text-align: center;
+        }
+        .space-btn:hover { background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.12); }
+        .space-btn.active { border-color: rgba(248,113,113,0.4); background: rgba(248,113,113,0.08); }
+        .space-btn.active.low { border-color: rgba(34,211,238,0.4); background: rgba(34,211,238,0.08); }
+        .space-btn.active.high { border-color: rgba(167,139,250,0.4); background: rgba(167,139,250,0.08); }
+        .space-btn.active.shallow { border-color: rgba(251,146,60,0.4); background: rgba(251,146,60,0.08); }
+        .space-btn.active.deep { border-color: rgba(239,68,68,0.4); background: rgba(239,68,68,0.08); }
+        .space-btn .sp-icon { font-size: 24px; display: block; margin-bottom: 4px; }
+        .space-btn .sp-name { font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.6); display: block; }
+        .space-btn .sp-range { font-size: 9px; color: rgba(255,255,255,0.25); font-family: monospace; display: block; margin-top: 2px; }
+        .space-params {
+            display: grid; grid-template-columns: repeat(3,1fr); gap: 10px;
+            background: rgba(0,0,0,0.2); border-radius: 10px; padding: 12px 14px;
+        }
+        .space-params .sp-item { text-align: center; }
+        .space-params .sp-item .sp-label { font-size: 10px; color: rgba(255,255,255,0.2); text-transform: uppercase; letter-spacing: 0.5px; }
+        .space-params .sp-item .sp-val { font-size: 15px; font-weight: 700; font-family: monospace; margin-top: 2px; }
+        .space-params .sp-item .sp-val.c1 { color: #67e8f9; }
+        .space-params .sp-item .sp-val.c2 { color: #fb923c; }
+        .space-params .sp-item .sp-val.steady { color: #a78bfa; }
+
+        /* 第三层：N边形博弈 */
+        .poly-controls {
+            display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 14px;
+            padding: 12px 14px; background: rgba(0,0,0,0.2); border-radius: 10px;
+        }
+        .poly-controls label { font-size: 12px; color: rgba(255,255,255,0.4); display: flex; align-items: center; gap: 6px; }
+        .poly-controls input[type=number] {
+            width: 60px; padding: 5px 8px; background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; color: #f1f5f9;
+            font-size: 13px; font-family: monospace; text-align: center;
+        }
+        .poly-btn {
+            padding: 6px 14px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.12);
+            background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.6);
+            font-size: 12px; cursor: pointer; transition: all .2s; font-weight: 500;
+        }
+        .poly-btn:hover { background: rgba(255,255,255,0.08); color: #f1f5f9; }
+        .poly-btn.active { background: rgba(167,139,250,0.15); border-color: rgba(167,139,250,0.4); color: #c4b5fd; }
+        .poly-btn.reset { border-color: rgba(239,68,68,0.3); color: #fca5a5; }
+        .poly-btn.center { border-color: rgba(34,197,94,0.3); color: #86efac; }
+        .poly-canvas-wrap {
+            background: radial-gradient(ellipse at center, rgba(167,139,250,0.05), rgba(0,0,0,0.3) 70%);
+            border-radius: 12px; border: 1px solid rgba(167,139,250,0.1);
+            position: relative; margin-bottom: 10px;
+        }
+        .poly-canvas-wrap canvas { display: block; width: 100%; height: 400px; cursor: grab; border-radius: 12px; }
+        .poly-canvas-wrap canvas.dragging { cursor: grabbing; }
+        .vertex-info {
+            position: absolute; top: 10px; right: 10px;
+            background: rgba(0,0,0,0.6); border: 1px solid rgba(167,139,250,0.2);
+            border-radius: 8px; padding: 8px 12px; font-size: 11px; color: rgba(255,255,255,0.5);
+            font-family: monospace; min-width: 160px; display: none;
+        }
+        .vertex-info .vname { font-weight: 700; color: #f1f5f9; font-size: 12px; margin-bottom: 4px; }
+        .vertex-info .vrow { display: flex; justify-content: space-between; gap: 10px; }
+        .vertex-info .vrow .k { color: rgba(255,255,255,0.3); }
+        .vertex-name-input {
+            position: absolute; display: none; z-index: 30;
+            background: rgba(20,20,40,0.95); border: 1px solid rgba(167,139,250,0.4);
+            padding: 4px 8px; border-radius: 6px; color: #f1f5f9; font-size: 11px;
+            width: 100px;
+        }
+
+        /* 第四层：双层扰动面板 */
+        .perturb-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; }
+        .perturb-card {
+            background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 12px; padding: 16px; text-align: center;
+        }
+        .perturb-card.c1 { border-left: 3px solid #22d3ee; }
+        .perturb-card.c2 { border-left: 3px solid #fb923c; }
+        .perturb-card.synth { border-left: 3px solid #a78bfa; }
+        .perturb-card .p-label { font-size: 11px; color: rgba(255,255,255,0.3); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+        .perturb-card .p-value { font-size: 28px; font-weight: 700; font-family: monospace; }
+        .perturb-card.c1 .p-value { color: #22d3ee; }
+        .perturb-card.c2 .p-value { color: #fb923c; }
+        .perturb-card.synth .p-value { color: #a78bfa; }
+        .perturb-card .p-bar {
+            height: 6px; background: rgba(255,255,255,0.06); border-radius: 3px;
+            margin-top: 8px; overflow: hidden;
+        }
+        .perturb-card .p-bar-fill { height: 100%; border-radius: 3px; transition: width .3s; }
+        .perturb-card.c1 .p-bar-fill { background: linear-gradient(90deg, #22d3ee, #0891b2); }
+        .perturb-card.c2 .p-bar-fill { background: linear-gradient(90deg, #fb923c, #ea580c); }
+        .perturb-card.synth .p-bar-fill { background: linear-gradient(90deg, #a78bfa, #7c3aed); }
+        .perturb-card .p-desc { font-size: 10px; color: rgba(255,255,255,0.2); margin-top: 6px; line-height: 1.4; }
+
+        /* 第五层：数据输出面板 */
+        .output-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 12px; margin-bottom: 14px; }
+        .output-card {
+            background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 10px; padding: 12px 16px;
+        }
+        .output-card .oc-label { font-size: 10px; color: rgba(255,255,255,0.25); text-transform: uppercase; letter-spacing: 0.5px; }
+        .output-card .oc-value { font-size: 18px; font-weight: 700; font-family: monospace; margin-top: 2px; }
+        .output-card .oc-value.safe { color: #4ade80; }
+        .output-card .oc-value.warn { color: #facc15; }
+        .output-card .oc-value.danger { color: #f87171; }
+        .pipeline-flow {
+            display: flex; align-items: center; justify-content: center; gap: 6px; flex-wrap: wrap;
+            padding: 12px; background: rgba(0,0,0,0.25); border-radius: 10px;
+            font-size: 11px;
+        }
+        .pipeline-flow .pf-step {
+            padding: 4px 10px; border-radius: 12px;
+            background: rgba(167,139,250,0.08); border: 1px solid rgba(167,139,250,0.15);
+            color: #c4b5fd; font-weight: 500; white-space: nowrap;
+        }
+        .pipeline-flow .pf-arrow { color: rgba(255,255,255,0.15); font-size: 14px; }
+        .pipeline-flow .pf-step.mood { background: rgba(192,132,252,0.1); border-color: rgba(192,132,252,0.25); color: #d8b4fe; }
+
+        /* 响应式 */
+        @media (max-width: 900px) {
+            .space-switcher { grid-template-columns: repeat(2,1fr); }
+            .perturb-grid { grid-template-columns: 1fr; }
+            .output-grid { grid-template-columns: 1fr; }
+            .version-plate { position: static; display: inline-block; margin-bottom: 12px; }
+        }
         @media (max-width: 600px) {
-            .container {
-                padding: 16px 12px 14px;
-            }
-            .block-kelly {
-                padding: 16px 12px 14px;
-            }
-            .block-support {
-                padding: 12px 12px 10px;
-            }
-            .mini-grid {
-                grid-template-columns: 1fr;
-            }
-            .kelly-box .formula {
-                font-size: 18px;
-            }
-            .kelly-simulator .result-row {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            .kelly-simulator .result-row .advice {
-                text-align: left;
-                width: 100%;
-            }
-            .header h1 {
-                font-size: 22px;
-            }
-            .value-prop p {
-                font-size: 14px;
-            }
-            .back-bottom {
-                flex-direction: column;
-                gap: 6px;
-            }
-            .threshold-visual .stats {
-                grid-template-columns: 1fr;
-            }
-            .flow-chain {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            .flow-chain .arrow {
-                transform: rotate(90deg);
-            }
-            .pipeline .flow {
-                flex-direction: column;
-            }
-            .pipeline .flow .arrow-icon {
-                transform: rotate(90deg);
-            }
-            .scene-grid {
-                grid-template-columns: 1fr;
-            }
+            .space-switcher { grid-template-columns: 1fr 1fr; }
+            .space-params { grid-template-columns: 1fr; }
+            .new-section { padding: 16px 14px; }
+            .tab-btn { font-size: 11px; padding: 8px 10px; }
         }
     </style>
 </head>
@@ -928,6 +1090,9 @@
 
     <!-- ===== 主容器 ===== -->
     <div class="container">
+
+        <!-- ===== 版本铭牌（右上角固定） ===== -->
+        <div class="version-plate" id="versionPlate">⚡ GameMind V2.2</div>
 
         <!-- ===== 面包屑导航 ===== -->
         <div class="breadcrumb">
@@ -941,6 +1106,171 @@
             <a href="javascript:history.back()" style="padding:6px 14px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);border-radius:8px;color:rgba(255,255,255,0.7);text-decoration:none;font-size:12px;transition:all .2s;">← 返回上一级</a>
             <a href="../../index.html" style="padding:6px 14px;background:rgba(248,113,113,0.12);border:1px solid rgba(248,113,113,0.3);border-radius:8px;color:#fca5a5;text-decoration:none;font-size:12px;transition:all .2s;">🏠 一键返回总控台</a>
         </div>
+
+        <!-- ===== Tab 切换栏 ===== -->
+        <div class="tab-bar">
+            <button class="tab-btn legacy" data-tab="legacy" id="tabLegacy">📐 经典旧版博弈视图 <span class="tab-ver">V2.1</span></button>
+            <button class="tab-btn active" data-tab="new" id="tabNew">🔺 新版三维圆锥全域博弈视图 <span class="tab-ver">V2.2</span></button>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- ===== TAB 2：新版三维圆锥全域博弈视图（默认显示） ===== -->
+        <!-- ============================================================ -->
+        <div class="tab-content active" id="newTab">
+
+            <!-- 第一层：全域圆锥数理基准总框架 -->
+            <div class="new-section" id="secCone" style="position:relative;">
+                <div class="baseplate-note">Game-OS 全域通用数理稳态基座 | 统一底层公理内核 | 全模块同源共用</div>
+                <div class="sec-title">🔺 第一层 · 全域圆锥数理基准总框架</div>
+                <div class="sec-sub">三维正态分布圆锥模型 · 三阈值边界 · 360°拖拽旋转 · 同源算法横跨力学/博弈/分子浓度</div>
+                <div class="cone-wrapper" id="coneWrapper">
+                    <div class="cone-volume">
+                        博弈总空间容积
+                        <span class="vol-num" id="coneVolume">—</span>
+                    </div>
+                    <canvas id="coneCanvas" width="900" height="360"></canvas>
+                    <div class="cone-tooltip" id="coneTooltip"></div>
+                    <div class="cone-legend">
+                        <div class="leg-item"><span class="leg-dot" style="background:#22c55e;"></span>0.48 保本容积底线</div>
+                        <div class="leg-item"><span class="leg-dot" style="background:#a78bfa;"></span>0.50 稳态中轴线（刚性圆柱）</div>
+                        <div class="leg-item"><span class="leg-dot" style="background:#ef4444;"></span>0.68 泡沫熔断边界</div>
+                        <div class="leg-item"><span class="leg-dot" style="background:linear-gradient(135deg,#67e8f9,#fb923c);border-radius:2px;"></span>正态分布概率曲面</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 第二层：四层全域空间切换 -->
+            <div class="new-section" id="secSpace">
+                <div class="sec-title">🌍 第二层 · 四层全域空间一键切换</div>
+                <div class="sec-sub">切换物理/商业空间环境，C₁/C₂扰动区间与稳态波动范围自动同步刷新</div>
+                <div class="space-switcher" id="spaceSwitcher">
+                    <div class="space-btn low active" data-space="low">
+                        <span class="sp-icon">🛩️</span>
+                        <span class="sp-name">低空乱流层</span>
+                        <span class="sp-range">0 ~ 500m</span>
+                    </div>
+                    <div class="space-btn high" data-space="high">
+                        <span class="sp-icon">✈️</span>
+                        <span class="sp-name">高空平流层</span>
+                        <span class="sp-range">6000m+</span>
+                    </div>
+                    <div class="space-btn shallow" data-space="shallow">
+                        <span class="sp-icon">🏗️</span>
+                        <span class="sp-name">浅层基建地下</span>
+                        <span class="sp-range">0 ~ 500m</span>
+                    </div>
+                    <div class="space-btn deep" data-space="deep">
+                        <span class="sp-icon">⛏️</span>
+                        <span class="sp-name">深层能源高压</span>
+                        <span class="sp-range">500m+</span>
+                    </div>
+                </div>
+                <div class="space-params" id="spaceParams">
+                    <div class="sp-item">
+                        <div class="sp-label">C₁ 外层扰动区间</div>
+                        <div class="sp-val c1" id="spC1">0.30 ~ 0.60</div>
+                    </div>
+                    <div class="sp-item">
+                        <div class="sp-label">C₂ 内层扰动区间</div>
+                        <div class="sp-val c2" id="spC2">0.15 ~ 0.40</div>
+                    </div>
+                    <div class="sp-item">
+                        <div class="sp-label">稳态波动区间</div>
+                        <div class="sp-val steady" id="spSteady">0.55 ~ 0.67</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 第三层：动态自适应 N 边形多方博弈核心交互区 -->
+            <div class="new-section" id="secPolygon">
+                <div class="sec-title">⬡ 第三层 · N边形多方博弈核心交互</div>
+                <div class="sec-sub">输入博弈主体数量N → 自动生成正N边形 · 顶点支持拖拽 · 两种连线模式一键切换 · 双击顶点可重命名</div>
+                <div class="poly-controls">
+                    <label>参与主体数量 N：
+                        <input type="number" id="polyNInput" min="2" max="12" value="5" step="1">
+                    </label>
+                    <button class="poly-btn" id="polyGenBtn">🔄 生成多边形</button>
+                    <button class="poly-btn active" id="modeParallelBtn" data-mode="parallel">═ 平行合作线</button>
+                    <button class="poly-btn" id="modeCrossBtn" data-mode="cross">✕ 交叉制衡线</button>
+                    <button class="poly-btn center" id="polyCenterBtn">🎯 一键居中复位</button>
+                    <button class="poly-btn reset" id="polyResetBtn">🔁 重置全部顶点</button>
+                </div>
+                <div class="poly-canvas-wrap" id="polyWrap">
+                    <canvas id="polyCanvas" width="900" height="400"></canvas>
+                    <div class="vertex-info" id="vertexInfo"></div>
+                    <input type="text" class="vertex-name-input" id="vertexNameInput" maxlength="8" placeholder="重命名...">
+                </div>
+            </div>
+
+            <!-- 第四层：双层扰动可视化面板 -->
+            <div class="new-section" id="secPerturb">
+                <div class="sec-title">🌀 第四层 · 双层扰动实时可视化</div>
+                <div class="sec-sub">外层 C₁ 环境扰动 + 内层 C₂ 腔体扰动 · 双层合成震荡幅度 · 沿用#30力学双层气流扰动逻辑</div>
+                <div class="perturb-grid">
+                    <div class="perturb-card c1">
+                        <div class="p-label">C₁ 外层扰动（环境/市场/竞品）</div>
+                        <div class="p-value" id="pC1Val">0.45</div>
+                        <div class="p-bar"><div class="p-bar-fill" id="pC1Bar" style="width:45%;"></div></div>
+                        <div class="p-desc">行业周期 · 宏观政策 · 竞品冲击 · 大气乱流</div>
+                    </div>
+                    <div class="perturb-card c2">
+                        <div class="p-label">C₂ 内层扰动（运营/腔体/团队）</div>
+                        <div class="p-value" id="pC2Val">0.28</div>
+                        <div class="p-bar"><div class="p-bar-fill" id="pC2Bar" style="width:28%;"></div></div>
+                        <div class="p-desc">团队内耗 · 资金链压力 · 结构空心化 · 腔体回流</div>
+                    </div>
+                    <div class="perturb-card synth">
+                        <div class="p-label">合成震荡幅度（PID制衡后）</div>
+                        <div class="p-value" id="pSynthVal">0.52</div>
+                        <div class="p-bar"><div class="p-bar-fill" id="pSynthBar" style="width:52%;"></div></div>
+                        <div class="p-desc">双环PID纠偏后合成风险 · 空心结构失稳判定</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 第五层：底部数据输出面板 -->
+            <div class="new-section" id="secOutput">
+                <div class="sec-title">📤 第五层 · 数据输出面板（→ MoodMind）</div>
+                <div class="sec-sub">扰动均衡数值实时输出 → MoodMind估值模块完成资产/风险/收益量化</div>
+                <div class="output-grid">
+                    <div class="output-card">
+                        <div class="oc-label">博弈均衡度</div>
+                        <div class="oc-value safe" id="outBalance">0.50</div>
+                    </div>
+                    <div class="output-card">
+                        <div class="oc-label">综合风险指数</div>
+                        <div class="oc-value warn" id="outRisk">0.52</div>
+                    </div>
+                    <div class="output-card">
+                        <div class="oc-label">空心化失稳判定</div>
+                        <div class="oc-value safe" id="outHollow">结构稳健</div>
+                    </div>
+                    <div class="output-card">
+                        <div class="oc-label">MoodMind 数据链路</div>
+                        <div class="oc-value safe" id="outMoodLink">● 已连通</div>
+                    </div>
+                </div>
+                <div class="pipeline-flow">
+                    <span class="pf-step">🔺 圆锥数理基座</span>
+                    <span class="pf-arrow">→</span>
+                    <span class="pf-step" id="pipeSpace">🛩️ 低空乱流层</span>
+                    <span class="pf-arrow">→</span>
+                    <span class="pf-step">⬡ N边形博弈运算</span>
+                    <span class="pf-arrow">→</span>
+                    <span class="pf-step">🌀 PID双环制衡</span>
+                    <span class="pf-arrow">→</span>
+                    <span class="pf-step">📊 扰动均衡输出</span>
+                    <span class="pf-arrow">→</span>
+                    <span class="pf-step mood">💜 MoodMind估值</span>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- ===== TAB 1：经典旧版博弈视图（完整保留，样式冻结） ===== -->
+        <!-- ============================================================ -->
+        <div class="tab-content legacy" id="legacyTab">
 
         <!-- ===== 头部 ===== -->
         <div class="header">
@@ -1276,6 +1606,8 @@
             <a href="#" style="color:rgba(255,255,255,0.06);">🏗️ 基建博弈</a>
             <a href="#" style="color:rgba(255,255,255,0.06);">⛏️ 地下经济</a>
         </div>
+
+        </div><!-- /legacyTab -->
 
     </div>
 
@@ -1767,6 +2099,754 @@
             e.preventDefault();
             alert('📄 低空运营总纲正在建设中，敬请期待。');
         });
+
+        // ================================================================
+        // ===== GameMind V2.2 新版三维圆锥全域博弈引擎 =====
+        // ================================================================
+        (function() {
+            'use strict';
+            const GMV_THRESHOLDS = Object.freeze({BREAKEVEN:0.48, STEADY:0.50, FUSE:0.68});
+            const GMV_ERR = 0.02;
+
+            // ===== 四层空间固定参数区间（严格写死） =====
+            const SPACE_PRESETS = Object.freeze({
+                low:     { name:'低空乱流层',     icon:'🛩️', c1Min:0.30, c1Max:0.60, c2Min:0.15, c2Max:0.40, sMin:0.55, sMax:0.67, color:'#22d3ee' },
+                high:    { name:'高空平流层',     icon:'✈️', c1Min:0.05, c1Max:0.15, c2Min:0.15, c2Max:0.40, sMin:0.50, sMax:0.52, color:'#a78bfa' },
+                shallow: { name:'浅层基建地下',   icon:'🏗️', c1Min:0.20, c1Max:0.50, c2Min:0.10, c2Max:0.30, sMin:0.53, sMax:0.63, color:'#fb923c' },
+                deep:    { name:'深层能源高压',   icon:'⛏️', c1Min:0.50, c1Max:0.90, c2Min:0.40, c2Max:0.80, sMin:0.68, sMax:0.95, color:'#ef4444' }
+            });
+
+            // ===== 状态 =====
+            const state = {
+                activeTab: 'new',
+                currentSpace: 'low',
+                lineMode: 'parallel',
+                nVertices: 5,
+                vertices: [],
+                vertexNames: ['厂商','政府','资本','用户','竞品'],
+                c1: 0.45,
+                c2: 0.28,
+                synth: 0.52,
+                coneRotX: -0.35,
+                coneRotY: 0.6,
+                draggingVertex: -1,
+                draggingCone: false,
+                lastMouse: {x:0,y:0},
+                animTime: 0
+            };
+
+            // ===== 工具函数 =====
+            function gmLS(k,d){try{const v=localStorage.getItem(k);return v!==null?JSON.parse(v):d;}catch(_){return d;}}
+            function gmSS(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(_){}}
+            function rand(a,b){return a+Math.random()*(b-a);}
+            function clamp(v,mn,mx){return Math.max(mn,Math.min(mx,v));}
+            function lerp(a,b,t){return a+(b-a)*t;}
+
+            // 圆锥同源公式：V = (1/3)πr²h （截面、容积统一）
+            function coneVolume(r, h){ return (1/3)*Math.PI*r*r*h; }
+            function coneSectionAt(h, H, R){ return R * (1 - h/H); }
+
+            // ===== Tab 切换 =====
+            function initTabs() {
+                const legacyBtn = document.getElementById('tabLegacy');
+                const newBtn = document.getElementById('tabNew');
+                const legacyTab = document.getElementById('legacyTab');
+                const newTab = document.getElementById('newTab');
+                const plate = document.getElementById('versionPlate');
+                const savedTab = gmLS('gamemind_active_tab','new');
+                state.activeTab = savedTab;
+                function switchTab(t) {
+                    state.activeTab = t;
+                    gmSS('gamemind_active_tab', t);
+                    if (t === 'legacy') {
+                        legacyTab.classList.add('active');
+                        newTab.classList.remove('active');
+                        legacyBtn.classList.add('active','legacy');
+                        newBtn.classList.remove('active');
+                        plate.textContent = '📐 GameMind Legacy V2.1';
+                    } else {
+                        newTab.classList.add('active');
+                        legacyTab.classList.remove('active');
+                        newBtn.classList.add('active');
+                        legacyBtn.classList.remove('active','legacy');
+                        plate.textContent = '⚡ GameMind V2.2';
+                        setTimeout(resizeCanvases, 50);
+                    }
+                }
+                legacyBtn.addEventListener('click', ()=>switchTab('legacy'));
+                newBtn.addEventListener('click', ()=>switchTab('new'));
+                switchTab(state.activeTab);
+            }
+
+            // ===== 第一层：三维圆锥渲染（2.5D等轴测投影） =====
+            function initCone() {
+                const canvas = document.getElementById('coneCanvas');
+                if (!canvas) return;
+                const wrap = document.getElementById('coneWrapper');
+                const tooltip = document.getElementById('coneTooltip');
+                const ctx = canvas.getContext('2d');
+                let W = canvas.width, H = canvas.height;
+                const coneH = 1.0;
+                const R_BREAKEVEN = GMV_THRESHOLDS.BREAKEVEN / GMV_THRESHOLDS.FUSE * 0.9 + 0.1;
+                const R_STEADY = 0.12;
+                const R_FUSE = 1.0;
+
+                function resize() {
+                    const rect = wrap.getBoundingClientRect();
+                    W = canvas.width = Math.floor(rect.width - 32);
+                    H = canvas.height = 360;
+                }
+
+                // 3D投影（简易等轴测）
+                function project(x,y,z) {
+                    const cosY = Math.cos(state.coneRotY), sinY = Math.sin(state.coneRotY);
+                    const cosX = Math.cos(state.coneRotX), sinX = Math.sin(state.coneRotX);
+                    let x1 = x*cosY - z*sinY;
+                    let z1 = x*sinY + z*cosY;
+                    let y1 = y*cosX - z1*sinX;
+                    let z2 = y*sinX + z1*cosX;
+                    const cx = W/2, cy = H/2 + 30;
+                    const scale = 280;
+                    return {
+                        x: cx + x1*scale,
+                        y: cy - y1*scale,
+                        z: z2
+                    };
+                }
+
+                function draw() {
+                    ctx.clearRect(0,0,W,H);
+
+                    // 绘制正态分布网格曲面（圆锥外侧）
+                    const segs = 24, rings = 14;
+                    // 先画熔断边界（外层透明红锥）
+                    ctx.strokeStyle = 'rgba(239,68,68,0.25)';
+                    ctx.lineWidth = 1;
+                    for (let i=0; i<=segs; i++) {
+                        const a = (i/segs)*Math.PI*2;
+                        ctx.beginPath();
+                        for (let j=0; j<=rings; j++) {
+                            const t = j/rings;
+                            const r = R_FUSE*(1-t);
+                            const x = Math.cos(a)*r;
+                            const z = Math.sin(a)*r;
+                            const y = t*coneH;
+                            // 加正态扰动（概率曲面）
+                            const bell = Math.exp(-Math.pow((t-0.5)*3.2,2))*0.08;
+                            const p = project(x*(1+bell*Math.sin(a*3+state.animTime)), y, z*(1+bell*Math.cos(a*2+state.animTime)));
+                            j===0 ? ctx.moveTo(p.x,p.y) : ctx.lineTo(p.x,p.y);
+                        }
+                        ctx.stroke();
+                    }
+                    // 环线
+                    for (let j=0; j<=rings; j++) {
+                        const t = j/rings;
+                        ctx.beginPath();
+                        for (let i=0; i<=segs; i++) {
+                            const a = (i/segs)*Math.PI*2;
+                            const r = R_FUSE*(1-t);
+                            const x = Math.cos(a)*r;
+                            const z = Math.sin(a)*r;
+                            const y = t*coneH;
+                            const bell = Math.exp(-Math.pow((t-0.5)*3.2,2))*0.08;
+                            const p = project(x*(1+bell*Math.sin(a*3+state.animTime)), y, z*(1+bell*Math.cos(a*2+state.animTime)));
+                            i===0 ? ctx.moveTo(p.x,p.y) : ctx.lineTo(p.x,p.y);
+                        }
+                        ctx.strokeStyle = t < 0.1 ? 'rgba(167,139,250,0.2)' : 'rgba(239,68,68,0.12)';
+                        ctx.stroke();
+                    }
+
+                    // 保本容积底线（绿色内锥）
+                    ctx.strokeStyle = 'rgba(34,197,94,0.5)';
+                    ctx.lineWidth = 1.5;
+                    for (let i=0; i<=segs; i++) {
+                        const a = (i/segs)*Math.PI*2;
+                        ctx.beginPath();
+                        for (let j=0; j<=rings; j++) {
+                            const t = j/rings;
+                            const r = R_BREAKEVEN*(1-t);
+                            const x = Math.cos(a)*r, z=Math.sin(a)*r, y=t*coneH;
+                            const p = project(x,y,z);
+                            j===0 ? ctx.moveTo(p.x,p.y) : ctx.lineTo(p.x,p.y);
+                        }
+                        ctx.stroke();
+                    }
+                    // 保本顶面（椭圆面）
+                    ctx.fillStyle = 'rgba(34,197,94,0.08)';
+                    ctx.beginPath();
+                    for (let i=0; i<=segs; i++) {
+                        const a = (i/segs)*Math.PI*2;
+                        const r = R_BREAKEVEN;
+                        const p = project(Math.cos(a)*r, 0, Math.sin(a)*r);
+                        i===0 ? ctx.moveTo(p.x,p.y) : ctx.lineTo(p.x,p.y);
+                    }
+                    ctx.closePath();
+                    ctx.fill();
+
+                    // 稳态中轴线（紫色刚性圆柱）
+                    ctx.strokeStyle = 'rgba(167,139,250,0.9)';
+                    ctx.lineWidth = 3;
+                    ctx.shadowColor = 'rgba(167,139,250,0.5)';
+                    ctx.shadowBlur = 8;
+                    const pBot = project(0,0,0);
+                    const pTop = project(0,coneH,0);
+                    ctx.beginPath();
+                    ctx.moveTo(pBot.x,pBot.y);
+                    ctx.lineTo(pTop.x,pTop.y);
+                    ctx.stroke();
+                    ctx.shadowBlur = 0;
+                    // 圆柱底圆
+                    ctx.strokeStyle = 'rgba(167,139,250,0.5)';
+                    ctx.lineWidth = 1.5;
+                    ctx.beginPath();
+                    for (let i=0; i<=segs; i++) {
+                        const a=(i/segs)*Math.PI*2;
+                        const p=project(Math.cos(a)*R_STEADY,0,Math.sin(a)*R_STEADY);
+                        i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y);
+                    }
+                    ctx.stroke();
+
+                    // 阈值标签
+                    const p048 = project(0,0,0);
+                    const p050 = project(R_STEADY+0.05,0,0);
+                    const p068 = project(R_FUSE*0.8,0.2,0);
+                    ctx.font = '10px monospace';
+                    ctx.fillStyle = 'rgba(34,197,94,0.7)';
+                    ctx.textAlign='left';
+                    ctx.fillText('0.48 保本线', p048.x+10, p048.y);
+                    ctx.fillStyle = 'rgba(167,139,250,0.8)';
+                    ctx.fillText('0.50 稳态中轴', p050.x+5, p050.y-5);
+                    ctx.fillStyle = 'rgba(239,68,68,0.7)';
+                    ctx.fillText('0.68 熔断边界', p068.x-10, p068.y);
+
+                    // 顶点（圆锥尖端光点）
+                    ctx.fillStyle = '#fff';
+                    ctx.shadowColor='rgba(167,139,250,0.8)';
+                    ctx.shadowBlur=12;
+                    ctx.beginPath();
+                    ctx.arc(pTop.x,pTop.y,4,0,Math.PI*2);
+                    ctx.fill();
+                    ctx.shadowBlur=0;
+
+                    // 更新容积
+                    const vol = coneVolume(1.0, coneH);
+                    document.getElementById('coneVolume').textContent = (vol*100).toFixed(1) + ' u³';
+
+                    state.animTime += 0.015;
+                    requestAnimationFrame(draw);
+                }
+
+                // 鼠标拖拽旋转 + 悬浮提示
+                canvas.addEventListener('mousedown', e=>{
+                    state.draggingCone = true;
+                    const r = canvas.getBoundingClientRect();
+                    state.lastMouse = {x:e.clientX-r.left, y:e.clientY-r.top};
+                });
+                function hitTestBoundary(mx, my) {
+                    const cx = W/2, cy = H/2 + 30;
+                    const p048 = project(0,0,0);
+                    const p050 = project(R_STEADY+0.05,0,0);
+                    const p068 = project(R_FUSE*0.8,0.2,0);
+                    const hits = [];
+                    const d48 = Math.hypot(mx-p048.x-60, my-p048.y+5);
+                    const d50 = Math.hypot(mx-p050.x-30, my-p050.y+8);
+                    const d68 = Math.hypot(mx-p068.x+20, my-p068.y);
+                    if (d48 < 40) return {type:'breakeven', x:p048.x, y:p048.y};
+                    if (d50 < 40) return {type:'steady', x:p050.x, y:p050.y};
+                    if (d68 < 50) return {type:'fuse', x:p068.x, y:p068.y};
+                    return null;
+                }
+                canvas.addEventListener('mousemove', e=>{
+                    const r = canvas.getBoundingClientRect();
+                    const mx = e.clientX-r.left, my=e.clientY-r.top;
+                    if (state.draggingCone) {
+                        const dx = mx - state.lastMouse.x, dy = my - state.lastMouse.y;
+                        state.coneRotY += dx*0.008;
+                        state.coneRotX = clamp(state.coneRotX + dy*0.008, -1.2, 0.2);
+                        state.lastMouse = {x:mx,y:my};
+                        tooltip.style.display='none';
+                    } else {
+                        const hit = hitTestBoundary(mx, my);
+                        if (hit) {
+                            canvas.style.cursor = 'pointer';
+                            tooltip.style.display = 'block';
+                            tooltip.style.left = Math.min(W-220, hit.x+10)+'px';
+                            tooltip.style.top = Math.max(10, hit.y-60)+'px';
+                            let html = '';
+                            if (hit.type==='breakeven') {
+                                html = '<div class="tt-title" style="color:#22c55e;">0.48 保本安全线</div>博弈空间容积底线 · 低于此值进入保守防御区间 · 风险可控边界';
+                            } else if (hit.type==='steady') {
+                                html = '<div class="tt-title" style="color:#a78bfa;">0.50 标准稳态中轴线</div>全局刚性均衡圆柱 · 多方博弈纳什均衡基准点 · 系统最优运行区间';
+                            } else if (hit.type==='fuse') {
+                                html = '<div class="tt-title" style="color:#ef4444;">0.68 结构熔断红线</div>市场泡沫临界边界 · 超过此值触发强制熔断 · 空心化失稳风险极高';
+                            }
+                            tooltip.innerHTML = html;
+                        } else {
+                            canvas.style.cursor = state.draggingCone ? 'grabbing' : 'grab';
+                            tooltip.style.display='none';
+                        }
+                    }
+                });
+                canvas.addEventListener('mouseleave', ()=>{ tooltip.style.display='none'; });
+                window.addEventListener('mouseup', ()=>{ state.draggingCone=false; });
+
+                resize();
+                window.addEventListener('resize', resize);
+                draw();
+            }
+
+            // ===== 第二层：四层空间切换 =====
+            function initSpaceSwitcher() {
+                const btns = document.querySelectorAll('.space-btn');
+                const spC1 = document.getElementById('spC1');
+                const spC2 = document.getElementById('spC2');
+                const spSteady = document.getElementById('spSteady');
+                const pipeSpace = document.getElementById('pipeSpace');
+
+                function applySpace(key) {
+                    state.currentSpace = key;
+                    const p = SPACE_PRESETS[key];
+                    btns.forEach(b=>{
+                        b.classList.remove('active','low','high','shallow','deep');
+                        if (b.dataset.space===key) b.classList.add('active', key);
+                    });
+                    spC1.textContent = p.c1Min.toFixed(2)+' ~ '+p.c1Max.toFixed(2);
+                    spC2.textContent = p.c2Min.toFixed(2)+' ~ '+p.c2Max.toFixed(2);
+                    spSteady.textContent = p.sMin.toFixed(2)+' ~ '+p.sMax.toFixed(2);
+                    pipeSpace.textContent = p.icon+' '+p.name;
+                    // 初始化扰动值为区间中值
+                    state.c1 = (p.c1Min+p.c1Max)/2;
+                    state.c2 = (p.c2Min+p.c2Max)/2;
+                    updatePerturb();
+                    resetPolygon();
+                }
+                btns.forEach(b=>{
+                    b.addEventListener('click', ()=>applySpace(b.dataset.space));
+                });
+                applySpace('low');
+            }
+
+            // ===== 第三层：N边形博弈 =====
+            let polyCtx, polyW, polyH, polyCanvas;
+            function resetPolygon() {
+                const p = SPACE_PRESETS[state.currentSpace];
+                state.c1 = (p.c1Min+p.c1Max)/2;
+                state.c2 = (p.c2Min+p.c2Max)/2;
+                if (!polyCanvas || !polyCtx) return;
+                const n = state.nVertices;
+                const cx = polyW/2, cy = polyH/2, R = Math.min(polyW,polyH)*0.32;
+                state.vertices = [];
+                for (let i=0;i<n;i++) {
+                    const a = (i/n)*Math.PI*2 - Math.PI/2;
+                    const jitter = (p.c1Max-p.c1Min)*0.15;
+                    const rr = R*(1+rand(-jitter,jitter));
+                    state.vertices.push({x:cx+Math.cos(a)*rr, y:cy+Math.sin(a)*rr, baseAngle:a});
+                }
+                updatePerturb();
+                drawPolyInternal();
+            }
+            function drawPolyInternal() {
+                if (!polyCtx || !polyCanvas) return;
+                polyCtx.clearRect(0,0,polyW,polyH);
+                const w=polyW,h=polyH;
+                const cx=w/2, cy=h/2;
+
+                polyCtx.strokeStyle = 'rgba(167,139,250,0.25)';
+                polyCtx.lineWidth = 1;
+                polyCtx.setLineDash([4,6]);
+                polyCtx.beginPath();
+                polyCtx.arc(cx,cy,8,0,Math.PI*2);
+                polyCtx.stroke();
+                polyCtx.fillStyle='rgba(167,139,250,0.6)';
+                polyCtx.font='10px monospace';
+                polyCtx.textAlign='center';
+                polyCtx.fillText('0.50', cx, cy-14);
+                polyCtx.setLineDash([]);
+
+                polyCtx.strokeStyle='rgba(34,197,94,0.15)';
+                polyCtx.beginPath();
+                polyCtx.arc(cx,cy,Math.min(w,h)*0.15,0,Math.PI*2);
+                polyCtx.stroke();
+
+                const fuseR = Math.min(w,h)*0.42;
+                const grad = polyCtx.createRadialGradient(cx,cy,0,cx,cy,fuseR);
+                grad.addColorStop(0,'rgba(239,68,68,0)');
+                grad.addColorStop(0.7,'rgba(239,68,68,0)');
+                grad.addColorStop(1,'rgba(239,68,68,0.08)');
+                polyCtx.fillStyle = grad;
+                polyCtx.beginPath();
+                polyCtx.arc(cx,cy,fuseR,0,Math.PI*2);
+                polyCtx.fill();
+                polyCtx.strokeStyle='rgba(239,68,68,0.3)';
+                polyCtx.setLineDash([6,4]);
+                polyCtx.stroke();
+                polyCtx.setLineDash([]);
+
+                const n = state.vertices.length;
+                polyCtx.lineWidth = 1.5;
+                if (state.lineMode === 'parallel') {
+                    for (let i=0;i<n;i++) {
+                        const v1=state.vertices[i], v2=state.vertices[(i+1)%n];
+                        polyCtx.strokeStyle = 'rgba(34,197,94,0.6)';
+                        polyCtx.beginPath();
+                        polyCtx.moveTo(v1.x,v1.y);
+                        polyCtx.lineTo(v2.x,v2.y);
+                        polyCtx.stroke();
+                    }
+                } else {
+                    for (let i=0;i<n;i++) {
+                        for (let j=i+1;j<n;j++) {
+                            if (j===(i+1)%n || (i===0&&j===n-1)) continue;
+                            const v1=state.vertices[i], v2=state.vertices[j];
+                            polyCtx.strokeStyle = 'rgba(248,113,113,0.3)';
+                            polyCtx.beginPath();
+                            polyCtx.moveTo(v1.x,v1.y);
+                            polyCtx.lineTo(v2.x,v2.y);
+                            polyCtx.stroke();
+                        }
+                    }
+                    for (let i=0;i<n;i++) {
+                        const v1=state.vertices[i], v2=state.vertices[(i+1)%n];
+                        polyCtx.strokeStyle = 'rgba(167,139,250,0.4)';
+                        polyCtx.lineWidth = 2;
+                        polyCtx.beginPath();
+                        polyCtx.moveTo(v1.x,v1.y);
+                        polyCtx.lineTo(v2.x,v2.y);
+                        polyCtx.stroke();
+                    }
+                }
+
+                const maxDist = Math.min(w,h)*0.42;
+                state.vertices.forEach((v,i)=>{
+                    const dist = Math.hypot(v.x-cx, v.y-cy);
+                    const offset = dist / maxDist;
+                    let color = '#a78bfa';
+                    if (offset > 0.8) color = '#ef4444';
+                    else if (offset > 0.5) color = '#facc15';
+                    else color = '#22c55e';
+
+                    polyCtx.fillStyle = color;
+                    polyCtx.shadowColor = color;
+                    polyCtx.shadowBlur = 10;
+                    polyCtx.beginPath();
+                    polyCtx.arc(v.x,v.y,8,0,Math.PI*2);
+                    polyCtx.fill();
+                    polyCtx.shadowBlur = 0;
+                    polyCtx.strokeStyle = 'rgba(255,255,255,0.5)';
+                    polyCtx.lineWidth=1.5;
+                    polyCtx.stroke();
+
+                    polyCtx.fillStyle = 'rgba(255,255,255,0.7)';
+                    polyCtx.font = '11px sans-serif';
+                    polyCtx.textAlign='center';
+                    const labelAngle = Math.atan2(v.y-cy, v.x-cx);
+                    const lx = v.x + Math.cos(labelAngle)*18;
+                    const ly = v.y + Math.sin(labelAngle)*18 + 4;
+                    polyCtx.fillText(state.vertexNames[i]||('V'+(i+1)), lx, ly);
+                });
+
+                const avgOffset = state.vertices.reduce((s,v)=>{
+                    return s + Math.hypot(v.x-cx,v.y-cy);
+                },0) / n / maxDist;
+                const newSynth = clamp(0.4 + avgOffset*0.4 + state.c1*0.15 + state.c2*0.15, 0, 1);
+                state.synth = lerp(state.synth, newSynth, 0.1);
+                updateOutput();
+            }
+            function initPolygon() {
+                polyCanvas = document.getElementById('polyCanvas');
+                if (!polyCanvas) return;
+                const wrap = document.getElementById('polyWrap');
+                const info = document.getElementById('vertexInfo');
+                const nameInput = document.getElementById('vertexNameInput');
+                polyCtx = polyCanvas.getContext('2d');
+
+                function resize() {
+                    const rect = wrap.getBoundingClientRect();
+                    polyW = polyCanvas.width = Math.floor(rect.width);
+                    polyH = polyCanvas.height = 400;
+                }
+                resize();
+                window.addEventListener('resize', ()=>{resize(); drawPolygon();});
+
+                function defaultNames(n) {
+                    const presets = [
+                        ['厂商','政府'],
+                        ['厂商','政府','用户'],
+                        ['厂商','政府','资本','用户'],
+                        ['厂商','政府','资本','用户','竞品'],
+                        ['厂商','政府','资本','用户','竞品','渠道'],
+                        ['厂商','政府','资本','用户','竞品','渠道','供应商'],
+                        ['厂商','政府','资本','用户','竞品','渠道','供应商','媒体']
+                    ];
+                    if (n <= 8) return presets[n-2].slice();
+                    const names = [];
+                    for (let i=0;i<n;i++) names.push('主体'+(i+1));
+                    return names;
+                }
+
+                function genPolygon(n) {
+                    state.nVertices = clamp(n,2,12);
+                    state.vertexNames = defaultNames(state.nVertices);
+                    state.vertices = [];
+                    const cx = polyW/2, cy = polyH/2, R = Math.min(polyW,polyH)*0.32;
+                    for (let i=0;i<state.nVertices;i++) {
+                        const a = (i/state.nVertices)*Math.PI*2 - Math.PI/2;
+                        state.vertices.push({
+                            x: cx + Math.cos(a)*R,
+                            y: cy + Math.sin(a)*R,
+                            baseAngle: a
+                        });
+                    }
+                    state.draggingVertex = -1;
+                    drawPolygon();
+                }
+
+                function resetVertices() {
+                    const cx = polyW/2, cy = polyH/2, R = Math.min(polyW,polyH)*0.32;
+                    state.vertices.forEach((v,i)=>{
+                        const a = (i/state.nVertices)*Math.PI*2 - Math.PI/2;
+                        v.x = cx + Math.cos(a)*R;
+                        v.y = cy + Math.sin(a)*R;
+                    });
+                    drawPolygon();
+                }
+
+                function centerVertices() {
+                    const cx=polyW/2, cy=polyH/2;
+                    let ax=0,ay=0;
+                    state.vertices.forEach(v=>{ax+=v.x;ay+=v.y;});
+                    ax/=state.nVertices; ay/=state.nVertices;
+                    const dx=cx-ax, dy=cy-ay;
+                    state.vertices.forEach(v=>{v.x+=dx;v.y+=dy;});
+                    drawPolygon();
+                }
+
+                function computeCenter() {
+                    let cx=0,cy=0;
+                    state.vertices.forEach(v=>{cx+=v.x;cy+=v.y;});
+                    return {x:cx/state.nVertices, y:cy/state.nVertices};
+                }
+
+                function drawPolygon() {
+                    drawPolyInternal();
+                }
+
+                function hitVertex(mx,my) {
+                    for (let i=0;i<state.vertices.length;i++) {
+                        const v=state.vertices[i];
+                        if (Math.hypot(mx-v.x,my-v.y) < 14) return i;
+                    }
+                    return -1;
+                }
+                polyCanvas.addEventListener('mousedown', e=>{
+                    const rect = polyCanvas.getBoundingClientRect();
+                    const mx = (e.clientX-rect.left)*(polyW/rect.width);
+                    const my = (e.clientY-rect.top)*(polyH/rect.height);
+                    const idx = hitVertex(mx,my);
+                    if (idx >= 0) {
+                        state.draggingVertex = idx;
+                        polyCanvas.classList.add('dragging');
+                        info.style.display='block';
+                    }
+                });
+                polyCanvas.addEventListener('mousemove', e=>{
+                    const rect = polyCanvas.getBoundingClientRect();
+                    const mx = (e.clientX-rect.left)*(polyW/rect.width);
+                    const my = (e.clientY-rect.top)*(polyH/rect.height);
+                    if (state.draggingVertex >= 0) {
+                        state.vertices[state.draggingVertex].x = clamp(mx, 20, polyW-20);
+                        state.vertices[state.draggingVertex].y = clamp(my, 20, polyH-20);
+                        const i = state.draggingVertex;
+                        const v = state.vertices[i];
+                        const center = computeCenter();
+                        const dist = Math.hypot(v.x-center.x, v.y-center.y);
+                        const maxDist = Math.min(polyW,polyH)*0.42;
+                        const c1v = clamp(state.c1 + (dist/maxDist-0.3)*0.3, 0, 1);
+                        const c2v = clamp(state.c2 + (dist/maxDist-0.3)*0.2, 0, 1);
+                        info.innerHTML = '<div class="vname">'+state.vertexNames[i]+'</div>'+
+                            '<div class="vrow"><span class="k">C₁扰动</span><span style="color:#67e8f9">'+c1v.toFixed(2)+'</span></div>'+
+                            '<div class="vrow"><span class="k">C₂扰动</span><span style="color:#fb923c">'+c2v.toFixed(2)+'</span></div>'+
+                            '<div class="vrow"><span class="k">偏移量</span><span>'+(dist/maxDist).toFixed(2)+'</span></div>';
+                        drawPolygon();
+                    } else {
+                        polyCanvas.style.cursor = hitVertex(mx,my)>=0 ? 'grab' : 'default';
+                    }
+                });
+                window.addEventListener('mouseup', ()=>{
+                    if (state.draggingVertex>=0) {
+                        state.draggingVertex=-1;
+                        polyCanvas.classList.remove('dragging');
+                    }
+                });
+                polyCanvas.addEventListener('dblclick', e=>{
+                    const rect = polyCanvas.getBoundingClientRect();
+                    const mx = (e.clientX-rect.left)*(polyW/rect.width);
+                    const my = (e.clientY-rect.top)*(polyH/rect.height);
+                    const idx = hitVertex(mx,my);
+                    if (idx >= 0) {
+                        nameInput.style.display = 'block';
+                        nameInput.style.left = (state.vertices[idx].x-50)+'px';
+                        nameInput.style.top = (state.vertices[idx].y-30)+'px';
+                        nameInput.value = state.vertexNames[idx];
+                        nameInput.dataset.idx = idx;
+                        nameInput.focus();
+                        nameInput.select();
+                    }
+                });
+                nameInput.addEventListener('blur', ()=>{
+                    const idx = parseInt(nameInput.dataset.idx);
+                    if (!isNaN(idx) && nameInput.value.trim()) {
+                        state.vertexNames[idx] = nameInput.value.trim().slice(0,8);
+                    }
+                    nameInput.style.display='none';
+                    drawPolygon();
+                });
+                nameInput.addEventListener('keydown', e=>{
+                    if (e.key==='Enter') nameInput.blur();
+                    if (e.key==='Escape') {nameInput.value=''; nameInput.blur();}
+                });
+
+                document.getElementById('polyGenBtn').addEventListener('click', ()=>{
+                    const n = parseInt(document.getElementById('polyNInput').value)||5;
+                    genPolygon(clamp(n,2,12));
+                    updatePerturb();
+                });
+                document.getElementById('modeParallelBtn').addEventListener('click', ()=>{
+                    state.lineMode='parallel';
+                    document.getElementById('modeParallelBtn').classList.add('active');
+                    document.getElementById('modeCrossBtn').classList.remove('active');
+                    drawPolygon();
+                });
+                document.getElementById('modeCrossBtn').addEventListener('click', ()=>{
+                    state.lineMode='cross';
+                    document.getElementById('modeCrossBtn').classList.add('active');
+                    document.getElementById('modeParallelBtn').classList.remove('active');
+                    drawPolygon();
+                });
+                document.getElementById('polyCenterBtn').addEventListener('click', centerVertices);
+                document.getElementById('polyResetBtn').addEventListener('click', resetPolygon);
+
+                genPolygon(5);
+            }
+
+            // ===== 第四层：双层扰动更新 =====
+            function updatePerturb() {
+                // PID双环制衡：合成值 = C1*0.4 + C2*0.3 + 顶点偏移*0.3，然后PID纠偏
+                const Kp = 0.5, Ki = 0.05, Kd = 0.1;
+                let integral = gmLS('gmv_integral',0);
+                const target = 0.5;
+                const err = state.synth - target;
+                integral = clamp(integral + err*0.016, -0.2, 0.2);
+                const deriv = (err - gmLS('gmv_last_err',0))/0.016;
+                const pidOut = Kp*err + Ki*integral + Kd*deriv*0.0;
+                state.synth = clamp(state.synth - pidOut*0.3, 0, 1);
+                gmSS('gmv_integral', integral);
+                gmSS('gmv_last_err', err);
+
+                document.getElementById('pC1Val').textContent = state.c1.toFixed(2);
+                document.getElementById('pC2Val').textContent = state.c2.toFixed(2);
+                document.getElementById('pSynthVal').textContent = state.synth.toFixed(2);
+                document.getElementById('pC1Bar').style.width = (state.c1*100)+'%';
+                document.getElementById('pC2Bar').style.width = (state.c2*100)+'%';
+                document.getElementById('pSynthBar').style.width = (state.synth*100)+'%';
+
+                const bar1 = document.getElementById('pC1Bar').parentElement;
+                const bar2 = document.getElementById('pC2Bar').parentElement;
+                const barS = document.getElementById('pSynthBar').parentElement;
+                [bar1,bar2,barS].forEach(b=>{b.style.boxShadow='';});
+                if (state.synth >= GMV_THRESHOLDS.FUSE) {
+                    document.getElementById('pSynthVal').style.color='#ef4444';
+                    barS.style.boxShadow='0 0 12px rgba(239,68,68,0.3)';
+                } else if (state.synth >= 0.55) {
+                    document.getElementById('pSynthVal').style.color='#facc15';
+                } else {
+                    document.getElementById('pSynthVal').style.color='#a78bfa';
+                }
+            }
+
+            // ===== 第五层：数据输出到MoodMind =====
+            function updateOutput() {
+                const balance = clamp(1 - Math.abs(state.synth - 0.5)*2, 0, 1);
+                const risk = state.synth;
+                // 空心化判定：C2 > 0.6时认为空心化（内部腔体扰动过大）
+                let hollow = '结构稳健', hollowClass='safe';
+                if (state.c2 > 0.7) { hollow='严重空心化 ⚠️'; hollowClass='danger'; }
+                else if (state.c2 > 0.5) { hollow='轻微空心化'; hollowClass='warn'; }
+
+                document.getElementById('outBalance').textContent = balance.toFixed(2);
+                document.getElementById('outBalance').className = 'oc-value '+(balance>0.7?'safe':(balance>0.4?'warn':'danger'));
+                document.getElementById('outRisk').textContent = risk.toFixed(2);
+                document.getElementById('outRisk').className = 'oc-value '+(risk<GMV_THRESHOLDS.FUSE-0.1?'safe':(risk<GMV_THRESHOLDS.FUSE?'warn':'danger'));
+                const hollowEl = document.getElementById('outHollow');
+                hollowEl.textContent = hollow;
+                hollowEl.className = 'oc-value '+hollowClass;
+
+                // 写入localStorage供MoodMind读取
+                const output = {
+                    balance: balance,
+                    risk: risk,
+                    c1: state.c1,
+                    c2: state.c2,
+                    synth: state.synth,
+                    hollowRisk: state.c2 > 0.5,
+                    space: state.currentSpace,
+                    vertices: state.nVertices,
+                    lineMode: state.lineMode,
+                    version: 'GameMind V2.2',
+                    timestamp: Date.now()
+                };
+                gmSS('pipeline_gamemind_v2_output', output);
+                gmSS('gamemind_to_moodmind', output);
+                if (typeof YBus !== 'undefined' && YBus.publish) {
+                    try { YBus.publish('gamemindV2Output', output, {trusted:true}); } catch(_){}
+                }
+            }
+
+            function resizeCanvases() {
+                // 触发resize事件让canvas自适应
+                window.dispatchEvent(new Event('resize'));
+            }
+
+            // ===== 初始化 =====
+            function readAirMindV2() {
+                try {
+                    const d = gmLS('airmind_gamebase', null);
+                    if (!d) return null;
+                    const age = Date.now() - (d.updatedAt||0);
+                    if (age > 60000) return null;
+                    return d;
+                } catch(_) { return null; }
+            }
+            function syncFromAirMind() {
+                const air = readAirMindV2();
+                if (!air) return;
+                if (air.space && SPACE_PRESETS[air.space]) {
+                    state.currentSpace = air.space;
+                }
+                if (typeof air.c1 === 'number') state.c1 = clamp(air.c1, 0, 1);
+                if (typeof air.c2 === 'number') state.c2 = clamp(air.c2, 0, 1);
+            }
+            window.addEventListener('load', function() {
+                initTabs();
+                initCone();
+                initSpaceSwitcher();
+                initPolygon();
+                syncFromAirMind();
+                updatePerturb();
+                updateOutput();
+                setInterval(()=>{
+                    if (state.activeTab !== 'new') return;
+                    const p = SPACE_PRESETS[state.currentSpace];
+                    state.c1 = clamp(state.c1 + rand(-0.01,0.01), p.c1Min, p.c1Max);
+                    state.c2 = clamp(state.c2 + rand(-0.008,0.008), p.c2Min, p.c2Max);
+                    updatePerturb();
+                    updateOutput();
+                }, 800);
+                setInterval(()=>{
+                    if (state.activeTab === 'new') syncFromAirMind();
+                }, 5000);
+            });
+        })();
     </script>
 
 </body>
