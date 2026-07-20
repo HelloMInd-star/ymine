@@ -41,8 +41,9 @@
             background: rgba(11, 11, 26, 0.95);
             backdrop-filter: blur(20px);
             border-bottom: 1px solid rgba(244, 114, 182, 0.15);
-            padding: 10px 20px;
-            display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+            padding: 8px 20px;
+            display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+            min-height: 48px; box-sizing: border-box;
         }
         .breadcrumb {
             font-size: 12px; color: rgba(255,255,255,0.4);
@@ -57,52 +58,54 @@
         .version-badge {
             background: linear-gradient(135deg, rgba(244,114,182,0.2), rgba(167,139,250,0.2));
             border: 1px solid rgba(244,114,182,0.4);
-            padding: 4px 12px; border-radius: 20px; font-size: 11px;
+            padding: 3px 10px; border-radius: 20px; font-size: 11px;
             color: var(--mindspeak-pink-light); font-weight: 600; font-family: monospace;
+            white-space: nowrap;
         }
 
         .pipeline-badge {
-            font-size: 11px; color: #67e8f9;
+            font-size: 10px; color: #67e8f9;
             background: rgba(103,232,249,0.1);
             border: 1px solid rgba(103,232,249,0.3);
-            padding: 3px 10px; border-radius: 12px; font-family: monospace;
+            padding: 3px 8px; border-radius: 12px; font-family: monospace;
+            white-space: nowrap;
         }
 
         .steady-control {
-            display: flex; align-items: center; gap: 8px; margin-left: auto;
+            display: flex; align-items: center; gap: 6px; margin-left: auto;
         }
         .steady-control label {
-            font-size: 11px; color: rgba(255,255,255,0.5); white-space: nowrap;
+            font-size: 10px; color: rgba(255,255,255,0.5); white-space: nowrap;
         }
         .steady-slider {
-            width: 120px; height: 6px; border-radius: 3px;
+            width: 100px; height: 5px; border-radius: 3px;
             background: linear-gradient(90deg, #22c55e 0%, #22c55e 48%, #facc15 50%, #facc15 68%, #ef4444 100%);
             -webkit-appearance: none; outline: none; cursor: pointer;
         }
         .steady-slider::-webkit-slider-thumb {
-            -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%;
-            background: #fff; cursor: pointer; box-shadow: 0 0 8px rgba(255,255,255,0.5);
+            -webkit-appearance: none; width: 12px; height: 12px; border-radius: 50%;
+            background: #fff; cursor: pointer; box-shadow: 0 0 6px rgba(255,255,255,0.5);
         }
         .steady-value {
-            font-family: monospace; font-size: 12px; min-width: 40px; color: var(--mindspeak-pink);
+            font-family: monospace; font-size: 11px; min-width: 34px; color: var(--mindspeak-pink);
         }
 
         .btn-emergency {
             background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.5);
-            color: #f87171; padding: 5px 14px; border-radius: 8px; font-size: 12px;
-            cursor: pointer; transition: all .2s; font-weight: 600;
+            color: #f87171; padding: 4px 10px; border-radius: 8px; font-size: 11px;
+            cursor: pointer; transition: all .2s; font-weight: 600; white-space: nowrap;
         }
         .btn-emergency:hover { background: rgba(239,68,68,0.3); }
         .btn-resume {
             background: rgba(34,197,94,0.15); border: 1px solid rgba(34,197,94,0.5);
-            color: #4ade80; padding: 5px 14px; border-radius: 8px; font-size: 12px;
-            cursor: pointer; transition: all .2s; font-weight: 600; display: none;
+            color: #4ade80; padding: 4px 10px; border-radius: 8px; font-size: 11px;
+            cursor: pointer; transition: all .2s; font-weight: 600; display: none; white-space: nowrap;
         }
 
-        .status-chips { display: flex; gap: 6px; }
+        .status-chips { display: flex; gap: 4px; }
         .status-chip {
-            padding: 3px 10px; border-radius: 10px; font-size: 10px; font-weight: 600;
-            font-family: monospace;
+            padding: 2px 8px; border-radius: 10px; font-size: 9px; font-weight: 600;
+            font-family: monospace; white-space: nowrap;
         }
         .status-chip.green { background:rgba(34,197,94,0.15); color:#22c55e; border:1px solid rgba(34,197,94,0.3); }
         .status-chip.yellow { background:rgba(250,204,21,0.15); color:#facc15; border:1px solid rgba(250,204,21,0.3); }
@@ -115,8 +118,11 @@
             display: none; pointer-events: none;
         }
         .emergency-overlay.active { display: block; }
+        :root {
+            --topbar-h: 48px;
+        }
         .emergency-banner {
-            position: fixed; top: 70px; left: 50%; transform: translateX(-50%);
+            position: fixed; top: var(--topbar-h); left: 50%; transform: translateX(-50%);
             background: rgba(239,68,68,0.9); color: #fff; padding: 12px 24px;
             border-radius: 12px; z-index: 501; font-weight: 600; font-size: 14px;
             display: none; box-shadow: 0 10px 40px rgba(239,68,68,0.4);
@@ -124,13 +130,13 @@
         .emergency-banner.active { display: block; }
 
         .layout-wrapper {
-            display: flex; padding-top: 70px; position: relative; z-index: 1;
+            display: flex; padding-top: var(--topbar-h); position: relative; z-index: 1;
             min-height: 100vh;
         }
 
         .left-nav {
-            position: fixed; top: 70px; left: 0;
-            width: 220px; height: calc(100vh - 70px);
+            position: fixed; top: var(--topbar-h); left: 0;
+            width: 220px; height: calc(100vh - var(--topbar-h));
             padding: 16px 12px 20px 16px;
             overflow-y: auto;
             background: rgba(11, 11, 26, 0.95);
@@ -177,7 +183,7 @@
 
         .main-content {
             flex: 1; margin-left: 220px; margin-right: 260px;
-            padding: 20px 30px 32px; min-height: calc(100vh - 70px); position: relative; z-index: 1;
+            padding: 20px 30px 32px; min-height: calc(100vh - var(--topbar-h)); position: relative; z-index: 1;
         }
         .container {
             width: 100%;
@@ -189,8 +195,8 @@
         }
 
         .right-panel {
-            position: fixed; top: 70px; right: 0;
-            width: 260px; height: calc(100vh - 70px);
+            position: fixed; top: var(--topbar-h); right: 0;
+            width: 260px; height: calc(100vh - var(--topbar-h));
             background: rgba(11, 11, 26, 0.95);
             backdrop-filter: blur(16px);
             border-left: 1px solid rgba(244, 114, 182, 0.08);
@@ -581,15 +587,6 @@
     <div class="emergency-banner" id="emergencyBanner">⚠️ 紧急停机中，运算拒绝执行</div>
 
     <div class="v19-top-bar">
-        <nav class="breadcrumb">
-            <a href="../../index.html">Y.Mine总控台</a>
-            <span class="sep">›</span>
-            <a href="../../index.html">认知科研实验组</a>
-            <span class="sep">›</span>
-            <span class="current">MindSpeak · 四层跨域数理同构翻译引擎 V19.0</span>
-        </nav>
-        <a href="javascript:history.back()" style="padding:6px 12px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);border-radius:8px;color:rgba(255,255,255,0.7);text-decoration:none;font-size:12px;transition:all .2s;white-space:nowrap;">← 返回上一级</a>
-        <a href="../../index.html" style="padding:6px 12px;background:rgba(244,114,182,0.12);border:1px solid rgba(244,114,182,0.3);border-radius:8px;color:#f472b6;text-decoration:none;font-size:12px;transition:all .2s;white-space:nowrap;">🏠 一键返回总控台</a>
         <span class="version-badge">V19.0 · GameOS V2.1</span>
         <span class="pipeline-badge">S1 · ETL信息清洗（MindSpeak）</span>
 
@@ -635,6 +632,17 @@
     </nav>
 
     <div class="main-content">
+        <nav class="breadcrumb" style="margin-bottom:8px;">
+            <a href="../../index.html">Y.Mine总控台</a>
+            <span class="sep">›</span>
+            <a href="../../index.html">认知科研实验组</a>
+            <span class="sep">›</span>
+            <span class="current">MindSpeak · 四层跨域数理同构翻译引擎 V19.0</span>
+        </nav>
+        <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;">
+            <a href="javascript:history.back()" style="padding:6px 14px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);border-radius:8px;color:rgba(255,255,255,0.7);text-decoration:none;font-size:12px;transition:all .2s;">← 返回上一级</a>
+            <a href="../../index.html" style="padding:6px 14px;background:rgba(244,114,182,0.12);border:1px solid rgba(244,114,182,0.3);border-radius:8px;color:#f9a8d4;text-decoration:none;font-size:12px;transition:all .2s;">🏠 一键返回总控台</a>
+        </div>
         <div class="container">
 
             <div class="section-anchor" id="section-hero"></div>
@@ -2149,6 +2157,13 @@
 
         window.onload = function() {
             try {
+                function syncTopbarHeight() {
+                    var h = document.querySelector('.v19-top-bar').offsetHeight;
+                    document.documentElement.style.setProperty('--topbar-h', h + 'px');
+                }
+                syncTopbarHeight();
+                window.addEventListener('resize', syncTopbarHeight);
+
                 const stopped = safeGetStorage('emergency_stop', 'false');
                 MS_STATE.emergencyStopped = stopped === 'true';
                 const savedBias = parseFloat(safeGetStorage('steady_bias', '0'));
