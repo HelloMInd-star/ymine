@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>🏛️ FinanceMind · 量化公司理财 & 投行资本中台 V1.0</title>
+    <link rel="stylesheet" href="../../assets/css/base.css?v=2">
+    <script src="../../assets/js/bus.js?v=3"></script>
+    <script src="../../models/common/normalizer.js?v=3"></script>
+    <script src="../../assets/js/triangle-audit.js?v=3"></script>
+    <script src="../../game-os-main/core-engine/circle-boundary.js?v=1"></script>
+    <script src="js/bus-subscribe.js?v=1"></script>
+    <style>
+        :root {
+            --bg-deep: #0a0f1e;
+            --bg-card: rgba(255, 255, 255, 0.03);
+            --border-glass: rgba(255, 255, 255, 0.06);
+            --gold: #fbbf24;
+            --emerald: #10b981;
+            --cyan: #22d3ee;
+            --purple: #a78bfa;
+            --orange: #fb923c;
+            --red: #f87171;
+            --green: #22c55e;
+        }
+        * { box-sizing: border-box; }
+        body {
+            background: var(--bg-deep);
+            color: #e2e8f0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            margin: 0; padding: 0;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        body::before {
+            content: '';
+            position: fixed; inset: 0;
+            background:
+                radial-gradient(2px 2px at 20% 30%, rgba(251,191,36,0.3), transparent),
+                radial-gradient(2px 2px at 60% 70%, rgba(16,185,129,0.25), transparent),
+                radial-gradient(1px 1px at 50% 50%, rgba(255,255,255,0.4), transparent),
+                radial-gradient(1px 1px at 80% 10%, rgba(34,210,238,0.3), transparent),
+                radial-gradient(2px 2px at 90% 60%, rgba(255,255,255,0.2), transparent);
+            background-size: 400px 400px;
+            pointer-events: none; z-index: 0;
+        }
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px 24px;
+            position: relative; z-index: 1;
+        }
+        .breadcrumb {
+            font-size: 12px; color: rgba(255,255,255,0.4);
+            margin-bottom: 16px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+        }
+        .breadcrumb a { color: var(--gold); text-decoration: none; }
+        .breadcrumb a:hover { color: #fcd34d; }
+        .breadcrumb .sep { color: rgba(255,255,255,0.2); }
+
+        .header-section {
+            background: linear-gradient(135deg, rgba(251,191,36,0.08), rgba(16,185,129,0.08), rgba(167,139,250,0.06));
+            border: 1px solid rgba(251,191,36,0.2);
+            border-radius: 18px;
+            padding: 24px 28px;
+            margin-bottom: 20px;
+            position: relative; overflow: hidden;
+            backdrop-filter: blur(12px);
+        }
+        .header-section::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+            background: linear-gradient(90deg, transparent, var(--gold), var(--emerald), var(--purple), transparent);
+        }
+        .header-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 20px; flex-wrap: wrap; }
+        .header-title h1 {
+            font-size: 28px; font-weight: 800; margin: 0 0 8px;
+            background: linear-gradient(135deg, #fef3c7, var(--gold), var(--emerald));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text; letter-spacing: -0.5px;
+        }
+        .header-sub { font-size: 13px; color: rgba(255,255,255,0.5); line-height: 1.7; }
+        .status-pill {
+            display: inline-flex; align-items: center; gap: 8px; font-size: 11px; padding: 6px 14px;
+            background: rgba(251,191,36,0.1); border: 1px solid rgba(251,191,36,0.25);
+            border-radius: 20px; color: var(--gold); font-weight: 600;
+        }
+        .status-pill .dot { width: 6px; height: 6px; background: var(--gold); border-radius: 50%; animation: pulse 2s infinite; }
+        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+        .thresholds-bar {
+            display: flex; gap: 12px; margin-top: 16px; flex-wrap: wrap;
+        }
+        .threshold-pill {
+            display: flex; align-items: center; gap: 8px; padding: 6px 14px;
+            background: rgba(255,255,255,0.04); border: 1px solid var(--border-glass);
+            border-radius: 10px; font-size: 12px; font-weight: 600;
+        }
+        .threshold-pill.breakeven { color: var(--orange); border-color: rgba(251,146,60,0.25); }
+        .threshold-pill.steady { color: var(--green); border-color: rgba(34,194,94,0.25); }
+        .threshold-pill.fuse { color: var(--red); border-color: rgba(248,113,113,0.3); }
+
+        .zone-tabs { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+        .zone-tab {
+            padding: 10px 22px; border-radius: 12px; cursor: pointer;
+            font-size: 13px; font-weight: 600; border: 1px solid var(--border-glass);
+            background: var(--bg-card); color: rgba(255,255,255,0.6);
+            transition: all 0.2s;
+        }
+        .zone-tab:hover { border-color: rgba(255,255,255,0.15); color: #fff; }
+        .zone-tab.active-zone-a { background: rgba(16,185,129,0.12); border-color: rgba(16,185,129,0.35); color: var(--emerald); }
+        .zone-tab.active-zone-b { background: rgba(251,191,36,0.12); border-color: rgba(251,191,36,0.35); color: var(--gold); }
+
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+        @media (max-width: 1100px) { .grid-2 { grid-template-columns: 1fr; } }
+
+        .card {
+            background: var(--bg-card); border: 1px solid var(--border-glass);
+            border-radius: 14px; padding: 20px; backdrop-filter: blur(8px);
+        }
+        .card-title {
+            font-size: 14px; font-weight: 700; margin: 0 0 14px;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .zone-a .card-title { color: var(--emerald); }
+        .zone-b .card-title { color: var(--gold); }
+
+        .module-list { display: flex; flex-direction: column; gap: 10px; }
+        .module-item {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 10px 14px; background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.04); border-radius: 8px;
+            font-size: 12px;
+        }
+        .module-name { font-weight: 600; color: #e2e8f0; }
+        .module-desc { font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 2px; }
+        .module-status {
+            font-size: 10px; padding: 3px 8px; border-radius: 6px; font-weight: 700;
+        }
+        .status-placeholder { background: rgba(248,113,113,0.12); color: var(--red); }
+        .status-ready { background: rgba(34,194,94,0.12); color: var(--green); }
+        .status-pending { background: rgba(251,191,36,0.12); color: var(--gold); }
+
+        .bus-panel {
+            background: var(--bg-card); border: 1px solid var(--border-glass);
+            border-radius: 14px; padding: 20px;
+        }
+        .bus-panel-title { font-size: 14px; font-weight: 700; color: var(--cyan); margin: 0 0 14px; display: flex; align-items: center; gap: 8px; }
+        .bus-channel {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 8px 12px; margin-bottom: 6px; background: rgba(255,255,255,0.02);
+            border-radius: 6px; font-size: 11px;
+        }
+        .bus-channel .ch-name { font-family: 'SF Mono', monospace; color: var(--cyan); font-weight: 600; }
+        .bus-channel .ch-dir { font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: 700; }
+        .ch-sub { background: rgba(34,210,238,0.1); color: var(--cyan); }
+        .ch-pub { background: rgba(251,146,60,0.1); color: var(--orange); }
+        .bus-channel .ch-status { font-size: 10px; color: rgba(255,255,255,0.35); }
+        .bus-channel .ch-val { font-family: 'SF Mono', monospace; color: rgba(255,255,255,0.5); font-size: 11px; }
+
+        .layers-stack { display: flex; flex-direction: column; gap: 6px; }
+        .layer-row {
+            display: grid; grid-template-columns: 50px 1fr auto; gap: 12px; align-items: center;
+            padding: 10px 14px; background: rgba(251,191,36,0.03);
+            border: 1px solid rgba(251,191,36,0.1); border-radius: 8px;
+            font-size: 12px;
+        }
+        .layer-num {
+            font-family: 'SF Mono', monospace; font-weight: 800; font-size: 14px;
+            color: var(--gold); text-align: center;
+        }
+        .layer-name { font-weight: 600; color: #fef3c7; }
+        .layer-desc { font-size: 10px; color: rgba(255,255,255,0.4); margin-top: 2px; }
+        .layer-lock {
+            width: 24px; height: 24px; border-radius: 6px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 11px;
+        }
+        .lock-stealth { background: rgba(248,113,113,0.1); color: var(--red); }
+
+        .risk-score-display {
+            text-align: center; padding: 20px;
+            background: linear-gradient(135deg, rgba(34,194,94,0.05), rgba(251,191,36,0.05), rgba(248,113,113,0.05));
+            border: 1px solid var(--border-glass); border-radius: 12px; margin-bottom: 16px;
+        }
+        .risk-gauge-value {
+            font-size: 48px; font-weight: 900; font-family: 'SF Mono', monospace;
+            background: linear-gradient(135deg, var(--green), var(--gold), var(--red));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .risk-gauge-label { font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 4px; letter-spacing: 2px; }
+        .risk-gauge-zone { font-size: 12px; font-weight: 700; margin-top: 8px; color: var(--green); }
+
+        .notice-bar {
+            background: rgba(251,191,36,0.06); border: 1px solid rgba(251,191,36,0.2);
+            border-radius: 10px; padding: 12px 16px; font-size: 11px; color: rgba(255,255,255,0.5);
+            line-height: 1.7; margin-top: 16px;
+        }
+        .notice-bar strong { color: var(--gold); }
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="breadcrumb">
+        <a href="../../index.html">Game-OS V2.1</a><span class="sep">›</span>
+        <a href="../index.html">核心Mind引擎</a><span class="sep">›</span>
+        <span style="color:var(--gold)">🏛️ FinanceMind 量化公司理财 & 投行资本中台</span>
+    </div>
+
+    <div class="header-section">
+        <div class="header-top">
+            <div class="header-title">
+                <h1>🏛️ FinanceMind · 量化公司理财 & 投行资本中台</h1>
+                <div class="header-sub">
+                    双分区架构：对内集团财务核算 · 对外11层投行估值 · 资本结构中枢锚定0.50稳态中轴线
+                </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end">
+                <div class="status-pill"><span class="dot"></span>V1.0 骨架初始化 · 待精算内核填充</div>
+            </div>
+        </div>
+        <div class="thresholds-bar">
+            <div class="threshold-pill breakeven">🛡️ 保本线 BREAKEVEN = <span id="thBE">--</span></div>
+            <div class="threshold-pill steady">⚖️ 稳态中轴 STEADY = <span id="thST">--</span></div>
+            <div class="threshold-pill fuse">🔥 熔断线 FUSE = <span id="thFU">--</span></div>
+        </div>
+    </div>
+
+    <div class="zone-tabs">
+        <div class="zone-tab active-zone-a" id="tabA" onclick="switchZone('A')">📒 分区A · 对内传统量化财务核算区</div>
+        <div class="zone-tab" id="tabB" onclick="switchZone('B')">🏦 分区B · 对外11层投行资本市场估值区</div>
+        <div class="zone-tab" id="tabBus" onclick="switchZone('Bus')">📡 YBus 总线监控</div>
+    </div>
+
+    <!-- ========== 分区A：对内财务核算区 ========== -->
+    <div id="zoneA" class="zone-a">
+        <div class="grid-2">
+            <div class="card">
+                <div class="card-title">📒 三表自动推演引擎</div>
+                <div class="module-list">
+                    <div class="module-item">
+                        <div><div class="module-name">资产负债表 Balance Sheet</div><div class="module-desc">资产 = 负债 + 股东权益，全事业部自动汇总</div></div>
+                        <div class="module-status status-placeholder">待开发</div>
+                    </div>
+                    <div class="module-item">
+                        <div><div class="module-name">利润表 Income Statement</div><div class="module-desc">收入→成本→毛利→EBIT→EBT→净利润 逐层推演</div></div>
+                        <div class="module-status status-placeholder">待开发</div>
+                    </div>
+                    <div class="module-item">
+                        <div><div class="module-name">自由现金流 FCF</div><div class="module-desc">FCFF = EBIT(1-t) + D&A - CapEx - ΔNWC</div></div>
+                        <div class="module-status status-placeholder">待开发</div>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-title">📊 财务分析工具集</div>
+                <div class="module-list">
+                    <div class="module-item">
+                        <div><div class="module-name">本量利 CVP 模型</div><div class="module-desc">盈亏平衡点 = FC/(P-VC) · 经营杠杆DOL测算</div></div>
+                        <div class="module-status status-placeholder">待开发</div>
+                    </div>
+                    <div class="module-item">
+                        <div><div class="module-name">杜邦分层拆解 DuPont</div><div class="module-desc">ROE = 净利率 × 资产周转率 × 权益乘数</div></div>
+                        <div class="module-status status-placeholder">待开发</div>
+                    </div>
+                    <div class="module-item">
+                        <div><div class="module-name">营运资本测算</div><div class="module-desc">NWC = 应收 + 存货 - 应付，现金转换周期CCC</div></div>
+                        <div class="module-status status-placeholder">待开发</div>
+                    </div>
+                    <div class="module-item">
+                        <div><div class="module-name">预算分摊 & 成本归集</div><div class="module-desc">全事业部固定/可变成本拆分，边际贡献核算</div></div>
+                        <div class="module-status status-placeholder">待开发</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-title">💚 集团现金流健康度评分</div>
+            <div class="risk-score-display">
+                <div class="risk-gauge-value" id="cashHealth">--</div>
+                <div class="risk-gauge-label">CASH FLOW HEALTH SCORE</div>
+                <div class="risk-gauge-zone" id="cashHealthZone">等待上游数据接入</div>
+            </div>
+            <div class="notice-bar">
+                <strong>⚠️ 保本预警逻辑：</strong>现金流健康度跌破 <strong>0.48 保本线</strong>自动触发riskThreshold保本预警；
+                突破 <strong>0.68 熔断线</strong>三角审计引擎STEP9闸门强制拦截降杠杆操作。
+                阈值常量引用全局THRESHOLDS，禁止本地重定义。
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== 分区B：11层投行估值区 ========== -->
+    <div id="zoneB" class="zone-b hidden">
+        <div class="card" style="margin-bottom:16px">
+            <div class="card-title">🏦 11层价值收敛骨架 · 投行资本市场估值架构</div>
+            <div class="layers-stack" id="layerStack"></div>
+        </div>
+        <div class="grid-2">
+            <div class="card">
+                <div class="card-title">🎯 核心定价模型</div>
+                <div class="module-list">
+                    <div class="module-item">
+                        <div><div class="module-name">WACC 加权平均资本成本</div><div class="module-desc">含MM税盾模型，资本结构最优杠杆锁定0.50中轴</div></div>
+                        <div class="module-status status-pending">复用公共内核</div>
+                    </div>
+                    <div class="module-item">
+                        <div><div class="module-name">DCF 自由现金流折现</div><div class="module-desc">多阶段增长模型，圆锥浓度校准风险溢价Rp</div></div>
+                        <div class="module-status status-pending">复用circle-boundary</div>
+                    </div>
+                    <div class="module-item">
+                        <div><div class="module-name">CAPM 圆锥稳态定价</div><div class="module-desc">E[R] = Rf + β(Rm-Rf) · β对接MoodMind认知差异向量</div></div>
+                        <div class="module-status status-pending">对接assetQuant</div>
+                    </div>
+                    <div class="module-item">
+                        <div><div class="module-name">凯利最优仓位配比</div><div class="module-desc">f*=(bp-q)/b 直接订阅GameMind kellyAllocation</div></div>
+                        <div class="module-status status-ready">通道预留</div>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-title">💼 投行专项工具</div>
+                <div class="module-list">
+                    <div class="module-item">
+                        <div><div class="module-name">可比公司估值 Comps</div><div class="module-desc">P/E、P/B、EV/EBITDA 多倍数对照</div></div>
+                        <div class="module-status status-placeholder">待开发</div>
+                    </div>
+                    <div class="module-item">
+                        <div><div class="module-name">先例交易估值 Precedents</div><div class="module-desc">并购先例交易溢价率分析</div></div>
+                        <div class="module-status status-placeholder">待开发</div>
+                    </div>
+                    <div class="module-item">
+                        <div><div class="module-name">LBO 杠杆收购模型</div><div class="module-desc">杠杆+内部收益率IRR退出测算</div></div>
+                        <div class="module-status status-placeholder">待开发</div>
+                    </div>
+                    <div class="module-item">
+                        <div><div class="module-name">融资稀释 & Pre-IPO定价</div><div class="module-desc">VC轮次股权稀释、IPO定价区间测算</div></div>
+                        <div class="module-status status-placeholder">待开发</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== YBus 总线监控 ========== -->
+    <div id="zoneBus" class="hidden">
+        <div class="bus-panel">
+            <div class="bus-panel-title">📡 YBus 六大标准通道收发状态</div>
+            <div id="busChannelList"></div>
+            <div class="notice-bar" style="margin-top:12px">
+                <strong>🔒 总线规范：</strong>仅使用六大官方标准YBus通道（mindVector/powerSchedule/assetQuant/riskThreshold/gameEquilibrium/kellyAllocation），
+                禁止新增任何私有局部通道、禁止复用旧版废弃的simulatorOutput通道。
+                所有riskThreshold输出须经三角审计引擎STEP9闸门校验。
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+(function(){
+    const TH = (typeof THRESHOLDS !== 'undefined') ? THRESHOLDS : Object.freeze({BREAKEVEN:0.48, STEADY:0.50, FUSE:0.68});
+    document.getElementById('thBE').textContent = TH.BREAKEVEN.toFixed(2);
+    document.getElementById('thST').textContent = TH.STEADY.toFixed(2);
+    document.getElementById('thFU').textContent = TH.FUSE.toFixed(2);
+
+    const layers = [
+        {n:1, name:'标准化财报基底', desc:'会计科目标准化·三表映射基底'},
+        {n:2, name:'全集团营运资本三流核算', desc:'信息/流量/物理三流分发财务映射 · 对接SalesMind'},
+        {n:3, name:'项目NPV/IRR资本预算引擎', desc:'项目可行性评估·投资决策门槛'},
+        {n:4, name:'全业态成本拆分 FC/VC', desc:'固定成本/可变成本边际测算·经营杠杆'},
+        {n:5, name:'资本结构中枢', desc:'MM税盾·最优杠杆0.50中轴锚定'},
+        {n:6, name:'无形资产估值接收层', desc:'订阅MoodMind assetQuant非标资产数据'},
+        {n:7, name:'CAPM圆锥稳态定价', desc:'复用Cone浓度内核·β风险系数定价'},
+        {n:8, name:'可比公司/并购先例估值', desc:'Comps+Precedents双引擎对照'},
+        {n:9, name:'融资稀释/Pre-IPO定价', desc:'股权债权融资测算·IPO区间'},
+        {n:10, name:'宏观利率锚定模块', desc:'无风险利率Rf·宏观周期信号'},
+        {n:11, name:'全局资本风控总闸', desc:'突破0.68自动熔断·降杠杆·STEP9闸门'}
+    ];
+    const ls = document.getElementById('layerStack');
+    layers.forEach(L => {
+        const dev = L.n>=6 && L.n<=10;
+        ls.innerHTML += `<div class="layer-row">
+            <div class="layer-num">L${L.n}</div>
+            <div><div class="layer-name">${L.name}</div><div class="layer-desc">${L.desc}</div></div>
+            <div class="layer-lock ${dev?'lock-stealth':''}">${dev?'🔒':'⚪'}</div>
+        </div>`;
+    });
+
+    const channels = [
+        {name:'assetQuant', dir:'sub', from:'MoodMind', desc:'非标无形资产四维估值+圆锥浓度', status:'已订阅模板'},
+        {name:'kellyAllocation', dir:'sub', from:'GameMind', desc:'全域资源最优资本配比', status:'已订阅模板'},
+        {name:'powerSchedule', dir:'sub', from:'AirMind', desc:'算力/运营固定成本负载', status:'已订阅模板'},
+        {name:'gameEquilibrium', dir:'sub', from:'GameMind', desc:'市场竞争均衡·行业稳态基准', status:'已订阅模板'},
+        {name:'riskThreshold', dir:'pub', from:'→三角审计', desc:'资本风险/融资熔断/现金流保本预警', status:'发布接口预留'}
+    ];
+    const bl = document.getElementById('busChannelList');
+    channels.forEach(c => {
+        bl.innerHTML += `<div class="bus-channel">
+            <span class="ch-name">${c.name}</span>
+            <span class="ch-val">${c.desc}</span>
+            <span class="ch-dir ${c.dir==='sub'?'ch-sub':'ch-pub'}">${c.dir==='sub'?'↓ SUB':'↑ PUB'}</span>
+            <span class="ch-status">${c.from} · ${c.status}</span>
+        </div>`;
+    });
+
+    window.switchZone = function(z){
+        ['A','B','Bus'].forEach(x => {
+            document.getElementById('zone'+x).classList.add('hidden');
+            document.getElementById('tab'+x).className = 'zone-tab';
+        });
+        document.getElementById('zone'+z).classList.remove('hidden');
+        const map = {A:'active-zone-a', B:'active-zone-b', Bus:''};
+        if(map[z]) document.getElementById('tab'+z).classList.add(map[z]);
+    };
+
+    window.FINANCE_MIND_STATE = {
+        cashHealth: null,
+        assetQuantData: null,
+        kellyData: null,
+        powerData: null,
+        equilibriumData: null,
+        thresholds: TH
+    };
+
+    function updateCashDisplay(){
+        const el = document.getElementById('cashHealth');
+        const elz = document.getElementById('cashHealthZone');
+        const s = FINANCE_MIND_STATE.cashHealth;
+        if(s === null){ el.textContent = '--'; elz.textContent = '等待上游数据接入'; elz.style.color='var(--green)'; return; }
+        el.textContent = s.toFixed(3);
+        if(s < TH.BREAKEVEN){ elz.textContent = '🛡️ 安全区 < 0.48 保本线'; elz.style.color='var(--green)'; }
+        else if(s < TH.STEADY+0.02){ elz.textContent = '⚖️ 稳态区 0.48~0.52 中轴线附近'; elz.style.color='var(--gold)'; }
+        else if(s < TH.FUSE){ elz.textContent = '⚠️ 警戒区 0.52~0.68'; elz.style.color='var(--orange)'; }
+        else { elz.textContent = '🔥 熔断区 ≥ 0.68 触发强制降杠杆'; elz.style.color='var(--red)'; }
+    }
+    updateCashDisplay();
+
+    window.FinanceMindPublishRisk = function(riskData){
+        if(typeof TriangleAudit !== 'undefined' && TriangleAudit.validate){
+            const r = TriangleAudit.validate({
+                financialActuarial: riskData.score,
+                gameTheory: riskData.score,
+                geometric: riskData.coneConcentration !== undefined ? riskData.coneConcentration : riskData.score
+            }, {source:'FinanceMind', action:'riskThreshold.publish'});
+            if(!r.passed){ console.warn('[FinanceMind] 三角审计未通过，阻断riskThreshold发布', r); return false; }
+        }
+        if(typeof YBus !== 'undefined' && YBus.publish){
+            YBus.publish('riskThreshold', Object.assign({
+                source: 'FinanceMind',
+                timestamp: Date.now(),
+                score: riskData.score,
+                level: riskData.level || 'NORMAL'
+            }, riskData), {trusted:true});
+            return true;
+        }
+        return false;
+    };
+    console.log('%c🏛️ FinanceMind V1.0 initialized','color:#fbbf24;font-weight:bold;font-size:13px;');
+    console.log('%c  Thresholds: BREAKEVEN='+TH.BREAKEVEN+' STEADY='+TH.STEADY+' FUSE='+TH.FUSE,'color:#10b981');
+    console.log('%c  YBus订阅已挂载: assetQuant/kellyAllocation/powerSchedule/gameEquilibrium','color:#22d3ee');
+})();
+</script>
+</body>
+</html>

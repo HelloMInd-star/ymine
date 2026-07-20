@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>🔬 金融稳态实证实验室 · 入口总览</title>
+    <link rel="stylesheet" href="../../assets/css/base.css?v=2">
+    <script src="../../assets/js/bus.js?v=3"></script>
+    <script src="../../assets/js/triangle-audit.js?v=3"></script>
+    <script src="../../game-os-main/core-engine/circle-boundary.js?v=1"></script>
+    <style>
+        :root{--bg:#070d1f;--card:rgba(255,255,255,.03);--border:rgba(255,255,255,.06);--gold:#fbbf24;--emerald:#10b981;--cyan:#22d3ee;--purple:#a78bfa;--red:#f87171}
+        *{box-sizing:border-box}
+        body{background:var(--bg);color:#e2e8f0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;margin:0;padding:0;min-height:100vh}
+        body::before{content:'';position:fixed;inset:0;background:radial-gradient(2px 2px at 20% 30%,rgba(251,191,36,.25),transparent),radial-gradient(2px 2px at 70% 60%,rgba(16,185,129,.2),transparent),radial-gradient(1px 1px at 50% 50%,rgba(255,255,255,.35),transparent);background-size:400px 400px;pointer-events:none;z-index:0}
+        .container{max-width:1300px;margin:0 auto;padding:24px;position:relative;z-index:1}
+        .disclaimer-banner{background:linear-gradient(135deg,rgba(248,113,113,.1),rgba(251,191,36,.08));border:2px solid rgba(248,113,113,.3);border-radius:14px;padding:18px 24px;margin-bottom:24px;font-size:13px;line-height:1.8}
+        .disclaimer-banner .disc-title{font-size:15px;font-weight:800;color:var(--red);margin-bottom:8px;display:flex;align-items:center;gap:8px}
+        .disclaimer-banner ul{margin:8px 0;padding-left:20px;color:rgba(255,255,255,.7)}
+        .disclaimer-banner li{margin:4px 0}
+        .header{margin-bottom:24px}
+        .header h1{font-size:28px;font-weight:800;margin:0 0 8px;background:linear-gradient(135deg,#fef3c7,var(--gold),var(--emerald));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+        .header .sub{font-size:13px;color:rgba(255,255,255,.5)}
+        .exp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px}
+        .exp-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
+        .exp-card:hover{border-color:rgba(251,191,36,.3);transform:translateY(-2px)}
+        .exp-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),var(--emerald),transparent)}
+        .exp-id{font-family:'SF Mono',monospace;font-size:11px;font-weight:700;color:var(--gold);margin-bottom:8px;letter-spacing:1px}
+        .exp-name{font-size:15px;font-weight:700;margin-bottom:6px;color:#fef3c7}
+        .exp-desc{font-size:12px;color:rgba(255,255,255,.5);line-height:1.7;margin-bottom:14px}
+        .exp-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+        .tag{font-size:10px;padding:3px 8px;border-radius:5px;font-weight:600}
+        .tag-canvas{background:rgba(34,210,238,.12);color:var(--cyan)}
+        .tag-mc{background:rgba(167,139,250,.12);color:var(--purple)}
+        .tag-control{background:rgba(251,146,60,.12);color:#fb923c}
+        .tag-physics{background:rgba(16,185,129,.12);color:var(--emerald)}
+        .exp-status{font-size:11px;font-weight:700;padding:4px 10px;border-radius:6px;display:inline-block}
+        .status-dev{background:rgba(248,113,113,.12);color:var(--red)}
+        .thresholds{display:flex;gap:12px;margin-top:20px;flex-wrap:wrap}
+        .th-pill{padding:6px 14px;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:8px;font-size:11px;font-weight:700}
+        .th-pill.be{color:#fb923c;border-color:rgba(251,146,60,.25)}
+        .th-pill.st{color:#22c55e;border-color:rgba(34,194,94,.25)}
+        .th-pill.fu{color:var(--red);border-color:rgba(248,113,113,.3)}
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="disclaimer-banner">
+        <div class="disc-title">⚠️ 科研实验模块 · 学术用途强制声明</div>
+        本实验室为 <strong>Game-OS V2.1 金融稳态数理实证科研板块</strong>，仅用于复杂系统稳态学术研究、数理模型校验、对照组对照验证：
+        <ul>
+            <li>❌ 不构成任何投资建议、财务建议、经营决策建议</li>
+            <li>❌ 实验输出不直接接入经营决策链路，仅作为校准参数供给 FinanceMind 商用层</li>
+            <li>❌ 禁止将仿真结果用于实际证券交易、杠杆决策、IPO定价实操</li>
+            <li>✅ 保留完整学术对照组设计、参数扫描、蒙特卡洛仿真等科研原色</li>
+            <li>✅ 股债资本成本模型复用 #30 双层阻尼力学同构映射（股权风险C₁+债权刚性C₂）</li>
+        </ul>
+    </div>
+
+    <div class="header">
+        <h1>🔬 金融稳态实证实验室</h1>
+        <div class="sub">圆锥金融数理实证 · 五组对照实验 · 股债双层阻尼同构 · 三阈值刚性约束</div>
+        <div class="thresholds">
+            <div class="th-pill be">🛡️ 保本线 0.48</div>
+            <div class="th-pill st">⚖️ 稳态中轴 0.50</div>
+            <div class="th-pill fu">🔥 熔断线 0.68</div>
+        </div>
+    </div>
+
+    <div class="exp-grid">
+        <div class="exp-card" onclick="alert('F-EXP01 资本结构对照仿真：待开发骨架')">
+            <div class="exp-id">F-EXP 01</div>
+            <div class="exp-name">多组资本结构对照仿真</div>
+            <div class="exp-desc">有无税盾MM模型对照、高低负债率收敛路径对比、最优杠杆0.50中轴线寻优</div>
+            <div class="exp-tags"><span class="tag tag-control">对照组</span><span class="tag tag-physics">力学阻尼映射</span></div>
+            <div class="exp-status status-dev">🔴 待开发</div>
+        </div>
+        <div class="exp-card" onclick="alert('F-EXP02 四大行业模板：待开发骨架')">
+            <div class="exp-id">F-EXP 02</div>
+            <div class="exp-name">四大行业财务稳态对照</div>
+            <div class="exp-desc">制造/互联网/非标服务/混合业态四模板，行业稳态半径、最优资本结构差异对比</div>
+            <div class="exp-tags"><span class="tag tag-control">多行业对照</span><span class="tag tag-canvas">行业圈层可视化</span></div>
+            <div class="exp-status status-dev">🔴 待开发</div>
+        </div>
+        <div class="exp-card" onclick="alert('F-EXP03 圆锥财务风险浓度：待开发骨架（复用circle-boundary）')">
+            <div class="exp-id">F-EXP 03</div>
+            <div class="exp-name">圆锥财务风险浓度对照实验</div>
+            <div class="exp-desc">不同杠杆下财务圈层扩张/收缩力学、圆锥浓度C=mρ/V动态测算、边界触熔断模拟</div>
+            <div class="exp-tags"><span class="tag tag-canvas">Canvas圆锥</span><span class="tag tag-physics">circle-boundary内核</span></div>
+            <div class="exp-status status-dev">🔴 待开发</div>
+        </div>
+        <div class="exp-card" onclick="alert('F-EXP04 DCF蒙特卡洛：待开发骨架')">
+            <div class="exp-id">F-EXP 04</div>
+            <div class="exp-name">DCF折现率多参数蒙特卡洛扫描</div>
+            <div class="exp-desc">WACC/Rp/g三参数蒙特卡洛扫描，估值分布、破产概率分布、敏感性热力图</div>
+            <div class="exp-tags"><span class="tag tag-mc">蒙特卡洛</span><span class="tag tag-canvas">分布直方图</span></div>
+            <div class="exp-status status-dev">🔴 待开发</div>
+        </div>
+        <div class="exp-card" onclick="alert('F-EXP05 破产风险边界：待开发骨架')">
+            <div class="exp-id">F-EXP 05</div>
+            <div class="exp-name">破产风险边界仿真</div>
+            <div class="exp-desc">验证0.48保本/0.68熔断阈值分界合理性，负债扩张→触熔断→降杠杆动态循环</div>
+            <div class="exp-tags"><span class="tag tag-control">阈值验证</span><span class="tag tag-canvas">边界动态图</span></div>
+            <div class="exp-status status-dev">🔴 待开发</div>
+        </div>
+    </div>
+
+    <div style="margin-top:28px;padding:16px 20px;background:rgba(34,210,238,.04);border:1px solid rgba(34,210,238,.15);border-radius:12px;font-size:12px;color:rgba(255,255,255,.5);line-height:1.8">
+        <strong style="color:var(--cyan)">📡 YBus 发布规范：</strong>
+        本实验室产出校准系数仅通过 <code style="color:var(--cyan);font-family:'SF Mono',monospace">assetQuant</code>（行业风险溢价参数）
+        和 <code style="color:var(--cyan);font-family:'SF Mono',monospace">riskThreshold</code>（实验阈值校准）两个标准通道发布至FinanceMind商用层，
+        不订阅经营性实时数据源，严格三分区存储隔离。
+    </div>
+</div>
+</body>
+</html>
