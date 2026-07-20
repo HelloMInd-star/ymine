@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>#30 万有引力多构型落体均衡·高低空无人机整机气动对照仿真实验</title>
+    <title>#30 AirMind V2.0 力学基准实验 - 万有引力多构型落体·高低空无人机气动对照</title>
     <link rel="stylesheet" href="../../assets/css/base.css">
     <script src="../../assets/js/bus.js"></script>
     <style>
@@ -16,8 +16,10 @@
             box-shadow:0 30px 80px rgba(40,10,80,0.4);position:relative;overflow:hidden;
         }
         .header{text-align:center;margin-bottom:14px;opacity:0;animation:fadeInUp 0.8s ease forwards;}
-        .badge{display:inline-block;background:rgba(34,211,238,0.08);border:1px solid rgba(34,211,238,0.2);color:rgba(34,211,238,0.8);font-size:12px;padding:4px 16px;border-radius:20px;letter-spacing:0.5px;margin-bottom:12px;font-weight:600;}
-        .header h1{font-size:26px;font-weight:700;color:#f1f5f9;letter-spacing:-0.3px;background:linear-gradient(135deg,#f1f5f9,#22d3ee,#60a5fa,#f1f5f9);background-size:300% 300%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:gradientFlow 6s ease-in-out infinite;margin:0;}
+        .badge-row{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-bottom:12px;}
+        .badge{display:inline-block;background:rgba(34,211,238,0.08);border:1px solid rgba(34,211,238,0.2);color:rgba(34,211,238,0.8);font-size:12px;padding:4px 16px;border-radius:20px;letter-spacing:0.5px;font-weight:600;}
+        .badge.airmind{background:rgba(167,139,250,0.08);border-color:rgba(167,139,250,0.3);color:#c4b5fd;}
+        .header h1{font-size:26px;font-weight:700;color:#f1f5f9;letter-spacing:-0.3px;background:linear-gradient(135deg,#f1f5f9,#22d3ee,#60a5fa,#c4b5fd,#f1f5f9);background-size:300% 300%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:gradientFlow 6s ease-in-out infinite;margin:0;}
         .header .sub{font-size:14px;color:rgba(255,255,255,0.35);font-weight:300;margin-top:6px;}
         .breadcrumb{display:flex;align-items:center;gap:7px;font-size:11px;color:rgba(255,255,255,0.3);margin-bottom:18px;flex-wrap:wrap;}
         .breadcrumb a{color:rgba(255,255,255,0.4);text-decoration:none;transition:color .2s;}
@@ -43,19 +45,22 @@
         .sec h2 .tag{font-size:10px;font-weight:600;color:#22d3ee;background:rgba(34,211,238,0.1);padding:2px 10px;border-radius:20px;}
         .sec h2 .tag.p{color:#c4b5fd;background:rgba(167,139,250,0.1);}
         .sec h2 .tag.g{color:#4ade80;background:rgba(74,222,128,0.1);}
+        .sec h2 .tag.o{color:#fb923c;background:rgba(251,146,60,0.1);}
+        .sec h2 .tag.dr{color:#f87171;background:rgba(248,113,113,0.1);}
         .sec p{color:rgba(255,255,255,0.55);font-size:13px;line-height:1.8;margin:0 0 8px;}
         .sec p strong{color:rgba(255,255,255,0.8);}
         .sec p .c{color:#22d3ee;font-weight:600;} .sec p .g{color:#4ade80;font-weight:600;}
         .sec p .y{color:#facc15;font-weight:600;} .sec p .r{color:#f87171;font-weight:600;}
-        .sec p .p{color:#c4b5fd;font-weight:600;}
+        .sec p .p{color:#c4b5fd;font-weight:600;} .sec p .o{color:#fb923c;font-weight:600;}
         .hbox{background:rgba(34,211,238,0.04);border:1px solid rgba(34,211,238,0.12);border-radius:10px;padding:14px 18px;margin:10px 0;}
         .hbox.g{background:rgba(34,197,94,0.04);border-color:rgba(34,197,94,0.15);}
         .hbox.y{background:rgba(250,204,21,0.04);border-color:rgba(250,204,21,0.15);}
         .hbox.p{background:rgba(167,139,250,0.04);border-color:rgba(167,139,250,0.15);}
         .hbox.r{background:rgba(248,113,113,0.04);border-color:rgba(248,113,113,0.15);}
+        .hbox.o{background:rgba(251,146,60,0.04);border-color:rgba(251,146,60,0.15);}
         .hbox p{margin-bottom:4px;}
         .sim-panel{background:linear-gradient(135deg,rgba(34,211,238,0.05),rgba(59,130,246,0.04));border:1.5px solid rgba(34,211,238,0.2);border-radius:16px;padding:22px 24px;margin:16px 0;}
-        .sim-panel.drone-panel{background:linear-gradient(135deg,rgba(167,139,250,0.05),rgba(34,211,238,0.04));border-color:rgba(167,139,250,0.2);}
+        .sim-panel.drone-panel{background:linear-gradient(135deg,rgba(167,139,250,0.05),rgba(248,113,113,0.04));border-color:rgba(167,139,250,0.2);}
         .sim-panel .sp-t{font-size:17px;font-weight:700;color:#67e8f9;display:flex;align-items:center;gap:8px;margin-bottom:4px;}
         .sim-panel.drone-panel .sp-t{color:#c4b5fd;}
         .sim-panel .sp-s{font-size:12px;color:rgba(255,255,255,0.35);margin-bottom:14px;line-height:1.5;}
@@ -66,6 +71,8 @@
         .env-btn.vac.on{background:rgba(167,139,250,0.12);border-color:rgba(167,139,250,0.45);color:#c4b5fd;box-shadow:0 0 16px rgba(167,139,250,0.12);}
         .env-btn.high.on{background:rgba(251,146,60,0.12);border-color:rgba(251,146,60,0.45);color:#fb923c;box-shadow:0 0 16px rgba(251,146,60,0.12);}
         .mod-btn.on{background:rgba(34,211,238,0.1);border-color:rgba(34,211,238,0.4);color:#67e8f9;}
+        .mod-btn.ideal.on{background:rgba(74,222,128,0.12);border-color:rgba(74,222,128,0.45);color:#4ade80;box-shadow:0 0 16px rgba(74,222,128,0.12);}
+        .mod-btn.drone.on{background:rgba(167,139,250,0.12);border-color:rgba(167,139,250,0.45);color:#c4b5fd;box-shadow:0 0 16px rgba(167,139,250,0.12);}
         .sim-split{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:12px 0;}
         .canvas-wrap{position:relative;width:100%;height:420px;background:linear-gradient(180deg,#0a0a1a 0%,#0f1a2e 40%,#1a2744 100%);border-radius:12px;border:1px solid rgba(255,255,255,0.05);overflow:hidden;transition:transform .1s;}
         .canvas-wrap.shake{animation:shakeK 0.4s ease-in-out;}
@@ -95,13 +102,15 @@
         .drone-sc.danger .dv{color:#f87171;animation:pulseD 1s infinite;}
         .drone-legend{position:absolute;bottom:8px;left:10px;right:10px;display:flex;gap:8px;flex-wrap:wrap;pointer-events:none;z-index:5;}
         .data-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:14px 0;}
+        .data-grid.damp-grid{grid-template-columns:repeat(3,1fr);}
         .dc{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.05);border-radius:10px;padding:12px;text-align:center;position:relative;overflow:hidden;}
         .dc::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--cc,#22d3ee);opacity:0.7;}
-        .dc.g{--cc:#4ade80;} .dc.y{--cc:#facc15;} .dc.r{--cc:#f87171;} .dc.c{--cc:#22d3ee;} .dc.o{--cc:#fb923c;}
+        .dc.g{--cc:#4ade80;} .dc.y{--cc:#facc15;}
+        .dc.r{--cc:#f87171;} .dc.c{--cc:#22d3ee;} .dc.o{--cc:#fb923c;} .dc.p{--cc:#c4b5fd;}
         .dc .dl{font-size:9px;color:rgba(255,255,255,0.25);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;}
         .dc .dv{font-size:22px;font-weight:700;font-family:'SF Mono',monospace;color:#f1f5f9;transition:color .3s;}
         .dc.g .dv{color:#4ade80;} .dc.y .dv{color:#facc15;}
-        .dc.r .dv{color:#f87171;animation:pulseD 1s infinite;} .dc.c .dv{color:#22d3ee;} .dc.o .dv{color:#fb923c;}
+        .dc.r .dv{color:#f87171;animation:pulseD 1s infinite;} .dc.c .dv{color:#22d3ee;} .dc.o .dv{color:#fb923c;} .dc.p .dv{color:#c4b5fd;}
         .dc .du{font-size:10px;color:rgba(255,255,255,0.3);margin-left:2px;}
         .dc .db{height:3px;background:rgba(255,255,255,0.05);border-radius:2px;margin-top:6px;overflow:hidden;}
         .dc .db-f{height:100%;border-radius:2px;transition:width .3s,background .3s;background:var(--cc,#22d3ee);}
@@ -126,8 +135,10 @@
         .grp{background:rgba(255,255,255,0.015);border:1px solid rgba(255,255,255,0.05);border-radius:10px;padding:14px 16px;cursor:pointer;transition:all .25s;}
         .grp:hover{border-color:rgba(34,211,238,0.3);background:rgba(34,211,238,0.03);}
         .grp.on{border-color:rgba(34,211,238,0.5);background:rgba(34,211,238,0.06);}
+        .grp.ideal{border-color:rgba(74,222,128,0.25);}
         .grp.s{border-color:rgba(34,197,94,0.25);} .grp.w{border-color:rgba(250,204,21,0.25);} .grp.d{border-color:rgba(248,113,113,0.25);}
         .grp.on.s{border-color:rgba(34,197,94,0.5);background:rgba(34,197,94,0.06);}
+        .grp.on.ideal{border-color:rgba(74,222,128,0.5);background:rgba(74,222,128,0.06);}
         .grp.on.w{border-color:rgba(250,204,21,0.5);background:rgba(250,204,21,0.06);}
         .grp.on.d{border-color:rgba(248,113,113,0.5);background:rgba(248,113,113,0.06);}
         .grp.drone{border-color:rgba(167,139,250,0.2);background:rgba(167,139,250,0.02);cursor:default;}
@@ -139,6 +150,7 @@
         .grp .d{font-size:11px;color:rgba(255,255,255,0.45);line-height:1.6;margin-bottom:6px;}
         .grp .r{font-family:'SF Mono',monospace;font-size:11px;font-weight:600;padding:2px 8px;border-radius:5px;display:inline-block;}
         .grp.s .r{background:rgba(34,197,94,0.1);color:#4ade80;}
+        .grp.ideal .r{background:rgba(74,222,128,0.15);color:#4ade80;}
         .grp.w .r{background:rgba(250,204,21,0.1);color:#facc15;}
         .grp.d .r{background:rgba(248,113,113,0.1);color:#f87171;}
         .grp.drone.g .r{background:rgba(74,222,128,0.1);color:#4ade80;}
@@ -155,6 +167,47 @@
         .boundary .bc{font-size:11px;line-height:1.7;color:rgba(255,255,255,0.3);}
         .boundary .bc.ok{color:rgba(74,222,128,0.55);} .boundary .bc.no{color:rgba(248,113,113,0.5);}
         .boundary .bc strong{font-size:11px;display:block;margin-bottom:3px;}
+        .globe-section{margin-top:24px;}
+        .globe-layers{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:14px 0 18px;}
+        .glayer{padding:14px 12px;border-radius:10px;text-align:center;border:1px solid;}
+        .glayer.low-a{background:rgba(34,211,238,0.04);border-color:rgba(34,211,238,0.2);}
+        .glayer.high-a{background:rgba(251,146,60,0.04);border-color:rgba(251,146,60,0.2);}
+        .glayer.under-s{background:rgba(250,204,21,0.04);border-color:rgba(250,204,21,0.2);}
+        .glayer.under-d{background:rgba(248,113,113,0.04);border-color:rgba(248,113,113,0.2);}
+        .glayer .gl-icon{font-size:24px;margin-bottom:6px;}
+        .glayer .gl-t{font-size:12px;font-weight:700;color:#f1f5f9;margin-bottom:4px;}
+        .glayer .gl-d{font-size:10px;color:rgba(255,255,255,0.4);line-height:1.5;}
+        .glayer.low-a .gl-t{color:#67e8f9;}
+        .glayer.high-a .gl-t{color:#fb923c;}
+        .glayer.under-s .gl-t{color:#facc15;}
+        .glayer.under-d .gl-t{color:#f87171;}
+        .compare-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:14px 0;}
+        .cmp-card{padding:18px;border-radius:12px;border:1.5px solid;}
+        .cmp-card.risk-high{background:linear-gradient(135deg,rgba(248,113,113,0.06),rgba(239,68,68,0.03));border-color:rgba(248,113,113,0.3);}
+        .cmp-card.risk-mid{background:linear-gradient(135deg,rgba(251,146,60,0.06),rgba(245,158,11,0.03));border-color:rgba(251,146,60,0.3);}
+        .cmp-card.risk-critical{background:linear-gradient(135deg,rgba(220,38,38,0.08),rgba(185,28,28,0.04));border-color:rgba(220,38,38,0.4);}
+        .cmp-card .cmp-tag{display:inline-block;font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;margin-bottom:10px;}
+        .cmp-card.risk-high .cmp-tag{background:rgba(248,113,113,0.15);color:#fca5a5;}
+        .cmp-card.risk-mid .cmp-tag{background:rgba(251,146,60,0.15);color:#fdba74;}
+        .cmp-card.risk-critical .cmp-tag{background:rgba(220,38,38,0.2);color:#fca5a5;}
+        .cmp-card .cmp-t{font-size:14px;font-weight:700;color:#f1f5f9;margin-bottom:8px;}
+        .cmp-card .cmp-d{font-size:11px;color:rgba(255,255,255,0.5);line-height:1.7;margin-bottom:10px;}
+        .cmp-card .cmp-m{display:flex;gap:8px;flex-wrap:wrap;}
+        .cmp-card .cmp-m span{font-size:10px;font-family:'SF Mono',monospace;padding:2px 8px;border-radius:4px;background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.5);}
+        .conclusion-box{margin-top:18px;padding:18px 22px;border-radius:12px;background:linear-gradient(135deg,rgba(74,222,128,0.06),rgba(34,211,238,0.04));border:1.5px solid rgba(74,222,128,0.25);}
+        .conclusion-box .cb-t{font-size:13px;font-weight:700;color:#4ade80;margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+        .conclusion-box p{font-size:12px;line-height:1.8;color:rgba(255,255,255,0.6);margin:0;}
+        .control-section{margin-top:24px;}
+        .ctrl-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:14px 0;}
+        .ctrl-card{padding:18px;border-radius:12px;background:rgba(167,139,250,0.03);border:1.5px solid rgba(167,139,250,0.2);}
+        .ctrl-card .ctrl-icon{font-size:28px;margin-bottom:10px;}
+        .ctrl-card .ctrl-t{font-size:13px;font-weight:700;color:#c4b5fd;margin-bottom:8px;}
+        .ctrl-card .ctrl-d{font-size:11px;color:rgba(255,255,255,0.5);line-height:1.7;margin-bottom:10px;}
+        .ctrl-card .ctrl-flow{font-size:10px;font-family:'SF Mono',monospace;color:rgba(34,211,238,0.7);padding:8px 10px;border-radius:6px;background:rgba(0,0,0,0.25);border:1px solid rgba(34,211,238,0.1);line-height:1.6;}
+        .data-chain{margin-top:16px;padding:14px 18px;border-radius:10px;background:rgba(0,0,0,0.2);border:1px solid rgba(167,139,250,0.15);text-align:center;}
+        .data-chain .dc-t{font-size:11px;font-weight:600;color:rgba(255,255,255,0.4);margin-bottom:8px;}
+        .data-chain .dc-flow{font-family:'SF Mono',monospace;font-size:12px;color:#c4b5fd;letter-spacing:0.3px;}
+        .data-chain .dc-flow .arrow{color:#22d3ee;margin:0 6px;}
         .back-btns{text-align:center;margin-top:30px;padding-top:20px;border-top:1px solid rgba(255,255,255,0.04);display:flex;justify-content:center;gap:16px;flex-wrap:wrap;}
         .back-btns a{color:rgba(255,255,255,0.25);text-decoration:none;font-size:13px;transition:color .3s;padding:8px 16px;border-radius:8px;border:1px solid rgba(255,255,255,0.05);}
         .back-btns a:hover{color:#67e8f9;border-color:rgba(34,211,238,0.2);}
@@ -164,18 +217,22 @@
         @media(max-width:1024px){
             .sim-split{grid-template-columns:1fr;}
             .canvas-wrap{height:360px;}
+            .globe-layers{grid-template-columns:repeat(2,1fr);}
         }
         @media(max-width:860px){
             .container{padding:28px 18px 22px;border-radius:18px;}
             .th-grid,.data-grid{grid-template-columns:1fr 1fr;}
-            .grp-grid{grid-template-columns:1fr 1fr;}
+            .grp-grid,.compare-grid,.ctrl-grid{grid-template-columns:1fr;}
+            .data-grid.damp-grid{grid-template-columns:1fr;}
             .canvas-wrap{height:320px;}
             .boundary .b-row{grid-template-columns:1fr;}
+            .globe-layers{grid-template-columns:1fr 1fr;}
         }
         @media(max-width:480px){
             .th-grid,.data-grid{grid-template-columns:1fr;}
             .grp-grid{grid-template-columns:1fr;}
             .header h1{font-size:20px;}
+            .globe-layers{grid-template-columns:1fr;}
         }
     </style>
 </head>
@@ -187,18 +244,21 @@
             <a href="../../index.html">Y.Mine 总控台</a><span class="sep">›</span>
             <a href="../../index.html">仿真实验室</a><span class="sep">›</span>
             <a href="../../index.html">🏗️ 结构力学与冗余安全类</a><span class="sep">›</span>
-            <span class="cur">#30 万有引力落体均衡·高低空无人机气动对照</span>
+            <span class="cur">#30 AirMind V2.0 力学基准实验</span>
         </div>
 
         <div class="header">
-            <div class="badge">🧪 #30 · 🏗️ 结构力学与冗余安全类 · 宏观力学 · 无人机整机气动</div>
-            <h1>万有引力多构型落体均衡<br>高低空无人机整机气动对照仿真实验</h1>
-            <div class="sub">真空理想 / 低空稠密 / 高空稀薄 · 四构型落体 · 双无人机高低空对照 · 三层同构映射</div>
+            <div class="badge-row">
+                <div class="badge">🧪 #30 · 🏗️ 结构力学与冗余安全类</div>
+                <div class="badge airmind">✈️ AirMind V2.0 力学基准实验</div>
+            </div>
+            <h1>万有引力多构型落体均衡<br>高低空无人机气动对照仿真实验</h1>
+            <div class="sub">微观理想基准 · 宏观异形力学 · 双级阻尼博弈 · 空地三维同构 · AirMind闭环控制</div>
         </div>
 
         <div class="meta-bar">
             <span>📋 编号 <b class="v">#30</b></span>
-            <span>🏛️ 归属 <b class="v">Game-OS V2.1</b></span>
+            <span>🏛️ 归属 <b class="v">AirMind V2.0</b></span>
             <span>🔒 密级 <b class="v">公开演示版</b></span>
             <span>📐 误差 <b class="v">±0.02</b></span>
         </div>
@@ -212,44 +272,51 @@
 
         <div class="sec">
             <h2>🔬 实验核心 <span class="tag">研究目的</span></h2>
-            <p>以经典牛顿自由落体为基底，区分<span class="p">「真空理想」</span>、<span class="c">「低空稠密大气」</span>、<span class="y">「高空稀薄大气」</span>三套环境模型；通过<strong>实心、空心、半注水、不规则异形</strong>四类落体构型对照，验证对称度、空心腔体、流动重心、异形结构对稳态的影响；并<strong>在右侧同步呈现「低空单发单点动力无人机」与「多电机分布式冗余无人机」高低空气动对照</strong>，完成<strong>自然科学→工程系统→低空产业</strong>三层闭环映射。</p>
+            <p>以<span class="g">「🍎 微观·牛顿苹果（理想基准）」</span>为第0构型绝对参考系，区分<span class="p">「真空理想」</span>、<span class="c">「低空稠密大气」</span>、<span class="y">「高空稀薄大气」</span>三套环境模型；通过<strong>五构型（理想基准/实心/空心/半注水/异形）落体对照</strong>，验证对称度、空心腔体、流动重心、异形结构对稳态的影响；揭示<span class="p">无人机空心落地窗双层腔体结构</span>内外气流博弈失稳机理；并<strong>在右侧同步呈现「低空单发单点动力无人机」与「多电机分布式冗余无人机」高低空气动对照</strong>，最终构建<strong>微观基准→宏观异形→空地三维→AirMind闭环控制</strong>完整体系。</p>
+            <div class="hbox g">
+                <p><strong>核心公理（必须写入）：</strong><span class="g">只有绝对对称、实心、质量均匀的理想结构才能维持纯匀加速稳态运动。现实工程设备（尤其是无人机）不满足理想对称，天然存在受力失衡与扰动偏移。</span></p>
+            </div>
             <div class="hbox p">
-                <p><strong>底层公理：</strong>受力越均匀、约束越对称、冗余度越高，系统稳态越强；单点偏心、薄壁空心、压差失衡、结构异形，系统扰动越大、越易触发<span class="r">0.68熔断</span>。多发分布式冗余+起落架兜底+加厚承压机身，是高低空全域稳态的工程最优解。</p>
+                <p><strong>底层公理：</strong>微观苹果→圆形对称→匀加速匀速受力；宏观无人机→异形机翼凸起非对称空心腔体→四面八方受力不均→全程变加速。外层C₁乱流挤压+内层C₂热气流顶压=两股力持续博弈拉扯抵消震荡，是低空无人机抖动偏移失稳的根本源头。</p>
             </div>
         </div>
 
         <div class="sec">
             <h2>⚛️ 物理原理简述</h2>
-            <div class="hbox">
-                <p><strong class="c">1. 真空理想落体：</strong>完美正圆实心均质物体，无空气阻力、无对流、无温差，仅受恒定万有引力匀加速运动，四面八方压强均等，数值牢牢收敛于 <span class="c">0.5 绝对稳态</span>。</p>
+            <div class="hbox g">
+                <p><strong class="g">0. 🍎 微观·牛顿苹果（理想基准）：</strong>完美正圆、实心、均质、对称；360°全方位绝对均衡，无偏心无侧向力无抖动；标准恒定匀加速直线运动（a=g=9.8m/s²，无波动）；稳态区间永久收敛0.49-0.51，数据面板全绿色。</p>
             </div>
             <div class="hbox">
-                <p><strong class="c">2. 低空稠密大气（0~3000m）：</strong>高密度空气、强纵向对流（近地高温上升/高空低温下沉）、风压扰动剧烈；规则对称构型压强均衡，不规则/空心/偏心结构受对流扰动出现明显抖动。</p>
+                <p><strong class="c">1. 真空理想落体：</strong>无空气阻力、无对流、无温差，仅受恒定万有引力匀加速运动，四面八方压强均等，数值牢牢收敛于 <span class="c">0.5 绝对稳态</span>。</p>
+            </div>
+            <div class="hbox">
+                <p><strong class="c">2. 低空稠密大气（0~500m）：</strong>高密度空气、强纵向对流（近地高温上升/高空低温下沉）、风压扰动剧烈；外层C₁=0.3-0.6剧烈波动，规则对称构型压强均衡，不规则/空心/偏心结构受对流扰动出现明显抖动。无人机双层腔体C₁+C₂叠加扰动最大。</p>
             </div>
             <div class="hbox y">
-                <p><strong class="y">3. 高空稀薄大气（6000m+）：</strong>空气密度极低但内外压差巨大，薄壁/空心结构易发生<span class="r">压差鼓胀形变</span>；同时强横风切变与冰晶粒子冲击构成高空特有风险。冗余分布式架构在稀薄压差下仍能维持稳态。</p>
+                <p><strong class="y">3. 高空稀薄大气（6000m+）：</strong>空气密度极低但内外压差巨大，薄壁/空心结构易发生<span class="r">压差鼓胀形变</span>；外层C₁=0.05-0.15，内层C₂=0.15-0.4；同时强横风切变与冰晶粒子冲击构成高空特有风险。冗余分布式架构在稀薄压差下仍能维持稳态。</p>
             </div>
-            <div class="hbox p">
-                <p><strong class="p">4. 无人机气动迁移逻辑：</strong>单发单点动力对标悬臂偏心结构（单支撑易失稳），多电机分布式冗余对标三角制衡/网状结构（多点受力、兜底支撑、承压机身），起落架提供类似简支梁的兜底支撑。</p>
+            <div class="hbox r">
+                <p><strong class="r">4. 🚁 无人机空心落地窗双层腔体核心机理：</strong>外壳=高层可推拉活动玻璃窗（可动有间隙非刚性锁死）；机身=空心腔体非实心刚体；外层对流C₁：低空外部乱流、阵风、风切变、冷暖垂直对流拍打外壁；内层对流C₂：机身空腔内部引擎散热热风、舱内密闭环流、油箱流体扰动、内部气压回流对冲。外部大风向内挤压壳体+内部热气流向外顶压腔体=两股力持续博弈拉扯抵消震荡→低空无人机抖动偏移失稳根本源头。</p>
             </div>
         </div>
 
         <div class="sec">
-            <h2>🎛️ 交互仿真面板 <span class="tag">三环境 · 四构型落体 · 双无人机对照</span></h2>
+            <h2>🎛️ 交互仿真面板 <span class="tag">三环境 · 五构型落体 · 双无人机对照 · 双级阻尼</span></h2>
             <div class="sim-panel">
-                <div class="sp-t">🌍 万有引力落体 + 高低空无人机 双区仿真器</div>
-                <div class="sp-s">全局切换三环境/极端大风，左右两区同步生效；左侧切换落体构型观察稳态差异，右侧固定展示单发 vs 多电机冗余无人机在当前环境下的气动表现</div>
+                <div class="sp-t">🌍 AirMind双区仿真器 · 双级串联阻尼演算</div>
+                <div class="sp-s">全局切换三环境/极端大风，左右两区同步生效；左侧切换落体构型观察稳态差异，右侧固定展示单发vs多电机冗余无人机在当前环境下的气动表现，Canvas实时展示双层气流（蓝色外层乱流/红色内层热风）和C₁、C₂阻尼值</div>
 
                 <div class="env-row">
                     <button class="env-btn vac" data-e="vac" onclick="setEnv('vac')">🌌 真空理想模式</button>
-                    <button class="env-btn on" data-e="low" onclick="setEnv('low')">🌤️ 低空稠密大气</button>
-                    <button class="env-btn high" data-e="high" onclick="setEnv('high')">🏔️ 高空稀薄大气</button>
+                    <button class="env-btn on" data-e="low" onclick="setEnv('low')">🌤️ 低空稠密大气 (0-500m)</button>
+                    <button class="env-btn high" data-e="high" onclick="setEnv('high')">🏔️ 高空稀薄大气 (6000m+)</button>
                 </div>
                 <div class="mod-row">
-                    <button class="mod-btn on" data-m="solid" onclick="setMod('solid')">🍎 实心苹果球体</button>
+                    <button class="mod-btn ideal on" data-m="ideal" onclick="setMod('ideal')">🍎 0·微观·牛顿苹果（理想基准）</button>
+                    <button class="mod-btn" data-m="solid" onclick="setMod('solid')">🍎 实心苹果球体</button>
                     <button class="mod-btn" data-m="hollow" onclick="setMod('hollow')">🫧 空心薄壁圆球</button>
                     <button class="mod-btn" data-m="water" onclick="setMod('water')">💧 半注水腔体球</button>
-                    <button class="mod-btn" data-m="irr" onclick="setMod('irr')">🪨 不规则异形体</button>
+                    <button class="mod-btn drone" data-m="drone" onclick="setMod('drone')">🚁 异形无人机腔体</button>
                 </div>
 
                 <div class="sim-split">
@@ -260,8 +327,8 @@
                             <div class="c-h" id="hIndL">高度: 0m</div>
                         </div>
                         <div class="c-legend">
-                            <div class="li"><span class="dot" style="background:#22d3ee"></span>冷空气下沉</div>
-                            <div class="li"><span class="dot" style="background:#f97316"></span>暖空气上升</div>
+                            <div class="li"><span class="dot" style="background:#3b82f6"></span>外层C₁蓝色乱流</div>
+                            <div class="li"><span class="dot" style="background:#ef4444"></span>内层C₂红色热风</div>
                             <div class="li"><span class="dot" style="background:#a78bfa"></span>运动轨迹</div>
                             <div class="li"><span class="dot" style="background:#f87171"></span>压差扰动</div>
                         </div>
@@ -277,8 +344,9 @@
                             <div class="drone-sc d6" id="ds6"><span class="dn">🟢 多电机冗余 · 起落架+承压机身</span><span class="dv" id="dv6">0.500</span></div>
                         </div>
                         <div class="drone-legend">
+                            <div class="li"><span class="dot" style="background:#3b82f6"></span>外层C₁乱流</div>
+                            <div class="li"><span class="dot" style="background:#ef4444"></span>内层C₂热风</div>
                             <div class="li"><span class="dot" style="background:#f87171"></span>应力集中</div>
-                            <div class="li"><span class="dot" style="background:#facc15"></span>压差鼓胀</div>
                             <div class="li"><span class="dot" style="background:#4ade80"></span>冗余受力</div>
                         </div>
                     </div>
@@ -291,8 +359,14 @@
                     <div class="dc c" id="dcRho"><div class="dl">空气密度</div><div class="dv" id="vRho">1.225<span class="du">kg/m³</span></div><div class="db"><div class="db-f" id="bRho" style="width:100%;background:#22d3ee"></div></div></div>
                 </div>
 
+                <div class="data-grid damp-grid">
+                    <div class="dc c" id="dcC1"><div class="dl">外层阻尼 C₁ (外部乱流)</div><div class="dv" id="vC1">0.450</div><div class="db"><div class="db-f" id="bC1" style="width:45%;background:#3b82f6"></div></div></div>
+                    <div class="dc p" id="dcC2"><div class="dl">内层阻尼 C₂ (腔体热风)</div><div class="dv" id="vC2">0.000</div><div class="db"><div class="db-f" id="bC2" style="width:0%;background:#ef4444"></div></div></div>
+                    <div class="dc r" id="dcCDist"><div class="dl">双层博弈合成扰动</div><div class="dv" id="vCDist">0.000</div><div class="db"><div class="db-f" id="bCDist" style="width:0%;background:#f87171"></div></div></div>
+                </div>
+
                 <div class="status safe" id="status">
-                    <span class="si">✓</span><span id="stxt">稳态安全：低空稠密大气下实心对称结构稳定下落</span>
+                    <span class="si">✓</span><span id="stxt">稳态安全：微观牛顿苹果理想基准，完美匀加速收敛0.5中轴线</span>
                 </div>
 
                 <div class="ctrl-row">
@@ -305,61 +379,175 @@
         </div>
 
         <div class="sec">
-            <h2>🧪 六组对照组可视化 <span class="tag">落体4组 + 无人机2组</span></h2>
+            <h2>🧪 七组对照组可视化 <span class="tag">落体5组 + 无人机2组</span></h2>
             <div class="grp-grid">
-                <div class="grp s on" onclick="setMod('solid')"><div class="n">对照组 1</div><div class="t">🍎 真空/低空 · 实心正圆均质</div><div class="d">通体实心、轮廓正圆、质量100%均匀对称；标准匀加速，无抖动无偏移。</div><div class="r">0.49 ~ 0.51 极致稳态</div></div>
-                <div class="grp w" onclick="setMod('hollow')"><div class="n">对照组 2</div><div class="t">🫧 大气 · 空心薄壁圆球</div><div class="d">外壳轻薄、内部空仓；承受高低空对流扰动；高空压差下易鼓胀形变。</div><div class="r">0.53 ~ 0.59 小幅波动</div></div>
-                <div class="grp w" onclick="setMod('water')"><div class="n">对照组 3</div><div class="t">💧 大气 · 半注水腔体球</div><div class="d">内部液态流动介质；液体晃动、重心持续动态偏移，轨迹摇摆不定。</div><div class="r">0.60 ~ 0.66 临近熔断</div></div>
-                <div class="grp d" onclick="setMod('irr')"><div class="n">对照组 4</div><div class="t">🪨 大气 · 不规则异形体</div><div class="d">轮廓不对称、迎风面不均；压差震荡，轨迹紊乱，极易触发熔断。</div><div class="r">> 0.68 极易熔断</div></div>
-                <div class="grp drone d"><div class="n">对照组 5</div><div class="t">🔴 低空单发单点 · 薄壁无兜底</div><div class="d">单一动力受力、薄壁机身无起落架；低空强对流0.63~0.67波动，高空压差鼓胀极易熔断。</div><div class="r purple">对标单点悬臂 · 高位风险</div></div>
-                <div class="grp drone g"><div class="n">对照组 6</div><div class="t">🟢 多电机分布式冗余 · 起落架+承压</div><div class="d">四/六电机分布式推力+起落架兜底+加厚承压机身；低空0.49~0.51稳态，高空0.50~0.52稳定。</div><div class="r">对标多点制衡 · 全域稳态</div></div>
+                <div class="grp ideal on" onclick="setMod('ideal')"><div class="n">对照组 0</div><div class="t">🍎 微观·牛顿苹果（理想基准）</div><div class="d">完美正圆、实心、均质、绝对对称；360°全方位受力均衡；标准恒定匀加速直线运动a=g=9.8m/s²，无波动无偏心。</div><div class="r">0.49 ~ 0.51 极致稳态</div></div>
+                <div class="grp s" onclick="setMod('solid')"><div class="n">对照组 1</div><div class="t">🍎 真空/低空 · 实心正圆均质</div><div class="d">通体实心、轮廓正圆、质量100%均匀对称；标准匀加速，无抖动无偏移。</div><div class="r">0.49 ~ 0.51 极致稳态</div></div>
+                <div class="grp w" onclick="setMod('hollow')"><div class="n">对照组 2</div><div class="t">🫧 大气 · 空心薄壁圆球</div><div class="d">外壳轻薄、内部空仓；C₁+C₂双层阻尼开启；承受高低空对流扰动；高空压差下易鼓胀形变。</div><div class="r">0.53 ~ 0.59 小幅波动</div></div>
+            </div>
+            <div class="grp-grid">
+                <div class="grp w" onclick="setMod('water')"><div class="n">对照组 3</div><div class="t">💧 大气 · 半注水腔体球</div><div class="d">内部液态流动介质；C₂内层阻尼大幅波动；液体晃动、重心持续动态偏移，轨迹摇摆不定。</div><div class="r">0.60 ~ 0.66 临近熔断</div></div>
+                <div class="grp d" onclick="setMod('irr')"><div class="n">对照组 4</div><div class="t">🪨 大气 · 不规则异形体</div><div class="d">轮廓不对称、迎风面不均；C₁外层阻尼剧烈；压差震荡，轨迹紊乱，极易触发熔断。</div><div class="r">> 0.68 极易熔断</div></div>
+                <div class="grp d" onclick="setMod('drone')"><div class="n">对照组 5</div><div class="t">🚁 异形无人机空心腔体</div><div class="d">异形机翼凸起非对称空心腔体；C₁外层+C₂内层双层阻尼全开；外层大风挤压+内层热风顶压博弈震荡；低空抖动偏移最剧烈。</div><div class="r purple">双层博弈 · 高位风险</div></div>
+            </div>
+            <div class="grp-grid">
+                <div class="grp drone d"><div class="n">对照组 6</div><div class="t">🔴 低空单发单点 · 薄壁无兜底</div><div class="d">单一动力受力、薄壁机身无起落架；低空强对流0.63~0.67波动，高空压差鼓胀极易熔断；C₁+C₂扰动无抑制。</div><div class="r purple">对标单点悬臂 · 高位风险</div></div>
+                <div class="grp drone g"><div class="n">对照组 7</div><div class="t">🟢 多电机分布式冗余 · 起落架+承压</div><div class="d">四/六电机分布式推力+起落架兜底+加厚承压机身；AirMind双环PID抑制双层扰动；低空0.49~0.51稳态，高空0.50~0.52稳定。</div><div class="r">对标多点制衡 · 全域稳态</div></div>
+            </div>
+        </div>
+
+        <div class="sec globe-section">
+            <h2>🌍 三维全域对照体系 <span class="tag o">空地同构 · 四层空间</span></h2>
+            <p>将大气双层阻尼博弈逻辑拓展至全域空间，构建<strong>地上天空+地下基建</strong>三维对照体系：</p>
+            
+            <div class="globe-layers">
+                <div class="glayer low-a">
+                    <div class="gl-icon">🌤️</div>
+                    <div class="gl-t">低空乱流层<br>0-500m</div>
+                    <div class="gl-d">大气边界层<br>湍流最强<br>热力对流最乱<br>C₁=0.3-0.6剧烈</div>
+                </div>
+                <div class="glayer high-a">
+                    <div class="gl-icon">🏔️</div>
+                    <div class="gl-t">高空平流层<br>6000m+</div>
+                    <div class="gl-d">层流稳定<br>无杂乱涡流<br>仅均匀压差<br>C₁=0.05-0.15</div>
+                </div>
+                <div class="glayer under-s">
+                    <div class="gl-icon">🚇</div>
+                    <div class="gl-t">浅层基建层<br>地下0-500m</div>
+                    <div class="gl-d">地铁隧道管廊<br>开挖卸荷应力<br>涡流地热窜流<br>类似低空C₁</div>
+                </div>
+                <div class="glayer under-d">
+                    <div class="gl-icon">⚡</div>
+                    <div class="gl-t">深层能源层<br>地下500-2000m</div>
+                    <div class="gl-d">地热油气岩层<br>高压储能<br>密闭高压热流体喷涌<br>熔断级风险</div>
+                </div>
+            </div>
+
+            <h3 style="font-size:14px;color:#f1f5f9;margin:18px 0 12px;display:flex;align-items:center;gap:8px;">⚔️ 三组对照实验</h3>
+            <div class="compare-grid">
+                <div class="cmp-card risk-high">
+                    <div class="cmp-tag">🔴 红色高风险</div>
+                    <div class="cmp-t">0-500m 低空大气乱流</div>
+                    <div class="cmp-d">大气边界层，地表摩擦+热力湍流+地形遮挡+风切变叠加；多方向随机交变湍流+C₁外层+C₂内层双层气流博弈；飞行器结构失稳核心区间。</div>
+                    <div class="cmp-m">
+                        <span>C₁: 0.3-0.6</span>
+                        <span>C₂: 0.15-0.4</span>
+                        <span>稳态值: 0.55-0.67</span>
+                    </div>
+                </div>
+                <div class="cmp-card risk-mid">
+                    <div class="cmp-tag">🟠 橙色中高风险</div>
+                    <div class="cmp-t">地下0-500m 基建应力乱流</div>
+                    <div class="cmp-d">地铁隧道管廊开挖卸荷应力涡流+地热窜流+施工扰动；类似低空大气边界层的多源扰动叠加；岩土结构应力重分布风险。</div>
+                    <div class="cmp-m">
+                        <span>C₁: 0.2-0.5</span>
+                        <span>C₂: 0.1-0.3</span>
+                        <span>稳态值: 0.53-0.63</span>
+                    </div>
+                </div>
+                <div class="cmp-card risk-critical">
+                    <div class="cmp-tag">🔴 深红色熔断级</div>
+                    <div class="cmp-t">地下500m+ 深层能源高压</div>
+                    <div class="cmp-d">地热油气岩层高压储能+密闭高压热流体喷涌+极端温压梯度；类似高空压差但烈度更高；高压流体突涌熔断级风险。</div>
+                    <div class="cmp-m">
+                        <span>C₁: 0.5-0.9</span>
+                        <span>C₂: 0.4-0.8</span>
+                        <span>稳态值: >0.68</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="conclusion-box">
+                <div class="cb-t">📊 核心论证结论（固定文案）</div>
+                <p>大众普遍认为"越高越危险"，本仿真通过微观基准+宏观异形对照+空地三维同构实验严格证明：<strong>0-500米近地低空大气边界层，因地表摩擦、热力湍流、地形遮挡、风切变叠加，综合扰动风险显著高于高空平流层。高空仅存在均匀压差风险；低空为多方向随机交变湍流+内外双层气流博弈，是飞行器结构失稳的核心区间。</strong></p>
+            </div>
+        </div>
+
+        <div class="sec control-section">
+            <h2>🎛️ AirMind稳定控制子系统 <span class="tag p">三大控制论闭环</span></h2>
+            <p>接入尼克弹簧阻尼实验逻辑，通过三大控制论闭环模块抵消双层阻尼博弈带来的扰动：</p>
+
+            <div class="ctrl-grid">
+                <div class="ctrl-card">
+                    <div class="ctrl-icon">🌡️</div>
+                    <div class="ctrl-t">PID水温负反馈控制</div>
+                    <div class="ctrl-d">无人机高低空温差恒温控制：低温保护（高空-56°C引擎预热）+高温过载保护（低空引擎散热热风C₂调节），温度传感器→PID计算→散热/加热执行器负反馈闭环。</div>
+                    <div class="ctrl-flow">温度偏差→PID运算<br>→散热风门调节→C₂内层阻尼控制</div>
+                </div>
+                <div class="ctrl-card">
+                    <div class="ctrl-icon">🛢️</div>
+                    <div class="ctrl-t">双容水箱串级液位控制</div>
+                    <div class="ctrl-d">双层油箱颠簸稳压供油仿真：主油箱+副油箱双容串级，抑制飞行姿态变化导致的燃油晃动（类似半注水球C₂扰动），保证供油压力恒定。</div>
+                    <div class="ctrl-flow">液位偏差→副油箱调节<br>→主油箱稳压→燃油晃动C₂抑制</div>
+                </div>
+                <div class="ctrl-card">
+                    <div class="ctrl-icon">🎯</div>
+                    <div class="ctrl-t">双级串级双环控制</div>
+                    <div class="ctrl-d">外环航线全局位置锁定 + 内环机身姿态角速度抗乱流抑制（专门抵消双层气流对抗带来的机身偏移震荡）。GPS/IMU→外环位置PID→内环姿态PID→电机推力分配。</div>
+                    <div class="ctrl-flow">位置偏差→外环PID→姿态目标<br>→角速度偏差→内环PID→电机推力</div>
+                </div>
+            </div>
+
+            <div class="data-chain">
+                <div class="dc-t">🔗 AirMind全域数据链路</div>
+                <div class="dc-flow">
+                    #30双层阻尼力学数据<span class="arrow">→</span>双环串级PID自控修正<span class="arrow">→</span>GameMind博弈风险量化<span class="arrow">→</span>AirMind全域调度决策
+                </div>
             </div>
         </div>
 
         <div class="sec">
-            <h2>🔗 三层同构映射</h2>
+            <h2>🔗 四层同构映射</h2>
             <div class="map">
-                <div class="mt">⚛️ 物理层规律</div>
+                <div class="mt">⚛️ 微观物理层基准（苹果）</div>
                 <ul>
-                    <li><strong>结构对称度越高、内部质量越均匀、内外压差越平衡，落体/飞行运动越稳态；</strong></li>
-                    <li>腔体空化、介质流动、轮廓异形、大气对流扰动，会持续放大系统不稳定性；</li>
-                    <li>单点受力（单发）应力集中，薄壁无支撑在高空压差下鼓胀断裂；多点制衡+兜底支撑+承压结构，抗扰动能力最强。</li>
+                    <li><strong>只有绝对对称、实心、质量均匀的理想结构才能维持纯匀加速稳态运动；</strong></li>
+                    <li>360°全方位绝对均衡，无偏心无侧向力无抖动，a=g=9.8m/s²恒定；</li>
+                    <li>这是所有工程系统的理论上限基准，现实设备无法达到。</li>
                 </ul>
             </div>
             <div class="map">
-                <div class="mt">🏛️ 系统架构层规律</div>
+                <div class="mt">🏛️ 宏观工程层规律（无人机）</div>
                 <ul>
-                    <li><strong>约束分布均匀、重心锁定、多点制衡、冗余兜底的系统，抗扰动抗风险能力极强；</strong></li>
-                    <li>架构中空、核心单点受力、无冗余备份、无兜底支撑的系统，微小外部扰动即可触发大幅震荡甚至熔断；</li>
-                    <li>多发分布式冗余架构类似共价键三角/高分子网状结构，单点断裂不引发全局崩溃。</li>
+                    <li><strong>现实工程设备不满足理想对称，天然存在受力失衡与扰动偏移；</strong></li>
+                    <li>无人机=空心落地窗双层腔体：外层C₁乱流挤压+内层C₂热风顶压=持续博弈震荡；</li>
+                    <li>多发分布式冗余+起落架兜底+加厚承压机身+AirMind双环PID，是工程最优解。</li>
                 </ul>
             </div>
             <div class="map">
-                <div class="mt">🛩️ 低空产业层规律</div>
+                <div class="mt">🌍 空地三维层同构</div>
                 <ul>
-                    <li>无人机机身越圆润对称、动力分布越均匀，高低空温差对流环境下飞行越平稳；</li>
-                    <li><strong>多电机分布式冗余+起落架兜底+加厚承压机身，是低空稠密与高空稀薄双域稳态的工程最优配置；</strong></li>
-                    <li>单发单点动力+薄壁机身仅适用于极低空短距场景，一旦进入强对流/高空压差区间立即触发结构熔断；</li>
-                    <li>空域高低温、疏密空气对流差对应不同圈层风控阈值，高空稀薄空域容错更低、冗余度要求更高。</li>
+                    <li>低空0-500m=C₁+C₂双层博弈最剧烈=飞行器失稳核心区间；</li>
+                    <li><strong>地下0-500m基建层=类似低空大气边界层=多源应力扰动；</strong></li>
+                    <li>地下500m+深层能源=熔断级高压风险，全域风控阈值需分层设定。</li>
+                </ul>
+            </div>
+            <div class="map">
+                <div class="mt">✈️ AirMind控制层闭环</div>
+                <ul>
+                    <li>PID水温负反馈→C₂内层热风流阻尼控制；</li>
+                    <li>双容水箱串级液位→燃油晃动C₂扰动抑制；</li>
+                    <li><strong>双级串级双环控制→C₁+C₂双层气流博弈扰动全域抵消；</strong></li>
+                    <li>力学数据→PID修正→风险量化→全域调度完整链路闭环。</li>
                 </ul>
             </div>
         </div>
 
         <div class="boundary">
-            <div class="bt">🛩️ 无人机迁移边界说明（严谨工程边界）</div>
+            <div class="bt">🚁 无人机迁移边界说明（严谨工程边界）</div>
             <div class="b-row">
                 <div class="bc ok">
                     <strong>✅ 可迁移规律</strong>
-                    稳态区间规律、重心稳定性逻辑、空心结构刚度短板、对流扰动模型、对称冗余架构理论、压差失衡熔断机制、多点制衡优于单点受力、起落架兜底支撑结构价值、分布式动力冗余架构逻辑、高低空分层风控阈值模型。
+                    稳态区间规律、重心稳定性逻辑、空心结构刚度短板、双层阻尼对流扰动模型、对称冗余架构理论、压差失衡熔断机制、多点制衡优于单点受力、起落架兜底支撑结构价值、分布式动力冗余架构逻辑、高低空分层风控阈值模型、PID负反馈控制原理、双容水箱串级控制逻辑、空地同构扰动映射规律。
                 </div>
                 <div class="bc no">
                     <strong>❌ 不可迁移参数</strong>
-                    球体下落绝对加速度数值、玻璃/球体材料物理参数、具体形变毫米值、真空实验室理想环境常数、地表重力绝对值、无人机翼型升力系数、电机推力绝对值、碳纤维/航空铝材具体承压强度、真空/低空/高空具体海拔温度数值。
+                    球体下落绝对加速度数值、玻璃/球体材料物理参数、具体形变毫米值、真空实验室理想环境常数、地表重力绝对值、无人机翼型升力系数、电机推力绝对值、碳纤维/航空铝材具体承压强度、真空/低空/高空具体海拔温度数值、PID具体整定参数、地下岩层具体地应力值。
                 </div>
             </div>
         </div>
 
-        <div class="conf">🔒 公开演示版 · 本页面仅展示物理规律与区间稳态，不嵌入涉密精算参数，严格公私分离</div>
+        <div class="conf">🔒 公开演示版 · AirMind V2.0 力学基准实验 · 本页面仅展示物理规律与区间稳态，不嵌入涉密精算参数，严格公私分离</div>
 
         <div class="back-btns">
             <a href="../../index.html">← 返回总控台</a>
@@ -374,20 +562,33 @@
     const TH={B:0.48,S:0.5,F:0.68,E:0.02};
     const RHO={vac:0,low:1.225,high:0.22};
     const ENV_TAG={vac:{cls:'v',txt:'🌌 真空理想环境'},low:{cls:'l',txt:'🌤️ 低空稠密大气'},high:{cls:'h',txt:'🏔️ 高空稀薄大气'}};
-    let env='low',mod='solid',run=false,pause=false,storm=false,stormT=0,aid=null,t=0;
+    let env='low',mod='ideal',run=false,pause=false,storm=false,stormT=0,aid=null,t=0;
+    let C1=0,C2=0,CDist=0;
     const cvL=document.getElementById('cvL'),cxL=cvL.getContext('2d'),wL=document.getElementById('cwrapL');
     const cvR=document.getElementById('cvR'),cxR=cvR.getContext('2d'),wR=document.getElementById('cwrapR');
-    let obj=null,trail=[],parts=[];
+    let obj=null,trail=[],parts=[],innerParts=[];
     let drones={
-        d5:{score:.65,vib:0,bulge:0,rotor:[0,0,0,0],crack:0,name:'单发薄壁',cfg:{motors:1,gear:false,thick:0.3,sym:.75}},
-        d6:{score:.5,vib:0,bulge:0,rotor:[0,0,0,0,0,0],crack:0,name:'多电机冗余',cfg:{motors:4,gear:true,thick:1.0,sym:.97}}
+        d5:{score:.65,vib:0,bulge:0,rotor:[0,0,0,0],crack:0,name:'单发薄壁',cfg:{motors:1,gear:false,thick:0.3,sym:.75},shakeX:0,shakeY:0},
+        d6:{score:.5,vib:0,bulge:0,rotor:[0,0,0,0,0,0],crack:0,name:'多电机冗余',cfg:{motors:4,gear:true,thick:1.0,sym:.97},shakeX:0,shakeY:0}
     };
     const CFG={
-        solid:{m:1,sym:1,slosh:0,drag:.015,base:.5,range:.01,name:'实心苹果'},
-        hollow:{m:.3,sym:.95,slosh:0,drag:.07,base:.56,range:.03,name:'空心圆球'},
-        water:{m:.7,sym:.9,slosh:.6,drag:.05,base:.63,range:.03,name:'半注水球'},
-        irr:{m:.8,sym:.55,slosh:.2,drag:.14,base:.72,range:.05,name:'异形体'}
+        ideal:{m:1,sym:1,slosh:0,drag:0,base:.5,range:.005,name:'牛顿苹果',inner:false,c2base:0,perfect:true},
+        solid:{m:1,sym:1,slosh:0,drag:.015,base:.5,range:.01,name:'实心苹果',inner:false,c2base:0},
+        hollow:{m:.3,sym:.95,slosh:0,drag:.07,base:.56,range:.03,name:'空心圆球',inner:true,c2base:.25},
+        water:{m:.7,sym:.9,slosh:.6,drag:.05,base:.63,range:.03,name:'半注水球',inner:true,c2base:.35},
+        irr:{m:.8,sym:.55,slosh:.2,drag:.14,base:.72,range:.05,name:'异形体',inner:true,c2base:.2},
+        drone:{m:.6,sym:.65,slosh:.3,drag:.12,base:.68,range:.04,name:'无人机腔体',inner:true,c2base:.4,droneShape:true}
     };
+    function calcDamping(){
+        if(env==='vac'){C1=0;C2=0;}
+        else if(env==='low'){C1=.45+Math.sin(t*.04)*.15+(storm?.2:0);C1=Math.max(.3,Math.min(.6,C1));}
+        else{C1=.1+Math.sin(t*.03)*.05;C1=Math.max(.05,Math.min(.15,C1));}
+        const c=CFG[mod];
+        if(c&&c.inner&&env!=='vac'){C2=c.c2base+Math.sin(t*.06+1)*.1+(c.slosh?Math.sin(t*.08)*.15:0)+(storm?.1:0);C2=Math.max(.15,Math.min(.4,C2));}
+        else{C2=0;}
+        CDist=C1*C2*1.2+C1*.3+C2*.4;
+        CDist=Math.min(.8,CDist);
+    }
     function rsz(){
         [['cvL','wL','cxL'],['cvR','wR','cxR']].forEach(([ci,wi,cxi])=>{
             const c=document.getElementById(ci),w=document.getElementById(wi),ctx=c.getContext('2d');
@@ -401,32 +602,38 @@
     function envDensity(){return RHO[env];}
     function envFactor(){if(env==='vac')return 0;if(env==='low')return 1;return .4;}
     function pressureDiff(){if(env==='vac')return .55;if(env==='low')return .08;return .75;}
-    function initP(){parts=[];const den=envDensity();if(den===0)return;const count=env==='low'?60:22;const w=wLw(),h=hL();for(let i=0;i<count;i++){const cold=env==='high';parts.push({x:Math.random()*w,y:Math.random()*h,vx:(Math.random()-.5)*(cold?.08:.25),vy:(Math.random()>.5?1:-1)*(cold?.12:(.3+Math.random()*.4)),sz:cold?0.8+Math.random()*1.2:1+Math.random()*2,a:cold?.06+Math.random()*.1:(.08+Math.random()*.15),cold:cold});}}
-    function initO(){const w=wLw();const c=CFG[mod];obj={x:w/2,y:50,vx:0,vy:0,r:20,rot:0,rs:0,wo:{x:0,y:0},cfg:c,pres:0,com:{x:0,y:0},bulge:0};trail=[];t=0;}
+    function initP(){parts=[];innerParts=[];const den=envDensity();if(den===0)return;const count=env==='low'?60:22;const w=wLw(),h=hL();for(let i=0;i<count;i++){const cold=env==='high';parts.push({x:Math.random()*w,y:Math.random()*h,vx:(Math.random()-.5)*(cold?.08:.25),vy:(Math.random()>.5?1:-1)*(cold?.12:(.3+Math.random()*.4)),sz:cold?0.8+Math.random()*1.2:1+Math.random()*2,a:cold?.06+Math.random()*.1:(.08+Math.random()*.15),cold:cold});}if(CFG[mod]&&CFG[mod].inner){const ic=25;for(let i=0;i<ic;i++){innerParts.push({a:(Math.PI*2/ic)*i,r:5+Math.random()*8,spd:.5+Math.random()*.5,phase:Math.random()*Math.PI*2,sz:1+Math.random()*1.5});}}}
+    function initO(){const w=wLw();const c=CFG[mod];obj={x:w/2,y:50,vx:0,vy:0,r:mod==='drone'?24:20,rot:0,rs:0,wo:{x:0,y:0},cfg:c,pres:0,com:{x:0,y:0},bulge:0,shakeX:0,shakeY:0};trail=[];t=0;initP();calcDamping();}
     function initDrones(){const w=wRw(),h=hR();drones.d5.x=w/2;drones.d5.y=h*.28;drones.d6.x=w/2;drones.d6.y=h*.72;}
     function starsL(){const w=wLw(),h=hL();cxL.fillStyle='rgba(255,255,255,0.4)';for(let i=0;i<50;i++){const sx=(i*137.5)%w,sy=(i*73.3)%(h*.8),sr=.4+(i%3)*.3;cxL.beginPath();cxL.arc(sx,sy,sr,0,Math.PI*2);cxL.fill();}}
     function starsR(){const w=wRw(),h=hR();cxR.fillStyle='rgba(255,255,255,0.35)';for(let i=0;i<45;i++){const sx=(i*157.7)%w,sy=(i*83.1)%h,sr=.3+(i%3)*.25;cxR.beginPath();cxR.arc(sx,sy,sr,0,Math.PI*2);cxR.fill();}}
-    function layersL(){const w=wLw(),h=hL();if(env==='vac')return;const layersN=env==='low'?8:6;for(let i=0;i<layersN;i++){const y=h/layersN*i,rat=i/layersN;let r,g,b,a;if(env==='low'){r=20+rat*40|0;g=40+rat*60|0;b=80+rat*60|0;a=.02+rat*.04;}else{r=15+rat*20|0;g=25+rat*35|0;b=50+rat*50|0;a=.02+rat*.03;}cxL.fillStyle=`rgba(${r},${g},${b},${a})`;cxL.fillRect(0,y,w,h/layersN+1);}cxL.font='9px SF Mono,monospace';const alts=env==='low'?[0,200,400,600,800,1000]:[6000,7000,8000,9000,10000];const tps=env==='low'?[25,20,15,10,5,0]:[-20,-30,-40,-50,-56];for(let i=0;i<alts.length;i++){const y=26+(h-52)*(i/(alts.length-1));cxL.fillStyle=`rgba(255,255,255,${.05+(1-i/(alts.length-1))*.07})`;cxL.fillText(`${alts[i]}m ${tps[i]}°C`,w-75,y);}}
-    function convL(){if(env==='vac')return;const w=wLw(),h=hL(),tt=t*.02,ef=envFactor(),str=storm?2.5:1;const cCold=env==='low'?'rgba(34,211,238,0.1)':'rgba(100,150,220,0.08)';const cWarm=env==='low'?'rgba(249,115,22,0.08)':'rgba(251,146,60,0.05)';cxL.strokeStyle=cCold;cxL.lineWidth=env==='low'?1.5:1;const ln=env==='low'?5:3;for(let i=0;i<ln;i++){const bx=w/(ln+1)*(i+1)+Math.sin(tt+i)*12*str;cxL.beginPath();for(let y=h;y>20;y-=8){cxL.lineTo(bx+Math.sin(y*.015+tt+i*.7)*8*str,y);}cxL.stroke();}cxL.strokeStyle=cWarm;const wn=env==='low'?4:2;for(let i=0;i<wn;i++){const bx=w/(wn+1)*(i+1)-18+Math.cos(tt*.8+i)*10*str;cxL.beginPath();for(let y=20;y<h;y+=8){cxL.lineTo(bx+Math.sin(y*.012+tt*.9+i*1.1)*9*str,y);}cxL.stroke();}}
-    function pstepL(){if(env==='vac')return;const w=wLw(),h=hL(),ef=envFactor(),str=storm?2.2:1;parts.forEach(p=>{p.x+=p.vx*str+Math.sin(t*.05+p.y*.01)*.15*str;p.y+=p.vy*str;if(p.y<0){p.y=h;p.x=Math.random()*w;}if(p.y>h){p.y=0;p.x=Math.random()*w;}if(p.x<0)p.x=w;if(p.x>w)p.x=0;cxL.beginPath();cxL.arc(p.x,p.y,p.sz,0,Math.PI*2);if(p.cold){cxL.fillStyle=`rgba(180,200,240,${p.a})`;}else{cxL.fillStyle=p.vy<0?`rgba(34,211,238,${p.a})`:`rgba(249,115,22,${p.a*.7})`;}cxL.fill();});}
+    function layersL(){const w=wLw(),h=hL();if(env==='vac')return;const layersN=env==='low'?8:6;for(let i=0;i<layersN;i++){const y=h/layersN*i,rat=i/layersN;let r,g,b,a;if(env==='low'){r=20+rat*40|0;g=40+rat*60|0;b=80+rat*60|0;a=.02+rat*.04;}else{r=15+rat*20|0;g=25+rat*35|0;b=50+rat*50|0;a=.02+rat*.03;}cxL.fillStyle=`rgba(${r},${g},${b},${a})`;cxL.fillRect(0,y,w,h/layersN+1);}cxL.font='9px SF Mono,monospace';const alts=env==='low'?[0,100,200,300,400,500]:[6000,7000,8000,9000,10000];const tps=env==='low'?[25,22,18,14,8,2]:[-20,-30,-40,-50,-56];for(let i=0;i<alts.length;i++){const y=26+(h-52)*(i/(alts.length-1));cxL.fillStyle=`rgba(255,255,255,${.05+(1-i/(alts.length-1))*.07})`;cxL.fillText(`${alts[i]}m ${tps[i]}°C`,w-75,y);}}
+    function convL(){if(env==='vac')return;const w=wLw(),h=hL(),tt=t*.02,ef=envFactor(),str=storm?2.5:1;const cCold='#3b82f6';cxL.strokeStyle=`rgba(59,130,246,${env==='low'?0.15:0.08})`;cxL.lineWidth=env==='low'?2:1;const ln=env==='low'?6:3;for(let i=0;i<ln;i++){const bx=w/(ln+1)*(i+1)+Math.sin(tt+i)*14*str;cxL.beginPath();for(let y=h;y>20;y-=6){cxL.lineTo(bx+Math.sin(y*.02+tt+i*.8)*10*str,y);}cxL.stroke();}}
+    function innerConvL(){if(!obj||!obj.cfg.inner||env==='vac')return;const or=obj.r;cxL.save();cxL.translate(obj.x+obj.shakeX,obj.y+obj.shakeY);const cWarm='#ef4444';cxL.strokeStyle='rgba(239,68,68,0.35)';cxL.lineWidth=1.5;innerParts.forEach(p=>{const ang=p.a+t*.03*p.spd+p.phase;const r2=p.r*(.8+Math.sin(t*.05+p.phase)*.2);const px=Math.cos(ang)*r2,py=Math.sin(ang)*r2;const tx=-Math.sin(ang)*3,ty=Math.cos(ang)*3;cxL.beginPath();cxL.moveTo(px-tx*.5,py-ty*.5);cxL.lineTo(px+tx,py+ty);cxL.stroke();cxL.beginPath();cxL.arc(px+tx,py+ty,p.sz*.6,0,Math.PI*2);cxL.fillStyle='rgba(239,68,68,0.4)';cxL.fill();});cxL.restore();}
+    function pstepL(){if(env==='vac')return;const w=wLw(),h=hL(),ef=envFactor(),str=storm?2.2:1;parts.forEach(p=>{p.x+=p.vx*str+Math.sin(t*.05+p.y*.01)*.15*str;p.y+=p.vy*str;if(p.y<0){p.y=h;p.x=Math.random()*w;}if(p.y>h){p.y=0;p.x=Math.random()*w;}if(p.x<0)p.x=w;if(p.x>w)p.x=0;cxL.beginPath();cxL.arc(p.x,p.y,p.sz,0,Math.PI*2);if(p.cold){cxL.fillStyle=`rgba(147,197,253,${p.a})`;}else{cxL.fillStyle=p.vy<0?`rgba(59,130,246,${p.a})`:`rgba(147,197,253,${p.a*.7})`;}cxL.fill();});}
     function groundL(){const w=wLw(),h=hL(),gy=h-26;const g=cxL.createLinearGradient(0,gy,0,h);g.addColorStop(0,'rgba(100,80,60,0.35)');g.addColorStop(1,'rgba(60,40,20,0.55)');cxL.fillStyle=g;cxL.fillRect(0,gy,w,26);cxL.strokeStyle='rgba(255,255,255,0.07)';cxL.lineWidth=1;cxL.beginPath();cxL.moveTo(0,gy);cxL.lineTo(w,gy);cxL.stroke();if(env==='high'){cxL.fillStyle='rgba(255,255,255,0.08)';for(let i=0;i<12;i++){const cx=w/12*i+20,cy=gy-5+Math.sin(i+t*.02)*2;cxL.beginPath();cxL.moveTo(cx-6,cy);cxL.lineTo(cx,cy-5);cxL.lineTo(cx+6,cy);cxL.lineTo(cx+3,cy+2);cxL.lineTo(cx-3,cy+2);cxL.closePath();cxL.fill();}}}
     function dtrailL(){if(trail.length<2)return;cxL.beginPath();cxL.strokeStyle='rgba(167,139,250,0.4)';cxL.lineWidth=2;cxL.moveTo(trail[0].x,trail[0].y);for(let i=1;i<trail.length;i++)cxL.lineTo(trail[i].x,trail[i].y);cxL.stroke();}
-    function pvecsL(){if(!obj||env==='vac')return;const c=obj.cfg,asym=1-c.sym,str=storm?1.8:1;for(let i=0;i<8;i++){const a=Math.PI*2/8*i+obj.rot,l=obj.r+4+obj.bulge*6,fx=obj.x+Math.cos(a)*l,fy=obj.y+Math.sin(a)*l,fd={x:Math.cos(a),y:Math.sin(a)},pt=asym*(.5+Math.sin(t*.1+i*2.3)*.5)*str,fl=3+pt*12,al=.15+pt*.35;cxL.strokeStyle=`rgba(248,113,113,${al})`;cxL.lineWidth=1.5;cxL.beginPath();cxL.moveTo(fx,fy);cxL.lineTo(fx+fd.x*fl,fy+fd.y*fl);cxL.stroke();cxL.beginPath();cxL.arc(fx+fd.x*fl,fy+fd.y*fl,2,0,Math.PI*2);cxL.fillStyle=`rgba(248,113,113,${al})`;cxL.fill();}}
-    function bulgeFor(){if(env==='vac'||!obj)return 0;const pd=pressureDiff(),hm=mod==='hollow'?1:mod==='water'?.6:mod==='irr'?.4:0;return Math.min(1,pd*hm*(.7+Math.sin(t*.08)*.3)*(storm?1.4:1));}
-    function dobjL(){if(!obj)return;const c=obj.cfg;obj.bulge=bulgeFor();cxL.save();cxL.translate(obj.x,obj.y);cxL.rotate(obj.rot||0);const br=obj.r*(1+obj.bulge*.15);
-    if(mod==='solid'){const g=cxL.createRadialGradient(-5,-5,2,0,0,obj.r);g.addColorStop(0,'#ff6b6b');g.addColorStop(.7,'#dc2626');g.addColorStop(1,'#991b1b');cxL.fillStyle=g;cxL.beginPath();cxL.arc(0,0,obj.r,0,Math.PI*2);cxL.fill();cxL.strokeStyle='rgba(255,255,255,0.25)';cxL.lineWidth=1;cxL.stroke();cxL.fillStyle='#166534';cxL.beginPath();cxL.ellipse(2,-obj.r-3,3,6,.3,0,Math.PI*2);cxL.fill();}
-    else if(mod==='hollow'){const bulge=obj.bulge;cxL.strokeStyle=`rgba(147,197,253,${0.7+bulge*.2})`;cxL.lineWidth=2.5-bulge*.8;cxL.fillStyle=`rgba(147,197,253,${0.05+bulge*.05})`;cxL.beginPath();cxL.ellipse(0,0,br,br*(1+bulge*.2),0,0,Math.PI*2);cxL.fill();cxL.stroke();if(bulge>.3){cxL.strokeStyle=`rgba(250,204,21,${(bulge-.3)*1.5})`;cxL.lineWidth=1.5;cxL.setLineDash([2,3]);cxL.beginPath();cxL.ellipse(0,0,br+3,br*(1+bulge*.2)+3,0,0,Math.PI*2);cxL.stroke();cxL.setLineDash([]);cxL.fillStyle=`rgba(250,204,21,${(bulge-.3)*.8})`;for(let i=0;i<6;i++){const a=Math.PI*2/6*i,px=Math.cos(a)*(br-2),py=Math.sin(a)*(br*(1+bulge*.2)-2);cxL.beginPath();cxL.arc(px,py,1.5,0,Math.PI*2);cxL.fill();}}const hg=cxL.createRadialGradient(-6,-6,1,0,0,br*.7);hg.addColorStop(0,'rgba(255,255,255,0.15)');hg.addColorStop(1,'rgba(255,255,255,0)');cxL.fillStyle=hg;cxL.beginPath();cxL.ellipse(0,0,br,br*(1+bulge*.2),0,0,Math.PI*2);cxL.fill();}
-    else if(mod==='water'){const bulge=obj.bulge*.5;cxL.strokeStyle='rgba(96,165,250,0.7)';cxL.lineWidth=2;cxL.fillStyle='rgba(96,165,250,0.05)';cxL.beginPath();cxL.ellipse(0,0,obj.r*(1+bulge*.1),obj.r*(1+bulge*.15),0,0,Math.PI*2);cxL.fill();cxL.stroke();cxL.save();cxL.beginPath();cxL.ellipse(0,0,(obj.r-2)*(1+bulge*.1),(obj.r-2)*(1+bulge*.15),0,0,Math.PI*2);cxL.clip();const wo=obj.wo,wl=obj.r*.55,wg=cxL.createLinearGradient(0,-wl,0,obj.r);wg.addColorStop(0,'rgba(59,130,246,0.4)');wg.addColorStop(1,'rgba(30,64,175,0.6)');cxL.fillStyle=wg;cxL.beginPath();cxL.moveTo(-obj.r,wl+wo.y);for(let wx=-obj.r;wx<=obj.r;wx+=3){cxL.lineTo(wx,wl+wo.y+Math.sin(wx*.15+t*.12)*4+wo.x*.3);}cxL.lineTo(obj.r,obj.r+5);cxL.lineTo(-obj.r,obj.r+5);cxL.closePath();cxL.fill();cxL.restore();if(bulge>.4){cxL.strokeStyle=`rgba(250,204,21,${(bulge-.4)*1.2})`;cxL.lineWidth=1;cxL.setLineDash([2,2]);cxL.beginPath();cxL.ellipse(0,0,obj.r*(1+bulge*.1)+2,obj.r*(1+bulge*.15)+2,0,0,Math.PI*2);cxL.stroke();cxL.setLineDash([]);}}
+    function pvecsL(){if(!obj||env==='vac')return;const c=obj.cfg,asym=1-c.sym,str=storm?1.8:1;for(let i=0;i<8;i++){const a=Math.PI*2/8*i+obj.rot,l=obj.r+8+obj.bulge*6,fx=obj.x+Math.cos(a)*l+obj.shakeX,fy=obj.y+Math.sin(a)*l+obj.shakeY,fd={x:Math.cos(a),y:Math.sin(a)},pt=asym*(.5+Math.sin(t*.1+i*2.3)*.5)*str+C1*.4,fl=4+pt*14,al=.2+pt*.4;cxL.strokeStyle=`rgba(59,130,246,${al})`;cxL.lineWidth=2;cxL.beginPath();cxL.moveTo(fx,fy);cxL.lineTo(fx+fd.x*fl,fy+fd.y*fl);cxL.stroke();cxL.beginPath();cxL.arc(fx+fd.x*fl,fy+fd.y*fl,2.5,0,Math.PI*2);cxL.fillStyle=`rgba(59,130,246,${al})`;cxL.fill();}}
+    function bulgeFor(){if(env==='vac'||!obj)return 0;const pd=pressureDiff(),hm=mod==='hollow'?1:mod==='water'?.6:mod==='drone'?.8:mod==='irr'?.4:0;return Math.min(1,pd*hm*(.7+Math.sin(t*.08)*.3)*(storm?1.4:1));}
+    function dobjL(){if(!obj)return;const c=obj.cfg;obj.bulge=bulgeFor();if(mod==='drone'&&env!=='vac'){obj.shakeX=(Math.random()-.5)*C1*4;obj.shakeY=(Math.random()-.5)*C1*3+C2*2;}else if(!c.perfect){obj.shakeX=Math.sin(t*.07)*(1-c.sym)*2*(storm?2:1);obj.shakeY=Math.cos(t*.09)*(1-c.sym)*1.5*(storm?2:1);}else{obj.shakeX=0;obj.shakeY=0;}cxL.save();cxL.translate(obj.x+obj.shakeX,obj.y+obj.shakeY);cxL.rotate(obj.rot||0);const br=obj.r*(1+obj.bulge*.15);
+    if(mod==='ideal'){const g=cxL.createRadialGradient(-5,-5,2,0,0,obj.r);g.addColorStop(0,'#4ade80');g.addColorStop(.6,'#16a34a');g.addColorStop(1,'#14532d');cxL.fillStyle=g;cxL.beginPath();cxL.arc(0,0,obj.r,0,Math.PI*2);cxL.fill();cxL.strokeStyle='rgba(255,255,255,0.3)';cxL.lineWidth=1.5;cxL.stroke();cxL.fillStyle='#166534';cxL.beginPath();cxL.ellipse(2,-obj.r-3,3,6,.3,0,Math.PI*2);cxL.fill();cxL.strokeStyle='rgba(74,222,128,0.2)';cxL.lineWidth=1;for(let i=0;i<12;i++){const a=Math.PI*2/12*i;cxL.beginPath();cxL.moveTo(0,0);cxL.lineTo(Math.cos(a)*(obj.r+4),Math.sin(a)*(obj.r+4));cxL.stroke();}}
+    else if(mod==='solid'){const g=cxL.createRadialGradient(-5,-5,2,0,0,obj.r);g.addColorStop(0,'#ff6b6b');g.addColorStop(.7,'#dc2626');g.addColorStop(1,'#991b1b');cxL.fillStyle=g;cxL.beginPath();cxL.arc(0,0,obj.r,0,Math.PI*2);cxL.fill();cxL.strokeStyle='rgba(255,255,255,0.25)';cxL.lineWidth=1;cxL.stroke();cxL.fillStyle='#166534';cxL.beginPath();cxL.ellipse(2,-obj.r-3,3,6,.3,0,Math.PI*2);cxL.fill();}
+    else if(mod==='hollow'){const bulge=obj.bulge;cxL.strokeStyle=`rgba(147,197,253,${0.7+bulge*.2})`;cxL.lineWidth=2.5-bulge*.8;cxL.fillStyle=`rgba(59,130,246,${0.08+bulge*.05})`;cxL.beginPath();cxL.ellipse(0,0,br,br*(1+bulge*.2),0,0,Math.PI*2);cxL.fill();cxL.stroke();if(bulge>.3){cxL.strokeStyle=`rgba(250,204,21,${(bulge-.3)*1.5})`;cxL.lineWidth=1.5;cxL.setLineDash([2,3]);cxL.beginPath();cxL.ellipse(0,0,br+3,br*(1+bulge*.2)+3,0,0,Math.PI*2);cxL.stroke();cxL.setLineDash([]);cxL.fillStyle=`rgba(250,204,21,${(bulge-.3)*.8})`;for(let i=0;i<6;i++){const a=Math.PI*2/6*i,px=Math.cos(a)*(br-2),py=Math.sin(a)*(br*(1+bulge*.2)-2);cxL.beginPath();cxL.arc(px,py,1.5,0,Math.PI*2);cxL.fill();}}const hg=cxL.createRadialGradient(-6,-6,1,0,0,br*.7);hg.addColorStop(0,'rgba(255,255,255,0.15)');hg.addColorStop(1,'rgba(255,255,255,0)');cxL.fillStyle=hg;cxL.beginPath();cxL.ellipse(0,0,br,br*(1+bulge*.2),0,0,Math.PI*2);cxL.fill();}
+    else if(mod==='water'){const bulge=obj.bulge*.5;cxL.strokeStyle='rgba(96,165,250,0.7)';cxL.lineWidth=2;cxL.fillStyle='rgba(59,130,246,0.05)';cxL.beginPath();cxL.ellipse(0,0,obj.r*(1+bulge*.1),obj.r*(1+bulge*.15),0,0,Math.PI*2);cxL.fill();cxL.stroke();cxL.save();cxL.beginPath();cxL.ellipse(0,0,(obj.r-2)*(1+bulge*.1),(obj.r-2)*(1+bulge*.15),0,0,Math.PI*2);cxL.clip();const wo=obj.wo,wl=obj.r*.55,wg=cxL.createLinearGradient(0,-wl,0,obj.r);wg.addColorStop(0,'rgba(59,130,246,0.4)');wg.addColorStop(1,'rgba(30,64,175,0.6)');cxL.fillStyle=wg;cxL.beginPath();cxL.moveTo(-obj.r,wl+wo.y);for(let wx=-obj.r;wx<=obj.r;wx+=3){cxL.lineTo(wx,wl+wo.y+Math.sin(wx*.15+t*.12)*4+wo.x*.3);}cxL.lineTo(obj.r,obj.r+5);cxL.lineTo(-obj.r,obj.r+5);cxL.closePath();cxL.fill();cxL.restore();if(bulge>.4){cxL.strokeStyle=`rgba(250,204,21,${(bulge-.4)*1.2})`;cxL.lineWidth=1;cxL.setLineDash([2,2]);cxL.beginPath();cxL.ellipse(0,0,obj.r*(1+bulge*.1)+2,obj.r*(1+bulge*.15)+2,0,0,Math.PI*2);cxL.stroke();cxL.setLineDash([]);}}
+    else if(mod==='drone'){const bulge=obj.bulge;const bw=br*1.2,bh=br*.6;cxL.strokeStyle=`rgba(167,139,250,${0.7+bulge*.2})`;cxL.lineWidth=2.5;cxL.fillStyle=`rgba(167,139,250,${0.1+bulge*.08})`;cxL.beginPath();cxL.ellipse(0,0,bw,bh*(1+bulge*.15),0,0,Math.PI*2);cxL.fill();cxL.stroke();const armN=4;for(let i=0;i<armN;i++){const ang=Math.PI*2/armN*i+Math.PI/4;const ax=Math.cos(ang)*bw*1.3,ay=Math.sin(ang)*bh*1.3;cxL.strokeStyle='rgba(167,139,250,0.6)';cxL.lineWidth=2;cxL.beginPath();cxL.moveTo(0,0);cxL.lineTo(ax,ay);cxL.stroke();cxL.save();cxL.translate(ax,ay);const rs=t*.3+i;cxL.fillStyle='rgba(80,90,100,0.9)';cxL.beginPath();cxL.arc(0,0,3,0,Math.PI*2);cxL.fill();cxL.strokeStyle='rgba(200,220,255,0.5)';cxL.lineWidth=1.5;for(let b=0;b<2;b++){const ba=rs+b*Math.PI;cxL.beginPath();cxL.moveTo(0,0);cxL.lineTo(Math.cos(ba)*10,Math.sin(ba)*6);cxL.stroke();}cxL.restore();}cxL.strokeStyle='rgba(239,68,68,0.3)';cxL.setLineDash([3,3]);cxL.beginPath();cxL.ellipse(0,0,bw*.7,bh*.6,0,0,Math.PI*2);cxL.stroke();cxL.setLineDash([]);}
     else{cxL.fillStyle='#6b7280';cxL.strokeStyle='rgba(255,255,255,0.2)';cxL.lineWidth=1.5;cxL.beginPath();for(let i=0;i<=9;i++){const a=Math.PI*2/9*i,n=.4+Math.sin(a*3+12345)*.3+Math.cos(a*5+12345*.7)*.2,r=obj.r*(.6+n*.7),px=Math.cos(a)*r,py=Math.sin(a)*r;i?cxL.lineTo(px,py):cxL.moveTo(px,py);}cxL.closePath();cxL.fill();cxL.stroke();}
-    if(env!=='vac'&&mod!=='solid'){cxL.strokeStyle='rgba(248,113,113,0.45)';cxL.setLineDash([3,3]);cxL.lineWidth=1;cxL.beginPath();cxL.moveTo(0,0);cxL.lineTo(obj.com.x*14,obj.com.y*14);cxL.stroke();cxL.setLineDash([]);cxL.fillStyle='rgba(248,113,113,0.8)';cxL.beginPath();cxL.arc(obj.com.x*14,obj.com.y*14,3,0,Math.PI*2);cxL.fill();}
+    if(env!=='vac'&&mod!=='solid'&&mod!=='ideal'){cxL.strokeStyle='rgba(248,113,113,0.45)';cxL.setLineDash([3,3]);cxL.lineWidth=1;cxL.beginPath();cxL.moveTo(0,0);cxL.lineTo(obj.com.x*14,obj.com.y*14);cxL.stroke();cxL.setLineDash([]);cxL.fillStyle='rgba(248,113,113,0.8)';cxL.beginPath();cxL.arc(obj.com.x*14,obj.com.y*14,3,0,Math.PI*2);cxL.fill();}
     cxL.restore();}
-    function physL(){if(!obj)return;const c=obj.cfg,w=wLw(),h=hL(),gy=h-26-obj.r,g=.32,ef=envFactor(),str=storm?2.5:1;obj.vy+=g*c.m;
-    if(env!=='vac'){const ht=obj.y/h,df=.3+ht*.7,drg=c.drag*df*ef;obj.vy*=(1-drg*.03);const tx=(Math.sin(t*.08)+Math.sin(t*.13+1.5)*.6)*(.3+(1-c.sym)*1.5)*df*str,ty=(Math.cos(t*.06+.8)+Math.sin(t*.11+2.1)*.4)*(.1+(1-c.sym)*.5)*df*str;obj.vx+=tx*.07*ef;obj.vy+=ty*.035*ef;if(env==='high'){obj.vx+=(Math.random()-.5)*.08*str;}if(c.slosh>0){obj.wo.x=obj.wo.x*.92+(obj.vx*.3+Math.sin(t*.1)*2)*c.slosh*.3;obj.wo.y=obj.wo.y*.92+(obj.vy*.1+Math.cos(t*.08)*1.5)*c.slosh*.2;obj.vx+=obj.wo.x*.012;obj.vy+=obj.wo.y*.006;obj.com.x=obj.wo.x*.3;obj.com.y=obj.wo.y*.3;}else{obj.com.x=Math.sin(t*.05)*.3*(1-c.sym)*str;obj.com.y=Math.cos(t*.07)*.2*(1-c.sym)*str;}obj.rs+=obj.vx*.002+(1-c.sym)*Math.sin(t*.04)*.008*str;obj.rs*=.98;obj.rot=(obj.rot||0)+obj.rs;obj.vx*=.96;}else{obj.wo={x:0,y:0};obj.com={x:0,y:0};obj.rs=0;obj.vx*=.99;}
+    function physL(){if(!obj)return;const c=obj.cfg,w=wLw(),h=hL(),gy=h-26-obj.r,g=c.perfect?.32:.32,ef=envFactor(),str=storm?2.5:1;
+    if(c.perfect&&env==='vac'){obj.vy+=g;obj.vx*=.995;}else{obj.vy+=g*c.m;}
+    if(env!=='vac'){const ht=obj.y/h,df=.3+ht*.7,drg=c.drag*df*ef;obj.vy*=(1-drg*.03);const dampFactor=1+C1*.8+C2*.5;const tx=(Math.sin(t*.08)+Math.sin(t*.13+1.5)*.6)*(.3+(1-c.sym)*1.5)*df*str*dampFactor,ty=(Math.cos(t*.06+.8)+Math.sin(t*.11+2.1)*.4)*(.1+(1-c.sym)*.5)*df*str*dampFactor;obj.vx+=tx*.07*ef*(1+C1);obj.vy+=ty*.035*ef;if(env==='high'){obj.vx+=(Math.random()-.5)*.08*str;}if(c.slosh>0){obj.wo.x=obj.wo.x*.92+(obj.vx*.3+Math.sin(t*.1)*2)*c.slosh*.3*(1+C2);obj.wo.y=obj.wo.y*.92+(obj.vy*.1+Math.cos(t*.08)*1.5)*c.slosh*.2*(1+C2);obj.vx+=obj.wo.x*.012*C2;obj.vy+=obj.wo.y*.006*C2;obj.com.x=obj.wo.x*.3;obj.com.y=obj.wo.y*.3;}else if(!c.perfect){obj.com.x=Math.sin(t*.05)*.3*(1-c.sym)*str*(1+C1);obj.com.y=Math.cos(t*.07)*.2*(1-c.sym)*str;}else{obj.com={x:0,y:0};obj.wo={x:0,y:0};}obj.rs+=obj.vx*.002+(1-c.sym)*Math.sin(t*.04)*.008*str;obj.rs*=.98;obj.rot=(obj.rot||0)+obj.rs;obj.vx*=.96;}else if(!c.perfect){obj.wo={x:0,y:0};obj.com={x:0,y:0};obj.rs=0;obj.vx*=.99;}
     obj.x+=obj.vx;obj.y+=obj.vy;if(obj.x<obj.r){obj.x=obj.r;obj.vx=Math.abs(obj.vx)*.3;}if(obj.x>w-obj.r){obj.x=w-obj.r;obj.vx=-Math.abs(obj.vx)*.3;}trail.push({x:obj.x,y:obj.y});if(trail.length>80)trail.shift();if(obj.y>=gy){obj.y=gy;obj.vy=-obj.vy*.2;obj.vx*=.7;if(Math.abs(obj.vy)<.4){obj.vy=0;if(!storm)run=false;}}}
-    function calcL(){if(!obj)return{score:.5,com:0,pres:0,turb:0,rho:RHO[env]};const c=obj.cfg,w=wLw(),h=hL(),ht=Math.max(0,1-obj.y/(h-50));let ed=env==='vac'?0:(env==='low'?(.07+(1-ht)*.03):(.12+(1-ht)*.05)),sp=(1-c.sym)*.12,sl=c.slosh*(.07+Math.abs(obj.wo.x)*.02+Math.abs(obj.wo.y)*.01),pp=env!=='vac'?((1-c.sym)*.055+Math.abs(obj.vx)*.018+obj.bulge*.08):0,vp=Math.abs(obj.vx)*.008+Math.abs(obj.rs||0)*2+(storm?.15:0);let dev=ed+sp+sl+pp+vp,score=c.base+dev;if(env==='vac'&&mod==='solid'){score=.5+Math.sin(t*.02)*.005;dev=Math.abs(score-.5);ed=0;pp=0;}score=Math.max(.3,Math.min(.9,score));const com=Math.sqrt(obj.com.x*obj.com.x+obj.com.y*obj.com.y)*.6+Math.abs(obj.vx)*.08;const pd=env==='vac'?0:(pressureDiff()*(mod==='hollow'?1:mod==='water'?.7:mod==='irr'?.5:.2)+obj.bulge*.1);const tb=Math.abs(obj.vx)*.45+ed*3+(storm?.4:0)+(env==='high'?.1:0);return{score,dev,com,pres:pd,turb:tb,rho:RHO[env]};}
-    function drawDrone(x,y,cfg,vib,bulge,rotors,broken,highlight,stressPts,color_main,color_accent){
+    function calcL(){if(!obj)return{score:.5,com:0,pres:0,turb:0,rho:RHO[env],c1:0,c2:0,cdist:0};const c=obj.cfg,w=wLw(),h=hL(),ht=Math.max(0,1-obj.y/(h-50));let ed=env==='vac'?0:(env==='low'?(.07+(1-ht)*.03):(.12+(1-ht)*.05)),sp=(1-c.sym)*.12,sl=c.slosh*(.07+Math.abs(obj.wo.x)*.02+Math.abs(obj.wo.y)*.01),pp=env!=='vac'?((1-c.sym)*.055+Math.abs(obj.vx)*.018+obj.bulge*.08):0,vp=Math.abs(obj.vx)*.008+Math.abs(obj.rs||0)*2+(storm?.15:0);let dampPert=C1*.15+C2*.1+CDist*.1;let dev=ed+sp+sl+pp+vp+dampPert,score=c.base+dev;if(c.perfect&&env==='vac'){score=.5+Math.sin(t*.02)*.003;dev=Math.abs(score-.5);ed=0;pp=0;C1=0;C2=0;CDist=0;}else if(mod==='solid'&&env==='vac'){score=.5+Math.sin(t*.02)*.005;dev=Math.abs(score-.5);ed=0;pp=0;}score=Math.max(.3,Math.min(.9,score));const com=Math.sqrt(obj.com.x*obj.com.x+obj.com.y*obj.com.y)*.6+Math.abs(obj.vx)*.08;const pd=env==='vac'?0:(pressureDiff()*(mod==='hollow'?1:mod==='water'?.7:mod==='drone'?.9:mod==='irr'?.5:.2)+obj.bulge*.1);const tb=Math.abs(obj.vx)*.45+ed*3+(storm?.4:0)+(env==='high'?.1:0)+C1+C2;return{score,dev,com,pres:pd,turb:tb,rho:RHO[env],c1:C1,c2:C2,cdist:CDist};}
+    function drawDrone(x,y,cfg,vib,bulge,rotors,broken,highlight,stressPts,color_main,color_accent,droneId){
         const ctx=cxR,w=48+(cfg.thick-1)*6,shake=vib*(broken?3:1);
-        ctx.save();ctx.translate(x+Math.sin(t*.3)*shake,y+Math.cos(t*.25)*shake);
+        const sx=droneId==='d5'?drones.d5.shakeX:drones.d6.shakeX;
+        const sy=droneId==='d5'?drones.d5.shakeY:drones.d6.shakeY;
+        ctx.save();ctx.translate(x+sx,y+sy);
         const bw=w*(1+bulge*.12),bh=w*.5*(1+bulge*.18);
         if(cfg.thick<1){ctx.strokeStyle=bulge>.3?`rgba(250,204,21,${0.4+bulge*.4})`:`rgba(200,210,220,${0.6+cfg.thick*.2})`;ctx.lineWidth=1.2+cfg.thick;}else{ctx.strokeStyle=color_accent;ctx.lineWidth=2.5;}
         ctx.fillStyle=color_main;
@@ -444,29 +651,30 @@
             if(cfg.motors>=6&&i<2){const ang2=ang+Math.PI/6;const ax2=Math.cos(ang2)*armL*.85,ay2=Math.sin(ang2)*armL*.7*.85;ctx.strokeStyle=color_accent;ctx.lineWidth=cfg.thick*1.5;ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(ax2,ay2);ctx.stroke();ctx.save();ctx.translate(ax2,ay2);ctx.fillStyle='rgba(80,90,100,0.9)';ctx.beginPath();ctx.arc(0,0,2.5,0,Math.PI*2);ctx.fill();const rs2=rotors[(i+4)%rotors.length]||0;ctx.strokeStyle='rgba(200,220,255,0.5)';ctx.lineWidth=1;for(let b=0;b<2;b++){const ba=rs2+b*Math.PI;ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(Math.cos(ba)*7,Math.sin(ba)*7*.6);ctx.stroke();}ctx.restore();}
         }
         if(cfg.motors===1){ctx.fillStyle='rgba(80,90,100,0.9)';ctx.beginPath();ctx.arc(0,-bh-10,3,0,Math.PI*2);ctx.fill();ctx.strokeStyle='rgba(200,220,255,0.6)';ctx.lineWidth=1.5;for(let b=0;b<2;b++){const ba=rotors[0]+b*Math.PI;ctx.beginPath();ctx.moveTo(0,-bh-10);ctx.lineTo(Math.cos(ba)*10,-bh-10+Math.sin(ba)*6);ctx.stroke();}}
+        if(env!=='vac'){const ic=12;for(let i=0;i<ic;i++){const a=Math.PI*2/ic*i+t*.02;const r1=bw*.8+Math.sin(t*.04+i)*3;const px=Math.cos(a)*r1,py=Math.sin(a)*bh*.8;ctx.strokeStyle='rgba(59,130,246,0.3)';ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(px,py);ctx.lineTo(px+Math.cos(a)*8,py+Math.sin(a)*8);ctx.stroke();}if(!broken||cfg.thick>.5){for(let i=0;i<8;i++){const a=Math.PI*2/8*i+t*.025+1;const r2=bw*.5+Math.sin(t*.05+i)*2;const px=Math.cos(a)*r2,py=Math.sin(a)*bh*.4;ctx.strokeStyle='rgba(239,68,68,0.25)';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(px,py);ctx.lineTo(px+Math.cos(a+Math.PI/2)*4,py+Math.sin(a+Math.PI/2)*4);ctx.stroke();}}}
         if(stressPts&&stressPts.length){stressPts.forEach(s=>{ctx.fillStyle=`rgba(248,113,113,${0.3+s.i*.5})`;ctx.beginPath();ctx.arc(s.x,s.y,3+s.i*2,0,Math.PI*2);ctx.fill();if(broken||s.i>.7){ctx.strokeStyle='rgba(248,113,113,0.8)';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(s.x-4,s.y);ctx.lineTo(s.x+4,s.y+2);ctx.moveTo(s.x,s.y-4);ctx.lineTo(s.x+2,s.y+4);ctx.stroke();}});}
         if(bulge>.3){ctx.strokeStyle=`rgba(250,204,21,${(bulge-.3)*1.5})`;ctx.lineWidth=1;ctx.setLineDash([3,3]);ctx.beginPath();ctx.ellipse(0,0,bw+4,bh+4,0,0,Math.PI*2);ctx.stroke();ctx.setLineDash([]);}
         if(broken){ctx.strokeStyle='rgba(248,113,113,0.9)';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(-bw*.3,-bh*.2);ctx.lineTo(bw*.3,bh*.3);ctx.moveTo(bw*.2,-bh*.4);ctx.lineTo(-bw*.4,bh*.4);ctx.stroke();ctx.fillStyle='rgba(248,113,113,0.2)';ctx.beginPath();ctx.ellipse(0,0,bw,bh,0,0,Math.PI*2);ctx.fill();}
         ctx.restore();
     }
     function renderR(){const w=wRw(),h=hR();cxR.clearRect(0,0,w,h);starsR();
-        if(env!=='vac'){const tt=t*.02,ef=envFactor(),str=storm?2.2:1;const cnt=env==='low'?8:4;cxR.strokeStyle=env==='low'?'rgba(34,211,238,0.12)':'rgba(100,150,220,0.08)';cxR.lineWidth=1;for(let i=0;i<cnt;i++){const bx=w/(cnt+1)*(i+1)+Math.sin(tt+i*1.3)*10*str;cxR.beginPath();for(let y=0;y<h;y+=10){cxR.lineTo(bx+Math.sin(y*.02+tt+i)*5*str,y);}cxR.stroke();}cxR.fillStyle=env==='low'?'rgba(34,211,238,0.2)':'rgba(150,180,230,0.15)';for(let i=0;i<(env==='low'?25:10);i++){const px=(i*97+t*(env==='low'?1.5:.5)*str)%w,py=(i*53+t*(Math.sin(i)+1)*.3*str)%h;cxR.beginPath();cxR.arc(px,py,env==='low'?1:.7,0,Math.PI*2);cxR.fill();}}
+        if(env!=='vac'){const tt=t*.02,ef=envFactor(),str=storm?2.2:1;const cnt=env==='low'?8:4;cxR.strokeStyle=env==='low'?'rgba(59,130,246,0.15)':'rgba(100,150,220,0.08)';cxR.lineWidth=1.5;for(let i=0;i<cnt;i++){const bx=w/(cnt+1)*(i+1)+Math.sin(tt+i*1.3)*10*str;cxR.beginPath();for(let y=0;y<h;y+=10){cxR.lineTo(bx+Math.sin(y*.02+tt+i)*6*str,y);}cxR.stroke();}cxR.fillStyle=env==='low'?'rgba(59,130,246,0.2)':'rgba(150,180,230,0.15)';for(let i=0;i<(env==='low'?25:10);i++){const px=(i*97+t*(env==='low'?1.5:.5)*str)%w,py=(i*53+t*(Math.sin(i)+1)*.3*str)%h;cxR.beginPath();cxR.arc(px,py,env==='low'?1:.7,0,Math.PI*2);cxR.fill();}}
         const str=storm?2:1;
         const d5=drones.d5,d6=drones.d6;
         const rotS=env==='vac'?.1:1;
         d5.rotor=d5.rotor.map(r=>r+.3*rotS*(1+str*.3)+(Math.random()-.5)*.1);
         d6.rotor=d6.rotor.map(r=>r+.28*rotS*(1+str*.2)+(Math.random()-.5)*.06);
         let s5,s6;
-        if(env==='vac'){s5=.52+Math.sin(t*.03)*.01;s6=.495+Math.sin(t*.02)*.005;d5.vib=.02;d5.bulge=0;d6.vib=.01;d6.bulge=0;}
-        else if(env==='low'){s5=.65+Math.sin(t*.08)*.02+(storm?.06:0);s6=.50+Math.sin(t*.04)*.01;d5.vib=.5+str*.8;d5.bulge=.15;d6.vib=.1;d6.bulge=.02;}
-        else{s5=.72+Math.sin(t*.1)*.04+(storm?.08:0);s6=.51+Math.sin(t*.05)*.01;d5.vib=.8+str*1.2;d5.bulge=.7+str*.3;d6.vib=.2;d6.bulge=.1;}
+        if(env==='vac'){s5=.52+Math.sin(t*.03)*.01;s6=.495+Math.sin(t*.02)*.005;d5.vib=.02;d5.bulge=0;d6.vib=.01;d6.bulge=0;d5.shakeX=0;d5.shakeY=0;d6.shakeX=0;d6.shakeY=0;}
+        else if(env==='low'){s5=.65+Math.sin(t*.08)*.02+(storm?.06:0)+C1*.05+C2*.03;s6=.50+Math.sin(t*.04)*.01+C1*.01+C2*.005;d5.vib=.5+str*.8+C1+C2;d5.bulge=.15;d6.vib=.1+C1*.2;d6.bulge=.02;d5.shakeX=(Math.random()-.5)*d5.vib*3;d5.shakeY=(Math.random()-.5)*d5.vib*2.5;d6.shakeX=(Math.random()-.5)*d6.vib*1.5;d6.shakeY=(Math.random()-.5)*d6.vib;}
+        else{s5=.72+Math.sin(t*.1)*.04+(storm?.08:0)+C1*.1;s6=.51+Math.sin(t*.05)*.01+C1*.02;d5.vib=.8+str*1.2+C1*2;d5.bulge=.7+str*.3;d6.vib=.2+C1*.5;d6.bulge=.1;d5.shakeX=(Math.random()-.5)*d5.vib*4;d5.shakeY=(Math.random()-.5)*d5.vib*3;d6.shakeX=(Math.random()-.5)*d6.vib*2;d6.shakeY=(Math.random()-.5)*d6.vib*1.5;}
         s5=Math.max(.3,Math.min(.9,s5));s6=Math.max(.4,Math.min(.7,s6));
         const d5br=s5>=TH.F,d6br=s6>=TH.F;
         d5.crack=d5br?1:Math.max(0,d5.crack-.005);d6.crack=d6br?1:Math.max(0,d6.crack-.005);
         const d5stress=[{x:-15,y:-5,i:d5.vib*.3},{x:15,y:-5,i:d5.vib*.3},{x:0,y:10,i:d5.bulge*.6}];
         const d6stress=d6.vib>.4?[{x:0,y:5,i:d6.vib*.2}]:[];
-        drawDrone(d5.x,d5.y,d5.cfg,d5.vib,d5.bulge,d5.rotor,d5br,false,d5stress,'rgba(248,113,113,0.3)','rgba(248,113,113,0.7)');
-        drawDrone(d6.x,d6.y,d6.cfg,d6.vib,d6.bulge,d6.rotor,d6br,true,d6stress,'rgba(74,222,128,0.25)','rgba(74,222,128,0.75)');
+        drawDrone(d5.x,d5.y,d5.cfg,d5.vib,d5.bulge,d5.rotor,d5br,false,d5stress,'rgba(248,113,113,0.3)','rgba(248,113,113,0.7)','d5');
+        drawDrone(d6.x,d6.y,d6.cfg,d6.vib,d6.bulge,d6.rotor,d6br,true,d6stress,'rgba(74,222,128,0.25)','rgba(74,222,128,0.75)','d6');
         cxR.font='10px SF Mono,monospace';cxR.fillStyle='rgba(255,255,255,0.25)';
         const elbl=document.getElementById('envTagR');elbl.textContent=env==='vac'?'真空':env==='low'?'低空稠密':'高空稀薄';
         elbl.className='c-h';
@@ -480,36 +688,49 @@
         if(env!=='vac'&&env==='high'){cxR.fillStyle='rgba(200,220,255,0.3)';for(let i=0;i<20;i++){const sx=Math.random()*w,sy=Math.random()*h;cxR.beginPath();cxR.moveTo(sx,sy);cxR.lineTo(sx+3,sy-3);cxR.lineTo(sx+6,sy);cxR.lineTo(sx+4,sy+2);cxR.lineTo(sx+2,sy+2);cxR.closePath();cxR.fill();}}
     }
     function upd(L){
-        const score=L.score,dev=L.dev,com=L.com,pres=L.pres,turb=L.turb,rho=L.rho;
+        const score=L.score,dev=L.dev,com=L.com,pres=L.pres,turb=L.turb,rho=L.rho,c1=L.c1,c2=L.c2,cdist=L.cdist;
         const vs=document.getElementById('vScore'),vc=document.getElementById('vCoM'),vp=document.getElementById('vPres'),vr=document.getElementById('vRho');
+        const vc1=document.getElementById('vC1'),vc2=document.getElementById('vC2'),vcd=document.getElementById('vCDist');
         const bs=document.getElementById('bScore'),bc=document.getElementById('bCoM'),bp=document.getElementById('bPres'),br=document.getElementById('bRho');
+        const bc1=document.getElementById('bC1'),bc2=document.getElementById('bC2'),bcd=document.getElementById('bCDist');
         const dcs=document.getElementById('dcScore'),dcc=document.getElementById('dcCoM'),dcp=document.getElementById('dcPres'),dcr=document.getElementById('dcRho');
+        const dcc1=document.getElementById('dcC1'),dcc2=document.getElementById('dcC2'),dccd=document.getElementById('dcCDist');
         const sj=document.getElementById('status'),st=document.getElementById('stxt'),hi=document.getElementById('hIndL');
         vs.textContent=score.toFixed(3);vc.textContent=com.toFixed(3);vp.textContent=pres.toFixed(2);
         vr.innerHTML=rho.toFixed(3)+'<span class="du">kg/m³</span>';
+        vc1.textContent=c1.toFixed(3);vc2.textContent=c2.toFixed(3);vcd.textContent=cdist.toFixed(3);
         bs.style.width=Math.min(100,Math.max(0,((score-.3)/.6)*100))+'%';
         bc.style.width=Math.min(100,com*120)+'%';
         bp.style.width=Math.min(100,pres*90)+'%';
         br.style.width=Math.min(100,(rho/1.225)*100)+'%';
-        [dcs,dcc,dcp,dcr].forEach(x=>x.classList.remove('g','y','r','c','o'));
+        bc1.style.width=Math.min(100,c1*150)+'%';
+        bc2.style.width=Math.min(100,c2*200)+'%';
+        bcd.style.width=Math.min(100,cdist*120)+'%';
+        [dcs,dcc,dcp,dcr,dcc1,dcc2,dccd].forEach(x=>x.classList.remove('g','y','r','c','o','p'));
         const envName=env==='vac'?'真空':env==='low'?'低空稠密':'高空稀薄';
-        if(score>=TH.F){dcs.classList.add('r');bs.style.background='#f87171';sj.className='status danger';sj.innerHTML='<span class="si">🚨</span><span>熔断告警：稳态突破0.68红线！'+(env==='high'?'高空压差下薄壁结构鼓胀失稳，':'气流扰动下')+'结构严重失稳，触发系统熔断</span>';}
-        else if(score>TH.S+TH.E+.04){dcs.classList.add('y');bs.style.background='#facc15';sj.className='status warn';let warnTxt='波动预警：';if(mod==='water')warnTxt+='液态介质晃动致重心持续偏移，临近熔断边缘';else if(mod==='hollow'&&env==='high')warnTxt+='高空压差致薄壁空心结构鼓胀形变，结构刚度下降';else if(mod==='irr')warnTxt+='异形轮廓迎风面不均，压差震荡轨迹紊乱';else warnTxt+='气流扰动导致轨迹抖动，抗扰动能力不足';sj.innerHTML='<span class="si">⚠</span><span>'+warnTxt+'</span>';}
-        else if(dev<=TH.E){dcs.classList.add('g');bs.style.background='#4ade80';sj.className='status safe';sj.innerHTML='<span class="si">✓</span><span>'+(env==='vac'?'极致稳态：真空匀加速自由落体，误差＜±0.02，完美收敛0.5中轴线':envName+'环境下对称结构受力均衡，扰动控制在允许范围内')+'</span>';}
+        if(score>=TH.F){dcs.classList.add('r');bs.style.background='#f87171';sj.className='status danger';sj.innerHTML='<span class="si">🚨</span><span>熔断告警：稳态突破0.68红线！'+(mod==='drone'?'无人机双层腔体C₁+C₂博弈震荡，':env==='high'?'高空压差下薄壁结构鼓胀失稳，':'气流扰动下')+'结构严重失稳，触发系统熔断</span>';}
+        else if(score>TH.S+TH.E+.04){dcs.classList.add('y');bs.style.background='#facc15';sj.className='status warn';let warnTxt='波动预警：';if(mod==='ideal'&&env==='vac')warnTxt+='理想基准稳态';else if(mod==='water')warnTxt+='液态介质晃动+C₂内层阻尼波动致重心持续偏移，临近熔断边缘';else if(mod==='drone')warnTxt+='无人机双层腔体：外层C₁乱流挤压+内层C₂热风顶压博弈震荡，抖动偏移加剧';else if(mod==='hollow'&&env==='high')warnTxt+='高空压差致薄壁空心结构鼓胀形变，结构刚度下降';else if(mod==='irr')warnTxt+='异形轮廓迎风面不均+C₁外层阻尼剧烈，压差震荡轨迹紊乱';else warnTxt+='C₁+C₂双层阻尼扰动导致轨迹抖动，抗扰动能力不足';sj.innerHTML='<span class="si">⚠</span><span>'+warnTxt+'</span>';}
+        else if(dev<=TH.E){dcs.classList.add('g');bs.style.background='#4ade80';sj.className='status safe';sj.innerHTML='<span class="si">✓</span><span>'+(mod==='ideal'?'🍎 极致稳态：微观牛顿苹果理想基准，绝对对称实心均质，完美匀加速收敛0.5中轴线，全绿色':env==='vac'?'极致稳态：真空匀加速自由落体，误差＜±0.02，完美收敛0.5中轴线':envName+'环境下对称结构受力均衡，C₁+C₂扰动控制在允许范围内')+'</span>';}
         else{dcs.classList.add('y');bs.style.background='#facc15';sj.className='status warn';sj.innerHTML='<span class="si">⚠</span><span>波动预警：存在小幅偏差，结构对称性待优化</span>';}
         dcc.classList.add(com>.3?'r':com>.1?'y':'g');
         dcp.classList.add(pres>.4?'r':pres>.15?'y':'g');
         dcr.classList.add(env==='high'?'o':env==='low'?'c':'g');
+        dcc1.classList.add(c1>.4?'c':c1>.2?'c':'g');
+        dcc2.classList.add(c2>.3?'r':c2>.15?'p':'g');
+        dccd.classList.add(cdist>.3?'r':cdist>.15?'y':'g');
         bc.style.background=com>.3?'#f87171':com>.1?'#facc15':'#4ade80';
         bp.style.background=pres>.4?'#f87171':pres>.15?'#facc15':'#4ade80';
         br.style.background=env==='high'?'#fb923c':env==='low'?'#22d3ee':'#4ade80';
-        if(obj){hi.textContent='高度: '+Math.max(0,Math.round((1-obj.y/(hL()-50))*(env==='high'?10000:1000)))+'m';}
+        bc1.style.background='#3b82f6';
+        bc2.style.background=c2>.3?'#ef4444':'#c4b5fd';
+        bcd.style.background=cdist>.3?'#f87171':cdist>.15?'#facc15':'#4ade80';
+        if(obj){hi.textContent='高度: '+Math.max(0,Math.round((1-obj.y/(hL()-50))*(env==='high'?10000:500)))+'m';}
     }
     function applyShake(){if(!storm)return;if(stormT%6===0){wL.classList.add('shake');wR.classList.add('shake');setTimeout(()=>{wL.classList.remove('shake');wR.classList.remove('shake');},350);}}
-    function render(){cxL.clearRect(0,0,wLw(),hL());cxR.clearRect(0,0,wRw(),hR());wL.classList.toggle('vac',env==='vac');wL.classList.toggle('low',env==='low');wL.classList.toggle('high',env==='high');wR.classList.toggle('vac',env==='vac');wR.classList.toggle('low',env==='low');wR.classList.toggle('high',env==='high');starsL();layersL();convL();pstepL();groundL();dtrailL();pvecsL();dobjL();renderR();}
-    function loop(){if(!pause&&run)physL();if(!pause){const L=calcL();upd(L);applyShake();}t++;if(storm){stormT++;if(stormT>180){storm=false;stormT=0;document.getElementById('btnStorm').classList.remove('active');document.getElementById('btnStorm').textContent='🌪️ 极端大风扰动';}}render();aid=requestAnimationFrame(loop);}
+    function render(){cxL.clearRect(0,0,wLw(),hL());cxR.clearRect(0,0,wRw(),hR());wL.classList.toggle('vac',env==='vac');wL.classList.toggle('low',env==='low');wL.classList.toggle('high',env==='high');wR.classList.toggle('vac',env==='vac');wR.classList.toggle('low',env==='low');wR.classList.toggle('high',env==='high');starsL();layersL();convL();pstepL();groundL();dtrailL();pvecsL();dobjL();innerConvL();renderR();}
+    function loop(){if(!pause&&run)physL();calcDamping();if(!pause){const L=calcL();upd(L);applyShake();}t++;if(storm){stormT++;if(stormT>180){storm=false;stormT=0;document.getElementById('btnStorm').classList.remove('active');document.getElementById('btnStorm').textContent='🌪️ 极端大风扰动';}}render();aid=requestAnimationFrame(loop);}
     window.setEnv=function(e){env=e;document.querySelectorAll('.env-btn').forEach(b=>{b.classList.toggle('on',b.dataset.e===e);b.classList.toggle('vac',e==='vac'&&b.dataset.e==='vac');b.classList.toggle('high',e==='high'&&b.dataset.e==='high');});const tg=ENV_TAG[e];['envLblL','envLblR'].forEach(id=>{const el=document.getElementById(id);el.className='c-label '+tg.cls;el.textContent=tg.txt+(id==='envLblR'?' 对照':'');});initP();if(!run){initO();}if(env==='vac'){if(obj){obj.vx*=.3;obj.vy*=.8;}}};
-    window.setMod=function(m){mod=m;document.querySelectorAll('.mod-btn').forEach(b=>b.classList.toggle('on',b.dataset.m===m));document.querySelectorAll('.grp').forEach(g=>g.classList.remove('on'));document.querySelectorAll('.grp').forEach(g=>{if(g.onclick){const txt=g.querySelector('.t').textContent;const keyMap={'实心':'solid','空心':'hollow','半注水':'water','不规则':'irr'};for(const k in keyMap){if(txt.indexOf(k)>=0&&m===keyMap[k])g.classList.add('on');}}});initO();};
+    window.setMod=function(m){mod=m;document.querySelectorAll('.mod-btn').forEach(b=>b.classList.toggle('on',b.dataset.m===m));document.querySelectorAll('.grp').forEach(g=>g.classList.remove('on'));document.querySelectorAll('.grp').forEach(g=>{if(g.onclick){const txt=g.querySelector('.t').textContent;const keyMap={'牛顿':'ideal','实心':'solid','空心':'hollow','半注水':'water','不规则':'irr','无人机腔体':'drone'};for(const k in keyMap){if(txt.indexOf(k)>=0&&m===keyMap[k])g.classList.add('on');}}});initO();};
     window.startSim=function(){initO();initDrones();run=true;pause=false;document.getElementById('btnGo').textContent='▶ 重新下落';document.getElementById('btnPause').textContent='⏸ 暂停';};
     window.togglePause=function(){pause=!pause;document.getElementById('btnPause').textContent=pause?'▶ 继续':'⏸ 暂停';};
     window.resetSim=function(){run=false;pause=false;storm=false;stormT=0;initO();initDrones();document.getElementById('btnGo').textContent='▶ 开始下落';document.getElementById('btnPause').textContent='⏸ 暂停';document.getElementById('btnStorm').classList.remove('active');document.getElementById('btnStorm').textContent='🌪️ 极端大风扰动';};
