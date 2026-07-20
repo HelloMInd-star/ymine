@@ -32,7 +32,13 @@
         }
 
         /* ===== 主容器 ===== */
+        body {
+            padding: 24px 20px;
+        }
         .container {
+            max-width: 1000px;
+            width: 100%;
+            margin: 0 auto;
             padding: 48px 48px 40px;
         }
 
@@ -1071,12 +1077,14 @@
 
         /* 响应式 */
         @media (max-width: 900px) {
+            body { padding: 12px 10px; }
             .space-switcher { grid-template-columns: repeat(2,1fr); }
             .perturb-grid { grid-template-columns: 1fr; }
             .output-grid { grid-template-columns: 1fr; }
             .version-plate { position: static; display: inline-block; margin-bottom: 12px; }
         }
         @media (max-width: 600px) {
+            body { padding: 8px 6px; }
             .space-switcher { grid-template-columns: 1fr 1fr; }
             .space-params { grid-template-columns: 1fr; }
             .new-section { padding: 16px 14px; }
@@ -1438,10 +1446,10 @@
         </div>
 
         <!-- ============================================================ -->
-        <!-- ===== 思考链路 ===== -->
+        <!-- ===== 博弈链路 ===== -->
         <!-- ============================================================ -->
         <div class="block-support" id="block-chain">
-            <div class="s-title">🧠 思考链路 <span class="tag">完整推导逻辑</span></div>
+            <div class="s-title">🔗 博弈链路 <span class="tag">完整推导逻辑</span></div>
 
             <p><strong>画圈实验对应人脑决策神经校准机制</strong>：每一次闭环画圈，都是对预期值与实际反馈的持续校正，构成结构化决策底层基础。</p>
             <p><strong>博弈论本质</strong>：资源具备稀缺属性进而产生市场竞争，竞争的底层运行逻辑即为博弈。</p>
@@ -1592,10 +1600,10 @@
         </div>
 
         <!-- ============================================================ -->
-        <!-- ===== 系统关系 ===== -->
+        <!-- ===== Game-OS 系统内部层级关系 ===== -->
         <!-- ============================================================ -->
         <div class="block-support" id="block-relation">
-            <div class="s-title">🔗 与全栖系统的层级关系 <span class="tag">底座层级</span></div>
+            <div class="s-title">🏛️ Game-OS 系统内部层级关系 <span class="tag">底座层级</span></div>
             <p><strong>GameMind</strong> 是 EvolveMind 认知系统、MoodMind 估值系统的上层博弈决策层。</p>
             <ul>
                 <li><strong>EvolveMind</strong>：负责认知逻辑升级，解决思考方法论问题</li>
@@ -2201,7 +2209,8 @@
 
                 function resize() {
                     const rect = wrap.getBoundingClientRect();
-                    W = canvas.width = Math.floor(rect.width - 32);
+                    const w = Math.floor(rect.width - 32);
+                    W = canvas.width = (w > 50 ? w : 800);
                     H = canvas.height = 360;
                 }
 
@@ -2524,7 +2533,7 @@
                     }
                 }
 
-                const maxDist = Math.min(w,h)*0.42;
+                const maxDist = Math.max(Math.min(w,h)*0.42, 1);
                 state.vertices.forEach((v,i)=>{
                     const dist = Math.hypot(v.x-cx, v.y-cy);
                     const offset = dist / maxDist;
@@ -2553,11 +2562,12 @@
                     polyCtx.fillText(state.vertexNames[i]||('V'+(i+1)), lx, ly);
                 });
 
-                const avgOffset = state.vertices.reduce((s,v)=>{
+                const totalOff = state.vertices.reduce((s,v)=>{
                     return s + Math.hypot(v.x-cx,v.y-cy);
-                },0) / n / maxDist;
-                const newSynth = clamp(0.4 + avgOffset*0.4 + state.c1*0.15 + state.c2*0.15, 0, 1);
-                state.synth = lerp(state.synth, newSynth, 0.1);
+                },0);
+                const avgOffset = (n>0 && maxDist>0) ? (totalOff / n / maxDist) : 0;
+                const newSynth = clamp(0.4 + (isNaN(avgOffset)?0:avgOffset)*0.4 + state.c1*0.15 + state.c2*0.15, 0, 1);
+                state.synth = lerp(isNaN(state.synth)?0.52:state.synth, newSynth, 0.1);
                 updateOutput();
             }
             function initPolygon() {
@@ -2570,7 +2580,8 @@
 
                 function resize() {
                     const rect = wrap.getBoundingClientRect();
-                    polyW = polyCanvas.width = Math.floor(rect.width);
+                    const w = Math.floor(rect.width) || 800;
+                    polyW = polyCanvas.width = w;
                     polyH = polyCanvas.height = 400;
                 }
                 resize();
@@ -2739,6 +2750,7 @@
 
             // ===== 第四层：双层扰动更新 =====
             function updatePerturb() {
+                if (isNaN(state.synth) || !isFinite(state.synth)) state.synth = 0.52;
                 // PID双环制衡：合成值 = C1*0.4 + C2*0.3 + 顶点偏移*0.3，然后PID纠偏
                 const Kp = 0.5, Ki = 0.05, Kd = 0.1;
                 let integral = gmLS('gmv_integral',0);
