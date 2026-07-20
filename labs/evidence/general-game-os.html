@@ -1,0 +1,1500 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Y.Mine · 低空经济 · 完整架构</title>
+    <link rel="stylesheet" href="../../assets/css/base.css">
+    <script src="../../assets/js/bus.js"></script>
+    <script src="../../assets/js/sidebar.js"></script>
+    <style>
+        .container {
+            max-width: 1100px;
+            width: 100%;
+            background: radial-gradient(ellipse at 30% 30%, #120b24, #0b0b1a 70%, #05030a);
+            border-radius: 32px;
+            padding: 40px 44px 32px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            box-shadow: 0 30px 80px rgba(40, 10, 80, 0.4);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        /* ===== 头部 ===== */
+        .header {
+            text-align: center;
+            margin-bottom: 12px;
+            opacity: 0;
+            animation: fadeInUp 0.8s ease forwards;
+        }
+        .badge {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            color: rgba(255, 255, 255, 0.2);
+            font-size: 11px;
+            font-weight: 600;
+            padding: 2px 14px;
+            border-radius: 20px;
+            letter-spacing: 0.3px;
+            margin-bottom: 6px;
+        }
+        .header h1 {
+            font-size: 30px;
+            font-weight: 700;
+            color: #f1f5f9;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #f1f5f9, #a78bfa, #60a5fa);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradientFlow 6s ease-in-out infinite;
+        }
+        .header .sub {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.25);
+            font-weight: 300;
+            margin-top: 2px;
+        }
+
+        .back-link {
+            text-align: center;
+            margin-top: 24px;
+            padding-top: 14px;
+            border-top: 1px solid rgba(255, 255, 255, 0.03);
+        }
+        .back-link a {
+            color: rgba(255, 255, 255, 0.2);
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s ease;
+        }
+        .back-link a:hover {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* ===== 架构概览 ===== */
+        .arch-overview {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+            gap: 6px;
+            margin-bottom: 20px;
+            opacity: 0;
+            animation: fadeInUp 0.6s ease 0.05s forwards;
+        }
+        .arch-item {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 10px;
+            padding: 8px 10px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .arch-item:hover {
+            border-color: rgba(167, 139, 250, 0.1);
+            background: rgba(167, 139, 250, 0.02);
+        }
+        .arch-item.active {
+            border-color: rgba(167, 139, 250, 0.15);
+            background: rgba(167, 139, 250, 0.04);
+        }
+        .arch-item .ai-icon {
+            font-size: 18px;
+        }
+        .arch-item .ai-label {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.2);
+            margin-top: 1px;
+            font-weight: 500;
+        }
+
+        /* ===== 内容区域 ===== */
+        .content-area {
+            min-height: 520px;
+            position: relative;
+        }
+
+        .module-panel {
+            display: none;
+            animation: fadeInUp 0.4s ease forwards;
+        }
+        .module-panel.active {
+            display: block;
+        }
+
+        /* ============================================================ */
+        /* ===== 各模块共用样式 ===== */
+        /* ============================================================ */
+        .module-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 2px;
+        }
+        .module-title span {
+            color: #a78bfa;
+        }
+        .module-sub {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.2);
+            margin-bottom: 12px;
+        }
+
+        .mini-grid-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+        .mini-grid-3 .card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 10px;
+            padding: 10px 12px;
+            text-align: center;
+        }
+        .mini-grid-3 .card .icon {
+            font-size: 20px;
+        }
+        .mini-grid-3 .card .label {
+            font-size: 12px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.4);
+            margin-top: 2px;
+        }
+        .mini-grid-3 .card .value {
+            font-size: 14px;
+            font-weight: 600;
+            color: #a78bfa;
+            margin-top: 1px;
+        }
+        .mini-grid-3 .card .desc {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.12);
+            margin-top: 1px;
+        }
+
+        .mini-canvas-wrap {
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 12px;
+            padding: 8px;
+            margin-bottom: 10px;
+            min-height: 200px;
+        }
+        .mini-canvas-wrap canvas {
+            display: block;
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.01);
+            min-height: 180px;
+        }
+
+        .mini-controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 8px 14px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 10px;
+            padding: 10px 14px;
+            margin-bottom: 10px;
+        }
+        .mini-controls .ctrl {
+            display: flex;
+            flex-direction: column;
+            gap: 1px;
+        }
+        .mini-controls .ctrl label {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.25);
+            display: flex;
+            justify-content: space-between;
+        }
+        .mini-controls .ctrl label span {
+            color: #a78bfa;
+            font-weight: 500;
+        }
+        .mini-controls .ctrl input[type="range"] {
+            width: 100%;
+            accent-color: #a78bfa;
+            background: rgba(255, 255, 255, 0.06);
+            height: 3px;
+            border-radius: 4px;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+        .mini-controls .ctrl input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #a78bfa;
+            cursor: pointer;
+        }
+
+        .mini-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+        .mini-stats .s-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 8px;
+            padding: 6px 10px;
+            text-align: center;
+        }
+        .mini-stats .s-card .s-label {
+            font-size: 9px;
+            color: rgba(255, 255, 255, 0.12);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        .mini-stats .s-card .s-value {
+            font-size: 16px;
+            font-weight: 700;
+            margin-top: 1px;
+        }
+        .mini-stats .s-card .s-sub {
+            font-size: 9px;
+            color: rgba(255, 255, 255, 0.1);
+            margin-top: 1px;
+        }
+
+        .mini-mapping {
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 10px;
+            padding: 10px 14px;
+        }
+        .mini-mapping .mm-title {
+            font-size: 11px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.2);
+            margin-bottom: 6px;
+        }
+        .mini-mapping .mm-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 2px 12px;
+        }
+        .mini-mapping .mm-grid .mm-item {
+            display: flex;
+            justify-content: space-between;
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.2);
+            padding: 2px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+        }
+        .mini-mapping .mm-grid .mm-item .to {
+            color: #a78bfa;
+        }
+
+        /* ===== 响应式 ===== */
+        @media (max-width: 900px) {
+            body {
+                padding: 12px;
+            }
+            .container {
+                padding: 20px 16px 16px;
+                border-radius: 16px;
+            }
+            .header h1 {
+                font-size: 24px;
+            }
+            .arch-overview {
+                grid-template-columns: 1fr 1fr 1fr;
+            }
+            .mini-grid-3 {
+                grid-template-columns: 1fr 1fr;
+            }
+            .mini-stats {
+                grid-template-columns: 1fr 1fr;
+            }
+            .mini-controls {
+                grid-template-columns: 1fr 1fr;
+            }
+            .mini-mapping .mm-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 14px 10px 12px;
+            }
+            .header h1 {
+                font-size: 20px;
+            }
+            .arch-overview {
+                grid-template-columns: 1fr 1fr;
+                gap: 4px;
+            }
+            .arch-item .ai-label {
+                font-size: 8px;
+            }
+            .mini-grid-3 {
+                grid-template-columns: 1fr;
+            }
+            .mini-controls {
+                grid-template-columns: 1fr;
+            }
+            .mini-stats {
+                grid-template-columns: 1fr 1fr;
+            }
+            .mini-mapping .mm-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body class="layout-fixed">
+
+    <div id="glow"></div>
+    <div class="sidebar"></div>
+
+    <div class="container">
+
+        <!-- ===== 头部 ===== -->
+        <div class="header">
+            <div class="badge">🏗️ 底层操作系统</div>
+            <h1>低空经济 · 完整架构</h1>
+            <div class="sub">博弈底座 · 低空经济 · 精算映射 · 物流底座 · 算力底座</div>
+        </div>
+
+        <!-- ===== 架构概览 ===== -->
+        <div class="arch-overview" id="archOverview">
+            <div class="arch-item active" data-panel="panel-game">
+                <div class="ai-icon">🧠</div>
+                <div class="ai-label">博弈底座</div>
+            </div>
+            <div class="arch-item" data-panel="panel-lowair">
+                <div class="ai-icon">🚁</div>
+                <div class="ai-label">低空经济</div>
+            </div>
+            <div class="arch-item" data-panel="panel-actuary">
+                <div class="ai-icon">📐</div>
+                <div class="ai-label">精算映射</div>
+            </div>
+            <div class="arch-item" data-panel="panel-logistics">
+                <div class="ai-icon">🏗️</div>
+                <div class="ai-label">物流底座</div>
+            </div>
+            <div class="arch-item" data-panel="panel-compute">
+                <div class="ai-icon">⚡</div>
+                <div class="ai-label">算力底座</div>
+            </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- ===== 内容区域（五大模块占位） ===== -->
+        <!-- ============================================================ -->
+        <div class="content-area" id="contentArea">
+
+            <!-- ====== 模块1：博弈底座 ====== -->
+            <div class="module-panel active" id="panel-game">
+                <div class="module-title">🧠 博弈底座 · <span>画圈实验</span></div>
+                <div class="module-sub">需求 → 供给 → 政策 · 动态均衡框架</div>
+                <div class="mini-grid-3">
+                    <div class="card"><div class="icon">📐</div><div class="label">凯利公式</div><div class="value" id="gameKelly">f* = 0%</div><div class="desc">最优投入比例</div></div>
+                    <div class="card"><div class="icon">⚖️</div><div class="label">二八管控</div><div class="value" id="gameRatio">80% / 20%</div><div class="desc">自动 / 人工</div></div>
+                    <div class="card"><div class="icon">🔄</div><div class="label">三圈演化</div><div class="value" id="gamePhase">研发 → 应用 → 经济</div><div class="desc">收束 → 放大 → 放大</div></div>
+                </div>
+                <div class="mini-canvas-wrap">
+                    <canvas id="canvasGame" width="800" height="200"></canvas>
+                </div>
+                <div class="mini-controls">
+                    <div class="ctrl"><label>胜率 p <span id="gameP">0.50</span></label><input type="range" id="gamePInput" min="0.01" max="0.99" step="0.01" value="0.50" /></div>
+                    <div class="ctrl"><label>赔率 b <span id="gameB">2.00</span></label><input type="range" id="gameBInput" min="0.50" max="10.0" step="0.10" value="2.00" /></div>
+                    <div class="ctrl"><label>演化 <span id="gameTimeLabel">0.00</span></label><input type="range" id="gameTimeInput" min="0" max="100" step="1" value="0" /></div>
+                    <div class="ctrl"><label>协调度 <span id="gameSyncLabel">50%</span></label><input type="range" id="gameSyncInput" min="0" max="100" step="1" value="50" /></div>
+                </div>
+                <div class="mini-mapping">
+                    <div class="mm-title">🔗 核心映射</div>
+                    <div class="mm-grid">
+                        <div class="mm-item"><span>画圈</span><span class="to">→ 决策结构</span></div>
+                        <div class="mm-item"><span>半径</span><span class="to">→ 供给</span></div>
+                        <div class="mm-item"><span>速度</span><span class="to">→ 需求</span></div>
+                        <div class="mm-item"><span>方向</span><span class="to">→ 政策</span></div>
+                        <div class="mm-item"><span>稳态接近</span><span class="to">→ 人机协调</span></div>
+                        <div class="mm-item"><span>收敛/发散</span><span class="to">→ 博弈边界</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ====== 模块2：低空经济 ====== -->
+            <div class="module-panel" id="panel-lowair">
+                <div class="module-title">🚁 低空经济 · <span>三方博弈</span></div>
+                <div class="module-sub">政府 · 用户 · 厂商 · 动态均衡</div>
+                <div class="mini-grid-3">
+                    <div class="card"><div class="icon">🏛️</div><div class="label">政府</div><div class="value" style="color:#a78bfa;">斜率 0.5</div><div class="desc">规则制定者</div></div>
+                    <div class="card"><div class="icon">🧑‍🤝‍🧑</div><div class="label">用户</div><div class="value" style="color:#facc15;">0.5 – 1.0</div><div class="desc">购买 / 投资</div></div>
+                    <div class="card"><div class="icon">🏭</div><div class="label">厂商</div><div class="value" style="color:#34d399;">0 – 0.5</div><div class="desc">研发 · 报废 · 能耗</div></div>
+                </div>
+                <div class="mini-canvas-wrap">
+                    <canvas id="canvasLowair" width="800" height="200"></canvas>
+                </div>
+                <div class="mini-controls">
+                    <div class="ctrl"><label>用户购买力 <span id="lowUser">0.50</span></label><input type="range" id="lowUserInput" min="0.0" max="1.0" step="0.01" value="0.50" /></div>
+                    <div class="ctrl"><label>厂商研发 <span id="lowRnd">0.50</span></label><input type="range" id="lowRndInput" min="0.0" max="1.0" step="0.01" value="0.50" /></div>
+                    <div class="ctrl"><label>政府监管 <span id="lowGov">0.50</span></label><input type="range" id="lowGovInput" min="0.0" max="1.0" step="0.01" value="0.50" /></div>
+                    <div class="ctrl"><label>市场热度 <span id="lowHeat">0.50</span></label><input type="range" id="lowHeatInput" min="0.0" max="1.0" step="0.01" value="0.50" /></div>
+                </div>
+                <div class="mini-stats">
+                    <div class="s-card"><div class="s-label">均衡状态</div><div class="s-value" style="color:#22c55e;" id="lowState">⚖️ 稳态</div><div class="s-sub" id="lowStateSub">三方协调</div></div>
+                    <div class="s-card"><div class="s-label">凯利比率</div><div class="s-value" style="color:#a78bfa;" id="lowKelly">35%</div><div class="s-sub">最优投入</div></div>
+                    <div class="s-card"><div class="s-label">竞争强度</div><div class="s-value" style="color:#facc15;" id="lowComp">中</div><div class="s-sub" id="lowCompSub">红海逼近</div></div>
+                    <div class="s-card"><div class="s-label">产业阶段</div><div class="s-value" style="color:#22d3ee;" id="lowPhase">成长期</div><div class="s-sub" id="lowPhaseSub">应用放大中</div></div>
+                </div>
+            </div>
+
+            <!-- ====== 模块3：精算映射 ====== -->
+            <div class="module-panel" id="panel-actuary">
+                <div class="module-title">📐 精算映射 · <span>保险 ↔ 博弈量化</span></div>
+                <div class="module-sub">保费 · 赔付率 · 准备金 · 退保率 · 投资收益</div>
+                <div class="mini-grid-3">
+                    <div class="card"><div class="icon">💰</div><div class="label">保费</div><div class="value" style="color:#a78bfa;">↔ 研发成本</div><div class="desc">进入市场的固定投入</div></div>
+                    <div class="card"><div class="icon">📊</div><div class="label">赔付率</div><div class="value" style="color:#facc15;">↔ 报废率</div><div class="desc">投入的损耗比例</div></div>
+                    <div class="card"><div class="icon">🏛️</div><div class="label">准备金</div><div class="value" style="color:#34d399;">↔ 政府资源</div><div class="desc">安全垫 · 规则制定</div></div>
+                </div>
+                <div class="mini-canvas-wrap">
+                    <canvas id="canvasActuary" width="800" height="200"></canvas>
+                </div>
+                <div class="mini-controls">
+                    <div class="ctrl"><label>退保率 <span id="actLapse">5.2%</span></label><input type="range" id="actLapseInput" min="0" max="20" step="0.1" value="5.2" /></div>
+                    <div class="ctrl"><label>收益率 <span id="actRoi">4.5%</span></label><input type="range" id="actRoiInput" min="0" max="10" step="0.1" value="4.5" /></div>
+                    <div class="ctrl"><label>赔付率 <span id="actLoss">65%</span></label><input type="range" id="actLossInput" min="40" max="80" step="0.5" value="65" /></div>
+                    <div class="ctrl"><label>精算感应 <span id="actSync">50%</span></label><input type="range" id="actSyncInput" min="0" max="100" step="1" value="50" /></div>
+                </div>
+                <div class="mini-stats">
+                    <div class="s-card"><div class="s-label">财务杠杆</div><div class="s-value" style="color:#facc15;" id="actLeverage">8.65</div><div class="s-sub">1/退保率 × 收益率</div></div>
+                    <div class="s-card"><div class="s-label">保单寿命</div><div class="s-value" style="color:#34d399;" id="actLife">19.2年</div><div class="s-sub">= 1 / 退保率</div></div>
+                    <div class="s-card"><div class="s-label">保险价值</div><div class="s-value" style="color:#22d3ee;" id="actValue">1.00</div><div class="s-sub">基线 × 放大</div></div>
+                    <div class="s-card"><div class="s-label">稳态接近</div><div class="s-value" style="color:#a78bfa;" id="actSyncDisplay">50%</div><div class="s-sub">精算师 ↔ 模型</div></div>
+                </div>
+            </div>
+
+            <!-- ====== 模块4：物流底座 ====== -->
+            <div class="module-panel" id="panel-logistics">
+                <div class="module-title">🏗️ 物流底座 · <span>运力网络调度</span></div>
+                <div class="module-sub">运力 · 订单 · 成本 · 时效 · 风险 · 调度</div>
+                <div class="mini-grid-3">
+                    <div class="card"><div class="icon">🚁</div><div class="label">运力规模</div><div class="value" id="logFleet">47</div><div class="desc">可用节点</div></div>
+                    <div class="card"><div class="icon">📦</div><div class="label">履约率</div><div class="value" style="color:#a78bfa;" id="logFulfill">98.1%</div><div class="desc">24h滚动</div></div>
+                    <div class="card"><div class="icon">⏱️</div><div class="label">平均时效</div><div class="value" style="color:#22d3ee;" id="logTime">28min</div><div class="desc">配送承诺</div></div>
+                </div>
+                <div class="mini-canvas-wrap">
+                    <canvas id="canvasLogistics" width="800" height="200"></canvas>
+                </div>
+                <div class="mini-controls">
+                    <div class="ctrl"><label>运力 <span id="logFleetLabel">47</span></label><input type="range" id="logFleetInput" min="20" max="80" step="1" value="47" /></div>
+                    <div class="ctrl"><label>订单密度 <span id="logOrderLabel">2.3k</span></label><input type="range" id="logOrderInput" min="0.5" max="4.0" step="0.1" value="2.3" /></div>
+                    <div class="ctrl"><label>时效压力 <span id="logTimeLabel">1.00</span></label><input type="range" id="logTimeInput" min="0.5" max="2.0" step="0.05" value="1.0" /></div>
+                    <div class="ctrl"><label>风险等级 <span id="logRiskLabel">50%</span></label><input type="range" id="logRiskInput" min="0" max="100" step="1" value="50" /></div>
+                </div>
+                <div class="mini-mapping">
+                    <div class="mm-title">🔗 博弈映射 · 物流 ↔ 低空经济</div>
+                    <div class="mm-grid">
+                        <div class="mm-item"><span>配送需求</span><span class="to">→ 航线分配</span></div>
+                        <div class="mm-item"><span>履约成本</span><span class="to">→ 研发成本</span></div>
+                        <div class="mm-item"><span>履约时效</span><span class="to">→ 速度/能耗</span></div>
+                        <div class="mm-item"><span>运输风险</span><span class="to">→ 空域冲突</span></div>
+                        <div class="mm-item"><span>网络密度</span><span class="to">→ 政府资源</span></div>
+                        <div class="mm-item"><span>规模效应</span><span class="to">→ 经济放大</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ====== 模块5：算力底座 ====== -->
+            <div class="module-panel" id="panel-compute">
+                <div class="module-title">⚡ 算力底座 · <span>任务调度模型</span></div>
+                <div class="module-sub">CPU/GPU · 任务编排 · 算力成本 · 延迟 · 风险 · 弹性</div>
+                <div class="mini-grid-3">
+                    <div class="card"><div class="icon">🖥️</div><div class="label">算力规模</div><div class="value" id="compCluster">128</div><div class="desc">核心节点</div></div>
+                    <div class="card"><div class="icon">📋</div><div class="label">成功率</div><div class="value" style="color:#a78bfa;" id="compSuccess">99.2%</div><div class="desc">24h滚动</div></div>
+                    <div class="card"><div class="icon">⏱️</div><div class="label">平均延迟</div><div class="value" style="color:#22d3ee;" id="compLatency">42ms</div><div class="desc">响应承诺</div></div>
+                </div>
+                <div class="mini-canvas-wrap">
+                    <canvas id="canvasCompute" width="800" height="200"></canvas>
+                </div>
+                <div class="mini-controls">
+                    <div class="ctrl"><label>算力 <span id="compClusterLabel">128</span></label><input type="range" id="compClusterInput" min="60" max="200" step="1" value="128" /></div>
+                    <div class="ctrl"><label>任务密度 <span id="compTaskLabel">4.7k</span></label><input type="range" id="compTaskInput" min="1.0" max="8.0" step="0.1" value="4.7" /></div>
+                    <div class="ctrl"><label>延迟压力 <span id="compLatencyLabel">1.00</span></label><input type="range" id="compLatencyInput" min="0.5" max="2.0" step="0.05" value="1.0" /></div>
+                    <div class="ctrl"><label>故障风险 <span id="compFaultLabel">50%</span></label><input type="range" id="compFaultInput" min="0" max="100" step="1" value="50" /></div>
+                </div>
+                <div class="mini-mapping">
+                    <div class="mm-title">🔗 博弈映射 · 算力 ↔ 物流 ↔ 低空经济</div>
+                    <div class="mm-grid">
+                        <div class="mm-item"><span>计算需求</span><span class="to">→ 配送需求</span></div>
+                        <div class="mm-item"><span>算力成本</span><span class="to">→ 履约成本</span></div>
+                        <div class="mm-item"><span>计算延迟</span><span class="to">→ 履约时效</span></div>
+                        <div class="mm-item"><span>任务失败</span><span class="to">→ 运输风险</span></div>
+                        <div class="mm-item"><span>集群密度</span><span class="to">→ 网络密度</span></div>
+                        <div class="mm-item"><span>算力规模</span><span class="to">→ 规模效应</span></div>
+                    </div>
+                    <div style="margin-top:6px; padding-top:4px; border-top:1px solid rgba(255,255,255,0.02); font-size:10px; color:rgba(255,255,255,0.1); text-align:center;">
+                        💡 与物流底座结构完全同构
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ===== 返回总控台 ===== -->
+        <div class="back-link">
+            <a href="index.html">← 返回总控台</a>
+        </div>
+
+    </div>
+
+    <script>
+        // ================================================================
+        // ===== 导航切换 =====
+        // ================================================================
+        const archItems = document.querySelectorAll('.arch-item');
+        const panels = {
+            game: document.getElementById('panel-game'),
+            lowair: document.getElementById('panel-lowair'),
+            actuary: document.getElementById('panel-actuary'),
+            logistics: document.getElementById('panel-logistics'),
+            compute: document.getElementById('panel-compute')
+        };
+
+        archItems.forEach(item => {
+            item.addEventListener('click', function() {
+                const target = this.dataset.panel;
+                archItems.forEach(el => el.classList.remove('active'));
+                this.classList.add('active');
+                Object.keys(panels).forEach(key => {
+                    const panel = panels[key];
+                    const isActive = key === target.replace('panel-', '');
+                    panel.classList.toggle('active', isActive);
+                });
+            });
+        });
+
+        // ================================================================
+        // ===== 所有 Canvas 绘制函数（占位，保留交互） =====
+        // ================================================================
+        // 博弈底座 Canvas
+        (function() {
+            const canvas = document.getElementById('canvasGame');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const w = 800,
+                h = 200;
+            canvas.width = w;
+            canvas.height = h;
+            const pInput = document.getElementById('gamePInput');
+            const bInput = document.getElementById('gameBInput');
+            const timeInput = document.getElementById('gameTimeInput');
+            const syncInput = document.getElementById('gameSyncInput');
+            const pDisplay = document.getElementById('gameP');
+            const bDisplay = document.getElementById('gameB');
+            const timeDisplay = document.getElementById('gameTimeLabel');
+            const syncDisplay = document.getElementById('gameSyncLabel');
+            const kellyDisplay = document.getElementById('gameKelly');
+            const ratioDisplay = document.getElementById('gameRatio');
+
+            let phase = 0,
+                animId = null;
+
+            function draw() {
+                const p = parseFloat(pInput.value);
+                const b = parseFloat(bInput.value);
+                const time = parseFloat(timeInput.value) / 100;
+                const sync = parseFloat(syncInput.value) / 100;
+
+                pDisplay.textContent = p.toFixed(2);
+                bDisplay.textContent = b.toFixed(2);
+                timeDisplay.textContent = time.toFixed(2);
+                syncDisplay.textContent = Math.round(sync * 100) + '%';
+
+                const q = 1 - p;
+                const f = Math.max(0, (b * p - q) / b);
+                kellyDisplay.textContent = 'f* = ' + (f * 100).toFixed(1) + '%';
+                const autoPct = Math.round(80 - f * 150);
+                const manualPct = 100 - autoPct;
+                ratioDisplay.textContent = Math.max(0, Math.min(100, autoPct)) + '% / ' + Math.max(0, Math.min(100,
+                    manualPct)) + '%';
+
+                ctx.clearRect(0, 0, w, h);
+
+                ctx.strokeStyle = 'rgba(255,255,255,0.02)';
+                ctx.lineWidth = 0.5;
+                for (let i = 0; i <= 10; i++) { const x = (i / 10) * w;
+                    ctx.beginPath();
+                    ctx.moveTo(x, 0);
+                    ctx.lineTo(x, h);
+                    ctx.stroke(); }
+                for (let i = 0; i <= 5; i++) { const y = (i / 5) * h;
+                    ctx.beginPath();
+                    ctx.moveTo(0, y);
+                    ctx.lineTo(w, y);
+                    ctx.stroke(); }
+
+                const cx = w / 2,
+                    cy = h / 2 + 10;
+                const r1 = 50 + 20 * (1 - time) * 0.8;
+                const r2 = 55 + 35 * time * 0.7;
+                const r3 = 45 + 45 * time * 0.6;
+
+                const colors = ['rgba(167,139,250,0.15)', 'rgba(250,204,21,0.12)', 'rgba(34,211,153,0.12)'];
+                const strokes = ['rgba(167,139,250,0.3)', 'rgba(250,204,21,0.25)', 'rgba(34,211,153,0.25)'];
+                const labels = ['研发圈', '应用圈', '经济圈'];
+                const xs = [cx - 120 + time * 80, cx + 0, cx + 120 + time * 40];
+
+                xs.forEach((x, i) => {
+                    const r = [r1, r2, r3][i];
+                    const yOff = [0, -10 + 10 * time, 0][i];
+                    const grad = ctx.createRadialGradient(x, cy + yOff, 2, x, cy + yOff, r * 1.3);
+                    grad.addColorStop(0, colors[i]);
+                    grad.addColorStop(1, 'transparent');
+                    ctx.fillStyle = grad;
+                    ctx.beginPath();
+                    ctx.arc(x, cy + yOff, r * 1.3, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.strokeStyle = strokes[i];
+                    ctx.lineWidth = 1.5;
+                    ctx.beginPath();
+                    ctx.arc(x, cy + yOff, r, 0, Math.PI * 2);
+                    ctx.stroke();
+                    ctx.fillStyle = colors[i];
+                    ctx.font = '9px sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'bottom';
+                    ctx.fillText(labels[i], x, cy + yOff - r - 4);
+                    ctx.fillStyle = 'rgba(255,255,255,0.06)';
+                    ctx.font = '8px sans-serif';
+                    ctx.textBaseline = 'top';
+                    ctx.fillText('r=' + Math.round(r), x, cy + yOff + r + 2);
+                });
+
+                ctx.strokeStyle = 'rgba(167,139,250,0.04)';
+                ctx.lineWidth = 1;
+                ctx.setLineDash([3, 5]);
+                ctx.beginPath();
+                ctx.moveTo(xs[0], cy + [0, -10 + 10 * time, 0][0]);
+                ctx.lineTo(xs[1], cy + [0, -10 + 10 * time, 0][1]);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(xs[1], cy + [0, -10 + 10 * time, 0][1]);
+                ctx.lineTo(xs[2], cy + [0, -10 + 10 * time, 0][2]);
+                ctx.stroke();
+                ctx.setLineDash([]);
+
+                const syncR = 80 + 30 * sync;
+                ctx.strokeStyle = 'rgba(167,139,250,0.04)';
+                ctx.lineWidth = 1;
+                ctx.setLineDash([3, 6]);
+                ctx.beginPath();
+                ctx.arc(cx, cy, syncR, 0, Math.PI * 2);
+                ctx.stroke();
+                ctx.setLineDash([]);
+                ctx.fillStyle = 'rgba(167,139,250,0.04)';
+                ctx.font = '7px sans-serif';
+                ctx.textAlign = 'right';
+                ctx.textBaseline = 'bottom';
+                ctx.fillText('协调边界 ' + Math.round(sync * 100) + '%', cx + syncR - 4, cy - 2);
+
+                const px = time * w;
+                ctx.strokeStyle = 'rgba(167,139,250,0.06)';
+                ctx.lineWidth = 1;
+                ctx.setLineDash([3, 5]);
+                ctx.beginPath();
+                ctx.moveTo(px, 0);
+                ctx.lineTo(px, h);
+                ctx.stroke();
+                ctx.setLineDash([]);
+                ctx.fillStyle = 'rgba(167,139,250,0.08)';
+                ctx.font = '8px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'top';
+                ctx.fillText('⏳ ' + Math.round(time * 100) + '%', px, 4);
+
+                const ly = h - 12;
+                const items = [
+                    ['●', '#a78bfa', '研发收束'],
+                    ['●', '#facc15', '应用放大'],
+                    ['●', '#34d399', '经济放大']
+                ];
+                let lx = 20;
+                ctx.font = '8px sans-serif';
+                ctx.textBaseline = 'bottom';
+                items.forEach(([dot, color, label]) => {
+                    ctx.fillStyle = color + '0.2)';
+                    ctx.fillText(dot, lx, ly);
+                    ctx.fillStyle = 'rgba(255,255,255,0.06)';
+                    ctx.fillText(label, lx + 12, ly);
+                    lx += 68;
+                });
+
+                animId = requestAnimationFrame(draw);
+            }
+
+            document.querySelectorAll('#panel-game .mini-controls input').forEach(el => {
+                el.addEventListener('input', draw);
+            });
+            draw();
+            window.addEventListener('beforeunload', () => { if (animId) cancelAnimationFrame(animId); });
+        })();
+
+        // 低空经济 Canvas（简化版，保留交互）
+        (function() {
+            const canvas = document.getElementById('canvasLowair');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const w = 800,
+                h = 200;
+            canvas.width = w;
+            canvas.height = h;
+
+            const userInput = document.getElementById('lowUserInput');
+            const rndInput = document.getElementById('lowRndInput');
+            const govInput = document.getElementById('lowGovInput');
+            const heatInput = document.getElementById('lowHeatInput');
+            const userDisp = document.getElementById('lowUser');
+            const rndDisp = document.getElementById('lowRnd');
+            const govDisp = document.getElementById('lowGov');
+            const heatDisp = document.getElementById('lowHeat');
+            const stateDisp = document.getElementById('lowState');
+            const stateSub = document.getElementById('lowStateSub');
+            const kellyDisp = document.getElementById('lowKelly');
+            const compDisp = document.getElementById('lowComp');
+            const compSub = document.getElementById('lowCompSub');
+            const phaseDisp = document.getElementById('lowPhase');
+            const phaseSub = document.getElementById('lowPhaseSub');
+
+            let phase = 0,
+                animId = null;
+
+            function draw() {
+                const user = parseFloat(userInput.value);
+                const rnd = parseFloat(rndInput.value);
+                const gov = parseFloat(govInput.value);
+                const heat = parseFloat(heatInput.value);
+
+                userDisp.textContent = user.toFixed(2);
+                rndDisp.textContent = rnd.toFixed(2);
+                govDisp.textContent = gov.toFixed(2);
+                heatDisp.textContent = heat.toFixed(2);
+
+                const kelly = Math.min(100, Math.max(0, (user * 0.6 + rnd * 0.3 + heat * 0.1) * 80));
+                kellyDisp.textContent = Math.round(kelly) + '%';
+
+                const diff = Math.abs(user - rnd);
+                let state, sub, color;
+                if (diff < 0.1 && gov > 0.4) { state = '⚖️ 稳态';
+                    sub = '三方协调';
+                    color = '#22c55e'; } else if (diff > 0.3) { state = '📈 博弈中';
+                    sub = '供需失衡';
+                    color = '#facc15'; } else { state = '🔄 调整中';
+                    sub = '逼近均衡';
+                    color = '#a78bfa'; }
+                stateDisp.textContent = state;
+                stateDisp.style.color = color;
+                stateSub.textContent = sub;
+
+                const comp = heat > 0.7 ? '高' : (heat > 0.4 ? '中' : '低');
+                compDisp.textContent = comp;
+                compDisp.style.color = heat > 0.7 ? '#ef4444' : (heat > 0.4 ? '#facc15' : '#22c55e');
+                compSub.textContent = heat > 0.7 ? '红海逼近' : (heat > 0.4 ? '竞争加剧' : '蓝海开拓');
+
+                const phaseText = heat < 0.3 ? '萌芽期' : (heat < 0.6 ? '成长期' : '成熟期');
+                phaseDisp.textContent = phaseText;
+                phaseDisp.style.color = heat < 0.3 ? 'rgba(255,255,255,0.3)' : (heat < 0.6 ? '#22d3ee' : '#facc15');
+                phaseSub.textContent = heat < 0.3 ? '技术验证' : (heat < 0.6 ? '应用放大中' : '规模化竞争');
+
+                ctx.clearRect(0, 0, w, h);
+
+                ctx.strokeStyle = 'rgba(255,255,255,0.02)';
+                ctx.lineWidth = 0.5;
+                for (let i = 0; i <= 10; i++) { const x = (i / 10) * w;
+                    ctx.beginPath();
+                    ctx.moveTo(x, 0);
+                    ctx.lineTo(x, h);
+                    ctx.stroke(); }
+                for (let i = 0; i <= 5; i++) { const y = (i / 5) * h;
+                    ctx.beginPath();
+                    ctx.moveTo(0, y);
+                    ctx.lineTo(w, y);
+                    ctx.stroke(); }
+
+                const cx = w / 2,
+                    cy = h / 2 + 10;
+                const baseR = 60 + 20 * heat;
+
+                const actors = [
+                    { label: '🏛️ 政府', color: '#a78bfa', angle: 0, radius: baseR * 0.85, fixed: 0.5 },
+                    { label: '🧑‍🤝‍🧑 用户', color: '#facc15', angle: 2.1, radius: baseR * 0.85 + 30 * user,
+                        fixed: 0.7 + 0.3 * user },
+                    { label: '🏭 厂商', color: '#34d399', angle: 4.2, radius: baseR * 0.85 - 20 * rnd + 20 * gov,
+                        fixed: 0.3 + 0.2 * rnd }
+                ];
+
+                actors.forEach((a, i) => {
+                    const ang = a.angle + phase * 0.3;
+                    const r = a.radius * (0.85 + 0.15 * Math.sin(phase * 0.5 + i));
+                    const px = cx + r * Math.cos(ang);
+                    const py = cy + r * 0.4 * Math.sin(ang);
+
+                    const grad = ctx.createRadialGradient(px, py, 2, px, py, 20);
+                    grad.addColorStop(0, a.color + '0.15)');
+                    grad.addColorStop(1, 'transparent');
+                    ctx.fillStyle = grad;
+                    ctx.beginPath();
+                    ctx.arc(px, py, 20, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    ctx.fillStyle = a.color;
+                    ctx.shadowColor = a.color + '0.15)';
+                    ctx.shadowBlur = 12;
+                    ctx.beginPath();
+                    ctx.arc(px, py, 6, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.shadowBlur = 0;
+
+                    ctx.fillStyle = a.color + '0.4)';
+                    ctx.font = '8px sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'bottom';
+                    ctx.fillText(a.label, px, py - 10);
+
+                    ctx.fillStyle = 'rgba(255,255,255,0.04)';
+                    ctx.font = '7px sans-serif';
+                    ctx.textBaseline = 'top';
+                    ctx.fillText('斜率 ' + a.fixed.toFixed(1), px, py + 8);
+
+                    ctx.strokeStyle = a.color + '0.04)';
+                    ctx.lineWidth = 0.5;
+                    ctx.setLineDash([2, 4]);
+                    ctx.beginPath();
+                    ctx.moveTo(cx, cy);
+                    ctx.lineTo(px, py);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+                });
+
+                ctx.fillStyle = 'rgba(255,255,255,0.06)';
+                ctx.beginPath();
+                ctx.arc(cx, cy, 4, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.fillStyle = 'rgba(255,255,255,0.04)';
+                ctx.font = '7px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'top';
+                ctx.fillText('⚖️ 均衡点', cx, cy + 6);
+
+                const ly = h - 12;
+                ctx.font = '8px sans-serif';
+                ctx.textBaseline = 'bottom';
+                const items = [
+                    ['●', '#a78bfa', '政府 0.5'],
+                    ['●', '#facc15', '用户 0.5-1.0'],
+                    ['●', '#34d399', '厂商 0-0.5']
+                ];
+                let lx = 20;
+                items.forEach(([dot, color, label]) => {
+                    ctx.fillStyle = color + '0.2)';
+                    ctx.fillText(dot, lx, ly);
+                    ctx.fillStyle = 'rgba(255,255,255,0.06)';
+                    ctx.fillText(label, lx + 12, ly);
+                    lx += 74;
+                });
+
+                phase += 0.008;
+                animId = requestAnimationFrame(draw);
+            }
+
+            document.querySelectorAll('#panel-lowair .mini-controls input').forEach(el => {
+                el.addEventListener('input', draw);
+            });
+            draw();
+            window.addEventListener('beforeunload', () => { if (animId) cancelAnimationFrame(animId); });
+        })();
+
+        // 精算映射 Canvas（简化占位）
+        (function() {
+            const canvas = document.getElementById('canvasActuary');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const w = 800,
+                h = 200;
+            canvas.width = w;
+            canvas.height = h;
+
+            const lapseInput = document.getElementById('actLapseInput');
+            const roiInput = document.getElementById('actRoiInput');
+            const lossInput = document.getElementById('actLossInput');
+            const syncInput = document.getElementById('actSyncInput');
+            const lapseDisp = document.getElementById('actLapse');
+            const roiDisp = document.getElementById('actRoi');
+            const lossDisp = document.getElementById('actLoss');
+            const syncDisp = document.getElementById('actSync');
+            const leverageDisp = document.getElementById('actLeverage');
+            const lifeDisp = document.getElementById('actLife');
+            const valueDisp = document.getElementById('actValue');
+            const actSyncDisplay = document.getElementById('actSyncDisplay');
+
+            let phase = 0,
+                animId = null;
+
+            function draw() {
+                const lapse = parseFloat(lapseInput.value);
+                const roi = parseFloat(roiInput.value);
+                const loss = parseFloat(lossInput.value);
+                const sync = parseFloat(syncInput.value) / 100;
+
+                lapseDisp.textContent = lapse.toFixed(1) + '%';
+                roiDisp.textContent = roi.toFixed(1) + '%';
+                lossDisp.textContent = loss.toFixed(0) + '%';
+                syncDisp.textContent = Math.round(sync * 100) + '%';
+
+                const leverage = (lapse > 0) ? (1 / (lapse / 100)) * (roi / 100) : 0;
+                const life = (lapse > 0) ? (1 / (lapse / 100)) : 0;
+                const value = Math.max(0.3, (1 - (loss - 60) / 100) * (1 + (roi / 100) * (1 + sync * 0.3)));
+
+                leverageDisp.textContent = leverage.toFixed(2);
+                lifeDisp.textContent = life.toFixed(1) + '年';
+                valueDisp.textContent = value.toFixed(2);
+                actSyncDisplay.textContent = Math.round(sync * 100) + '%';
+
+                ctx.clearRect(0, 0, w, h);
+
+                ctx.strokeStyle = 'rgba(255,255,255,0.02)';
+                ctx.lineWidth = 0.5;
+                for (let i = 0; i <= 10; i++) { const x = (i / 10) * w;
+                    ctx.beginPath();
+                    ctx.moveTo(x, 0);
+                    ctx.lineTo(x, h);
+                    ctx.stroke(); }
+                for (let i = 0; i <= 5; i++) { const y = (i / 5) * h;
+                    ctx.beginPath();
+                    ctx.moveTo(0, y);
+                    ctx.lineTo(w, y);
+                    ctx.stroke(); }
+
+                const cx = w / 2,
+                    cy = h / 2 + 10;
+                const baseR = 50 + 20 * value * 0.5;
+                const hOff = 20 + 10 * value * 0.3;
+                ctx.strokeStyle = 'rgba(34,211,238,0.1)';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.ellipse(cx, cy + hOff, baseR, baseR * 0.3, 0, 0, Math.PI * 2);
+                ctx.stroke();
+                ctx.strokeStyle = 'rgba(34,211,238,0.2)';
+                ctx.lineWidth = 1.5;
+                ctx.beginPath();
+                ctx.ellipse(cx, cy - hOff, baseR, baseR * 0.3, 0, 0, Math.PI * 2);
+                ctx.stroke();
+                ctx.strokeStyle = 'rgba(34,211,238,0.06)';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.moveTo(cx - baseR, cy + hOff);
+                ctx.lineTo(cx - baseR, cy - hOff);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(cx + baseR, cy + hOff);
+                ctx.lineTo(cx + baseR, cy - hOff);
+                ctx.stroke();
+
+                const cGrad = ctx.createRadialGradient(cx, cy, 10, cx, cy, baseR);
+                cGrad.addColorStop(0, 'rgba(34,211,238,0.03)');
+                cGrad.addColorStop(1, 'rgba(34,211,238,0)');
+                ctx.fillStyle = cGrad;
+                ctx.beginPath();
+                ctx.ellipse(cx, cy, baseR, baseR * 0.3, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = 'rgba(34,211,238,0.15)';
+                ctx.beginPath();
+                ctx.arc(cx, cy, 4, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.fillStyle = 'rgba(34,211,238,0.06)';
+                ctx.font = '7px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'top';
+                ctx.fillText('保险价值', cx, cy + 6);
+
+                const ax = 100,
+                    ay = 60 + 20 * Math.sin(phase * 0.8);
+                const ar = 20 + 10 * sync * 0.5;
+                ctx.strokeStyle = 'rgba(167,139,250,0.1)';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                for (let t = 0; t <= Math.PI * 2; t += 0.05) {
+                    const dx = Math.cos(t) * ar,
+                        dy = Math.sin(t) * ar * 0.5;
+                    if (t === 0) ctx.moveTo(ax + dx, ay + dy);
+                    else ctx.lineTo(ax + dx, ay + dy);
+                }
+                ctx.stroke();
+                ctx.fillStyle = 'rgba(167,139,250,0.3)';
+                ctx.shadowColor = 'rgba(167,139,250,0.1)';
+                ctx.shadowBlur = 8;
+                const da = phase * 0.8;
+                ctx.beginPath();
+                ctx.arc(ax + Math.cos(da) * ar, ay + Math.sin(da) * ar * 0.5, 3, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.shadowBlur = 0;
+                ctx.fillStyle = 'rgba(167,139,250,0.15)';
+                ctx.font = '7px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'bottom';
+                ctx.fillText('🧠 精算师', ax, ay - ar - 2);
+
+                const sAlpha = 0.04 + 0.04 * sync;
+                ctx.strokeStyle = 'rgba(167,139,250,' + sAlpha + ')';
+                ctx.lineWidth = 1 + sync * 1.5;
+                ctx.setLineDash([3, 5]);
+                ctx.beginPath();
+                ctx.moveTo(ax, ay);
+                ctx.lineTo(cx - baseR * 0.3, cy - hOff * 0.2);
+                ctx.stroke();
+                ctx.setLineDash([]);
+
+                const actors2 = [
+                    { color: '#facc15', label: '投保人', angle: 0.5 },
+                    { color: '#34d399', label: '再保', angle: 1.8 },
+                    { color: '#fb923c', label: '资本', angle: 3.0 },
+                    { color: '#f472b6', label: '监管', angle: 4.2 },
+                    { color: '#ef4444', label: '中介', angle: 5.5 }
+                ];
+                actors2.forEach((a, i) => {
+                    const ang = a.angle + phase * 0.2;
+                    const r = baseR * 0.8 + 20 * Math.sin(phase * 0.3 + i);
+                    const px = cx + r * 0.9 * Math.cos(ang);
+                    const py = cy + r * 0.3 * Math.sin(ang);
+                    ctx.fillStyle = a.color + '0.15)';
+                    ctx.shadowColor = a.color + '0.05)';
+                    ctx.shadowBlur = 6;
+                    ctx.beginPath();
+                    ctx.arc(px, py, 3, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.shadowBlur = 0;
+                    ctx.fillStyle = a.color + '0.15)';
+                    ctx.font = '5px sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'bottom';
+                    ctx.fillText(a.label, px, py - 4);
+                });
+
+                const ly = h - 12;
+                ctx.font = '7px sans-serif';
+                ctx.textBaseline = 'bottom';
+                const items2 = [
+                    ['●', '#22d3ee', '价值'],
+                    ['●', '#a78bfa', '精算师'],
+                    ['●', '#facc15', '投保人']
+                ];
+                let lx = 20;
+                items2.forEach(([dot, color, label]) => {
+                    ctx.fillStyle = color + '0.2)';
+                    ctx.fillText(dot, lx, ly);
+                    ctx.fillStyle = 'rgba(255,255,255,0.06)';
+                    ctx.fillText(label, lx + 10, ly);
+                    lx += 50;
+                });
+
+                phase += 0.006;
+                animId = requestAnimationFrame(draw);
+            }
+
+            document.querySelectorAll('#panel-actuary .mini-controls input').forEach(el => {
+                el.addEventListener('input', draw);
+            });
+            draw();
+            window.addEventListener('beforeunload', () => { if (animId) cancelAnimationFrame(animId); });
+        })();
+
+        // 物流底座 Canvas（简化占位）
+        (function() {
+            const canvas = document.getElementById('canvasLogistics');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const w = 800,
+                h = 200;
+            canvas.width = w;
+            canvas.height = h;
+
+            const fleetInput = document.getElementById('logFleetInput');
+            const orderInput = document.getElementById('logOrderInput');
+            const timeInput = document.getElementById('logTimeInput');
+            const riskInput = document.getElementById('logRiskInput');
+            const fleetDisp = document.getElementById('logFleetLabel');
+            const orderDisp = document.getElementById('logOrderLabel');
+            const timeDisp = document.getElementById('logTimeLabel');
+            const riskDisp = document.getElementById('logRiskLabel');
+            const fleetVal = document.getElementById('logFleet');
+            const fulfillVal = document.getElementById('logFulfill');
+            const timeVal = document.getElementById('logTime');
+
+            let phase = 0,
+                animId = null;
+
+            function draw() {
+                const fleet = parseInt(fleetInput.value);
+                const order = parseFloat(orderInput.value);
+                const timeF = parseFloat(timeInput.value);
+                const risk = parseFloat(riskInput.value) / 100;
+
+                fleetDisp.textContent = fleet;
+                orderDisp.textContent = order.toFixed(1) + 'k';
+                timeDisp.textContent = timeF.toFixed(2);
+                riskDisp.textContent = Math.round(risk * 100) + '%';
+
+                const avail = Math.round(fleet * (0.7 + 0.25 * (1 - risk)));
+                const fulfill = Math.min(100, Math.round(98 - risk * 8 - (timeF - 1) * 5));
+                const avgTime = Math.round(20 + risk * 15 + (timeF - 1) * 8);
+
+                fleetVal.textContent = avail;
+                fulfillVal.textContent = fulfill + '%';
+                timeVal.textContent = avgTime + 'min';
+
+                ctx.clearRect(0, 0, w, h);
+
+                ctx.strokeStyle = 'rgba(255,255,255,0.02)';
+                ctx.lineWidth = 0.5;
+                for (let i = 0; i <= 10; i++) { const x = (i / 10) * w;
+                    ctx.beginPath();
+                    ctx.moveTo(x, 0);
+                    ctx.lineTo(x, h);
+                    ctx.stroke(); }
+                for (let i = 0; i <= 5; i++) { const y = (i / 5) * h;
+                    ctx.beginPath();
+                    ctx.moveTo(0, y);
+                    ctx.lineTo(w, y);
+                    ctx.stroke(); }
+
+                const cx = w / 2,
+                    cy = h / 2 + 10;
+                const numNodes = Math.min(60, fleet + 20);
+                const nodes = [];
+                for (let i = 0; i < numNodes; i++) {
+                    nodes.push({
+                        x: 40 + Math.random() * (w - 80),
+                        y: 20 + Math.random() * (h - 40),
+                        isHub: i < 4 || Math.random() < 0.08
+                    });
+                }
+
+                const hubs = nodes.filter(n => n.isHub);
+                const others = nodes.filter(n => !n.isHub);
+                hubs.forEach(hub => {
+                    others.forEach(node => {
+                        const dist = Math.hypot(hub.x - node.x, hub.y - node.y);
+                        if (dist < 200 && Math.random() < 0.15) {
+                            ctx.strokeStyle = 'rgba(167,139,250,0.03)';
+                            ctx.lineWidth = 0.5;
+                            ctx.beginPath();
+                            ctx.moveTo(hub.x, hub.y);
+                            ctx.lineTo(node.x, node.y);
+                            ctx.stroke();
+                        }
+                    });
+                });
+
+                nodes.forEach((node, i) => {
+                    const isHub = node.isHub;
+                    const r = isHub ? 6 : 3 + 2 * (order / 2.5);
+                    const color = isHub ? '#a78bfa' : '#22c55e';
+                    if (isHub) {
+                        const grad = ctx.createRadialGradient(node.x, node.y, 2, node.x, node.y, 20);
+                        grad.addColorStop(0, 'rgba(167,139,250,0.05)');
+                        grad.addColorStop(1, 'transparent');
+                        ctx.fillStyle = grad;
+                        ctx.beginPath();
+                        ctx.arc(node.x, node.y, 20, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                    ctx.fillStyle = color;
+                    ctx.globalAlpha = isHub ? 0.8 : 0.3 + 0.2 * (order / 3);
+                    ctx.shadowColor = isHub ? 'rgba(167,139,250,0.1)' : 'rgba(34,197,94,0.05)';
+                    ctx.shadowBlur = isHub ? 10 : 4;
+                    ctx.beginPath();
+                    ctx.arc(node.x, node.y, r, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.shadowBlur = 0;
+                    ctx.globalAlpha = 1;
+                    if (isHub) {
+                        ctx.fillStyle = 'rgba(255,255,255,0.08)';
+                        ctx.font = '6px sans-serif';
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillText('⚡', node.x, node.y);
+                    }
+                });
+
+                const hotCount = Math.round(order * 1.5);
+                for (let i = 0; i < hotCount; i++) {
+                    const ang = phase * 0.5 + i * 1.2;
+                    const dist = 60 + 40 * Math.sin(phase * 0.3 + i);
+                    const px = cx + dist * Math.cos(ang);
+                    const py = cy + dist * 0.4 * Math.sin(ang);
+                    const alpha = 0.04 + 0.04 * Math.sin(phase * 1.5 + i);
+                    ctx.fillStyle = 'rgba(250,204,21,' + alpha + ')';
+                    ctx.shadowColor = 'rgba(250,204,21,0.03)';
+                    ctx.shadowBlur = 12;
+                    ctx.beginPath();
+                    ctx.arc(px, py, 4 + 2 * Math.sin(phase * 1.2 + i), 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.shadowBlur = 0;
+                }
+
+                const flowCount = Math.round(order * 0.8);
+                for (let i = 0; i < flowCount; i++) {
+                    const t = (i / flowCount + phase * 0.15) % 1;
+                    const sn = nodes[i % nodes.length];
+                    const en = nodes[(i + 2) % nodes.length];
+                    if (sn && en) {
+                        const px = sn.x + (en.x - sn.x) * t;
+                        const py = sn.y + (en.y - sn.y) * t;
+                        const alpha = 0.03 + 0.03 * (1 - Math.abs(t - 0.5) * 2);
+                        ctx.fillStyle = 'rgba(34,211,238,' + alpha + ')';
+                        ctx.beginPath();
+                        ctx.arc(px, py, 1.5, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                }
+
+                if (risk > 0.2) {
+                    const rAlpha = 0.01 + risk * 0.03;
+                    const grad = ctx.createRadialGradient(cx, cy, 20, cx, cy, 200 * risk);
+                    grad.addColorStop(0, 'rgba(239,68,68,' + rAlpha + ')');
+                    grad.addColorStop(1, 'transparent');
+                    ctx.fillStyle = grad;
+                    ctx.beginPath();
+                    ctx.arc(cx, cy, 200 * risk, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+
+                const ly = h - 12;
+                ctx.font = '7px sans-serif';
+                ctx.textBaseline = 'bottom';
+                const items = [
+                    ['●', '#22c55e', '运力'],
+                    ['●', '#a78bfa', '调度'],
+                    ['●', '#facc15', '订单'],
+                    ['●', '#22d3ee', '路径']
+                ];
+                let lx = 20;
+                items.forEach(([dot, color, label]) => {
+                    ctx.fillStyle = color + '0.2)';
+                    ctx.fillText(dot, lx, ly);
+                    ctx.fillStyle = 'rgba(255,255,255,0.06)';
+                    ctx.fillText(label, lx + 10, ly);
+                    lx += 48;
+                });
+
+                phase += 0.005;
+                animId = requestAnimationFrame(draw);
+            }
+
+            document.querySelectorAll('#panel-logistics .mini-controls input').forEach(el => {
+                el.addEventListener('input', draw);
+            });
+            draw();
+            window.addEventListener('beforeunload', () => { if (animId) cancelAnimationFrame(animId); });
+        })();
+
+        // 算力底座 Canvas（简化占位）
+        (function() {
+            const canvas = document.getElementById('canvasCompute');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const w = 800,
+                h = 200;
+            canvas.width = w;
+            canvas.height = h;
+
+            const clusterInput = document.getElementById('compClusterInput');
+            const taskInput = document.getElementById('compTaskInput');
+            const latencyInput = document.getElementById('compLatencyInput');
+            const faultInput = document.getElementById('compFaultInput');
+            const clusterDisp = document.getElementById('compClusterLabel');
+            const taskDisp = document.getElementById('compTaskLabel');
+            const latencyDisp = document.getElementById('compLatencyLabel');
+            const faultDisp = document.getElementById('compFaultLabel');
+            const clusterVal = document.getElementById('compCluster');
+            const successVal = document.getElementById('compSuccess');
+            const latencyVal = document.getElementById('compLatency');
+
+            let phase = 0,
+                animId = null;
+
+            function draw() {
+                const cluster = parseInt(clusterInput.value);
+                const task = parseFloat(taskInput.value);
+                const latF = parseFloat(latencyInput.value);
+                const fault = parseFloat(faultInput.value) / 100;
+
+                clusterDisp.textContent = cluster;
+                taskDisp.textContent = task.toFixed(1) + 'k';
+                latencyDisp.textContent = latF.toFixed(2);
+                faultDisp.textContent = Math.round(fault * 100) + '%';
+
+                const avail = Math.round(cluster * (0.7 + 0.25 * (1 - fault)));
+                const success = Math.min(100, Math.round(99 - fault * 8 - (latF - 1) * 4));
+                const lat = Math.round(20 + fault * 25 + (latF - 1) * 12);
+
+                clusterVal.textContent = avail;
+                successVal.textContent = success + '%';
+                latencyVal.textContent = lat + 'ms';
+
+                ctx.clearRect(0, 0, w, h);
+
+                ctx.strokeStyle = 'rgba(255,255,255,0.02)';
+                ctx.lineWidth = 0.5;
+                for (let i = 0; i <= 10; i++) { const x = (i / 10) * w;
+                    ctx.beginPath();
+                    ctx.moveTo(x, 0);
+                    ctx.lineTo(x, h);
+                    ctx.stroke(); }
+                for (let i = 0; i <= 5; i++) { const y = (i / 5) * h;
+                    ctx.beginPath();
+                    ctx.moveTo(0, y);
+                    ctx.lineTo(w, y);
+                    ctx.stroke(); }
+
+                const cx = w / 2,
+                    cy = h / 2 + 10;
+                const numNodes = Math.min(80, cluster + 30);
+                const nodes = [];
+                for (let i = 0; i < numNodes; i++) {
+                    nodes.push({
+                        x: 40 + Math.random() * (w - 80),
+                        y: 20 + Math.random() * (h - 40),
+                        isHub: i < 3 || Math.random() < 0.06
+                    });
+                }
+
+                const hubs = nodes.filter(n => n.isHub);
+                const others = nodes.filter(n => !n.isHub);
+                hubs.forEach(hub => {
+                    others.forEach(node => {
+                        const dist = Math.hypot(hub.x - node.x, hub.y - node.y);
+                        if (dist < 200 && Math.random() < 0.12) {
+                            ctx.strokeStyle = 'rgba(167,139,250,0.03)';
+                            ctx.lineWidth = 0.5;
+                            ctx.beginPath();
+                            ctx.moveTo(hub.x, hub.y);
+                            ctx.lineTo(node.x, node.y);
+                            ctx.stroke();
+                        }
+                    });
+                });
+
+                nodes.forEach((node, i) => {
+                    const isHub = node.isHub;
+                    const r = isHub ? 6 : 3 + 2 * (task / 4);
+                    const color = isHub ? '#a78bfa' : '#22c55e';
+                    if (isHub) {
+                        const grad = ctx.createRadialGradient(node.x, node.y, 2, node.x, node.y, 20);
+                        grad.addColorStop(0, 'rgba(167,139,250,0.05)');
+                        grad.addColorStop(1, 'transparent');
+                        ctx.fillStyle = grad;
+                        ctx.beginPath();
+                        ctx.arc(node.x, node.y, 20, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                    ctx.fillStyle = color;
+                    ctx.globalAlpha = isHub ? 0.8 : 0.3 + 0.2 * (task / 5);
+                    ctx.shadowColor = isHub ? 'rgba(167,139,250,0.1)' : 'rgba(34,197,94,0.05)';
+                    ctx.shadowBlur = isHub ? 10 : 4;
+                    ctx.beginPath();
+                    ctx.arc(node.x, node.y, r, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.shadowBlur = 0;
+                    ctx.globalAlpha = 1;
+                    if (isHub) {
+                        ctx.fillStyle = 'rgba(255,255,255,0.08)';
+                        ctx.font = '6px sans-serif';
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillText('⚡', node.x, node.y);
+                    }
+                });
+
+                const hotCount = Math.round(task * 1.2);
+                for (let i = 0; i < hotCount; i++) {
+                    const ang = phase * 0.5 + i * 1.2;
+                    const dist = 60 + 40 * Math.sin(phase * 0.3 + i);
+                    const px = cx + dist * Math.cos(ang);
+                    const py = cy + dist * 0.4 * Math.sin(ang);
+                    const alpha = 0.04 + 0.04 * Math.sin(phase * 1.5 + i);
+                    ctx.fillStyle = 'rgba(250,204,21,' + alpha + ')';
+                    ctx.shadowColor = 'rgba(250,204,21,0.03)';
+                    ctx.shadowBlur = 12;
+                    ctx.beginPath();
+                    ctx.arc(px, py, 4 + 2 * Math.sin(phase * 1.2 + i), 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.shadowBlur = 0;
+                }
+
+                const flowCount = Math.round(task * 0.7);
+                for (let i = 0; i < flowCount; i++) {
+                    const t = (i / flowCount + phase * 0.15) % 1;
+                    const sn = nodes[i % nodes.length];
+                    const en = nodes[(i + 2) % nodes.length];
+                    if (sn && en) {
+                        const px = sn.x + (en.x - sn.x) * t;
+                        const py = sn.y + (en.y - sn.y) * t;
+                        const alpha = 0.03 + 0.03 * (1 - Math.abs(t - 0.5) * 2);
+                        ctx.fillStyle = 'rgba(34,211,238,' + alpha + ')';
+                        ctx.beginPath();
+                        ctx.arc(px, py, 1.5, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                }
+
+                if (fault > 0.15) {
+                    const rAlpha = 0.01 + fault * 0.03;
+                    const grad = ctx.createRadialGradient(cx, cy, 20, cx, cy, 200 * fault);
+                    grad.addColorStop(0, 'rgba(239,68,68,' + rAlpha + ')');
+                    grad.addColorStop(1, 'transparent');
+                    ctx.fillStyle = grad;
+                    ctx.beginPath();
+                    ctx.arc(cx, cy, 200 * fault, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+
+                const ly = h - 12;
+                ctx.font = '7px sans-serif';
+                ctx.textBaseline = 'bottom';
+                const items = [
+                    ['●', '#22c55e', '算力'],
+                    ['●', '#a78bfa', '调度'],
+                    ['●', '#facc15', '任务'],
+                    ['●', '#22d3ee', '计算流']
+                ];
+                let lx = 20;
+                items.forEach(([dot, color, label]) => {
+                    ctx.fillStyle = color + '0.2)';
+                    ctx.fillText(dot, lx, ly);
+                    ctx.fillStyle = 'rgba(255,255,255,0.06)';
+                    ctx.fillText(label, lx + 10, ly);
+                    lx += 48;
+                });
+
+                phase += 0.005;
+                animId = requestAnimationFrame(draw);
+            }
+
+            document.querySelectorAll('#panel-compute .mini-controls input').forEach(el => {
+                el.addEventListener('input', draw);
+            });
+            draw();
+            window.addEventListener('beforeunload', () => { if (animId) cancelAnimationFrame(animId); });
+        })();
+    </script>
+
+</body>
+</html>

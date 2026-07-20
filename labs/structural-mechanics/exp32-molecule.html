@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>#32 分子化学键多构型制衡仿真实验</title>
+    <link rel="stylesheet" href="../../assets/css/base.css">
+    <script src="../../assets/js/bus.js"></script>
+    <style>
+        body{background:#05030a;min-height:100vh;}
+        body.layout-fixed{padding-left:0;}
+        .wrap{max-width:1180px;margin:0 auto;padding:40px 28px 60px;}
+        .container{
+            background:radial-gradient(ellipse at 30% 20%,#120b24,#0b0b1a 70%,#05030a);
+            border-radius:28px;padding:44px 44px 36px;border:1px solid rgba(255,255,255,0.06);
+            box-shadow:0 30px 80px rgba(40,10,80,0.4);position:relative;overflow:hidden;
+        }
+        .header{text-align:center;margin-bottom:14px;opacity:0;animation:fadeInUp 0.8s ease forwards;}
+        .badge{display:inline-block;background:rgba(52,211,153,0.1);border:1px solid rgba(52,211,153,0.25);color:rgba(52,211,153,0.9);font-size:12px;padding:4px 16px;border-radius:20px;letter-spacing:0.5px;margin-bottom:12px;font-weight:600;}
+        .header h1{font-size:26px;font-weight:700;color:#f1f5f9;letter-spacing:-0.3px;background:linear-gradient(135deg,#f1f5f9,#34d399,#60a5fa,#f1f5f9);background-size:300% 300%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:gradientFlow 6s ease-in-out infinite;margin:0;}
+        .header .sub{font-size:14px;color:rgba(255,255,255,0.35);font-weight:300;margin-top:6px;}
+        .breadcrumb{display:flex;align-items:center;gap:7px;font-size:11px;color:rgba(255,255,255,0.3);margin-bottom:18px;flex-wrap:wrap;}
+        .breadcrumb a{color:rgba(255,255,255,0.4);text-decoration:none;transition:color .2s;}
+        .breadcrumb a:hover{color:#34d399;}
+        .breadcrumb .sep{color:rgba(255,255,255,0.12);}
+        .breadcrumb .cur{color:#34d399;font-weight:600;}
+        .meta-bar{display:flex;justify-content:center;gap:18px;flex-wrap:wrap;margin:10px 0 18px;font-size:11px;color:rgba(255,255,255,0.3);}
+        .meta-bar span{display:inline-flex;align-items:center;gap:5px;}
+        .meta-bar .v{color:#34d399;font-family:'SF Mono',monospace;font-weight:600;}
+        .th-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:14px 0 20px;}
+        .th-item{padding:12px;border-radius:10px;text-align:center;border:1px solid;}
+        .th-item.g{background:rgba(34,197,94,0.05);border-color:rgba(34,197,94,0.2);}
+        .th-item.c{background:rgba(52,211,153,0.05);border-color:rgba(52,211,153,0.2);}
+        .th-item.y{background:rgba(250,204,21,0.05);border-color:rgba(250,204,21,0.2);}
+        .th-item.r{background:rgba(248,113,113,0.05);border-color:rgba(248,113,113,0.2);}
+        .th-item .tv{font-size:22px;font-weight:700;font-family:'SF Mono',monospace;}
+        .th-item.g .tv{color:#4ade80;} .th-item.c .tv{color:#34d399;}
+        .th-item.y .tv{color:#facc15;} .th-item.r .tv{color:#f87171;}
+        .th-item .tl{font-size:10px;color:rgba(255,255,255,0.3);margin-top:3px;}
+        .sec{margin-bottom:28px;opacity:0;animation:fadeInUp 0.6s ease forwards;}
+        .sec:nth-child(odd){animation-delay:.05s;} .sec:nth-child(even){animation-delay:.1s;}
+        .sec h2{font-size:18px;font-weight:700;color:#f1f5f9;margin:0 0 10px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+        .sec h2 .tag{font-size:10px;font-weight:600;color:#34d399;background:rgba(52,211,153,0.1);padding:2px 10px;border-radius:20px;}
+        .sec p{color:rgba(255,255,255,0.55);font-size:13px;line-height:1.8;margin:0 0 8px;}
+        .sec p strong{color:rgba(255,255,255,0.8);}
+        .sec p .c{color:#34d399;font-weight:600;} .sec p .g{color:#4ade80;font-weight:600;}
+        .sec p .y{color:#facc15;font-weight:600;} .sec p .r{color:#f87171;font-weight:600;}
+        .sec p .p{color:#22d3ee;font-weight:600;}
+        .hbox{background:rgba(52,211,153,0.04);border:1px solid rgba(52,211,153,0.15);border-radius:10px;padding:14px 18px;margin:10px 0;}
+        .hbox.g{background:rgba(34,197,94,0.04);border-color:rgba(34,197,94,0.15);}
+        .hbox.y{background:rgba(250,204,21,0.04);border-color:rgba(250,204,21,0.15);}
+        .hbox.r{background:rgba(248,113,113,0.04);border-color:rgba(248,113,113,0.15);}
+        .hbox.p{background:rgba(167,139,250,0.04);border-color:rgba(167,139,250,0.15);}
+        .hbox p{margin-bottom:4px;}
+        .sim-panel{background:linear-gradient(135deg,rgba(52,211,153,0.06),rgba(59,130,246,0.04));border:1.5px solid rgba(52,211,153,0.25);border-radius:16px;padding:22px 24px;margin:16px 0;}
+        .sim-panel .sp-t{font-size:17px;font-weight:700;color:#6ee7b7;display:flex;align-items:center;gap:8px;margin-bottom:4px;}
+        .sim-panel .sp-s{font-size:12px;color:rgba(255,255,255,0.35);margin-bottom:14px;line-height:1.5;}
+        .mod-row,.ctrl-row{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;}
+        .mod-btn,.tog-btn{padding:8px 14px;border-radius:10px;cursor:pointer;font-size:12px;font-weight:600;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);color:rgba(255,255,255,0.45);transition:all .25s;display:inline-flex;align-items:center;gap:6px;}
+        .mod-btn:hover{border-color:rgba(52,211,153,0.3);color:rgba(255,255,255,0.75);}
+        .mod-btn.on{background:rgba(52,211,153,0.12);border-color:rgba(52,211,153,0.45);color:#6ee7b7;box-shadow:0 0 16px rgba(52,211,153,0.12);}
+        .c-btn{padding:8px 16px;border-radius:8px;cursor:pointer;font-size:12px;font-weight:600;transition:all .2s;}
+        .c-btn.push{background:rgba(251,146,60,0.1);border:1px solid rgba(251,146,60,0.3);color:#fb923c;}
+        .c-btn.push:hover{background:rgba(251,146,60,0.18);}
+        .c-btn.rst{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.5);}
+        .c-btn.rst:hover{background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.8);}
+        .drag-hint{font-size:11px;color:rgba(255,255,255,0.3);padding:6px 12px;background:rgba(251,146,60,0.06);border:1px dashed rgba(251,146,60,0.2);border-radius:8px;display:inline-flex;align-items:center;gap:6px;}
+        .canvas-wrap{position:relative;width:100%;height:440px;margin:12px 0;background:radial-gradient(ellipse at center,#0a0a1a 0%,#05030a 80%);border-radius:12px;border:1px solid rgba(255,255,255,0.05);overflow:hidden;cursor:grab;}
+        .canvas-wrap:active{cursor:grabbing;}
+        .canvas-wrap canvas{width:100%;height:100%;display:block;}
+        .c-ov{position:absolute;top:10px;left:10px;right:10px;display:flex;justify-content:space-between;pointer-events:none;z-index:5;}
+        .c-label{padding:5px 10px;border-radius:6px;font-size:10px;font-weight:600;background:rgba(0,0,0,0.5);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,0.1);color:#6ee7b7;border-color:rgba(52,211,153,0.3);}
+        .c-h{padding:5px 10px;border-radius:6px;font-size:10px;font-family:'SF Mono',monospace;background:rgba(0,0,0,0.5);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.6);}
+        .c-legend{position:absolute;bottom:8px;left:10px;display:flex;gap:10px;flex-wrap:wrap;pointer-events:none;z-index:5;}
+        .c-legend .li{display:flex;align-items:center;gap:4px;font-size:9px;color:rgba(255,255,255,0.35);}
+        .c-legend .dot{width:7px;height:7px;border-radius:50%;}
+        .c-legend .line{width:14px;height:3px;border-radius:2px;}
+        .data-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:14px 0;}
+        .dc{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.05);border-radius:10px;padding:12px;text-align:center;position:relative;overflow:hidden;}
+        .dc::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--cc,#34d399);opacity:0.7;}
+        .dc.g{--cc:#4ade80;} .dc.y{--cc:#facc15;} .dc.r{--cc:#f87171;} .dc.c{--cc:#34d399;}
+        .dc .dl{font-size:9px;color:rgba(255,255,255,0.25);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;}
+        .dc .dv{font-size:22px;font-weight:700;font-family:'SF Mono',monospace;color:#f1f5f9;transition:color .3s;}
+        .dc.g .dv{color:#4ade80;} .dc.y .dv{color:#facc15;}
+        .dc.r .dv{color:#f87171;animation:pulseD 1s infinite;} .dc.c .dv{color:#34d399;}
+        .dc .db{height:3px;background:rgba(255,255,255,0.05);border-radius:2px;margin-top:6px;overflow:hidden;}
+        .dc .db-f{height:100%;border-radius:2px;transition:width .3s,background .3s;background:var(--cc,#34d399);}
+        @keyframes pulseD{0%,100%{opacity:1}50%{opacity:0.5}}
+        .status{display:flex;align-items:center;gap:10px;padding:10px 16px;border-radius:10px;font-size:12px;font-weight:600;transition:all .3s;}
+        .status.safe{background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);color:#4ade80;}
+        .status.warn{background:rgba(250,204,21,0.08);border:1px solid rgba(250,204,21,0.2);color:#facc15;}
+        .status.danger{background:rgba(248,113,113,0.08);border:1px solid rgba(248,113,113,0.2);color:#f87171;animation:pulseD 1.5s infinite;}
+        .status .si{font-size:18px;}
+        .grp-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:14px 0;}
+        .grp{background:rgba(255,255,255,0.015);border:1px solid rgba(255,255,255,0.05);border-radius:10px;padding:14px 16px;cursor:pointer;transition:all .25s;}
+        .grp:hover{border-color:rgba(52,211,153,0.3);background:rgba(52,211,153,0.03);}
+        .grp.on{border-color:rgba(52,211,153,0.5);background:rgba(52,211,153,0.06);}
+        .grp.s{border-color:rgba(34,197,94,0.25);} .grp.w{border-color:rgba(167,139,250,0.25);} .grp.d{border-color:rgba(248,113,113,0.25);} .grp.g{border-color:rgba(52,211,153,0.25);}
+        .grp.on.s{border-color:rgba(34,197,94,0.5);background:rgba(34,197,94,0.06);}
+        .grp.on.w{border-color:rgba(167,139,250,0.5);background:rgba(167,139,250,0.06);}
+        .grp.on.d{border-color:rgba(248,113,113,0.5);background:rgba(248,113,113,0.06);}
+        .grp.on.g{border-color:rgba(52,211,153,0.5);background:rgba(52,211,153,0.06);}
+        .grp .n{font-family:'SF Mono',monospace;font-size:10px;color:rgba(255,255,255,0.2);margin-bottom:3px;}
+        .grp .t{font-size:13px;font-weight:700;color:#f1f5f9;margin-bottom:5px;}
+        .grp .d{font-size:11px;color:rgba(255,255,255,0.45);line-height:1.6;margin-bottom:6px;}
+        .grp .r{font-family:'SF Mono',monospace;font-size:11px;font-weight:600;padding:2px 8px;border-radius:5px;display:inline-block;}
+        .grp.s .r{background:rgba(34,197,94,0.1);color:#4ade80;}
+        .grp.w .r{background:rgba(167,139,250,0.1);color:#c4b5fd;}
+        .grp.d .r{background:rgba(248,113,113,0.1);color:#f87171;}
+        .grp.g .r{background:rgba(52,211,153,0.1);color:#34d399;}
+        .map{background:rgba(255,255,255,0.012);border:1px solid rgba(255,255,255,0.04);border-radius:12px;padding:16px 18px;margin:10px 0;}
+        .map .mt{font-size:13px;font-weight:700;color:#f1f5f9;margin-bottom:8px;display:flex;align-items:center;gap:7px;}
+        .map ul{margin:0;padding-left:18px;}
+        .map li{color:rgba(255,255,255,0.55);font-size:12px;line-height:1.8;margin-bottom:2px;}
+        .map li strong{color:rgba(255,255,255,0.8);}
+        .boundary{margin-top:20px;padding:14px 18px;border-radius:10px;background:rgba(255,255,255,0.015);border:1px solid rgba(255,255,255,0.04);}
+        .boundary .bt{font-size:11px;font-weight:700;color:rgba(255,255,255,0.35);margin-bottom:8px;letter-spacing:0.5px;text-transform:uppercase;}
+        .boundary .b-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+        .boundary .bc{font-size:11px;line-height:1.7;color:rgba(255,255,255,0.3);}
+        .boundary .bc.ok{color:rgba(74,222,128,0.55);} .boundary .bc.no{color:rgba(248,113,113,0.5);}
+        .boundary .bc strong{font-size:11px;display:block;margin-bottom:3px;}
+        .back-btns{text-align:center;margin-top:30px;padding-top:20px;border-top:1px solid rgba(255,255,255,0.04);display:flex;justify-content:center;gap:16px;flex-wrap:wrap;}
+        .back-btns a{color:rgba(255,255,255,0.25);text-decoration:none;font-size:13px;transition:color .3s;padding:8px 16px;border-radius:8px;border:1px solid rgba(255,255,255,0.05);}
+        .back-btns a:hover{color:#34d399;border-color:rgba(52,211,153,0.2);}
+        .conf{margin-top:16px;padding:10px 14px;border-radius:8px;background:rgba(250,204,21,0.02);border:1px solid rgba(250,204,21,0.08);font-size:10px;color:rgba(255,255,255,0.2);text-align:center;}
+        @keyframes fadeInUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+        @keyframes gradientFlow{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+        @media(max-width:860px){
+            .container{padding:28px 18px 22px;border-radius:18px;}
+            .th-grid,.data-grid{grid-template-columns:1fr 1fr;}
+            .grp-grid{grid-template-columns:1fr;}
+            .canvas-wrap{height:340px;}
+            .boundary .b-row{grid-template-columns:1fr;}
+        }
+        @media(max-width:480px){
+            .th-grid,.data-grid{grid-template-columns:1fr;}
+            .header h1{font-size:20px;}
+        }
+    </style>
+</head>
+<body>
+    <div id="glow"></div>
+    <div class="wrap">
+    <div class="container">
+        <div class="breadcrumb">
+            <a href="../../index.html">Y.Mine 总控台</a><span class="sep">›</span>
+            <a href="../../index.html">仿真实验室</a><span class="sep">›</span>
+            <a href="../../index.html">🏗️ 结构力学与冗余安全类</a><span class="sep">›</span>
+            <span class="cur">#32 分子化学键多构型制衡仿真实验</span>
+        </div>
+
+        <div class="header">
+            <div class="badge">🔗 #32 · 🏗️ 结构力学与冗余安全类 · 微观结构力学</div>
+            <h1>#32 分子化学键多构型<br>制衡仿真实验</h1>
+            <div class="sub">共价键三角制衡 · 离子键单点吸附 · 高分子网状冗余</div>
+        </div>
+
+        <div class="meta-bar">
+            <span>📋 编号 <b class="v">#32</b></span>
+            <span>🏛️ 归属 <b class="v">Game-OS V2.1</b></span>
+            <span>🔒 密级 <b class="v">公开演示版</b></span>
+            <span>📐 误差 <b class="v">±0.02</b></span>
+        </div>
+
+        <div class="th-grid">
+            <div class="th-item g"><div class="tv">0.48</div><div class="tl">保本安全线</div></div>
+            <div class="th-item c"><div class="tv">0.50</div><div class="tl">标准稳态中轴线</div></div>
+            <div class="th-item y"><div class="tv">±0.02</div><div class="tl">审计允许误差</div></div>
+            <div class="th-item r"><div class="tv">0.68</div><div class="tl">结构熔断红线</div></div>
+        </div>
+
+        <div class="sec">
+            <h2>🔬 实验核心 <span class="tag">研究目的</span></h2>
+            <p>对比四种分子结构力学体系，证明：<strong>多点制衡结构＞单点受力结构、网状多层冗余＞简单绑定结构</strong>。通过拖拽施加外力直观展示化学键断裂差异，揭示分子键合架构与系统冗余风控的深层同构关系。</p>
+            <div class="hbox">
+                <p><strong>底层公理：</strong>多方制衡最稳、单点吸附最弱、网状结构承载力最强；化学键应力超过键能阈值即触发<span class="r">断裂熔断</span>，多层网状冗余可将应力分散至全域、抵御极端冲击。</p>
+            </div>
+        </div>
+
+        <div class="sec">
+            <h2>⚛️ 物理原理简述</h2>
+            <div class="hbox g">
+                <p><strong class="g">惰性单原子（绝对稳态）：</strong>如He/Ne单原子分子，无化学键、无外部约束、电子层全饱和，独立存在极其稳定，数值恒定于 <span class="g">0.5</span>。</p>
+            </div>
+            <div class="hbox">
+                <p><strong class="c">共价键三角制衡（稳态）：</strong>如H₂O/O₃，原子间通过共用电子对形成<strong>三角/多角共价键网络</strong>，键力均匀制衡、形变量可恢复，数值稳定 <span class="g">0.49~0.51</span>。</p>
+            </div>
+            <div class="hbox y">
+                <p><strong class="y">离子键单点吸附（高危）：</strong>如NaCl，阴阳离子间通过静电吸引单点吸附结合，无网状冗余，单点应力超过键能即整体断裂，数值 <span class="r">0.66~0.68</span> 临近熔断。</p>
+            </div>
+            <div class="hbox p">
+                <p><strong class="c">高分子立体网状（高冗余稳态）：</strong>如金刚石/石墨烯，原子间形成<strong>三维立体共价网状结构</strong>，每个原子4键与周边原子深度连接，应力全域分散、抗冲击极强，数值稳态收敛于 <span class="g">0.5</span>。</p>
+            </div>
+        </div>
+
+        <div class="sec">
+            <h2>🎛️ 交互仿真面板 <span class="tag">四构型 · 拖拽施力</span></h2>
+            <div class="sim-panel">
+                <div class="sp-t">🔗 分子化学键力学仿真器</div>
+                <div class="sp-s">切换分子构型，拖拽原子施加外力；观察不同键型受力后形变、应力集中、断裂差异</div>
+
+                <div class="mod-row">
+                    <button class="mod-btn on" data-m="inert" onclick="setMod('inert')">🟢 惰性单原子</button>
+                    <button class="mod-btn" data-m="covalent" onclick="setMod('covalent')">🔵 共价键三角(H₂O)</button>
+                    <button class="mod-btn" data-m="ionic" onclick="setMod('ionic')">🔴 离子键单点(NaCl)</button>
+                    <button class="mod-btn" data-m="polymer" onclick="setMod('polymer')">🟣 高分子立体网状</button>
+                </div>
+                <div class="mod-row">
+                    <span class="drag-hint">👆 提示：点击并拖拽任意原子施加外力，释放观察回弹/断裂</span>
+                </div>
+
+                <div class="canvas-wrap" id="cwrap">
+                    <canvas id="cv"></canvas>
+                    <div class="c-ov">
+                        <div class="c-label" id="molLbl">🟢 惰性单原子 · 绝对稳态</div>
+                        <div class="c-h" id="stressInd">键应力: 0.00</div>
+                    </div>
+                    <div class="c-legend">
+                        <div class="li"><span class="dot" style="background:#6ee7b7"></span>稳态原子</div>
+                        <div class="li"><span class="line" style="background:#60a5fa"></span>共价键</div>
+                        <div class="li"><span class="line" style="background:#f87171"></span>离子键</div>
+                        <div class="li"><span class="line" style="background:#c4b5fd"></span>网状键</div>
+                        <div class="li"><span class="dot" style="background:#f87171"></span>断裂原子</div>
+                    </div>
+                </div>
+
+                <div class="data-grid">
+                    <div class="dc c" id="dcScore"><div class="dl">稳态归一值</div><div class="dv" id="vScore">0.500</div><div class="db"><div class="db-f" id="bScore" style="width:50%"></div></div></div>
+                    <div class="dc" id="dcStress"><div class="dl">最大键应力</div><div class="dv" id="vStress">0.00</div><div class="db"><div class="db-f" id="bStress" style="width:0%;background:#4ade80"></div></div></div>
+                    <div class="dc" id="dcRedun"><div class="dl">结构冗余度</div><div class="dv" id="vRedun">0%</div><div class="db"><div class="db-f" id="bRedun" style="width:0%;background:#34d399"></div></div></div>
+                    <div class="dc" id="dcBreak"><div class="dl">断裂键数</div><div class="dv" id="vBreak">0</div><div class="db"><div class="db-f" id="bBreak" style="width:0%;background:#4ade80"></div></div></div>
+                </div>
+
+                <div class="status safe" id="status">
+                    <span class="si">✓</span><span id="stxt">稳态安全：单原子无化学键，独立稳定</span>
+                </div>
+
+                <div class="ctrl-row">
+                    <button class="c-btn push" onclick="applyShock()">💥 施加冲击</button>
+                    <button class="c-btn rst" onclick="resetMol()">↺ 重置分子</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="sec">
+            <h2>🧪 四组对照组可视化 <span class="tag">稳态区间</span></h2>
+            <div class="grp-grid">
+                <div class="grp s on" onclick="setMod('inert')"><div class="n">对照组 1</div><div class="t">🟢 惰性单原子分子</div><div class="d">He/Ne类单原子，无化学键、电子层全饱和，独立存在、绝对稳态，无外部约束。</div><div class="r">0.50 绝对稳态</div></div>
+                <div class="grp g" onclick="setMod('covalent')"><div class="n">对照组 2</div><div class="t">🔵 共价键三角制衡分子</div><div class="d">H₂O/O₃类，原子间共用电子对形成多角共价键网络，键力均匀制衡、形变量可恢复。</div><div class="r">0.49 ~ 0.51 三角稳态</div></div>
+                <div class="grp d" onclick="setMod('ionic')"><div class="n">对照组 3</div><div class="t">🔴 离子键单点吸附分子</div><div class="d">NaCl类，阴阳离子静电单点吸附结合，无网状冗余，单点超应力即整体断裂。</div><div class="r">0.66 ~ 0.68 临近熔断</div></div>
+                <div class="grp w" onclick="setMod('polymer')"><div class="n">对照组 4</div><div class="t">🟣 高分子立体网状结构</div><div class="d">金刚石/石墨烯类，三维立体共价网状，每原子4键全域连接，应力分散抗冲击最强。</div><div class="r">0.50 全域高冗余稳态</div></div>
+            </div>
+        </div>
+
+        <div class="sec">
+            <h2>🔗 三层同构映射</h2>
+            <div class="map">
+                <div class="mt">⚛️ 物理层规律</div>
+                <ul>
+                    <li><strong>多方制衡最稳、单点吸附最弱、网状结构承载力最强；</strong></li>
+                    <li>共价键三角网络可恢复形变，离子键单点断裂即整体崩溃，立体网状结构可全域分散应力。</li>
+                </ul>
+            </div>
+            <div class="map">
+                <div class="mt">🏛️ 系统架构层规律</div>
+                <ul>
+                    <li><strong>三角制衡架构优于单点架构、多层嵌套冗余系统抗扰动最强；</strong></li>
+                    <li>单点依赖系统一旦核心节点失效整体崩溃；多点制衡+网状备份架构可承受局部断裂而不熔断。</li>
+                </ul>
+            </div>
+            <div class="map">
+                <div class="mt">🛩️ 低空产业层规律</div>
+                <ul>
+                    <li>三方空域管控（军民航+地方+运营方）稳于单一主体管控；</li>
+                    <li><strong>多层分级风控架构可抵御极端天气与政策突发扰动；</strong></li>
+                    <li>建立全域网状冗余调度体系，避免单条航线故障引发空域级联熔断。</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="boundary">
+            <div class="bt">🛩️ 无人机迁移边界说明（严谨工程边界）</div>
+            <div class="b-row">
+                <div class="bc ok">
+                    <strong>✅ 可迁移规律</strong>
+                    多方博弈制衡理论、单点应力集中高危逻辑、多层冗余风控架构、应力分散机制、三角稳态判定、级联熔断预防。
+                </div>
+                <div class="bc no">
+                    <strong>❌ 不可迁移参数</strong>
+                    化学键键能绝对值、分子断裂拉力数值、微观分子尺寸参数、元素电负性数据、真实化学实验温度压强条件。
+                </div>
+            </div>
+        </div>
+
+        <div class="conf">🔒 公开演示版 · 本页面仅展示结构规律与区间稳态，不嵌入涉密精算参数，严格公私分离</div>
+
+        <div class="back-btns">
+            <a href="../../index.html">← 返回总控台</a>
+            <a href="../../index.html">← 返回分类列表</a>
+        </div>
+    </div>
+    </div>
+
+<script>
+(function(){
+    'use strict';
+    const TH={B:0.48,S:0.5,F:0.68,E:0.02};
+    let mod='inert',aid=null,t=0;
+    const cv=document.getElementById('cv'),cx=cv.getContext('2d'),wrap=document.getElementById('cwrap');
+    let atoms=[],bonds=[],drag=null,shock=0,shockForce={x:0,y:0};
+    const MOLCFG={
+        inert:{baseScore:.5,color:'#6ee7b7',bondColor:'#6ee7b7',redundancy:0,name:'惰性单原子'},
+        covalent:{baseScore:.5,color:'#60a5fa',bondColor:'#60a5fa',redundancy:.6,name:'共价键三角(H₂O)'},
+        ionic:{baseScore:.67,color:'#f87171',bondColor:'#f87171',redundancy:.1,name:'离子键单点(NaCl)'},
+        polymer:{baseScore:.5,color:'#c4b5fd',bondColor:'#c4b5fd',redundancy:.95,name:'高分子立体网状'}
+    };
+    function rsz(){const r=wrap.getBoundingClientRect();cv.width=r.width*devicePixelRatio;cv.height=r.height*devicePixelRatio;cx.scale(devicePixelRatio,devicePixelRatio);buildMol();}
+    function buildMol(){const w=wrap.clientWidth,h=wrap.clientHeight,cx0=w/2,cy0=h/2;atoms=[];bonds=[];drag=null;shock=0;
+        if(mod==='inert'){atoms.push({x:cx0,y:cy0,vx:0,vy:0,r:16,color:MOLCFG.inert.color,fixed:false,charge:0,broken:false});}
+        else if(mod==='covalent'){const ox={x:cx0,y:cy0,vx:0,vy:0,r:18,color:'#ef4444',fixed:false,charge:-2,broken:false};const h1={x:cx0-55,y:cy0+40,vx:0,vy:0,r:12,color:'#e5e7eb',fixed:false,charge:1,broken:false};const h2={x:cx0+55,y:cy0+40,vx:0,vy:0,r:12,color:'#e5e7eb',fixed:false,charge:1,broken:false};atoms=[ox,h1,h2];bonds=[{a:0,b:1,k:.08,len:70,stress:0,broken:false,type:'covalent'},{a:0,b:2,k:.08,len:70,stress:0,broken:false,type:'covalent'},{a:1,b:2,k:.03,len:110,stress:0,broken:false,type:'covalent',weak:true}];}
+        else if(mod==='ionic'){const na={x:cx0-40,y:cy0,vx:0,vy:0,r:16,color:'#fb923c',fixed:false,charge:1,broken:false};const cl={x:cx0+40,y:cy0,vx:0,vy:0,r:20,color:'#22c55e',fixed:false,charge:-1,broken:false};atoms=[na,cl];bonds=[{a:0,b:1,k:.04,len:80,stress:0,broken:false,type:'ionic'}];}
+        else if(mod==='polymer'){const grid=[[0,0],[1,0],[0,1],[1,1],[-1,0],[0,-1],[1,-1],[-1,1],[2,0],[0,2]];const sp=48;grid.forEach((p,i)=>{atoms.push({x:cx0+p[0]*sp,y:cy0+p[1]*sp,vx:0,vy:0,r:i<4?15:13,color:i%2===0?'#c4b5fd':'#a78bfa',fixed:false,charge:0,broken:false});});const links=[[0,1],[0,2],[0,3],[1,3],[2,3],[0,4],[2,5],[1,6],[2,7],[1,8],[3,9],[4,0],[5,2],[6,1],[7,2],[8,1],[9,3]];links.forEach(l=>{if(l[0]<atoms.length&&l[1]<atoms.length)bonds.push({a:l[0],b:l[1],k:.1,len:sp*0.9,stress:0,broken:false,type:'polymer'});});}
+    }
+    function applyShock(){shock=1;const ang=Math.random()*Math.PI*2;shockForce={x:Math.cos(ang)*6,vy:Math.sin(ang)*6};setTimeout(()=>{shock=0;},200);}
+    function resetMol(){buildMol();document.getElementById('status').className='status safe';}
+    function getMousePos(e){const r=cv.getBoundingClientRect();const t=e.touches?e.touches[0]:e;return{x:t.clientX-r.left,y:t.clientY-r.top};}
+    function onDown(e){e.preventDefault();const m=getMousePos(e);for(let i=atoms.length-1;i>=0;i--){const a=atoms[i];const dx=m.x-a.x,dy=m.y-a.y;if(dx*dx+dy*dy<(a.r+8)*(a.r+8)){drag=i;return;}}}
+    function onMove(e){e.preventDefault();if(drag===null)return;const m=getMousePos(e);atoms[drag].x=m.x;atoms[drag].y=m.y;atoms[drag].vx=0;atoms[drag].vy=0;}
+    function onUp(){drag=null;}
+    function physics(){atoms.forEach(a=>{if(drag!==null&&atoms[drag]===a)return;a.vy+=0.05;a.vx*=0.92;a.vy*=0.92;});
+        bonds.forEach(b=>{if(b.broken)return;const a1=atoms[b.a],a2=atoms[b.b];const dx=a2.x-a1.x,dy=a2.y-a1.y,dist=Math.sqrt(dx*dx+dy*dy)||1;const diff=dist-b.len;b.stress=Math.abs(diff)/b.len;const f=b.k*diff;const fx=(dx/dist)*f,fy=(dy/dist)*f;a1.vx+=fx;a1.vy+=fy;a2.vx-=fx;a2.vy-=fy;const breakThresh=b.type==='ionic'?0.35:b.weak?0.45:b.type==='polymer'?0.8:0.6;if(b.stress>breakThresh){b.broken=true;const bi=bonds.indexOf(b);if(bi>=0){/* stay broken */}}});
+        if(shock>0){atoms.forEach(a=>{a.vx+=shockForce.x*0.3;a.vy+=shockForce.y*0.3;});}
+        atoms.forEach((a,i)=>{if(drag===i)return;a.x+=a.vx;a.y+=a.vy;});
+        for(let iter=0;iter<3;iter++){bonds.forEach(b=>{if(b.broken)return;const a1=atoms[b.a],a2=atoms[b.b];const dx=a2.x-a1.x,dy=a2.y-a1.y,dist=Math.sqrt(dx*dx+dy*dy)||1;if(dist>b.len*1.5)return;const diff=(dist-b.len)/dist*0.5;a1.x+=dx*diff*0.5;a1.y+=dy*diff*0.5;a2.x-=dx*diff*0.5;a2.y-=dy*diff*0.5;});}
+    }
+    function drawAtoms(){atoms.forEach(a=>{const glow=cx.createRadialGradient(a.x,a.y,1,a.x,a.y,a.r+8);glow.addColorStop(0,a.broken?'rgba(248,113,113,0.4)':a.color+'66');glow.addColorStop(1,'rgba(0,0,0,0)');cx.fillStyle=glow;cx.beginPath();cx.arc(a.x,a.y,a.r+8,0,Math.PI*2);cx.fill();cx.fillStyle=a.broken?'#f87171':a.color;cx.beginPath();cx.arc(a.x,a.y,a.r,0,Math.PI*2);cx.fill();if(a.charge){cx.fillStyle='rgba(255,255,255,0.9)';cx.font='bold 10px SF Mono,monospace';cx.textAlign='center';cx.textBaseline='middle';cx.fillText((a.charge>0?'+':'')+a.charge,a.x,a.y);}else{cx.fillStyle='rgba(255,255,255,0.3)';cx.beginPath();cx.arc(a.x-3,a.y-3,3,0,Math.PI*2);cx.fill();}});}
+    function drawBonds(){bonds.forEach(b=>{if(b.broken){return;}const a1=atoms[b.a],a2=atoms[b.b];const stress=b.stress;let col=b.type==='covalent'?'#60a5fa':b.type==='ionic'?'#f87171':'#c4b5fd';let alpha=0.8;if(stress>0.3){const t=Math.min(1,(stress-0.3)/0.3);col='#f87171';alpha=0.6+t*0.4;}cx.strokeStyle=col;cx.globalAlpha=alpha;cx.lineWidth=b.type==='polymer'?2.5:3;if(b.type==='covalent'){cx.setLineDash([]);}else if(b.type==='ionic'){cx.setLineDash([6,4]);}else{cx.setLineDash([]);}cx.beginPath();cx.moveTo(a1.x,a1.y);cx.lineTo(a2.x,a2.y);cx.stroke();cx.setLineDash([]);cx.globalAlpha=1;if(stress>0.15){const mx=(a1.x+a2.x)/2,my=(a1.y+a2.y)/2;cx.fillStyle=stress>0.3?'#f87171':'#facc15';cx.font='9px SF Mono,monospace';cx.textAlign='center';cx.fillText((stress*100|0)+'%',mx,my-6);}});}
+    function drawBrokenEffect(){bonds.forEach(b=>{if(!b.broken)return;const a1=atoms[b.a],a2=atoms[b.b];cx.strokeStyle='rgba(248,113,113,0.3)';cx.lineWidth=1;cx.setLineDash([2,3]);cx.beginPath();cx.moveTo(a1.x,a1.y);cx.lineTo(a2.x,a2.y);cx.stroke();cx.setLineDash([]);});}
+    function calc(){const c=MOLCFG[mod];let maxStress=0,brokenCount=0,totalBonds=bonds.length||1;bonds.forEach(b=>{if(b.broken)brokenCount++;else maxStress=Math.max(maxStress,b.stress);});const redundancy=c.redundancy;let score=c.baseScore;if(mod==='inert')score=.5+Math.sin(t*.02)*.003;else if(mod==='covalent')score=.5+maxStress*.3+brokenCount*.2;else if(mod==='ionic'){score=.67+maxStress*.15+brokenCount*.1;if(brokenCount>0)score=Math.min(.85,score);}else if(mod==='polymer')score=.5+maxStress*.2+brokenCount*.05;score=Math.max(.4,Math.min(.85,score));upd(score,maxStress,redundancy,brokenCount);}
+    function upd(score,stress,redun,brk){const vs=document.getElementById('vScore'),vst=document.getElementById('vStress'),vr=document.getElementById('vRedun'),vb=document.getElementById('vBreak');const bs=document.getElementById('bScore'),bst=document.getElementById('bStress'),br2=document.getElementById('bRedun'),bb=document.getElementById('bBreak');const dcs=document.getElementById('dcScore'),dcst=document.getElementById('dcStress'),dcr=document.getElementById('dcRedun'),dcb=document.getElementById('dcBreak');const sj=document.getElementById('status'),st=document.getElementById('stxt'),ml=document.getElementById('molLbl'),si=document.getElementById('stressInd');vs.textContent=score.toFixed(3);vst.textContent=stress.toFixed(2);vr.textContent=Math.round(redun*100)+'%';vb.textContent=brk;bs.style.width=Math.min(100,Math.max(0,((score-.3)/.6)*100))+'%';bst.style.width=Math.min(100,stress*150)+'%';br2.style.width=Math.min(100,redun*100)+'%';bb.style.width=Math.min(100,brk*30)+'%';[dcs,dcst,dcr,dcb].forEach(x=>x.classList.remove('g','y','r','c'));dcr.classList.add(redun>.6?'g':redun>.3?'c':'y');br2.style.background=redun>.6?'#4ade80':redun>.3?'#34d399':'#facc15';dcb.classList.add(brk===0?'g':brk<2?'y':'r');bb.style.background=brk===0?'#4ade80':brk<2?'#facc15':'#f87171';
+    if(score>=TH.F||brk>0&&mod==='ionic'){dcs.classList.add('r');bs.style.background='#f87171';sj.className='status danger';sj.innerHTML='<span class="si">🚨</span><span>熔断告警：化学键断裂！结构应力超过0.68阈值，系统崩溃</span>';}else if(score>.6){dcs.classList.add('r');bs.style.background='#f87171';sj.className='status danger';sj.innerHTML='<span class="si">⚠</span><span>高危：键应力临近熔断临界，单点即将断裂</span>';}else if(score>TH.S+TH.E+.03){dcs.classList.add('y');bs.style.background='#facc15';sj.className='status warn';sj.innerHTML='<span class="si">⚠</span><span>波动预警：化学键受力形变，存在断裂风险</span>';}else{dcs.classList.add('g');bs.style.background='#4ade80';sj.className='status safe';sj.innerHTML='<span class="si">✓</span><span>稳态安全：'+(mod==='inert'?'单原子独立稳定，无化学键约束':mod==='covalent'?'共价三角制衡，键力均匀分布':mod==='polymer'?'立体网状冗余，应力全域分散':'结构稳定')+'</span>';}
+    dcst.classList.add(stress>.3?'r':stress>.15?'y':'g');bst.style.background=stress>.3?'#f87171':stress>.15?'#facc15':'#4ade80';ml.textContent=MOLCFG[mod].color==='#6ee7b7'?'🟢 惰性单原子 · 绝对稳态':MOLCFG[mod].color==='#60a5fa'?'🔵 共价键三角 · 制衡稳态':MOLCFG[mod].color==='#f87171'?'🔴 离子键单点 · 高危临近熔断':'🟣 高分子网状 · 高冗余稳态';si.textContent='键应力: '+stress.toFixed(2);}
+    function render(){const w=wrap.clientWidth,h=wrap.clientHeight;cx.clearRect(0,0,w,h);cx.fillStyle='rgba(255,255,255,0.03)';for(let i=0;i<30;i++){const sx=(i*157.7+50)%w,sy=(i*89.3+30)%h;sr=.3+(i%3)*.2;cx.beginPath();cx.arc(sx,sy,sr,0,Math.PI*2);cx.fill();}if(shock>0){cx.fillStyle=`rgba(251,146,60,${shock*0.1})`;cx.fillRect(0,0,w,h);}drawBonds();drawBrokenEffect();drawAtoms();}
+    function loop(){physics();t++;calc();render();aid=requestAnimationFrame(loop);}
+    window.setMod=function(m){mod=m;buildMol();document.querySelectorAll('.mod-btn').forEach(b=>b.classList.toggle('on',b.dataset.m===m));document.querySelectorAll('.grp').forEach((g,i)=>g.classList.toggle('on',['inert','covalent','ionic','polymer'][i]===m));};
+    window.applyShock=applyShock;
+    window.resetMol=resetMol;
+    function init(){rsz();buildMol();cv.addEventListener('mousedown',onDown);cv.addEventListener('mousemove',onMove);window.addEventListener('mouseup',onUp);cv.addEventListener('touchstart',onDown,{passive:false});cv.addEventListener('touchmove',onMove,{passive:false});window.addEventListener('touchend',onUp);loop();window.addEventListener('resize',rsz);}
+    document.readyState==='loading'?document.addEventListener('DOMContentLoaded',init):init();
+})();
+</script>
+</body>
+</html>

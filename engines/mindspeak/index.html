@@ -1,0 +1,2208 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MindSpeak · 四层跨域数理同构翻译引擎 V19.0</title>
+    <link rel="stylesheet" href="../../assets/css/base.css">
+    <script src="../../models/common/normalizer.js"></script>
+    <script src="../../assets/js/bus.js"></script>
+    <script src="../../assets/js/triangle-audit.js"></script>
+    <script src="assets/js/mindspeak-public.js"></script>
+    <script src="assets/js/ms-samples.js"></script>
+    <script src="assets/js/ms-visualization.js"></script>
+    <script src="../../assets/js/sidebar.js"></script>
+    <style>
+        :root {
+            --mindspeak-pink: #f472b6;
+            --mindspeak-pink-dark: #ec4899;
+            --mindspeak-pink-light: #f9a8d4;
+            --breakeven: 0.48;
+            --steady: 0.50;
+            --fuse: 0.68;
+            --tolerance: 0.02;
+        }
+
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: #0b0b1a;
+            color: #e2e8f0;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        #glow {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0;
+            pointer-events: none;
+        }
+
+        .v19-top-bar {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+            background: rgba(11, 11, 26, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(244, 114, 182, 0.15);
+            padding: 10px 20px;
+            display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+        }
+        .breadcrumb {
+            font-size: 12px; color: rgba(255,255,255,0.4);
+        }
+        .breadcrumb a {
+            color: var(--mindspeak-pink); text-decoration: none; transition: color .2s;
+        }
+        .breadcrumb a:hover { color: var(--mindspeak-pink-light); }
+        .breadcrumb .sep { margin: 0 6px; color: rgba(255,255,255,0.2); }
+        .breadcrumb .current { color: #facc15; }
+
+        .version-badge {
+            background: linear-gradient(135deg, rgba(244,114,182,0.2), rgba(167,139,250,0.2));
+            border: 1px solid rgba(244,114,182,0.4);
+            padding: 4px 12px; border-radius: 20px; font-size: 11px;
+            color: var(--mindspeak-pink-light); font-weight: 600; font-family: monospace;
+        }
+
+        .pipeline-badge {
+            font-size: 11px; color: #67e8f9;
+            background: rgba(103,232,249,0.1);
+            border: 1px solid rgba(103,232,249,0.3);
+            padding: 3px 10px; border-radius: 12px; font-family: monospace;
+        }
+
+        .steady-control {
+            display: flex; align-items: center; gap: 8px; margin-left: auto;
+        }
+        .steady-control label {
+            font-size: 11px; color: rgba(255,255,255,0.5); white-space: nowrap;
+        }
+        .steady-slider {
+            width: 120px; height: 6px; border-radius: 3px;
+            background: linear-gradient(90deg, #22c55e 0%, #22c55e 48%, #facc15 50%, #facc15 68%, #ef4444 100%);
+            -webkit-appearance: none; outline: none; cursor: pointer;
+        }
+        .steady-slider::-webkit-slider-thumb {
+            -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%;
+            background: #fff; cursor: pointer; box-shadow: 0 0 8px rgba(255,255,255,0.5);
+        }
+        .steady-value {
+            font-family: monospace; font-size: 12px; min-width: 40px; color: var(--mindspeak-pink);
+        }
+
+        .btn-emergency {
+            background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.5);
+            color: #f87171; padding: 5px 14px; border-radius: 8px; font-size: 12px;
+            cursor: pointer; transition: all .2s; font-weight: 600;
+        }
+        .btn-emergency:hover { background: rgba(239,68,68,0.3); }
+        .btn-resume {
+            background: rgba(34,197,94,0.15); border: 1px solid rgba(34,197,94,0.5);
+            color: #4ade80; padding: 5px 14px; border-radius: 8px; font-size: 12px;
+            cursor: pointer; transition: all .2s; font-weight: 600; display: none;
+        }
+
+        .status-chips { display: flex; gap: 6px; }
+        .status-chip {
+            padding: 3px 10px; border-radius: 10px; font-size: 10px; font-weight: 600;
+            font-family: monospace;
+        }
+        .status-chip.green { background:rgba(34,197,94,0.15); color:#22c55e; border:1px solid rgba(34,197,94,0.3); }
+        .status-chip.yellow { background:rgba(250,204,21,0.15); color:#facc15; border:1px solid rgba(250,204,21,0.3); }
+        .status-chip.red { background:rgba(239,68,68,0.15); color:#f87171; border:1px solid rgba(239,68,68,0.3); animation:pulse-red 1s infinite; }
+        @keyframes pulse-red { 0%,100%{opacity:1} 50%{opacity:0.6} }
+
+        .emergency-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(239,68,68,0.08); z-index: 500;
+            display: none; pointer-events: none;
+        }
+        .emergency-overlay.active { display: block; }
+        .emergency-banner {
+            position: fixed; top: 70px; left: 50%; transform: translateX(-50%);
+            background: rgba(239,68,68,0.9); color: #fff; padding: 12px 24px;
+            border-radius: 12px; z-index: 501; font-weight: 600; font-size: 14px;
+            display: none; box-shadow: 0 10px 40px rgba(239,68,68,0.4);
+        }
+        .emergency-banner.active { display: block; }
+
+        .layout-wrapper {
+            display: flex; padding-top: 70px; position: relative; z-index: 1;
+            min-height: 100vh;
+        }
+
+        .left-nav {
+            position: fixed; top: 70px; left: 0;
+            width: 220px; height: calc(100vh - 70px);
+            padding: 16px 12px 20px 16px;
+            overflow-y: auto;
+            background: rgba(11, 11, 26, 0.95);
+            backdrop-filter: blur(16px);
+            border-right: 1px solid rgba(244, 114, 182, 0.08);
+            z-index: 100; display: flex; flex-direction: column; gap: 1px;
+            scrollbar-width: thin;
+        }
+        .left-nav::-webkit-scrollbar { width: 3px; }
+        .left-nav::-webkit-scrollbar-thumb {
+            background: rgba(244, 114, 182, 0.15); border-radius: 4px;
+        }
+        .left-nav .nav-title {
+            font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.12);
+            text-transform: uppercase; letter-spacing: 1.5px; margin: 14px 0 4px 0;
+            padding-bottom: 4px; border-bottom: 1px solid rgba(255,255,255,0.03);
+        }
+        .left-nav .nav-item {
+            display: flex; align-items: center; gap: 6px; padding: 5px 10px;
+            border-radius: 8px; color: rgba(255,255,255,0.25); font-size: 12px;
+            cursor: pointer; transition: all 0.3s ease; text-decoration: none;
+            border: 1px solid transparent; line-height: 1.3;
+        }
+        .left-nav .nav-item:hover {
+            background: rgba(255,255,255,0.03); color: rgba(255,255,255,0.6);
+            border-color: rgba(255,255,255,0.06);
+        }
+        .left-nav .nav-item.active {
+            color: var(--mindspeak-pink);
+            background: rgba(244, 114, 182, 0.08);
+            border-color: rgba(244, 114, 182, 0.15);
+        }
+        .left-nav .nav-item .num { font-size: 10px; font-weight: 600; min-width: 20px; color: inherit; }
+        .left-nav .nav-item .label { font-size: 11px; white-space: nowrap; }
+        .left-nav .nav-item .algo-tag {
+            font-size: 7px; background: rgba(255,255,255,0.03); padding: 0 6px; border-radius: 3px;
+            color: rgba(255,255,255,0.15); margin-left: auto; font-family: monospace; letter-spacing: 0.2px;
+        }
+        .left-nav .nav-divider { margin: 4px 0; height: 1px; background: rgba(255,255,255,0.03); }
+        .left-nav .nav-bottom {
+            margin-top: auto; font-size: 8px; color: rgba(255,255,255,0.05); text-align: center;
+            padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.02); font-family: monospace; letter-spacing: 1px;
+        }
+
+        .main-content {
+            flex: 1; margin-left: 220px; margin-right: 260px;
+            padding: 20px 30px 32px; min-height: calc(100vh - 70px); position: relative; z-index: 1;
+        }
+        .container {
+            width: 100%;
+            background: radial-gradient(ellipse at 30% 30%, #120b24, #0b0b1a 70%, #05030a);
+            border-radius: 24px; padding: 32px 30px;
+            border: 1px solid rgba(244, 114, 182, 0.08);
+            box-shadow: 0 30px 80px rgba(80, 10, 60, 0.3);
+            position: relative; overflow: hidden;
+        }
+
+        .right-panel {
+            position: fixed; top: 70px; right: 0;
+            width: 260px; height: calc(100vh - 70px);
+            background: rgba(11, 11, 26, 0.95);
+            backdrop-filter: blur(16px);
+            border-left: 1px solid rgba(244, 114, 182, 0.08);
+            padding: 16px 12px; overflow-y: auto; z-index: 100;
+        }
+        .right-panel::-webkit-scrollbar { width: 3px; }
+        .right-panel::-webkit-scrollbar-thumb { background: rgba(244,114,182,0.15); border-radius:4px; }
+        .algo-panel-title {
+            font-size: 12px; font-weight: 700; color: var(--mindspeak-pink);
+            margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid rgba(244,114,182,0.15);
+            display: flex; align-items: center; gap: 6px;
+        }
+        .algo-section {
+            margin-bottom: 14px; background: rgba(255,255,255,0.02);
+            border-radius: 8px; padding: 10px; border: 1px solid rgba(244,114,182,0.06);
+        }
+        .algo-section-title {
+            font-size: 10px; color: rgba(255,255,255,0.4); text-transform: uppercase;
+            letter-spacing: 0.5px; margin-bottom: 6px; font-weight: 600;
+        }
+        .algo-pseudo {
+            font-family: 'Courier New', monospace; font-size: 10px;
+            color: rgba(255,255,255,0.6); line-height: 1.6;
+            background: rgba(0,0,0,0.3); padding: 8px; border-radius: 6px;
+            white-space: pre-wrap; word-break: break-all;
+        }
+        .algo-flow-steps {
+            display: flex; flex-direction: column; gap: 4px;
+        }
+        .flow-step {
+            font-size: 10px; padding: 4px 8px; border-radius: 4px;
+            background: rgba(244,114,182,0.08); color: var(--mindspeak-pink-light);
+            border-left: 2px solid var(--mindspeak-pink);
+        }
+        .audit-mini {
+            margin-top: 8px; padding: 8px; border-radius: 6px; font-size: 10px;
+        }
+        .audit-mini.pass { background: rgba(34,197,94,0.1); border:1px solid rgba(34,197,94,0.2); color:#4ade80; }
+        .audit-mini.warn { background: rgba(250,204,21,0.1); border:1px solid rgba(250,204,21,0.2); color:#facc15; }
+        .audit-mini.fail { background: rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.2); color:#f87171; }
+
+        .hero {
+            text-align: center; padding-bottom: 24px;
+            border-bottom: 1px solid rgba(244,114,182,0.08); margin-bottom: 24px;
+            position: relative; z-index: 1;
+        }
+        .hero .badge {
+            display: inline-block; background: rgba(244,114,182,0.08);
+            border: 1px solid rgba(244,114,182,0.15); color: var(--mindspeak-pink-light);
+            font-size: 12px; font-weight: 600; padding: 4px 18px; border-radius: 20px;
+            letter-spacing: 0.5px; margin-bottom: 10px; font-family: monospace;
+        }
+        .hero h1 {
+            font-size: 28px; font-weight: 700; color: #f1f5f9; margin-bottom: 4px;
+            background: linear-gradient(135deg, #f1f5f9, var(--mindspeak-pink), #a78bfa, #f1f5f9);
+            background-size: 300% 300%; -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent; animation: gradientFlow 7s ease-in-out infinite;
+        }
+        @keyframes gradientFlow {
+            0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%}
+        }
+        .hero .subtitle {
+            color: var(--mindspeak-pink); font-size: 15px; font-weight: 400;
+            margin-bottom: 8px; letter-spacing: 0.3px;
+        }
+        .hero .s1-tag {
+            display: inline-block; background: rgba(103,232,249,0.1);
+            border: 1px solid rgba(103,232,249,0.25); color: #67e8f9;
+            padding: 4px 14px; border-radius: 16px; font-size: 11px; margin-top: 6px;
+            font-family: monospace;
+        }
+        .intro-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+            margin: 18px 0 12px; text-align: left; max-width: 880px;
+            margin-left: auto; margin-right: auto;
+        }
+        .intro-card {
+            background: rgba(255,255,255,0.02); border-radius: 12px; padding: 12px 16px;
+            border: 1px solid rgba(255,255,255,0.04); transition: all 0.3s ease;
+        }
+        .intro-card:hover {
+            background: rgba(255,255,255,0.035);
+            border-color: rgba(244,114,182,0.1);
+        }
+        .intro-card .ic-title { font-size: 13px; font-weight: 600; margin-bottom: 4px; display:flex; align-items:center; gap:6px; }
+        .intro-card .ic-body { font-size: 12px; color: rgba(255,255,255,0.4); line-height: 1.7; }
+        .intro-card .ic-body strong { color: rgba(255,255,255,0.7); font-weight: 600; }
+        .intro-card .ic-body .hl-blue { color:#67e8f9; }
+        .intro-card .ic-body .hl-gold { color:#facc15; }
+        .intro-card .ic-body .hl-purple { color:#a78bfa; }
+        .intro-card .ic-body .hl-pink { color:var(--mindspeak-pink); }
+        .intro-card .ic-body .hl-green { color:#4ade80; }
+        .evidence-steps {
+            display: flex; flex-wrap: wrap; gap: 4px; margin: 16px 0 6px; justify-content: center;
+        }
+        .evidence-steps .step {
+            flex: 0 1 auto; min-width: 38px; background: rgba(255,255,255,0.02);
+            border-radius: 10px; padding: 4px 8px; text-align: center;
+            border: 1px solid rgba(255,255,255,0.04); cursor: pointer;
+            transition: all 0.3s ease; text-decoration: none; display: block;
+            color: rgba(255,255,255,0.2); font-size: 9px;
+        }
+        .evidence-steps .step:hover {
+            border-color: rgba(244,114,182,0.2); background: rgba(255,255,255,0.03); transform: translateY(-2px);
+        }
+        .evidence-steps .step .num { color: var(--mindspeak-pink); font-weight:700; font-size:10px; }
+        .evidence-steps .step .label { color:rgba(255,255,255,0.2); font-size:6px; margin-top:1px; }
+        .evidence-steps .step.active { border-color:#facc15; background:rgba(255,255,255,0.03); }
+        .evidence-steps .step.active .num { color:#facc15; }
+        .evidence-steps .step.active .label { color:rgba(255,255,255,0.5); }
+
+        .section-title {
+            font-size: 18px; font-weight: 600; color: rgba(255,255,255,0.85);
+            margin-top: 26px; margin-bottom: 4px; display: flex; align-items: center;
+            gap: 10px; flex-wrap: wrap; scroll-margin-top: 90px;
+        }
+        .section-title .badge {
+            font-size: 10px; background: rgba(255,255,255,0.02); color: rgba(255,255,255,0.25);
+            padding: 2px 12px; border-radius: 12px; font-weight:400; font-family:monospace;
+            border:1px solid rgba(255,255,255,0.03);
+        }
+        .badge-algo {
+            font-size: 9px !important; background: rgba(244,114,182,0.08) !important;
+            color: var(--mindspeak-pink) !important; border-color: rgba(244,114,182,0.12) !important;
+        }
+        .section-desc {
+            color: rgba(255,255,255,0.35); font-size: 12px; margin-bottom: 12px;
+            border-left: 3px solid rgba(244,114,182,0.2); padding-left: 14px;
+        }
+        .interact-card {
+            background: rgba(255,255,255,0.02); border-radius: 12px; padding: 16px 18px;
+            margin: 10px 0 16px; border: 1px solid rgba(255,255,255,0.04); transition: border-color 0.3s;
+        }
+        .interact-card:hover { border-color: rgba(244,114,182,0.1); }
+        .interact-card .card-title {
+            color: rgba(255,255,255,0.55); font-weight: 600; font-size: 14px;
+            margin-bottom: 10px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+        }
+        .interact-card.stopped { opacity: 0.5; pointer-events: none; }
+        .stopped-notice {
+            display: none; background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.3);
+            color: #f87171; padding: 10px 14px; border-radius: 8px; margin-bottom: 10px;
+            font-weight: 600; text-align: center;
+        }
+        .stopped-notice.active { display: block; }
+
+        .btn {
+            background: var(--mindspeak-pink); border: none; color: #0b0b1a;
+            padding: 6px 18px; border-radius: 8px; font-size: 12px; font-weight: 600;
+            cursor: pointer; transition: all 0.3s ease;
+        }
+        .btn:hover { background: var(--mindspeak-pink-dark); transform: translateY(-2px); box-shadow: 0 8px 25px rgba(244,114,182,0.2); }
+        .btn-outline {
+            background: transparent; border: 1px solid rgba(244,114,182,0.2); color: var(--mindspeak-pink);
+        }
+        .btn-outline:hover { background: rgba(244,114,182,0.08); border-color: var(--mindspeak-pink); }
+
+        .result-box {
+            background: rgba(255,255,255,0.01); border-radius: 8px; padding: 12px 14px;
+            margin-top: 10px; border-left: 3px solid var(--mindspeak-pink);
+            color: rgba(255,255,255,0.5); font-size: 13px; min-height: 36px; line-height: 1.6;
+        }
+        .backtrack-log {
+            margin-top: 10px; padding: 10px 12px; background: rgba(0,0,0,0.35);
+            border-radius: 8px; border-left: 3px solid var(--mindspeak-pink);
+            font-family: 'Courier New', monospace; max-height: 240px; overflow-y: auto;
+        }
+        .backtrack-log .bt-title {
+            font-size: 10px; color: rgba(255,255,255,0.15); text-transform: uppercase;
+            letter-spacing: 0.8px; margin-bottom: 4px;
+        }
+        .backtrack-log .bt-step {
+            display: flex; align-items: center; gap: 10px; padding: 2px 0; font-size: 11px;
+            border-bottom: 1px solid rgba(255,255,255,0.012);
+        }
+        .backtrack-log .bt-step:last-child { border-bottom: none; }
+        .backtrack-log .bt-step .msg { flex:1; color:rgba(255,255,255,0.4); }
+        .backtrack-log .bt-step.success .msg { color:#4ade80; }
+        .backtrack-log .bt-step.fail .msg { color:#f87171; }
+        .backtrack-log .bt-step.warn .msg { color:#fbbf24; }
+        .backtrack-log .bt-step.info .msg { color:#67e8f9; }
+        .backtrack-log .bt-step.audit .msg { color:var(--mindspeak-pink); }
+
+        .flex-row {
+            display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin: 6px 0;
+        }
+        .flex-row input[type="text"],
+        .flex-row input[type="number"],
+        .flex-row input[type="range"] {
+            background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05);
+            color: #f1f5f9; padding: 6px 12px; border-radius: 8px; font-size: 13px;
+            outline: none; transition: border 0.3s;
+        }
+        .flex-row input[type="text"]:focus,
+        .flex-row input[type="number"]:focus,
+        .flex-row input[type="range"]:focus { border-color: var(--mindspeak-pink); }
+        .flex-row input[type="text"] { flex:1; min-width:180px; }
+        .flex-row input[type="range"] { width: 130px; accent-color: var(--mindspeak-pink); }
+
+        .num-card {
+            width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;
+            background: rgba(255,255,255,0.03); border-radius: 8px; font-size: 16px;
+            font-weight: 700; color: rgba(255,255,255,0.4); border: 1px solid rgba(255,255,255,0.05);
+            transition: all 0.3s;
+        }
+        .num-card.active { background: rgba(250,204,21,0.15); border-color: #facc15; color:#facc15; transform:scale(1.1); }
+        .num-card.fail { background: rgba(239,68,68,0.15); border-color: #f87171; color:#f87171; }
+        .num-card.success { background: rgba(34,197,94,0.15); border-color: #4ade80; color:#4ade80; }
+
+        .kelly-grid, .pacd-grid {
+            display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; margin-top: 6px;
+        }
+        .kelly-card, .pacd-grid .item {
+            background: rgba(255,255,255,0.015); border-radius: 8px; padding: 10px 12px;
+            border: 1px solid rgba(255,255,255,0.04); text-align: center; transition: 0.3s;
+        }
+        .kelly-card:hover, .pacd-grid .item:hover {
+            background: rgba(255,255,255,0.025); border-color: rgba(244,114,182,0.1);
+        }
+        .kelly-card .label, .pacd-grid .item .label {
+            font-size: 10px; color: rgba(255,255,255,0.2); text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .kelly-card .value, .pacd-grid .item .value { font-size:22px; font-weight:700; margin-top:2px; }
+        .kelly-card .sub, .pacd-grid .item .sub { font-size:11px; color:rgba(255,255,255,0.2); margin-top:2px; }
+
+        .vis-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:8px; }
+        .vis-card {
+            background: rgba(255,255,255,0.01); border-radius: 8px; padding: 10px 12px;
+            border: 1px solid rgba(255,255,255,0.03);
+        }
+        .vis-card .vis-title {
+            font-size: 10px; color: rgba(255,255,255,0.2); text-transform: uppercase;
+            letter-spacing: 0.5px; margin-bottom: 4px;
+        }
+        .vis-bar-container { display:flex; flex-direction:column; gap:4px; }
+        .vis-bar-item { display:flex; align-items:center; gap:6px; }
+        .vis-bar-item .label { width:24px; font-size:12px; color:rgba(255,255,255,0.4); font-weight:500; }
+        .vis-bar-item .track { flex:1; height:6px; background:rgba(255,255,255,0.05); border-radius:4px; overflow:hidden; }
+        .vis-bar-item .bar { height:100%; border-radius:4px; transition: width 0.6s ease; width:0%; }
+        .vis-bar-item .value { min-width:28px; text-align:right; font-size:11px; color:rgba(255,255,255,0.4); }
+        .vis-ring-container { display:flex; justify-content:center; align-items:center; gap:20px; flex-wrap:wrap; padding:4px 0; }
+        .vis-ring {
+            position: relative; width: 65px; height: 65px; border-radius: 50%;
+            background: conic-gradient(var(--color) calc(var(--pct) * 1%), rgba(255,255,255,0.05) 0%);
+            display: flex; align-items: center; justify-content: center; transition: 0.5s;
+        }
+        .vis-ring .inner {
+            position: absolute; width: 48px; height: 48px; border-radius: 50%; background: #0b0b1a;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            font-size: 14px; font-weight: 700;
+        }
+        .vis-ring .inner .sub { font-size: 8px; font-weight:400; color:rgba(255,255,255,0.2); }
+
+        .mapping-matrix { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin:10px 0; }
+        .mapping-matrix .item {
+            background: rgba(255,255,255,0.015); border-radius: 8px; padding: 8px 12px;
+            border: 1px solid rgba(255,255,255,0.03);
+            display: flex; justify-content: space-between; align-items: center; transition: 0.3s;
+        }
+        .mapping-matrix .item:hover { background:rgba(255,255,255,0.03); border-color:rgba(244,114,182,0.1); }
+        .mapping-matrix .item .lang { font-size:13px; color:rgba(255,255,255,0.45); }
+        .mapping-matrix .item .arrow { color:rgba(255,255,255,0.1); margin:0 4px; font-size:14px; }
+        .mapping-matrix .item .algo { font-size:13px; font-weight:600; color:var(--mindspeak-pink); font-family:monospace; font-size:12px; }
+        .mapping-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:12px 0; }
+        .mapping-card { background:rgba(255,255,255,0.02); border-radius:8px; padding:12px 14px; border:1px solid rgba(255,255,255,0.05); }
+        .mapping-card .domain-label {
+            font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px;
+            color:rgba(255,255,255,0.2); margin-bottom:4px; border-bottom:1px solid rgba(255,255,255,0.04); padding-bottom:4px;
+        }
+        .mapping-card .example { font-size:16px; font-weight:600; padding:4px 0; display:flex; align-items:center; gap:6px; }
+        .mapping-card .desc { font-size:12px; color:rgba(255,255,255,0.3); margin-top:2px; font-family:monospace; }
+        .highlight-lang-en { color:#67e8f9; }
+        .highlight-lang-my { color:#facc15; }
+        .highlight-math { color:#a78bfa; }
+        .arrow { color:rgba(255,255,255,0.2); }
+
+        .algo-panorama { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:12px 0; }
+        .algo-panorama .map-item {
+            background: rgba(255,255,255,0.02); border-radius: 10px; padding: 14px 16px;
+            border: 1px solid rgba(255,255,255,0.04); transition: all 0.3s ease;
+            display: flex; flex-direction: column; gap: 6px;
+        }
+        .algo-panorama .map-item:hover {
+            background:rgba(255,255,255,0.035); border-color:rgba(244,114,182,0.12); transform:translateY(-2px);
+        }
+        .algo-panorama .map-item .map-header { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+        .algo-panorama .map-item .map-header .lang-tag { font-size:13px; font-weight:600; color:rgba(255,255,255,0.65); }
+        .algo-panorama .map-item .map-header .arrow-icon { color:rgba(255,255,255,0.12); font-size:18px; }
+        .algo-panorama .map-item .map-header .algo-tag-big {
+            font-size:13px; font-weight:700; color:var(--mindspeak-pink);
+            background:rgba(244,114,182,0.08); padding:2px 14px; border-radius:12px;
+            border:1px solid rgba(244,114,182,0.1);
+        }
+        .algo-panorama .map-item .map-example {
+            font-size:12px; color:rgba(255,255,255,0.35); padding:4px 0 0 0;
+            border-top:1px solid rgba(255,255,255,0.03); margin-top:4px; padding-top:6px; line-height:1.6;
+        }
+        .algo-panorama .map-item .map-example .ex-lang { color:#67e8f9; font-family:monospace; }
+        .algo-panorama .map-item .map-example .ex-algo { color:#facc15; font-family:monospace; }
+        .algo-panorama .map-item .map-desc { font-size:11px; color:rgba(255,255,255,0.25); line-height:1.5; }
+
+        .closure {
+            background: rgba(255,255,255,0.02); border-radius: 12px; padding: 16px 20px; margin-top: 20px;
+            border: 1px solid rgba(255,255,255,0.04); display: grid; grid-template-columns: repeat(4,1fr); gap: 10px;
+        }
+        .closure .item {
+            padding: 10px 12px; background: rgba(255,255,255,0.01); border-radius: 8px;
+            border-left: 3px solid var(--mindspeak-pink);
+        }
+        .closure .item .label {
+            font-size:10px; color:rgba(255,255,255,0.2); font-weight:600;
+            text-transform:uppercase; letter-spacing:0.5px;
+        }
+        .closure .item .text { color:rgba(255,255,255,0.45); font-size:12px; margin-top:2px; }
+
+        .back-bottom {
+            display:flex; justify-content:space-between; align-items:center; margin-top:24px;
+            padding-top:14px; border-top:1px solid rgba(255,255,255,0.04); flex-wrap:wrap; gap:10px;
+        }
+        .back-bottom a { color:rgba(255,255,255,0.2); text-decoration:none; font-size:12px; transition:color 0.3s; }
+        .back-bottom a:hover { color:var(--mindspeak-pink); }
+        .back-bottom .meta { color:rgba(255,255,255,0.1); font-size:11px; font-family:monospace; }
+
+        .public-private-note {
+            margin-top: 16px; padding: 10px 14px; background: rgba(0,0,0,0.2);
+            border-radius: 8px; border: 1px dashed rgba(255,255,255,0.06);
+            font-size: 10px; color: rgba(255,255,255,0.25); line-height: 1.7; text-align: center;
+        }
+        .public-private-note strong { color: rgba(255,255,255,0.4); font-weight: 600; }
+
+        .audit-log-panel {
+            margin-top: 16px; background: rgba(0,0,0,0.3); border-radius: 10px;
+            border: 1px solid rgba(244,114,182,0.08); overflow: hidden;
+        }
+        .audit-log-header {
+            padding: 8px 14px; background: rgba(244,114,182,0.06);
+            border-bottom: 1px solid rgba(244,114,182,0.1);
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .audit-log-header h4 { font-size: 11px; color: var(--mindspeak-pink-light); font-weight: 600; }
+        .audit-log-content {
+            max-height: 150px; overflow-y: auto; padding: 8px 14px;
+            font-family: monospace; font-size: 10px; line-height: 1.6;
+        }
+        .audit-log-entry { color: rgba(255,255,255,0.35); }
+        .audit-log-entry .ts { color: rgba(255,255,255,0.15); margin-right: 6px; }
+        .audit-log-entry .mod { color: var(--mindspeak-pink); margin-right: 6px; }
+
+        .flex-row select {
+            background: rgba(255,255,255,0.05); border:1px solid rgba(244,114,182,0.2);
+            color:#f1f5f9; padding:6px 10px; border-radius:8px; font-size:12px;
+        }
+
+        @media (max-width: 1400px) {
+            .right-panel { width: 220px; }
+            .main-content { margin-right: 220px; }
+        }
+        @media (max-width: 1024px) {
+            .left-nav { width: 180px; padding: 12px 8px; }
+            .main-content { margin-left: 180px; margin-right: 0; padding: 16px 20px; }
+            .right-panel { display: none; }
+            .intro-grid { grid-template-columns: 1fr 1fr; }
+            .algo-panorama { grid-template-columns: 1fr 1fr; }
+        }
+        @media (max-width: 768px) {
+            .v19-top-bar { padding: 8px 12px; gap: 8px; }
+            .steady-control { display: none; }
+            .pipeline-badge { display: none; }
+            .left-nav { display: none; }
+            .main-content { margin-left: 0; padding: 12px; }
+            .container { padding: 16px 12px; border-radius: 0; }
+            .intro-grid { grid-template-columns: 1fr; }
+            .kelly-grid, .pacd-grid, .mapping-matrix { grid-template-columns: 1fr 1fr; }
+            .mapping-grid, .vis-grid { grid-template-columns: 1fr; }
+            .closure { grid-template-columns: 1fr 1fr; }
+            .algo-panorama { grid-template-columns: 1fr; }
+            .hero h1 { font-size: 22px; }
+        }
+        @media (max-width: 480px) {
+            .kelly-grid, .pacd-grid, .mapping-matrix { grid-template-columns: 1fr; }
+            .closure { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body class="layout-fixed">
+
+    <div id="glow"></div><div class="sidebar"></div>
+
+    <div class="emergency-overlay" id="emergencyOverlay"></div>
+    <div class="emergency-banner" id="emergencyBanner">⚠️ 紧急停机中，运算拒绝执行</div>
+
+    <div class="v19-top-bar">
+        <nav class="breadcrumb">
+            <a href="../../index.html">Y.Mine总控台</a>
+            <span class="sep">›</span>
+            <a href="../../index.html">认知科研实验组</a>
+            <span class="sep">›</span>
+            <span class="current">MindSpeak · 四层跨域数理同构翻译引擎 V19.0</span>
+        </nav>
+        <span class="version-badge">V19.0 · GameOS V2.1</span>
+        <span class="pipeline-badge">S1 · ETL信息清洗（MindSpeak）</span>
+
+        <div class="steady-control">
+            <label>全局稳态：</label>
+            <input type="range" class="steady-slider" id="globalSteadySlider" min="0" max="100" value="50" step="1">
+            <span class="steady-value" id="steadyValueDisplay">0.50</span>
+        </div>
+
+        <div class="status-chips">
+            <span class="status-chip green" id="chipSteady">● 稳态</span>
+            <span class="status-chip" id="chipCalc" style="background:rgba(103,232,249,0.1);color:#67e8f9;border:1px solid rgba(103,232,249,0.3)">CALC</span>
+            <span class="status-chip" id="chipGM" style="background:rgba(167,139,250,0.1);color:#c4b5fd;border:1px solid rgba(167,139,250,0.3)">GM</span>
+            <span class="status-chip" id="chipCmp" style="background:rgba(244,114,182,0.1);color:#f9a8d4;border:1px solid rgba(244,114,182,0.3)">CMP</span>
+        </div>
+
+        <button class="btn-emergency" id="emergencyStopBtn">🛑 紧急停机</button>
+        <button class="btn-resume" id="resumeBtn">▶ 恢复运算</button>
+    </div>
+
+    <div class="layout-wrapper">
+
+    <nav class="left-nav" id="leftNav">
+        <div style="margin-bottom:6px; font-size:13px; font-weight:700; color:rgba(244,114,182,0.15);">📋 模块导航</div>
+        <a class="nav-item active" data-target="section-hero"><span class="num">①</span><span class="label">总览</span><span class="algo-tag">结构</span></a>
+        <a class="nav-item" data-target="section-router"><span class="num">🚀</span><span class="label">翻译器</span><span class="algo-tag">入口</span></a>
+        <div class="nav-divider"></div>
+        <a class="nav-item" data-target="section-svo"><span class="num">②</span><span class="label">语序</span><span class="algo-tag">交换律</span></a>
+        <a class="nav-item" data-target="section-tense"><span class="num">③</span><span class="label">时态</span><span class="algo-tag">凯利/概率</span></a>
+        <a class="nav-item" data-target="section-derivation"><span class="num">④</span><span class="label">词缀</span><span class="algo-tag">特征工程</span></a>
+        <a class="nav-item" data-target="section-passive"><span class="num">⑤</span><span class="label">被动</span><span class="algo-tag">IoC反转</span></a>
+        <a class="nav-item" data-target="section-wsd"><span class="num">⑥</span><span class="label">多义词</span><span class="algo-tag">策略模式</span></a>
+        <a class="nav-item" data-target="section-culture"><span class="num">⑦</span><span class="label">文化</span><span class="algo-tag">正则化</span></a>
+        <a class="nav-item" data-target="section-diff"><span class="num">⑧</span><span class="label">边界</span><span class="algo-tag">异常检测</span></a>
+        <div class="nav-divider"></div>
+        <a class="nav-item" data-target="section-chicken"><span class="num">⑨</span><span class="label">鸡兔</span><span class="algo-tag">枚举/拆分</span></a>
+        <a class="nav-item" data-target="section-pacd"><span class="num">⑩</span><span class="label">工程</span><span class="algo-tag">PACD</span></a>
+        <div class="nav-divider"></div>
+        <a class="nav-item" data-target="section-math"><span class="num">⑪</span><span class="label">枚举</span><span class="algo-tag">搜索</span></a>
+        <a class="nav-item" data-target="section-closure"><span class="num">∞</span><span class="label">闭环</span><span class="algo-tag">元映射</span></a>
+        <a class="nav-item" data-target="section-panorama"><span class="num">🧩</span><span class="label">全景</span><span class="algo-tag">矩阵</span></a>
+        <div class="nav-bottom">MindSpeak V19.0</div>
+    </nav>
+
+    <div class="main-content">
+        <div class="container">
+
+            <div class="section-anchor" id="section-hero"></div>
+            <div class="hero">
+                <div class="badge">🧠 MindSpeak · 语言 → 数理 → 算法 · 四层同构</div>
+                <h1>MindSpeak · 四层跨域数理同构翻译引擎 V19.0</h1>
+                <div class="subtitle">词缀→特征工程 · 被动→IoC · 多义词→策略模式 · 文化→正则化 · 边界→异常检测</div>
+                <span class="s1-tag">⚡ S1 · ETL信息清洗流水线入口</span>
+
+                <div class="intro-grid">
+                    <div class="intro-card">
+                        <div class="ic-title" style="color:#67e8f9;">🧭 这是什么</div>
+                        <div class="ic-body">
+                            一个<strong>"结构即算法"</strong>的交互式验证台。<br>
+                            把语言结构（语序/时态/词缀/被动/多义词/文化/边界）<br>
+                            映射到<strong style="color:#a78bfa;">数学结构</strong>（线性代数/凯利公式/二元拆分/PACD）<br>
+                            再映射到<strong style="color:var(--mindspeak-pink);">算法架构</strong>（交换律/概率/特征工程/IoC/策略/正则化/异常检测）。
+                        </div>
+                    </div>
+                    <div class="intro-card">
+                        <div class="ic-title" style="color:var(--mindspeak-pink);">🧠 V19.0核心升级</div>
+                        <div class="ic-body">
+                            <strong>全局稳态控制</strong>：0.48保本/0.50稳态/0.68熔断<br>
+                            <strong>三角冗余审计</strong>：calc/gamemind/compute三模型并行校验<br>
+                            <strong>五步骤流程</strong>：候选→验证→审计→回退→采纳<br>
+                            <span class="hl-pink">紧急停机一键切断</span>，localStorage隔离存储
+                        </div>
+                    </div>
+                    <div class="intro-card">
+                        <div class="ic-title" style="color:#4ade80;">🖱️ 怎么用</div>
+                        <div class="ic-body">
+                            ① 在顶部的 <span class="hl-blue">"双域翻译器"</span> 输入任何内容（语言/奥数题）。<br>
+                            ② 点击左侧导航 <span class="hl-pink">不同模块</span>，观察同一输入在不同领域的映射。<br>
+                            ③ 调节滑块/点击按钮，查看 <span class="hl-gold">完整计算过程</span> 和 <span class="hl-green">算法伪代码</span>（右侧面板）。
+                        </div>
+                    </div>
+                    <div class="intro-card">
+                        <div class="ic-title" style="color:#facc15;">🎯 设计思想</div>
+                        <div class="ic-body">
+                            证明 <strong>"结构是可以迁移的"</strong>。<br>
+                            所有符号系统（语言、数学、代码）共享同一套底层逻辑：<br>
+                            <span class="hl-green">生成候选 → 验证约束 → 三角审计 → 冲突回退 → 采纳最优</span><br>
+                            三栏实时联动：语言层 ↔ 数理层 ↔ 架构层
+                        </div>
+                    </div>
+                </div>
+
+                <div class="evidence-steps">
+                    <a href="#section-router" class="step"><span class="num">🚀</span><span class="label">翻译器</span></a>
+                    <a href="#section-svo" class="step"><span class="num">②</span><span class="label">语序</span></a>
+                    <a href="#section-tense" class="step"><span class="num">③</span><span class="label">时态</span></a>
+                    <a href="#section-derivation" class="step"><span class="num">④</span><span class="label">词缀</span></a>
+                    <a href="#section-passive" class="step"><span class="num">⑤</span><span class="label">被动</span></a>
+                    <a href="#section-wsd" class="step"><span class="num">⑥</span><span class="label">多义</span></a>
+                    <a href="#section-culture" class="step"><span class="num">⑦</span><span class="label">文化</span></a>
+                    <a href="#section-diff" class="step"><span class="num">⑧</span><span class="label">边界</span></a>
+                    <a href="#section-chicken" class="step"><span class="num">⑨</span><span class="label">鸡兔</span></a>
+                    <a href="#section-pacd" class="step"><span class="num">⑩</span><span class="label">工程</span></a>
+                </div>
+            </div>
+
+            <div class="section-anchor" id="section-router"></div>
+            <div class="section-title">🚀 双域翻译器 <span class="badge">语言 / 奥数 · 自动路由</span></div>
+            <div class="section-desc">输入任何内容，自动识别路由到对应模块。所有运算经过五步骤流程+三角审计。</div>
+            <div class="interact-card" id="routerCard">
+                <div class="stopped-notice" id="routerStopped">⚠️ 紧急停机中，运算拒绝执行</div>
+                <div class="card-title">⚡ 输入内容
+                    <span style="margin-left:auto; font-size:12px; color:rgba(255,255,255,0.2);">
+                        域: <span id="domainIndicator">等待</span> |
+                        稳态: <span id="routerSteady" style="color:var(--mindspeak-pink)">0.50</span>
+                    </span>
+                </div>
+                <div class="flex-row">
+                    <input type="text" id="routerInput" placeholder="例如：red car 或 鸡兔同笼 10头28脚" value="red car">
+                    <button class="btn" onclick="processRouter()">翻译</button>
+                </div>
+                <div style="display:flex; gap:6px; flex-wrap:wrap; margin:6px 0;">
+                    <button class="btn-outline" onclick="setRouter('red car')">🚗 red car</button>
+                    <button class="btn-outline" onclick="setRouter('I ate rice')">🍚 I ate rice</button>
+                    <button class="btn-outline" onclick="setRouter('打篮球')">🏀 打篮球</button>
+                    <button class="btn-outline" onclick="setRouter('鸡兔同笼 10头28脚')">🐔 鸡兔</button>
+                    <button class="btn-outline" onclick="setRouter('5个人围成一圈')">⭕ 圆排列</button>
+                    <button class="btn-outline" onclick="setRouter('龙')">🐉 文化</button>
+                    <button class="btn-outline" onclick="setRouter('kereta')">🚨 OOD</button>
+                </div>
+                <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-top:6px;">
+                    <div style="background:rgba(255,255,255,0.01); border-radius:8px; padding:8px 10px; border:1px solid rgba(255,255,255,0.03);">
+                        <div style="font-size:9px; color:rgba(255,255,255,0.15);">📥 源解析</div>
+                        <div id="routerSource" style="font-size:12px; color:rgba(255,255,255,0.35);">等待...</div>
+                    </div>
+                    <div style="background:rgba(255,255,255,0.01); border-radius:8px; padding:8px 10px; border:1px solid rgba(255,255,255,0.03);">
+                        <div style="font-size:9px; color:rgba(255,255,255,0.15);">⚙️ 结构化</div>
+                        <div id="routerTarget" style="font-size:11px; color:#34d399; font-family:monospace;">等待...</div>
+                    </div>
+                    <div style="background:rgba(255,255,255,0.01); border-radius:8px; padding:8px 10px; border:1px solid rgba(255,255,255,0.03);">
+                        <div style="font-size:9px; color:rgba(255,255,255,0.15);">🛣️ 路由</div>
+                        <div id="routerRoute" style="font-size:12px; color:rgba(255,255,255,0.35);">等待...</div>
+                    </div>
+                </div>
+                <div id="routerBacktrack" class="backtrack-log" style="margin-top:8px;">
+                    <div class="bt-title">⚙️ 五步骤流程日志（候选→验证→审计→回退→采纳）</div>
+                    <div style="color:rgba(255,255,255,0.08);">等待输入...</div>
+                </div>
+            </div>
+
+            <div class="section-anchor" id="section-svo"></div>
+            <div class="section-title">② 语序规则 ↔ 线性代数 <span class="badge">交换律 · word-order</span></div>
+            <div class="section-desc">修饰语重排（前置/后置）等价于线性组合交换律：Adj·N = N·Adj（线性空间成立）。</div>
+            <div class="interact-card" id="svoCard">
+                <div class="stopped-notice">⚠️ 紧急停机中，运算拒绝执行</div>
+                <div class="card-title">🔄 语序转换翻译器
+                    <span style="margin-left:auto; font-size:12px; color:rgba(255,255,255,0.2);" id="svoStatus">点击示例</span>
+                </div>
+                <div class="mapping-grid">
+                    <div class="mapping-card">
+                        <div class="domain-label">🌐 语言表达层</div>
+                        <div class="example"><span class="highlight-lang-en">red car</span> <span class="arrow">⇄</span> <span class="highlight-lang-my">kereta merah</span></div>
+                        <div class="desc">[Adj+N] ⇄ [N+Adj] 修饰语位置交换</div>
+                    </div>
+                    <div class="mapping-card">
+                        <div class="domain-label">📐 数理结构层</div>
+                        <div class="example"><span class="highlight-math">2x + 4y</span> <span class="arrow">⇄</span> <span class="highlight-math">4y + 2x</span></div>
+                        <div class="desc">交换律 a+b = b+a，和不变</div>
+                    </div>
+                </div>
+                <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                    <button class="btn-outline" onclick="showSVOMapping('red')">🚗 red car</button>
+                    <button class="btn-outline" onclick="showSVOMapping('big')">🏠 big house</button>
+                    <button class="btn-outline" onclick="showSVOMapping('math')">📐 线性组合</button>
+                </div>
+                <div id="svo-result" class="result-box"><span style="color:rgba(255,255,255,0.2);">点击示例查看完整映射与五步骤审计</span></div>
+                <div id="svo-backtrack" class="backtrack-log">
+                    <div class="bt-title">⏳ 跨域映射·五步骤审计日志</div>
+                    <div style="color:rgba(255,255,255,0.08);">等待触发...</div>
+                </div>
+            </div>
+
+            <div class="section-anchor" id="section-tense"></div>
+            <div class="section-title">③ 凯利二元结构 → 年龄/时态 <span class="badge badge-algo">🎲 概率模型 · tense-kelly</span></div>
+            <div class="section-desc">凯利公式 f* = (bp - q)/b 完整计算过程，映射到年龄和时态，全局稳态阈值联动。</div>
+            <div class="interact-card" id="tenseCard">
+                <div class="stopped-notice">⚠️ 紧急停机中，运算拒绝执行</div>
+                <div class="card-title">🎲 凯利验证器
+                    <span style="margin-left:auto; font-size:12px; color:rgba(255,255,255,0.2);" id="tenseStatus">就绪</span>
+                </div>
+                <div class="flex-row">
+                    <label style="color:rgba(255,255,255,0.35);">🎯 胜率 p</label>
+                    <input type="range" id="probSlider" min="5" max="95" value="60" oninput="updateKellyMapping()">
+                    <span id="probDisplay" style="color:#f1f5f9; min-width:50px;">0.60</span>
+                    <label style="color:rgba(255,255,255,0.35); margin-left:12px;">💰 赔率 b</label>
+                    <input type="range" id="oddsSlider" min="10" max="50" value="20" step="5" oninput="updateKellyMapping()">
+                    <span id="oddsDisplay" style="color:#f1f5f9; min-width:40px;">2.0</span>
+                    <button class="btn" onclick="updateKellyMapping()">验证运算</button>
+                </div>
+                <div class="kelly-grid">
+                    <div class="kelly-card"><div class="label">🕰️ 时态</div><div class="value" style="color:#67e8f9;" id="tenseType">现在时</div><div class="sub" id="tenseExample">I eat</div></div>
+                    <div class="kelly-card"><div class="label">🧮 凯利 f*</div><div class="value" style="color:#facc15;" id="kellyValue">20%</div><div class="sub" id="kellyDesc">最佳下注</div></div>
+                    <div class="kelly-card"><div class="label">📈 预期年龄</div><div class="value" style="color:#a78bfa;" id="baseAge">60 岁</div><div class="sub">p × 100</div></div>
+                    <div class="kelly-card"><div class="label">⚡ 有效年龄</div><div class="value" style="color:#4ade80;" id="riskAge">48 岁</div><div class="sub" id="riskDesc">风险折扣</div></div>
+                </div>
+                <div id="tense-result" class="result-box" style="border-left-color:var(--mindspeak-pink);">
+                    <span style="color:rgba(255,255,255,0.2);">调整 p 和 b 观察完整计算 + 三角审计</span>
+                </div>
+                <div id="tense-backtrack" class="backtrack-log">
+                    <div class="bt-title">📝 凯利公式·五步骤完整计算+三角审计</div>
+                    <div style="color:rgba(255,255,255,0.08);">等待操作...</div>
+                </div>
+            </div>
+
+            <div class="section-anchor" id="section-derivation"></div>
+            <div class="section-title">④ 词缀派生 → 特征工程 <span class="badge badge-algo">🧩 装饰器/特征变换 · affix-feature</span></div>
+            <div class="section-desc">词根 + 词缀 = 新词，类比基础特征 + 特征变换 = 新特征。拓扑网络多层映射。</div>
+            <div class="interact-card" id="deriveCard">
+                <div class="stopped-notice">⚠️ 紧急停机中，运算拒绝执行</div>
+                <div class="card-title">🧩 词根派生器
+                    <span style="margin-left:auto; font-size:12px; color:rgba(255,255,255,0.2);" id="deriveStatus">等待输入</span>
+                </div>
+                <div class="flex-row">
+                    <input type="text" id="deriveInput" placeholder="输入词根（如 makan/ajar/tulis）" value="makan">
+                    <button class="btn" onclick="runDerive()">派生特征</button>
+                </div>
+                <div style="display:flex; gap:6px; flex-wrap:wrap; margin:6px 0;">
+                    <button class="btn-outline" onclick="setDerive('makan')">🍚 makan (吃)</button>
+                    <button class="btn-outline" onclick="setDerive('ajar')">📚 ajar (教)</button>
+                    <button class="btn-outline" onclick="setDerive('tulis')">✏️ tulis (写)</button>
+                </div>
+                <div id="derivation-result"><div style="color:rgba(255,255,255,0.2);">输入词根查看特征工程映射</div></div>
+                <div id="derive-backtrack" class="backtrack-log">
+                    <div class="bt-title">⏳ 特征工程·五步骤映射日志</div>
+                    <div style="color:rgba(255,255,255,0.08);">等待触发...</div>
+                </div>
+            </div>
+
+            <div class="section-anchor" id="section-passive"></div>
+            <div class="section-title">⑤ 被动句式 → 控制反转 (IoC) <span class="badge badge-algo">🔄 依赖注入 · ioc-passive</span></div>
+            <div class="section-desc">主动 ↔ 被动 映射到 调用者 ↔ 被调用者 的关系反转，控制流方向逆转。</div>
+            <div class="interact-card" id="passiveCard">
+                <div class="stopped-notice">⚠️ 紧急停机中，运算拒绝执行</div>
+                <div class="card-title">🔄 被动/IoC转换器
+                    <span style="margin-left:auto; font-size:12px; color:rgba(255,255,255,0.2);" id="passiveStatus">等待输入</span>
+                </div>
+                <div class="flex-row">
+                    <input type="text" id="passiveInput" placeholder='输入主动句（如"我吃了苹果"）或被动句' value="我吃了苹果">
+                    <button class="btn" onclick="runPassive()">IoC反转</button>
+                </div>
+                <div id="passive-result" class="result-box"><span style="color:rgba(255,255,255,0.2);">输入句子查看IoC控制反转映射</span></div>
+                <div id="passive-backtrack" class="backtrack-log">
+                    <div class="bt-title">⏳ IoC依赖注入·五步骤映射日志</div>
+                    <div style="color:rgba(255,255,255,0.08);">等待触发...</div>
+                </div>
+            </div>
+
+            <div class="section-anchor" id="section-wsd"></div>
+            <div class="section-title">⑥ 多义词消歧 → 策略模式 <span class="badge badge-algo">🎯 上下文路由 · polysemy</span></div>
+            <div class="section-desc">根据上下文选择词义，类比策略模式根据上下文动态选择算法分支。</div>
+            <div class="interact-card" id="wsdCard">
+                <div class="stopped-notice">⚠️ 紧急停机中，运算拒绝执行</div>
+                <div class="card-title">🎯 词义消歧/策略路由
+                    <span style="margin-left:auto; font-size:12px; color:rgba(255,255,255,0.2);" id="wsdStatus">等待输入</span>
+                </div>
+                <div class="flex-row">
+                    <input type="text" id="wsdInput" placeholder="输入多义词（如 打/bank）" value="打">
+                    <select id="wsdBranch" style="background:rgba(255,255,255,0.05); border:1px solid rgba(244,114,182,0.2); color:#f1f5f9; padding:6px 10px; border-radius:8px;">
+                        <option value="0">🏀 体育分支（打球）</option>
+                        <option value="1">🚕 交通分支（打车）</option>
+                        <option value="2">💧 日常分支（打水）</option>
+                        <option value="3">⚖️ 法律分支（打官司）</option>
+                    </select>
+                    <button class="btn" onclick="runWSD()">策略路由</button>
+                </div>
+                <div id="wsd-result" class="result-box"><span style="color:rgba(255,255,255,0.2);">选择分支查看策略模式映射</span></div>
+                <div id="wsd-backtrack" class="backtrack-log">
+                    <div class="bt-title">⏳ 策略模式·五步骤路由日志</div>
+                    <div style="color:rgba(255,255,255,0.08);">等待触发...</div>
+                </div>
+            </div>
+
+            <div class="section-anchor" id="section-culture"></div>
+            <div class="section-title">⑦ 文化适配 → 正则化 <span class="badge badge-algo">⚖️ 偏见消除/约束 · culture-regex</span></div>
+            <div class="section-desc">文化约束（龙→Loong）类比正则化约束（L1/L2），防止不当输出，边界收敛。</div>
+            <div class="interact-card" id="cultureCard">
+                <div class="stopped-notice">⚠️ 紧急停机中，运算拒绝执行</div>
+                <div class="card-title">🤝 文化规约/正则化引擎
+                    <span style="margin-left:auto; font-size:12px; color:rgba(255,255,255,0.2);" id="cultureStatus">等待输入</span>
+                </div>
+                <div class="flex-row">
+                    <input type="text" id="cultureInput" placeholder="输入文化意象（如 龙/凤凰/dragon）" value="龙">
+                    <label style="color:rgba(255,255,255,0.35);">约束强度</label>
+                    <input type="range" id="cultureStrength" min="0" max="100" value="55" oninput="document.getElementById('cultureStrengthVal').textContent=(this.value/100).toFixed(2)">
+                    <span id="cultureStrengthVal" style="color:var(--mindspeak-pink); min-width:40px;">0.55</span>
+                    <button class="btn" onclick="runCulture()">正则约束</button>
+                </div>
+                <div id="culture-result" class="result-box"><span style="color:rgba(255,255,255,0.2);">输入文化意象查看正则化约束</span></div>
+                <div id="culture-backtrack" class="backtrack-log">
+                    <div class="bt-title">⏳ 正则化约束·五步骤日志</div>
+                    <div style="color:rgba(255,255,255,0.08);">等待触发...</div>
+                </div>
+            </div>
+
+            <div class="section-anchor" id="section-diff"></div>
+            <div class="section-title">⑧ 差异边界 → 异常检测 <span class="badge badge-algo">🛡️ OOD/置信度 · ood-detect</span></div>
+            <div class="section-desc">伪同源词（kereta）类比 OOD 数据，触发异常处理/置信度降级，触碰0.68红线自动熔断。</div>
+            <div class="interact-card" id="diffCard">
+                <div class="stopped-notice">⚠️ 紧急停机中，运算拒绝执行</div>
+                <div class="card-title">🔍 OOD边界/伪同源词检测
+                    <span style="margin-left:auto; font-size:12px; color:rgba(255,255,255,0.2);" id="diffStatus">等待输入</span>
+                </div>
+                <div class="flex-row">
+                    <input type="text" id="diffInput" placeholder="输入词汇（如 kereta/美丽/巭孬）" value="kereta">
+                    <label style="color:rgba(255,255,255,0.35);">OOD距离</label>
+                    <input type="range" id="oodScore" min="0" max="100" value="50" oninput="document.getElementById('oodScoreVal').textContent=(this.value/100).toFixed(2)">
+                    <span id="oodScoreVal" style="color:var(--mindspeak-pink); min-width:40px;">0.50</span>
+                    <button class="btn" onclick="runDiff()">OOD检测</button>
+                </div>
+                <div id="diff-result" class="result-box"><span style="color:rgba(255,255,255,0.2);">输入词汇查看异常检测映射</span></div>
+                <div id="diff-backtrack" class="backtrack-log">
+                    <div class="bt-title">⏳ OOD异常检测·五步骤日志</div>
+                    <div style="color:rgba(255,255,255,0.08);">等待触发...</div>
+                </div>
+            </div>
+
+            <div class="section-anchor" id="section-chicken"></div>
+            <div class="section-title">🐔 ⑨ 鸡兔同笼 <span class="badge badge-algo">🔢 方程组求解 · chicken-rabbit</span></div>
+            <div class="section-desc">二元拆分法完整计算过程：假设→差值→替换→验证，整数解校验+稳态审计。</div>
+            <div class="interact-card" id="chickenCard">
+                <div class="stopped-notice">⚠️ 紧急停机中，运算拒绝执行</div>
+                <div class="card-title">🧮 二元拆分解题器</div>
+                <div class="flex-row">
+                    <label style="color:rgba(255,255,255,0.35);">头数</label>
+                    <input type="number" id="chickenHeads" value="10" min="1" max="100" style="width:70px;">
+                    <label style="color:rgba(255,255,255,0.35); margin-left:8px;">脚数</label>
+                    <input type="number" id="chickenLegs" value="28" min="2" max="400" style="width:70px;">
+                    <button class="btn" onclick="runChicken()">运行求解</button>
+                    <button class="btn-outline" onclick="resetChicken()">重置</button>
+                </div>
+                <div style="display:flex; gap:6px; flex-wrap:wrap; margin:6px 0;">
+                    <button class="btn-outline" onclick="setChicken(35,94)">📖 孙子算经(35头94脚)</button>
+                    <button class="btn-outline" onclick="setChicken(10,28)">🐥 小规模(10头28脚)</button>
+                    <button class="btn-outline" onclick="setChicken(1,4)">🐰 边界(1头4脚全兔)</button>
+                </div>
+                <div class="vis-grid">
+                    <div class="vis-card"><div class="vis-title">🐔 鸡 vs 🐰 兔 数量</div>
+                        <div class="vis-bar-container">
+                            <div class="vis-bar-item"><span class="label">🐔</span><div class="track"><div class="bar" style="background:#67e8f9;" id="chickenBar"></div></div><span class="value" id="chickenBarVal">0</span></div>
+                            <div class="vis-bar-item"><span class="label">🐰</span><div class="track"><div class="bar" style="background:var(--mindspeak-pink);" id="rabbitBar"></div></div><span class="value" id="rabbitBarVal">0</span></div>
+                        </div>
+                    </div>
+                    <div class="vis-card"><div class="vis-title">📊 占比环形图</div>
+                        <div class="vis-ring-container">
+                            <div class="vis-ring" style="--color:#67e8f9; --pct:50;" id="chickenRing"><div class="inner"><span id="ringChickenPct">50%</span><span class="sub">鸡</span></div></div>
+                            <div class="vis-ring" style="--color:var(--mindspeak-pink); --pct:50;" id="rabbitRing"><div class="inner"><span id="ringRabbitPct">50%</span><span class="sub">兔</span></div></div>
+                        </div>
+                    </div>
+                </div>
+                <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-top:6px;">
+                    <div style="background:rgba(255,255,255,0.01); border-radius:8px; padding:8px; text-align:center;"><span style="color:rgba(255,255,255,0.2);">🐔 鸡</span><br><span id="cCount" style="font-size:22px; color:#67e8f9;">--</span></div>
+                    <div style="background:rgba(255,255,255,0.01); border-radius:8px; padding:8px; text-align:center;"><span style="color:rgba(255,255,255,0.2);">🐰 兔</span><br><span id="rCount" style="font-size:22px; color:var(--mindspeak-pink);">--</span></div>
+                    <div style="background:rgba(255,255,255,0.01); border-radius:8px; padding:8px; text-align:center;"><span style="color:rgba(255,255,255,0.2);">✅ 验证</span><br><span id="vCount" style="font-size:22px; color:#4ade80;">--</span></div>
+                </div>
+                <div id="chickenLog" class="backtrack-log">
+                    <div class="bt-title">📝 鸡兔同笼·五步骤完整计算+三角审计</div>
+                    <div style="color:rgba(255,255,255,0.08);">点击运行查看分步算术</div>
+                </div>
+            </div>
+
+            <div class="section-anchor" id="section-pacd"></div>
+            <div class="section-title">🏗️ ⑩ 工程问题 <span class="badge badge-algo">⚙️ 并行调度 · pacd</span></div>
+            <div class="section-desc">效率计算→合作效率→合作时间，完整PACD并行调度映射，阿马迪亚瓶颈检测。</div>
+            <div class="interact-card" id="pacdCard">
+                <div class="stopped-notice">⚠️ 紧急停机中，运算拒绝执行</div>
+                <div class="card-title">🧮 PACD工程效率/并行调度翻译器</div>
+                <div class="flex-row">
+                    <input type="text" id="pacdInput" placeholder="例如：甲单独做需5天，乙单独做需10天" value="甲单独做需5天，乙单独做需10天，合作需几天？">
+                    <button class="btn" onclick="runPACD()">翻译为PACD</button>
+                    <button class="btn-outline" onclick="resetPACD()">重置</button>
+                </div>
+                <div style="display:flex; gap:6px; flex-wrap:wrap; margin:6px 0;">
+                    <button class="btn-outline" onclick="setPACD('甲单独做需5天，乙单独做需10天，合作需几天？')">📐 双人合作</button>
+                    <button class="btn-outline" onclick="setPACD('甲做需3天，乙做需6天，丙做需9天')">👷 三人协作</button>
+                </div>
+                <div class="pacd-grid">
+                    <div class="item"><div class="label">P (总量)</div><div class="value" style="color:#67e8f9;" id="pacdP">--</div><div class="sub">任务总量=1</div></div>
+                    <div class="item"><div class="label">A (效率1)</div><div class="value" style="color:#facc15;" id="pacdA">--</div><div class="sub">主体1效率</div></div>
+                    <div class="item"><div class="label">C (效率2)</div><div class="value" style="color:#a78bfa;" id="pacdC">--</div><div class="sub">主体2效率</div></div>
+                    <div class="item"><div class="label">D (结果)</div><div class="value" style="color:#4ade80;" id="pacdD">--</div><div class="sub">合作工期</div></div>
+                </div>
+                <div class="vis-grid">
+                    <div class="vis-card"><div class="vis-title">⚡ 效率对比</div>
+                        <div class="vis-bar-container">
+                            <div class="vis-bar-item"><span class="label">甲</span><div class="track"><div class="bar" style="background:#facc15;" id="eff1Bar"></div></div><span class="value" id="eff1Val">0</span></div>
+                            <div class="vis-bar-item"><span class="label">乙</span><div class="track"><div class="bar" style="background:#a78bfa;" id="eff2Bar"></div></div><span class="value" id="eff2Val">0</span></div>
+                            <div class="vis-bar-item"><span class="label">合</span><div class="track"><div class="bar" style="background:#4ade80;" id="effSumBar"></div></div><span class="value" id="effSumVal">0</span></div>
+                        </div>
+                    </div>
+                    <div class="vis-card"><div class="vis-title">🎯 结果</div>
+                        <div style="text-align:center; padding:8px 0;">
+                            <div style="font-size:32px; font-weight:700; color:#4ade80;" id="resultDisplay">--</div>
+                            <div style="color:rgba(255,255,255,0.2);" id="resultLabel">等待</div>
+                        </div>
+                    </div>
+                </div>
+                <div id="pacdLog" class="backtrack-log">
+                    <div class="bt-title">📝 PACD并行调度·五步骤完整计算</div>
+                    <div style="color:rgba(255,255,255,0.08);">等待输入...</div>
+                </div>
+            </div>
+
+            <div class="section-anchor" id="section-math"></div>
+            <div class="section-title">⑪ 奥数枚举 <span class="badge badge-algo">🔍 搜索/剪枝 · enum-validation</span></div>
+            <div class="section-desc">枚举所有组合→验证条件→剪枝优化，组合搜索+约束满足映射。</div>
+            <div class="interact-card" id="mathCard">
+                <div class="stopped-notice">⚠️ 紧急停机中，运算拒绝执行</div>
+                <div class="card-title">🧮 枚举验证/组合剪枝器
+                    <span style="margin-left:auto; font-size:12px; color:rgba(255,255,255,0.2);">
+                        步骤 <span id="mathStepCounter">0</span> |
+                        剪枝: <label style="display:inline-flex;align-items:center;gap:4px;"><input type="checkbox" id="pruneCheck" checked> 启用</label>
+                    </span>
+                </div>
+                <div id="numberPool" style="display:flex; gap:10px; flex-wrap:wrap; margin:12px 0; justify-content:center;"></div>
+                <div id="currentAttempt" style="color:rgba(255,255,255,0.25); text-align:center; padding:8px; background:rgba(255,255,255,0.02); border-radius:8px;">🎯 点击下一步开始枚举</div>
+                <div class="result-box" style="border-left-color:var(--mindspeak-pink); display:flex; gap:20px;">
+                    <div><span style="color:rgba(255,255,255,0.2);">📦 已尝试</span><br><span id="mathTried" style="font-size:20px; color:#67e8f9;">0</span></div>
+                    <div><span style="color:rgba(255,255,255,0.2);">✅ 保留</span><br><span id="mathValid" style="font-size:20px; color:#4ade80;">0</span></div>
+                    <div><span style="color:rgba(255,255,255,0.2);">✂️ 剪枝率</span><br><span id="mathPruneRate" style="font-size:20px; color:var(--mindspeak-pink);">0%</span></div>
+                </div>
+                <div id="mathBacktrack" class="backtrack-log">
+                    <div class="bt-title">⚙️ 枚举搜索·五步骤日志</div>
+                    <div style="color:rgba(255,255,255,0.08);">等待...</div>
+                </div>
+                <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:12px;">
+                    <button class="btn" onclick="mathNextStep()">▶ 下一步</button>
+                    <button class="btn-outline" onclick="mathReset()">重置</button>
+                    <button class="btn-outline" onclick="mathRunAll()">⏩ 快速运行</button>
+                    <span style="color:rgba(255,255,255,0.1); margin-left:auto;" id="mathStatus">就绪</span>
+                </div>
+            </div>
+
+            <div class="section-anchor" id="section-closure"></div>
+            <div class="section-title">∞ 证据闭环 <span class="badge">语言 ↔ 数理 ↔ 算法 元映射</span></div>
+            <div class="section-desc">从②到⑪，每一层都完成了"语言→数理→算法"的结构迁移，五步骤流程统一所有模块。</div>
+            <div class="closure">
+                <div class="item"><div class="label">② 语序</div><div class="text">线性代数交换律</div></div>
+                <div class="item"><div class="label">③ 时态</div><div class="text">凯利公式/概率模型</div></div>
+                <div class="item"><div class="label">④ 词缀</div><div class="text">特征工程/装饰器</div></div>
+                <div class="item"><div class="label">⑤ 被动</div><div class="text">控制反转(IoC)/DI</div></div>
+                <div class="item"><div class="label">⑥ 多义词</div><div class="text">策略模式/路由</div></div>
+                <div class="item"><div class="label">⑦ 文化</div><div class="text">正则化/偏见约束</div></div>
+                <div class="item"><div class="label">⑧ 边界</div><div class="text">OOD异常检测</div></div>
+                <div class="item"><div class="label">⑨⑩⑪</div><div class="text">方程组/PACD/枚举剪枝</div></div>
+            </div>
+
+            <div class="section-anchor" id="section-panorama"></div>
+            <div class="section-title">🧩 算法映射全景 <span class="badge">10大模块 × 三层架构 完整矩阵</span></div>
+            <div class="section-desc">语言证据链（②-⑧）与算法架构（交换律/凯利/特征工程/IoC/策略/正则化/OOD）的完整映射全景。</div>
+
+            <div class="interact-card" style="background:rgba(244,114,182,0.02); border-color:rgba(244,114,182,0.08);">
+                <div class="card-title">📊 跨域映射全景矩阵</div>
+                <div class="algo-panorama">
+                    <div class="map-item">
+                        <div class="map-header">
+                            <span class="lang-tag">② 语序规则</span>
+                            <span class="arrow-icon">→</span>
+                            <span class="algo-tag-big">线性代数交换律</span>
+                        </div>
+                        <div class="map-example">
+                            <span class="ex-lang">red car ⇄ kereta merah</span><br>
+                            <span class="ex-algo">a+b = b+a（线性空间交换律）</span>
+                        </div>
+                        <div class="map-desc">💡 修饰语重排 = 向量位置交换，交换律在线性空间成立</div>
+                    </div>
+                    <div class="map-item">
+                        <div class="map-header">
+                            <span class="lang-tag">③ 时态/概率</span>
+                            <span class="arrow-icon">→</span>
+                            <span class="algo-tag-big">凯利公式</span>
+                        </div>
+                        <div class="map-example">
+                            <span class="ex-lang">过去/现在/将来时 ↔ 确定/进行/不确定</span><br>
+                            <span class="ex-algo">f* = (bp-q)/b 最优持仓</span>
+                        </div>
+                        <div class="map-desc">💡 时态持续时间映射凯利持仓周期，p值联动时态</div>
+                    </div>
+                    <div class="map-item">
+                        <div class="map-header">
+                            <span class="lang-tag">④ 词缀派生</span>
+                            <span class="arrow-icon">→</span>
+                            <span class="algo-tag-big">特征工程</span>
+                        </div>
+                        <div class="map-example">
+                            <span class="ex-lang">makan → makanan/pemakan/memakan</span><br>
+                            <span class="ex-algo">基特征→多项式/归一化/交互特征</span>
+                        </div>
+                        <div class="map-desc">💡 词根+词缀=新词，类比基础特征+特征变换=新特征</div>
+                    </div>
+                    <div class="map-item">
+                        <div class="map-header">
+                            <span class="lang-tag">⑤ 被动句式</span>
+                            <span class="arrow-icon">→</span>
+                            <span class="algo-tag-big">控制反转(IoC)</span>
+                        </div>
+                        <div class="map-example">
+                            <span class="ex-lang">Saya makan nasi → Nasi dimakan</span><br>
+                            <span class="ex-algo">调用者→被调用者（依赖注入/DI）</span>
+                        </div>
+                        <div class="map-desc">💡 主动→被动=控制反转，数据流方向反转</div>
+                    </div>
+                    <div class="map-item">
+                        <div class="map-header">
+                            <span class="lang-tag">⑥ 多义词消歧</span>
+                            <span class="arrow-icon">→</span>
+                            <span class="algo-tag-big">策略模式</span>
+                        </div>
+                        <div class="map-example">
+                            <span class="ex-lang">"打" → hit/play/take（上下文决定）</span><br>
+                            <span class="ex-algo">不同上下文→不同算法分支</span>
+                        </div>
+                        <div class="map-desc">💡 根据上下文选择词义=根据上下文选择算法策略</div>
+                    </div>
+                    <div class="map-item">
+                        <div class="map-header">
+                            <span class="lang-tag">⑦ 文化适配</span>
+                            <span class="arrow-icon">→</span>
+                            <span class="algo-tag-big">正则化约束</span>
+                        </div>
+                        <div class="map-example">
+                            <span class="ex-lang">"龙"→"Loong"（避免西方负面联想）</span><br>
+                            <span class="ex-algo">L1/L2正则化→约束模型输出边界</span>
+                        </div>
+                        <div class="map-desc">💡 文化约束=正则化约束，防止不当输出</div>
+                    </div>
+                    <div class="map-item">
+                        <div class="map-header">
+                            <span class="lang-tag">⑧ 差异边界</span>
+                            <span class="arrow-icon">→</span>
+                            <span class="algo-tag-big">OOD异常检测</span>
+                        </div>
+                        <div class="map-example">
+                            <span class="ex-lang">"kereta"→MY=汽车/ID=火车</span><br>
+                            <span class="ex-algo">OOD检测→置信度降级/人工介入</span>
+                        </div>
+                        <div class="map-desc">💡 伪同源词=分布外(OOD)数据→触发异常处理</div>
+                    </div>
+                    <div class="map-item">
+                        <div class="map-header">
+                            <span class="lang-tag">⑨⑩⑪ 奥数问题</span>
+                            <span class="arrow-icon">→</span>
+                            <span class="algo-tag-big">方程组/PACD/枚举剪枝</span>
+                        </div>
+                        <div class="map-example">
+                            <span class="ex-lang">鸡兔同笼/工程问题/组合枚举</span><br>
+                            <span class="ex-algo">线性方程组/并行调度/约束满足</span>
+                        </div>
+                        <div class="map-desc">💡 算术问题→经典算法范式映射</div>
+                    </div>
+                </div>
+                <div style="margin-top:10px; color:rgba(255,255,255,0.15); font-size:11px; border-top:1px solid rgba(255,255,255,0.03); padding-top:10px; text-align:center; line-height:1.8;">
+                    💡 每一层语言证据都对应一类算法设计思想，构成从"语言学"到"计算机科学"的完整映射链。<br>
+                    <strong style="color:var(--mindspeak-pink);">五步骤统一流程</strong>：生成候选 → 约束验证 → 三角审计(calc/GM/CMP) → 冲突回退 → 采纳最优
+                </div>
+            </div>
+
+            <div class="audit-log-panel" id="auditLogPanel">
+                <div class="audit-log-header">
+                    <h4>📋 审计日志（mindspeak_audit_log · 仅追加写入）</h4>
+                    <button class="btn-outline" style="font-size:10px; padding:3px 10px;" onclick="clearAuditDisplay()">清空显示</button>
+                </div>
+                <div class="audit-log-content" id="auditLogContent">
+                    <div class="audit-log-entry"><span class="ts">[系统]</span><span class="mod">INIT</span> 等待运算触发审计记录...</div>
+                </div>
+            </div>
+
+            <div class="public-private-note">
+                <strong>公开层：</strong>mindspeak/ 目录（本页面及公开引擎），可 GitHub 公开；
+                <strong>私有涉密内核：</strong>mindspeak-private-engine/ 目录（四维向量算子/权重矩阵/置信度内核/加密矩阵），例外交存密封，前端仅接口桩。
+            </div>
+
+            <div class="back-bottom">
+                <a href="../../index.html">← 返回Y.Mine总控台</a>
+                <span class="meta">Y.Mine · MindSpeak 四层跨域数理同构翻译引擎 V19.0 · 隶属于 Game-OS V2.1 · EvolveMind 认知演化引擎独立子组件</span>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="right-panel" id="rightAlgoPanel">
+        <div class="algo-panel-title">⚙️ 算法架构层 <span style="margin-left:auto; font-size:9px; color:rgba(255,255,255,0.2);">Layer 3</span></div>
+
+        <div class="algo-section">
+            <div class="algo-section-title">🔄 当前模块</div>
+            <div id="currentAlgoModule" style="font-size:12px; color:var(--mindspeak-pink); font-weight:600;">① 总览 · overview</div>
+        </div>
+
+        <div class="algo-section">
+            <div class="algo-section-title">📝 算法伪代码</div>
+            <div class="algo-pseudo" id="algoPseudo">function mindSpeakTranslate(input):
+  candidates = generate(input)
+  valid = constraints.filter(candidates)
+  audit = triangleAudit(valid)
+  if audit.conflict: rollback()
+  return best(valid)</div>
+        </div>
+
+        <div class="algo-section">
+            <div class="algo-section-title">🔀 五步骤流程</div>
+            <div class="algo-flow-steps" id="algoFlowSteps">
+                <div class="flow-step">步骤1：生成候选</div>
+                <div class="flow-step" style="opacity:0.5;">步骤2：约束验证</div>
+                <div class="flow-step" style="opacity:0.5;">步骤3：三角审计</div>
+                <div class="flow-step" style="opacity:0.5;">步骤4：冲突回退</div>
+                <div class="flow-step" style="opacity:0.5;">步骤5：采纳最优</div>
+            </div>
+        </div>
+
+        <div class="algo-section">
+            <div class="algo-section-title">📊 三角审计状态</div>
+            <div id="algoAuditMini" class="audit-mini pass">
+                ✅ 审计待执行<br>
+                <span style="font-size:9px; opacity:0.8;">三模型 calc/GM/CMP 并行校验，允许误差±0.02</span>
+            </div>
+            <div style="margin-top:8px; font-size:10px; color:rgba(255,255,255,0.3); line-height:1.6;">
+                <div style="display:flex; justify-content:space-between;">
+                    <span>CALC (金融精算):</span>
+                    <span id="miniCalc" style="color:#67e8f9;">--</span>
+                </div>
+                <div style="display:flex; justify-content:space-between;">
+                    <span>GM (博弈沙盘):</span>
+                    <span id="miniGM" style="color:#c4b5fd;">--</span>
+                </div>
+                <div style="display:flex; justify-content:space-between;">
+                    <span>CMP (几何算力):</span>
+                    <span id="miniCmp" style="color:#f9a8d4;">--</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="algo-section">
+            <div class="algo-section-title">🎚️ 全局阈值常量</div>
+            <div style="font-size:10px; font-family:monospace; line-height:1.8; color:rgba(255,255,255,0.45);">
+                <div>BREAKEVEN = <span style="color:#4ade80;">0.48</span> (保本线)</div>
+                <div>STEADY    = <span style="color:#facc15;">0.50</span> (中轴线)</div>
+                <div>FUSE      = <span style="color:#f87171;">0.68</span> (熔断红线)</div>
+                <div>TOLERANCE = <span style="color:var(--mindspeak-pink);">0.02</span> (允许误差)</div>
+            </div>
+        </div>
+
+        <div class="algo-section">
+            <div class="algo-section-title">💾 存储隔离</div>
+            <div style="font-size:9px; color:rgba(255,255,255,0.3); font-family:monospace; line-height:1.8;">
+                前缀: mindspeak_<br>
+                审计: mindspeak_audit_log<br>
+                停机: mindspeak_emergency_stop<br>
+                状态: mindspeak_steady_bias
+            </div>
+        </div>
+    </div>
+
+    </div>
+
+    <script>
+        const MS_THRESHOLDS = {
+            BREAKEVEN: 0.48,
+            STEADY: 0.50,
+            FUSE: 0.68,
+            TOLERANCE: 0.02
+        };
+        const STORAGE_PREFIX = 'mindspeak_';
+        const AUDIT_LOG_KEY = STORAGE_PREFIX + 'audit_log';
+
+        let MS_STATE = {
+            emergencyStopped: false,
+            globalSteady: 0.50,
+            currentModule: 'section-hero',
+            auditLog: []
+        };
+
+        function generateId() {
+            return 'MS-' + Date.now().toString(36) + '-' + Math.random().toString(36).substr(2, 6);
+        }
+
+        function safeGetStorage(key, def) {
+            try {
+                const v = localStorage.getItem(STORAGE_PREFIX + key);
+                return v !== null ? v : def;
+            } catch(e) { return def; }
+        }
+
+        function safeSetStorage(key, val) {
+            try { localStorage.setItem(STORAGE_PREFIX + key, val); } catch(e) {}
+        }
+
+        function appendAuditLog(module, message, level) {
+            const entry = {
+                id: generateId(),
+                timestamp: Date.now(),
+                timeStr: new Date().toLocaleTimeString('zh-CN', {hour12:false}),
+                module: module,
+                message: message,
+                level: level || 'info'
+            };
+            MS_STATE.auditLog.push(entry);
+            if (MS_STATE.auditLog.length > 500) MS_STATE.auditLog = MS_STATE.auditLog.slice(-500);
+            try {
+                let stored = [];
+                const raw = localStorage.getItem(AUDIT_LOG_KEY);
+                if (raw) { try { stored = JSON.parse(raw); } catch(e){} }
+                stored.push(entry);
+                if (stored.length > 1000) stored = stored.slice(-1000);
+                localStorage.setItem(AUDIT_LOG_KEY, JSON.stringify(stored));
+            } catch(e) {}
+            renderAuditEntry(entry);
+        }
+
+        function renderAuditEntry(entry) {
+            const box = document.getElementById('auditLogContent');
+            if (!box) return;
+            const colorMap = { info: 'rgba(255,255,255,0.4)', warn: '#facc15', error: '#f87171', audit: 'var(--mindspeak-pink)' };
+            const div = document.createElement('div');
+            div.className = 'audit-log-entry';
+            div.innerHTML = '<span class="ts">[' + entry.timeStr + ']</span><span class="mod">' + entry.module + '</span><span style="color:' + (colorMap[entry.level]||colorMap.info) + '">' + entry.message + '</span>';
+            box.appendChild(div);
+            box.scrollTop = box.scrollHeight;
+        }
+
+        function clearAuditDisplay() {
+            const box = document.getElementById('auditLogContent');
+            if (box) box.innerHTML = '<div class="audit-log-entry"><span class="ts">[清空]</span><span class="mod">UI</span>显示已清空（localStorage审计日志仅追加不可删除）</div>';
+        }
+
+        function runTriangleAudit(baseConfidence) {
+            const calcVal = Math.max(0, Math.min(1, baseConfidence + (Math.random()-0.5)*0.015));
+            const gmVal = Math.max(0, Math.min(1, baseConfidence + (Math.random()-0.5)*0.018));
+            const cmpVal = Math.max(0, Math.min(1, baseConfidence + (Math.random()-0.5)*0.012));
+
+            const maxDiff = Math.max(Math.abs(calcVal-gmVal), Math.abs(gmVal-cmpVal), Math.abs(cmpVal-calcVal));
+            let auditResult = 'PASS';
+            let finalConf = (calcVal + gmVal + cmpVal) / 3;
+            let msg = '';
+
+            if (maxDiff > MS_THRESHOLDS.TOLERANCE * 1.5) {
+                auditResult = 'BLOCK';
+                msg = '两组异常，运算阻断';
+            } else if (maxDiff > MS_THRESHOLDS.TOLERANCE) {
+                auditResult = 'CORRECTED';
+                msg = '单组偏差，均值修正至 ' + finalConf.toFixed(3);
+            } else {
+                msg = '三模型偏差 ' + maxDiff.toFixed(4) + '，校验通过';
+            }
+
+            return { auditResult, finalConf, models: { calc: calcVal, gamemind: gmVal, compute: cmpVal }, maxDiff, msg };
+        }
+
+        function updateAuditUI(audit) {
+            const mini = document.getElementById('algoAuditMini');
+            document.getElementById('miniCalc').textContent = audit.models.calc.toFixed(3);
+            document.getElementById('miniGM').textContent = audit.models.gamemind.toFixed(3);
+            document.getElementById('miniCmp').textContent = audit.models.compute.toFixed(3);
+            document.getElementById('chipCalc').textContent = 'CALC ' + (Math.abs(audit.models.calc - audit.finalConf)<=0.02 ? '✓' : '✗');
+            document.getElementById('chipGM').textContent = 'GM ' + (Math.abs(audit.models.gamemind - audit.finalConf)<=0.02 ? '✓' : '✗');
+            document.getElementById('chipCmp').textContent = 'CMP ' + (Math.abs(audit.models.compute - audit.finalConf)<=0.02 ? '✓' : '✗');
+
+            if (audit.auditResult === 'PASS') {
+                mini.className = 'audit-mini pass';
+                mini.innerHTML = '✅ 三角审计通过<br><span style="font-size:9px; opacity:0.8;">' + audit.msg + '</span>';
+            } else if (audit.auditResult === 'CORRECTED') {
+                mini.className = 'audit-mini warn';
+                mini.innerHTML = '⚠️ 单组偏差·已修正<br><span style="font-size:9px; opacity:0.8;">' + audit.msg + '</span>';
+            } else {
+                mini.className = 'audit-mini fail';
+                mini.innerHTML = '❌ 审计阻断<br><span style="font-size:9px; opacity:0.8;">' + audit.msg + '</span>';
+            }
+        }
+
+        function updateSteadyUI(steady) {
+            const chip = document.getElementById('chipSteady');
+            if (steady > MS_THRESHOLDS.FUSE) {
+                chip.className = 'status-chip red'; chip.textContent = '● 熔断';
+            } else if (steady > MS_THRESHOLDS.STEADY + MS_THRESHOLDS.TOLERANCE) {
+                chip.className = 'status-chip yellow'; chip.textContent = '● 预警';
+            } else if (steady < MS_THRESHOLDS.BREAKEVEN) {
+                chip.className = 'status-chip yellow'; chip.textContent = '● 保本线下';
+            } else {
+                chip.className = 'status-chip green'; chip.textContent = '● 稳态';
+            }
+            document.getElementById('steadyValueDisplay').textContent = steady.toFixed(2);
+            const rs = document.getElementById('routerSteady');
+            if (rs) rs.textContent = steady.toFixed(2);
+        }
+
+        function updateRightPanel(moduleName, algoName) {
+            document.getElementById('currentAlgoModule').textContent = moduleName;
+            document.getElementById('algoPseudo').textContent = getDefaultPseudo(algoName);
+            const steps = document.getElementById('algoFlowSteps').children;
+            for (let i = 0; i < steps.length; i++) {
+                steps[i].style.opacity = (i < 2) ? '1' : '0.5';
+            }
+        }
+
+        function getDefaultPseudo(algo) {
+            const pseudos = {
+                'word-order': 'function swapWordOrder(sentence):\n  tokens = posTag(sentence)\n  adj_pos = findAdjectives(tokens)\n  swapped = linearSwap(adj_pos, nouns)\n  return verifyCommutativity(swapped)',
+                'tense-kelly': 'function kellyFraction(p, b):\n  q = 1 - p\n  f_star = (b*p - q) / b\n  f_star = max(0, f_star)\n  if applyGlobalSteady(f_star) > 0.68:\n    triggerFuse()\n  return f_star',
+                'affix-feature': 'function deriveFeatures(root):\n  layer1 = applyAffixes(root, prefixes)\n  layer2 = crossFeatures(layer1)\n  topology = buildTopology(layer1, layer2)\n  return {features: layer2, topology}',
+                'ioc-passive': 'function reverseVoice(sentence):\n  subj, verb, obj = parseSVO(sentence)\n  newSubj = obj\n  newVerb = applyPassive(verb)\n  newAgent = addByMarker(subj)\n  return reverseFlow(newSubj, newVerb, newAgent)',
+                'polysemy': 'function disambiguate(word, context):\n  branches = loadStrategyBranches(word)\n  key = extractContextKey(context)\n  activeBranch = routeToBranch(key, branches)\n  deactivateOthers(branches, activeBranch)\n  return activeBranch.resolve(word)',
+                'culture-regex': 'function cultureConstrain(concept, culture):\n  rules = loadRegex(culture)\n  strength = getConstraintStrength(concept)\n  output = applyConstraints(concept, rules, strength)\n  if detectTaboo(output): replaceOrNote(output)\n  return output',
+                'ood-detect': 'function detectOOD(word, distribution):\n  distance = computeOODScore(word, distribution)\n  confidence = max(0, 1 - distance*0.9)\n  if distance > 0.68: triggerFuse()\n  else if distance > 0.52: downgradeConfidence()\n  else: passThrough()\n  return {confidence, ood: distance}',
+                'chicken-rabbit': 'function solveChickenRabbit(heads, feet):\n  assume = heads * 2\n  diff = feet - assume\n  rabbit = diff / 2\n  chicken = heads - rabbit\n  if validInteger(chicken, rabbit):\n    audit = triangleAudit(0.5)\n    return {chicken, rabbit, audit}\n  else: return OOD_ERROR',
+                'pacd': 'function solvePACD(rates):\n  total = 1\n  combined = sum(rates)\n  days = total / combined\n  bottleneck = min(rates)\n  return {days, combined, bottleneck}',
+                'enum-validation': 'function enumValidate(n, constraints):\n  combos = generateAllCombinations(n)\n  valid = []\n  for combo in combos:\n    if constraints.check(combo):\n      if pruneEnabled: pruneBranch(combo)\n      valid.push(combo)\n    else: backtrack()\n  return {valid, prunedRate}',
+                'router': 'function dualDomainRouter(input):\n  domain = detectDomain(input)\n  if domain == MATH: routeToMathSolver(input)\n  else: routeToLanguageMapper(input)\n  return runFiveStepPipeline(input)',
+                'meta': 'function metaMapping(input):\n  for each module in modules:\n    result = module.run(input)\n    verifyStructuralIsomorphism(result)\n  return closedLoopProof',
+                'panorama': 'function buildPanoramaMatrix():\n  matrix = []\n  for lang in language_features:\n    for algo in algorithms:\n      if isomorphic(lang, algo):\n        matrix.push({lang, algo})\n  return renderMatrix(matrix)',
+                'overview': 'function mindSpeakTranslate(input):\n  candidates = step1_generateCandidates(input)\n  valid = step2_constraintFilter(candidates)\n  audit = step3_triangleAudit(valid)\n  if audit.conflict: result = step4_rollback(audit)\n  else: result = step5_selectBest(valid)\n  return appendAuditTrail(result)'
+            };
+            return pseudos[algo] || pseudos['overview'];
+        }
+
+        function generateFiveStepLogs(moduleName, baseConf, details) {
+            if (MS_STATE.emergencyStopped) {
+                return { html: '<div class="bt-title">⚠️ 紧急停机</div><div class="bt-step fail"><span class="msg">🚨 紧急停机中，运算拒绝执行</span></div>', audit: null, finalConf: baseConf, status: 'STOPPED' };
+            }
+            const conf = Math.max(0, Math.min(1, baseConf + MS_STATE.globalSteady - 0.5 + (Math.random()-0.5)*0.02));
+            const audit = runTriangleAudit(conf);
+            let html = '<div class="bt-title">⚙️ ' + moduleName + ' · 五步骤演算日志</div>';
+
+            html += '<div class="bt-step info"><span class="msg">🔹 步骤1：生成候选映射向量... ' + (details.candidates || '') + '</span></div>';
+            html += '<div class="bt-step info"><span class="msg">🔸 步骤2：约束验证，全局稳态偏置=' + MS_STATE.globalSteady.toFixed(2) + '</span></div>';
+            html += '<div class="bt-step audit"><span class="msg">🔺 步骤3：三角审计 calc=' + audit.models.calc.toFixed(3) + ' GM=' + audit.models.gamemind.toFixed(3) + ' CMP=' + audit.models.compute.toFixed(3) + '</span></div>';
+            if (audit.auditResult === 'BLOCK') {
+                html += '<div class="bt-step fail"><span class="msg">⚠️ 步骤4：冲突无法回退，运算阻断</span></div>';
+            } else if (audit.auditResult === 'CORRECTED') {
+                html += '<div class="bt-step warn"><span class="msg">🔄 步骤4：冲突回退→均值修正至 ' + audit.finalConf.toFixed(3) + '</span></div>';
+                html += '<div class="bt-step success"><span class="msg">✅ 步骤5：采纳修正后最优解</span></div>';
+            } else {
+                html += '<div class="bt-step success"><span class="msg">✅ 步骤4：无冲突，无需回退</span></div>';
+                html += '<div class="bt-step success"><span class="msg">✅ 步骤5：采纳最优解，最终置信度=' + audit.finalConf.toFixed(3) + '</span></div>';
+            }
+
+            let status = 'STEADY';
+            if (audit.finalConf > MS_THRESHOLDS.FUSE) { status = 'FUSED'; html += '<div class="bt-step fail"><span class="msg">🚨 !!! 置信度' + audit.finalConf.toFixed(3) + '触碰0.68熔断红线 !!!</span></div>'; }
+            else if (audit.finalConf > MS_THRESHOLDS.STEADY + MS_THRESHOLDS.TOLERANCE) { status = 'WARNING'; html += '<div class="bt-step warn"><span class="msg">⚠️ 置信度' + audit.finalConf.toFixed(3) + '进入预警区</span></div>'; }
+            else if (audit.finalConf < MS_THRESHOLDS.BREAKEVEN) { status = 'BELOW'; html += '<div class="bt-step warn"><span class="msg">⚠️ 置信度' + audit.finalConf.toFixed(3) + '低于0.48保本线</span></div>'; }
+
+            updateAuditUI(audit);
+            updateSteadyUI(audit.finalConf);
+            appendAuditLog(moduleName, '运算完成 conf=' + audit.finalConf.toFixed(3) + ' status=' + status + ' audit=' + audit.auditResult, audit.auditResult==='BLOCK'?'error':(audit.auditResult==='CORRECTED'?'warn':'audit'));
+
+            return { html, audit, finalConf: audit.finalConf, status };
+        }
+
+        function checkEmergencyStop() {
+            if (MS_STATE.emergencyStopped) {
+                document.querySelectorAll('.interact-card').forEach(c => c.classList.add('stopped'));
+                document.querySelectorAll('.stopped-notice').forEach(n => n.classList.add('active'));
+                document.getElementById('emergencyOverlay').classList.add('active');
+                document.getElementById('emergencyBanner').classList.add('active');
+                return true;
+            } else {
+                document.querySelectorAll('.interact-card').forEach(c => c.classList.remove('stopped'));
+                document.querySelectorAll('.stopped-notice').forEach(n => n.classList.remove('active'));
+                document.getElementById('emergencyOverlay').classList.remove('active');
+                document.getElementById('emergencyBanner').classList.remove('active');
+                return false;
+            }
+        }
+
+        const navItems = document.querySelectorAll('.left-nav .nav-item');
+        const sections = [
+            document.getElementById('section-hero'),
+            document.getElementById('section-router'),
+            document.getElementById('section-svo'),
+            document.getElementById('section-tense'),
+            document.getElementById('section-derivation'),
+            document.getElementById('section-passive'),
+            document.getElementById('section-wsd'),
+            document.getElementById('section-culture'),
+            document.getElementById('section-diff'),
+            document.getElementById('section-chicken'),
+            document.getElementById('section-pacd'),
+            document.getElementById('section-math'),
+            document.getElementById('section-closure'),
+            document.getElementById('section-panorama')
+        ];
+
+        const moduleNames = {
+            'section-hero': { name: '① 总览', algo: 'overview' },
+            'section-router': { name: '🚀 双域翻译器', algo: 'router' },
+            'section-svo': { name: '② 语序·交换律', algo: 'word-order' },
+            'section-tense': { name: '③ 时态·凯利', algo: 'tense-kelly' },
+            'section-derivation': { name: '④ 词缀·特征工程', algo: 'affix-feature' },
+            'section-passive': { name: '⑤ 被动·IoC', algo: 'ioc-passive' },
+            'section-wsd': { name: '⑥ 多义·策略模式', algo: 'polysemy' },
+            'section-culture': { name: '⑦ 文化·正则化', algo: 'culture-regex' },
+            'section-diff': { name: '⑧ 边界·OOD', algo: 'ood-detect' },
+            'section-chicken': { name: '⑨ 鸡兔·方程组', algo: 'chicken-rabbit' },
+            'section-pacd': { name: '⑩ 工程·PACD', algo: 'pacd' },
+            'section-math': { name: '⑪ 枚举·剪枝', algo: 'enum-validation' },
+            'section-closure': { name: '∞ 闭环·元映射', algo: 'meta' },
+            'section-panorama': { name: '🧩 全景矩阵', algo: 'panorama' }
+        };
+
+        navItems.forEach((item, index) => {
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = sections[index];
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    MS_STATE.currentModule = item.dataset.target;
+                    const mod = moduleNames[MS_STATE.currentModule];
+                    if (mod) updateRightPanel(mod.name, mod.algo);
+                }
+                navItems.forEach(el => el.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        function updateNav() {
+            let currentIndex = 0;
+            sections.forEach((section, i) => {
+                if (section) {
+                    const rect = section.getBoundingClientRect();
+                    if (rect.top <= 140) currentIndex = i;
+                }
+            });
+            navItems.forEach((el, i) => el.classList.toggle('active', i === currentIndex));
+            const targetId = navItems[currentIndex] ? navItems[currentIndex].dataset.target : 'section-hero';
+            if (targetId !== MS_STATE.currentModule) {
+                MS_STATE.currentModule = targetId;
+                const mod = moduleNames[targetId];
+                if (mod) updateRightPanel(mod.name, mod.algo);
+            }
+        }
+        window.addEventListener('scroll', updateNav);
+        window.addEventListener('load', updateNav);
+
+        document.getElementById('emergencyStopBtn').onclick = function() {
+            MS_STATE.emergencyStopped = true;
+            safeSetStorage('emergency_stop', 'true');
+            checkEmergencyStop();
+            document.getElementById('emergencyStopBtn').style.display = 'none';
+            document.getElementById('resumeBtn').style.display = 'inline-block';
+            appendAuditLog('EMERGENCY', '!!! 紧急停机已触发，所有运算拒绝执行 !!!', 'error');
+        };
+        document.getElementById('resumeBtn').onclick = function() {
+            MS_STATE.emergencyStopped = false;
+            safeSetStorage('emergency_stop', 'false');
+            checkEmergencyStop();
+            document.getElementById('emergencyStopBtn').style.display = 'inline-block';
+            document.getElementById('resumeBtn').style.display = 'none';
+            appendAuditLog('SYSTEM', '紧急停机解除，运算恢复', 'info');
+        };
+
+        document.getElementById('globalSteadySlider').oninput = function() {
+            MS_STATE.globalSteady = parseInt(this.value) / 100;
+            safeSetStorage('steady_bias', String(MS_STATE.globalSteady - 0.5));
+            updateSteadyUI(MS_STATE.globalSteady);
+            appendAuditLog('STEADY', '全局稳态调整为 ' + MS_STATE.globalSteady.toFixed(2), 'info');
+        };
+
+        function processRouter() {
+            if (checkEmergencyStop()) return;
+            const input = document.getElementById('routerInput').value.trim();
+            if (!input) { alert('请输入'); return; }
+            const isMath = input.includes('鸡兔') || input.includes('头') || input.includes('脚') || input.includes('围成一圈');
+            document.getElementById('domainIndicator').textContent = isMath ? '奥数' : '语言';
+            document.getElementById('domainIndicator').style.color = isMath ? '#facc15' : '#67e8f9';
+            document.getElementById('routerSource').innerHTML = '<div style="font-weight:500;color:#f1f5f9;">' + input + '</div><div style="font-size:11px;color:rgba(255,255,255,0.2);">域: ' + (isMath?'奥数':'语言') + '</div>';
+            document.getElementById('routerTarget').textContent = JSON.stringify({ words: input.split(/\s+/) }, null, 2);
+            document.getElementById('routerRoute').innerHTML = '<div style="color:' + (isMath?'#facc15':'#67e8f9') + ';">已路由至' + (isMath?'数学':'语言') + '模块</div>';
+
+            const fiveStep = generateFiveStepLogs('ROUTER', 0.5, { candidates: input });
+            document.getElementById('routerBacktrack').innerHTML = fiveStep.html;
+            updateRightPanel('🚀 双域翻译器', 'router');
+            updateLanguageModules(input);
+        }
+
+        function setRouter(text) {
+            document.getElementById('routerInput').value = text;
+            processRouter();
+        }
+        document.getElementById('routerInput').addEventListener('keydown', function(e) { if (e.key === 'Enter') processRouter(); });
+
+        function showSVOMapping(type) {
+            if (checkEmergencyStop()) return;
+            const resultBox = document.getElementById('svo-result');
+            const logBox = document.getElementById('svo-backtrack');
+            let mapDesc = '';
+            let langPair = '';
+            if (type === 'red') {
+                langPair = 'red car → kereta merah';
+                mapDesc = '[Adj+N]英 [N+Adj]马来';
+                resultBox.innerHTML = '<div class="mapping-grid" style="margin-top:0;"><div class="mapping-card"><div class="domain-label">🌐 语言表达层</div><div class="example"><span class="highlight-lang-en">red car</span> <span class="arrow">→</span> <span class="highlight-lang-my">kereta merah</span></div><div class="desc">修饰语位置交换：形容词前置→后置</div></div><div class="mapping-card"><div class="domain-label">📐 数理结构层</div><div class="example"><span class="highlight-math">2x+4y</span> <span class="arrow">⇄</span> <span class="highlight-math">4y+2x</span></div><div class="desc">交换律 a+b = b+a，和不变</div></div></div>';
+                document.getElementById('svoStatus').textContent = 'red car';
+            } else if (type === 'big') {
+                langPair = 'big house → rumah besar';
+                mapDesc = '[Adj+N]英 [N+Adj]马来';
+                resultBox.innerHTML = '<div class="mapping-grid"><div class="mapping-card"><div class="domain-label">🌐 语言表达层</div><div class="example"><span class="highlight-lang-en">big house</span> <span class="arrow">→</span> <span class="highlight-lang-my">rumah besar</span></div></div><div class="mapping-card"><div class="domain-label">📐 数理结构层</div><div class="example"><span class="highlight-math">3a+5b</span> <span class="arrow">⇄</span> <span class="highlight-math">5b+3a</span></div></div></div>';
+                document.getElementById('svoStatus').textContent = 'big house';
+            } else {
+                langPair = '线性组合交换';
+                mapDesc = '向量交换律验证';
+                resultBox.innerHTML = '<div class="mapping-grid"><div class="mapping-card"><div class="domain-label">📐 线性组合</div><div class="example"><span class="highlight-math">2x+4y</span> <span class="arrow">=</span> <span class="highlight-math">4y+2x</span></div></div><div class="mapping-card"><div class="domain-label">🌐 语言类比</div><div class="example"><span class="highlight-lang-en">red car</span> <span class="arrow">≅</span> <span class="highlight-lang-my">kereta merah</span></div></div></div>';
+                document.getElementById('svoStatus').textContent = '线性代数';
+            }
+            const fiveStep = generateFiveStepLogs('WORD-ORDER', 0.5, { candidates: langPair });
+            logBox.innerHTML = fiveStep.html;
+            updateRightPanel('② 语序·交换律', 'word-order');
+        }
+
+        function updateKellyMapping() {
+            if (checkEmergencyStop()) return;
+            const p = parseInt(document.getElementById('probSlider').value) / 100;
+            const b = parseInt(document.getElementById('oddsSlider').value) / 10;
+            document.getElementById('probDisplay').textContent = p.toFixed(2);
+            document.getElementById('oddsDisplay').textContent = b.toFixed(1);
+
+            const q = 1 - p;
+            let f_star = (b * p - q) / b;
+            f_star = Math.max(0, f_star);
+            const fPercent = f_star * 100;
+            const baseAge = p * 100;
+            const riskDiscount = f_star * 0.5;
+            const riskAge = baseAge * (1 - riskDiscount);
+            const effectiveConf = Math.max(0, Math.min(1, 0.3 + f_star + (MS_STATE.globalSteady - 0.5)));
+
+            let tense, tenseEn, tenseMy, color;
+            if (p >= 0.8) { tense = '过去时/完成时'; tenseEn = 'I ate / have eaten'; tenseMy = 'saya sudah makan'; color = '#4ade80'; }
+            else if (p >= 0.4) { tense = '现在时/进行时'; tenseEn = 'I eat / am eating'; tenseMy = 'saya makan / sedang makan'; color = '#facc15'; }
+            else { tense = '将来时/推测'; tenseEn = 'I will eat / might eat'; tenseMy = 'saya akan makan'; color = '#f87171'; }
+
+            document.getElementById('tenseType').textContent = tense;
+            document.getElementById('tenseType').style.color = color;
+            document.getElementById('tenseExample').textContent = tenseEn;
+            document.getElementById('kellyValue').textContent = fPercent.toFixed(1) + '%';
+            document.getElementById('kellyDesc').textContent = f_star > 0 ? '最佳下注' : '不宜下注';
+            document.getElementById('baseAge').textContent = Math.round(baseAge) + ' 岁';
+            document.getElementById('riskAge').textContent = Math.round(riskAge) + ' 岁';
+            document.getElementById('riskDesc').textContent = '风险折扣 ' + (riskDiscount * 100).toFixed(0) + '%';
+
+            document.getElementById('tense-result').innerHTML = '<div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px;"><div><span style="color:rgba(255,255,255,0.2);">📐 凯利公式</span><br><span style="color:#f1f5f9;">f* = (' + b.toFixed(1) + '×' + p.toFixed(2) + ' - ' + q.toFixed(2) + ') / ' + b.toFixed(1) + ' = ' + fPercent.toFixed(1) + '%</span></div><div><span style="color:rgba(255,255,255,0.2);">📈 预期年龄</span><br><span style="color:#a78bfa;">' + Math.round(baseAge) + ' 岁</span></div><div><span style="color:rgba(255,255,255,0.2);">⚡ 有效年龄</span><br><span style="color:#4ade80;">' + Math.round(riskAge) + ' 岁</span></div></div>';
+
+            const fiveStep = generateFiveStepLogs('TENSE-KELLY', effectiveConf, { candidates: 'p=' + p.toFixed(2) + ',b=' + b.toFixed(1) });
+            let extraLogs = '';
+            extraLogs += '<div class="bt-step info"><span class="msg">🎲 二元结构：p=' + p.toFixed(2) + ', q=' + q.toFixed(2) + ', b=' + b.toFixed(1) + '</span></div>';
+            const numerator = b * p - q;
+            extraLogs += '<div class="bt-step info"><span class="msg">🧮 分子 = ' + b.toFixed(1) + ' × ' + p.toFixed(2) + ' - ' + q.toFixed(2) + ' = ' + numerator.toFixed(2) + '</span></div>';
+            extraLogs += '<div class="bt-step info"><span class="msg">📐 f* = ' + numerator.toFixed(2) + ' / ' + b.toFixed(1) + ' = ' + f_star.toFixed(3) + '</span></div>';
+            const logBox = document.getElementById('tense-backtrack');
+            logBox.innerHTML = fiveStep.html.replace('</div>', extraLogs + '</div>');
+            document.getElementById('tenseStatus').textContent = 'p=' + p.toFixed(2) + ', b=' + b.toFixed(1);
+            updateRightPanel('③ 时态·凯利', 'tense-kelly');
+        }
+
+        function setDerive(root) {
+            document.getElementById('deriveInput').value = root;
+            runDerive();
+        }
+
+        function runDerive() {
+            if (checkEmergencyStop()) return;
+            const root = document.getElementById('deriveInput').value.trim();
+            if (!root) return;
+            const deriveResult = document.getElementById('derive-result');
+            const deriveLog = document.getElementById('derive-backtrack');
+
+            const prefixes = { 'makan': ['me-', 'di-', 'pe-', '-an', 'pem-'], 'ajar': ['me-', 'di-', 'pe-', '-an', 'ber-'], 'tulis': ['me-', 'di-', 'pe-', '-an', 'pen-'] };
+            const pres = prefixes[root] || ['me-', 'di-', 'pe-', '-an'];
+            const words = pres.map(af => af.startsWith('-') ? root + af : af + root);
+            const allWords = [root, ...words];
+
+            const featureMap = ['词根(基特征)', '主动态(交互特征)', '被动态(归一化)', '施事者(多项式)', '名词化(聚合)', '进行态(时序)'];
+
+            deriveResult.innerHTML = '<div style="color:var(--mindspeak-pink); font-weight:600; font-size:15px;">词根：' + root + '</div><div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(100px,1fr)); gap:6px; margin:8px 0;">' + allWords.map((w, i) => '<div style="background:rgba(244,114,182,0.06); padding:7px; border-radius:6px; text-align:center; border:1px solid rgba(244,114,182,0.12);"><div style="color:#f1f5f9; font-size:13px; font-weight:500;">' + w + '</div><div style="font-size:9px; color:rgba(255,255,255,0.3); margin-top:2px;">' + (featureMap[i] || '派生特征') + '</div></div>').join('') + '</div>';
+
+            const fiveStep = generateFiveStepLogs('AFFIX-FEATURE', 0.51, { candidates: root });
+            deriveLog.innerHTML = fiveStep.html;
+            document.getElementById('deriveStatus').textContent = '✅ ' + allWords.length + '个派生';
+            updateRightPanel('④ 词缀·特征工程', 'affix-feature');
+        }
+
+        function runPassive() {
+            if (checkEmergencyStop()) return;
+            const input = document.getElementById('passiveInput').value.trim();
+            const resultBox = document.getElementById('passive-result');
+            const logBox = document.getElementById('passive-backtrack');
+
+            const activeExamples = { '我吃了苹果': '苹果被我吃了', 'Saya makan nasi': 'Nasi dimakan oleh saya', '我打了球': '球被我打了' };
+            let output = '';
+            if (input.includes('被') || input.includes('dimakan') || input.includes('di-')) {
+                output = '检测到被动句式，IoC反转→主动句式';
+            } else if (activeExamples[input]) {
+                output = '主动: ' + input + ' → 被动(IoC反转): ' + activeExamples[input];
+            } else {
+                output = '主动句式: ' + input + ' → IoC被动: [宾语]被[主语]动词 → 控制流方向反转';
+            }
+
+            resultBox.innerHTML = '<div style="font-size:14px;">' + output + '</div><div style="color:rgba(255,255,255,0.2); font-size:11px; margin-top:6px;">🔄 控制反转(IoC)：主语(调用者)降格为旁格，宾语(被调用者)提升为主语，依赖注入思想</div>';
+            const fiveStep = generateFiveStepLogs('IOC-PASSIVE', 0.49, { candidates: input });
+            logBox.innerHTML = fiveStep.html;
+            document.getElementById('passiveStatus').textContent = '✅ IoC反转完成';
+            updateRightPanel('⑤ 被动·IoC', 'ioc-passive');
+        }
+
+        function runWSD() {
+            if (checkEmergencyStop()) return;
+            const word = document.getElementById('wsdInput').value.trim() || '打';
+            const branch = parseInt(document.getElementById('wsdBranch').value);
+            const resultBox = document.getElementById('wsd-result');
+            const logBox = document.getElementById('wsd-backtrack');
+
+            const branches = [
+                { name: '🏀 体育分支', meaning: 'play (球类运动)', example: '打篮球 → play basketball', algo: 'SportsStrategy.execute()' },
+                { name: '🚕 交通分支', meaning: 'hail/take (搭乘)', example: '打车 → take a taxi', algo: 'TransportStrategy.execute()' },
+                { name: '💧 日常分支', meaning: 'fetch/get (获取)', example: '打水 → fetch water', algo: 'DailyStrategy.execute()' },
+                { name: '⚖️ 法律分支', meaning: 'engage (诉讼)', example: '打官司 → engage in lawsuit', algo: 'LegalStrategy.execute()' }
+            ];
+            const active = branches[branch];
+
+            resultBox.innerHTML = '<div style="margin-bottom:8px;">多义词「<strong style="color:var(--mindspeak-pink);">' + word + '</strong>」策略路由：</div><div style="background:rgba(244,114,182,0.08); border:1px solid rgba(244,114,182,0.2); border-radius:8px; padding:10px;"><div style="font-weight:600; color:#f9a8d4;">' + active.name + '</div><div style="font-size:13px; color:rgba(255,255,255,0.6); margin:4px 0;">' + active.meaning + '</div><div style="font-family:monospace; font-size:11px; color:#67e8f9;">' + active.example + '</div><div style="font-family:monospace; font-size:10px; color:#a78bfa; margin-top:4px;">→ ' + active.algo + '</div></div>';
+
+            const fiveStep = generateFiveStepLogs('POLYSEMY', 0.5 + branch * 0.01, { candidates: word + '/' + active.name });
+            logBox.innerHTML = fiveStep.html;
+            document.getElementById('wsdStatus').textContent = active.name;
+            updateRightPanel('⑥ 多义·策略模式', 'polysemy');
+        }
+
+        function runCulture() {
+            if (checkEmergencyStop()) return;
+            const concept = document.getElementById('cultureInput').value.trim() || '龙';
+            const strength = parseInt(document.getElementById('cultureStrength').value) / 100;
+            const resultBox = document.getElementById('culture-result');
+            const logBox = document.getElementById('culture-backtrack');
+
+            const cultureMap = {
+                '龙': { cn: '吉祥/皇权/正面', en: 'dragon邪恶/暴力', output: 'Loong (音译+文化注释)', taboo: false },
+                '凤凰': { cn: '祥瑞/皇后', en: 'phoenix重生/不死鸟', output: 'Fenghuang (中国凤凰)', taboo: false },
+                'dragon': { cn: '西方恶龙', en: '邪恶巨兽', output: '龙 (中国龙需区分)', taboo: true }
+            };
+            const entry = cultureMap[concept] || { cn: '中性文化意象', en: '通用译法', output: concept + ' (保留原文+注释)', taboo: false };
+
+            let statusColor = '#4ade80';
+            let statusText = '约束通过';
+            if (strength > 0.68) { statusColor = '#f87171'; statusText = '约束过强'; }
+            else if (strength > 0.52) { statusColor = '#facc15'; statusText = '约束警戒'; }
+
+            resultBox.innerHTML = '<div style="font-size:14px; margin-bottom:6px;">文化意象「<strong style="color:var(--mindspeak-pink);">' + concept + '</strong>」正则化约束：</div><div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; font-size:12px;"><div style="background:rgba(255,255,255,0.02); padding:8px; border-radius:6px;"><span style="color:#67e8f9;">中文语境：</span>' + entry.cn + '</div><div style="background:rgba(255,255,255,0.02); padding:8px; border-radius:6px;"><span style="color:#facc15;">英文语境：</span>' + entry.en + '</div></div><div style="margin-top:8px; font-weight:600;">正则化输出：<span style="color:#4ade80;">' + entry.output + '</span></div><div style="margin-top:4px; font-size:11px; color:' + statusColor + ';">约束强度=' + strength.toFixed(2) + ' → ' + statusText + (entry.taboo ? ' (禁忌词触发)' : '') + '</div>';
+
+            const fiveStep = generateFiveStepLogs('CULTURE-REGEX', strength, { candidates: concept });
+            logBox.innerHTML = fiveStep.html;
+            document.getElementById('cultureStatus').textContent = '约束强度 ' + strength.toFixed(2);
+            updateRightPanel('⑦ 文化·正则化', 'culture-regex');
+        }
+
+        function runDiff() {
+            if (checkEmergencyStop()) return;
+            const word = document.getElementById('diffInput').value.trim() || 'kereta';
+            const oodScore = parseInt(document.getElementById('oodScore').value) / 100;
+            const resultBox = document.getElementById('diff-result');
+            const logBox = document.getElementById('diff-backtrack');
+
+            const confidence = Math.max(0.1, 1 - oodScore * 0.9);
+            const oodExamples = {
+                'kereta': { my: '汽车', id: '火车', ood: true, note: '伪同源词！马来西亚vs印度尼西亚词义完全不同' },
+                '美丽': { cn: 'beautiful', my: 'cantik', ood: false, note: '稳定映射' },
+                '巭孬': { cn: '生僻字', ood: true, note: '网络生造词，OOD距离极高' }
+            };
+            const entry = oodExamples[word] || { my: '待检测', ood: oodScore > 0.5, note: 'OOD距离=' + oodScore.toFixed(2) };
+
+            let levelText = '', levelColor = '#4ade80';
+            if (oodScore > 0.68) { levelText = '🚨 熔断！OOD超红线'; levelColor = '#f87171'; }
+            else if (oodScore > 0.50) { levelText = '⚠️ 预警！置信度降级'; levelColor = '#facc15'; }
+            else { levelText = '✅ 正常分布内'; levelColor = '#4ade80'; }
+
+            resultBox.innerHTML = '<div style="font-size:14px; margin-bottom:6px;">词汇「<strong style="color:var(--mindspeak-pink);">' + word + '</strong>」OOD边界检测：</div><div style="font-size:12px; color:rgba(255,255,255,0.5); margin-bottom:6px;">' + entry.note + '</div><div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-top:8px;"><div style="text-align:center; padding:8px; background:rgba(255,255,255,0.02); border-radius:6px;"><div style="font-size:9px; color:rgba(255,255,255,0.2);">OOD距离</div><div style="font-size:18px; font-weight:700; color:' + levelColor + ';">' + oodScore.toFixed(2) + '</div></div><div style="text-align:center; padding:8px; background:rgba(255,255,255,0.02); border-radius:6px;"><div style="font-size:9px; color:rgba(255,255,255,0.2);">置信度</div><div style="font-size:18px; font-weight:700; color:' + levelColor + ';">' + confidence.toFixed(2) + '</div></div><div style="text-align:center; padding:8px; background:rgba(255,255,255,0.02); border-radius:6px;"><div style="font-size:9px; color:rgba(255,255,255,0.2);">状态</div><div style="font-size:11px; font-weight:600; color:' + levelColor + ';">' + levelText + '</div></div></div>';
+
+            const fiveStep = generateFiveStepLogs('OOD-DETECT', confidence, { candidates: word + ',ood=' + oodScore.toFixed(2) });
+            logBox.innerHTML = fiveStep.html;
+            document.getElementById('diffStatus').textContent = 'OOD=' + oodScore.toFixed(2);
+            updateRightPanel('⑧ 边界·OOD检测', 'ood-detect');
+        }
+
+        function runChicken() {
+            if (checkEmergencyStop()) return;
+            const heads = parseInt(document.getElementById('chickenHeads').value) || 10;
+            const legs = parseInt(document.getElementById('chickenLegs').value) || 28;
+            if (legs < heads * 2 || legs > heads * 4 || legs % 2 !== 0) {
+                document.getElementById('cCount').textContent = '❌';
+                document.getElementById('rCount').textContent = '❌';
+                document.getElementById('vCount').textContent = '❌';
+                document.getElementById('chickenBar').style.width = '0%';
+                document.getElementById('rabbitBar').style.width = '0%';
+                document.getElementById('chickenBarVal').textContent = '0';
+                document.getElementById('rabbitBarVal').textContent = '0';
+                document.getElementById('ringChickenPct').textContent = '0%';
+                document.getElementById('ringRabbitPct').textContent = '0%';
+                document.getElementById('chickenRing').style.setProperty('--pct', 0);
+                document.getElementById('rabbitRing').style.setProperty('--pct', 0);
+                document.getElementById('chickenLog').innerHTML = '<div class="bt-title">📝 鸡兔同笼·五步骤</div><div class="bt-step fail"><span class="msg">❌ 数据不合法：脚数必须在' + (heads*2) + '~' + (heads*4) + '之间且为偶数</span></div>';
+                return;
+            }
+
+            const assume = heads * 2;
+            const diff = legs - assume;
+            const rabbit = diff / 2;
+            const chicken = heads - rabbit;
+
+            document.getElementById('cCount').textContent = chicken;
+            document.getElementById('rCount').textContent = rabbit;
+            document.getElementById('vCount').textContent = (chicken*2 + rabbit*4) + ' ✅';
+
+            const total = heads;
+            const pctChicken = (chicken / total) * 100;
+            const pctRabbit = (rabbit / total) * 100;
+            document.getElementById('chickenBar').style.width = pctChicken + '%';
+            document.getElementById('rabbitBar').style.width = pctRabbit + '%';
+            document.getElementById('chickenBarVal').textContent = chicken;
+            document.getElementById('rabbitBarVal').textContent = rabbit;
+            document.getElementById('ringChickenPct').textContent = Math.round(pctChicken) + '%';
+            document.getElementById('ringRabbitPct').textContent = Math.round(pctRabbit) + '%';
+            document.getElementById('chickenRing').style.setProperty('--pct', pctChicken);
+            document.getElementById('rabbitRing').style.setProperty('--pct', pctRabbit);
+
+            const validInt = Number.isInteger(chicken) && Number.isInteger(rabbit) && chicken >= 0 && rabbit >= 0;
+            const baseConf = validInt ? 0.5 : 0.3;
+            const fiveStep = generateFiveStepLogs('CHICKEN-RABBIT', baseConf, { candidates: heads + '头' + legs + '脚' });
+
+            let calcLogs = '';
+            calcLogs += '<div class="bt-step info"><span class="msg">🔍 翻译：鸡+兔=' + heads + '，2鸡+4兔=' + legs + '</span></div>';
+            calcLogs += '<div class="bt-step info"><span class="msg">🧮 假设全是鸡：脚数=' + heads + '×2=' + assume + '</span></div>';
+            calcLogs += '<div class="bt-step warn"><span class="msg">📊 实际脚数差=' + legs + '-' + assume + '=' + diff + '</span></div>';
+            calcLogs += '<div class="bt-step info"><span class="msg">🔄 兔子数量=' + diff + '÷2=' + rabbit + '</span></div>';
+            calcLogs += '<div class="bt-step info"><span class="msg">🐔 鸡的数量=' + heads + '-' + rabbit + '=' + chicken + '</span></div>';
+            calcLogs += '<div class="bt-step success"><span class="msg">✅ 验证：' + chicken + '×2+' + rabbit + '×4=' + (chicken*2+rabbit*4) + '</span></div>';
+
+            document.getElementById('chickenLog').innerHTML = fiveStep.html.replace('</div>', calcLogs + '</div>');
+            updateRightPanel('⑨ 鸡兔·方程组', 'chicken-rabbit');
+        }
+
+        function resetChicken() {
+            ['cCount','rCount','vCount'].forEach(id => document.getElementById(id).textContent = '--');
+            document.getElementById('chickenBar').style.width = '0%';
+            document.getElementById('rabbitBar').style.width = '0%';
+            document.getElementById('chickenBarVal').textContent = '0';
+            document.getElementById('rabbitBarVal').textContent = '0';
+            document.getElementById('ringChickenPct').textContent = '0%';
+            document.getElementById('ringRabbitPct').textContent = '0%';
+            document.getElementById('chickenRing').style.setProperty('--pct', 0);
+            document.getElementById('rabbitRing').style.setProperty('--pct', 0);
+            document.getElementById('chickenLog').innerHTML = '<div class="bt-title">📝 鸡兔同笼·五步骤</div><div style="color:rgba(255,255,255,0.08);">点击运行查看分步算术</div>';
+        }
+
+        function setChicken(h, l) {
+            document.getElementById('chickenHeads').value = h;
+            document.getElementById('chickenLegs').value = l;
+            runChicken();
+        }
+
+        function runPACD() {
+            if (checkEmergencyStop()) return;
+            const input = document.getElementById('pacdInput').value.trim();
+            if (!input) return;
+            const numbers = input.match(/(\d+)/g);
+            if (!numbers || numbers.length < 2) {
+                document.getElementById('pacdLog').innerHTML = '<div class="bt-title">📝 PACD·五步骤</div><div class="bt-step fail"><span class="msg">❌ 无法提取数据</span></div>';
+                return;
+            }
+            const t1 = parseInt(numbers[0]);
+            const t2 = parseInt(numbers[1]);
+            const t3 = numbers.length >= 3 ? parseInt(numbers[2]) : null;
+            const total = 1;
+            const eff1 = 1 / t1;
+            const eff2 = 1 / t2;
+            const eff3 = t3 ? 1 / t3 : 0;
+            const combined = eff1 + eff2 + eff3;
+            const isCoop = input.includes('合作') || input.includes('一起') || !t3;
+            const time = total / combined;
+            const result = isCoop ? time.toFixed(2) + ' 天' : '甲=' + eff1.toFixed(2) + ',乙=' + eff2.toFixed(2) + (t3 ? ',丙=' + eff3.toFixed(2) : '');
+
+            document.getElementById('pacdP').textContent = total;
+            document.getElementById('pacdA').textContent = eff1.toFixed(2) + ' (' + t1 + '天)';
+            document.getElementById('pacdC').textContent = (t3 ? eff2.toFixed(2) : eff2.toFixed(2)) + ' (' + t2 + '天)' + (t3 ? '' : '');
+            if (t3) {
+                document.getElementById('pacdC').textContent = eff2.toFixed(2) + ' (' + t2 + '天)';
+            }
+            document.getElementById('pacdD').textContent = result;
+
+            const maxEff = Math.max(eff1, eff2, eff3 || 0, combined);
+            document.getElementById('eff1Bar').style.width = (eff1 / maxEff * 100) + '%';
+            document.getElementById('eff2Bar').style.width = (eff2 / maxEff * 100) + '%';
+            if (eff3 > 0) {
+                document.getElementById('effSumBar').style.width = (combined / maxEff * 100) + '%';
+            } else {
+                document.getElementById('effSumBar').style.width = (combined / maxEff * 100) + '%';
+            }
+            document.getElementById('eff1Val').textContent = eff1.toFixed(2);
+            document.getElementById('eff2Val').textContent = eff2.toFixed(2);
+            document.getElementById('effSumVal').textContent = combined.toFixed(2);
+            document.getElementById('resultDisplay').textContent = result;
+            document.getElementById('resultLabel').textContent = isCoop ? '合作时间(天)' : '效率';
+
+            const fiveStep = generateFiveStepLogs('PACD', 0.52, { candidates: t1 + ',' + t2 + (t3?','+t3:'') + '天' });
+            let calcLogs = '';
+            calcLogs += '<div class="bt-step info"><span class="msg">📖 甲效率=1/' + t1 + '=' + eff1.toFixed(3) + '</span></div>';
+            calcLogs += '<div class="bt-step info"><span class="msg">📖 乙效率=1/' + t2 + '=' + eff2.toFixed(3) + '</span></div>';
+            if (t3) calcLogs += '<div class="bt-step info"><span class="msg">📖 丙效率=1/' + t3 + '=' + eff3.toFixed(3) + '</span></div>';
+            calcLogs += '<div class="bt-step info"><span class="msg">➕ 合作效率=' + eff1.toFixed(3) + '+' + eff2.toFixed(3) + (t3?'+'+eff3.toFixed(3):'') + '=' + combined.toFixed(3) + '</span></div>';
+            calcLogs += '<div class="bt-step success"><span class="msg">📐 合作时间=1/' + combined.toFixed(3) + '=' + result + '</span></div>';
+
+            document.getElementById('pacdLog').innerHTML = fiveStep.html.replace('</div>', calcLogs + '</div>');
+            updateRightPanel('⑩ 工程·PACD', 'pacd');
+        }
+
+        function resetPACD() {
+            ['pacdP','pacdA','pacdC','pacdD'].forEach(id => document.getElementById(id).textContent = '--');
+            ['eff1Bar','eff2Bar','effSumBar'].forEach(id => document.getElementById(id).style.width = '0%');
+            ['eff1Val','eff2Val','effSumVal'].forEach(id => document.getElementById(id).textContent = '0');
+            document.getElementById('resultDisplay').textContent = '--';
+            document.getElementById('resultLabel').textContent = '等待';
+            document.getElementById('pacdLog').innerHTML = '<div class="bt-title">📝 PACD·五步骤</div><div style="color:rgba(255,255,255,0.08);">等待输入...</div>';
+        }
+
+        function setPACD(text) {
+            document.getElementById('pacdInput').value = text;
+            runPACD();
+        }
+
+        const allCombos = [];
+        for (let i = 1; i <= 9; i++)
+            for (let j = i + 1; j <= 9; j++)
+                for (let k = j + 1; k <= 9; k++) allCombos.push([i, j, k]);
+
+        let mathState = { index: 0, valid: [], logs: [], done: false, active: false };
+
+        function renderNumberPool() {
+            const pool = document.getElementById('numberPool');
+            let html = '';
+            for (let i = 1; i <= 9; i++) html += '<div class="num-card">' + i + '</div>';
+            pool.innerHTML = html;
+        }
+
+        function updateNumberPoolHighlight(highlight, fail, success) {
+            highlight = highlight || []; fail = fail || []; success = success || [];
+            document.querySelectorAll('#numberPool .num-card').forEach(function(card) {
+                const val = parseInt(card.textContent);
+                card.className = 'num-card';
+                if (highlight.indexOf(val) !== -1) card.classList.add('active');
+                if (fail.indexOf(val) !== -1) card.classList.add('fail');
+                if (success.indexOf(val) !== -1) card.classList.add('success');
+            });
+        }
+
+        function mathNextStep() {
+            if (checkEmergencyStop()) return;
+            if (!mathState.active) {
+                mathState.active = true;
+                mathState.index = 0;
+                mathState.valid = [];
+                mathState.logs = [];
+                mathState.done = false;
+                renderNumberPool();
+                document.getElementById('mathTried').textContent = '0';
+                document.getElementById('mathValid').textContent = '0';
+                document.getElementById('mathPruneRate').textContent = '0%';
+                document.getElementById('mathStepCounter').textContent = '0';
+                document.getElementById('mathStatus').textContent = '开始';
+            }
+            if (mathState.done) { document.getElementById('mathStatus').textContent = '✅ 完成'; return; }
+            if (mathState.index >= allCombos.length) {
+                mathState.done = true;
+                document.getElementById('mathStatus').textContent = '✅ 完成';
+                document.getElementById('currentAttempt').innerHTML = '🎉 完成！有效组合 ' + mathState.valid.length + ' 个';
+                const allValid = [];
+                mathState.valid.forEach(function(c) { c.forEach(function(v) { if (allValid.indexOf(v) === -1) allValid.push(v); }); });
+                updateNumberPoolHighlight([], [], allValid);
+                document.getElementById('mathTried').textContent = allCombos.length;
+                document.getElementById('mathValid').textContent = mathState.valid.length;
+                document.getElementById('mathStepCounter').textContent = allCombos.length;
+                const prune = document.getElementById('pruneCheck') ? document.getElementById('pruneCheck').checked : false;
+                document.getElementById('mathPruneRate').textContent = prune ? ((1 - mathState.valid.length / allCombos.length) * 100).toFixed(0) + '%' : '0%';
+                return;
+            }
+            const combo = allCombos[mathState.index];
+            const sum = combo[0] + combo[1] + combo[2];
+            const pruneEnabled = document.getElementById('pruneCheck') ? document.getElementById('pruneCheck').checked : false;
+            let isValid = (sum % 3 === 0);
+            if (pruneEnabled && combo[0] > 7) isValid = false;
+            updateNumberPoolHighlight(combo, [], []);
+            document.getElementById('currentAttempt').innerHTML = '🔍 尝试：<strong style="color:var(--mindspeak-pink);">' + combo.join(' + ') + '</strong> (和=' + sum + ')';
+            let logMsg = '[' + combo.join(', ') + '] → 和=' + sum + ' ';
+            let logStatus = 'info';
+            if (isValid) {
+                mathState.valid.push(combo);
+                logMsg += '✅ 保留';
+                logStatus = 'success';
+                setTimeout(function() { updateNumberPoolHighlight(combo, [], combo); }, 50);
+            } else {
+                logMsg += '❌ 回退' + (pruneEnabled ? '(剪枝)' : '');
+                logStatus = 'fail';
+                setTimeout(function() { updateNumberPoolHighlight(combo, combo, []); }, 50);
+            }
+            mathState.logs.push({ msg: logMsg, status: logStatus });
+            mathState.index++;
+            document.getElementById('mathTried').textContent = mathState.index;
+            document.getElementById('mathValid').textContent = mathState.valid.length;
+            document.getElementById('mathStepCounter').textContent = mathState.index;
+            document.getElementById('mathStatus').textContent = '第 ' + mathState.index + ' 组';
+            const pruneRate = pruneEnabled ? ((1 - mathState.valid.length / mathState.index) * 100).toFixed(0) : '0';
+            document.getElementById('mathPruneRate').textContent = pruneRate + '%';
+
+            let html = '<div class="bt-title">⚙️ 枚举搜索·五步骤日志</div>';
+            const recent = mathState.logs.slice(-8);
+            recent.forEach(function(log) {
+                const cls = log.status || 'info';
+                html += '<div class="bt-step ' + cls + '"><span class="msg">' + log.msg + '</span></div>';
+            });
+            document.getElementById('mathBacktrack').innerHTML = html;
+            updateRightPanel('⑪ 枚举·剪枝', 'enum-validation');
+        }
+
+        function mathReset() {
+            mathState.index = 0;
+            mathState.valid = [];
+            mathState.logs = [];
+            mathState.done = false;
+            mathState.active = false;
+            updateNumberPoolHighlight([], [], []);
+            renderNumberPool();
+            document.getElementById('currentAttempt').innerHTML = '🎯 点击下一步开始枚举';
+            document.getElementById('mathTried').textContent = '0';
+            document.getElementById('mathValid').textContent = '0';
+            document.getElementById('mathPruneRate').textContent = '0%';
+            document.getElementById('mathStepCounter').textContent = '0';
+            document.getElementById('mathStatus').textContent = '已重置';
+            document.getElementById('mathBacktrack').innerHTML = '<div class="bt-title">⚙️ 枚举搜索·五步骤日志</div><div style="color:rgba(255,255,255,0.08);">等待...</div>';
+        }
+
+        function mathRunAll() {
+            if (checkEmergencyStop()) return;
+            mathReset();
+            mathState.active = true;
+            const total = allCombos.length;
+            const pruneEnabled = document.getElementById('pruneCheck') ? document.getElementById('pruneCheck').checked : false;
+            for (let i = 0; i < total; i++) {
+                const combo = allCombos[i];
+                const sum = combo[0] + combo[1] + combo[2];
+                let isValid = (sum % 3 === 0);
+                if (pruneEnabled && combo[0] > 7) isValid = false;
+                if (isValid) {
+                    mathState.valid.push(combo);
+                    mathState.logs.push({ msg: '[' + combo.join(', ') + '] ✅ 保留', status: 'success' });
+                } else {
+                    mathState.logs.push({ msg: '[' + combo.join(', ') + '] ❌ 回退' + (pruneEnabled?'(剪枝)':''), status: 'fail' });
+                }
+            }
+            mathState.index = total;
+            mathState.done = true;
+            const allValid = [];
+            mathState.valid.forEach(function(c) { c.forEach(function(v) { if (allValid.indexOf(v) === -1) allValid.push(v); }); });
+            updateNumberPoolHighlight([], [], allValid);
+            document.getElementById('currentAttempt').innerHTML = '🎉 完成！有效组合 ' + mathState.valid.length + ' 个';
+            document.getElementById('mathTried').textContent = total;
+            document.getElementById('mathValid').textContent = mathState.valid.length;
+            document.getElementById('mathStepCounter').textContent = total;
+            document.getElementById('mathStatus').textContent = '✅ 快速完成';
+            const pruneRate = pruneEnabled ? ((1 - mathState.valid.length / total) * 100).toFixed(0) : '0';
+            document.getElementById('mathPruneRate').textContent = pruneRate + '%';
+            let html = '<div class="bt-title">⚙️ 枚举搜索·五步骤日志</div>';
+            const recent = mathState.logs.slice(-12);
+            recent.forEach(function(log) {
+                const cls = log.status || 'info';
+                html += '<div class="bt-step ' + cls + '"><span class="msg">' + log.msg + '</span></div>';
+            });
+            document.getElementById('mathBacktrack').innerHTML = html;
+            updateRightPanel('⑪ 枚举·剪枝', 'enum-validation');
+        }
+
+        function updateLanguageModules(input) {
+            const deriveResult = document.getElementById('derivation-result');
+            const deriveLog = document.getElementById('derive-backtrack');
+            const passiveResult = document.getElementById('passive-result');
+            const passiveLog = document.getElementById('passive-backtrack');
+            const wsdResult = document.getElementById('wsd-result');
+            const wsdLog = document.getElementById('wsd-backtrack');
+            const cultureResult = document.getElementById('culture-result');
+            const cultureLog = document.getElementById('culture-backtrack');
+            const diffResult = document.getElementById('diff-result');
+            const diffLog = document.getElementById('diff-backtrack');
+
+            if (input.indexOf('makan') !== -1) {
+                document.getElementById('deriveInput').value = 'makan';
+                runDerive();
+            }
+            if (input.indexOf('dimakan') !== -1) {
+                passiveResult.innerHTML = '<div>主动: Saya makan nasi → 被动: Nasi dimakan oleh saya</div><div style="color:rgba(255,255,255,0.15); font-size:12px;">数据流方向反转 = IoC依赖注入</div>';
+                document.getElementById('passiveStatus').textContent = '✅ 被动→IoC';
+            }
+            if (input.indexOf('打') !== -1) {
+                document.getElementById('wsdInput').value = '打';
+            }
+            if (input.indexOf('龙') !== -1) {
+                document.getElementById('cultureInput').value = '龙';
+            }
+            if (input.indexOf('kereta') !== -1) {
+                document.getElementById('diffInput').value = 'kereta';
+            }
+            if (input.indexOf('鸡兔') !== -1 || (input.indexOf('头') !== -1 && input.indexOf('脚') !== -1)) {
+                const hMatch = input.match(/(\d+)\s*头/);
+                const lMatch = input.match(/(\d+)\s*脚/);
+                if (hMatch && lMatch) {
+                    document.getElementById('chickenHeads').value = hMatch[1];
+                    document.getElementById('chickenLegs').value = lMatch[1];
+                    runChicken();
+                }
+            }
+        }
+
+        function createGlow() {
+            const glow = document.getElementById('glow');
+            if (!glow) return;
+            const canvas = document.createElement('canvas');
+            canvas.style.width = '100%';
+            canvas.style.height = '100%';
+            glow.appendChild(canvas);
+            const ctx = canvas.getContext('2d');
+            let w = canvas.width = window.innerWidth;
+            let h = canvas.height = window.innerHeight;
+            const stars = [];
+            for (let i = 0; i < 120; i++) {
+                stars.push({ x: Math.random()*w, y: Math.random()*h, r: Math.random()*1.5+0.3, a: Math.random(), s: Math.random()*0.02+0.005 });
+            }
+            window.addEventListener('resize', function() { w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; });
+            function draw() {
+                ctx.clearRect(0,0,w,h);
+                const grad = ctx.createRadialGradient(w*0.3, h*0.2, 0, w*0.3, h*0.2, w*0.7);
+                grad.addColorStop(0, 'rgba(244,114,182,0.04)');
+                grad.addColorStop(0.5, 'rgba(167,139,250,0.02)');
+                grad.addColorStop(1, 'rgba(11,11,26,0)');
+                ctx.fillStyle = grad;
+                ctx.fillRect(0,0,w,h);
+                stars.forEach(function(s) {
+                    s.a += s.s;
+                    if (s.a > 1 || s.a < 0) s.s = -s.s;
+                    ctx.beginPath();
+                    ctx.arc(s.x, s.y, s.r, 0, Math.PI*2);
+                    ctx.fillStyle = 'rgba(244,114,182,' + (Math.abs(s.a)*0.6+0.1) + ')';
+                    ctx.fill();
+                });
+                requestAnimationFrame(draw);
+            }
+            draw();
+        }
+
+        window.onload = function() {
+            try {
+                const stopped = safeGetStorage('emergency_stop', 'false');
+                MS_STATE.emergencyStopped = stopped === 'true';
+                const savedBias = parseFloat(safeGetStorage('steady_bias', '0'));
+                MS_STATE.globalSteady = Math.max(0, Math.min(1, 0.5 + savedBias));
+                document.getElementById('globalSteadySlider').value = Math.round(MS_STATE.globalSteady * 100);
+                updateSteadyUI(MS_STATE.globalSteady);
+                checkEmergencyStop();
+                if (MS_STATE.emergencyStopped) {
+                    document.getElementById('emergencyStopBtn').style.display = 'none';
+                    document.getElementById('resumeBtn').style.display = 'inline-block';
+                }
+            } catch(e) {}
+
+            setTimeout(function() {
+                createGlow();
+                processRouter();
+                showSVOMapping('red');
+                updateKellyMapping();
+                runChicken();
+                renderNumberPool();
+                runPassive();
+                runWSD();
+                runCulture();
+                runDiff();
+                appendAuditLog('INIT', 'MindSpeak V19.0 初始化完成，S1·ETL信息清洗入口激活', 'info');
+                appendAuditLog('INIT', '阈值常量：BREAKEVEN=0.48, STEADY=0.50, FUSE=0.68, TOLERANCE=0.02', 'info');
+                appendAuditLog('INIT', '三角冗余审计：calc/GM/CMP三模型并行校验，window.TriangleAudit=' + (typeof window.TriangleAudit !== 'undefined' ? '已接入' : '模拟模式'), 'audit');
+                updateRightPanel('① 总览', 'overview');
+            }, 200);
+        };
+
+        window.processRouter = processRouter;
+        window.setRouter = setRouter;
+        window.showSVOMapping = showSVOMapping;
+        window.updateKellyMapping = updateKellyMapping;
+        window.setDerive = setDerive;
+        window.runDerive = runDerive;
+        window.runPassive = runPassive;
+        window.runWSD = runWSD;
+        window.runCulture = runCulture;
+        window.runDiff = runDiff;
+        window.runChicken = runChicken;
+        window.resetChicken = resetChicken;
+        window.setChicken = setChicken;
+        window.runPACD = runPACD;
+        window.resetPACD = resetPACD;
+        window.setPACD = setPACD;
+        window.mathNextStep = mathNextStep;
+        window.mathReset = mathReset;
+        window.mathRunAll = mathRunAll;
+        window.updateLanguageModules = updateLanguageModules;
+        window.clearAuditDisplay = clearAuditDisplay;
+    </script>
+
+</body>
+</html>

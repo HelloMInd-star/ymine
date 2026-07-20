@@ -1,0 +1,1584 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Game-OS 认知画圈基础实验・全域圈层稳态认知引擎</title>
+    <link rel="stylesheet" href="../../assets/css/base.css">
+    <script src="../../assets/js/bus.js"></script>
+    <script src="../../assets/js/sidebar.js"></script>
+    <script src="game-os-main/business-modules/circle-cognitive/private-logic/circle-public-api.js"></script>
+    <style>
+        :root {
+            --circle-purple: #a78bfa;
+            --circle-blue: #60a5fa;
+            --circle-green: #22c55e;
+            --circle-yellow: #facc15;
+            --circle-red: #f87171;
+            --circle-cyan: #22d3ee;
+        }
+
+        body { background: #080612; }
+
+        .circle-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        /* ===== 顶部Header ===== */
+        .circle-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid rgba(167,139,250,0.1);
+        }
+        .circle-header .title-area {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .circle-header .back-btn {
+            color: rgba(167,139,250,0.6);
+            text-decoration: none;
+            font-size: 13px;
+            padding: 6px 14px;
+            border: 1px solid rgba(167,139,250,0.2);
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+        .circle-header .back-btn:hover {
+            color: #a78bfa;
+            border-color: rgba(167,139,250,0.4);
+            background: rgba(167,139,250,0.05);
+        }
+        .circle-header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: #f1f5f9;
+            margin: 0;
+            letter-spacing: -0.3px;
+        }
+        .circle-header h1 span { color: var(--circle-purple); }
+        .circle-header .subtitle {
+            font-size: 12px;
+            color: rgba(255,255,255,0.3);
+            margin-top: 2px;
+        }
+        .circle-header .status-badges {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .badge-fuse {
+            font-size: 10px;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+        .badge-fuse.ok {
+            background: rgba(34,197,94,0.1);
+            color: var(--circle-green);
+            border: 1px solid rgba(34,197,94,0.2);
+        }
+        .badge-fuse.warn {
+            background: rgba(250,204,21,0.1);
+            color: var(--circle-yellow);
+            border: 1px solid rgba(250,204,21,0.2);
+        }
+        .badge-ver {
+            font-size: 10px;
+            color: rgba(255,255,255,0.2);
+            padding: 4px 8px;
+        }
+
+        /* ===== 科研声明 ===== */
+        .original-statement {
+            background: rgba(250, 204, 21, 0.04);
+            border: 1px solid rgba(250, 204, 21, 0.12);
+            border-radius: 12px;
+            padding: 14px 18px;
+            margin-bottom: 20px;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.5);
+            line-height: 1.7;
+            text-align: justify;
+        }
+        .original-statement strong {
+            color: #facc15;
+            font-weight: 600;
+        }
+
+        /* ===== 模式切换Tab ===== */
+        .mode-tabs {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 20px;
+            background: rgba(255,255,255,0.02);
+            padding: 4px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.04);
+        }
+        .mode-tab {
+            flex: 1;
+            padding: 12px 16px;
+            text-align: center;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.25s;
+            color: rgba(255,255,255,0.4);
+            font-size: 13px;
+            font-weight: 500;
+            border: none;
+            background: transparent;
+        }
+        .mode-tab:hover {
+            color: rgba(255,255,255,0.7);
+            background: rgba(255,255,255,0.02);
+        }
+        .mode-tab.active {
+            background: rgba(167,139,250,0.1);
+            color: var(--circle-purple);
+            font-weight: 600;
+        }
+        .mode-tab .mode-icon { font-size: 18px; display: block; margin-bottom: 4px; }
+        .mode-tab .mode-sub { font-size: 9px; opacity: 0.6; margin-top: 2px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+        /* ===== 主布局Grid ===== */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 360px;
+            gap: 20px;
+        }
+
+        /* ===== Canvas画布区 ===== */
+        .canvas-panel {
+            background: radial-gradient(ellipse at center, #120b24 0%, #0a0818 100%);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 20px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        .canvas-panel::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background:
+                radial-gradient(circle at 20% 30%, rgba(167,139,250,0.03) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(96,165,250,0.03) 0%, transparent 50%);
+            pointer-events: none;
+        }
+        #circleCanvas {
+            width: 100%;
+            height: 420px;
+            border-radius: 12px;
+            cursor: crosshair;
+            background: radial-gradient(circle at center, #0f0a1f 0%, #070512 100%);
+            border: 1px solid rgba(255,255,255,0.04);
+        }
+        .canvas-info {
+            position: absolute;
+            top: 28px;
+            left: 28px;
+            font-size: 10px;
+            color: rgba(255,255,255,0.2);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .canvas-legend {
+            position: absolute;
+            bottom: 28px;
+            left: 28px;
+            display: flex;
+            gap: 16px;
+            font-size: 10px;
+            color: rgba(255,255,255,0.3);
+        }
+        .legend-item { display: flex; align-items: center; gap: 6px; }
+        .legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+        /* ===== 控制面板 ===== */
+        .control-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+        .panel-card {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 14px;
+            padding: 16px;
+        }
+        .panel-card .card-title {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: rgba(255,255,255,0.3);
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        /* 滑块组 */
+        .slider-group { margin-bottom: 12px; }
+        .slider-group:last-child { margin-bottom: 0; }
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: rgba(255,255,255,0.5);
+            margin-bottom: 6px;
+        }
+        .slider-label .val { color: var(--circle-purple); font-weight: 600; font-family: monospace; }
+        input[type="range"] {
+            width: 100%;
+            height: 4px;
+            border-radius: 2px;
+            background: rgba(255,255,255,0.1);
+            outline: none;
+            -webkit-appearance: none;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: var(--circle-purple);
+            cursor: pointer;
+            box-shadow: 0 0 8px rgba(167,139,250,0.4);
+        }
+        input[type="range"].danger::-webkit-slider-thumb { background: var(--circle-red); box-shadow: 0 0 8px rgba(248,113,113,0.4); }
+        input[type="range"].success::-webkit-slider-thumb { background: var(--circle-green); box-shadow: 0 0 8px rgba(34,197,94,0.4); }
+
+        /* 按钮 */
+        .btn-row { display: flex; gap: 8px; margin-top: 12px; }
+        .btn {
+            flex: 1;
+            padding: 10px 14px;
+            border: none;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--circle-purple), #7c3aed);
+            color: #fff;
+        }
+        .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(167,139,250,0.3); }
+        .btn-secondary {
+            background: rgba(255,255,255,0.05);
+            color: rgba(255,255,255,0.6);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .btn-secondary:hover { background: rgba(255,255,255,0.08); color: #fff; }
+        .btn-danger {
+            background: rgba(248,113,113,0.1);
+            color: var(--circle-red);
+            border: 1px solid rgba(248,113,113,0.2);
+        }
+
+        /* 输入框 */
+        .input-field {
+            width: 100%;
+            background: rgba(11,11,26,0.6);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 8px;
+            padding: 10px 12px;
+            color: #f1f5f9;
+            font-size: 13px;
+            font-family: inherit;
+            outline: none;
+            box-sizing: border-box;
+            margin-bottom: 8px;
+        }
+        .input-field:focus { border-color: var(--circle-purple); }
+        textarea.input-field { min-height: 70px; resize: vertical; line-height: 1.5; }
+
+        /* 指标卡片 */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+        .metric-box {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.04);
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+        }
+        .metric-box .mv {
+            font-size: 18px;
+            font-weight: 700;
+            font-family: monospace;
+        }
+        .metric-box .ml {
+            font-size: 9px;
+            color: rgba(255,255,255,0.3);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 2px;
+        }
+        .mv.green { color: var(--circle-green); }
+        .mv.yellow { color: var(--circle-yellow); }
+        .mv.red { color: var(--circle-red); }
+        .mv.purple { color: var(--circle-purple); }
+        .mv.cyan { color: var(--circle-cyan); }
+
+        /* 市场类型选择 */
+        .market-select {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        .market-opt {
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            border: 1px solid rgba(255,255,255,0.06);
+            background: rgba(255,255,255,0.02);
+            color: rgba(255,255,255,0.4);
+            transition: all 0.2s;
+        }
+        .market-opt:hover { border-color: rgba(255,255,255,0.15); }
+        .market-opt.active.blue { border-color: rgba(34,197,94,0.4); background: rgba(34,197,94,0.08); color: var(--circle-green); }
+        .market-opt.active.red { border-color: rgba(248,113,113,0.4); background: rgba(248,113,113,0.08); color: var(--circle-red); }
+        .market-opt .mi { font-size: 20px; display: block; margin-bottom: 4px; }
+
+        /* 下方模块区 */
+        .bottom-section {
+            margin-top: 20px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+        .bottom-card {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 14px;
+            padding: 18px;
+        }
+        .bottom-card h3 {
+            font-size: 13px;
+            font-weight: 600;
+            color: #f1f5f9;
+            margin: 0 0 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .bottom-card h3 .icon { font-size: 16px; }
+
+        /* 对照组对比 */
+        .compare-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+            font-size: 12px;
+        }
+        .compare-row:last-child { border-bottom: none; }
+        .compare-row .cl { color: rgba(255,255,255,0.4); }
+        .compare-row .cv { font-family: monospace; font-weight: 600; }
+        .compare-row .cv.rat { color: var(--circle-cyan); }
+        .compare-row .cv.hum { color: var(--circle-yellow); }
+        .compare-row .delta { color: var(--circle-red); font-size: 10px; }
+
+        /* 轨迹采集区 */
+        .draw-hint {
+            font-size: 11px;
+            color: rgba(255,255,255,0.3);
+            text-align: center;
+            padding: 8px;
+            background: rgba(167,139,250,0.05);
+            border-radius: 6px;
+            margin-bottom: 10px;
+            border: 1px dashed rgba(167,139,250,0.2);
+        }
+        .track-records {
+            max-height: 120px;
+            overflow-y: auto;
+            margin-top: 10px;
+        }
+        .track-record {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            padding: 6px 8px;
+            border-radius: 4px;
+            margin-bottom: 4px;
+            background: rgba(255,255,255,0.02);
+        }
+        .track-record .rn { color: rgba(255,255,255,0.4); }
+        .track-record .rs { font-family: monospace; font-weight: 600; }
+
+        /* 匹配度评分 */
+        .match-score {
+            text-align: center;
+            margin-bottom: 12px;
+        }
+        .match-score .score-big {
+            font-size: 42px;
+            font-weight: 800;
+            font-family: monospace;
+        }
+        .match-score .score-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 4px;
+        }
+        .match-dims { margin-top: 10px; }
+        .match-dim {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 6px;
+            font-size: 11px;
+        }
+        .match-dim .dim-label { width: 60px; color: rgba(255,255,255,0.4); }
+        .match-dim .dim-bar { flex: 1; height: 4px; background: rgba(255,255,255,0.08); border-radius: 2px; overflow: hidden; }
+        .match-dim .dim-fill { height: 100%; background: var(--circle-purple); border-radius: 2px; transition: width 0.3s; }
+        .match-dim .dim-val { width: 32px; text-align: right; font-family: monospace; color: rgba(255,255,255,0.6); }
+        .dim-slider {
+            height: 4px;
+            -webkit-appearance: none;
+            background: rgba(255,255,255,0.1);
+            border-radius: 2px;
+            outline: none;
+        }
+        .dim-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--circle-purple);
+            cursor: pointer;
+        }
+
+        /* 市场预判选择 */
+        .prejudge-opts {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 10px;
+        }
+        .prejudge-opt {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.05);
+            background: rgba(255,255,255,0.02);
+            cursor: pointer;
+            font-size: 12px;
+            color: rgba(255,255,255,0.5);
+            transition: all 0.2s;
+        }
+        .prejudge-opt:hover { border-color: rgba(255,255,255,0.12); }
+        .prejudge-opt.active { border-color: var(--circle-purple); background: rgba(167,139,250,0.08); color: #f1f5f9; }
+        .prejudge-opt .radio {
+            width: 14px; height: 14px; border-radius: 50%;
+            border: 2px solid rgba(255,255,255,0.2);
+            flex-shrink: 0;
+        }
+        .prejudge-opt.active .radio { border-color: var(--circle-purple); background: var(--circle-purple); box-shadow: inset 0 0 0 2px #0a0818; }
+
+        /* 隐藏的模式面板 */
+        .mode-panel { display: none; }
+        .mode-panel.active { display: block; }
+
+        /* 结果通知 */
+        .result-notice {
+            margin-top: 12px;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            line-height: 1.6;
+            display: none;
+        }
+        .result-notice.show { display: block; }
+        .result-notice.success { background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.2); color: var(--circle-green); }
+        .result-notice.error { background: rgba(248,113,113,0.08); border: 1px solid rgba(248,113,113,0.2); color: var(--circle-red); }
+        .result-notice.info { background: rgba(96,165,250,0.08); border: 1px solid rgba(96,165,250,0.2); color: var(--circle-blue); }
+
+        /* 私有引擎占位提示 */
+        .private-note {
+            font-size: 10px;
+            color: rgba(250,204,21,0.4);
+            padding: 8px;
+            background: rgba(250,204,21,0.03);
+            border-radius: 6px;
+            border-left: 2px solid rgba(250,204,21,0.2);
+            margin-top: 8px;
+            line-height: 1.5;
+        }
+
+        /* 响应式 */
+        @media (max-width: 1100px) {
+            .main-grid { grid-template-columns: 1fr; }
+            .bottom-section { grid-template-columns: 1fr; }
+            #circleCanvas { height: 320px; }
+        }
+    </style>
+</head>
+<body class="layout-flex">
+    <div id="glow"></div>
+    <div class="sidebar"></div>
+
+    <div class="main-content">
+        <div class="circle-container">
+            <!-- ===== 顶部Header ===== -->
+            <div class="circle-header">
+                <div class="title-area">
+                    <a href="../../index.html" class="back-btn">← 返回总控台</a>
+                    <div>
+                        <h1>🧠 Game-OS 认知画圈基础实验・全域圈层稳态认知引擎</h1>
+                        <div class="subtitle">运动-认知耦合 · 3→1→1→3→100架构 · 从脑神经到系统决策</div>
+                    </div>
+                </div>
+                <div class="status-badges">
+                    <span class="badge-fuse ok" id="fuseBadge">🛡️ 熔断: 0.6 正常</span>
+                    <span class="badge-ver">v2.1 · GAME-OS</span>
+                </div>
+            </div>
+
+            <!-- ===== 置顶科研声明 ===== -->
+            <div class="original-statement">
+                <strong>⚠️ 科研声明：</strong>本页面为 Game-OS 全体系底层数理与认知仿真引擎，包含静态圈层求解、系统供需动力学仿真、多智能体闭环迭代、人体运动-认知耦合轨迹采集、人类决策偏差对照测算。所有模块仅用于复杂系统稳态、认知机理、智能体收敛规律学术研究，不构成任何商业运营、投资实操指导。
+            </div>
+
+            <!-- ===== 四大模式Tab ===== -->
+            <div class="mode-tabs">
+                <button class="mode-tab active" data-mode="static" onclick="switchMode('static')">
+                    <span class="mode-icon">📐</span>
+                    静态圈层・确定性数理求解
+                    <span class="mode-sub">静态圈层·确定性求解</span>
+                </button>
+                <button class="mode-tab" data-mode="dynamic" onclick="switchMode('dynamic')">
+                    <span class="mode-icon">🌊</span>
+                    系统供需动态演化・圈层挤压仿真
+                    <span class="mode-sub">动态演化·圈层挤压仿真</span>
+                </button>
+                <button class="mode-tab" data-mode="ai_feedback" onclick="switchMode('ai_feedback')">
+                    <span class="mode-icon">🤖</span>
+                    多智能体闭环迭代・系统自适应纠偏仿真
+                    <span class="mode-sub">智能体·自适应纠偏</span>
+                </button>
+                <button class="mode-tab" data-mode="experiment" onclick="switchMode('experiment')">
+                    <span class="mode-icon">🎯</span>
+                    认知轨迹采集・决策偏差对照实验
+                    <span class="mode-sub">轨迹采集·偏差测算</span>
+                </button>
+            </div>
+
+            <!-- ===== 主Grid ===== -->
+            <div class="main-grid">
+                <!-- Canvas画布 -->
+                <div class="canvas-panel">
+                    <div class="canvas-info" id="canvasInfo">静态圈层・确定性数理求解</div>
+                    <canvas id="circleCanvas" width="800" height="420"></canvas>
+                    <div class="canvas-legend">
+                        <div class="legend-item"><div class="legend-dot" style="background: var(--circle-blue);"></div> 系统供给圈层半径（水平轴）</div>
+                        <div class="legend-item"><div class="legend-dot" style="background: var(--circle-purple);"></div> 系统需求演化速率（垂直轴）</div>
+                        <div class="legend-item"><div class="legend-dot" style="background: var(--circle-green);"></div> 系统稳态均衡节点</div>
+                        <div class="legend-item"><div class="legend-dot" style="background: var(--circle-yellow);"></div> 外部宏观扰动偏移</div>
+                    </div>
+                </div>
+
+                <!-- 控制面板 -->
+                <div class="control-panel">
+                    <!-- ===== 静态圈层模式 ===== -->
+                    <div class="mode-panel active" id="panel-static">
+                        <div class="panel-card">
+                            <div class="card-title">📐 静态圈层・确定性数理求解</div>
+                            <div style="font-size:11px;color:rgba(255,255,255,0.35);margin-bottom:12px;line-height:1.6;">
+                                圆心/半径完全固定 · 速度=0 · 二元一次方程组确定性求解<br>
+                                <span style="color:var(--circle-blue);">需求端变量</span> · <span style="color:var(--circle-purple);">供给端变量</span> · 总头=系统弹性约束 · 总腿=系统硬约束
+                            </div>
+                            <div class="slider-group">
+                                <div class="slider-label"><span>系统弹性约束（总头数）</span><span class="val" id="headsVal">35</span></div>
+                                <input type="range" id="headsSlider" min="1" max="100" value="35" oninput="updateStatic()">
+                            </div>
+                            <div class="slider-group">
+                                <div class="slider-label"><span>系统硬约束（总腿数）</span><span class="val" id="legsVal">94</span></div>
+                                <input type="range" id="legsSlider" min="2" max="400" value="94" class="danger" oninput="updateStatic()">
+                            </div>
+                            <div class="btn-row">
+                                <button class="btn btn-primary" onclick="solveStatic()">▶ 求解均衡</button>
+                                <button class="btn btn-secondary" onclick="resetStatic()">重置</button>
+                            </div>
+                            <div class="result-notice" id="staticResult"></div>
+                            <div class="private-note">
+                                ⚠️ 【需在私有circle认知引擎内配置填充】高级求解算法、扩展方程类型、整数解优化
+                            </div>
+                        </div>
+                        <div class="panel-card" id="staticMetrics" style="display:none;">
+                            <div class="card-title">求解结果</div>
+                            <div class="metrics-grid">
+                                <div class="metric-box">
+                                    <div class="mv purple" id="mChickens">—</div>
+                                    <div class="ml">📊 需求端变量</div>
+                                </div>
+                                <div class="metric-box">
+                                    <div class="mv cyan" id="mRabbits">—</div>
+                                    <div class="ml">📊 供给端变量</div>
+                                </div>
+                                <div class="metric-box">
+                                    <div class="mv green" id="mStability">1.00</div>
+                                    <div class="ml">系统稳定性</div>
+                                </div>
+                                <div class="metric-box">
+                                    <div class="mv yellow" id="mRadius">—</div>
+                                    <div class="ml">稳态圈半径</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ===== 经济模式 ===== -->
+                    <div class="mode-panel" id="panel-dynamic">
+                        <div class="panel-card">
+                            <div class="card-title">🌊 系统供需动态演化·圈层挤压仿真</div>
+                            <div class="market-select">
+                                <div class="market-opt active blue" data-market="blue_sea" onclick="setMarket('blue_sea')">
+                                    <span class="mi">🌊</span>宽松稳态圈层
+                                </div>
+                                <div class="market-opt red" data-market="red_sea" onclick="setMarket('red_sea')">
+                                    <span class="mi">🔥</span>挤压收敛圈层
+                                </div>
+                            </div>
+                            <div class="slider-group">
+                                <div class="slider-label"><span>初始系统需求</span><span class="val" id="dDemand">50</span></div>
+                                <input type="range" id="demandSlider" min="10" max="100" value="50" oninput="updateDynamicLabels()">
+                            </div>
+                            <div class="slider-group">
+                                <div class="slider-label"><span>初始系统供给</span><span class="val" id="dSupply">50</span></div>
+                                <input type="range" id="supplySlider" min="10" max="100" value="50" oninput="updateDynamicLabels()">
+                            </div>
+                            <div class="slider-group">
+                                <div class="slider-label"><span>外部宏观扰动偏移</span><span class="val" id="dPolicy">0</span></div>
+                                <input type="range" id="policySlider" min="-50" max="50" value="0" oninput="updateDynamicLabels()">
+                            </div>
+                            <div class="slider-group">
+                                <div class="slider-label"><span>🦢 黑天鹅扰动</span><span class="val" id="dShock">0</span></div>
+                                <input type="range" id="shockSlider" min="0" max="100" value="0" class="danger" oninput="updateDynamicLabels()">
+                            </div>
+                            <div class="btn-row">
+                                <button class="btn btn-primary" onclick="startDynamic()">▶ 启动演化</button>
+                                <button class="btn btn-secondary" onclick="stopDynamic()">⏹ 停止</button>
+                            </div>
+                            <div class="result-notice" id="dynamicResult"></div>
+                        </div>
+                        <div class="panel-card" id="dynamicMetrics">
+                            <div class="card-title">演化指标</div>
+                            <div class="metrics-grid">
+                                <div class="metric-box">
+                                    <div class="mv green" id="mStab">—</div>
+                                    <div class="ml">均衡稳定性</div>
+                                </div>
+                                <div class="metric-box">
+                                    <div class="mv yellow" id="mVol">—</div>
+                                    <div class="ml">系统状态波动偏移率</div>
+                                </div>
+                                <div class="metric-box">
+                                    <div class="mv cyan" id="mProfit">—</div>
+                                    <div class="ml">系统稳态收益区间</div>
+                                </div>
+                                <div class="metric-box">
+                                    <div class="mv purple" id="mConv">—</div>
+                                    <div class="ml">系统稳态收敛速率</div>
+                                </div>
+                            </div>
+                            <div class="private-note">
+                                ⚠️ 【需在私有circle认知引擎内配置填充】宽松/挤压稳态阈值、收敛系数、收益压缩率、黑天鹅恢复曲线
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ===== AI反馈模式 ===== -->
+                    <div class="mode-panel" id="panel-ai_feedback">
+                        <div class="panel-card">
+                            <div class="card-title">🤖 多智能体闭环迭代・系统自适应纠偏仿真</div>
+                            <div style="font-size:11px;color:rgba(255,255,255,0.35);margin-bottom:12px;line-height:1.6;">
+                                外部需求扰动·圈层供给响应·系统弹性约束·宏观规则偏移·系统演化步进速度<br>
+                                链路：外部耦合输入→系统映射推理→闭环反馈纠偏→多轮迭代稳态收敛
+                            </div>
+                            <textarea class="input-field" id="aiPrompt" placeholder="输入外部需求扰动..."></textarea>
+                            <input type="text" class="input-field" id="aiSystem" placeholder="宏观规则偏移量（可选）">
+                            <div class="slider-group">
+                                <div class="slider-label"><span>系统弹性约束窗口长度</span><span class="val" id="aiCtxVal">4096</span></div>
+                                <input type="range" id="aiCtxSlider" min="512" max="32768" value="4096" step="512" oninput="document.getElementById('aiCtxVal').textContent=this.value">
+                            </div>
+                            <div class="btn-row">
+                                <button class="btn btn-primary" onclick="runAIFeedback()">▶ 启动反馈循环</button>
+                                <button class="btn btn-secondary" onclick="resetAI()">重置</button>
+                            </div>
+                            <div style="font-size:10px;color:rgba(96,165,250,0.5);margin-top:10px;line-height:1.5;padding:8px;background:rgba(96,165,250,0.03);border-radius:6px;">
+                                本模块模拟多智能体在外部扰动、弹性约束下自主迭代纠偏，属于复杂系统自适应机理仿真。
+                            </div>
+                            <div class="result-notice" id="aiResult"></div>
+                        </div>
+                        <div class="panel-card" id="aiMetrics" style="display:none;">
+                            <div class="card-title">迭代结果</div>
+                            <div class="metrics-grid">
+                                <div class="metric-box">
+                                    <div class="mv green" id="mEquil">—</div>
+                                    <div class="ml">均衡达成</div>
+                                </div>
+                                <div class="metric-box">
+                                    <div class="mv purple" id="mScore">—</div>
+                                    <div class="ml">收敛分数</div>
+                                </div>
+                                <div class="metric-box">
+                                    <div class="mv cyan" id="mIters">—</div>
+                                    <div class="ml">迭代轮次</div>
+                                </div>
+                                <div class="metric-box">
+                                    <div class="mv yellow" id="mCtxUse">—</div>
+                                    <div class="ml">上下文占用</div>
+                                </div>
+                            </div>
+                            <div class="private-note">
+                                ⚠️ 【需在私有circle认知引擎内配置填充】实际LLM接入、嵌入向量模型、质量评估算法
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ===== 实验对照模式 ===== -->
+                    <div class="mode-panel" id="panel-experiment">
+                        <div class="panel-card">
+                            <div class="card-title">🎯 人体运动-认知耦合轨迹采集</div>
+                            <div class="draw-hint" id="drawHint">👆 在左侧Canvas上按住鼠标画一个圆</div>
+                            <div class="btn-row">
+                                <button class="btn btn-primary" id="drawBtn" onclick="toggleDrawing()">🎨 开始画圈</button>
+                                <button class="btn btn-secondary" onclick="clearTracks()">🗑️ 清除记录</button>
+                            </div>
+                            <div class="metrics-grid" style="margin-top:12px;">
+                                <div class="metric-box">
+                                    <div class="mv purple" id="mRound">—</div>
+                                    <div class="ml">轨迹圆度系数</div>
+                                </div>
+                                <div class="metric-box">
+                                    <div class="mv cyan" id="mRadErr">—</div>
+                                    <div class="ml">径向约束误差</div>
+                                </div>
+                                <div class="metric-box">
+                                    <div class="mv yellow" id="mSpdCV">—</div>
+                                    <div class="ml">运动速度变异度</div>
+                                </div>
+                                <div class="metric-box">
+                                    <div class="mv red" id="mDrift">—</div>
+                                    <div class="ml">认知圆心漂移量</div>
+                                </div>
+                            </div>
+                            <div class="track-records" id="trackRecords"></div>
+                            <div class="private-note">
+                                ⚠️ 【需在私有circle认知引擎内配置填充】PDCA学习曲线拟合、神经运动指标阈值、进步评估算法
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== 下方三模块 ===== -->
+            <div class="bottom-section">
+                <!-- 人类决策信息精度对照实验 -->
+                <div class="bottom-card">
+                    <h3><span class="icon">⚖️</span> 人类决策信息精度对照实验</h3>
+                    <div style="margin-bottom:10px;">
+                        <div class="slider-group" style="margin-bottom:8px;">
+                            <div class="slider-label"><span>决策信息精准度</span><span class="val" id="biasInfoVal">70%</span></div>
+                            <input type="range" id="biasInfo" min="0" max="100" value="70" class="success" oninput="document.getElementById('biasInfoVal').textContent=this.value+'%'">
+                        </div>
+                        <div class="slider-group">
+                            <div class="slider-label"><span>系统反馈响应速率</span><span class="val" id="biasFbVal">50%</span></div>
+                            <input type="range" id="biasFb" min="0" max="100" value="50" oninput="document.getElementById('biasFbVal').textContent=this.value+'%'">
+                        </div>
+                        <button class="btn btn-primary" style="width:100%;flex:none;margin-top:4px;" onclick="runBiasCompare()">▶ 对照计算</button>
+                    </div>
+                    <div id="biasResults" style="display:none;">
+                        <div class="compare-row">
+                            <span class="cl">决策精准度</span>
+                            <span><span class="cv rat" id="bRatAcc">—</span> vs <span class="cv hum" id="bHumAcc">—</span> <span class="delta" id="bAccD">—</span></span>
+                        </div>
+                        <div class="compare-row">
+                            <span class="cl">收敛轮次</span>
+                            <span><span class="cv rat" id="bRatConv">—</span> vs <span class="cv hum" id="bHumConv">—</span> <span class="delta" id="bConvD">—</span></span>
+                        </div>
+                        <div class="compare-row">
+                            <span class="cl">期望系统收益</span>
+                            <span><span class="cv rat" id="bRatRet">—</span> vs <span class="cv hum" id="bHumRet">—</span> <span class="delta" id="bRetD">—</span></span>
+                        </div>
+                    </div>
+                    <div class="private-note">
+                        ⚠️ 【需在私有circle认知引擎内配置填充】锚定/损失厌恶/过度自信三类偏差权重系数
+                    </div>
+                </div>
+
+                <!-- 认知主体-系统适配度拟合实验 -->
+                <div class="bottom-card">
+                    <h3><span class="icon">👤</span> 认知主体-系统适配度拟合实验</h3>
+                    <div class="match-score">
+                        <div class="score-big purple" id="matchScore">—</div>
+                        <div class="score-label" id="matchRating" style="color:rgba(255,255,255,0.3);">待拟合测算</div>
+                    </div>
+                    <div class="match-dims">
+                        <div class="match-dim">
+                            <span class="dim-label">主体认知基底能力</span>
+                            <input type="range" min="0" max="100" value="50" class="dim-slider" id="sldFounder" oninput="updateMatchDim('founder', this.value)">
+                            <span class="dim-val" id="dimFounderV">50</span>
+                        </div>
+                        <div class="match-dim">
+                            <span class="dim-label">认知决策输出质量</span>
+                            <input type="range" min="0" max="100" value="50" class="dim-slider" id="sldDecision" oninput="updateMatchDim('decision', this.value)">
+                            <span class="dim-val" id="dimDecisionV">50</span>
+                        </div>
+                        <div class="match-dim">
+                            <span class="dim-label">信息判别精准度</span>
+                            <input type="range" min="0" max="100" value="50" class="dim-slider" id="sldCog" oninput="updateMatchDim('cog', this.value)">
+                            <span class="dim-val" id="dimCogV">50</span>
+                        </div>
+                        <div class="match-dim">
+                            <span class="dim-label">复杂系统适配度</span>
+                            <input type="range" min="0" max="100" value="50" class="dim-slider" id="sldMarket" oninput="updateMatchDim('market', this.value)">
+                            <span class="dim-val" id="dimMarketV">50</span>
+                        </div>
+                        <div class="match-dim">
+                            <span class="dim-label">行为落地执行效率</span>
+                            <input type="range" min="0" max="100" value="50" class="dim-slider" id="sldExec" oninput="updateMatchDim('exec', this.value)">
+                            <span class="dim-val" id="dimExecV">50</span>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" style="width:100%;flex:none;margin-top:10px;" onclick="runMatchRate()">▶ 综合测算</button>
+                    <div class="private-note">
+                        ⚠️ 【需在私有circle认知引擎内配置填充】五大维度加权系数
+                    </div>
+                </div>
+
+                <!-- 不确定性认知决策预判实验 -->
+                <div class="bottom-card">
+                    <h3><span class="icon">🔮</span> 不确定性认知决策预判实验</h3>
+                    <div style="font-size:11px;color:rgba(255,255,255,0.35);margin-bottom:10px;">实验启动前选择：</div>
+                    <div class="prejudge-opts">
+                        <div class="prejudge-opt active" data-pjudge="clear" onclick="setPrejudge('clear')">
+                            <div class="radio"></div>
+                            <div>
+                                <div style="font-weight:600;">确定区间预判</div>
+                                <div style="opacity:0.6;font-size:10px;margin-top:2px;">给出明确上下限</div>
+                            </div>
+                        </div>
+                        <div class="prejudge-opt" data-pjudge="cautious" onclick="setPrejudge('cautious')">
+                            <div class="radio"></div>
+                            <div>
+                                <div style="font-weight:600;">弹性区间预判</div>
+                                <div style="opacity:0.6;font-size:10px;margin-top:2px;">模糊区间估计</div>
+                            </div>
+                        </div>
+                        <div class="prejudge-opt" data-pjudge="abstain" onclick="setPrejudge('abstain')">
+                            <div class="radio"></div>
+                            <div>
+                                <div style="font-weight:600;">信息不足暂缓预判</div>
+                                <div style="opacity:0.6;font-size:10px;margin-top:2px;">等待更多数据</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="result-notice info" id="prejudgeNote">
+                        当前选择：<strong>确定给出区间预判</strong><br>
+                        认知循环：感知→决策→反馈→校准
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================================
+        // Global State
+        // ============================================================
+        var currentMode = 'static';
+        var currentMarket = 'blue_sea';
+        var currentPrejudge = 'clear';
+        var dynamicAnimId = null;
+        var isDrawing = false;
+        var drawPoints = [];
+        var trackHistory = [];
+
+        // Canvas setup
+        var canvas = document.getElementById('circleCanvas');
+        var ctx = canvas.getContext('2d');
+        function resizeCanvas() {
+            var rect = canvas.getBoundingClientRect();
+            var dpr = window.devicePixelRatio || 1;
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+            ctx.scale(dpr, dpr);
+            canvas.style.width = rect.width + 'px';
+            canvas.style.height = rect.height + 'px';
+            drawStaticScene();
+        }
+        window.addEventListener('resize', resizeCanvas);
+
+        // ============================================================
+        // Mode Switching
+        // ============================================================
+        function switchMode(mode) {
+            currentMode = mode;
+            document.querySelectorAll('.mode-tab').forEach(function (t) { t.classList.remove('active'); });
+            document.querySelector('.mode-tab[data-mode="' + mode + '"]').classList.add('active');
+            document.querySelectorAll('.mode-panel').forEach(function (p) { p.classList.remove('active'); });
+            document.getElementById('panel-' + mode).classList.add('active');
+            stopDynamic();
+
+            var info = document.getElementById('canvasInfo');
+            if (mode === 'static') { info.textContent = '静态圈层・确定性数理求解'; drawStaticScene(); }
+            else if (mode === 'dynamic') { info.textContent = '系统供需动态演化・圈层挤压仿真'; drawDynamicBase(); }
+            else if (mode === 'ai_feedback') { info.textContent = 'AI反馈模式·多智能体闭环迭代'; drawAIBase(); }
+            else if (mode === 'experiment') { info.textContent = '实验模式·人体运动-认知耦合轨迹采集'; drawExperimentBase(); }
+        }
+
+        // ============================================================
+        // Drawing helpers
+        // ============================================================
+        function getCanvasCenter() {
+            var rect = canvas.getBoundingClientRect();
+            return { x: rect.width / 2, y: rect.height / 2, w: rect.width, h: rect.height };
+        }
+
+        function drawAxes(cx, cy, w, h) {
+            ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(40, cy); ctx.lineTo(w - 40, cy);
+            ctx.moveTo(cx, 30); ctx.lineTo(cx, h - 30);
+            ctx.stroke();
+            ctx.fillStyle = 'rgba(255,255,255,0.2)';
+            ctx.font = '10px monospace';
+            ctx.fillText('系统供给→', w - 80, cy - 8);
+            ctx.fillText('↑系统需求', cx + 8, 40);
+        }
+
+        // ============================================================
+        // STATIC MODE: Chicken-Rabbit Math Solver
+        // ============================================================
+        var staticSolution = null;
+
+        function drawStaticScene() {
+            var c = getCanvasCenter();
+            ctx.clearRect(0, 0, c.w, c.h);
+            drawAxes(c.x, c.y, c.w, c.h);
+
+            // Draw guide circle (static)
+            ctx.strokeStyle = 'rgba(167,139,250,0.15)';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([5, 5]);
+            ctx.beginPath();
+            ctx.arc(c.x, c.y, 100, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            if (staticSolution && staticSolution.code === 200) {
+                var sol = staticSolution.data;
+                var scale = 3;
+                var eqX = c.x + sol.circleParams.centerX * scale;
+                var eqY = c.y - sol.circleParams.centerY * scale;
+                var r = sol.circleParams.radius * scale + 20;
+
+                // Draw two lines (chicken+rabbit=heads, 2c+4r=legs)
+                ctx.strokeStyle = 'rgba(96,165,250,0.5)';
+                ctx.lineWidth = 1.5;
+                ctx.beginPath();
+                var heads = sol.solution.totalHeads;
+                ctx.moveTo(c.x, c.y - heads * scale);
+                ctx.lineTo(c.x + heads * scale, c.y);
+                ctx.stroke();
+
+                ctx.strokeStyle = 'rgba(167,139,250,0.5)';
+                ctx.beginPath();
+                var legs = sol.solution.totalLegs;
+                ctx.moveTo(c.x, c.y - legs * scale / 4);
+                ctx.lineTo(c.x + legs * scale / 2, c.y);
+                ctx.stroke();
+
+                // Equilibrium circle
+                ctx.strokeStyle = 'rgba(34,197,94,0.6)';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.arc(eqX, eqY, r, 0, Math.PI * 2);
+                ctx.stroke();
+
+                // Equilibrium point
+                ctx.fillStyle = '#22c55e';
+                ctx.beginPath();
+                ctx.arc(eqX, eqY, 6, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.shadowColor = '#22c55e';
+                ctx.shadowBlur = 15;
+                ctx.fill();
+                ctx.shadowBlur = 0;
+
+                ctx.fillStyle = '#f1f5f9';
+                ctx.font = '12px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('系统稳态均衡节点: 需求=' + sol.solution.chickens + ' 供给=' + sol.solution.rabbits, eqX, eqY - r - 10);
+                ctx.textAlign = 'left';
+            } else {
+                // Draw dashed expected circle
+                ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+                ctx.lineWidth = 1;
+                ctx.setLineDash([3, 3]);
+                ctx.beginPath();
+                ctx.arc(c.x, c.y, 80, 0, Math.PI * 2);
+                ctx.stroke();
+                ctx.setLineDash([]);
+                ctx.fillStyle = 'rgba(255,255,255,0.15)';
+                ctx.font = '12px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('调整参数后点击「求解均衡」', c.x, c.y);
+                ctx.textAlign = 'left';
+            }
+        }
+
+        function updateStatic() {
+            document.getElementById('headsVal').textContent = document.getElementById('headsSlider').value;
+            document.getElementById('legsVal').textContent = document.getElementById('legsSlider').value;
+        }
+
+        function solveStatic() {
+            var heads = parseInt(document.getElementById('headsSlider').value);
+            var legs = parseInt(document.getElementById('legsSlider').value);
+            var result = CircleAPI.staticSolve({ totalHeads: heads, totalLegs: legs });
+            staticSolution = result;
+            var notice = document.getElementById('staticResult');
+            notice.classList.add('show');
+
+            if (result.code === 200) {
+                var sol = result.data;
+                notice.className = 'result-notice show success';
+                notice.innerHTML = '✅ 均衡解存在：<strong>系统需求=' + sol.solution.chickens + '</strong>，<strong>系统供给=' + sol.solution.rabbits + '</strong>';
+                document.getElementById('staticMetrics').style.display = 'block';
+                document.getElementById('mChickens').textContent = sol.solution.chickens;
+                document.getElementById('mRabbits').textContent = sol.solution.rabbits;
+                document.getElementById('mStability').textContent = sol.equilibrium.stability.toFixed(2);
+                document.getElementById('mRadius').textContent = sol.circleParams.radius.toFixed(1);
+            } else {
+                notice.className = 'result-notice show error';
+                notice.textContent = '❌ ' + result.message;
+                document.getElementById('staticMetrics').style.display = 'none';
+            }
+            drawStaticScene();
+        }
+
+        function resetStatic() {
+            staticSolution = null;
+            document.getElementById('headsSlider').value = 35;
+            document.getElementById('legsSlider').value = 94;
+            updateStatic();
+            document.getElementById('staticResult').classList.remove('show');
+            document.getElementById('staticMetrics').style.display = 'none';
+            drawStaticScene();
+        }
+
+        // ============================================================
+        // DYNAMIC MODE: Evolving Economic Circles
+        // ============================================================
+        var dynamicState = null;
+        var dynamicTime = 0;
+
+        function drawDynamicBase() {
+            var c = getCanvasCenter();
+            ctx.clearRect(0, 0, c.w, c.h);
+            drawAxes(c.x, c.y, c.w, c.h);
+
+            ctx.fillStyle = 'rgba(255,255,255,0.15)';
+            ctx.font = '12px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(currentMarket === 'blue_sea' ? '🌊 宽松稳态圈层·低波动·高收益区间' : '🔥 挤压收敛圈层·剧烈扰动·收益压缩', c.x, c.y);
+            ctx.textAlign = 'left';
+        }
+
+        function setMarket(type) {
+            currentMarket = type;
+            document.querySelectorAll('.market-opt').forEach(function (o) { o.classList.remove('active'); });
+            document.querySelector('.market-opt[data-market="' + type + '"]').classList.add('active');
+            updateDynamicLabels();
+        }
+
+        function updateDynamicLabels() {
+            document.getElementById('dDemand').textContent = document.getElementById('demandSlider').value;
+            document.getElementById('dSupply').textContent = document.getElementById('supplySlider').value;
+            document.getElementById('dPolicy').textContent = document.getElementById('policySlider').value;
+            document.getElementById('dShock').textContent = document.getElementById('shockSlider').value;
+
+            // Check fuse (0.6 baseline = 60/100 shock)
+            var shock = parseInt(document.getElementById('shockSlider').value);
+            var fuse = document.getElementById('fuseBadge');
+            fuse.style.background = '';
+            fuse.style.color = '';
+            if (shock >= 60) {
+                fuse.className = 'badge-fuse';
+                fuse.style.background = 'rgba(248,113,113,0.1)';
+                fuse.style.borderColor = 'rgba(248,113,113,0.3)';
+                fuse.style.color = 'var(--circle-red)';
+                fuse.textContent = '🛑 熔断触发·操作锁死';
+            } else if (shock > 45) {
+                fuse.className = 'badge-fuse warn';
+                fuse.textContent = '⚠️ 扰动接近熔断阈值';
+            } else {
+                fuse.className = 'badge-fuse ok';
+                fuse.textContent = '🛡️ 熔断: 0.6 正常';
+            }
+        }
+
+        function reportFuseStatus(status, reason) {
+            if (window.GameOSBus || window.bus) {
+                var b = window.GameOSBus || window.bus;
+                if (b.emit) b.emit('circle-fuse-update', { status: status, reason: reason, module: 'circle-cognitive' });
+            }
+        }
+
+        function startDynamic() {
+            stopDynamic();
+            var demand = parseInt(document.getElementById('demandSlider').value);
+            var supply = parseInt(document.getElementById('supplySlider').value);
+            var policy = parseInt(document.getElementById('policySlider').value);
+            var shock = parseInt(document.getElementById('shockSlider').value);
+
+            // Frontend double-check: fuse baseline 0.6 = 60/100
+            if (shock >= 60) {
+                var notice = document.getElementById('dynamicResult');
+                notice.className = 'result-notice show error';
+                notice.textContent = '🛑 FUSE_TRIGGERED: RISK_EXCEEDS_0.6_FUSE · Operation locked';
+                reportFuseStatus('HALTED', 'RISK_EXCEEDS_0.6');
+                return;
+            }
+
+            var result = CircleAPI.dynamicEvolve({
+                initialDemand: demand,
+                initialSupply: supply,
+                policyOffset: policy,
+                marketType: currentMarket,
+                blackSwanShock: shock,
+                ticks: 200,
+                riskConcentration: shock / 100
+            });
+
+            if (result.code !== 200) {
+                var notice = document.getElementById('dynamicResult');
+                notice.className = 'result-notice show error';
+                notice.textContent = '🛑 ' + result.message;
+                return;
+            }
+
+            dynamicState = result.data.timeSeries;
+            dynamicTime = 0;
+            document.getElementById('dynamicResult').classList.remove('show');
+
+            // Display metrics
+            document.getElementById('mStab').textContent = (result.data.metrics.equilibriumStability * 100).toFixed(0) + '%';
+            document.getElementById('mVol').textContent = result.data.metrics.priceVolatility.toFixed(1);
+            document.getElementById('mProfit').textContent = result.data.metrics.profitSpace.toFixed(1);
+            document.getElementById('mConv').textContent = result.data.metrics.convergenceSpeed.toFixed(2);
+
+            animateDynamic();
+        }
+
+        function animateDynamic() {
+            if (!dynamicState || dynamicTime >= dynamicState.length) {
+                dynamicAnimId = null;
+                return;
+            }
+            var c = getCanvasCenter();
+            ctx.clearRect(0, 0, c.w, c.h);
+            drawAxes(c.x, c.y, c.w, c.h);
+
+            var scale = 2;
+            // Trail
+            ctx.strokeStyle = currentMarket === 'blue_sea' ? 'rgba(34,197,94,0.2)' : 'rgba(248,113,113,0.2)';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            for (var i = 0; i <= dynamicTime && i < dynamicState.length; i++) {
+                var p = dynamicState[i];
+                var px = c.x + (p.supply - 50) * scale;
+                var py = c.y - (p.demand - 50) * scale;
+                if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+            }
+            ctx.stroke();
+
+            // Current circle
+            var cur = dynamicState[Math.min(dynamicTime, dynamicState.length - 1)];
+            var cx = c.x + (cur.supply - 50) * scale;
+            var cy = c.y - (cur.demand - 50) * scale;
+            var cr = Math.max(10, cur.radius * scale * 0.8);
+
+            ctx.strokeStyle = currentMarket === 'blue_sea' ? 'rgba(34,197,94,0.7)' : 'rgba(248,113,113,0.7)';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(cx, cy, cr, cur.angle, cur.angle + Math.PI * 2);
+            ctx.stroke();
+
+            // Rotating indicator
+            var ix = cx + Math.cos(cur.angle) * cr;
+            var iy = cy + Math.sin(cur.angle) * cr;
+            ctx.fillStyle = currentMarket === 'blue_sea' ? '#22c55e' : '#f87171';
+            ctx.beginPath();
+            ctx.arc(ix, iy, 4, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Center point
+            ctx.fillStyle = 'rgba(255,255,255,0.5)';
+            ctx.beginPath();
+            ctx.arc(cx, cy, 3, 0, Math.PI * 2);
+            ctx.fill();
+
+            dynamicTime += 2;
+            dynamicAnimId = requestAnimationFrame(animateDynamic);
+        }
+
+        function stopDynamic() {
+            if (dynamicAnimId) { cancelAnimationFrame(dynamicAnimId); dynamicAnimId = null; }
+        }
+
+        // ============================================================
+        // AI FEEDBACK MODE
+        // ============================================================
+        function drawAIBase() {
+            var c = getCanvasCenter();
+            ctx.clearRect(0, 0, c.w, c.h);
+            drawAxes(c.x, c.y, c.w, c.h);
+
+            ctx.strokeStyle = 'rgba(34,211,238,0.2)';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([8, 4]);
+            ctx.beginPath();
+            ctx.arc(c.x, c.y, 120, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // Spiral hint
+            ctx.strokeStyle = 'rgba(167,139,250,0.15)';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            for (var a = 0; a < Math.PI * 6; a += 0.1) {
+                var r = a * 8;
+                var px = c.x + Math.cos(a) * r;
+                var py = c.y + Math.sin(a) * r;
+                if (r < 130) {
+                    if (a === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+                }
+            }
+            ctx.stroke();
+
+            ctx.fillStyle = 'rgba(255,255,255,0.2)';
+            ctx.font = '12px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('🤖 输入外部扰动→启动多智能体迭代→螺旋逼近稳态', c.x, c.y + 5);
+            ctx.textAlign = 'left';
+        }
+
+        function runAIFeedback() {
+            var prompt = document.getElementById('aiPrompt').value.trim();
+            var system = document.getElementById('aiSystem').value;
+            var ctx_len = parseInt(document.getElementById('aiCtxSlider').value);
+            if (!prompt) {
+                var notice = document.getElementById('aiResult');
+                notice.className = 'result-notice show error';
+                notice.textContent = '请输入外部需求扰动';
+                return;
+            }
+            var result = CircleAPI.aiFeedback({
+                prompt: prompt,
+                systemInstruction: system,
+                contextLength: ctx_len,
+                maxIterations: 10
+            });
+            if (result.code === 200) {
+                var notice = document.getElementById('aiResult');
+                notice.className = 'result-notice show success';
+                notice.innerHTML = '✅ 完成 ' + result.data.result.totalIterations + ' 轮迭代' +
+                    (result.data.result.equilibriumReached ? '，<strong>均衡已达成</strong>' : '，未完全收敛');
+                document.getElementById('aiMetrics').style.display = 'block';
+                document.getElementById('mEquil').textContent = result.data.result.equilibriumReached ? 'YES' : 'NO';
+                document.getElementById('mEquil').style.color = result.data.result.equilibriumReached ? '#22c55e' : '#facc15';
+                document.getElementById('mScore').textContent = (result.data.result.convergenceScore * 100).toFixed(0) + '%';
+                document.getElementById('mIters').textContent = result.data.result.totalIterations;
+                document.getElementById('mCtxUse').textContent = (result.data.result.finalContextUsage * 100).toFixed(0) + '%';
+
+                // Draw spiral converging
+                drawAISpiral(result.data.iterations.length);
+            }
+        }
+
+        function drawAISpiral(iterCount) {
+            var c = getCanvasCenter();
+            ctx.clearRect(0, 0, c.w, c.h);
+            drawAxes(c.x, c.y, c.w, c.h);
+
+            var hue = 0.3 + Math.random() * 0.4;
+            ctx.strokeStyle = 'rgba(34,211,238,0.6)';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            for (var a = 0; a < Math.PI * iterCount; a += 0.08) {
+                var decay = Math.exp(-a * 0.15);
+                var r = decay * 130;
+                var px = c.x + Math.cos(a) * r;
+                var py = c.y + Math.sin(a) * r;
+                if (a === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+            }
+            ctx.stroke();
+
+            // Final point
+            ctx.fillStyle = '#22c55e';
+            ctx.beginPath();
+            ctx.arc(c.x, c.y, 8, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.shadowColor = '#22c55e'; ctx.shadowBlur = 20; ctx.fill(); ctx.shadowBlur = 0;
+        }
+
+        function resetAI() {
+            document.getElementById('aiPrompt').value = '';
+            document.getElementById('aiSystem').value = '';
+            document.getElementById('aiResult').classList.remove('show');
+            document.getElementById('aiMetrics').style.display = 'none';
+            drawAIBase();
+        }
+
+        // ============================================================
+        // EXPERIMENT MODE: Mouse Drawing & Tracking
+        // ============================================================
+        function drawExperimentBase() {
+            var c = getCanvasCenter();
+            ctx.clearRect(0, 0, c.w, c.h);
+            drawAxes(c.x, c.y, c.w, c.h);
+
+            // Target dashed circle
+            ctx.strokeStyle = 'rgba(167,139,250,0.4)';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([8, 4]);
+            ctx.beginPath();
+            ctx.arc(c.x, c.y, 120, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // Center target
+            ctx.strokeStyle = 'rgba(34,197,94,0.3)';
+            ctx.lineWidth = 1;
+            ctx.beginPath(); ctx.moveTo(c.x - 8, c.y); ctx.lineTo(c.x + 8, c.y); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(c.x, c.y - 8); ctx.lineTo(c.x, c.y + 8); ctx.stroke();
+
+            ctx.fillStyle = 'rgba(255,255,255,0.2)';
+            ctx.font = '11px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('🎯 沿虚线画一个圆（运动-认知耦合目标）', c.x, c.y - 130);
+            ctx.textAlign = 'left';
+        }
+
+        function toggleDrawing() {
+            isDrawing = !isDrawing;
+            var btn = document.getElementById('drawBtn');
+            var hint = document.getElementById('drawHint');
+            if (isDrawing) {
+                drawPoints = [];
+                btn.textContent = '⏹ 完成画圈';
+                btn.className = 'btn btn-danger';
+                hint.textContent = '🎨 正在绘制...松开鼠标或再次点击完成';
+                hint.style.borderColor = 'rgba(248,113,113,0.4)';
+                drawExperimentBase();
+            } else {
+                btn.textContent = '🎨 开始画圈';
+                btn.className = 'btn btn-primary';
+                hint.textContent = '👆 在Canvas上按住鼠标画一个圆';
+                hint.style.borderColor = 'rgba(167,139,250,0.2)';
+                if (drawPoints.length > 10) {
+                    analyzeDrawing();
+                }
+            }
+        }
+
+        // Canvas mouse events for drawing
+        canvas.addEventListener('mousedown', function (e) {
+            if (currentMode !== 'experiment' || !isDrawing) return;
+            var rect = canvas.getBoundingClientRect();
+            drawPoints = [{ x: e.clientX - rect.left, y: e.clientY - rect.top, t: Date.now() }];
+        });
+        canvas.addEventListener('mousemove', function (e) {
+            if (currentMode !== 'experiment' || !isDrawing || drawPoints.length === 0) return;
+            var rect = canvas.getBoundingClientRect();
+            drawPoints.push({ x: e.clientX - rect.left, y: e.clientY - rect.top, t: Date.now() });
+            redrawUserPath();
+        });
+        canvas.addEventListener('mouseup', function () {
+            if (currentMode === 'experiment' && isDrawing && drawPoints.length > 10) {
+                toggleDrawing();
+            }
+        });
+        canvas.addEventListener('mouseleave', function () {
+            if (currentMode === 'experiment' && isDrawing && drawPoints.length > 10) {
+                toggleDrawing();
+            }
+        });
+
+        function redrawUserPath() {
+            var c = getCanvasCenter();
+            drawExperimentBase();
+            if (drawPoints.length < 2) return;
+            ctx.strokeStyle = 'rgba(167,139,250,0.8)';
+            ctx.lineWidth = 2.5;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            ctx.beginPath();
+            ctx.moveTo(drawPoints[0].x, drawPoints[0].y);
+            for (var i = 1; i < drawPoints.length; i++) {
+                ctx.lineTo(drawPoints[i].x, drawPoints[i].y);
+            }
+            ctx.stroke();
+        }
+
+        function analyzeDrawing() {
+            var c = getCanvasCenter();
+            var expectedR = 120;
+            var result = CircleAPI.trackingCollect({
+                points: drawPoints,
+                expectedRadius: expectedR,
+                expectedCenter: { x: c.x, y: c.y }
+            });
+            if (result.code === 200) {
+                var m = result.data.metrics;
+                document.getElementById('mRound').textContent = m.roundness.toFixed(2);
+                document.getElementById('mRadErr').textContent = m.radialError.toFixed(1);
+                document.getElementById('mSpdCV').textContent = m.speedVariation.toFixed(2);
+                document.getElementById('mDrift').textContent = m.centerDrift.toFixed(1);
+
+                // Add to history
+                trackHistory.push({
+                    idx: trackHistory.length + 1,
+                    roundness: m.roundness,
+                    rating: result.data.rating
+                });
+                renderTrackHistory();
+            }
+        }
+
+        function renderTrackHistory() {
+            var container = document.getElementById('trackRecords');
+            container.innerHTML = trackHistory.map(function (t) {
+                var color = t.roundness > 0.85 ? '#22c55e' : t.roundness > 0.7 ? '#facc15' : '#f87171';
+                return '<div class="track-record"><span class="rn">#' + t.idx + ' ' + t.rating + '</span><span class="rs" style="color:' + color + '">' + (t.roundness * 100).toFixed(0) + '%</span></div>';
+            }).join('');
+        }
+
+        function clearTracks() {
+            trackHistory = [];
+            drawPoints = [];
+            document.getElementById('trackRecords').innerHTML = '';
+            document.getElementById('mRound').textContent = '—';
+            document.getElementById('mRadErr').textContent = '—';
+            document.getElementById('mSpdCV').textContent = '—';
+            document.getElementById('mDrift').textContent = '—';
+            drawExperimentBase();
+        }
+
+        // ============================================================
+        // BIAS COMPARE (Control Group)
+        // ============================================================
+        function runBiasCompare() {
+            var infoAcc = parseInt(document.getElementById('biasInfo').value) / 100;
+            var fbSpeed = parseInt(document.getElementById('biasFb').value) / 100;
+            var result = CircleAPI.biasCompare({
+                infoAccuracy: infoAcc,
+                feedbackSpeed: fbSpeed,
+                scenario: 'investment'
+            });
+            if (result.code === 200) {
+                var r = result.data.groups.rational;
+                var h = result.data.groups.human;
+                var d = result.data.delta;
+                document.getElementById('biasResults').style.display = 'block';
+                document.getElementById('bRatAcc').textContent = (r.decisionAccuracy * 100).toFixed(0) + '%';
+                document.getElementById('bHumAcc').textContent = (h.decisionAccuracy * 100).toFixed(0) + '%';
+                document.getElementById('bAccD').textContent = '-' + (d.accuracyDelta * 100).toFixed(0) + '%';
+                document.getElementById('bRatConv').textContent = r.convergenceSpeed;
+                document.getElementById('bHumConv').textContent = h.convergenceSpeed;
+                document.getElementById('bConvD').textContent = '+' + d.convergenceDelta;
+                document.getElementById('bRatRet').textContent = (r.expectedReturn * 100).toFixed(1) + '%';
+                document.getElementById('bHumRet').textContent = (h.expectedReturn * 100).toFixed(1) + '%';
+                document.getElementById('bRetD').textContent = '-' + (d.returnDelta * 100).toFixed(1) + '%';
+            }
+        }
+
+        // ============================================================
+        // FOUNDER MATCH RATE
+        // ============================================================
+        function updateMatchDim(dim, val) {
+            var map = { founder: 'dimFounderV', decision: 'dimDecisionV', cog: 'dimCogV', market: 'dimMarketV', exec: 'dimExecV' };
+            document.getElementById(map[dim]).textContent = val;
+        }
+
+        function runMatchRate() {
+            var scores = {
+                founderAbility: parseInt(document.getElementById('sldFounder').value) / 100,
+                decisionQuality: parseInt(document.getElementById('sldDecision').value) / 100,
+                cognitiveAccuracy: parseInt(document.getElementById('sldCog').value) / 100,
+                marketFit: parseInt(document.getElementById('sldMarket').value) / 100,
+                executionEfficiency: parseInt(document.getElementById('sldExec').value) / 100
+            };
+            var result = CircleAPI.matchRate(scores);
+            if (result.code === 200) {
+                var total = result.data.totalMatchRate * 100;
+                document.getElementById('matchScore').textContent = total.toFixed(0) + '%';
+                document.getElementById('matchScore').style.color =
+                    total > 75 ? '#22c55e' : total > 50 ? '#facc15' : '#f87171';
+                var label = document.getElementById('matchRating');
+                if (result.data.rating === 'HIGH_MATCH') {
+                    label.textContent = '高匹配 · 推荐全力投入';
+                    label.style.color = '#22c55e';
+                } else if (result.data.rating === 'MEDIUM_MATCH') {
+                    label.textContent = '中等匹配 · 建议补强短板';
+                    label.style.color = '#facc15';
+                } else {
+                    label.textContent = '低匹配 · 建议重新评估';
+                    label.style.color = '#f87171';
+                }
+            }
+        }
+
+        // ============================================================
+        // PREJUDGE MODULE
+        // ============================================================
+        function setPrejudge(type) {
+            currentPrejudge = type;
+            document.querySelectorAll('.prejudge-opt').forEach(function (o) { o.classList.remove('active'); });
+            document.querySelector('.prejudge-opt[data-pjudge="' + type + '"]').classList.add('active');
+            var note = document.getElementById('prejudgeNote');
+            var texts = {
+                clear: { title: '确定给出区间预判', desc: '精准边界·但可能过度自信（锚定偏差风险）' },
+                cautious: { title: '弹性区间预判', desc: '模糊区间·保留容错·较稳健' },
+                abstain: { title: '信息不足暂缓预判', desc: '等待更多数据·避免误判·放弃机会成本' }
+            };
+            note.innerHTML = '当前选择：<strong>' + texts[type].title + '</strong><br>' + texts[type].desc;
+        }
+
+        // ============================================================
+        // Init
+        // ============================================================
+        window.addEventListener('load', function () {
+            setTimeout(resizeCanvas, 100);
+            // Check API health
+            var health = CircleAPI.health();
+            console.log('[Circle Cognitive Engine]', health);
+        });
+    </script>
+</body>
+</html>

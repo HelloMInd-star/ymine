@@ -1,79 +1,131 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<meta charset="UTF-8">
-<title>低空经济三方空域博弈 · Game-OS</title>
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<style>
-  *{margin:0;padding:0;box-sizing:border-box}
-  body{background:#0a0e1a;color:#e0e6f0;font-family:-apple-system,"PingFang SC","Microsoft YaHei",monospace;height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center}
-  .badge{display:inline-block;padding:4px 12px;border:1px solid #4488ff;border-radius:20px;font-size:12px;color:#66aaff;margin-bottom:24px;letter-spacing:2px}
-  h1{font-size:32px;font-weight:300;letter-spacing:4px;margin-bottom:12px}
-  .sub{color:#8899aa;font-size:14px;margin-bottom:40px;letter-spacing:1px}
-  .panel{background:#0f1525;border:1px solid #1a2540;border-radius:8px;padding:32px;min-width:480px;max-width:640px}
-  .row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #1a2540;font-size:13px}
-  .row:last-child{border-bottom:none}
-  .k{color:#667799}
-  .v{color:#aaccee;font-weight:500}
-  .v.ok{color:#44cc88}
-  .v.warn{color:#ffaa44}
-  .notice{margin-top:24px;padding:16px;background:#0d1a2e;border-left:3px solid #4488ff;border-radius:4px;font-size:12px;line-height:1.8;color:#88aadd}
-  .notice b{color:#66aaff}
-  .back{position:fixed;top:20px;left:20px;color:#667799;text-decoration:none;font-size:13px;padding:8px 16px;border:1px solid #1a2540;border-radius:4px}
-  .back:hover{color:#aaccee;border-color:#4488ff}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🛩️ AirMind · 低空全域人机神经协同调度引擎 V2.0</title>
+    <meta http-equiv="refresh" content="0; url=../../../airmind/index.html">
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: #0b0b1a;
+            color: #e2e8f0;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .redirect-card {
+            background: radial-gradient(ellipse at 30% 30%, #0b1a24, #0b0b1a 70%, #03050a);
+            border-radius: 24px;
+            padding: 48px 56px;
+            border: 1px solid rgba(34, 211, 238, 0.15);
+            box-shadow: 0 30px 80px rgba(10, 60, 80, 0.3);
+            text-align: center;
+            max-width: 560px;
+        }
+        .badge {
+            display: inline-block;
+            background: rgba(34,211,238,0.1);
+            border: 1px solid rgba(34,211,238,0.3);
+            color: #22d3ee;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 4px 18px;
+            border-radius: 20px;
+            letter-spacing: 0.5px;
+            margin-bottom: 16px;
+            font-family: monospace;
+        }
+        h1 {
+            font-size: 26px;
+            font-weight: 700;
+            color: #f1f5f9;
+            margin-bottom: 12px;
+            background: linear-gradient(135deg, #f1f5f9, #22d3ee, #60a5fa);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .desc {
+            color: rgba(255,255,255,0.45);
+            font-size: 14px;
+            line-height: 1.8;
+            margin-bottom: 24px;
+        }
+        .spinner {
+            width: 36px;
+            height: 36px;
+            border: 3px solid rgba(34,211,238,0.15);
+            border-top-color: #22d3ee;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 20px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .countdown {
+            font-size: 13px;
+            color: rgba(255,255,255,0.3);
+            font-family: monospace;
+        }
+        a.manual-link {
+            display: inline-block;
+            margin-top: 20px;
+            color: #22d3ee;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            padding: 10px 28px;
+            border: 1px solid rgba(34,211,238,0.3);
+            border-radius: 10px;
+            transition: all 0.3s;
+        }
+        a.manual-link:hover {
+            background: rgba(34,211,238,0.1);
+            border-color: #22d3ee;
+            box-shadow: 0 8px 25px rgba(34,211,238,0.15);
+        }
+        .meta {
+            margin-top: 24px;
+            padding-top: 16px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            font-size: 10px;
+            color: rgba(255,255,255,0.15);
+            font-family: monospace;
+            line-height: 1.8;
+        }
+    </style>
 </head>
 <body>
-<a class="back" href="../../total-index.html">← 返回总控门户</a>
-<div class="badge">BUSINESS MODULE</div>
-<h1>低空经济三方空域博弈</h1>
-<div class="sub">lowalt-economy · Skeleton v0.1.0</div>
-<div class="panel">
-  <div class="row"><span class="k">模块状态</span><span class="v warn">骨架就绪 · 业务逻辑待填充</span></div>
-  <div class="row"><span class="k">API通道</span><span class="v ok" id="api-status">检测中...</span></div>
-  <div class="row"><span class="k">Core版本</span><span class="v" id="core-ver">-</span></div>
-  <div class="row"><span class="k">Core锁定</span><span class="v" id="core-locked">-</span></div>
-  <div class="row"><span class="k">熔断基准</span><span class="v" id="fuse-base">-</span></div>
-  <div class="row"><span class="k">11层骨架</span><span class="v" id="layer-count">-</span></div>
-  <div class="notice">
-    <b>开发约定：</b><br>
-    · 所有底层运算（凯利/圈层/熔断/控制/肥瘦/11层骨架）必须通过 GameOS_API.invoke() 调用<br>
-    · 禁止直接 require/import core-engine/ 下除 common-api.js 之外的任何文件<br>
-    · 行业私有参数全部配置在 module-config.json，由后期填入<br>
-    · 模块私有业务逻辑写入 private-logic/ 目录
-  </div>
-</div>
-<script src="../../core-engine/_internal.js"></script>
-<script src="../../core-engine/kelly-base.js"></script>
-<script src="../../core-engine/circle-boundary.js"></script>
-<script src="../../core-engine/safety-fuse.js"></script>
-<script src="../../core-engine/four-layer-control.js"></script>
-<script src="../../core-engine/fat-lean-band.js"></script>
-<script src="../../core-engine/triangle-loopback.js"></script>
-<script src="../../core-engine/eleven-layer-public.js"></script>
-<script src="../../core-engine/common-api.js"></script>
-<script>
-(function(){
-  var s=function(id,t){document.getElementById(id).textContent=t};
-  try{
-    var h = GameOS_API.health();
-    if(h.code === 200){
-      s('api-status','连接正常 ('+h.code+')');
-      s('api-status','ok');
-      document.getElementById('api-status').className='v ok';
-      s('api-status','OK · '+h.data.apiVersion);
-      s('core-ver',h.data.coreVersion);
-      s('core-locked',h.data.coreLocked?'TRUE (公理锁死)':'FALSE');
-      var c = GameOS_API.getConstants();
-      s('fuse-base', c.FUSE_BASELINE+' (全局铁律)');
-      s('layer-count', c.ELEVEN_LAYER_COUNT+' 层');
-    }else{
-      s('api-status','连接失败: '+h.message);
-    }
-  }catch(e){
-    s('api-status','ERROR: '+e.message);
-  }
-})();
-</script>
+    <div class="redirect-card">
+        <div class="badge">🔄 页面迁移</div>
+        <h1>🛩️ AirMind · 低空全域人机神经协同调度引擎 V2.0</h1>
+        <div class="desc">
+            低空经济模块已升级为独立 AirMind V2.0 引擎<br>
+            新增：双层阻尼张量 · 串级PID控制 · 三维空地对照 · 地应力矩阵 · 对流算法
+        </div>
+        <div class="spinner"></div>
+        <div class="countdown" id="countdown">正在跳转到 airmind/index.html ... 0秒</div>
+        <a href="../../../airmind/index.html" class="manual-link">→ 立即跳转 AirMind V2.0</a>
+        <div class="meta">
+            Y.Mine · AirMind V2.0 · Game-OS V2.1<br>
+            GameMind 子引擎 · 低空全域人机神经协同调度
+        </div>
+    </div>
+
+    <script>
+        var seconds = 0;
+        var cd = document.getElementById('countdown');
+        function updateCountdown() {
+            cd.textContent = '正在跳转到 airmind/index.html ... ' + seconds + '秒';
+            seconds++;
+        }
+        updateCountdown();
+        setInterval(updateCountdown, 1000);
+        setTimeout(function() {
+            window.location.href = '../../../airmind/index.html';
+        }, 100);
+    </script>
 </body>
 </html>

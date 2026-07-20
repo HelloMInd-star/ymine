@@ -1,0 +1,1909 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Y.Mine · 跨域同构积木映射引擎</title>
+    <link rel="stylesheet" href="../../assets/css/base.css">
+    <script src="../../assets/js/bus.js"></script>
+    <style>
+        /* ===== 面包屑样式 ===== */
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
+        }
+        .breadcrumb a {
+            color: rgba(255,255,255,0.5);
+            text-decoration: none;
+            transition: color .2s;
+        }
+        .breadcrumb a:hover {
+            color: rgba(255,255,255,0.8);
+        }
+        .breadcrumb .sep {
+            color: rgba(255,255,255,0.2);
+        }
+        .breadcrumb .current {
+            color: rgba(255,255,255,0.7);
+        }
+
+        /* ===== 主容器 ===== */
+        .container {
+            max-width: 900px;
+            width: 100%;
+            background: radial-gradient(ellipse at 30% 30%, #120b24, #0b0b1a 70%, #05030a);
+            border-radius: 32px;
+            padding: 48px 44px 40px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            box-shadow: 0 30px 80px rgba(40, 10, 80, 0.4);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+            backdrop-filter: blur(2px);
+            margin: 0 auto;
+        }
+
+        /* ===== 头部 ===== */
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            opacity: 0;
+            animation: fadeInUp 0.8s ease forwards;
+        }
+
+        .badge {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 13px;
+            padding: 4px 16px;
+            border-radius: 20px;
+            letter-spacing: 0.3px;
+            margin-bottom: 12px;
+        }
+
+        .header h1 {
+            font-size: 32px;
+            font-weight: 700;
+            color: #f1f5f9;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #f1f5f9, #a78bfa, #60a5fa, #f1f5f9);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradientFlow 6s ease-in-out infinite;
+        }
+
+        .header .sub {
+            font-size: 15px;
+            color: rgba(255, 255, 255, 0.35);
+            font-weight: 300;
+            margin-top: 4px;
+        }
+
+        /* ===== 定位说明 ===== */
+        .positioning {
+            background: rgba(167, 139, 250, 0.04);
+            border-left: 3px solid #a78bfa;
+            border-radius: 0 12px 12px 0;
+            padding: 16px 20px;
+            margin-bottom: 28px;
+            opacity: 0;
+            animation: fadeInUp 0.6s ease 0.03s forwards;
+        }
+
+        .positioning p {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 15px;
+            line-height: 1.7;
+            margin-bottom: 0;
+        }
+
+        .positioning p strong {
+            color: #a78bfa;
+            font-weight: 600;
+        }
+
+        .positioning p .highlight {
+            color: #facc15;
+            font-weight: 600;
+        }
+
+        /* ===== 验证快照 ===== */
+        .snapshot-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 28px;
+            opacity: 0;
+            animation: fadeInUp 0.6s ease 0.05s forwards;
+        }
+
+        .snapshot-item {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 12px;
+            padding: 12px 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .snapshot-item:hover {
+            border-color: rgba(255, 255, 255, 0.08);
+        }
+
+        .snapshot-item .label {
+            font-size: 10px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.2);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 2px;
+        }
+
+        .snapshot-item .value {
+            font-size: 14px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.7);
+            line-height: 1.4;
+        }
+
+        .snapshot-item .value .highlight {
+            color: #a78bfa;
+        }
+
+        .snapshot-item .value .small {
+            font-size: 12px;
+            font-weight: 400;
+            color: rgba(255, 255, 255, 0.25);
+        }
+
+        /* ===== 锚点 ===== */
+        .section-anchor {
+            scroll-margin-top: 16px;
+        }
+
+        /* ===== 通用板块 ===== */
+        .section {
+            margin-bottom: 36px;
+            opacity: 0;
+            animation: fadeInUp 0.6s ease forwards;
+        }
+
+        .section:nth-child(5) { animation-delay: 0.1s; }
+        .section:nth-child(6) { animation-delay: 0.15s; }
+        .section:nth-child(7) { animation-delay: 0.2s; }
+        .section:nth-child(8) { animation-delay: 0.25s; }
+        .section:nth-child(9) { animation-delay: 0.3s; }
+
+        .section h2 {
+            font-size: 20px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            padding-bottom: 8px;
+        }
+
+        .section h2 .tag {
+            font-size: 11px;
+            font-weight: 500;
+            color: #a78bfa;
+            background: rgba(167, 139, 250, 0.12);
+            padding: 2px 12px;
+            border-radius: 20px;
+        }
+
+        .section h3 {
+            font-size: 16px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 6px;
+            margin-top: 14px;
+        }
+
+        .section p {
+            color: rgba(255, 255, 255, 0.5);
+            line-height: 1.8;
+            font-size: 15px;
+            margin-bottom: 8px;
+        }
+
+        .section p strong {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .section ul {
+            list-style: none;
+            padding: 0;
+            margin-bottom: 10px;
+        }
+
+        .section ul li {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 14px;
+            line-height: 1.7;
+            padding: 5px 0 5px 24px;
+            position: relative;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+        }
+
+        .section ul li:last-child {
+            border-bottom: none;
+        }
+
+        .section ul li::before {
+            content: "▸";
+            color: #a78bfa;
+            position: absolute;
+            left: 2px;
+            font-weight: 700;
+        }
+
+        .section ul li strong {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .highlight-box {
+            background: rgba(167, 139, 250, 0.04);
+            border-left: 3px solid #facc15;
+            border-radius: 0 10px 10px 0;
+            padding: 14px 18px;
+            margin: 10px 0 14px;
+        }
+
+        .highlight-box p {
+            margin-bottom: 0;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .highlight-box p strong {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        /* ===== 中心辐射图 ===== */
+        .mindmap {
+            position: relative;
+            width: 100%;
+            min-height: 460px;
+            padding: 20px 0;
+            margin-bottom: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.02);
+            overflow: hidden;
+        }
+
+        .mindmap .center-node {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.03);
+            border: 2px solid #a78bfa;
+            border-radius: 50%;
+            width: 110px;
+            height: 110px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: #f1f5f9;
+            font-weight: 700;
+            font-size: 13px;
+            padding: 10px;
+            z-index: 5;
+            box-shadow: 0 0 40px rgba(167, 139, 250, 0.08);
+            cursor: default;
+        }
+
+        .mindmap .center-node .big {
+            font-size: 22px;
+            color: #a78bfa;
+        }
+
+        .mindmap .center-node .small {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.25);
+            font-weight: 400;
+        }
+
+        .radial-node {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 12px;
+            padding: 10px 14px;
+            max-width: 160px;
+            text-align: center;
+            z-index: 3;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .radial-node:hover {
+            border-color: #a78bfa;
+            transform: scale(1.04);
+            box-shadow: 0 0 30px rgba(167, 139, 250, 0.06);
+        }
+
+        .radial-node .label {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.2);
+            font-weight: 500;
+        }
+
+        .radial-node .title {
+            font-size: 14px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.7);
+            margin-top: 1px;
+        }
+
+        .radial-node .analogy {
+            font-size: 10px;
+            color: #a78bfa;
+            margin-top: 3px;
+            background: rgba(167, 139, 250, 0.06);
+            padding: 1px 8px;
+            border-radius: 12px;
+            display: inline-block;
+        }
+
+        .mindmap svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .mindmap svg line {
+            stroke: rgba(167, 139, 250, 0.08);
+            stroke-width: 1.5;
+            stroke-dasharray: 4 4;
+        }
+
+        /* ===== 详细推导卡片 ===== */
+        .detail-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-bottom: 14px;
+        }
+
+        .detail-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 12px;
+            padding: 14px 16px;
+            transition: border-color 0.3s ease;
+            scroll-margin-top: 20px;
+        }
+
+        .detail-card:hover {
+            border-color: rgba(255, 255, 255, 0.08);
+        }
+
+        .detail-card .step {
+            font-size: 11px;
+            color: #a78bfa;
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+
+        .detail-card h3 {
+            font-size: 15px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 4px;
+        }
+
+        .detail-card .analogy-tag {
+            display: inline-block;
+            background: rgba(167, 139, 250, 0.06);
+            color: #a78bfa;
+            font-size: 11px;
+            padding: 1px 10px;
+            border-radius: 12px;
+            margin-bottom: 6px;
+        }
+
+        .detail-card p {
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 13px;
+            line-height: 1.6;
+            margin-bottom: 4px;
+        }
+
+        .detail-card .conclusion {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 13px;
+            font-weight: 500;
+            margin-top: 6px;
+            padding-top: 6px;
+            border-top: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        .detail-card .conclusion .highlight {
+            color: #a78bfa;
+        }
+
+        .detail-card .jump-btn {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 4px 14px;
+            background: rgba(255, 255, 255, 0.02);
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 12px;
+            font-weight: 500;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 8px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .detail-card .jump-btn:hover {
+            background: rgba(167, 139, 250, 0.04);
+            border-color: #a78bfa;
+            color: #a78bfa;
+            transform: translateX(4px);
+        }
+
+        /* ===== 乐高四步拆解法（新增） ===== */
+        .lego-method {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(250, 204, 21, 0.12);
+            border-radius: 16px;
+            padding: 24px 28px;
+            margin-bottom: 20px;
+        }
+
+        .lego-method .method-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 4px;
+            text-align: center;
+        }
+
+        .lego-method .method-title span {
+            color: #facc15;
+        }
+
+        .lego-method .method-sub {
+            text-align: center;
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.2);
+            margin-bottom: 16px;
+        }
+
+        .method-steps {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .method-step {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 10px;
+            padding: 12px 14px;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .method-step .step-num {
+            font-size: 20px;
+            font-weight: 700;
+            color: #facc15;
+            flex-shrink: 0;
+            line-height: 1.2;
+            min-width: 30px;
+        }
+
+        .method-step .step-content .step-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .method-step .step-content .step-desc {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.35);
+            line-height: 1.5;
+            margin-top: 2px;
+        }
+
+        /* ===== 乐高双塔 ===== */
+        .lego-tower {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 16px;
+            padding: 24px 26px;
+            margin: 20px 0;
+        }
+
+        .lego-tower .tower-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 4px;
+        }
+
+        .lego-tower .tower-sub {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.2);
+            margin-bottom: 16px;
+        }
+
+        .mapping-row {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr 70px;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+            cursor: pointer;
+            transition: background 0.2s ease;
+            border-radius: 6px;
+            padding-left: 4px;
+            padding-right: 4px;
+        }
+
+        .mapping-row:last-child {
+            border-bottom: none;
+        }
+
+        .mapping-row:hover {
+            background: rgba(167, 139, 250, 0.02);
+        }
+
+        .mapping-row .left {
+            text-align: right;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .mapping-row .left .sub {
+            font-weight: 400;
+            color: rgba(255, 255, 255, 0.2);
+            font-size: 12px;
+        }
+
+        .mapping-row .center-lego {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid #facc15;
+            border-radius: 30px;
+            padding: 2px 14px;
+            color: #facc15;
+            font-weight: 700;
+            font-size: 13px;
+            letter-spacing: 0.3px;
+            box-shadow: 0 0 20px rgba(250, 204, 21, 0.03);
+            min-width: 50px;
+        }
+
+        .mapping-row .center-lego .sub {
+            font-size: 8px;
+            font-weight: 400;
+            color: rgba(255, 255, 255, 0.15);
+            letter-spacing: 0.3px;
+        }
+
+        .mapping-row .right {
+            text-align: left;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .mapping-row .right .sub {
+            font-weight: 400;
+            color: rgba(255, 255, 255, 0.2);
+            font-size: 12px;
+        }
+
+        /* 步骤标注标签（新增） */
+        .mapping-row .step-tag {
+            font-size: 10px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.15);
+            text-align: center;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 12px;
+            padding: 2px 8px;
+            white-space: nowrap;
+        }
+
+        .mapping-row .step-tag.active-step {
+            color: #facc15;
+            border-color: rgba(250, 204, 21, 0.2);
+            background: rgba(250, 204, 21, 0.04);
+        }
+
+        /* ===== 塔图卡片区 ===== */
+        .tower-detail-section {
+            margin-top: 16px;
+        }
+
+        .tower-detail-section h2 {
+            font-size: 18px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            padding-bottom: 8px;
+        }
+
+        .tower-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 12px;
+            padding: 14px 16px;
+            margin-bottom: 14px;
+            transition: border-color 0.3s ease;
+            scroll-margin-top: 20px;
+        }
+
+        .tower-card:hover {
+            border-color: rgba(255, 255, 255, 0.08);
+        }
+
+        .tower-card .tower-step {
+            font-size: 11px;
+            color: #a78bfa;
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+
+        .tower-card h3 {
+            font-size: 15px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 4px;
+        }
+
+        .tower-card .tower-analogy {
+            display: inline-block;
+            background: rgba(167, 139, 250, 0.06);
+            color: #facc15;
+            font-size: 11px;
+            padding: 1px 10px;
+            border-radius: 12px;
+            margin-bottom: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        .tower-card .tower-process {
+            background: rgba(255, 255, 255, 0.02);
+            border-left: 2px solid #a78bfa;
+            padding: 6px 12px;
+            margin: 6px 0 8px 0;
+            border-radius: 0 6px 6px 0;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.4);
+            line-height: 1.6;
+        }
+
+        .tower-card .tower-process strong {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .tower-card .tower-process .step-label {
+            color: #facc15;
+            font-weight: 600;
+        }
+
+        .tower-card p {
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 13px;
+            line-height: 1.6;
+            margin-bottom: 4px;
+        }
+
+        .tower-card .tower-conclusion {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 13px;
+            font-weight: 500;
+            margin-top: 6px;
+            padding-top: 6px;
+            border-top: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        .tower-card .tower-jump {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 4px 14px;
+            background: rgba(255, 255, 255, 0.02);
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 12px;
+            font-weight: 500;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 8px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .tower-card .tower-jump:hover {
+            background: rgba(167, 139, 250, 0.04);
+            border-color: #a78bfa;
+            color: #a78bfa;
+            transform: translateX(4px);
+        }
+
+        /* ===== 用积木降维复杂世界 ===== */
+        .lego-scene {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 16px;
+            padding: 24px 26px;
+            margin: 16px 0;
+            text-align: center;
+        }
+
+        .lego-scene .scene-title {
+            font-size: 17px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 6px;
+        }
+
+        .lego-scene .scene-title span {
+            color: #facc15;
+        }
+
+        .lego-scene .scene-sub {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.2);
+            margin-bottom: 14px;
+        }
+
+        .lego-scene .scene-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .lego-scene .scene-grid .item {
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+            padding: 12px 14px;
+        }
+
+        .lego-scene .scene-grid .item .tag {
+            font-size: 11px;
+            font-weight: 600;
+            color: #facc15;
+        }
+
+        .lego-scene .scene-grid .item p {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.4);
+            line-height: 1.6;
+            margin-top: 4px;
+        }
+
+        .lego-scene .scene-grid .item p strong {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        /* ===== 终极验证 ===== */
+        .verify-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 12px;
+            margin: 14px 0 18px;
+        }
+
+        .verify-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 12px;
+            padding: 14px 16px;
+            text-align: center;
+        }
+
+        .verify-card .icon {
+            font-size: 24px;
+            margin-bottom: 4px;
+        }
+
+        .verify-card h4 {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+
+        .verify-card p {
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        /* ===== 服务关联 ===== */
+        .service-bridge {
+            background: rgba(167, 139, 250, 0.04);
+            border: 1px solid rgba(167, 139, 250, 0.08);
+            border-radius: 16px;
+            padding: 24px 28px;
+            margin: 24px 0 16px;
+            text-align: center;
+        }
+
+        .service-bridge .bridge-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 8px;
+        }
+
+        .service-bridge .bridge-title span {
+            color: #a78bfa;
+        }
+
+        .service-bridge .bridge-desc {
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 14px;
+            line-height: 1.7;
+            margin-bottom: 14px;
+        }
+
+        .service-bridge .bridge-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+        }
+
+        .service-bridge .bridge-item {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 10px;
+            padding: 12px 14px;
+            text-align: center;
+        }
+
+        .service-bridge .bridge-item .icon {
+            font-size: 20px;
+        }
+
+        .service-bridge .bridge-item .name {
+            font-size: 13px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.6);
+            margin-top: 4px;
+        }
+
+        .service-bridge .bridge-item .price {
+            font-size: 12px;
+            color: #a78bfa;
+            font-weight: 500;
+            margin-top: 2px;
+        }
+
+        .service-bridge .bridge-link {
+            display: inline-block;
+            margin-top: 14px;
+            padding: 8px 28px;
+            background: rgba(167, 139, 250, 0.08);
+            border: 1px solid rgba(167, 139, 250, 0.12);
+            border-radius: 20px;
+            color: #a78bfa;
+            font-size: 14px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .service-bridge .bridge-link:hover {
+            background: rgba(167, 139, 250, 0.15);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(167, 139, 250, 0.1);
+        }
+
+        /* ===== 延伸方向 ===== */
+        .extension-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin: 10px 0 14px;
+        }
+
+        .extension-grid .ext-item {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 12px;
+            padding: 14px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.3s ease;
+            cursor: default;
+        }
+
+        .extension-grid .ext-item .ext-info .ext-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .extension-grid .ext-item .ext-info .ext-desc {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.2);
+            margin-top: 2px;
+        }
+
+        .extension-grid .ext-item .ext-status {
+            font-size: 12px;
+            padding: 4px 12px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            color: rgba(255, 255, 255, 0.12);
+            flex-shrink: 0;
+        }
+
+        .extension-grid .ext-item .ext-status.live {
+            color: #22c55e;
+            border-color: rgba(34, 197, 94, 0.2);
+            background: rgba(34, 197, 94, 0.04);
+        }
+
+        /* ===== 底部 ===== */
+        .back-bottom {
+            text-align: center;
+            margin-top: 32px;
+            padding-top: 16px;
+            border-top: 1px solid rgba(255, 255, 255, 0.03);
+            opacity: 0;
+            animation: fadeInUp 0.6s ease 0.4s forwards;
+        }
+
+        .back-bottom a {
+            color: rgba(255, 255, 255, 0.2);
+            text-decoration: none;
+            font-size: 13px;
+            transition: color 0.3s ease;
+        }
+
+        .back-bottom a:hover {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        /* ===== 新增：引擎入口条 ===== */
+        .engine-entry {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 12px;
+            align-items: center;
+            margin-bottom: 24px;
+            opacity: 0;
+            animation: fadeInUp 0.6s ease 0.04s forwards;
+        }
+        .engine-entry-card {
+            background: rgba(250,204,21,0.06);
+            border: 1px solid rgba(250,204,21,0.18);
+            border-radius: 12px;
+            padding: 12px 18px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .engine-entry-btn {
+            padding: 10px 22px;
+            background: rgba(250,204,21,0.1);
+            border: 1px solid rgba(250,204,21,0.3);
+            border-radius: 20px;
+            color: #facc15;
+            font-size: 13px;
+            font-weight: 600;
+            text-decoration: none;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+        .engine-entry-btn:hover { background: rgba(250,204,21,0.2); }
+
+        /* ===== 新增：公私双引擎 ===== */
+        .dual-engine-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-top: 16px;
+        }
+        .engine-box-public {
+            background: rgba(250,204,21,0.04);
+            border: 1px solid rgba(250,204,21,0.18);
+            border-radius: 14px;
+            padding: 20px;
+        }
+        .engine-box-private {
+            background: rgba(239,68,68,0.05);
+            border: 1px solid rgba(239,68,68,0.2);
+            border-radius: 14px;
+            padding: 20px;
+        }
+        .engine-linkage-note {
+            margin-top: 14px;
+            padding: 12px 16px;
+            background: rgba(99,102,241,0.08);
+            border-left: 3px solid #818cf8;
+            border-radius: 8px;
+            font-size: 12px;
+            color: rgba(255,255,255,0.5);
+        }
+
+        /* ===== 新增：熔断机制区块 ===== */
+        .fuse-rules {
+            margin-top: 12px;
+            padding: 14px 18px;
+            background: rgba(239,68,68,0.06);
+            border: 1px solid rgba(239,68,68,0.2);
+            border-radius: 10px;
+            font-size: 12px;
+            color: rgba(255,255,255,0.6);
+            line-height: 1.9;
+        }
+
+        /* ===== 响应式 ===== */
+        @media (max-width: 900px) {
+            .container {
+                padding: 28px 24px 24px;
+            }
+            .snapshot-grid {
+                grid-template-columns: 1fr;
+            }
+            .detail-grid {
+                grid-template-columns: 1fr;
+            }
+            .verify-grid {
+                grid-template-columns: 1fr;
+            }
+            .extension-grid {
+                grid-template-columns: 1fr;
+            }
+            .lego-scene .scene-grid {
+                grid-template-columns: 1fr;
+            }
+            .service-bridge .bridge-grid {
+                grid-template-columns: 1fr;
+            }
+            .method-steps {
+                grid-template-columns: 1fr;
+            }
+            .mapping-row {
+                grid-template-columns: 1fr 1fr;
+                text-align: center;
+                gap: 4px;
+            }
+            .mapping-row .left {
+                text-align: center;
+                grid-column: 1;
+                grid-row: 1;
+            }
+            .mapping-row .center-lego {
+                grid-column: 1 / 3;
+                grid-row: 2;
+                flex-direction: row;
+                gap: 6px;
+                padding: 2px 12px;
+                width: auto;
+                margin: 0 auto;
+            }
+            .mapping-row .center-lego .sub {
+                display: inline;
+            }
+            .mapping-row .right {
+                text-align: center;
+                grid-column: 2;
+                grid-row: 1;
+            }
+            .mapping-row .step-tag {
+                grid-column: 1 / 3;
+                grid-row: 3;
+                justify-self: center;
+            }
+            .dual-engine-grid {
+                grid-template-columns: 1fr;
+            }
+            .engine-entry {
+                grid-template-columns: 1fr;
+            }
+            .engine-entry-btn {
+                text-align: center;
+            }
+        }
+
+        @media (max-width: 700px) {
+            .container {
+                padding: 20px 16px 18px;
+            }
+            .header h1 {
+                font-size: 24px;
+            }
+            .section h2 {
+                font-size: 17px;
+            }
+            .section p,
+            .section ul li,
+            .detail-card p,
+            .tower-card p {
+                font-size: 13px;
+            }
+            .mindmap {
+                min-height: 400px;
+            }
+            .mindmap .center-node {
+                width: 80px;
+                height: 80px;
+                font-size: 11px;
+            }
+            .mindmap .center-node .big {
+                font-size: 18px;
+            }
+            .radial-node {
+                max-width: 110px;
+                padding: 6px 8px;
+            }
+            .radial-node .title {
+                font-size: 12px;
+            }
+            .radial-node .analogy {
+                font-size: 9px;
+            }
+            .positioning p {
+                font-size: 14px;
+            }
+            .service-bridge {
+                padding: 18px 16px;
+            }
+            .lego-method {
+                padding: 18px 16px;
+            }
+            .lego-tower {
+                padding: 16px 14px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 16px 12px 14px;
+            }
+            .header h1 {
+                font-size: 20px;
+            }
+            .snapshot-item .value {
+                font-size: 12px;
+            }
+            .mindmap {
+                min-height: 340px;
+            }
+            .mindmap .center-node {
+                width: 60px;
+                height: 60px;
+                font-size: 9px;
+                padding: 6px;
+            }
+            .mindmap .center-node .big {
+                font-size: 14px;
+            }
+            .radial-node {
+                max-width: 80px;
+                padding: 4px 6px;
+            }
+            .radial-node .title {
+                font-size: 10px;
+            }
+            .radial-node .analogy {
+                font-size: 8px;
+            }
+            .radial-node .label {
+                font-size: 8px;
+            }
+            .service-bridge .bridge-item .name {
+                font-size: 12px;
+            }
+            .mapping-row .left {
+                font-size: 12px;
+            }
+            .mapping-row .right {
+                font-size: 12px;
+            }
+            .mapping-row .center-lego {
+                font-size: 11px;
+                padding: 2px 10px;
+            }
+            .method-step .step-content .step-label {
+                font-size: 12px;
+            }
+            .method-step .step-content .step-desc {
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="glow"></div>
+
+    <!-- ===== 主容器 ===== -->
+    <div class="container">
+
+        <!-- ===== 面包屑导航 ===== -->
+        <div class="breadcrumb">
+            <a href="../../index.html">🏠 Y.Mine总控台</a>
+            <span class="sep">›</span>
+            <span class="current">跨域映射</span>
+        </div>
+        <div class="nav-actions" style="display:flex;gap:10px;margin-bottom:16px;">
+            <a href="javascript:history.back()" style="padding:6px 14px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);border-radius:8px;color:rgba(255,255,255,0.7);text-decoration:none;font-size:12px;transition:all .2s;">← 返回上一级</a>
+            <a href="../../index.html" style="padding:6px 14px;background:rgba(34,211,238,0.12);border:1px solid rgba(34,211,238,0.3);border-radius:8px;color:#22d3ee;text-decoration:none;font-size:12px;transition:all .2s;">🏠 一键返回总控台</a>
+        </div>
+
+        <!-- ===== 头部 ===== -->
+        <div class="header">
+            <div class="badge">🧱 Isomorphism Block Engine · v2.1 · GameOS</div>
+            <h1>跨域同构积木映射引擎</h1>
+            <div class="sub">基于 Y.MINE GameOS 元架构的全域模组同构拼装验证系统</div>
+        </div>
+
+        <!-- ===== 定位说明 ===== -->
+        <div class="section-anchor" id="section-positioning"></div>
+        <div class="positioning">
+            <p>
+                <strong>🧱 引擎核心能力</strong><br>
+                跨域同构积木映射引擎基于 <strong>GameOS 元架构</strong>，通过 <span class="highlight">乐高四步拆解法</span>（拆零件→找接口→重新拼装→验证运行），
+                在任意陌生领域快速建立结构化认知、输出判断、完成跨域知识迁移。<br>
+                核心价值：<strong>元架构 + 积木映射 = 可复用的全域同构拼装框架</strong> ——
+                依托乐高积木作为通用翻译器，可在财务、工程、AI、生物、能源等任意领域之间完成认知映射与结构迁移。
+            </p>
+        </div>
+
+        <!-- ===== 引擎入口条 ===== -->
+        <div class="engine-entry">
+            <div class="engine-entry-card">
+                <div style="font-size:24px;">🧩</div>
+                <div>
+                    <div style="font-size:13px;font-weight:600;color:rgba(255,255,255,0.75);">乐高积木可视化拼装演示</div>
+                    <div style="font-size:11px;color:rgba(255,255,255,0.35);margin-top:2px;">依托七大领域模组，可拖拽积木块进行同构拼装验证 · 0.6 兼容度熔断</div>
+                </div>
+            </div>
+            <a href="isomorphism-block-demo.html" class="engine-entry-btn">🧱 进入拼装台 →</a>
+        </div>
+
+        <!-- ===== 验证快照 ===== -->
+        <div class="section-anchor" id="section-snapshot"></div>
+        <div class="snapshot-grid">
+            <div class="snapshot-item">
+                <div class="label">🎯 引擎目标</div>
+                <div class="value">证明 <span class="highlight">元架构 + 积木映射 = 可复用的全域同构拼装框架</span></div>
+            </div>
+            <div class="snapshot-item">
+                <div class="label">🧩 核心方法</div>
+                <div class="value">乐高四步拆解法<br><span class="small">拆零件→找接口→重新拼装→验证运行</span></div>
+            </div>
+            <div class="snapshot-item">
+                <div class="label">📐 验证覆盖</div>
+                <div class="value">财务·CAD·乐高·电池·园林·运营·PDCA·大模型·低空地质 <span class="small">9大领域完整映射链路</span></div>
+            </div>
+            <div class="snapshot-item">
+                <div class="label">💡 核心结论</div>
+                <div class="value">积木映射框架下的跨领域认知不是天赋，而是 <span class="highlight">可工程化复用的操作系统</span></div>
+            </div>
+        </div>
+
+        <!-- ===== 中心辐射图 ===== -->
+        <div class="section-anchor" id="section-mindmap"></div>
+        <div class="section">
+            <h2>中心辐射拓扑 <span class="tag">7个领域 · 1个元架构核心</span></h2>
+            <div class="mindmap" id="mindmap">
+                <div class="center-node">
+                    <div class="big">🧱</div>
+                    元架构
+                    <div class="small">积木映射引擎</div>
+                </div>
+                <svg id="mindmapSvg"></svg>
+            </div>
+        </div>
+
+        <!-- ===== 详细推导卡片 ===== -->
+        <div class="section-anchor" id="section-detail"></div>
+        <div class="section">
+            <h2>完整同构推导链路 <span class="tag">7步积木映射</span></h2>
+            <div class="detail-grid">
+
+                <div class="detail-card" id="card-step1">
+                    <div class="step">第 1 步</div>
+                    <h3>财务 → CAD</h3>
+                    <span class="analogy-tag">类比：图层 = 会计科目体系</span>
+                    <p>图块 = 标准凭证模板，装配体 = 合并报表。</p>
+                    <div class="conclusion">✅ CAD 就是一个可视化的会计信息系统。</div>
+                    <a href="#" class="jump-btn">查看完整推导 <span class="arrow">→</span></a>
+                </div>
+
+                <div class="detail-card" id="card-step2">
+                    <div class="step">第 2 步</div>
+                    <h3>CAD → 乐高</h3>
+                    <span class="analogy-tag">类比：零件清单 = BOM 表</span>
+                    <p>拼装步骤 = 装配体配合关系。</p>
+                    <div class="conclusion">✅ CAD 就是在虚拟空间里玩乐高。</div>
+                    <a href="#" class="jump-btn">查看完整推导 <span class="arrow">→</span></a>
+                </div>
+
+                <div class="detail-card" id="card-step3">
+                    <div class="step">第 3 步</div>
+                    <h3>电池 → CAD 装配体</h3>
+                    <span class="analogy-tag">类比：电池组合 = 零件装配</span>
+                    <p>高能量 + 高功率电池通过智能管理"装配"。</p>
+                    <div class="conclusion">✅ 电池突破点可能在系统架构，不只在材料化学。</div>
+                    <a href="#" class="jump-btn">查看完整推导 <span class="arrow">→</span></a>
+                </div>
+
+                <div class="detail-card" id="card-step4">
+                    <div class="step">第 4 步</div>
+                    <h3>园林 → 财务</h3>
+                    <span class="analogy-tag">类比：植物生长 = 资产增值</span>
+                    <p>种下去只完成 30%，剩下 70% 是时间轴上的生长。</p>
+                    <div class="conclusion">✅ 园林设计本质是一个跨期财务模型。</div>
+                    <a href="#" class="jump-btn">查看完整推导 <span class="arrow">→</span></a>
+                </div>
+
+                <div class="detail-card" id="card-step5">
+                    <div class="step">第 5 步</div>
+                    <h3>运营 → 工程</h3>
+                    <span class="analogy-tag">类比：运营内核 = PDCA 循环</span>
+                    <p>系统构建 + 资源编排 + 反馈闭环。</p>
+                    <div class="conclusion">✅ 顶尖者学的不是领域知识，而是通用操作系统。</div>
+                    <a href="#" class="jump-btn">查看完整推导 <span class="arrow">→</span></a>
+                </div>
+
+                <div class="detail-card" id="card-step6">
+                    <div class="step">第 6 步</div>
+                    <h3>工程管理 → 大模型</h3>
+                    <span class="analogy-tag">类比：Token 预测 = PDCA 循环</span>
+                    <p>大模型在每一个字上做一次 PDCA。</p>
+                    <div class="conclusion">✅ 大模型和工程管理在底层逻辑上完全同构。</div>
+                    <a href="#" class="jump-btn">查看完整推导 <span class="arrow">→</span></a>
+                </div>
+
+                <div class="detail-card" id="card-step7" style="grid-column: 1 / -1;">
+                    <div class="step">第 7 步 · 补上空间维度</div>
+                    <h3>地质学</h3>
+                    <span class="analogy-tag">类比：低空 0-500 米 ↔ 地下 0-500 米</span>
+                    <p>低空经济对应地下能源储存带。</p>
+                    <div class="conclusion">✅ 元架构能横跨学科，还能纵贯空间和时间尺度。</div>
+                    <a href="#" class="jump-btn">查看完整推导 <span class="arrow">→</span></a>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ===== 乐高四步拆解法（新增） ===== -->
+        <div class="section-anchor" id="section-lego-method"></div>
+        <div class="lego-method">
+            <div class="method-title">🧱 <span>乐高四步拆解法</span></div>
+            <div class="method-sub">积木映射引擎的核心算法 —— 把任何陌生领域模组化成可拼装的积木单元</div>
+            <div class="method-steps">
+                <div class="method-step">
+                    <div class="step-num">①</div>
+                    <div class="step-content">
+                        <div class="step-label">拆零件</div>
+                        <div class="step-desc">把陌生领域拆成最小可理解的单元（基础元素、操作、规则）</div>
+                    </div>
+                </div>
+                <div class="method-step">
+                    <div class="step-num">②</div>
+                    <div class="step-content">
+                        <div class="step-label">找接口</div>
+                        <div class="step-desc">每个零件对应你已有知识体系里的哪个模块</div>
+                    </div>
+                </div>
+                <div class="method-step">
+                    <div class="step-num">③</div>
+                    <div class="step-content">
+                        <div class="step-label">重新拼装</div>
+                        <div class="step-desc">用已有知识的逻辑重新理解陌生领域的结构</div>
+                    </div>
+                </div>
+                <div class="method-step">
+                    <div class="step-num">④</div>
+                    <div class="step-content">
+                        <div class="step-label">验证运行</div>
+                        <div class="step-desc">用陌生领域自身的逻辑检验拼装是否正确</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== 乐高双塔（增加步骤标注） ===== -->
+        <div class="section-anchor" id="section-tower"></div>
+        <div class="lego-tower">
+            <div class="tower-title">🧱 乐高双塔 · 类比映射的 AB 对照结构</div>
+            <div class="tower-sub">点击任意一行，跳转到下方对应的"塔图"详情 · 乐高是元架构的"通用翻译器"</div>
+
+            <div class="mapping-row" data-target="tower-card-1">
+                <div class="left">CAD 制图 <span class="sub">（专业工程软件）</span></div>
+                <div class="center-lego">🧱 乐高</div>
+                <div class="right">虚拟空间里的乐高 <span class="sub">（童年积木游戏）</span></div>
+                <div class="step-tag active-step">① 拆零件</div>
+            </div>
+
+            <div class="mapping-row" data-target="tower-card-2">
+                <div class="left">会计科目体系 <span class="sub">（财务分类分层）</span></div>
+                <div class="center-lego">🧱 乐高</div>
+                <div class="right">CAD 图层 <span class="sub">（制图分层管理）</span></div>
+                <div class="step-tag active-step">② 找接口</div>
+            </div>
+
+            <div class="mapping-row" data-target="tower-card-3">
+                <div class="left">电池组合 <span class="sub">（物理储能单元）</span></div>
+                <div class="center-lego">🧱 乐高</div>
+                <div class="right">CAD 零件装配 <span class="sub">（系统集成思维）</span></div>
+                <div class="step-tag active-step">③ 重新拼装</div>
+            </div>
+
+            <div class="mapping-row" data-target="tower-card-4">
+                <div class="left">植物生长 <span class="sub">（时间轴上的自然演化）</span></div>
+                <div class="center-lego">🧱 乐高</div>
+                <div class="right">财务资产增值 <span class="sub">（跨期价值模型）</span></div>
+                <div class="step-tag active-step">③ 重新拼装</div>
+            </div>
+
+            <div class="mapping-row" data-target="tower-card-5">
+                <div class="left">运营内核 <span class="sub">（系统构建 + 资源编排）</span></div>
+                <div class="center-lego">🧱 乐高</div>
+                <div class="right">工程 PDCA 循环 <span class="sub">（计划-执行-检查-改进）</span></div>
+                <div class="step-tag active-step">③ 重新拼装</div>
+            </div>
+
+            <div class="mapping-row" data-target="tower-card-6">
+                <div class="left">Token 预测 <span class="sub">（大模型逐字推理）</span></div>
+                <div class="center-lego">🧱 乐高</div>
+                <div class="right">PDCA 循环 <span class="sub">（动态反馈修正）</span></div>
+                <div class="step-tag active-step">④ 验证运行</div>
+            </div>
+
+            <div class="mapping-row" data-target="tower-card-7">
+                <div class="left">低空 0-500 米 <span class="sub">（无人机空域）</span></div>
+                <div class="center-lego">🧱 乐高</div>
+                <div class="right">地下 0-500 米能源带 <span class="sub">（空间尺度迁移）</span></div>
+                <div class="step-tag active-step">③ 重新拼装</div>
+            </div>
+
+            <div style="margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.03); text-align: center; color: rgba(255,255,255,0.2); font-size: 13px;">
+                💡 每一行左侧标注了该映射对应乐高四步拆解法的哪一步
+            </div>
+        </div>
+
+        <!-- ===== 塔图卡片区（增加拆解过程占位） ===== -->
+        <div class="section-anchor" id="section-tower-detail"></div>
+        <div class="tower-detail-section">
+            <h2>塔图 · 每个映射的完整推导</h2>
+
+            <div class="tower-card" id="tower-card-1">
+                <div class="tower-step">映射 1 · ① 拆零件</div>
+                <h3>CAD 制图 → 虚拟空间里的乐高</h3>
+                <span class="tower-analogy">🧱 乐高锚点：拼装 = 装配体</span>
+                <div class="tower-process">
+                    <strong>【拆解过程】</strong><br>
+                    <span class="step-label">① 拆零件：</span>CAD 里有图层、图块、装配体、尺寸标注、约束关系……这些都是它的“零件”。<br>
+                    <span class="step-label">② 找接口：</span>图层 ≈ 会计科目分类，图块 ≈ 标准凭证模板，装配体 ≈ 合并报表。<br>
+                    <span class="step-label">③ 重新拼装：</span>用会计思维理解 CAD 的工作流程——新建图层 = 新建科目，插入图块 = 录入凭证。<br>
+                    <span class="step-label">④ 验证运行：</span>用 CAD 的一个实际操作用会计逻辑解释一遍，看是否说得通。
+                </div>
+                <p>CAD 制图的本质是在虚拟空间里组装零件，和玩乐高的逻辑完全一致。零件清单 = BOM 表，拼装步骤 = 装配体配合关系。</p>
+                <div class="tower-conclusion">✅ 任何拼过乐高的人，都已经具备理解 CAD 底层逻辑的直观经验。</div>
+                <a href="#" class="tower-jump">查看完整推导 <span class="arrow">→</span></a>
+            </div>
+
+            <div class="tower-card" id="tower-card-2">
+                <div class="tower-step">映射 2 · ② 找接口</div>
+                <h3>会计科目体系 → CAD 图层</h3>
+                <span class="tower-analogy">🧱 乐高锚点：分层 = 分类管理</span>
+                <div class="tower-process">
+                    <strong>【拆解过程】</strong><br>
+                    <span class="step-label">① 拆零件：</span>会计科目体系分成资产、负债、权益、收入、费用五大类。<br>
+                    <span class="step-label">② 找接口：</span>这五大类 ≈ CAD 里的五个主图层，每个科目 ≈ 图层里的一个子层。<br>
+                    <span class="step-label">③ 重新拼装：</span>把 CAD 里的所有图块按图层分类，等价于把凭证按科目分类。<br>
+                    <span class="step-label">④ 验证运行：</span>用 CAD 图层管理的逻辑去解释会计科目的分层规则，看是否对应。
+                </div>
+                <p>会计科目体系按资产、负债、权益分类分层管理，和 CAD 图层的逻辑完全一致。图层 = 会计科目体系，图块 = 标准凭证模板。</p>
+                <div class="tower-conclusion">✅ CAD 就是一个可视化的会计信息系统。</div>
+                <a href="#" class="tower-jump">查看完整推导 <span class="arrow">→</span></a>
+            </div>
+
+            <div class="tower-card" id="tower-card-3">
+                <div class="tower-step">映射 3 · ③ 重新拼装</div>
+                <h3>电池组合 → CAD 零件装配</h3>
+                <span class="tower-analogy">🧱 乐高锚点：组合 = 装配</span>
+                <div class="tower-process">
+                    <strong>【拆解过程】</strong><br>
+                    <span class="step-label">① 拆零件：</span>电池系统由电芯、BMS 管理系统、散热系统、结构件组成。<br>
+                    <span class="step-label">② 找接口：</span>这些 ≈ CAD 里的零件集合，BMS ≈ 装配体的约束关系。<br>
+                    <span class="step-label">③ 重新拼装：</span>电池系统设计 = 在系统架构层面把不同功能的零件“装配”在一起。<br>
+                    <span class="step-label">④ 验证运行：</span>用 CAD 装配体的逻辑去解释电池系统的集成逻辑，看是否自洽。
+                </div>
+                <p>高能量密度电池和高功率密度电池通过智能管理系统"装配"在一起，和 CAD 里把多个零件装配成一个整体完全同构。</p>
+                <div class="tower-conclusion">✅ 电池的突破点，不一定只在材料化学里，也可能在系统架构里。</div>
+                <a href="#" class="tower-jump">查看完整推导 <span class="arrow">→</span></a>
+            </div>
+
+            <div class="tower-card" id="tower-card-4">
+                <div class="tower-step">映射 4 · ③ 重新拼装</div>
+                <h3>植物生长 → 财务资产增值</h3>
+                <span class="tower-analogy">🧱 乐高锚点：生长 = 时间轴上的价值变化</span>
+                <div class="tower-process">
+                    <strong>【拆解过程】</strong><br>
+                    <span class="step-label">① 拆零件：</span>园林设计 = 植物选择 + 空间布局 + 时间轴上的生长管理。<br>
+                    <span class="step-label">② 找接口：</span>植物 ≈ 资产，生长 ≈ 资产增值，养护成本 ≈ 折旧/维护费用。<br>
+                    <span class="step-label">③ 重新拼装：</span>把园林设计的“种下去只完成 30%”理解为“初始投资只完成 30%，剩下的 70% 是跨期价值增长”。<br>
+                    <span class="step-label">④ 验证运行：</span>用财务资产增值的模型去推演一个园林项目的全周期价值，看是否成立。
+                </div>
+                <p>园林设计里，种下去只完成 30%，剩下 70% 是植物在时间轴上的生长。这和财务资产增值的跨期模型完全同构。</p>
+                <div class="tower-conclusion">✅ 园林设计的本质 = 一个跨期的财务模型（初始投资 = 在建工程，植物生长 = 资产增值）。</div>
+                <a href="#" class="tower-jump">查看完整推导 <span class="arrow">→</span></a>
+            </div>
+
+            <div class="tower-card" id="tower-card-5">
+                <div class="tower-step">映射 5 · ③ 重新拼装</div>
+                <h3>运营内核 → 工程 PDCA 循环</h3>
+                <span class="tower-analogy">🧱 乐高锚点：系统构建 = PDCA 循环</span>
+                <div class="tower-process">
+                    <strong>【拆解过程】</strong><br>
+                    <span class="step-label">① 拆零件：</span>顶尖运营 = 系统构建能力 + 资源编排能力 + 反馈闭环思维。<br>
+                    <span class="step-label">② 找接口：</span>这三个 ≈ 工程管理的计划、执行、检查、改进四个环节。<br>
+                    <span class="step-label">③ 重新拼装：</span>运营的本质就是在动态环境里做 PDCA——建系统、跑系统、看反馈、调系统。<br>
+                    <span class="step-label">④ 验证运行：</span>用一个运营决策的案例，用 PDCA 循环的框架重新拆解一遍，看是否一致。
+                </div>
+                <p>顶尖运营的内核 = 系统构建能力 + 资源编排能力 + 反馈闭环思维，和工程管理的 PDCA 循环完全同构。</p>
+                <div class="tower-conclusion">✅ 所有领域的顶尖者，学的不是那个领域的知识，而是从那个领域里提炼出一套通用操作系统。</div>
+                <a href="#" class="tower-jump">查看完整推导 <span class="arrow">→</span></a>
+            </div>
+
+            <div class="tower-card" id="tower-card-6">
+                <div class="tower-step">映射 6 · ④ 验证运行</div>
+                <h3>Token 预测 → PDCA 循环</h3>
+                <span class="tower-analogy">🧱 乐高锚点：逐字推理 = 实时反馈修正</span>
+                <div class="tower-process">
+                    <strong>【拆解过程】</strong><br>
+                    <span class="step-label">① 拆零件：</span>大模型生成文本 = Token 序列预测，每个 Token 依赖前文。<br>
+                    <span class="step-label">② 找接口：</span>每个 Token 预测 ≈ PDCA 的一个循环——预测（Plan）、生成（Do）、对比概率（Check）、修正下一个 Token（Adjust）。<br>
+                    <span class="step-label">③ 重新拼装：</span>大模型生成一整段文本 = 连续执行了 N 次 PDCA 循环。<br>
+                    <span class="step-label">④ 验证运行：</span>用 PDCA 的逻辑去追踪大模型生成一句话的过程，看是否每一步都对应得上。
+                </div>
+                <p>大模型生成文本，是一个 Token 一个 Token 地预测下一个字，本质上就是在每一个字上做一次 PDCA。</p>
+                <div class="tower-conclusion">✅ 大模型和工程管理，在底层逻辑上完全同构——都是在动态排列组合中，通过实时反馈修正，逼近最优解。</div>
+                <a href="#" class="tower-jump">查看完整推导 <span class="arrow">→</span></a>
+            </div>
+
+            <div class="tower-card" id="tower-card-7">
+                <div class="tower-step">映射 7 · ③ 重新拼装</div>
+                <h3>低空 0-500 米 → 地下 0-500 米能源带</h3>
+                <span class="tower-analogy">🧱 乐高锚点：空间尺度迁移</span>
+                <div class="tower-process">
+                    <strong>【拆解过程】</strong><br>
+                    <span class="step-label">① 拆零件：</span>低空经济 = 0-500 米空域的资源分配 + 无人机运营 + 监管框架。<br>
+                    <span class="step-label">② 找接口：</span>0-500 米空域 ≈ 0-500 米地下空间，无人机 ≈ 能源开采设备，空域管理 ≈ 资源权属管理。<br>
+                    <span class="step-label">③ 重新拼装：</span>把低空经济的资源配置逻辑，平移应用到地下能源储存带的资源配置逻辑。<br>
+                    <span class="step-label">④ 验证运行：</span>用低空经济的一个实际问题（如航线竞标），看能不能用地下资源的逻辑重新理解一遍。
+                </div>
+                <p>低空经济关注 0-500 米空域，对应地下 0-500 米是能源储存带。同一套空间尺度逻辑，从空中迁移到地下。</p>
+                <div class="tower-conclusion">✅ 元架构不仅能横跨学科，还能纵贯空间和时间尺度。</div>
+                <a href="#" class="tower-jump">查看完整推导 <span class="arrow">→</span></a>
+            </div>
+        </div>
+
+        <!-- ===== 用积木降维复杂世界 ===== -->
+        <div class="section-anchor" id="section-lego"></div>
+        <div class="lego-scene">
+            <div class="scene-title">🧱 <span>用积木模组化降维复杂世界</span></div>
+            <div class="scene-sub">同构积木引擎如何把陌生领域模组化成"可拼装的积木单元"</div>
+            <div class="scene-grid">
+                <div class="item">
+                    <div class="tag">🧱 模组化降维</div>
+                    <p>把 CAD 从<strong>"专业工程软件"</strong>降到<strong>"通用乐高积木单元"</strong>，通过结构同构破除领域壁垒。</p>
+                </div>
+                <div class="item">
+                    <div class="tag">🧩 引擎普适性</div>
+                    <p>积木映射<strong>不依赖特定专业背景</strong>，任何领域均可以乐高四步拆解法完成结构化认知迁移。</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== 终极验证 ===== -->
+        <div class="section-anchor" id="section-verify"></div>
+        <div class="section">
+            <h2>⚡ 引擎验证结论 <span class="tag">三大核心特性</span></h2>
+            <div class="verify-grid">
+                <div class="verify-card">
+                    <div class="icon">🔒</div>
+                    <h4>不可复制内核</h4>
+                    <p>输出可被参考，但生成输出的同构映射引擎能力为核心资产。</p>
+                </div>
+                <div class="verify-card">
+                    <div class="icon">🧠</div>
+                    <h4>自生成引擎</h4>
+                    <p>元架构可从零推演重建，具备跨领域迁移的自主推演能力。</p>
+                </div>
+                <div class="verify-card">
+                    <div class="icon">🔗</div>
+                    <h4>体系自洽</h4>
+                    <p>GameOS v2.1 体系在全领域模组化映射测试下保持逻辑自洽。</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== 服务关联 ===== -->
+        <div class="service-bridge">
+            <div class="bridge-title">📌 本引擎已封装为 <span>可交付的商用服务</span></div>
+            <div class="bridge-desc">
+                跨域同构积木映射引擎的标准算法框架已沉淀为以下商用服务产品（完整参数、阈值见私有内核库）
+            </div>
+            <div class="bridge-grid">
+                <div class="bridge-item">
+                    <div class="icon">🧪</div>
+                    <div class="name">积木模组同构诊断</div>
+                    <div class="price">【私有库定价】</div>
+                </div>
+                <div class="bridge-item">
+                    <div class="icon">🔗</div>
+                    <div class="name">跨域同构映射方案定制</div>
+                    <div class="price">【私有库定价】</div>
+                </div>
+                <div class="bridge-item">
+                    <div class="icon">📐</div>
+                    <div class="name">领域积木拆解框架搭建</div>
+                    <div class="price">【私有库定价】</div>
+                </div>
+            </div>
+            <a href="#" class="bridge-link">→ 查看完整服务全景图</a>
+        </div>
+
+        <!-- ===== 公私双引擎架构说明 ===== -->
+        <div class="section">
+            <h2>🔧 公私双引擎架构 <span class="tag">公开演示 · 私有内核物理隔离</span></h2>
+            <div class="dual-engine-grid">
+                <div class="engine-box-public">
+                    <div style="font-size:14px;font-weight:700;color:#facc15;margin-bottom:10px;">📦 isomorphism-block-engine（公开仓库）</div>
+                    <ul style="margin:0;padding-left:18px;color:rgba(255,255,255,0.6);font-size:12px;line-height:2;">
+                        <li>改造升级后的整套静态 HTML 展示页</li>
+                        <li>简化版公开领域推导说明、通用拼装算法框架</li>
+                        <li>Streamlit 拼装外层框架（演示版）</li>
+                        <li>公开版 README 产品介绍</li>
+                        <li><span style="color:#ef4444;">不含精细阈值、完整私密推导原稿</span></li>
+                    </ul>
+                </div>
+                <div class="engine-box-private">
+                    <div style="font-size:14px;font-weight:700;color:#ef4444;margin-bottom:10px;">🔒 isomorphism-block-private-engine（私有内核）</div>
+                    <ul style="margin:0;padding-left:18px;color:rgba(255,255,255,0.6);font-size:12px;line-height:2;">
+                        <li>9大领域全部完整版原始详细推导文稿</li>
+                        <li>积木模组兼容判定精细权重、匹配阈值参数</li>
+                        <li>全套商业化定制交付资料、定价体系、服务底稿</li>
+                        <li>生物医学、天文物理两大预留赛道底层架构</li>
+                        <li>仅单人读写权限，关闭所有外部访问</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="engine-linkage-note">
+                <strong style="color:#818cf8;">联动逻辑：</strong>公开页面仅做展示与基础结构演示；高精度量化运算、完整深度推演需要调用私有引擎数据包。缺失私有库时仅能做基础结构演示，无法商用落地。
+            </div>
+        </div>
+
+        <!-- ===== 0.6兼容度熔断机制 ===== -->
+        <div class="section">
+            <h2>⚖️ 积木拼接风险浓度熔断 <span class="tag" style="background:rgba(239,68,68,0.15);color:#fca5a5;">C=0.6 红线</span></h2>
+            <div class="fuse-rules">
+                <span style="color:#ef4444;font-weight:700;">🔴 熔断规则：</span>沿用全局 0.6 风险浓度阈值机制 —— 当两块积木（领域模组）拼接兼容度低于 0.6 时，系统红色告警拦截，禁止拼装通过。<br>
+                <span style="color:#facc15;font-weight:700;">🟡 兼容度计算：</span>接口匹配度 × 结构同构度 × 权重系数 = 兼容度C（精细权重与阈值参数位于私有引擎库，<strong>【私有引擎配置填充位】</strong>）。<br>
+                <span style="color:#22c55e;font-weight:700;">🟢 通过条件：</span>C ≥ 0.6 → 拼装通过，允许进入验证运行阶段；C &lt; 0.6 → 红色拦截，需重新拆解匹配。
+            </div>
+        </div>
+
+        <!-- ===== 延伸方向 ===== -->
+        <div class="section-anchor" id="section-extension"></div>
+        <div class="section" style="margin-bottom:20px;">
+            <h2>延伸赛道 <span class="tag">预留模组接口</span></h2>
+            <p>同一套"跨域同构积木映射"算法框架可平移至更多学科领域。以下赛道预留积木接口，底层架构存于私有引擎库：</p>
+            <div class="extension-grid">
+                <div class="ext-item">
+                    <div class="ext-info">
+                        <div class="ext-name">🧬 生物/医学领域模组</div>
+                        <div class="ext-desc">用积木映射引擎重新理解生物系统、医学诊断逻辑（底层架构见私有库）</div>
+                    </div>
+                    <div class="ext-status">🔒 待解锁</div>
+                </div>
+                <div class="ext-item">
+                    <div class="ext-info">
+                        <div class="ext-name">🔭 物理/天文领域模组</div>
+                        <div class="ext-desc">用积木映射引擎重新理解物理规律、天文观测模型（底层架构见私有库）</div>
+                    </div>
+                    <div class="ext-status">🔒 待解锁</div>
+                </div>
+                <div class="ext-item" style="grid-column: 1 / -1; border-color: rgba(250, 204, 21, 0.15);">
+                    <div class="ext-info">
+                        <div class="ext-name" style="color: #facc15;">🧱 乐高可视化拼装演示台（已落地）</div>
+                        <div class="ext-desc">七大领域积木模组拖拽拼装 · 0.6兼容度熔断 · 红色告警拦截 —— 可进入演示</div>
+                    </div>
+                    <a href="isomorphism-block-demo.html" class="ext-status live" style="text-decoration:none;color:#22c55e;">🧩 进入演示</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== 底部 ===== -->
+        <div class="back-bottom">
+            <a href="../../index.html">← 返回总控台</a>
+        </div>
+
+    </div>
+
+    <script>
+        // ===== 节点数据 =====
+        const nodesData = [{
+            id: 'n1',
+            title: '财务 → CAD',
+            analogy: '图层 = 会计科目',
+            x: 0.10,
+            y: 0.15,
+            target: 'card-step1'
+        }, {
+            id: 'n2',
+            title: 'CAD → 乐高',
+            analogy: '拼装 = 装配体',
+            x: 0.90,
+            y: 0.12,
+            target: 'card-step2'
+        }, {
+            id: 'n3',
+            title: '电池 → CAD',
+            analogy: '电池组合 = 零件',
+            x: 0.93,
+            y: 0.45,
+            target: 'card-step3'
+        }, {
+            id: 'n4',
+            title: '园林 → 财务',
+            analogy: '生长 = 资产增值',
+            x: 0.78,
+            y: 0.85,
+            target: 'card-step4'
+        }, {
+            id: 'n5',
+            title: '运营 → 工程',
+            analogy: '运营 = PDCA',
+            x: 0.45,
+            y: 0.92,
+            target: 'card-step5'
+        }, {
+            id: 'n6',
+            title: '工程管理 → 大模型',
+            analogy: 'Token = PDCA',
+            x: 0.12,
+            y: 0.78,
+            target: 'card-step6'
+        }, {
+            id: 'n7',
+            title: '地质学',
+            analogy: '低空 ↔ 地下',
+            x: 0.06,
+            y: 0.48,
+            target: 'card-step7'
+        }];
+
+        const mindmap = document.getElementById('mindmap');
+        const svg = document.getElementById('mindmapSvg');
+
+        function placeNodes() {
+            const rect = mindmap.getBoundingClientRect();
+            const w = mindmap.clientWidth || rect.width || 800;
+            const h = mindmap.clientHeight || rect.height || 460;
+
+            const container = mindmap;
+            nodesData.forEach(node => {
+                const px = node.x * w;
+                const py = node.y * h;
+
+                let el = document.getElementById(node.id);
+                if (!el) {
+                    el = document.createElement('div');
+                    el.id = node.id;
+                    el.className = 'radial-node';
+                    container.appendChild(el);
+                }
+                const halfW = 70;
+                const halfH = 30;
+                el.style.left = Math.max(0, Math.min(w - halfW * 2, px - halfW)) + 'px';
+                el.style.top = Math.max(0, Math.min(h - halfH * 2, py - halfH)) + 'px';
+                el.innerHTML = `
+                        <div class="label">映射</div>
+                        <div class="title">${node.title}</div>
+                        <div class="analogy">${node.analogy}</div>
+                    `;
+
+                el.addEventListener('click', function() {
+                    const target = document.getElementById(node.target);
+                    if (target) {
+                        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        target.style.transition = 'border-color 0.3s, border-left 0.3s';
+                        target.style.borderColor = '#a78bfa';
+                        target.style.borderLeft = '4px solid #facc15';
+                        setTimeout(() => {
+                            target.style.borderColor = '';
+                            target.style.borderLeft = '';
+                        }, 3000);
+                    }
+                });
+            });
+
+            const cx = w / 2;
+            const cy = h / 2;
+            const padding = 55;
+
+            let svgContent = '';
+            nodesData.forEach(node => {
+                const px = node.x * w;
+                const py = node.y * h;
+                const dx = px - cx;
+                const dy = py - cy;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist < 10) return;
+                const ratio = (dist - padding) / dist;
+                const startX = cx + dx * (1 - ratio);
+                const startY = cy + dy * (1 - ratio);
+                svgContent += `<line x1="${startX}" y1="${startY}" x2="${px}" y2="${py}" />`;
+            });
+
+            svg.innerHTML = svgContent;
+        }
+
+        setTimeout(placeNodes, 80);
+
+        let resizeTimer;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(placeNodes, 200);
+        });
+
+        // ===== 乐高双塔点击联动 =====
+        document.querySelectorAll('.mapping-row').forEach(row => {
+            row.addEventListener('click', function() {
+                const targetId = this.dataset.target;
+                const target = document.getElementById(targetId);
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    target.style.transition = 'border-color 0.3s, box-shadow 0.3s, border-left 0.3s';
+                    target.style.borderColor = '#facc15';
+                    target.style.borderLeft = '4px solid #facc15';
+                    target.style.boxShadow = '0 0 30px rgba(250, 204, 21, 0.06)';
+                    setTimeout(() => {
+                        target.style.borderColor = '';
+                        target.style.borderLeft = '';
+                        target.style.boxShadow = '';
+                    }, 3000);
+                }
+            });
+        });
+    </script>
+
+</body>
+</html>
