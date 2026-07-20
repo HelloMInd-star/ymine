@@ -17,6 +17,12 @@
 (function(global) {
     'use strict';
 
+    const THRESHOLDS = (global.YBus && global.YBus.THRESHOLDS) || Object.freeze({
+        BREAKEVEN: 0.48,
+        STEADY: 0.50,
+        FUSE: 0.68
+    });
+
     // ================================================================
     // 数学工具
     // ================================================================
@@ -86,24 +92,23 @@
     }
 
     // ================================================================
-    // A3: α标准化匹配系数（纯余弦相似度，严格对齐A3）
+    // A3: α标准化匹配系数（纯余弦相似度，严格对齐全局阈值0.48/0.50/0.68）
     // ================================================================
     // α = cos(θ) = (A·B) / (||A|| × ||B||)
-    // 评级：S≥0.85 / A≥0.70 / B≥0.55 / C≥0.40 / D<0.40
+    // 评级基准：S+≥0.68(熔断预警) / A>0.50(优质) / B=0.50(稳态) / C≥0.48(保本观察) / D<0.48(清退)
     const ALPHA_GRADES = [
-        { min:0.85, grade:'S', name:'核心资产', action:'重点保护，开放杠杆，最低干预' },
-        { min:0.70, grade:'A', name:'优质资产', action:'深度赋能，推动向S级跃迁' },
-        { min:0.55, grade:'B', name:'成长资产', action:'标准化培育，阶梯式推进' },
-        { min:0.40, grade:'C', name:'观察资产', action:'限资源观察，给予改进窗口' },
-        { min:0.00, grade:'D', name:'低效资产', action:'触发清退评估' }
+        { min:THRESHOLDS.FUSE, grade:'S+', name:'熔断预警资产', action:'立即熔断评估，风控介入' },
+        { min:THRESHOLDS.STEADY + 0.001, grade:'A', name:'优质资产', action:'重点培育，资源倾斜' },
+        { min:THRESHOLDS.STEADY, grade:'B', name:'稳态资产', action:'常规监控，0.50中轴线参照' },
+        { min:THRESHOLDS.BREAKEVEN, grade:'C', name:'保本观察资产', action:'限制资源，保本预警' },
+        { min:0.00, grade:'D', name:'高危资产', action:'强制清退' }
     ];
 
-    // 理想资产向量（四维归一化到[0,1]）
     const IDEAL_ANCHORS = {
-        S: { flow:0.95, persona:0.90, monetize:0.85, risk:0.10 },  // 风险是负向，理想风险低
+        'S+': { flow:0.95, persona:0.90, monetize:0.85, risk:0.10 },
         A: { flow:0.75, persona:0.80, monetize:0.70, risk:0.20 },
-        B: { flow:0.55, persona:0.60, monetize:0.50, risk:0.35 },
-        C: { flow:0.35, persona:0.40, monetize:0.30, risk:0.50 },
+        B: { flow:0.50, persona:0.50, monetize:0.50, risk:0.50 },
+        C: { flow:0.35, persona:0.40, monetize:0.30, risk:0.55 },
         D: { flow:0.15, persona:0.20, monetize:0.15, risk:0.70 }
     };
 
@@ -112,16 +117,9 @@
         return ALPHA_GRADES[ALPHA_GRADES.length-1];
     }
 
-    function computeAlpha(creatorVec, anchorKey = 'S') {
-        // α = cosine-magnitude similarity  (A·B)/(|A||B|) 的幅度投影版本
-        // 纯余弦只测方向、对幅度不敏感，在4维同向特征上无法拉开等级。
-        // 这里采用"方向对齐×幅度强度"的幅度归一化投影：
-        //   1) 将四维中心化（减0.5），让"好"在正、"差"在负方向
-        //   2) 风险转为正向（低风险=高分）
-        //   3) 投影到理想方向(全正向)，除以最大投影做归一化
-        //   最终 α ∈ [0,1]，严格对齐文档阈值 S≥0.85/A≥0.70/B≥0.55/C≥0.40/D<0.40
-        const CENTER = 0.50;
-        const anchor = IDEAL_ANCHORS[anchorKey] || IDEAL_ANCHORS.S;
+    function computeAlpha(creatorVec, anchorKey = 'B') {
+        const CENTER = THRESHOLDS.STEADY;
+        const anchor = IDEAL_ANCHORS[anchorKey] || IDEAL_ANCHORS.B;
         const v = [
             creatorVec.flow    - CENTER,
             creatorVec.persona - CENTER,
@@ -216,25 +214,27 @@
     }
 
     // ================================================================
-    // A5/§5.4: 交互判定系统（对齐EBwEds）
+    // A5/§5.4: 交互判定系统（对齐全局阈值0.48/0.50/0.68）
     // ================================================================
     const INTERACTION_PARAMS = {
-        BALANCE_POINT: 0.50,       // 精确运行点
-        VERIFY_THRESHOLD: 0.68,   // 资产评级确认线
-        STABLE_LOW: 0.50,         // 稳定区间下界
-        STABLE_HIGH: 0.68,        // 稳定区间上界
-        DEVIATION_LIGHT: 0.333,   // 1/3 稳定与偏离分界
-        DEVIATION_MODERATE: 0.50, // 1/2 轻度与中度分界
-        DEVIATION_SIGNIFICANT: 0.667, // 2/3 中度与显著分界
-        DEVIATION_CRITICAL: 0.80  // 4/5 触发调试阈值
+        BALANCE_POINT: THRESHOLDS.STEADY,
+        VERIFY_THRESHOLD: THRESHOLDS.FUSE,
+        STABLE_LOW: THRESHOLDS.STEADY,
+        STABLE_HIGH: THRESHOLDS.FUSE,
+        BREAKEVEN: THRESHOLDS.BREAKEVEN,
+        DEVIATION_LIGHT: 0.333,
+        DEVIATION_MODERATE: 0.50,
+        DEVIATION_SIGNIFICANT: 0.667,
+        DEVIATION_CRITICAL: 0.80
     };
 
     const CONFIDENCE_BANDS = [
-        { min:0.85, max:1.01, label:'收敛态',   color:'#a855f7', action:'可直接执行，架构师SOP' },
-        { min:0.68, max:0.85, label:'强信号',   color:'#22c55e', action:'AI自治执行' },
-        { min:0.59, max:0.68, label:'中等信号', color:'#3b82f6', action:'AI参谋+人审' },
-        { min:0.50, max:0.59, label:'弱信号',   color:'#f59e0b', action:'辅助模式，人决策' },
-        { min:0.00, max:0.50, label:'随机区',   color:'#6b7280', action:'禁止决策，补充数据' }
+        { min: THRESHOLDS.FUSE + 0.17, max: 1.01, label: '收敛态', color: '#a855f7', action: '可直接执行，架构师SOP' },
+        { min: THRESHOLDS.FUSE, max: THRESHOLDS.FUSE + 0.17, label: '强信号·熔断预警', color: '#f87171', action: '风控审核后执行' },
+        { min: THRESHOLDS.STEADY + 0.09, max: THRESHOLDS.FUSE, label: '中等信号', color: '#3b82f6', action: 'AI参谋+人审' },
+        { min: THRESHOLDS.STEADY, max: THRESHOLDS.STEADY + 0.09, label: '弱信号·稳态', color: '#6ee7b7', action: '辅助模式，人决策' },
+        { min: THRESHOLDS.BREAKEVEN, max: THRESHOLDS.STEADY, label: '保本观察区', color: '#fb923c', action: '限制决策，补充数据' },
+        { min: 0.00, max: THRESHOLDS.BREAKEVEN, label: '高危区', color: '#ef4444', action: '禁止决策，保本预警' }
     ];
 
     function confidenceBand(c) {
@@ -243,13 +243,13 @@
     }
 
     // ================================================================
-    // §3.1: R²四阶调度器
+    // §3.1: R²四阶调度器（以0.50稳态中轴线为基准）
     // ================================================================
     const AUTONOMY_MODES = {
-        LIGHT:  { id:'light',  name:'轻量化模式', minR2:0,    maxR2:0.30, humanOversight:1.0, aiAutonomy:0.0 },
-        ASSIST: { id:'assist', name:'辅助智能',   minR2:0.30, maxR2:0.50, humanOversight:0.7, aiAutonomy:0.3 },
-        AUTO:   { id:'auto',   name:'全量自治',   minR2:0.50, maxR2:0.75, humanOversight:0.2, aiAutonomy:0.8 },
-        ARCH:   { id:'arch',   name:'架构师迭代', minR2:0.75, maxR2:1.01, humanOversight:0.5, aiAutonomy:0.5 }
+        LIGHT:  { id:'light',  name:'轻量化模式', minR2:0,    maxR2: THRESHOLDS.BREAKEVEN - 0.08, humanOversight:1.0, aiAutonomy:0.0 },
+        ASSIST: { id:'assist', name:'辅助智能',   minR2: THRESHOLDS.BREAKEVEN - 0.08, maxR2: THRESHOLDS.STEADY, humanOversight:0.7, aiAutonomy:0.3 },
+        AUTO:   { id:'auto',   name:'全量自治',   minR2: THRESHOLDS.STEADY, maxR2: THRESHOLDS.FUSE + 0.07, humanOversight:0.2, aiAutonomy:0.8 },
+        ARCH:   { id:'arch',   name:'架构师迭代', minR2: THRESHOLDS.FUSE + 0.07, maxR2:1.01, humanOversight:0.5, aiAutonomy:0.5 }
     };
 
     // ================================================================
@@ -312,12 +312,9 @@
                 monetize: dimScores.monetize/100,
                 risk: dimScores.risk/100
             };
-            // α系数：以S级（核心资产理想向量）为基准计算余弦幅度相似度，
-            // 然后与各锚点做模式匹配作为诊断信息
-            const sAlpha = computeAlpha(this.vec, 'S');
+            const sAlpha = computeAlpha(this.vec, 'B');
             this.alpha = sAlpha.alpha;
             this.grade = sAlpha.grade;
-            // 计算与各锚点的匹配度（诊断用）
             this.archetypeMatch = {};
             for(const k of Object.keys(IDEAL_ANCHORS)) {
                 this.archetypeMatch[k] = computeAlpha(this.vec, k).alpha;
@@ -327,8 +324,7 @@
         }
 
         _bestAlpha() {
-            // 保留方法供兼容，但主流程使用S锚点
-            return computeAlpha(this.vec, 'S');
+            return computeAlpha(this.vec, 'B');
         }
 
         snapshot() {
@@ -462,20 +458,19 @@
         }
         confidence() {
             const w = this.history.slice(-this.window);
-            if(w.length < 5) return { conf:0.5, band:confidenceBand(0.5), converged:false, diverging:false };
+            if(w.length < 5) return { conf: THRESHOLDS.STEADY, band: confidenceBand(THRESHOLDS.STEADY), converged: false, diverging: false };
             let hits = 0;
             w.forEach(h => {
-                if((h.p>0.5 && h.a>0.5) || (h.p<0.5 && h.a<0.5)) hits++;
+                if((h.p > THRESHOLDS.STEADY && h.a > THRESHOLDS.STEADY) || (h.p < THRESHOLDS.STEADY && h.a < THRESHOLDS.STEADY)) hits++;
             });
-            const hitRate = hits/w.length;
+            const hitRate = hits / w.length;
             return {
                 conf: MathKit.clamp(hitRate, 0, 1),
                 band: confidenceBand(hitRate),
-                converged: hitRate >= 0.68,
-                diverging: hitRate < 0.50
+                converged: hitRate >= THRESHOLDS.FUSE,
+                diverging: hitRate < THRESHOLDS.BREAKEVEN
             };
         }
-        // 偏离比例：近N次判定中超出稳定区间的比例
         deviationRatio() {
             const w = this.history.slice(-this.window);
             if(w.length === 0) return 0;

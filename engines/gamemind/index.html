@@ -6,6 +6,7 @@
     <title>⚡ GameMind · 全域通用博弈总基座 V2.2</title>
     <link rel="stylesheet" href="../../assets/css/base.css">
     <script src="../../assets/js/bus.js"></script>
+    <script src="../../models/common/normalizer.js"></script>
     <style>
         /* ===== 面包屑样式 ===== */
         .breadcrumb {
@@ -1254,8 +1255,30 @@
                         <div class="oc-value safe" id="outHollow">结构稳健</div>
                     </div>
                     <div class="output-card">
-                        <div class="oc-label">MoodMind 数据链路</div>
-                        <div class="oc-value safe" id="outMoodLink">● 已连通</div>
+                        <div class="oc-label">数据链路状态</div>
+                        <div class="oc-value" id="outLinkStatus" style="color:#666;">
+                            MoodMind: <span id="mmLinkStatus" style="color:#666;">○ 等待MoodMind数据</span>
+                            &nbsp;|&nbsp;
+                            EvolveMind: <span id="evLinkStatus" style="color:#666;">○ 等待认知数据</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="output-grid" style="margin-top:10px;">
+                    <div class="output-card">
+                        <div class="oc-label">管控模式</div>
+                        <div class="oc-value" id="outControlMode" style="color:#a78bfa;">HUMAN_AI_46</div>
+                    </div>
+                    <div class="output-card">
+                        <div class="oc-label">人机配比</div>
+                        <div class="oc-value" id="outRatio" style="color:#a78bfa;">40% / 60%</div>
+                    </div>
+                    <div class="output-card">
+                        <div class="oc-label">凯利上限</div>
+                        <div class="oc-value" id="outKellyCap" style="color:#22c55e;">无限制</div>
+                    </div>
+                    <div class="output-card">
+                        <div class="oc-label">二八触发</div>
+                        <div class="oc-value" id="outTwoEight" style="color:#22c55e;">否</div>
                     </div>
                 </div>
                 <div class="pipeline-flow">
@@ -1653,9 +1676,9 @@
         <!-- ===== 底部 ===== -->
         <div class="back-bottom">
             <a href="../../index.html">← 返回总控台</a>
-            <a href="#" id="appLink">📄 低空运营总纲 →</a>
-            <a href="#" style="color:rgba(255,255,255,0.06);">🏗️ 基建博弈</a>
-            <a href="#" style="color:rgba(255,255,255,0.06);">⛽ 地下能源博弈</a>
+            <a href="../airmind/index.html" id="appLink">📄 低空运营总纲 →</a>
+            <a href="#" style="color:rgba(255,255,255,0.06);pointer-events:none;">🏗️ 基建博弈（规划中）</a>
+            <a href="#" style="color:rgba(255,255,255,0.06);pointer-events:none;">⛽ 地下能源博弈（规划中）</a>
         </div>
 
         </div><!-- /legacyTab -->
@@ -1668,10 +1691,59 @@
             const THRESHOLDS = Object.freeze({BREAKEVEN:0.48, STEADY:0.50, FUSE:0.68});
             const AUDIT_ERROR = 0.02;
             let _fuseTriggered = false;
+            var _subscribedAssets = null;
+            var _subscribedCog = null;
 
             function lsGet(key,def){try{const v=localStorage.getItem(key);return v!==null?JSON.parse(v):def;}catch(_){return def;}}
             function lsSet(key,val){try{localStorage.setItem(key,JSON.stringify(val));}catch(_){}}
             function appendAuditLog(entry){try{const key='audit_log_gamemind';const log=lsGet(key,[]);log.push(Object.assign({id:'gamemind-'+Date.now().toString(36),ts:Date.now()},entry));if(log.length>300)log.splice(0,log.length-300);lsSet(key,log);}catch(_){}}
+            function gmLog(msg, level) {
+                try {
+                    console.log('[GameMind]', msg);
+                    appendAuditLog({type:level||'info', message:msg});
+                } catch(_) {}
+            }
+            function updateLinkStatus(type, connected) {
+                try {
+                    if (type === 'asset') {
+                        const el = document.getElementById('mmLinkStatus');
+                        if (el && _subscribedAssets) {
+                            el.textContent = '● 已连通(α='+(_subscribedAssets.alphaScore||0).toFixed(2)+')';
+                            el.style.color = '#22c55e';
+                        }
+                    } else if (type === 'cog') {
+                        const el = document.getElementById('evLinkStatus');
+                        if (el && _subscribedCog) {
+                            el.textContent = '● 已连通';
+                            el.style.color = '#22c55e';
+                        }
+                    }
+                } catch(_) {}
+            }
+            function initSubscriptions() {
+                if (typeof YBus === 'undefined' || !YBus.subscribe) return;
+                YBus.subscribe('assetQuant', function(data) {
+                    _subscribedAssets = data;
+                    gmLog('接收到MoodMind资产量化：α='+(data.alphaScore||0).toFixed(3)+' 等级='+(data.assetGrade||'N/A')+' 赛道='+(data.redBlueOcean||'N/A'));
+                    if (data.alphaScore !== undefined) {
+                    }
+                    updateLinkStatus('asset', true);
+                });
+                YBus.subscribe('mindVector', function(data) {
+                    _subscribedCog = data;
+                    var cv = data.cognitiveVector || {};
+                    var avg = ((cv.math||0)+(cv.economic||0)+(cv.ai||0)+(cv.language||0))/4;
+                    gmLog('接收到EvolveMind认知向量：综合='+avg.toFixed(3));
+                    updateLinkStatus('cog', true);
+                });
+                YBus.subscribe('riskThreshold', function(data) {
+                    if (data.fuseTriggered) {
+                        gmLog('!!! 全局风控熔断触发，风险水平='+(data.currentRiskLevel||0).toFixed(3)+' !!!','error');
+                    }
+                });
+            }
+            window._gmSubscribedAssets = function(){return _subscribedAssets;};
+            window._gmSubscribedCog = function(){return _subscribedCog;};
 
             function readAirMindData() {
                 const gamebase = lsGet('airmind_gamebase', null);
@@ -1681,27 +1753,110 @@
                 return {available:true, stale:stale, age:age, data:gamebase};
             }
 
+            function calcControlMode(synth) {
+                var humanRatio, aiRatio, controlMode, kellyCap, twoEightTriggered;
+                if (synth >= 0.68) {
+                    humanRatio = 0.80;
+                    aiRatio = 0.20;
+                    controlMode = 'HUMAN_AI_28';
+                    kellyCap = 0.25;
+                    twoEightTriggered = true;
+                } else if (synth >= 0.50) {
+                    humanRatio = 0.60;
+                    aiRatio = 0.40;
+                    controlMode = 'HUMAN_AI_46';
+                    kellyCap = 0.50;
+                    twoEightTriggered = false;
+                } else {
+                    humanRatio = 0.40;
+                    aiRatio = 0.60;
+                    controlMode = 'HUMAN_AI_46';
+                    kellyCap = 1.0;
+                    twoEightTriggered = false;
+                }
+                return {humanRatio:humanRatio, aiRatio:aiRatio, controlMode:controlMode, kellyCap:kellyCap, twoEightTriggered:twoEightTriggered};
+            }
+            window._gmCalcControlMode = calcControlMode;
+
+            function updateControlUI(ctrl) {
+                try {
+                    var cmEl = document.getElementById('outControlMode');
+                    var ratioEl = document.getElementById('outRatio');
+                    var capEl = document.getElementById('outKellyCap');
+                    var teEl = document.getElementById('outTwoEight');
+                    if (cmEl) { cmEl.textContent = ctrl.controlMode; cmEl.style.color = ctrl.twoEightTriggered?'#ef4444':'#a78bfa'; }
+                    if (ratioEl) ratioEl.textContent = Math.round(ctrl.humanRatio*100)+'% / '+Math.round(ctrl.aiRatio*100)+'%';
+                    if (capEl) { capEl.textContent = ctrl.kellyCap>=1?'无限制':(Math.round(ctrl.kellyCap*100)+'%'); capEl.style.color = ctrl.twoEightTriggered?'#ef4444':(ctrl.kellyCap<1?'#facc15':'#22c55e'); }
+                    if (teEl) { teEl.textContent = ctrl.twoEightTriggered?'是':'否'; teEl.style.color = ctrl.twoEightTriggered?'#ef4444':'#22c55e'; }
+                } catch(_) {}
+            }
+            window._gmUpdateControlUI = updateControlUI;
+
             function writeGameMindOutput(kelly, humanAutoRatio, riskQuant, coordScore) {
                 const airmind = readAirMindData();
                 const airGlobalRisk = airmind.available && !airmind.stale ? (airmind.data.globalRisk || 0.5) : 0.5;
                 const airFuse = airmind.available && !airmind.stale ? (airmind.data.fuseTriggered || false) : false;
-                const output = {
+                var ctrl = calcControlMode(riskQuant);
+                var fstar = Math.min(kelly, ctrl.kellyCap);
+                var b = 2.0, p = 0.5;
+                try {
+                    var pInput = document.getElementById('kellyPInput');
+                    var bInput = document.getElementById('kellyBInput');
+                    if (pInput) p = parseFloat(pInput.value);
+                    if (bInput) b = parseFloat(bInput.value);
+                } catch(_) {}
+                var winRate = p;
+                var winLossRatio = b;
+                var kellyFraction = fstar;
+                var actualAllocation = fstar;
+                var fuseCheckPassed = !(_fuseTriggered || airFuse);
+                var resourcePlan = ctrl.controlMode;
+                var eqOutput = {
+                    engine:'GameMind',
+                    timestamp:Date.now(),
+                    model:'cournot',
+                    nashStability:coordScore,
+                    c1Disturbance:0.45,
+                    c2Disturbance:0.28,
+                    syntheticShock:riskQuant,
+                    regime:ctrl.controlMode,
+                    spaceEnvironment:'low',
+                    equilibriumPrice:0.5,
+                    participants:5,
                     kellyFstar: kelly,
                     humanAutoRatio: humanAutoRatio,
                     coordScore: coordScore,
                     riskQuant: riskQuant,
                     airmindRisk: airGlobalRisk,
                     airmindFuse: airFuse,
-                    fuseTriggered: _fuseTriggered || airFuse,
-                    timestamp: Date.now()
+                    fuseTriggered: _fuseTriggered || airFuse
                 };
-                lsSet('pipeline_gamemind_output', output);
+                var kellyOutput = {
+                    engine:'GameMind',
+                    timestamp:Date.now(),
+                    winRate:winRate,
+                    winLossRatio:winLossRatio,
+                    kellyFraction:kellyFraction,
+                    actualAllocation:actualAllocation,
+                    humanRatio:ctrl.humanRatio,
+                    aiRatio:ctrl.aiRatio,
+                    controlMode:ctrl.controlMode,
+                    twoEightTriggered:ctrl.twoEightTriggered,
+                    fuseCheckPassed:fuseCheckPassed,
+                    resourcePlan:resourcePlan
+                };
+                updateControlUI(ctrl);
+                lsSet('pipeline_gamemind_output', eqOutput);
+                lsSet('pipeline_gamemind_kelly', kellyOutput);
                 if (typeof YBus !== 'undefined' && YBus.publish) {
-                    try { YBus.publish('gamebaseOutput', output, {trusted:true}); } catch(_) {}
+                    try { YBus.publish('gameEquilibrium', eqOutput, {trusted:true}); } catch(_) {}
+                    try { YBus.publish('kellyAllocation', kellyOutput, {trusted:true}); } catch(_) {}
                 }
             }
 
             window.writeGameMindOutput = writeGameMindOutput;
+            window.initSubscriptions = initSubscriptions;
+            window.gmLog = gmLog;
             window.checkGameMindFuse = function(riskVal) {
                 if (riskVal >= THRESHOLDS.FUSE && !_fuseTriggered) {
                     _fuseTriggered = true;
@@ -2819,11 +2974,10 @@
                 }
             }
 
-            // ===== 第五层：数据输出到MoodMind =====
+            // ===== 第五层：数据输出 =====
             function updateOutput() {
                 const balance = clamp(1 - Math.abs(state.synth - 0.5)*2, 0, 1);
                 const risk = state.synth;
-                // 空心化判定：C2 > 0.6时认为空心化（内部腔体扰动过大）
                 let hollow = '结构稳健', hollowClass='safe';
                 if (state.c2 > 0.7) { hollow='严重空心化 ⚠️'; hollowClass='danger'; }
                 else if (state.c2 > 0.5) { hollow='轻微空心化'; hollowClass='warn'; }
@@ -2836,8 +2990,34 @@
                 hollowEl.textContent = hollow;
                 hollowEl.className = 'oc-value '+hollowClass;
 
-                // 写入localStorage供MoodMind读取
-                const output = {
+                var ctrl = (window._gmCalcControlMode)?window._gmCalcControlMode(state.synth):{humanRatio:0.4,aiRatio:0.6,controlMode:'HUMAN_AI_46',kellyCap:1.0,twoEightTriggered:false};
+                if (window._gmUpdateControlUI) window._gmUpdateControlUI(ctrl);
+
+                var pVal = 0.5, bVal = 2.0;
+                try {
+                    var pI = document.getElementById('kellyPInput');
+                    var bI = document.getElementById('kellyBInput');
+                    if (pI) pVal = parseFloat(pI.value);
+                    if (bI) bVal = parseFloat(bI.value);
+                } catch(_) {}
+                var fRaw = (bVal*pVal - (1-pVal))/bVal;
+                var fClamped = Math.max(0, fRaw);
+                var fCapped = Math.min(fClamped, ctrl.kellyCap);
+                var fusePassed = !(window.isGameMindFused && window.isGameMindFused());
+
+                var spaceName = SPACE_PRESETS[state.currentSpace]?SPACE_PRESETS[state.currentSpace].name:'低空乱流层';
+                var eqOutput = {
+                    engine:'GameMind',
+                    timestamp:Date.now(),
+                    model:'cournot',
+                    nashStability:balance,
+                    c1Disturbance:state.c1,
+                    c2Disturbance:state.c2,
+                    syntheticShock:state.synth,
+                    regime:ctrl.controlMode,
+                    spaceEnvironment:state.currentSpace,
+                    equilibriumPrice:balance,
+                    participants:state.nVertices,
                     balance: balance,
                     risk: risk,
                     c1: state.c1,
@@ -2847,13 +3027,29 @@
                     space: state.currentSpace,
                     vertices: state.nVertices,
                     lineMode: state.lineMode,
-                    version: 'GameMind V2.2',
-                    timestamp: Date.now()
+                    version: 'GameMind V2.2'
                 };
-                gmSS('pipeline_gamemind_v2_output', output);
-                gmSS('gamemind_to_moodmind', output);
+                var kellyOutput = {
+                    engine:'GameMind',
+                    timestamp:Date.now(),
+                    winRate:pVal,
+                    winLossRatio:bVal,
+                    kellyFraction:fCapped,
+                    actualAllocation:fCapped,
+                    humanRatio:ctrl.humanRatio,
+                    aiRatio:ctrl.aiRatio,
+                    controlMode:ctrl.controlMode,
+                    twoEightTriggered:ctrl.twoEightTriggered,
+                    fuseCheckPassed:fusePassed,
+                    resourcePlan:ctrl.controlMode
+                };
+
+                gmSS('pipeline_gamemind_v2_output', eqOutput);
+                gmSS('gamemind_to_moodmind', eqOutput);
+                gmSS('pipeline_gamemind_kelly', kellyOutput);
                 if (typeof YBus !== 'undefined' && YBus.publish) {
-                    try { YBus.publish('gamemindV2Output', output, {trusted:true}); } catch(_){}
+                    try { YBus.publish('gameEquilibrium', eqOutput, {trusted:true}); } catch(_){}
+                    try { YBus.publish('kellyAllocation', kellyOutput, {trusted:true}); } catch(_){}
                 }
             }
 
@@ -3084,6 +3280,7 @@
                 initCone();
                 initSpaceSwitcher();
                 initPolygon();
+                if (window.initSubscriptions) window.initSubscriptions();
                 syncFromAirMind();
                 updatePerturb();
                 updateOutput();
@@ -3098,6 +3295,10 @@
                 setInterval(()=>{
                     if (state.activeTab === 'new') syncFromAirMind();
                 }, 5000);
+                setInterval(()=>{
+                    updateOutput();
+                    if (window.gmLog) window.gmLog('[定时心跳] 自动发布当前博弈状态');
+                }, 10000);
             });
         })();
     </script>

@@ -6,6 +6,7 @@
     <title>💜 MoodMind · 全域非标资产计量中台</title>
     <link rel="stylesheet" href="../../assets/css/base.css">
     <script src="../../assets/js/bus.js"></script>
+    <script src="../../models/common/normalizer.js"></script>
     <style>
         /* ===== 面包屑样式 ===== */
         .breadcrumb {
@@ -853,6 +854,86 @@
             .bs-result-grid { grid-template-columns: 1fr 1fr; }
             .blogger-sim { padding: 18px 14px; }
         }
+
+        .bus-panel {
+            background: rgba(15,23,42,0.6);
+            border: 1px solid rgba(148,163,184,0.12);
+            border-radius: 14px;
+            padding: 16px 20px;
+            margin: 14px 0 18px;
+            display: grid;
+            grid-template-columns: 1fr 1fr auto;
+            gap: 14px;
+            align-items: center;
+        }
+        .bus-channel {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 12px;
+        }
+        .bus-channel .ch-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #64748b;
+            flex-shrink: 0;
+        }
+        .bus-channel .ch-dot.active { background: #22c55e; box-shadow: 0 0 8px rgba(34,197,94,0.5); }
+        .bus-channel .ch-dot.warn { background: #f59e0b; box-shadow: 0 0 8px rgba(245,158,11,0.5); }
+        .bus-channel .ch-dot.danger { background: #ef4444; box-shadow: 0 0 8px rgba(239,68,68,0.5); }
+        .bus-channel .ch-label { color: rgba(255,255,255,0.4); }
+        .bus-channel .ch-value { color: rgba(255,255,255,0.7); font-weight: 600; font-family: monospace; }
+        .bus-channel .ch-time { color: rgba(255,255,255,0.2); font-size: 11px; }
+        .bus-publish-btn {
+            padding: 7px 16px;
+            background: linear-gradient(135deg, #a78bfa, #7c3aed);
+            border: none;
+            color: white;
+            font-size: 12px;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all .2s;
+            white-space: nowrap;
+        }
+        .bus-publish-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(167,139,250,0.3); }
+
+        .audit-log-wrap {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.04);
+            border-radius: 10px;
+            padding: 12px 16px;
+            margin-top: 12px;
+            max-height: 140px;
+            overflow-y: auto;
+        }
+        .audit-log-wrap .log-title {
+            font-size: 11px;
+            color: rgba(255,255,255,0.3);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+        .audit-log-wrap .log-entry {
+            font-size: 11px;
+            color: rgba(255,255,255,0.45);
+            line-height: 1.6;
+            font-family: 'Courier New', monospace;
+            padding: 2px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+        }
+        .audit-log-wrap .log-entry:last-child { border-bottom: none; }
+        .audit-log-wrap .log-entry .ts { color: rgba(255,255,255,0.25); margin-right: 8px; }
+        .audit-log-wrap .log-entry .lv-info { color: #60a5fa; }
+        .audit-log-wrap .log-entry .lv-warn { color: #fbbf24; }
+        .audit-log-wrap .log-entry .lv-danger { color: #f87171; }
+        .audit-log-wrap .log-entry .lv-success { color: #34d399; }
+
+        @media (max-width: 700px) {
+            .bus-panel { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body>
@@ -866,12 +947,15 @@
         <div class="breadcrumb">
             <a href="../../index.html">Y.Mine总控台</a>
             <span class="sep">›</span>
+            <a href="../evolvemind/index.html">🧬 EvolveMind认知基座</a>
+            <span class="sep">›</span>
             <a href="../gamemind/index.html">🎯 GameMind 博弈基座</a>
             <span class="sep">›</span>
             <span class="current">💜 MoodMind · 全域非标资产计量中台</span>
         </div>
-        <div class="nav-actions" style="display:flex;gap:10px;margin-bottom:16px;">
+        <div class="nav-actions" style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;">
             <a href="javascript:history.back()" style="padding:6px 14px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);border-radius:8px;color:rgba(255,255,255,0.7);text-decoration:none;font-size:12px;transition:all .2s;">← 返回上一级</a>
+            <a href="../evolvemind/index.html" id="loadEvolveBtn" style="padding:6px 14px;background:rgba(168,85,247,0.12);border:1px solid rgba(168,85,247,0.3);border-radius:8px;color:#c4b5fd;text-decoration:none;font-size:12px;transition:all .2s;">🧠 EvolveMind认知基座</a>
             <a href="../gamemind/index.html" style="padding:6px 14px;background:rgba(251,146,60,0.12);border:1px solid rgba(251,146,60,0.3);border-radius:8px;color:#fdba74;text-decoration:none;font-size:12px;transition:all .2s;">🎯 接入GameMind博弈基座</a>
             <a href="../../index.html" style="padding:6px 14px;background:rgba(192,132,252,0.12);border:1px solid rgba(192,132,252,0.3);border-radius:8px;color:#d8b4fe;text-decoration:none;font-size:12px;transition:all .2s;">🏠 一键返回总控台</a>
         </div>
@@ -1057,17 +1141,17 @@
                 <strong>🧠 前景理论双架构决策偏差校正（挂载于风险盘/估值前置风控）：</strong>消除收益/损失框架带来的主观风险偏好偏移，以系统 0.5 稳态中轴线替代决策者私人沉没成本心理参照点，规避战略固守类非理性决策。<span style="color:rgba(255,255,255,0.2);">损失厌恶量化系数、参照点偏移函数属内部自研模型，不予前端展示。</span>
             </div>
 
-            <h3>α值计算与资产分级</h3>
-            <p>α值 = 博主当前数据向量与"理想资产向量"的余弦相似度，取值 0-1。</p>
+            <h3>α值计算与资产分级（THRESHOLDS三基准体系）</h3>
+            <p>α值 = 博主当前数据向量与"理想资产向量"的余弦相似度，取值 0-1。基于 MindSpeak V19.0 三基准阈值（0.68熔断线 / 0.50稳态中轴 / 0.48保本线）。</p>
             <div class="table-wrap">
                 <table>
-                    <thead><tr><th>α区间</th><th>资产等级</th><th>运营策略</th></tr></thead>
+                    <thead><tr><th>α区间</th><th>资产等级</th><th>运营策略</th><th>风险标识</th></tr></thead>
                     <tbody>
-                        <tr><td>α ≥ 0.85</td><td>S级（核心资产）</td><td>重点保护，开放杠杆权限，最低干预</td></tr>
-                        <tr><td>0.70 ≤ α < 0.85</td><td>A级（优质资产）</td><td>深度赋能，推动向S级跃迁</td></tr>
-                        <tr><td>0.55 ≤ α < 0.70</td><td>B级（成长资产）</td><td>标准化培育，重点攻克短板维度</td></tr>
-                        <tr><td>0.40 ≤ α < 0.55</td><td>C级（观察资产）</td><td>限资源观察，逾期未改善则降级</td></tr>
-                        <tr><td>α < 0.40</td><td>D级（低效资产）</td><td>触发清退评估，启动资产处置流程</td></tr>
+                        <tr><td style="color:#ef4444;font-weight:600;">α ≥ 0.68</td><td style="color:#ef4444;">S+ 熔断预警区</td><td>触发熔断预警，强制人工复核，暂停杠杆加仓</td><td><span class="ocean-tag red">🔴 高危熔断</span></td></tr>
+                        <tr><td style="color:#22c55e;font-weight:600;">0.50 &lt; α &lt; 0.68</td><td style="color:#22c55e;">优质/成长期</td><td>0.58-0.67优质赋能向稳态靠拢；0.51-0.57成长期标准化培育</td><td><span class="ocean-tag blue">🟢/🟡 健康/成长</span></td></tr>
+                        <tr><td style="color:#22c55e;font-weight:600;">α = 0.50</td><td style="color:#22c55e;">稳态区</td><td>系统稳态中轴线，80%自动化处理，维持现有配置</td><td><span class="ocean-tag" style="background:rgba(34,197,94,0.12);color:#4ade80;border-color:rgba(34,197,94,0.25);">🟢 稳态运行</span></td></tr>
+                        <tr><td style="color:#f59e0b;font-weight:600;">0.48 ≤ α &lt; 0.50</td><td style="color:#f59e0b;">观察预警区</td><td>橙色预警观察期，收紧资源投放，启动偏差校正</td><td><span class="ocean-tag" style="background:rgba(245,158,11,0.12);color:#fbbf24;border-color:rgba(245,158,11,0.25);">🟠 观察预警</span></td></tr>
+                        <tr><td style="color:#ef4444;font-weight:600;">α &lt; 0.48</td><td style="color:#ef4444;">保本线下高危清仓</td><td>跌破保本线，触发清仓评估，启动沉没成本转机会成本流程</td><td><span class="ocean-tag red">🔴 保本线破位</span></td></tr>
                     </tbody>
                 </table>
             </div>
@@ -1175,16 +1259,16 @@
                 </table>
             </div>
 
-            <h3>资产结构健康度</h3>
+            <h3>资产结构健康度（THRESHOLDS基准）</h3>
             <div class="table-wrap">
                 <table>
                     <thead><tr><th>维度</th><th>健康标准</th><th>预警标准</th></tr></thead>
                     <tbody>
-                        <tr><td>S/A级资产占比</td><td>≥ 40%</td><td>&lt; 30%</td></tr>
+                        <tr><td>稳态区+优质/成长期资产占比（α≥0.50）</td><td>≥ 40%</td><td>&lt; 30%</td></tr>
                         <tr><td>单一博主营收占比</td><td>&lt; 20%</td><td>&gt; 40%</td></tr>
                         <tr><td>单一赛道营收占比</td><td>&lt; 40%</td><td>&gt; 60%</td></tr>
                         <tr><td>跨赛道分散度</td><td>≥ 3个赛道</td><td>≤ 1个赛道</td></tr>
-                        <tr><td>成长资产储备（B/C级占比）</td><td>30%-40%</td><td>&lt; 20%或&gt; 50%</td></tr>
+                        <tr><td>观察预警+保本线下资产占比（α&lt;0.50）</td><td>&lt; 20%</td><td>&gt; 35%</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -1201,11 +1285,11 @@
                 <table>
                     <thead><tr><th>逼近阶段</th><th>α值状态</th><th>系统行为</th></tr></thead>
                     <tbody>
-                        <tr><td>初次接入</td><td>未知或 &lt; 0.3</td><td>强制进入观察期（1/3前置样本积累）</td></tr>
-                        <tr><td>观察期积累</td><td>0.3 → 0.5</td><td>持续建模、建立评判标尺</td></tr>
-                        <tr><td>进入核心区</td><td>[0.5, 0.68]</td><td>向圆柱体靠近，80%自动化处理</td></tr>
-                        <tr><td>持续迭代</td><td>[0.5, 0.68]内波动</td><td>持续校验、搭配优化，向中轴靠拢</td></tr>
-                        <tr><td>偏离中心</td><td>&gt; 0.68或&lt; 0.5</td><td>触发复检或人工排查</td></tr>
+                        <tr><td>初次接入</td><td>未知或 &lt; 0.48</td><td>保本线下高危区，强制进入观察期+清仓评估前置</td></tr>
+                        <tr><td>观察预警积累</td><td>0.48 → 0.50</td><td>橙色预警观察期，持续建模、建立评判标尺，收紧资源</td></tr>
+                        <tr><td>稳态核心区</td><td>α = 0.50</td><td>稳态中轴，向圆柱体靠近，80%自动化处理</td></tr>
+                        <tr><td>优质/成长期</td><td>0.50 &lt; α &lt; 0.68</td><td>持续校验、搭配优化，向0.50稳态中轴靠拢</td></tr>
+                        <tr><td>S+熔断预警</td><td>α ≥ 0.68</td><td>触发熔断预警，强制人工复核，暂停杠杆加仓</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -1215,7 +1299,27 @@
         <div class="section-anchor" id="section-link"></div>
         <div class="section">
             <h2>7. 完整应用链路 <span class="tag">端到端</span></h2>
-            <div class="flow-row" style="flex-direction: column; align-items: stretch; gap: 8px;">
+
+            <div class="bus-panel">
+                <div class="bus-channel">
+                    <div class="ch-dot" id="aqDot"></div>
+                    <span class="ch-label">assetQuant 通道：</span>
+                    <span class="ch-value" id="aqStatus">未连接</span>
+                    <span class="ch-time" id="aqTime"></span>
+                </div>
+                <div class="bus-channel">
+                    <div class="ch-dot" id="rtDot"></div>
+                    <span class="ch-label">riskThreshold 通道：</span>
+                    <span class="ch-value" id="rtStatus">未连接</span>
+                    <span class="ch-time" id="rtTime"></span>
+                </div>
+                <button class="bus-publish-btn" id="manualPublishBtn">📤 发布量化结果到总线</button>
+            </div>
+            <div class="audit-log-wrap" id="mmAuditLog">
+                <div class="log-title">📋 审计日志</div>
+            </div>
+
+            <div class="flow-row" style="flex-direction: column; align-items: stretch; gap: 8px; margin-top: 16px;">
                 <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
                     <span class="step" style="background:rgba(167,139,250,0.15);">前景理论校正</span>
                     <span class="arrow">→</span>
@@ -1287,9 +1391,9 @@
                 <div class="bs-field">
                     <label>博主层级</label>
                     <select id="bsTier">
-                        <option value="head">头部博主（S/A级参照标杆）</option>
-                        <option value="waist" selected>腰部博主（B级培育对象）</option>
-                        <option value="tail">尾部博主（C/D级待盘活）</option>
+                        <option value="head">头部博主（优质/S+参照标杆）</option>
+                        <option value="waist" selected>腰部博主（成长期/稳态培育对象）</option>
+                        <option value="tail">尾部博主（观察预警/保本线下待盘活）</option>
                     </select>
                 </div>
                 <div class="bs-field">
@@ -1327,7 +1431,7 @@
                     <div class="bs-result-item">
                         <div class="bs-r-label">资产等级</div>
                         <div class="bs-r-value" id="bsGrade" style="color:#94a3b8;">—</div>
-                        <div class="bs-r-sub">S/A/B/C/D</div>
+                        <div class="bs-r-sub">熔断/优质/稳态/观察/高危</div>
                     </div>
                     <div class="bs-result-item">
                         <div class="bs-r-label">赛道博弈属性</div>
@@ -1362,6 +1466,109 @@
     </div>
 
     <script>
+        var THRESHOLDS = { FUSE: 0.68, STEADY: 0.50, BREAKEVEN: 0.48 };
+        var MM_STATE = {
+            alphaScore: 0.50, fourDim: { revenue:0.5, cost:0.5, growth:0.5, risk:0.5 },
+            cosSim: 0.50, biasCorrection: 0.0, regime: 'RED_OCEAN',
+            blendedValue: 0.50, totalValuation: 0.50, source: 'dynamic'
+        };
+        var lastGameEq = null;
+        var mindVectorBias = 0.0;
+
+        function logMsg(msg, level) {
+            level = level || 'info';
+            var logEl = document.getElementById('mmAuditLog');
+            if (!logEl) return;
+            var ts = new Date().toLocaleTimeString('zh-CN', {hour12:false});
+            var lvClass = 'lv-' + (level === 'warn' ? 'warn' : level === 'danger' ? 'danger' : level === 'success' ? 'success' : 'info');
+            var entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.innerHTML = '<span class="ts">[' + ts + ']</span><span class="' + lvClass + '">●</span> ' + msg;
+            var titleEl = logEl.querySelector('.log-title');
+            if (titleEl) { logEl.insertBefore(entry, titleEl.nextSibling); } else { logEl.appendChild(entry); }
+            while (logEl.querySelectorAll('.log-entry').length > 30) {
+                var entries = logEl.querySelectorAll('.log-entry');
+                if (entries[0]) entries[0].parentNode.removeChild(entries[0]);
+            }
+        }
+
+        function updateBusPanel(channel, status, level) {
+            level = level || 'active';
+            if (channel === 'assetQuant') {
+                var dot = document.getElementById('aqDot'); var st = document.getElementById('aqStatus'); var tm = document.getElementById('aqTime');
+                if (dot) dot.className = 'ch-dot ' + (level === 'danger' ? 'danger' : level === 'warn' ? 'warn' : 'active');
+                if (st) st.textContent = status;
+                if (tm) tm.textContent = new Date().toLocaleTimeString('zh-CN', {hour12:false});
+            } else if (channel === 'riskThreshold') {
+                var dot2 = document.getElementById('rtDot'); var st2 = document.getElementById('rtStatus'); var tm2 = document.getElementById('rtTime');
+                if (dot2) dot2.className = 'ch-dot ' + (level === 'danger' ? 'danger' : level === 'warn' ? 'warn' : 'active');
+                if (st2) st2.textContent = status;
+                if (tm2) tm2.textContent = new Date().toLocaleTimeString('zh-CN', {hour12:false});
+            }
+        }
+
+        function getAlphaGrade(alpha) {
+            if (alpha >= THRESHOLDS.FUSE) return { grade:'S+熔断', color:'#ef4444', status:'FUSED', desc:'熔断预警·强制复核' };
+            if (alpha > THRESHOLDS.STEADY && alpha < THRESHOLDS.FUSE) {
+                if (alpha >= 0.58) return { grade:'优质期', color:'#22c55e', status:'QUALITY', desc:'优质赋能·向稳态靠拢' };
+                return { grade:'成长期', color:'#fbbf24', status:'GROWTH', desc:'标准化培育·攻克短板' };
+            }
+            if (Math.abs(alpha - THRESHOLDS.STEADY) < 0.005) return { grade:'稳态区', color:'#22c55e', status:'STEADY', desc:'稳态中轴·自动运行' };
+            if (alpha >= THRESHOLDS.BREAKEVEN && alpha < THRESHOLDS.STEADY) return { grade:'观察预警', color:'#f59e0b', status:'WATCH', desc:'橙色预警·收紧资源' };
+            return { grade:'保本线下', color:'#ef4444', status:'BELOW_BREAKEVEN', desc:'高危清仓·启动盘活' };
+        }
+
+        function publishToAssetQuant() {
+            if (typeof YBus === 'undefined' || !YBus.publish) {
+                updateBusPanel('assetQuant', '总线不可用', 'warn');
+                return;
+            }
+            var alphaEl = document.getElementById('alphaValue');
+            var totalEl = document.getElementById('totalValuation');
+            var bsAlphaEl = document.getElementById('bsAlpha');
+            var bsTotalEl = document.getElementById('bsTotal');
+            var alphaScore = MM_STATE.alphaScore;
+            var blended = MM_STATE.blendedValue;
+            if (alphaEl && alphaEl.textContent && parseFloat(alphaEl.textContent) > 0) {
+                alphaScore = parseFloat(alphaEl.textContent);
+            }
+            if (bsAlphaEl && bsAlphaEl.textContent && bsAlphaEl.textContent !== '—' && parseFloat(bsAlphaEl.textContent) > 0) {
+                alphaScore = parseFloat(bsAlphaEl.textContent);
+                blended = MM_STATE.blendedValue;
+            }
+            if (totalEl && totalEl.textContent && parseFloat(totalEl.textContent) > 0) {
+                blended = parseFloat(totalEl.textContent);
+            }
+            if (bsTotalEl && bsTotalEl.textContent && bsTotalEl.textContent !== '—' && parseFloat(bsTotalEl.textContent) > 0) {
+                blended = parseFloat(bsTotalEl.textContent);
+            }
+            var gradeInfo = getAlphaGrade(alphaScore);
+            var riskFlags = [];
+            if (alphaScore >= THRESHOLDS.FUSE) riskFlags.push('ASSET_FUSE_0.68');
+            if (alphaScore < THRESHOLDS.BREAKEVEN) riskFlags.push('BELOW_BREAKEVEN_0.48');
+            var rtLevel = 'active'; var rtStatus = '正常';
+            if (alphaScore >= THRESHOLDS.FUSE) { rtLevel = 'danger'; rtStatus = '熔断触发'; }
+            else if (alphaScore < THRESHOLDS.BREAKEVEN) { rtLevel = 'danger'; rtStatus = '保本线破位'; }
+            else if (alphaScore < THRESHOLDS.STEADY) { rtLevel = 'warn'; rtStatus = '观察预警'; }
+            var data = {
+                engine: 'MoodMind', timestamp: Date.now(), assetId: 'moodmind-'+Date.now(),
+                alphaScore: alphaScore, assetGrade: gradeInfo.status,
+                fourDim: MM_STATE.fourDim, cosineSimilarity: MM_STATE.cosSim,
+                prospectCorrection: { biasCorrection: MM_STATE.biasCorrection, lossAversionAdj: 1.0 },
+                redBlueOcean: MM_STATE.regime,
+                valuationResult: { blendedValue: blended, npv:0, irr:0 },
+                sinkRevival: { sunk2Option: 0, revivedValue: 0 }
+            };
+            try { YBus.publish('assetQuant', data, {trusted:true}); updateBusPanel('assetQuant', 'α='+alphaScore.toFixed(3)+' '+gradeInfo.grade, alphaScore>=THRESHOLDS.FUSE||alphaScore<THRESHOLDS.BREAKEVEN?'danger':alphaScore<THRESHOLDS.STEADY?'warn':'active'); logMsg('发布assetQuant: α='+alphaScore.toFixed(3)+' 等级='+gradeInfo.grade, alphaScore>=THRESHOLDS.FUSE||alphaScore<THRESHOLDS.BREAKEVEN?'danger':alphaScore<THRESHOLDS.STEADY?'warn':'success'); } catch(e) { updateBusPanel('assetQuant', '发布失败', 'danger'); logMsg('assetQuant发布失败: '+e.message, 'danger'); }
+            if (alphaScore >= THRESHOLDS.FUSE) {
+                try { YBus.publish('riskThreshold', { engine:'MoodMind', timestamp:Date.now(), currentRiskLevel:alphaScore, fuseTriggered:true, breakevenWarning:false, riskFlags:riskFlags, source:'assetQuant' }, {trusted:true}); updateBusPanel('riskThreshold', rtStatus, rtLevel); } catch(_){}
+            } else if (alphaScore < THRESHOLDS.BREAKEVEN) {
+                try { YBus.publish('riskThreshold', { engine:'MoodMind', timestamp:Date.now(), currentRiskLevel:alphaScore, fuseTriggered:false, breakevenWarning:true, riskFlags:riskFlags, source:'assetQuant' }, {trusted:true}); updateBusPanel('riskThreshold', rtStatus, rtLevel); } catch(_){}
+            } else {
+                updateBusPanel('riskThreshold', rtStatus, rtLevel);
+            }
+        }
+
         // ===== 动态估值计算 =====
         (function() {
             const flowSlider = document.getElementById('flowWeight');
@@ -1384,7 +1591,6 @@
             const gradeDisplay = document.getElementById('assetGrade');
             const strategyDisplay = document.getElementById('gradeStrategy');
 
-            // 模拟各维度的子指标得分（0-1）
             function getScores() {
                 return {
                     flow: 0.72 + 0.15 * Math.random(),
@@ -1410,60 +1616,40 @@
                 monetizeDisplay.textContent = Math.round(wMonetize * 100) + '%';
                 riskDisplay.textContent = Math.round(wRisk * 100) + '%';
 
-                // 模拟子指标得分（用确定性 + 随机性模拟动态演变）
                 const scores = getScores();
                 const flowScore = scores.flow;
                 const personaScore = scores.persona;
                 const monetizeScore = scores.monetize;
                 const riskScore = scores.risk;
 
-                // 综合估值
                 const total = wFlow * flowScore + wPersona * personaScore + wMonetize * monetizeScore - wRisk * riskScore;
                 const clampedTotal = Math.max(0, Math.min(1, total));
                 totalDisplay.textContent = clampedTotal.toFixed(3);
 
-                // α值（模拟余弦相似度）
-                const alpha = 0.5 + 0.4 * clampedTotal + 0.1 * Math.sin(Date.now() / 5000);
+                const gameShock = lastGameEq ? lastGameEq.syntheticShock * 0.05 : 0;
+                const alpha = THRESHOLDS.STEADY + 0.4 * clampedTotal + 0.1 * Math.sin(Date.now() / 5000) - 0.2 + gameShock;
                 const clampedAlpha = Math.max(0, Math.min(1, alpha));
                 alphaDisplay.textContent = clampedAlpha.toFixed(3);
 
-                // 资产等级判定
-                let grade, strategy, color;
-                if (clampedAlpha >= 0.85) {
-                    grade = 'S级';
-                    strategy = '重点保护 · 开放杠杆';
-                    color = '#a78bfa';
-                } else if (clampedAlpha >= 0.70) {
-                    grade = 'A级';
-                    strategy = '深度赋能 · 推动跃迁';
-                    color = '#60a5fa';
-                } else if (clampedAlpha >= 0.55) {
-                    grade = 'B级';
-                    strategy = '标准化培育 · 攻克短板';
-                    color = '#fbbf24';
-                } else if (clampedAlpha >= 0.40) {
-                    grade = 'C级';
-                    strategy = '限资源观察 · 逾期降级';
-                    color = '#fb923c';
-                } else {
-                    grade = 'D级';
-                    strategy = '清退评估 · 处置流程';
-                    color = '#ef4444';
-                }
-                gradeDisplay.textContent = grade;
-                gradeDisplay.style.color = color;
-                strategyDisplay.textContent = strategy;
+                var gradeInfo = getAlphaGrade(clampedAlpha);
+                gradeDisplay.textContent = gradeInfo.grade;
+                gradeDisplay.style.color = gradeInfo.color;
+                strategyDisplay.textContent = gradeInfo.desc;
+
+                MM_STATE.alphaScore = clampedAlpha;
+                MM_STATE.fourDim = { revenue: wFlow*flowScore, cost: wRisk*riskScore, growth: wMonetize*monetizeScore, risk: wRisk*riskScore };
+                MM_STATE.cosSim = clampedAlpha;
+                MM_STATE.blendedValue = clampedTotal;
+                MM_STATE.totalValuation = clampedTotal;
+                MM_STATE.regime = clampedTotal < 0.45 ? 'RED_OCEAN' : 'BLUE_OCEAN';
+                MM_STATE.source = 'dynamic';
             }
 
-            // 滑块事件
             [flowSlider, personaSlider, monetizeSlider, riskSlider].forEach(slider => {
                 slider.addEventListener('input', updateValuation);
             });
 
-            // 初始计算
             updateValuation();
-
-            // 每3秒微调一次，模拟动态演变
             setInterval(updateValuation, 3000);
         })();
 
@@ -1501,7 +1687,6 @@
             function draw() {
                 ctx.clearRect(0, 0, W, H);
 
-                // Draw connections
                 for (let i = 0; i < steps.length - 1; i++) {
                     const a = getStepCenter(i);
                     const b = getStepCenter(i + 1);
@@ -1514,7 +1699,6 @@
                     ctx.stroke();
                     ctx.setLineDash([]);
 
-                    // Arrow
                     const midX = (a.x + b.x) / 2;
                     const midY = a.y;
                     ctx.fillStyle = 'rgba(148,163,184,0.3)';
@@ -1526,7 +1710,6 @@
                     ctx.fill();
                 }
 
-                // Animate particles
                 for (let i = particles.length - 1; i >= 0; i--) {
                     const p = particles[i];
                     p.t += p.speed;
@@ -1547,10 +1730,8 @@
                     ctx.fill();
                 }
 
-                // Draw step nodes
                 steps.forEach((step, i) => {
                     const c = getStepCenter(i);
-                    // Glow
                     const glow = ctx.createRadialGradient(c.x, c.y, 0, c.x, c.y, 45);
                     glow.addColorStop(0, step.color + '30');
                     glow.addColorStop(1, step.color + '00');
@@ -1559,7 +1740,6 @@
                     ctx.arc(c.x, c.y, 45, 0, Math.PI * 2);
                     ctx.fill();
 
-                    // Node circle
                     ctx.beginPath();
                     ctx.arc(c.x, c.y, 32, 0, Math.PI * 2);
                     ctx.fillStyle = 'rgba(15,23,42,0.9)';
@@ -1568,7 +1748,6 @@
                     ctx.lineWidth = 2.5;
                     ctx.stroke();
 
-                    // Number badge
                     ctx.fillStyle = step.color;
                     ctx.beginPath();
                     ctx.arc(c.x + 20, c.y - 22, 11, 0, Math.PI * 2);
@@ -1579,7 +1758,6 @@
                     ctx.textBaseline = 'middle';
                     ctx.fillText(i + 1, c.x + 20, c.y - 22);
 
-                    // Label
                     ctx.fillStyle = '#e2e8f0';
                     ctx.font = 'bold 12px sans-serif';
                     ctx.textAlign = 'center';
@@ -1588,7 +1766,6 @@
                         ctx.fillText(line, c.x, c.y - 3 + li * 14 - (lines.length - 1) * 7);
                     });
 
-                    // Subtitle
                     ctx.fillStyle = 'rgba(148,163,184,0.6)';
                     ctx.font = '10px sans-serif';
                     ctx.fillText(step.sub, c.x, c.y + 48);
@@ -1634,15 +1811,14 @@
                 risk = Math.max(0, Math.min(100, risk)) / 100;
 
                 const td = trackData[track];
-                // Prospect theory correction - bias correction factor (self-developed, not exposed)
-                const biasCorrection = 0.5; // system steady-state axis, replaces sunk cost reference point
-                // Weighted 4D valuation (simplified demo version)
+                var dynamicBias = THRESHOLDS.STEADY + mindVectorBias;
+                dynamicBias = Math.max(0.3, Math.min(0.7, dynamicBias));
+                MM_STATE.biasCorrection = dynamicBias - THRESHOLDS.STEADY;
                 const wFlow = 0.3, wPersona = 0.25, wMon = 0.3, wRisk = 0.15;
                 let total = wFlow * flow + wPersona * persona + wMon * monetize - wRisk * risk;
-                total = total * (0.85 + biasCorrection * 0.3);
+                total = total * (0.85 + dynamicBias * 0.3);
                 total = Math.max(0.05, Math.min(0.98, total));
 
-                // Alpha cosine similarity (simplified)
                 const idealVec = [0.85, 0.80, 0.80, 0.20];
                 const userVec = [flow, persona, monetize, risk];
                 let dot = 0, magA = 0, magB = 0;
@@ -1650,21 +1826,14 @@
                 let alpha = dot / (Math.sqrt(magA) * Math.sqrt(magB) + 0.001);
                 alpha = Math.max(0.1, Math.min(0.98, alpha));
 
-                // Grade (blended: weighted combination of total and alpha)
                 const blendedScore = total * 0.45 + alpha * 0.55;
-                let grade, gradeColor, gradeDesc;
-                if (blendedScore >= 0.80) { grade = 'S级'; gradeColor = '#a78bfa'; gradeDesc = '头部标杆资产，超额收益标杆'; }
-                else if (blendedScore >= 0.65) { grade = 'A级'; gradeColor = '#60a5fa'; gradeDesc = '优质资产，具备跃迁S级潜力'; }
-                else if (blendedScore >= 0.50) { grade = 'B级'; gradeColor = '#fbbf24'; gradeDesc = '腰部培育资产，需针对性补短板'; }
-                else if (blendedScore >= 0.35) { grade = 'C级'; gradeColor = '#fb923c'; gradeDesc = '尾部观察资产，存在盘活空间'; }
-                else { grade = 'D级'; gradeColor = '#ef4444'; gradeDesc = '低效资产，考虑清退或全面转型'; }
+                var bsGradeInfo = getAlphaGrade(blendedScore);
 
-                // Update result display
                 document.getElementById('bsTotal').textContent = total.toFixed(3);
                 document.getElementById('bsAlpha').textContent = alpha.toFixed(3);
                 const gradeEl = document.getElementById('bsGrade');
-                gradeEl.textContent = grade;
-                gradeEl.style.color = gradeColor;
+                gradeEl.textContent = bsGradeInfo.grade;
+                gradeEl.style.color = bsGradeInfo.color;
 
                 const oceanEl = document.getElementById('bsOcean');
                 oceanEl.textContent = td.oceanLabel;
@@ -1673,7 +1842,6 @@
                 document.getElementById('bsRiskFree').textContent = td.rf;
                 document.getElementById('bsConcThreshold').textContent = td.conc;
 
-                // Diagnosis
                 let diagnosis = '';
                 const weakDims = [];
                 if (flow < 0.5) weakDims.push('流量盘');
@@ -1683,36 +1851,45 @@
 
                 const diagEl = document.getElementById('bsDiagnosis');
                 if (weakDims.length === 0) {
-                    diagnosis = `<strong>🩺 赛道健康诊断：</strong>${trackNames[track]}赛道四维表现均衡，资产质量${alpha >= 0.7 ? '优良' : '尚可'}。系统已自动完成前景理论决策偏差校正，规避主观风险偏好偏移。`;
+                    diagnosis = `<strong>🩺 赛道健康诊断：</strong>${trackNames[track]}赛道四维表现均衡，资产质量${alpha >= 0.6 ? '优良' : '尚可'}。系统已自动完成前景理论决策偏差校正(bias=${(dynamicBias-THRESHOLDS.STEADY).toFixed(3)})，规避主观风险偏好偏移。`;
                 } else {
                     diagnosis = `<strong>🩺 赛道健康诊断：</strong>${trackNames[track]}赛道博主存在短板维度：${weakDims.join('、')}。当前赛道属${td.oceanLabel}市场，建议采用${td.ctrl}模式。`;
                 }
                 diagEl.innerHTML = diagnosis;
 
-                // Strategy
                 const stratEl = document.getElementById('bsStrategy');
                 let strategy = '';
-                if (grade === 'S级' || grade === 'A级') {
+                var g = bsGradeInfo.grade;
+                if (g === 'S+熔断' || g === '优质期') {
                     strategy = `<strong>🎯 矩阵运营策略：</strong>纳入核心资产组合，配置60%-80%核心资源，维持优势盘稳定输出；${td.ocean === 'blue' ? '蓝海赛道可启用序贯多轮博弈策略，分阶段扩张品类。' : '红海赛道需构筑差异化壁垒，巩固古诺均衡产能份额。'}`;
-                } else if (grade === 'B级') {
-                    strategy = `<strong>🎯 矩阵运营策略：</strong>腰部培育对象，配置20%-40%辅助资源，聚焦${weakDims.length > 0 ? weakDims[0] : '核心维度'}补短板；对标S级头部标杆，完成内容/变现路径对齐。`;
-                } else if (grade === 'C级') {
-                    strategy = `<strong>🎯 矩阵运营策略：</strong>尾部观察对象，配置<15%探索性资源；启动蜈蚣序贯盘活方案，分阶段完成存量内容资产向新方向迁移，设置3个月观察期。`;
+                } else if (g === '成长期' || g === '稳态区') {
+                    strategy = `<strong>🎯 矩阵运营策略：</strong>腰部培育/稳态对象，配置20%-40%辅助资源，聚焦${weakDims.length > 0 ? weakDims[0] : '核心维度'}补短板；对标S级头部标杆，完成内容/变现路径对齐。`;
+                } else if (g === '观察预警') {
+                    strategy = `<strong>🎯 矩阵运营策略：</strong>观察预警对象，配置<15%探索性资源；启动蜈蚣序贯盘活方案，分阶段完成存量内容资产向新方向迁移，设置3个月观察期。`;
                 } else {
-                    strategy = `<strong>🎯 矩阵运营策略：</strong>D级低效资产，启动沉没成本转化流程：提取过往内容资产可复用要素，将不可收回沉没投入改造为${td.ocean === 'blue' ? '蓝海赛道' : '相邻赛道'}选择权价值，完成清退或全面转型。`;
+                    strategy = `<strong>🎯 矩阵运营策略：</strong>保本线下高危资产，启动沉没成本转化流程：提取过往内容资产可复用要素，将不可收回沉没投入改造为${td.ocean === 'blue' ? '蓝海赛道' : '相邻赛道'}选择权价值，完成清退或全面转型。`;
                 }
                 stratEl.innerHTML = strategy;
 
-                // Revitalization plan for waist/tail
                 const revEl = document.getElementById('bsRevitalize');
-                if (tier === 'waist' || tier === 'tail' || grade === 'C级' || grade === 'D级') {
-                    revEl.innerHTML = `<strong>♻️ 存量博主盘活方案（${tier === 'tail' ? '尾部' : '腰部'}）：</strong>对标S级头部标杆基准，将过往内容沉没投入拆解为"人设沉淀/粉丝资产/内容方法论"三个可复用模块，转化为${td.ocean === 'blue' ? '蓝海序贯赛道' : '差异化细分赛道'}的运营机会成本；依托蜈蚣多轮博弈模型分3-5个迭代周期完成转型布局，避免一次性All-in的非理性决策。<br><span style="color:rgba(167,139,250,0.7);font-size:12px;">→ 已通过前景理论0.5稳态中轴线校正，自动规避"沉没成本执念"导致的固守低效账号决策偏差。</span>`;
+                if (tier === 'waist' || tier === 'tail' || g === '观察预警' || g === '保本线下') {
+                    revEl.innerHTML = `<strong>♻️ 存量博主盘活方案（${tier === 'tail' ? '尾部' : '腰部'}）：</strong>对标S级头部标杆基准，将过往内容沉没投入拆解为"人设沉淀/粉丝资产/内容方法论"三个可复用模块，转化为${td.ocean === 'blue' ? '蓝海序贯赛道' : '差异化细分赛道'}的运营机会成本；依托蜈蚣多轮博弈模型分3-5个迭代周期完成转型布局，避免一次性All-in的非理性决策。<br><span style="color:rgba(167,139,250,0.7);font-size:12px;">→ 已通过前景理论0.50稳态中轴线校正(动态bias=${(dynamicBias-THRESHOLDS.STEADY).toFixed(3)})，自动规避"沉没成本执念"导致的固守低效账号决策偏差。</span>`;
                     revEl.style.display = 'block';
                 } else {
                     revEl.style.display = 'none';
                 }
 
-                // Animate result area
+                MM_STATE.alphaScore = alpha;
+                MM_STATE.cosSim = alpha;
+                MM_STATE.blendedValue = blendedScore;
+                MM_STATE.totalValuation = total;
+                MM_STATE.fourDim = { revenue: wFlow*flow, cost: wRisk*risk, growth: wMon*monetize, risk: wRisk*risk };
+                MM_STATE.regime = td.ocean === 'red' ? 'RED_OCEAN' : 'BLUE_OCEAN';
+                MM_STATE.source = 'simulator';
+                logMsg('博主模拟器运算完成: 赛道='+trackNames[track]+' α='+alpha.toFixed(3)+' 等级='+bsGradeInfo.grade, bsGradeInfo.status==='FUSED'||bsGradeInfo.status==='BELOW_BREAKEVEN'?'danger':bsGradeInfo.status==='WATCH'?'warn':'success');
+
+                publishToAssetQuant();
+
                 const resultArea = document.getElementById('bsResultArea');
                 resultArea.classList.add('show');
                 resultArea.style.opacity = '0';
@@ -1724,7 +1901,6 @@
                 }, 50);
             });
 
-            // Track change -> auto-update base parameters
             document.getElementById('bsTrack').addEventListener('change', function() {
                 const track = this.value;
                 const td = trackData[track];
@@ -1734,6 +1910,47 @@
                 document.getElementById('bsRisk').value = td.ocean === 'red' ? 40 : 30;
             });
         })();
+
+        if (typeof YBus !== 'undefined' && YBus.subscribe) {
+            YBus.subscribe('gameEquilibrium', function(data) {
+                if (data && data.syntheticShock !== undefined) {
+                    lastGameEq = data;
+                    var c1 = data.c1Disturbance !== undefined ? data.c1Disturbance.toFixed(2) : 'N/A';
+                    var c2 = data.c2Disturbance !== undefined ? data.c2Disturbance.toFixed(2) : 'N/A';
+                    logMsg('接收到GameMind博弈均衡数据：C1='+c1+' C2='+c2+' 综合震荡='+data.syntheticShock.toFixed(2), 'info');
+                }
+            });
+            YBus.subscribe('mindVector', function(data) {
+                if (data && data.biasCorrection !== undefined) {
+                    mindVectorBias = data.biasCorrection;
+                    MM_STATE.biasCorrection = mindVectorBias;
+                    logMsg('接收到EvolveMind认知偏差向量：biasCorrection='+mindVectorBias.toFixed(3), 'info');
+                } else if (data && data.cognitiveBias !== undefined) {
+                    mindVectorBias = data.cognitiveBias;
+                    MM_STATE.biasCorrection = mindVectorBias;
+                }
+            });
+            logMsg('YBus订阅已注册: gameEquilibrium, mindVector', 'success');
+        } else {
+            logMsg('YBus不可用，总线功能离线', 'warn');
+        }
+
+        var manualBtn = document.getElementById('manualPublishBtn');
+        if (manualBtn) {
+            manualBtn.addEventListener('click', function() {
+                logMsg('手动触发量化结果发布', 'info');
+                publishToAssetQuant();
+            });
+        }
+
+        setTimeout(function() {
+            logMsg('MoodMind初始化完成，THRESHOLDS: FUSE=0.68 STEADY=0.50 BREAKEVEN=0.48', 'success');
+            publishToAssetQuant();
+        }, 500);
+
+        setInterval(function() {
+            publishToAssetQuant();
+        }, 15000);
     </script>
 
 </body>

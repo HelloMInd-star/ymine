@@ -16,12 +16,19 @@
 (function(global) {
     'use strict';
 
+    const THRESHOLDS = (global.YBus && global.YBus.THRESHOLDS) || Object.freeze({
+        BREAKEVEN: 0.48,
+        STEADY: 0.50,
+        FUSE: 0.68
+    });
+
     const FUSE_THRESHOLDS = {
-        CONE_C: 0.68,
+        CONE_C: THRESHOLDS.FUSE,
         ZSCORE_BLACK_SWAN: 2.0,
         ZSCORE_MELTDOWN: 3.0,
-        MDD_MAX: 0.50,
-        DRAWDOWN_MAX: 0.40
+        MDD_MAX: THRESHOLDS.STEADY,
+        DRAWDOWN_MAX: THRESHOLDS.BREAKEVEN * 0.833,
+        DRAWDOWN_BREAKEVEN: THRESHOLDS.BREAKEVEN
     };
 
     const FUSE_IDS = {
@@ -30,6 +37,7 @@
         ZSCORE_MELTDOWN: 'ZSCORE_MELTDOWN',
         MDD_BREACH: 'MDD_BREACH',
         DRAWDOWN_FUSE: 'DRAWDOWN_FUSE',
+        BREAKEVEN_WARNING: 'BREAKEVEN_WARNING',
         MANUAL_HALT: 'MANUAL_HALT',
         NPV_NEGATIVE: 'NPV_NEGATIVE',
         IRR_BELOW_HURDLE: 'IRR_BELOW_HURDLE'
@@ -70,27 +78,56 @@
     RiskCircuitBreaker.prototype.evaluate = function() {
         const s = this._state;
         const f = {};
+        const warnings = {};
         const t = FUSE_THRESHOLDS;
 
-        if (s.coneC >= t.CONE_C) f[FUSE_IDS.CONE_C_BREACH] = { value: s.coneC, threshold: t.CONE_C, reason: '圆锥浓度C≥0.68·1σ引力边界' };
+        const compositeScore = (s.coneC + (1 - Math.min(Math.abs(s.zScore) / 3, 1)) + (1 - s.mdd) + (1 - s.drawdown)) / 4;
+
+        if (compositeScore < THRESHOLDS.BREAKEVEN || s.coneC < THRESHOLDS.BREAKEVEN) {
+            warnings[FUSE_IDS.BREAKEVEN_WARNING] = { value: compositeScore, threshold: THRESHOLDS.BREAKEVEN, reason: '跌破0.48保本线·启动保本风控' };
+        }
+        if (s.coneC >= t.CONE_C) f[FUSE_IDS.CONE_C_BREACH] = { value: s.coneC, threshold: t.CONE_C, reason: '圆锥浓度C≥0.68·熔断预警线触发' };
         if (Math.abs(s.zScore) >= t.ZSCORE_MELTDOWN) f[FUSE_IDS.ZSCORE_MELTDOWN] = { value: s.zScore, threshold: t.ZSCORE_MELTDOWN, reason: 'zScore≥3σ·系统性坍缩' };
         else if (Math.abs(s.zScore) >= t.ZSCORE_BLACK_SWAN) f[FUSE_IDS.ZSCORE_BLACK_SWAN] = { value: s.zScore, threshold: t.ZSCORE_BLACK_SWAN, reason: 'zScore≥2σ·黑天鹅事件' };
-        if (s.mdd >= t.MDD_MAX) f[FUSE_IDS.MDD_BREACH] = { value: s.mdd, threshold: t.MDD_MAX, reason: '最大回撤≥50%' };
-        if (s.drawdown >= t.DRAWDOWN_MAX) f[FUSE_IDS.DRAWDOWN_FUSE] = { value: s.drawdown, threshold: t.DRAWDOWN_MAX, reason: '组合回撤≥40%' };
+        if (s.mdd >= t.MDD_MAX) f[FUSE_IDS.MDD_BREACH] = { value: s.mdd, threshold: t.MDD_MAX, reason: '最大回撤≥0.50稳态中轴线' };
+        if (s.drawdown >= t.DRAWDOWN_MAX) f[FUSE_IDS.DRAWDOWN_FUSE] = { value: s.drawdown, threshold: t.DRAWDOWN_MAX, reason: '组合回撤≥熔断阈值' };
         if (s.manualHalt) f[FUSE_IDS.MANUAL_HALT] = { value: true, threshold: true, reason: '手动紧急停机' };
         if (s.npvNegative) f[FUSE_IDS.NPV_NEGATIVE] = { value: true, threshold: true, reason: 'NPV为负·资本约束' };
 
         this._activeFuses = f;
+        this._activeWarnings = warnings;
         const triggered = Object.keys(f);
+        const warningList = Object.keys(warnings);
         const isHalted = triggered.length > 0;
+        const breakevenWarning = warningList.length > 0;
 
         const event = {
             halted: isHalted,
             activeFuses: f,
+            activeWarnings: warnings,
             fuseIds: triggered,
+            warningIds: warningList,
+            breakevenWarning: breakevenWarning,
+            fuseTriggered: isHalted,
+            currentRiskLevel: compositeScore,
             state: Object.assign({}, s),
             timestamp: Date.now()
         };
+
+        if (typeof YBus !== 'undefined' && YBus.publish) {
+            YBus.publish('riskThreshold', {
+                engine: 'RiskCircuitBreaker',
+                timestamp: Date.now(),
+                breakevenLine: THRESHOLDS.BREAKEVEN,
+                steadyAxis: THRESHOLDS.STEADY,
+                fuseLine: THRESHOLDS.FUSE,
+                currentRiskLevel: compositeScore,
+                breakevenWarning: breakevenWarning,
+                fuseTriggered: isHalted,
+                riskFlags: triggered.concat(warningList),
+                source: 'risk-circuit-breaker'
+            }, { trusted: true });
+        }
 
         this._listeners.forEach(function(fn) {
             try { fn(event); } catch (e) { console.warn('[RCB] Listener error:', e); }

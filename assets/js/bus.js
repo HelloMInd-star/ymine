@@ -382,6 +382,85 @@
             storageKey: 'audit_log_triangle',
             eventName: 'triangle-audit-update',
             defaultValue: []
+        },
+
+        mindVector: {
+            partition: 'PIPELINE',
+            storageKey: 'pipeline_mindVector',
+            eventName: 'mind-vector-update',
+            defaultValue: {
+                engine: 'EvolveMind', version: '2.1.0', timestamp: 0,
+                cognitiveVector: { math: 0.5, economic: 0.5, ai: 0.5, language: 0.5 },
+                threeTierMemory: { working: null, longTerm: null, genetic: null },
+                biasParams: { anchoring: 0.15, lossAversion: 0.2, overconfidence: 0.12 },
+                overloadScore: 0.0, status: 'IDLE'
+            }
+        },
+        powerSchedule: {
+            partition: 'PIPELINE',
+            storageKey: 'pipeline_powerSchedule',
+            eventName: 'power-schedule-update',
+            defaultValue: {
+                engine: 'EvolveMind', timestamp: 0,
+                loadV: 0.3, loadS: 0.3, loadL: 0.3, totalDensity: 0.3,
+                computeAllocation: { vModel: 0.34, sModel: 0.33, lModel: 0.33 },
+                peakShaveRequired: false, overloadFuseTriggered: false
+            }
+        },
+        assetQuant: {
+            partition: 'PIPELINE',
+            storageKey: 'pipeline_assetQuant',
+            eventName: 'asset-quant-update',
+            defaultValue: {
+                engine: 'MoodMind', timestamp: 0, assetId: '',
+                alphaScore: 0.50, assetGrade: 'STEADY',
+                fourDim: { revenue: 0.5, cost: 0.5, growth: 0.5, risk: 0.5 },
+                cosineSimilarity: 0.50,
+                prospectCorrection: { biasCorrection: 0.0, lossAversionAdj: 1.0 },
+                redBlueOcean: 'RED_OCEAN',
+                valuationResult: { blendedValue: 0.50, npv: 0, irr: 0 },
+                sinkRevival: { sunk2Option: 0, revivedValue: 0 }
+            }
+        },
+        riskThreshold: {
+            partition: 'PIPELINE',
+            storageKey: 'pipeline_riskThreshold',
+            eventName: 'risk-threshold-update',
+            defaultValue: {
+                engine: 'Global', timestamp: 0,
+                breakevenLine: THRESHOLDS.BREAKEVEN,
+                steadyAxis: THRESHOLDS.STEADY,
+                fuseLine: THRESHOLDS.FUSE,
+                currentRiskLevel: 0.50,
+                breakevenWarning: false, fuseTriggered: false,
+                riskFlags: [], source: ''
+            }
+        },
+        gameEquilibrium: {
+            partition: 'PIPELINE',
+            storageKey: 'pipeline_gameEquilibrium',
+            eventName: 'game-equilibrium-update',
+            defaultValue: {
+                engine: 'GameMind', timestamp: 0,
+                model: 'cournot', participants: [], nashStability: 0.50,
+                c1Disturbance: 0.0, c2Disturbance: 0.0,
+                syntheticShock: 0.50, regime: 'RED_OCEAN',
+                spaceEnvironment: 'air_low', equilibriumPrice: 0.50,
+                centipedeProgress: null
+            }
+        },
+        kellyAllocation: {
+            partition: 'PIPELINE',
+            storageKey: 'pipeline_kellyAllocation',
+            eventName: 'kelly-allocation-update',
+            defaultValue: {
+                engine: 'GameMind', timestamp: 0,
+                winRate: 0.50, winLossRatio: 1.0,
+                kellyFraction: 0.0, actualAllocation: 0.0,
+                humanRatio: 0.60, aiRatio: 0.40,
+                controlMode: 'HUMAN_AI_46', twoEightTriggered: false,
+                resourcePlan: {}, fuseCheckPassed: true
+            }
         }
     };
 
