@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MindSpeak · 四层跨域数理同构翻译引擎 V19.0</title>
+<script src="../mindspeak-private-engine/vector4d-operator.js"></script>
+<script src="../mindspeak-private-engine/weight-matrix.js"></script>
+<script src="../mindspeak-private-engine/confidence-kernel.js"></script>
+<script src="../mindspeak-private-engine/crypto-matrix.js"></script>
+<script src="../models/common/normalizer.js"></script>
+<script src="../assets/js/bus.js"></script>
+<script src="../assets/js/triangle-audit.js"></script>
+<script src="assets/js/ms-samples.js"></script>
+<script src="assets/js/ms-visualization.js"></script>
+<script src="assets/js/mindspeak-public.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0b0b1a;color:#e2e8f0;font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh;overflow-x:hidden}
+#starfield{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none}
+.page-wrapper{position:relative;z-index:1;max-width:1600px;margin:0 auto;padding:16px}
+
+.breadcrumb{padding:12px 16px;background:rgba(15,23,42,0.7);border:1px solid rgba(103,232,249,0.2);border-radius:8px;margin-bottom:16px;backdrop-filter:blur(10px);font-size:13px}
+.breadcrumb a{color:#67e8f9;text-decoration:none;transition:color .2s}
+.breadcrumb a:hover{color:#22d3ee}
+.breadcrumb .sep{color:rgba(255,255,255,0.3);margin:0 8px}
+.breadcrumb .current{color:#facc15}
+
+.header{display:flex;justify-content:space-between;align-items:center;padding:20px 24px;background:linear-gradient(135deg,rgba(30,27,75,0.8),rgba(49,46,129,0.6));border:1px solid rgba(167,139,250,0.3);border-radius:12px;margin-bottom:16px;backdrop-filter:blur(10px)}
+.header h1{font-size:22px;background:linear-gradient(90deg,#67e8f9,#a78bfa,#f472b6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.header .version-badge{background:rgba(167,139,250,0.2);border:1px solid rgba(167,139,250,0.4);padding:4px 12px;border-radius:20px;font-size:12px;color:#c4b5fd}
+.header-controls{display:flex;gap:10px;align-items:center}
+
+.btn{padding:8px 16px;border-radius:6px;border:1px solid;font-size:13px;cursor:pointer;transition:all .2s;font-weight:500}
+.btn-primary{background:rgba(34,211,238,0.15);border-color:rgba(34,211,238,0.4);color:#67e8f9}
+.btn-primary:hover{background:rgba(34,211,238,0.25)}
+.btn-danger{background:rgba(239,68,68,0.15);border-color:rgba(239,68,68,0.4);color:#f87171}
+.btn-danger:hover{background:rgba(239,68,68,0.25)}
+.btn-warn{background:rgba(250,204,21,0.15);border-color:rgba(250,204,21,0.4);color:#facc15}
+.btn-warn:hover{background:rgba(250,204,21,0.25)}
+
+.global-control-bar{display:grid;grid-template-columns:auto 1fr auto;gap:16px;align-items:center;padding:14px 20px;background:rgba(15,23,42,0.7);border:1px solid rgba(148,163,184,0.2);border-radius:10px;margin-bottom:16px;backdrop-filter:blur(10px)}
+.steady-control{display:flex;align-items:center;gap:12px}
+.steady-control label{font-size:12px;color:#94a3b8;white-space:nowrap}
+.steady-slider{width:200px;-webkit-appearance:none;height:6px;border-radius:3px;background:linear-gradient(90deg,#ef4444 0%,#facc15 48%,#22c55e 50%,#facc15 52%,#ef4444 100%);outline:none}
+.steady-slider::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:#fff;cursor:pointer;box-shadow:0 0 8px rgba(255,255,255,0.5)}
+.steady-value{font-family:monospace;font-size:13px;min-width:50px}
+.status-indicators{display:flex;gap:8px}
+.status-chip{padding:4px 10px;border-radius:12px;font-size:11px;font-weight:600}
+.status-chip.green{background:rgba(34,197,94,0.15);color:#22c55e;border:1px solid rgba(34,197,94,0.3)}
+.status-chip.yellow{background:rgba(250,204,21,0.15);color:#facc15;border:1px solid rgba(250,204,21,0.3)}
+.status-chip.red{background:rgba(239,68,68,0.15);color:#f87171;border:1px solid rgba(239,68,68,0.3);animation:pulse-red 1s infinite}
+@keyframes pulse-red{0%,100%{opacity:1}50%{opacity:0.6}}
+
+.pipeline-indicator{display:flex;gap:4px;align-items:center;font-size:11px;color:#64748b}
+.pipe-step{padding:3px 8px;border-radius:4px;background:rgba(100,116,139,0.2);border:1px solid rgba(100,116,139,0.3);color:#94a3b8}
+.pipe-step.active{background:rgba(34,211,238,0.2);border-color:rgba(34,211,238,0.5);color:#67e8f9}
+.pipe-arrow{color:#475569}
+
+.module-tabs{display:flex;flex-wrap:wrap;gap:6px;padding:14px;background:rgba(15,23,42,0.7);border:1px solid rgba(148,163,184,0.2);border-radius:10px;margin-bottom:16px;backdrop-filter:blur(10px)}
+.module-tab{padding:8px 14px;border-radius:6px;border:1px solid rgba(148,163,184,0.2);background:rgba(30,41,59,0.5);color:#94a3b8;cursor:pointer;transition:all .2s;font-size:12px;white-space:nowrap}
+.module-tab:hover{border-color:rgba(103,232,249,0.4);color:#67e8f9}
+.module-tab.active{background:rgba(103,232,249,0.15);border-color:rgba(103,232,249,0.5);color:#67e8f9;font-weight:600}
+
+.three-col-layout{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:16px}
+.col-panel{background:rgba(15,23,42,0.7);border:1px solid rgba(148,163,184,0.2);border-radius:10px;padding:16px;backdrop-filter:blur(10px);min-height:400px}
+.col-panel.lang-layer{border-color:rgba(103,232,249,0.3)}
+.col-panel.math-layer{border-color:rgba(167,139,250,0.3)}
+.col-panel.algo-layer{border-color:rgba(244,114,182,0.3)}
+.col-header{display:flex;align-items:center;gap:8px;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid rgba(148,163,184,0.15)}
+.col-header .col-icon{font-size:20px}
+.col-header .col-title{font-size:15px;font-weight:600}
+.col-header .col-badge{margin-left:auto;padding:2px 8px;border-radius:10px;font-size:10px}
+.lang-layer .col-header .col-badge{background:rgba(103,232,249,0.15);color:#67e8f9;border:1px solid rgba(103,232,249,0.3)}
+.math-layer .col-header .col-badge{background:rgba(167,139,250,0.15);color:#c4b5fd;border:1px solid rgba(167,139,250,0.3)}
+.algo-layer .col-header .col-badge{background:rgba(244,114,182,0.15);color:#f9a8d4;border:1px solid rgba(244,114,182,0.3)}
+
+.input-area{margin-bottom:12px}
+.input-area textarea,.input-area input{width:100%;background:rgba(15,23,42,0.8);border:1px solid rgba(103,232,249,0.2);border-radius:6px;padding:10px;color:#e2e8f0;font-size:13px;resize:vertical;font-family:inherit}
+.input-area textarea{min-height:80px}
+.input-area label{display:block;font-size:11px;color:#64748b;margin-bottom:6px}
+.input-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.input-group{margin-bottom:10px}
+.param-slider{width:100%;margin:6px 0}
+.param-value{font-family:monospace;font-size:12px;color:#a78bfa}
+
+.sample-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.sample-chip{padding:5px 10px;border-radius:4px;background:rgba(100,116,139,0.2);border:1px solid rgba(100,116,139,0.3);color:#94a3b8;font-size:11px;cursor:pointer;transition:all .2s}
+.sample-chip:hover{background:rgba(103,232,249,0.1);border-color:rgba(103,232,249,0.4);color:#67e8f9}
+.sample-chip.active{background:rgba(103,232,249,0.2);border-color:rgba(103,232,249,0.5);color:#67e8f9}
+
+.output-display{background:rgba(0,0,0,0.3);border-radius:8px;padding:12px;border:1px solid rgba(103,232,249,0.15);min-height:120px}
+.output-text{font-size:14px;line-height:1.7;color:#e2e8f0}
+.output-label{font-size:10px;color:#64748b;margin-bottom:6px;text-transform:uppercase;letter-spacing:1px}
+
+.canvas-container{background:rgba(0,0,0,0.3);border-radius:8px;padding:8px;border:1px solid rgba(167,139,250,0.15);margin-bottom:12px;position:relative}
+.canvas-container canvas{width:100%;height:180px;display:block;border-radius:4px}
+.math-values{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.math-value-card{background:rgba(0,0,0,0.3);border-radius:6px;padding:8px;border:1px solid rgba(167,139,250,0.1)}
+.math-value-label{font-size:10px;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px}
+.math-value-num{font-family:monospace;font-size:18px;font-weight:bold;color:#c4b5fd;margin-top:2px}
+.confidence-bar{height:6px;background:rgba(100,116,139,0.3);border-radius:3px;margin-top:6px;overflow:hidden}
+.confidence-fill{height:100%;border-radius:3px;transition:width .3s}
+.conf-fill-green{background:linear-gradient(90deg,#22c55e,#4ade80)}
+.conf-fill-yellow{background:linear-gradient(90deg,#facc15,#fbbf24)}
+.conf-fill-red{background:linear-gradient(90deg,#ef4444,#f87171)}
+
+.algo-diagram{background:rgba(0,0,0,0.3);border-radius:8px;padding:12px;border:1px solid rgba(244,114,182,0.15);margin-bottom:12px}
+.algo-flow{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:8px 0}
+.algo-node{padding:6px 10px;border-radius:4px;font-size:11px;background:rgba(244,114,182,0.1);border:1px solid rgba(244,114,182,0.3);color:#f9a8d4}
+.algo-arrow{color:#64748b;font-size:14px}
+.audit-result{margin-top:10px;padding:10px;border-radius:6px;font-size:11px}
+.audit-pass{background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.3);color:#22c55e}
+.audit-warn{background:rgba(250,204,21,0.1);border:1px solid rgba(250,204,21,0.3);color:#facc15}
+.audit-fail{background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);color:#f87171}
+
+.log-panel{background:rgba(15,23,42,0.8);border:1px solid rgba(148,163,184,0.2);border-radius:10px;margin-bottom:16px;overflow:hidden}
+.log-header{display:flex;justify-content:space-between;align-items:center;padding:10px 16px;background:rgba(30,41,59,0.6);border-bottom:1px solid rgba(148,163,184,0.15)}
+.log-header h3{font-size:13px;color:#94a3b8}
+.log-content{height:200px;overflow-y:auto;padding:10px 16px;font-family:monospace;font-size:11px;line-height:1.6}
+.log-entry{margin-bottom:3px;padding:2px 0}
+.log-time{color:#64748b;margin-right:8px}
+.log-module{color:#67e8f9;margin-right:8px;font-weight:600}
+.log-msg.info{color:#cbd5e1}
+.log-msg.warn{color:#facc15}
+.log-msg.error{color:#f87171;font-weight:600}
+
+.overview-section{background:rgba(15,23,42,0.7);border:1px solid rgba(148,163,184,0.2);border-radius:10px;padding:16px;margin-bottom:16px;backdrop-filter:blur(10px)}
+.overview-section h2{font-size:15px;margin-bottom:12px;color:#e2e8f0;display:flex;align-items:center;gap:8px}
+.overview-canvas-wrap{background:rgba(0,0,0,0.3);border-radius:8px;padding:10px;border:1px solid rgba(167,139,250,0.15)}
+.overview-canvas-wrap canvas{width:100%;height:200px;display:block;border-radius:4px}
+
+.footer{text-align:center;padding:20px;color:rgba(255,255,255,0.4);font-size:12px;line-height:1.8;border-top:1px solid rgba(148,163,184,0.1);margin-top:20px}
+.footer a{color:#67e8f9;text-decoration:none}
+
+.back-link{display:inline-block;margin-bottom:12px;padding:8px 14px;background:rgba(103,232,249,0.1);border:1px solid rgba(103,232,249,0.3);border-radius:6px;color:#67e8f9;text-decoration:none;font-size:12px;transition:all .2s}
+.back-link:hover{background:rgba(103,232,249,0.2)}
+
+@media(max-width:1200px){.three-col-layout{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<canvas id="starfield"></canvas>
+<div class="page-wrapper">
+    <nav class="breadcrumb">
+        <a href="../index.html">Y.Mine 总控台</a>
+        <span class="sep">›</span>
+        <a href="../index.html">认知科研实验组</a>
+        <span class="sep">›</span>
+        <span class="current">MindSpeak · 四层跨域数理同构翻译引擎 V19.0</span>
+    </nav>
+
+    <a href="../index.html" class="back-link">← 返回总控台</a>
+
+    <header class="header">
+        <div>
+            <h1>MindSpeak · 四层跨域数理同构翻译引擎</h1>
+            <div style="font-size:11px;color:#94a3b8;margin-top:4px">语言表达层 ↔ 数理结构层 ↔ 算法架构层 · 三层实时联动</div>
+        </div>
+        <div style="display:flex;gap:12px;align-items:center">
+            <span class="version-badge">V19.0 · GameOS V2.1</span>
+            <div class="header-controls">
+                <button class="btn btn-danger" id="emergencyStopBtn">🛑 紧急停机</button>
+                <button class="btn btn-warn" id="resumeBtn" style="display:none">▶ 恢复运算</button>
+            </div>
+        </div>
+    </header>
+
+    <div class="global-control-bar">
+        <div class="steady-control">
+            <label>全局稳态扰动：</label>
+            <input type="range" class="steady-slider" id="steadySlider" min="-20" max="20" value="0" step="1">
+            <span class="steady-value" id="steadyValue">0.00</span>
+        </div>
+        <div class="pipeline-indicator">
+            <span class="pipe-step">S0</span><span class="pipe-arrow">→</span>
+            <span class="pipe-step active">S1 · ETL信息清洗（MindSpeak）</span><span class="pipe-arrow">→</span>
+            <span class="pipe-step">S2</span><span class="pipe-arrow">→</span>
+            <span class="pipe-step">S3</span><span class="pipe-arrow">→</span>
+            <span class="pipe-step">S4</span><span class="pipe-arrow">⇢</span>
+            <span class="pipe-step">S5</span><span class="pipe-arrow">⇢</span>
+            <span class="pipe-step">S6</span><span class="pipe-arrow">⇢</span>
+            <span class="pipe-step">S7</span><span class="pipe-arrow">⇢</span>
+            <span class="pipe-step">S8</span><span class="pipe-arrow">⇢</span>
+            <span class="pipe-step">S9</span>
+        </div>
+        <div class="status-indicators">
+            <span class="status-chip green" id="statusSteady">● 稳态</span>
+            <span class="status-chip" id="statusCalc" style="background:rgba(34,211,238,0.1);color:#67e8f9;border:1px solid rgba(34,211,238,0.3)">CALC ✓</span>
+            <span class="status-chip" id="statusGM" style="background:rgba(167,139,250,0.1);color:#c4b5fd;border:1px solid rgba(167,139,250,0.3)">GM ✓</span>
+            <span class="status-chip" id="statusCmp" style="background:rgba(52,211,153,0.1);color:#6ee7b7;border:1px solid rgba(52,211,153,0.3)">CMP ✓</span>
+        </div>
+    </div>
+
+    <div class="module-tabs" id="moduleTabs"></div>
+
+    <div class="three-col-layout">
+        <div class="col-panel lang-layer">
+            <div class="col-header">
+                <span class="col-icon">📝</span>
+                <span class="col-title">语言表达层</span>
+                <span class="col-badge">Layer 1</span>
+            </div>
+            <div id="langInputArea"></div>
+            <div style="margin-top:12px">
+                <div class="output-label">对照样本（点击载入）</div>
+                <div class="sample-chips" id="sampleChips"></div>
+            </div>
+            <div style="margin-top:12px">
+                <button class="btn btn-primary" id="runBtn" style="width:100%">▶ 执行跨域映射演算</button>
+            </div>
+            <div class="output-display" style="margin-top:12px">
+                <div class="output-label">输出文本</div>
+                <div class="output-text" id="langOutput">— 等待输入 —</div>
+            </div>
+        </div>
+
+        <div class="col-panel math-layer">
+            <div class="col-header">
+                <span class="col-icon">📐</span>
+                <span class="col-title">数理结构层</span>
+                <span class="col-badge">Layer 2</span>
+            </div>
+            <div class="canvas-container">
+                <canvas id="vizCanvas"></canvas>
+            </div>
+            <div class="math-values">
+                <div class="math-value-card">
+                    <div class="math-value-label">置信度</div>
+                    <div class="math-value-num" id="confValue">0.500</div>
+                    <div class="confidence-bar"><div class="confidence-fill conf-fill-green" id="confBar" style="width:50%"></div></div>
+                </div>
+                <div class="math-value-card">
+                    <div class="math-value-label">系统状态</div>
+                    <div class="math-value-num" id="statusValue" style="font-size:14px;color:#22c55e">STEADY</div>
+                </div>
+            </div>
+            <div style="margin-top:12px">
+                <div class="canvas-container">
+                    <canvas id="secVizCanvas" style="height:120px"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-panel algo-layer">
+            <div class="col-header">
+                <span class="col-icon">⚙️</span>
+                <span class="col-title">算法架构层</span>
+                <span class="col-badge">Layer 3</span>
+            </div>
+            <div class="algo-diagram" id="algoFlow">
+                <div class="output-label">演算流程</div>
+                <div class="algo-flow">
+                    <span class="algo-node">生成候选</span>
+                    <span class="algo-arrow">→</span>
+                    <span class="algo-node">验证约束</span>
+                    <span class="algo-arrow">→</span>
+                    <span class="algo-node">冲突回退</span>
+                    <span class="algo-arrow">→</span>
+                    <span class="algo-node">采纳最优</span>
+                </div>
+            </div>
+            <div id="algoDetails" style="font-size:12px;color:#94a3b8;line-height:1.8">选择模块并输入内容后开始演算</div>
+            <div id="auditResult" class="audit-result audit-pass" style="margin-top:12px">
+                三角审计待执行
+            </div>
+            <div style="margin-top:12px;font-size:11px;color:#64748b;line-height:1.6">
+                <strong style="color:#94a3b8">三模型并行校验：</strong><br>
+                <span style="color:#67e8f9">CALC</span> 金融精算模拟器 · 
+                <span style="color:#c4b5fd">GM</span> GameMind博弈沙盘 · 
+                <span style="color:#6ee7b7">CMP</span> 几何心智算力底座<br>
+                允许误差：±0.02 · 熔断红线：0.68
+            </div>
+        </div>
+    </div>
+
+    <div class="overview-section">
+        <h2>🗺️ 总览全景映射矩阵（10大模块 × 三层架构）</h2>
+        <div class="overview-canvas-wrap">
+            <canvas id="overviewCanvas"></canvas>
+        </div>
+    </div>
+
+    <div class="log-panel">
+        <div class="log-header">
+            <h3>📋 全流程演算日志（实时逐行打印，不省略中间步骤）</h3>
+            <button class="btn btn-primary" style="padding:4px 10px;font-size:11px" id="clearLogBtn">清空日志</button>
+        </div>
+        <div class="log-content" id="logContent"></div>
+    </div>
+
+    <footer class="footer">
+        Y.Mine · Mind Speak 心智语言映射引擎 v19.0<br>
+        隶属于 Game-OS V2.1 · EvolveMind 认知演化引擎独立子组件
+    </footer>
+</div>
+
+<script>
+(function(){
+    const canvas = document.getElementById('starfield');
+    const ctx = canvas.getContext('2d');
+    let stars = [];
+    function resize(){
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        stars = [];
+        for(let i=0;i<120;i++){
+            stars.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,r:Math.random()*1.5+0.3,a:Math.random(),s:Math.random()*0.02+0.005,dir:Math.random()>0.5?1:-1});
+        }
+    }
+    function drawStars(){
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        stars.forEach(s=>{
+            s.a += s.s*s.dir;
+            if(s.a>1||s.a<0.1)s.dir*=-1;
+            ctx.beginPath();
+            ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+            ctx.fillStyle=`rgba(200,210,255,${s.a*0.6})`;
+            ctx.fill();
+        });
+        requestAnimationFrame(drawStars);
+    }
+    resize();
+    window.addEventListener('resize',resize);
+    drawStars();
+})();
+
+MindSpeak.init();
+
+let currentModule = 'word-order';
+let currentSample = null;
+let swapAnim = 0;
+let swapTarget = 0;
+
+function renderModuleTabs(){
+    const tabs = document.getElementById('moduleTabs');
+    tabs.innerHTML = '';
+    MS_SAMPLES.modules.forEach(m=>{
+        const el = document.createElement('div');
+        el.className = 'module-tab' + (m.id===currentModule?' active':'');
+        el.textContent = m.icon + ' ' + m.name;
+        el.onclick = ()=>{ currentModule = m.id; currentSample=null; renderModuleTabs(); renderInputArea(); renderSampleChips(); };
+        tabs.appendChild(el);
+    });
+}
+
+function renderSampleChips(){
+    const chips = document.getElementById('sampleChips');
+    chips.innerHTML = '';
+    const samples = MS_SAMPLES[currentModule.replace(/-([a-z])/g,(_,c)=>c.toUpperCase())];
+    if(!samples) return;
+    samples.forEach((s,i)=>{
+        const el = document.createElement('div');
+        el.className = 'sample-chip' + (currentSample===i?' active':'');
+        el.textContent = s.label;
+        el.onclick = ()=>{ currentSample = i; renderSampleChips(); loadSample(s); };
+        chips.appendChild(el);
+    });
+}
+
+function renderInputArea(){
+    const area = document.getElementById('langInputArea');
+    let html = '';
+    const m = currentModule;
+    if(m==='word-order'){
+        html = `<div class="input-area">
+            <label>输入语句</label>
+            <textarea id="inputText" placeholder="输入英文或中文句子...">a beautiful red flower</textarea>
+        </div>
+        <div class="input-group">
+            <label><input type="checkbox" id="swapOrder"> 执行Adj/N语序交换（线性向量交换）</label>
+        </div>`;
+    } else if(m==='tense-kelly'){
+        html = `<div class="input-area">
+            <label>示例语句</label>
+            <input type="text" id="inputText" value="He plays tennis every week">
+        </div>
+        <div class="input-group">
+            <label>胜率 p（凯利公式参数）</label>
+            <input type="range" class="param-slider" id="kellyP" min="0.3" max="0.75" step="0.01" value="0.55">
+            <span class="param-value" id="kellyPVal">0.55</span>
+        </div>
+        <div class="input-group">
+            <label>时态类型</label>
+            <select id="tenseSelect" style="width:100%;padding:6px;background:#1e293b;border:1px solid rgba(167,139,250,0.3);border-radius:4px;color:#e2e8f0">
+                <option value="present">一般现在时</option>
+                <option value="progressive">现在进行时</option>
+                <option value="perfect">现在完成时</option>
+                <option value="future">一般将来时</option>
+            </select>
+        </div>`;
+    } else if(m==='affix-feature'){
+        html = `<div class="input-area">
+            <label>词根（印尼语）</label>
+            <input type="text" id="inputText" value="ajar (教)">
+        </div>`;
+    } else if(m==='ioc-passive'){
+        html = `<div class="input-area">
+            <label>输入语句</label>
+            <textarea id="inputText" placeholder="输入主动或被动句...">我 吃了 苹果</textarea>
+        </div>
+        <div class="input-group">
+            <label><input type="checkbox" id="reverseVoice" checked> 执行IoC语态反转（主动↔被动）</label>
+        </div>`;
+    } else if(m==='polysemy'){
+        html = `<div class="input-area">
+            <label>多义词</label>
+            <input type="text" id="inputText" value="打">
+        </div>
+        <div class="input-group">
+            <label>策略分支选择</label>
+            <select id="branchSelect" style="width:100%;padding:6px;background:#1e293b;border:1px solid rgba(244,114,182,0.3);border-radius:4px;color:#e2e8f0">
+                <option value="0">① 体育分支（打球）</option>
+                <option value="1">② 交通分支（打车）</option>
+                <option value="2">③ 日常分支（打水）</option>
+                <option value="3">④ 法律分支（打官司）</option>
+            </select>
+        </div>`;
+    } else if(m==='culture-regex'){
+        html = `<div class="input-area">
+            <label>文化意象</label>
+            <input type="text" id="inputText" value="龙">
+        </div>
+        <div class="input-group">
+            <label>文化约束强度</label>
+            <input type="range" class="param-slider" id="cultureStrength" min="0" max="1" step="0.05" value="0.55">
+            <span class="param-value" id="cultureStrengthVal">0.55</span>
+        </div>`;
+    } else if(m==='ood-detect'){
+        html = `<div class="input-area">
+            <label>输入词汇</label>
+            <input type="text" id="inputText" value="美丽">
+        </div>
+        <div class="input-group">
+            <label>OOD分布外距离</label>
+            <input type="range" class="param-slider" id="oodScore" min="0" max="1" step="0.05" value="0.15">
+            <span class="param-value" id="oodScoreVal">0.15</span>
+        </div>`;
+    } else if(m==='chicken-rabbit'){
+        html = `<div class="input-row">
+            <div class="input-group">
+                <label>头的数量</label>
+                <input type="number" id="headsInput" value="35" style="width:100%;padding:8px;background:#1e293b;border:1px solid rgba(103,232,249,0.2);border-radius:4px;color:#e2e8f0">
+            </div>
+            <div class="input-group">
+                <label>脚的数量</label>
+                <input type="number" id="feetInput" value="94" style="width:100%;padding:8px;background:#1e293b;border:1px solid rgba(103,232,249,0.2);border-radius:4px;color:#e2e8f0">
+            </div>
+        </div>`;
+    } else if(m==='pacd'){
+        html = `<div class="input-area">
+            <label>工程效率问题（每人单独完成天数）</label>
+            <input type="text" id="inputText" value="A:10天,B:15天" readonly style="background:#1e293b">
+        </div>
+        <div class="input-group">
+            <label>人数配置</label>
+            <select id="peopleConfig" style="width:100%;padding:6px;background:#1e293b;border:1px solid rgba(167,139,250,0.3);border-radius:4px;color:#e2e8f0">
+                <option value="dual">双人合作（10天+15天）</option>
+                <option value="triple">三人合作（10+12+15天）</option>
+            </select>
+        </div>`;
+    } else if(m==='enum-validation'){
+        html = `<div class="input-area">
+            <label>枚举规模n</label>
+            <input type="number" id="enumN" value="4" min="1" max="20" style="width:100%;padding:8px;background:#1e293b;border:1px solid rgba(103,232,249,0.2);border-radius:4px;color:#e2e8f0">
+        </div>
+        <div class="input-group">
+            <label><input type="checkbox" id="pruneCheck" checked> 启用约束剪枝</label>
+        </div>`;
+    }
+    area.innerHTML = html;
+    setupParamListeners();
+}
+
+function setupParamListeners(){
+    const kp = document.getElementById('kellyP');
+    if(kp){
+        kp.addEventListener('input',e=>{document.getElementById('kellyPVal').textContent=parseFloat(e.target.value).toFixed(2)});
+    }
+    const cs = document.getElementById('cultureStrength');
+    if(cs){
+        cs.addEventListener('input',e=>{document.getElementById('cultureStrengthVal').textContent=parseFloat(e.target.value).toFixed(2)});
+    }
+    const os = document.getElementById('oodScore');
+    if(os){
+        os.addEventListener('input',e=>{document.getElementById('oodScoreVal').textContent=parseFloat(e.target.value).toFixed(2)});
+    }
+}
+
+function loadSample(s){
+    document.getElementById('inputText') && (document.getElementById('inputText').value = s.source || s.root || s.word || s.label);
+    if(s.p!==undefined && document.getElementById('kellyP')){
+        document.getElementById('kellyP').value = s.p;
+        document.getElementById('kellyPVal').textContent = s.p.toFixed(2);
+    }
+    if(s.oodScore!==undefined && document.getElementById('oodScore')){
+        document.getElementById('oodScore').value = s.oodScore;
+        document.getElementById('oodScoreVal').textContent = s.oodScore.toFixed(2);
+    }
+    if(s.heads!==undefined && document.getElementById('headsInput')){
+        document.getElementById('headsInput').value = s.heads;
+        document.getElementById('feetInput').value = s.feet;
+    }
+    if(s.culture!==undefined && document.getElementById('cultureStrength')){
+        document.getElementById('cultureStrength').value = 0.55;
+        document.getElementById('cultureStrengthVal').textContent = '0.55';
+    }
+}
+
+function appendLog(entry){
+    const lc = document.getElementById('logContent');
+    const div = document.createElement('div');
+    div.className = 'log-entry';
+    div.innerHTML = `<span class="log-time">[${entry.time}]</span><span class="log-module">[${entry.module}]</span><span class="log-msg ${entry.level}">${entry.message}</span>`;
+    lc.appendChild(div);
+    lc.scrollTop = lc.scrollHeight;
+}
+
+function setupCanvases(){
+    MS_Viz.setupCanvas('vizCanvas', 400, 180);
+    MS_Viz.setupCanvas('secVizCanvas', 400, 120);
+    MS_Viz.setupCanvas('overviewCanvas', 1200, 200);
+}
+
+function runMapping(){
+    const input = document.getElementById('inputText') ? document.getElementById('inputText').value : '';
+    let params = {};
+    const m = currentModule;
+
+    if(m==='word-order'){
+        params.swapped = document.getElementById('swapOrder') ? document.getElementById('swapOrder').checked : false;
+        swapTarget = params.swapped ? 1 : 0;
+    } else if(m==='tense-kelly'){
+        params.p = parseFloat(document.getElementById('kellyP').value);
+        params.tense = document.getElementById('tenseSelect').value;
+    } else if(m==='ioc-passive'){
+        params.reversed = document.getElementById('reverseVoice') ? document.getElementById('reverseVoice').checked : false;
+    } else if(m==='polysemy'){
+        params.branch = parseInt(document.getElementById('branchSelect').value);
+    } else if(m==='culture-regex'){
+        params.strength = parseFloat(document.getElementById('cultureStrength').value);
+    } else if(m==='ood-detect'){
+        params.oodScore = parseFloat(document.getElementById('oodScore').value);
+    } else if(m==='chicken-rabbit'){
+        params.heads = parseInt(document.getElementById('headsInput').value);
+        params.feet = parseInt(document.getElementById('feetInput').value);
+    } else if(m==='pacd'){
+        const pc = document.getElementById('peopleConfig').value;
+        params.rates = pc==='dual' ? [1/10, 1/15] : [1/10, 1/12, 1/15];
+    } else if(m==='enum-validation'){
+        params.n = parseInt(document.getElementById('enumN').value);
+        params.prune = document.getElementById('pruneCheck').checked;
+    }
+
+    const result = MindSpeak.runMapping(m, input, params);
+    updateUI(result);
+}
+
+function updateUI(result){
+    if(!result || result.error){
+        document.getElementById('langOutput').textContent = result && result.error==='EMERGENCY_STOPPED' ? '⚠️ 紧急停机中，运算拒绝执行' : '运算错误';
+        return;
+    }
+
+    const outEl = document.getElementById('langOutput');
+    if(result.output) outEl.textContent = result.output;
+    else if(result.chicken!==null && result.chicken!==undefined) outEl.textContent = `鸡：${result.chicken} 只，兔：${result.rabbit} 只`;
+    else if(result.days) outEl.textContent = `合作完成需要 ${result.days.toFixed(2)} 天，综合效率 ${result.combinedRate.toFixed(3)}`;
+    else if(result.totalBranches!==undefined) outEl.textContent = `总分支数 ${result.totalBranches}，剪枝后 ${result.prunedBranches}，剪枝率 ${(result.pruneRate*100).toFixed(1)}%`;
+    else if(result.fStar!==undefined) outEl.textContent = `凯利最优仓位 f* = ${result.fStar.toFixed(3)}，p=${result.p.toFixed(2)}`;
+    else if(result.meaning) outEl.textContent = `词义：${result.meaning}`;
+    else if(result.constraintStrength!==undefined) outEl.textContent = `文化约束强度 ${(result.constraintStrength*100).toFixed(0)}%，${result.taboo?'禁忌词触发':'正常'}`;
+    else if(result.oodScore!==undefined) outEl.textContent = `OOD距离 ${result.oodScore.toFixed(2)}，${result.fused?'已熔断':'正常'}`;
+    else if(result.affixes) outEl.textContent = `词缀：${result.affixes.join(' → ')}`;
+    else outEl.textContent = '运算完成';
+
+    const conf = result.confidence;
+    document.getElementById('confValue').textContent = conf.toFixed(3);
+    const bar = document.getElementById('confBar');
+    bar.style.width = (conf*100)+'%';
+    bar.className = 'confidence-fill ' + (conf>0.68?'conf-fill-red':conf>0.52?'conf-fill-yellow':'conf-fill-green');
+
+    const sv = document.getElementById('statusValue');
+    const ss = document.getElementById('statusSteady');
+    sv.textContent = result.status;
+    if(result.status==='FUSED'){
+        sv.style.color = '#f87171';
+        ss.className = 'status-chip red';
+        ss.textContent = '● 熔断';
+    } else if(result.status==='WARNING' || result.status==='BELOW_BREAKEVEN'){
+        sv.style.color = '#facc15';
+        ss.className = 'status-chip yellow';
+        ss.textContent = '● 预警';
+    } else {
+        sv.style.color = '#22c55e';
+        ss.className = 'status-chip green';
+        ss.textContent = '● 稳态';
+    }
+
+    const ar = document.getElementById('auditResult');
+    if(result.audit){
+        const a = result.audit;
+        document.getElementById('statusCalc').textContent = 'CALC ' + (Math.abs(a.models.calc-conf)<=0.02?'✓':'✗');
+        document.getElementById('statusGM').textContent = 'GM ' + (Math.abs(a.models.gamemind-conf)<=0.02?'✓':'✗');
+        document.getElementById('statusCmp').textContent = 'CMP ' + (Math.abs(a.models.compute-conf)<=0.02?'✓':'✗');
+        if(a.auditResult==='PASS'){
+            ar.className = 'audit-result audit-pass';
+            ar.innerHTML = '✅ 三角审计通过 · 三模型偏差在±0.02允许范围内';
+        } else if(a.auditResult==='CORRECTED'){
+            ar.className = 'audit-result audit-warn';
+            ar.innerHTML = '⚠️ 单组偏差 · 已自动均值修正至 ' + a.finalConf.toFixed(3);
+        } else {
+            ar.className = 'audit-result audit-fail';
+            ar.innerHTML = '❌ 两组异常 · 运算已阻断，请检查输入';
+        }
+    }
+
+    renderViz(result);
+    renderAlgoDetails(result);
+}
+
+function renderViz(result){
+    const m = currentModule;
+    const vc = document.getElementById('vizCanvas');
+    const svc = document.getElementById('secVizCanvas');
+
+    if(m==='word-order'){
+        MS_Viz.drawWordOrderSwap('vizCanvas', swapAnim, ['Adj', 'N']);
+    } else if(m==='tense-kelly'){
+        MS_Viz.drawKellyCurve('vizCanvas', result.p || 0.55, result.history || []);
+    } else if(m==='affix-feature'){
+        MS_Viz.drawFeatureTopology('vizCanvas', result.topologyLayers);
+    } else if(m==='ioc-passive'){
+        MS_Viz.drawIoCFlow('vizCanvas', result.reversed);
+    } else if(m==='polysemy'){
+        MS_Viz.drawStrategyRouting('vizCanvas', result.branches, result.activeBranch);
+    } else if(m==='culture-regex'){
+        MS_Viz.drawCultureConstraint('vizCanvas', result.constraintStrength);
+    } else if(m==='ood-detect'){
+        MS_Viz.drawOODConfidenceDecay('vizCanvas', result.decayPoints);
+    } else if(m==='chicken-rabbit'){
+        MS_Viz.drawBarChart('vizCanvas', ['鸡', '兔'], [result.chicken||0, result.rabbit||0], ['#67e8f9', '#f472b6']);
+    } else if(m==='pacd'){
+        const names = (result.rates||[]).map((r,i)=>String.fromCharCode(65+i));
+        const colors = ['#67e8f9','#a78bfa','#f472b6','#34d399'];
+        MS_Viz.drawPieChart('vizCanvas', names, result.distribution||[0.5,0.5], colors.slice(0,names.length));
+    } else if(m==='enum-validation'){
+        MS_Viz.drawBarChart('vizCanvas', ['枚举', '剪枝后'], [Math.log10(result.totalBranches+1), Math.log10(result.prunedBranches+1)], ['#a78bfa', '#22c55e']);
+    }
+}
+
+function renderAlgoDetails(result){
+    const d = document.getElementById('algoDetails');
+    const m = currentModule;
+    let txt = '';
+    if(m==='word-order'){
+        txt = `<b>线性代数同构：</b>语序调换 = 向量空间位置交换<br>交换律验证：Adj·N = N·Adj（线性空间成立）<br>四维向量：[句法, 语义, 语境, 置信度] = [${(result.vector||[0.5,0.5,0.5,0.5]).map(v=>v.toFixed(2)).join(', ')}]`;
+    } else if(m==='tense-kelly'){
+        txt = `<b>凯利概率模型同构：</b>时态持续时长 ↔ 凯利持仓周期<br>胜率p=${result.p} → 最优仓位f*=${(result.fStar||0).toFixed(3)}<br>0.48保本/0.5稳态/0.68熔断三级阈值联动`;
+    } else if(m==='affix-feature'){
+        txt = `<b>特征工程同构：</b>词缀派生 ↔ 多层特征变换<br>基础词根 → 一阶词缀 → 二阶交互 → 高阶语义<br>拓扑网络可视化见左侧数理层`;
+    } else if(m==='ioc-passive'){
+        txt = `<b>IoC依赖反转同构：</b>主动/被动 ↔ 控制流方向反转<br>主语→动词→宾语 ↔ 宾语→被/by→主语→动词<br>依赖注入容器范式映射`;
+    } else if(m==='polysemy'){
+        txt = `<b>策略模式同构：</b>多义词 ↔ 策略路由分支<br>上下文作为路由key，激活对应算法分支<br>当前激活分支：${result.activeBranch+1}/${result.branches.length}`;
+    } else if(m==='culture-regex'){
+        txt = `<b>正则化约束同构：</b>文化规范 ↔ 正则边界约束<br>约束强度：${(result.constraintStrength*100).toFixed(0)}%<br>禁忌词触发自动加注或替换机制`;
+    } else if(m==='ood-detect'){
+        txt = `<b>OOD异常检测同构：</b>生词/伪同源 ↔ 分布外检测<br>OOD距离：${result.oodScore.toFixed(2)}<br>${result.fused?'⚠️ 已触发熔断，写入不可篡改审计日志':'置信度正常区间'}`;
+    } else if(m==='chicken-rabbit'){
+        txt = `<b>方程组求解同构：</b>鸡兔同笼 ↔ 二元一次方程组<br>方程：x+y=${result.heads}; 2x+4y=${result.feet}<br>${result.chicken!==null?'整数解验证通过':'无合法解，异常检测触发'}`;
+    } else if(m==='pacd'){
+        txt = `<b>并行调度同构：</b>工程合作 ↔ 并行速率叠加<br>效率叠加：${result.rates.map(r=>r.toFixed(3)).join(' + ')} = ${result.combinedRate.toFixed(3)}<br>阿马迪亚定律：最慢节点决定整体效率`;
+    } else if(m==='enum-validation'){
+        txt = `<b>组合剪枝同构：</b>枚举验证 ↔ 约束满足剪枝<br>${result.prune?'启用剪枝，剪枝率'+(result.pruneRate*100).toFixed(1)+'%':'纯暴力枚举'}<br>分支定界算法映射`;
+    }
+    d.innerHTML = txt;
+}
+
+MindSpeak.on('log', appendLog);
+
+MindSpeak.on('render',()=>{
+    swapAnim += (swapTarget - swapAnim) * 0.08;
+    if(currentModule==='word-order' && document.getElementById('vizCanvas')){
+        MS_Viz.drawWordOrderSwap('vizCanvas', swapAnim, ['Adj', 'N']);
+    }
+    if(currentModule==='ioc-passive' && document.getElementById('vizCanvas')){
+        MS_Viz.drawIoCFlow('vizCanvas', document.getElementById('reverseVoice') && document.getElementById('reverseVoice').checked);
+    }
+    if(document.getElementById('overviewCanvas')){
+        MS_Viz.drawMatrixOverview('overviewCanvas');
+    }
+});
+
+document.getElementById('runBtn').onclick = runMapping;
+document.getElementById('clearLogBtn').onclick = ()=>{
+    document.getElementById('logContent').innerHTML='';
+    MindSpeak.logs = [];
+};
+document.getElementById('emergencyStopBtn').onclick = ()=>{
+    MindSpeak.emergencyStop();
+    document.getElementById('emergencyStopBtn').style.display='none';
+    document.getElementById('resumeBtn').style.display='inline-block';
+    const ss = document.getElementById('statusSteady');
+    ss.className = 'status-chip red';
+    ss.textContent = '● 已停机';
+};
+document.getElementById('resumeBtn').onclick = ()=>{
+    MindSpeak.resume();
+    document.getElementById('emergencyStopBtn').style.display='inline-block';
+    document.getElementById('resumeBtn').style.display='none';
+};
+document.getElementById('steadySlider').addEventListener('input',e=>{
+    const v = parseInt(e.target.value)/100;
+    MindSpeak.setGlobalSteadyBias(v);
+    document.getElementById('steadyValue').textContent = (v>=0?'+':'')+v.toFixed(2);
+});
+
+window.addEventListener('load',()=>{
+    setupCanvases();
+    renderModuleTabs();
+    renderInputArea();
+    renderSampleChips();
+    setTimeout(()=>{
+        MS_Viz.drawWordOrderSwap('vizCanvas', 0, ['Adj', 'N']);
+        MS_Viz.drawMatrixOverview('overviewCanvas');
+        MS_Viz.drawFeatureTopology('secVizCanvas', [
+            {nodes:['语','法'],color:'#67e8f9'},
+            {nodes:['映射'],color:'#a78bfa'},
+            {nodes:['输出'],color:'#f472b6'}
+        ]);
+    },100);
+});
+</script>
+</body>
+</html>
