@@ -503,6 +503,9 @@ Game-OS V2.1历经80分B级整改后，已具备以下**五大集团级数字操
 ---
 
 **文档归档信息**
-- 本文件：`docs/system-v21-rectification/Game-OS_V2.1_全科研实证实验室专项深度审计报告.md`
-- 配套文件：`Game-OS_V2.1_底层基座与核心Mind引擎深度架构审计报告.md`
-- 两份合并构成Game-OS V2.1（80分B级版）完整系统审计档案
+- 归档版本：Game-OS V2.1（80分B级完整版）
+- 归档日期：2026-07-20
+- 归档位置：`docs/system-v21-rectification/Game-OS_V2.1_全科研实证实验室专项深度审计报告.md`
+- 配套报告：[Game-OS_V2.1_底层基座与核心Mind引擎深度架构审计报告.md](file:///workspace/docs/system-v21-rectification/Game-OS_V2.1_底层基座与核心Mind引擎深度架构审计报告.md)
+- 配套架构文档：[engines/financemind/docs/FINANCEMIND_V1.0_双分区架构搭建规范与目录设计文档.md](file:///workspace/engines/financemind/docs/FINANCEMIND_V1.0_双分区架构搭建规范与目录设计文档.md)
+- 两份审计报告合并构成Game-OS V2.1（80分B级版）完整系统审计档案
