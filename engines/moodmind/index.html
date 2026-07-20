@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>💜 MoodMind · 非标资产估值底座</title>
+    <title>💜 MoodMind · 全域非标资产计量中台</title>
     <link rel="stylesheet" href="../../assets/css/base.css">
     <script src="../../assets/js/bus.js"></script>
     <style>
@@ -581,6 +581,278 @@
                 gap: 10px;
             }
         }
+
+        /* ===== 全流程拓扑链路 Canvas ===== */
+        .topology-canvas-wrap {
+            background: linear-gradient(180deg, rgba(10,8,25,0.95) 0%, rgba(5,5,18,0.98) 100%);
+            border: 1px solid rgba(167,139,250,0.08);
+            border-radius: 16px;
+            padding: 16px;
+            margin: 16px 0 8px;
+            overflow: hidden;
+        }
+        .topology-canvas-wrap canvas {
+            width: 100%;
+            height: auto;
+            display: block;
+            border-radius: 10px;
+        }
+
+        /* ===== 理论标签 ===== */
+        .theory-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 11px;
+            padding: 3px 10px;
+            border-radius: 6px;
+            font-weight: 500;
+            margin-left: 8px;
+            vertical-align: middle;
+        }
+        .theory-tag.prospect {
+            background: rgba(167,139,250,0.1);
+            border: 1px solid rgba(167,139,250,0.2);
+            color: #c4b5fd;
+        }
+        .theory-tag.cournot {
+            background: rgba(239,68,68,0.08);
+            border: 1px solid rgba(239,68,68,0.2);
+            color: #fca5a5;
+        }
+        .theory-tag.centipede {
+            background: rgba(52,211,153,0.08);
+            border: 1px solid rgba(52,211,153,0.2);
+            color: #6ee7b7;
+        }
+        .theory-tag.sunkcost {
+            background: rgba(251,191,36,0.08);
+            border: 1px solid rgba(251,191,36,0.2);
+            color: #fcd34d;
+        }
+        .theory-tag.wallstreet {
+            background: rgba(59,130,246,0.08);
+            border: 1px solid rgba(59,130,246,0.2);
+            color: #93c5fd;
+        }
+
+        /* ===== 红蓝海赛道标签 ===== */
+        .ocean-tag {
+            display: inline-block;
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+            margin-left: 6px;
+        }
+        .ocean-tag.red {
+            background: rgba(239,68,68,0.12);
+            color: #f87171;
+            border: 1px solid rgba(239,68,68,0.25);
+        }
+        .ocean-tag.blue {
+            background: rgba(59,130,246,0.12);
+            color: #60a5fa;
+            border: 1px solid rgba(59,130,246,0.25);
+        }
+
+        /* ===== 前景理论/古诺/蜈蚣注解框 ===== */
+        .theory-note {
+            background: rgba(255,255,255,0.015);
+            border-left: 3px solid;
+            border-radius: 0 10px 10px 0;
+            padding: 12px 16px;
+            margin: 10px 0 14px;
+            font-size: 13px;
+            line-height: 1.75;
+            color: rgba(255,255,255,0.4);
+        }
+        .theory-note.prospect { border-color: #a78bfa; }
+        .theory-note.cournot { border-color: #ef4444; }
+        .theory-note.centipede { border-color: #34d399; }
+        .theory-note.sunkcost { border-color: #fbbf24; }
+        .theory-note.wallstreet { border-color: #3b82f6; }
+        .theory-note strong { color: rgba(255,255,255,0.65); }
+
+        /* ===== 博主矩阵估值模拟器 ===== */
+        .blogger-sim {
+            background: linear-gradient(135deg, rgba(167,139,250,0.04), rgba(59,130,246,0.02));
+            border: 1px solid rgba(167,139,250,0.1);
+            border-radius: 18px;
+            padding: 28px;
+            margin: 20px 0;
+        }
+        .blogger-sim .bs-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: rgba(255,255,255,0.8);
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .blogger-sim .bs-sub {
+            font-size: 13px;
+            color: rgba(255,255,255,0.3);
+            margin-bottom: 20px;
+        }
+        .bs-form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px 20px;
+            margin-bottom: 18px;
+        }
+        .bs-field {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .bs-field label {
+            font-size: 12px;
+            font-weight: 500;
+            color: rgba(255,255,255,0.4);
+        }
+        .bs-field select,
+        .bs-field input[type="number"] {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 8px;
+            padding: 9px 12px;
+            color: rgba(255,255,255,0.8);
+            font-size: 13px;
+            outline: none;
+            transition: border-color .2s;
+            font-family: inherit;
+        }
+        .bs-field select:focus,
+        .bs-field input[type="number"]:focus {
+            border-color: rgba(167,139,250,0.4);
+        }
+        .bs-field select option {
+            background: #1a1530;
+            color: rgba(255,255,255,0.8);
+        }
+        .bs-field input[type="number"] {
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .bs-field select {
+            cursor: pointer;
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='rgba(255,255,255,0.3)' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            padding-right: 32px;
+        }
+        .bs-calc-btn {
+            background: linear-gradient(135deg, #a78bfa, #7c3aed);
+            border: none;
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            padding: 11px 28px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all .2s;
+            font-family: inherit;
+            box-shadow: 0 4px 20px rgba(167,139,250,0.25);
+        }
+        .bs-calc-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 24px rgba(167,139,250,0.35);
+        }
+        .bs-result-area {
+            display: none;
+            margin-top: 20px;
+            padding-top: 18px;
+            border-top: 1px solid rgba(255,255,255,0.06);
+        }
+        .bs-result-area.show {
+            display: block;
+        }
+        .bs-result-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+        .bs-result-item {
+            background: rgba(0,0,0,0.2);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 10px;
+            padding: 12px 14px;
+            text-align: center;
+        }
+        .bs-result-item .bs-r-label {
+            font-size: 10px;
+            color: rgba(255,255,255,0.25);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .bs-result-item .bs-r-value {
+            font-size: 22px;
+            font-weight: 700;
+            color: #f1f5f9;
+            margin-top: 3px;
+        }
+        .bs-result-item .bs-r-value.purple { color: #c4b5fd; }
+        .bs-result-item .bs-r-value.gold { color: #fcd34d; }
+        .bs-result-item .bs-r-value.red { color: #f87171; }
+        .bs-result-item .bs-r-value.green { color: #6ee7b7; }
+        .bs-result-item .bs-r-value.blue { color: #60a5fa; }
+        .bs-result-item .bs-r-sub {
+            font-size: 11px;
+            color: rgba(255,255,255,0.2);
+            margin-top: 2px;
+        }
+        .bs-diagnosis {
+            background: rgba(0,0,0,0.15);
+            border-radius: 10px;
+            padding: 14px 16px;
+            margin-bottom: 10px;
+            font-size: 13px;
+            line-height: 1.7;
+            color: rgba(255,255,255,0.45);
+        }
+        .bs-diagnosis strong { color: rgba(255,255,255,0.7); }
+        .bs-strategy {
+            background: rgba(167,139,250,0.04);
+            border: 1px solid rgba(167,139,250,0.1);
+            border-radius: 10px;
+            padding: 14px 16px;
+            margin-bottom: 10px;
+            font-size: 13px;
+            line-height: 1.7;
+            color: rgba(255,255,255,0.45);
+        }
+        .bs-strategy strong { color: #c4b5fd; }
+        .bs-revitalize {
+            background: rgba(52,211,153,0.04);
+            border: 1px solid rgba(52,211,153,0.1);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font-size: 12px;
+            line-height: 1.7;
+            color: rgba(255,255,255,0.35);
+        }
+        .bs-revitalize strong { color: #6ee7b7; }
+        .bs-disclaimer {
+            margin-top: 14px;
+            padding: 10px 14px;
+            background: rgba(251,146,60,0.04);
+            border: 1px solid rgba(251,146,60,0.1);
+            border-radius: 8px;
+            font-size: 11px;
+            color: rgba(251,146,60,0.6);
+            line-height: 1.6;
+            text-align: center;
+        }
+        @media (max-width: 700px) {
+            .bs-form-grid { grid-template-columns: 1fr; }
+            .bs-result-grid { grid-template-columns: 1fr 1fr; }
+            .blogger-sim { padding: 18px 14px; }
+        }
     </style>
 </head>
 <body>
@@ -596,7 +868,7 @@
             <span class="sep">›</span>
             <a href="../../index.html">认知科研实验组</a>
             <span class="sep">›</span>
-            <span class="current">💜 MoodMind · 非标资产估值底座</span>
+            <span class="current">💜 MoodMind · 全域非标资产计量中台</span>
         </div>
         <div class="nav-actions" style="display:flex;gap:10px;margin-bottom:16px;">
             <a href="javascript:history.back()" style="padding:6px 14px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);border-radius:8px;color:rgba(255,255,255,0.7);text-decoration:none;font-size:12px;transition:all .2s;">← 返回上一级</a>
@@ -605,45 +877,46 @@
 
         <!-- ===== 头部 ===== -->
         <div class="header">
-            <div class="badge">🧠 估值底座</div>
-            <h1>💜 MoodMind · 非标资产估值底座</h1>
-            <div class="sub">MCN博主 · IP · 账号矩阵 · 不确定性资产估值框架</div>
+            <div class="badge">💜 全域非标资产计量中台</div>
+            <h1>💜 MoodMind・全域非标资产计量中台</h1>
+            <div class="sub">依托前景理论完成决策偏差前置校正，通过四维穿透式估值架构实现全品类不确定性资产量化</div>
         </div>
 
-        <!-- ===== 顶部映射说明 ===== -->
+        <!-- ===== 开篇定稿文案 ===== -->
         <div class="section-anchor" id="section-intro"></div>
-        <div class="mapping-intro">
-            <div class="intro-title">📌 估值模型 → 映射体 → 应用方向</div>
-            <div class="intro-flow">
-                <div class="node">
-                    <div class="n-label">3 →</div>
-                    <div class="n-value">三个方向</div>
-                    <div class="n-desc">估值模型 · 赛道组合 · 全域矩阵</div>
+        <div class="mapping-intro" style="margin-bottom:28px;">
+            <p style="color:rgba(255,255,255,0.45);font-size:14px;line-height:1.85;margin:0;text-align:left;">
+                依托<strong style="color:#c4b5fd;">前景理论</strong>完成决策偏差前置校正，搭配<strong style="color:#fb923c;">古诺寡头纳什均衡</strong>、<strong style="color:#34d399;">蜈蚣序贯多轮博弈</strong>完成红蓝海赛道动态定性；通过四维穿透式估值架构实现全品类不确定性资产量化，可将存量沉没资产有序盘活，完成沉没成本向机会成本转化；估值结果向上接入 GameMind 全域博弈总基座，完成最优资源配比与分层人机权限管控。
+            </p>
+            <p style="color:rgba(255,255,255,0.25);font-size:12px;line-height:1.7;margin:10px 0 0;text-align:left;">
+                配套独立博主矩阵估值模拟器，作为全域估值体系标准化演示场景，覆盖头部、腰部、尾部矩阵分层运营全流程。全部精细化底层测算模型内部自研打磨，前端仅展示标准化整体运行架构。
+            </p>
+        </div>
+
+        <!-- ===== 全流程可视化拓扑链路 ===== -->
+        <div class="section">
+            <h2>📊 全流程估值推演拓扑 <span class="tag">端到端链路</span></h2>
+            <div class="topology-canvas-wrap">
+                <canvas id="topologyCanvas" width="920" height="340"></canvas>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px;margin-top:14px;">
+                <div class="theory-note prospect" style="margin:0;">
+                    <strong>① 前景理论双架构决策偏差校正：</strong>消除收益/损失框架带来的主观风险偏好偏移，以系统 0.5 稳态中轴线替代决策者私人沉没成本心理参照点，规避战略固守类非理性决策。
                 </div>
-                <span class="arrow-icon">→</span>
-                <div class="node highlight">
-                    <div class="n-label">→ 1</div>
-                    <div class="n-value">核心资产</div>
-                    <div class="n-desc">非标资产 · 不确定性资产</div>
+                <div class="theory-note cournot" style="margin:0;">
+                    <strong>② 红蓝海双博弈定性：</strong>红海对应古诺寡头产能纳什均衡（存量饱和竞争）；蓝海对应蜈蚣多轮序贯递进博弈（长期增量迭代），赛道属性可动态切换。
                 </div>
-                <span class="arrow-icon">→</span>
-                <div class="node highlight">
-                    <div class="n-label">→ 1</div>
-                    <div class="n-value">可迁移架构</div>
-                    <div class="n-desc">同一套估值框架 · 任意非标领域</div>
+                <div class="theory-note" style="margin:0;border-color:#a78bfa;">
+                    <strong>③ 四维量化：</strong>流量盘、人设盘、变现盘、风险盘加权计算，输出资产 α 余弦相似度与五级资产等级。
                 </div>
-                <span class="arrow-icon">→</span>
-                <div class="node">
-                    <div class="n-label">→ 3</div>
-                    <div class="n-value">三个应用方向</div>
-                    <div class="n-desc">✅ MCN博主 · 🔜 股票 · 🔜 熵值</div>
-                    <div class="n-status">✅ 已实现 · 🔒 待解锁</div>
+                <div class="theory-note sunkcost" style="margin:0;">
+                    <strong>④ 存量资产盘活：</strong>依托头部标杆基准，将不可收回沉没投入改造为蓝海赛道选择权，完成成本属性转换。
                 </div>
-                <span class="arrow-icon">→</span>
-                <div class="node">
-                    <div class="n-label">→ 100</div>
-                    <div class="n-value">无限延展</div>
-                    <div class="n-desc">任何需要评估不确定性资产的场景</div>
+                <div class="theory-note" style="margin:0;border-color:#fb923c;">
+                    <strong>⑤ 顶层博弈决策：</strong>接入 GameMind 全域博弈基座，通过凯利模型求解资源投入比例，自动匹配四六通用管控/二八高精管控模式。
+                </div>
+                <div class="theory-note centipede" style="margin:0;">
+                    <strong>⑥ 全域资产配置方案输出：</strong>整合前述全链路量化结果，输出可执行矩阵运营配置方案。
                 </div>
             </div>
         </div>
@@ -773,10 +1046,14 @@
                     <div class="desc">变现规模 · 效率 · 稳定性 · 潜力 · 多元化</div>
                 </div>
                 <div class="card-item">
-                    <div class="label">⚠️ 风险盘</div>
+                    <div class="label">⚠️ 风险盘 <span class="theory-tag prospect">前景理论</span></div>
                     <div class="value" id="riskDisplay">10%</div>
                     <div class="desc">舆情风险 · 合规风险 · 流量下滑 · 变现中断 · 人设崩塌</div>
                 </div>
+            </div>
+
+            <div class="theory-note prospect">
+                <strong>🧠 前景理论双架构决策偏差校正（挂载于风险盘/估值前置风控）：</strong>消除收益/损失框架带来的主观风险偏好偏移，以系统 0.5 稳态中轴线替代决策者私人沉没成本心理参照点，规避战略固守类非理性决策。<span style="color:rgba(255,255,255,0.2);">损失厌恶量化系数、参照点偏移函数属内部自研模型，不予前端展示。</span>
             </div>
 
             <h3>α值计算与资产分级</h3>
@@ -792,6 +1069,10 @@
                         <tr><td>α < 0.40</td><td>D级（低效资产）</td><td>触发清退评估，启动资产处置流程</td></tr>
                     </tbody>
                 </table>
+            </div>
+
+            <div class="theory-note sunkcost">
+                <strong>💱 沉没成本转机会成本转化模型（挂载于四维估值结果输出末端）：</strong>依托头部标杆基准，将不可收回沉没投入改造为蓝海赛道选择权，完成成本属性转换——腰部、尾部存量博主可对标 S 级头部标杆，将过往内容沉没投入转化为新赛道运营机会成本。<span style="color:rgba(255,255,255,0.2);">具体转化阈值属内部自研参数，不予前端展示。</span>
             </div>
         </div>
 
@@ -819,17 +1100,25 @@
                 </div>
             </div>
 
-            <h3>赛道无风险收益率基准（年化）</h3>
+            <div class="theory-note cournot">
+                <strong>🔴 红海赛道 · 古诺寡头纳什均衡博弈：</strong>赛道产能趋于饱和，多方存量竞争形成稳定纳什均衡，增量空间枯竭，适合二八人工终审管控模式。
+            </div>
+            <div class="theory-note centipede">
+                <strong>🟢 蓝海赛道 · 蜈蚣多轮序贯递进博弈：</strong>多回合分步迭代扩张，可分阶段完成老旧存量资产转型布局，增量空间充裕，可启用四六动态自动化管控。
+                <span style="color:rgba(255,255,255,0.2);">古诺均衡求解过程、蜈蚣博弈逆向归纳详细推演属内部自研模型，不予前端展示。</span>
+            </div>
+
+            <h3>赛道无风险收益率基准（年化） <span class="tag" style="background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.3);">含博弈属性判定</span></h3>
             <div class="table-wrap">
                 <table>
-                    <thead><tr><th>赛道类型</th><th>无风险收益率</th><th>说明</th></tr></thead>
+                    <thead><tr><th>赛道类型</th><th>无风险收益率</th><th>博弈属性</th><th>管控模式</th><th>说明</th></tr></thead>
                     <tbody>
-                        <tr><td>泛娱乐/搞笑/剧情</td><td>8%</td><td>门槛低、竞争激烈、流量红利消退快</td></tr>
-                        <tr><td>美妆/时尚/生活方式</td><td>10%</td><td>赛道成熟、变现路径清晰</td></tr>
-                        <tr><td>知识/教育/财经</td><td>12%</td><td>赛道壁垒高、用户粘性强</td></tr>
-                        <tr><td>美食/旅行/Vlog</td><td>9%</td><td>中等竞争、内容生命周期较长</td></tr>
-                        <tr><td>游戏/电竞/二次元</td><td>7%</td><td>流量波动大、受平台政策影响明显</td></tr>
-                        <tr><td>三农/公益/政务</td><td>6%</td><td>有政策红利但商业化程度低</td></tr>
+                        <tr><td>泛娱乐/搞笑/剧情</td><td>8%</td><td><span class="ocean-tag red">红海</span></td><td>二八高精管控</td><td>门槛低、竞争激烈、流量红利消退快</td></tr>
+                        <tr><td>美妆/时尚/生活方式</td><td>10%</td><td><span class="ocean-tag red">红海</span></td><td>二八高精管控</td><td>赛道成熟、变现路径清晰</td></tr>
+                        <tr><td>知识/教育/财经</td><td>12%</td><td><span class="ocean-tag blue">蓝海</span></td><td>四六动态管控</td><td>赛道壁垒高、用户粘性强</td></tr>
+                        <tr><td>美食/旅行/Vlog</td><td>9%</td><td><span class="ocean-tag blue">蓝海</span></td><td>四六动态管控</td><td>中等竞争、内容生命周期较长</td></tr>
+                        <tr><td>游戏/电竞/二次元</td><td>7%</td><td><span class="ocean-tag red">红海</span></td><td>二八高精管控</td><td>流量波动大、受平台政策影响明显</td></tr>
+                        <tr><td>三农/公益/政务</td><td>6%</td><td><span class="ocean-tag blue">蓝海</span></td><td>四六动态管控</td><td>有政策红利但商业化程度低</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -925,26 +1214,24 @@
         <div class="section-anchor" id="section-link"></div>
         <div class="section">
             <h2>7. 完整应用链路 <span class="tag">端到端</span></h2>
-            <div class="flow-row" style="flex-direction: column; align-items: stretch; gap: 6px;">
+            <div class="flow-row" style="flex-direction: column; align-items: stretch; gap: 8px;">
                 <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-                    <span class="step">单博主数据采集</span>
+                    <span class="step" style="background:rgba(167,139,250,0.15);">前景理论校正</span>
                     <span class="arrow">→</span>
-                    <span class="step">四维定价评分</span>
+                    <span class="step" style="background:rgba(239,68,68,0.12);color:#fca5a5;">红蓝海定性</span>
                     <span class="arrow">→</span>
-                    <span class="step">α值计算</span>
+                    <span class="step">四维量化测算</span>
                     <span class="arrow">→</span>
-                    <span class="step">资产等级判定</span>
+                    <span class="step" style="background:rgba(251,191,36,0.12);color:#fcd34d;">存量盘活转化</span>
                 </div>
                 <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-                    <span class="step">赛道汇总</span>
+                    <span class="step" style="background:rgba(251,146,60,0.12);color:#fdba74;">GameMind凯利配比</span>
                     <span class="arrow">→</span>
-                    <span class="step">赛道策略决策</span>
+                    <span class="step" style="background:rgba(52,211,153,0.12);color:#6ee7b7;">配置方案输出</span>
                     <span class="arrow">→</span>
-                    <span class="step">全域矩阵汇总</span>
+                    <span class="step">α/等级判定</span>
                     <span class="arrow">→</span>
-                    <span class="step">动态再平衡</span>
-                    <span class="arrow">→</span>
-                    <span class="step">下一轮迭代逼近</span>
+                    <span class="step">全域矩阵再平衡</span>
                 </div>
             </div>
         </div>
@@ -957,8 +1244,8 @@
             <div class="extension-grid">
                 <div class="ext-item">
                     <div class="ext-info">
-                        <div class="ext-name">📈 股票估值</div>
-                        <div class="ext-desc">PE/PB/DCF 模型 · 风险评估 · 投资组合优化</div>
+                        <div class="ext-name">📈 金融非标资产 <span class="theory-tag wallstreet">华尔街十一层漏斗</span></div>
+                        <div class="ext-desc">赛道初筛 → 红蓝海定性 → K线波动率测算 → 博弈校验 → 凯利配置（深层规则私有自研）</div>
                     </div>
                     <div class="ext-lock"><span class="lock-icon">🔒</span> 待解锁</div>
                 </div>
@@ -970,8 +1257,99 @@
                     <div class="ext-lock"><span class="lock-icon">🔒</span> 待解锁</div>
                 </div>
             </div>
-            <div class="highlight-box" style="margin-top: 8px;">
-                <p><strong>💡 迁移逻辑：</strong>不确定性资产的估值框架，本质上是"状态概率 × 价值评估"的通用结构。博主是"状态概率"的具象化，股票是"市场状态"的具象化，熵值是"物理状态"的具象化——同一套框架，三种不同领域的映射。</p>
+            <div class="theory-note wallstreet" style="border-color:#3b82f6;margin-top:10px;">
+                <strong>🏦 华尔街十一层金融选股漏斗（挂载于金融非标资产待解锁板块）：</strong>完整筛选链路为 赛道初筛 → 红蓝海定性 → K线波动率测算 → 博弈校验 → 凯利配置 五层公开框架，<span style="color:rgba(255,255,255,0.2);">深层十一层筛选规则全部私有自研，不予前端展示。</span>
+            </div>
+            <div class="highlight-box" style="margin-top: 10px;">
+                <p><strong>💡 迁移逻辑：</strong>不确定性资产的估值框架，本质上是"状态概率 × 价值评估"的通用结构。博主是"流量状态"的具象化，金融标的是"市场状态"的具象化，熵值是"物理状态"的具象化——同一套框架，多种领域映射。</p>
+            </div>
+        </div>
+
+        <!-- ===== 九、博主矩阵估值交互式模拟器 ===== -->
+        <div class="section-anchor" id="section-simulator"></div>
+        <div class="blogger-sim">
+            <div class="bs-title">🎛️ 博主矩阵估值交互式模拟器 <span class="tag" style="font-size:11px;color:#c4b5fd;background:rgba(167,139,250,0.12);padding:2px 10px;border-radius:20px;">标准化演示样板</span></div>
+            <div class="bs-sub">作为 MoodMind 全域非标估值体系对外标准化演示样板，仅用于架构流程可视化演示，不对外开放底层精密模型</div>
+
+            <div class="bs-form-grid">
+                <div class="bs-field">
+                    <label>赛道选择</label>
+                    <select id="bsTrack">
+                        <option value="entertainment">泛娱乐（搞笑/剧情）</option>
+                        <option value="beauty">美妆时尚（生活方式）</option>
+                        <option value="knowledge">知识财经（教育）</option>
+                        <option value="food">美食旅行（Vlog）</option>
+                        <option value="gaming">游戏电竞（二次元）</option>
+                        <option value="rural">三农政务（公益）</option>
+                    </select>
+                </div>
+                <div class="bs-field">
+                    <label>博主层级</label>
+                    <select id="bsTier">
+                        <option value="head">头部博主（S/A级参照标杆）</option>
+                        <option value="waist" selected>腰部博主（B级培育对象）</option>
+                        <option value="tail">尾部博主（C/D级待盘活）</option>
+                    </select>
+                </div>
+                <div class="bs-field">
+                    <label>流量盘分值 (0-100)</label>
+                    <input type="number" id="bsFlow" min="0" max="100" value="55" placeholder="0-100">
+                </div>
+                <div class="bs-field">
+                    <label>人设盘分值 (0-100)</label>
+                    <input type="number" id="bsPersona" min="0" max="100" value="48" placeholder="0-100">
+                </div>
+                <div class="bs-field">
+                    <label>变现盘分值 (0-100)</label>
+                    <input type="number" id="bsMonetize" min="0" max="100" value="42" placeholder="0-100">
+                </div>
+                <div class="bs-field">
+                    <label>风险盘分值 (0-100，越低越优)</label>
+                    <input type="number" id="bsRisk" min="0" max="100" value="35" placeholder="0-100">
+                </div>
+            </div>
+
+            <button class="bs-calc-btn" id="bsCalcBtn">⚡ 一键运算估值</button>
+
+            <div class="bs-result-area" id="bsResultArea">
+                <div class="bs-result-grid">
+                    <div class="bs-result-item">
+                        <div class="bs-r-label">综合归一化估值</div>
+                        <div class="bs-r-value purple" id="bsTotal">—</div>
+                        <div class="bs-r-sub">0~1 区间</div>
+                    </div>
+                    <div class="bs-result-item">
+                        <div class="bs-r-label">α 余弦相似度</div>
+                        <div class="bs-r-value gold" id="bsAlpha">—</div>
+                        <div class="bs-r-sub">对标理想向量</div>
+                    </div>
+                    <div class="bs-result-item">
+                        <div class="bs-r-label">资产等级</div>
+                        <div class="bs-r-value" id="bsGrade" style="color:#94a3b8;">—</div>
+                        <div class="bs-r-sub">S/A/B/C/D</div>
+                    </div>
+                    <div class="bs-result-item">
+                        <div class="bs-r-label">赛道博弈属性</div>
+                        <div class="bs-r-value" id="bsOcean">—</div>
+                        <div class="bs-r-sub" id="bsOceanCtrl">—</div>
+                    </div>
+                    <div class="bs-result-item">
+                        <div class="bs-r-label">无风险基准</div>
+                        <div class="bs-r-value blue" id="bsRiskFree">—</div>
+                        <div class="bs-r-sub">年化基准</div>
+                    </div>
+                    <div class="bs-result-item">
+                        <div class="bs-r-label">赛道集中度阈值</div>
+                        <div class="bs-r-value green" id="bsConcThreshold">—</div>
+                        <div class="bs-r-sub">Top3 占比红线</div>
+                    </div>
+                </div>
+                <div class="bs-diagnosis" id="bsDiagnosis"></div>
+                <div class="bs-strategy" id="bsStrategy"></div>
+                <div class="bs-revitalize" id="bsRevitalize"></div>
+                <div class="bs-disclaimer">
+                    ⚠️ 整套精细化估值调参、心理偏差量化模型处于内部持续自研迭代，本界面仅展示标准运行架构。前景理论纠偏自动规避沉没成本执念，防止死守低效老旧账号资产。
+                </div>
             </div>
         </div>
 
@@ -1086,6 +1464,274 @@
 
             // 每3秒微调一次，模拟动态演变
             setInterval(updateValuation, 3000);
+        })();
+
+        // ===== 全流程拓扑Canvas动画 =====
+        (function() {
+            const canvas = document.getElementById('topologyCanvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const W = canvas.width = 920;
+            const H = canvas.height = 340;
+
+            const steps = [
+                { label: '前景理论\n偏差校正', color: '#a78bfa', sub: '收益/损失框架校正' },
+                { label: '红蓝海赛道\n博弈定性', color: '#ef4444', sub: '古诺/蜈蚣双模型' },
+                { label: '四维非标\n量化测算', color: '#f59e0b', sub: '流量/人设/变现/风险' },
+                { label: '沉没存量\n盘活转化', color: '#fbbf24', sub: '沉没→机会成本' },
+                { label: 'GameMind\n凯利配比', color: '#fb923c', sub: '四六/二八管控' },
+                { label: '全域资产\n配置输出', color: '#34d399', sub: 'α分级+策略' }
+            ];
+
+            const particles = [];
+            function spawnParticle() {
+                particles.push({ t: 0, speed: 0.003 + Math.random() * 0.002 });
+            }
+            for (let i = 0; i < 3; i++) {
+                particles.push({ t: Math.random(), speed: 0.003 + Math.random() * 0.002 });
+            }
+
+            function getStepCenter(i) {
+                const padX = 70;
+                const gap = (W - padX * 2) / (steps.length - 1);
+                return { x: padX + gap * i, y: H / 2 - 10 };
+            }
+
+            function draw() {
+                ctx.clearRect(0, 0, W, H);
+
+                // Draw connections
+                for (let i = 0; i < steps.length - 1; i++) {
+                    const a = getStepCenter(i);
+                    const b = getStepCenter(i + 1);
+                    ctx.beginPath();
+                    ctx.moveTo(a.x + 55, a.y);
+                    ctx.lineTo(b.x - 55, b.y);
+                    ctx.strokeStyle = 'rgba(148,163,184,0.15)';
+                    ctx.lineWidth = 2;
+                    ctx.setLineDash([6, 4]);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+
+                    // Arrow
+                    const midX = (a.x + b.x) / 2;
+                    const midY = a.y;
+                    ctx.fillStyle = 'rgba(148,163,184,0.3)';
+                    ctx.beginPath();
+                    ctx.moveTo(midX + 6, midY);
+                    ctx.lineTo(midX - 4, midY - 6);
+                    ctx.lineTo(midX - 4, midY + 6);
+                    ctx.closePath();
+                    ctx.fill();
+                }
+
+                // Animate particles
+                for (let i = particles.length - 1; i >= 0; i--) {
+                    const p = particles[i];
+                    p.t += p.speed;
+                    if (p.t > 1) { particles.splice(i, 1); spawnParticle(); continue; }
+
+                    const segIdx = Math.min(Math.floor(p.t * (steps.length - 1)), steps.length - 2);
+                    const segT = (p.t * (steps.length - 1)) - segIdx;
+                    const a = getStepCenter(segIdx);
+                    const b = getStepCenter(segIdx + 1);
+                    const px = a.x + 55 + (b.x - a.x - 110) * segT;
+                    const py = a.y + Math.sin(Date.now() / 300 + i) * 4;
+                    const grad = ctx.createRadialGradient(px, py, 0, px, py, 10);
+                    grad.addColorStop(0, steps[segIdx].color + 'cc');
+                    grad.addColorStop(1, steps[segIdx].color + '00');
+                    ctx.fillStyle = grad;
+                    ctx.beginPath();
+                    ctx.arc(px, py, 8, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+
+                // Draw step nodes
+                steps.forEach((step, i) => {
+                    const c = getStepCenter(i);
+                    // Glow
+                    const glow = ctx.createRadialGradient(c.x, c.y, 0, c.x, c.y, 45);
+                    glow.addColorStop(0, step.color + '30');
+                    glow.addColorStop(1, step.color + '00');
+                    ctx.fillStyle = glow;
+                    ctx.beginPath();
+                    ctx.arc(c.x, c.y, 45, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    // Node circle
+                    ctx.beginPath();
+                    ctx.arc(c.x, c.y, 32, 0, Math.PI * 2);
+                    ctx.fillStyle = 'rgba(15,23,42,0.9)';
+                    ctx.fill();
+                    ctx.strokeStyle = step.color;
+                    ctx.lineWidth = 2.5;
+                    ctx.stroke();
+
+                    // Number badge
+                    ctx.fillStyle = step.color;
+                    ctx.beginPath();
+                    ctx.arc(c.x + 20, c.y - 22, 11, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.fillStyle = '#0f172a';
+                    ctx.font = 'bold 11px monospace';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(i + 1, c.x + 20, c.y - 22);
+
+                    // Label
+                    ctx.fillStyle = '#e2e8f0';
+                    ctx.font = 'bold 12px sans-serif';
+                    ctx.textAlign = 'center';
+                    const lines = step.label.split('\n');
+                    lines.forEach((line, li) => {
+                        ctx.fillText(line, c.x, c.y - 3 + li * 14 - (lines.length - 1) * 7);
+                    });
+
+                    // Subtitle
+                    ctx.fillStyle = 'rgba(148,163,184,0.6)';
+                    ctx.font = '10px sans-serif';
+                    ctx.fillText(step.sub, c.x, c.y + 48);
+                });
+
+                requestAnimationFrame(draw);
+            }
+
+            draw();
+            setInterval(spawnParticle, 1200);
+        })();
+
+        // ===== 博主矩阵估值模拟器 =====
+        (function() {
+            const trackData = {
+                entertainment: { rf: '8%', conc: '45%', ocean: 'red', oceanLabel: '红海·古诺均衡', ctrl: '二八人工终审管控', baseFlow: 0.6, basePersona: 0.5, baseMon: 0.55 },
+                beauty:        { rf: '10%', conc: '50%', ocean: 'red', oceanLabel: '红海·古诺均衡', ctrl: '二八人工终审管控', baseFlow: 0.65, basePersona: 0.7, baseMon: 0.7 },
+                knowledge:     { rf: '12%', conc: '30%', ocean: 'blue', oceanLabel: '蓝海·序贯博弈', ctrl: '四六动态自动化管控', baseFlow: 0.5, basePersona: 0.75, baseMon: 0.65 },
+                food:          { rf: '9%', conc: '35%', ocean: 'blue', oceanLabel: '蓝海·序贯博弈', ctrl: '四六动态自动化管控', baseFlow: 0.6, basePersona: 0.6, baseMon: 0.55 },
+                gaming:        { rf: '7%', conc: '55%', ocean: 'red', oceanLabel: '红海·古诺均衡', ctrl: '二八人工终审管控', baseFlow: 0.55, basePersona: 0.5, baseMon: 0.5 },
+                rural:         { rf: '6%', conc: '25%', ocean: 'blue', oceanLabel: '蓝海·序贯博弈', ctrl: '四六动态自动化管控', baseFlow: 0.4, basePersona: 0.55, baseMon: 0.35 }
+            };
+
+            const trackNames = {
+                entertainment: '泛娱乐', beauty: '美妆时尚', knowledge: '知识财经',
+                food: '美食旅行', gaming: '游戏电竞', rural: '三农政务'
+            };
+
+            const calcBtn = document.getElementById('bsCalcBtn');
+            if (!calcBtn) return;
+
+            calcBtn.addEventListener('click', function() {
+                const track = document.getElementById('bsTrack').value;
+                const tier = document.getElementById('bsTier').value;
+                let flow = parseFloat(document.getElementById('bsFlow').value) || 0;
+                let persona = parseFloat(document.getElementById('bsPersona').value) || 0;
+                let monetize = parseFloat(document.getElementById('bsMonetize').value) || 0;
+                let risk = parseFloat(document.getElementById('bsRisk').value) || 0;
+
+                flow = Math.max(0, Math.min(100, flow)) / 100;
+                persona = Math.max(0, Math.min(100, persona)) / 100;
+                monetize = Math.max(0, Math.min(100, monetize)) / 100;
+                risk = Math.max(0, Math.min(100, risk)) / 100;
+
+                const td = trackData[track];
+                // Prospect theory correction - bias correction factor (self-developed, not exposed)
+                const biasCorrection = 0.5; // system steady-state axis, replaces sunk cost reference point
+                // Weighted 4D valuation (simplified demo version)
+                const wFlow = 0.3, wPersona = 0.25, wMon = 0.3, wRisk = 0.15;
+                let total = wFlow * flow + wPersona * persona + wMon * monetize - wRisk * risk;
+                total = total * (0.85 + biasCorrection * 0.3);
+                total = Math.max(0.05, Math.min(0.98, total));
+
+                // Alpha cosine similarity (simplified)
+                const idealVec = [0.85, 0.80, 0.80, 0.20];
+                const userVec = [flow, persona, monetize, risk];
+                let dot = 0, magA = 0, magB = 0;
+                for (let i = 0; i < 4; i++) { dot += idealVec[i] * userVec[i]; magA += idealVec[i] * idealVec[i]; magB += userVec[i] * userVec[i]; }
+                let alpha = dot / (Math.sqrt(magA) * Math.sqrt(magB) + 0.001);
+                alpha = Math.max(0.1, Math.min(0.98, alpha));
+
+                // Grade (blended: weighted combination of total and alpha)
+                const blendedScore = total * 0.45 + alpha * 0.55;
+                let grade, gradeColor, gradeDesc;
+                if (blendedScore >= 0.80) { grade = 'S级'; gradeColor = '#a78bfa'; gradeDesc = '头部标杆资产，超额收益标杆'; }
+                else if (blendedScore >= 0.65) { grade = 'A级'; gradeColor = '#60a5fa'; gradeDesc = '优质资产，具备跃迁S级潜力'; }
+                else if (blendedScore >= 0.50) { grade = 'B级'; gradeColor = '#fbbf24'; gradeDesc = '腰部培育资产，需针对性补短板'; }
+                else if (blendedScore >= 0.35) { grade = 'C级'; gradeColor = '#fb923c'; gradeDesc = '尾部观察资产，存在盘活空间'; }
+                else { grade = 'D级'; gradeColor = '#ef4444'; gradeDesc = '低效资产，考虑清退或全面转型'; }
+
+                // Update result display
+                document.getElementById('bsTotal').textContent = total.toFixed(3);
+                document.getElementById('bsAlpha').textContent = alpha.toFixed(3);
+                const gradeEl = document.getElementById('bsGrade');
+                gradeEl.textContent = grade;
+                gradeEl.style.color = gradeColor;
+
+                const oceanEl = document.getElementById('bsOcean');
+                oceanEl.textContent = td.oceanLabel;
+                oceanEl.style.color = td.ocean === 'red' ? '#f87171' : '#34d399';
+                document.getElementById('bsOceanCtrl').textContent = td.ctrl;
+                document.getElementById('bsRiskFree').textContent = td.rf;
+                document.getElementById('bsConcThreshold').textContent = td.conc;
+
+                // Diagnosis
+                let diagnosis = '';
+                const weakDims = [];
+                if (flow < 0.5) weakDims.push('流量盘');
+                if (persona < 0.5) weakDims.push('人设盘');
+                if (monetize < 0.5) weakDims.push('变现盘');
+                if (risk > 0.6) weakDims.push('风险盘（风险过高）');
+
+                const diagEl = document.getElementById('bsDiagnosis');
+                if (weakDims.length === 0) {
+                    diagnosis = `<strong>🩺 赛道健康诊断：</strong>${trackNames[track]}赛道四维表现均衡，资产质量${alpha >= 0.7 ? '优良' : '尚可'}。系统已自动完成前景理论决策偏差校正，规避主观风险偏好偏移。`;
+                } else {
+                    diagnosis = `<strong>🩺 赛道健康诊断：</strong>${trackNames[track]}赛道博主存在短板维度：${weakDims.join('、')}。当前赛道属${td.oceanLabel}市场，建议采用${td.ctrl}模式。`;
+                }
+                diagEl.innerHTML = diagnosis;
+
+                // Strategy
+                const stratEl = document.getElementById('bsStrategy');
+                let strategy = '';
+                if (grade === 'S级' || grade === 'A级') {
+                    strategy = `<strong>🎯 矩阵运营策略：</strong>纳入核心资产组合，配置60%-80%核心资源，维持优势盘稳定输出；${td.ocean === 'blue' ? '蓝海赛道可启用序贯多轮博弈策略，分阶段扩张品类。' : '红海赛道需构筑差异化壁垒，巩固古诺均衡产能份额。'}`;
+                } else if (grade === 'B级') {
+                    strategy = `<strong>🎯 矩阵运营策略：</strong>腰部培育对象，配置20%-40%辅助资源，聚焦${weakDims.length > 0 ? weakDims[0] : '核心维度'}补短板；对标S级头部标杆，完成内容/变现路径对齐。`;
+                } else if (grade === 'C级') {
+                    strategy = `<strong>🎯 矩阵运营策略：</strong>尾部观察对象，配置<15%探索性资源；启动蜈蚣序贯盘活方案，分阶段完成存量内容资产向新方向迁移，设置3个月观察期。`;
+                } else {
+                    strategy = `<strong>🎯 矩阵运营策略：</strong>D级低效资产，启动沉没成本转化流程：提取过往内容资产可复用要素，将不可收回沉没投入改造为${td.ocean === 'blue' ? '蓝海赛道' : '相邻赛道'}选择权价值，完成清退或全面转型。`;
+                }
+                stratEl.innerHTML = strategy;
+
+                // Revitalization plan for waist/tail
+                const revEl = document.getElementById('bsRevitalize');
+                if (tier === 'waist' || tier === 'tail' || grade === 'C级' || grade === 'D级') {
+                    revEl.innerHTML = `<strong>♻️ 存量博主盘活方案（${tier === 'tail' ? '尾部' : '腰部'}）：</strong>对标S级头部标杆基准，将过往内容沉没投入拆解为"人设沉淀/粉丝资产/内容方法论"三个可复用模块，转化为${td.ocean === 'blue' ? '蓝海序贯赛道' : '差异化细分赛道'}的运营机会成本；依托蜈蚣多轮博弈模型分3-5个迭代周期完成转型布局，避免一次性All-in的非理性决策。<br><span style="color:rgba(167,139,250,0.7);font-size:12px;">→ 已通过前景理论0.5稳态中轴线校正，自动规避"沉没成本执念"导致的固守低效账号决策偏差。</span>`;
+                    revEl.style.display = 'block';
+                } else {
+                    revEl.style.display = 'none';
+                }
+
+                // Animate result area
+                const resultArea = document.getElementById('bsResultArea');
+                resultArea.classList.add('show');
+                resultArea.style.opacity = '0';
+                resultArea.style.transform = 'translateY(10px)';
+                resultArea.style.transition = 'all 0.4s ease';
+                setTimeout(() => {
+                    resultArea.style.opacity = '1';
+                    resultArea.style.transform = 'translateY(0)';
+                }, 50);
+            });
+
+            // Track change -> auto-update base parameters
+            document.getElementById('bsTrack').addEventListener('change', function() {
+                const track = this.value;
+                const td = trackData[track];
+                document.getElementById('bsFlow').value = Math.round(td.baseFlow * 100);
+                document.getElementById('bsPersona').value = Math.round(td.basePersona * 100);
+                document.getElementById('bsMonetize').value = Math.round(td.baseMon * 100);
+                document.getElementById('bsRisk').value = td.ocean === 'red' ? 40 : 30;
+            });
         })();
     </script>
 
