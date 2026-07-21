@@ -107,6 +107,14 @@ with st.sidebar:
         <div style="font-size:11px; color:#7a86b4; margin-top:4px; font-family:monospace">
             v1.0-Batch1
         </div>
+        <div style="margin-top:10px">
+            <a href="../../engines/geom-compute/index.html" target="_self"
+               style="display:inline-flex;align-items:center;gap:6px;font-size:11px;color:#93c5fd;
+                      background:rgba(59,130,246,0.12);border:1px solid rgba(59,130,246,0.35);
+                      padding:5px 10px;border-radius:6px;text-decoration:none">
+               🏗️ 回到几何算力中控台
+            </a>
+        </div>
     </div>
     """, unsafe_allow_html=True)
 

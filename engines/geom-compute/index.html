@@ -195,6 +195,52 @@
         .breadcrumb .sep { color:rgba(255,255,255,0.2); }
         .breadcrumb .current { color:rgba(255,255,255,0.7); }
 
+        /* ===== 下层挂载实验室监控面板 ===== */
+        .mount-panel { margin-top:10px; }
+        .mount-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(280px,1fr)); gap:14px; margin-top:14px; }
+        .mount-card {
+            background: linear-gradient(135deg, rgba(14,20,42,0.75), rgba(20,30,60,0.6));
+            border:1.5px solid rgba(96,165,250,0.25);
+            border-radius:14px; padding:18px 20px;
+            text-decoration:none; display:block; transition:all .25s;
+            position:relative; overflow:hidden;
+        }
+        .mount-card::before{
+            content:""; position:absolute; top:0; left:0; right:0; height:3px;
+        }
+        .mount-card:hover{
+            transform:translateY(-3px);
+            border-color:rgba(96,165,250,0.55);
+            box-shadow:0 12px 36px rgba(59,130,246,0.2);
+        }
+        .mount-card.mslab::before{background:linear-gradient(90deg,#3b82f6,#06b6d4);}
+        .mount-card.moodmind::before{background:linear-gradient(90deg,#a855f7,#ec4899);}
+        .mount-card.mindspeak::before{background:linear-gradient(90deg,#ec4899,#f472b6);}
+        .mount-card.default::before{background:linear-gradient(90deg,#22d3ee,#10b981);}
+        .mount-head { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+        .mount-icon { font-size:26px; filter:drop-shadow(0 0 8px rgba(96,165,250,0.4)); }
+        .mount-name { font-size:14px; font-weight:700; color:#e0e7ff; line-height:1.3; }
+        .mount-sub { font-size:11px; color:rgba(255,255,255,0.35); margin-top:2px; font-family:'SF Mono',Consolas,monospace; }
+        .mount-kpis { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-top:12px; }
+        .mkpi { background:rgba(0,0,0,0.25); border-radius:6px; padding:6px 8px; text-align:center; }
+        .mkpi-v { font-size:13px; font-weight:700; font-family:'SF Mono',Consolas,monospace; color:#e0e7ff; }
+        .mkpi-v.ok{color:#6ee7b7;} .mkpi-v.warn{color:#fcd34d;} .mkpi-v.err{color:#fca5a5;} .mkpi-v.info{color:#93c5fd;}
+        .mkpi-l { font-size:9px; color:rgba(255,255,255,0.35); text-transform:uppercase; letter-spacing:0.5px; margin-top:2px; }
+        .mount-status {
+            display:inline-flex; align-items:center; gap:5px;
+            font-size:10px; padding:2px 8px; border-radius:10px; margin-top:10px;
+            font-family:'SF Mono',Consolas,monospace; font-weight:600;
+        }
+        .mount-status.online{background:rgba(52,211,153,0.12); color:#6ee7b7; border:1px solid rgba(52,211,153,0.35);}
+        .mount-status.idle{background:rgba(251,191,36,0.12); color:#fcd34d; border:1px solid rgba(251,191,36,0.35);}
+        .mount-status.pending{background:rgba(148,163,184,0.15); color:#94a3b8; border:1px solid rgba(148,163,184,0.35);}
+        .mount-status .dot{width:6px;height:6px;border-radius:50%;background:currentColor;animation:dotPulse 1.5s ease-in-out infinite;}
+        @keyframes dotPulse{0%,100%{opacity:1;}50%{opacity:0.3;}}
+        .mount-arrow{position:absolute;right:16px;top:16px;color:rgba(255,255,255,0.2);font-size:18px;transition:all .25s;}
+        .mount-card:hover .mount-arrow{color:rgba(96,165,250,0.8);transform:translateX(3px);}
+        .mount-policy{font-size:10px;color:rgba(255,255,255,0.3);margin-top:8px;line-height:1.5}
+        .mount-note{font-size:11px;color:rgba(255,255,255,0.35);margin-top:12px;padding-top:10px;border-top:1px dashed rgba(255,255,255,0.08);line-height:1.6}
+
         @media (max-width:900px) {
             .container { padding:32px 20px 24px; border-radius:20px; }
             .ctrl-grid, .result-grid, .threshold-grid { grid-template-columns:1fr 1fr; }
@@ -655,6 +701,125 @@
                     <span class="sicon">✅</span>
                     <span id="statusText">安全均衡</span>
                 </div>
+            </div>
+        </div>
+
+        <!-- ===== 下层挂载实验室/系统监控面板 ===== -->
+        <div class="section mount-panel" id="sec-mounts" style="animation-delay:1.4s">
+            <h2><strong>下层挂载实验室监控</strong> <span class="tag">主动推送 · 只读展示 · 指令下发</span></h2>
+            <p>
+                本底座作为全体系最底层物理执行基座，对上层实验室/向量库采用<b style="color:#93c5fd">实验室主动推送、总控只读展示</b>模式。
+                底座只读接收各实验室上报的容量/水位/Token/精度/告警指标，不下发修改底层向量逻辑的指令。
+                各实验室私有数理内核（求解算子、128bit高精度、KMP底层源码、风控估值）均在各自 private_engine 独立运行，本底座不承载具体业务逻辑。
+            </p>
+
+            <div class="mount-grid">
+
+                <!-- MS-Lab · 心智向量化实验室 -->
+                <a href="../../ms-lab/index.html" class="mount-card mslab" style="text-decoration:none;">
+                    <span class="mount-arrow">→</span>
+                    <div class="mount-head">
+                        <span class="mount-icon">🧠</span>
+                        <div>
+                            <div class="mount-name">MindSpeak Embedding Lab</div>
+                            <div class="mount-sub">MS-Lab · 心智向量化实验室 · V1.0-Batch1</div>
+                        </div>
+                    </div>
+                    <div class="mount-kpis">
+                        <div class="mkpi"><div class="mkpi-v info">4</div><div class="mkpi-l">向量库</div></div>
+                        <div class="mkpi"><div class="mkpi-v ok">86.2%</div><div class="mkpi-l">比特率</div></div>
+                        <div class="mkpi"><div class="mkpi-v ok">0.962</div><div class="mkpi-l">精度</div></div>
+                        <div class="mkpi"><div class="mkpi-v warn">68%</div><div class="mkpi-l">最高水位</div></div>
+                        <div class="mkpi"><div class="mkpi-v info">≈13.8GB</div><div class="mkpi-l">磁盘占用</div></div>
+                        <div class="mkpi"><div class="mkpi-v warn">0🟡0🔴</div><div class="mkpi-l">告警</div></div>
+                    </div>
+                    <span class="mount-status online"><span class="dot"></span>握手已发 · Streamlit运行中 :8501</span>
+                    <div class="mount-policy">
+                        🔐 AES-256-GCM · 四级仓储(噪/缓/常/知) · Token实时刻度 · 三级权限<br>
+                        128bit/KMP/求解器 均为预留空接口 · 公私严格分层
+                    </div>
+                </a>
+
+                <!-- MoodMind · 全域非标计量 -->
+                <a href="../../engines/moodmind/index.html" class="mount-card moodmind" style="text-decoration:none;">
+                    <span class="mount-arrow">→</span>
+                    <div class="mount-head">
+                        <span class="mount-icon">💜</span>
+                        <div>
+                            <div class="mount-name">MoodMind 全域非标计量</div>
+                            <div class="mount-sub">金融向量实验室 · 同级平行实验室</div>
+                        </div>
+                    </div>
+                    <div class="mount-kpis">
+                        <div class="mkpi"><div class="mkpi-v info">IPD</div><div class="mkpi-l">向量库</div></div>
+                        <div class="mkpi"><div class="mkpi-v ok">—</div><div class="mkpi-l">比特率</div></div>
+                        <div class="mkpi"><div class="mkpi-v ok">稳态</div><div class="mkpi-l">精度</div></div>
+                        <div class="mkpi"><div class="mkpi-v ok">正常</div><div class="mkpi-l">水位</div></div>
+                        <div class="mkpi"><div class="mkpi-v info">—</div><div class="mkpi-l">磁盘</div></div>
+                        <div class="mkpi"><div class="mkpi-v ok">0🟡0🔴</div><div class="mkpi-l">告警</div></div>
+                    </div>
+                    <span class="mount-status idle"><span class="dot"></span>运行中 · 博弈估值内核隔离</span>
+                    <div class="mount-policy">
+                        古诺/蜈蚣双博弈 · 四维穿透估值 · 前景理论校正<br>
+                        金融私有算子在 private_engine 隔离
+                    </div>
+                </a>
+
+                <!-- MindSpeak · 四层跨域翻译 -->
+                <a href="../../engines/mindspeak/index.html" class="mount-card mindspeak" style="text-decoration:none;">
+                    <span class="mount-arrow">→</span>
+                    <div class="mount-head">
+                        <span class="mount-icon">🗣️</span>
+                        <div>
+                            <div class="mount-name">MindSpeak 四层同构翻译</div>
+                            <div class="mount-sub">数理-语言同构引擎 · V19.0</div>
+                        </div>
+                    </div>
+                    <div class="mount-kpis">
+                        <div class="mkpi"><div class="mkpi-v info">4层</div><div class="mkpi-l">映射层</div></div>
+                        <div class="mkpi"><div class="mkpi-v ok">稳态</div><div class="mkpi-l">置信度核</div></div>
+                        <div class="mkpi"><div class="mkpi-v ok">0.5</div><div class="mkpi-l">中轴线</div></div>
+                        <div class="mkpi"><div class="mkpi-v ok">正常</div><div class="mkpi-l">密码矩阵</div></div>
+                        <div class="mkpi"><div class="mkpi-v info">4D</div><div class="mkpi-l">向量算子</div></div>
+                        <div class="mkpi"><div class="mkpi-v ok">0🟡0🔴</div><div class="mkpi-l">告警</div></div>
+                    </div>
+                    <span class="mount-status online"><span class="dot"></span>在线 · 跨域同构链路正常</span>
+                    <div class="mount-policy">
+                        语言→思维→算法→数学 四层映射 · 置信度核熔断<br>
+                        MS-Lab 向量化结果可同步至本引擎完成数理-语言同构
+                    </div>
+                </a>
+
+                <!-- 预留挂载位 -->
+                <div class="mount-card" style="text-decoration:none;cursor:default;opacity:0.55;border-style:dashed;">
+                    <div class="mount-head">
+                        <span class="mount-icon" style="filter:none">⬜</span>
+                        <div>
+                            <div class="mount-name">预留挂载位</div>
+                            <div class="mount-sub">future_lab_slot_01</div>
+                        </div>
+                    </div>
+                    <div class="mount-kpis">
+                        <div class="mkpi"><div class="mkpi-v">—</div><div class="mkpi-l">向量库</div></div>
+                        <div class="mkpi"><div class="mkpi-v">—</div><div class="mkpi-l">比特率</div></div>
+                        <div class="mkpi"><div class="mkpi-v">—</div><div class="mkpi-l">精度</div></div>
+                    </div>
+                    <span class="mount-status pending">等待新实验室接入握手</span>
+                    <div class="mount-note">
+                        📌 新实验室接入流程：<br>
+                        1) 在自身工程完成 0.48/0.50/0.68 全局阈值对齐<br>
+                        2) 实现主动心跳/状态上报协议<br>
+                        3) 本底座只读接收监控指标，不修改实验室内部逻辑
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="mount-note" style="margin-top:16px;font-size:12px;color:rgba(255,255,255,0.4);line-height:1.8;background:rgba(0,0,0,0.2);padding:12px 16px;border-radius:8px;border-left:3px solid #3b82f6;">
+                <b style="color:#93c5fd">📡 数据方向规则：</b>
+                MS-Lab 等挂载实验室 → 主动推送容量/水位/Token/精度/告警 → 本底座<b style="color:#6ee7b7">只读展示</b>；
+                本底座 → 可下发错峰调度/流量切换/熔断指令 → <b style="color:#fcd34d">不修改任何实验室底层向量逻辑与私有算子</b>。
+                128bit高精度、KMP底层匹配源码、通用数学求解库、风控估值深层算子均在各实验室 private_engine 独立隔离，本底座不承载也不转发。
             </div>
         </div>
 
