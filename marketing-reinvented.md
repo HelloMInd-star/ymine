@@ -1,6 +1,6 @@
 ## 核心证据链
 
-- [6小时吞噬6个陌生领域](./cross-domain-mapping.md)
+- [6小时吞噬6个陌生领域](./cross-domain-mapping.html)
 - [元架构重构营销学](./marketing-mapping.md)
 
 # 营销学：元架构的“吞噬”与“重构”
