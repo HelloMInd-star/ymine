@@ -1,65 +1,59 @@
 {
-  "lab_name": "MoodMind-Lab · 金融向量实验室",
-  "lab_id": "moodmind_finance_lab",
-  "version": "v1.0",
-  "storage": {
-    "main_db_path": "../moodmind_storage_main",
-    "design_capacity_gb": 50,
-    "hot_ratio_target": 0.2,
-    "warm_ratio_target": 0.5,
-    "cold_ratio_target": 0.3
+  "lab_name": "MoodMind-Lab 金融向量实验室",
+  "batch_version": "Batch1",
+  "batch_status": {
+    "batch1": "completed",
+    "batch2": "pending",
+    "batch3": "pending"
+  },
+  "ports": {
+    "static_home": 8100,
+    "streamlit_dashboard": 8510
   },
   "vector": {
-    "public_dims": 4,
-    "finance_dims": 7,
     "total_dims": 11,
-    "precision": "fp32",
-    "sphere_risk_threshold_warn": 0.50,
-    "sphere_risk_threshold_fuse": 0.68
+    "public_dims": 4,
+    "private_dims": 7,
+    "dimension_names": {
+      "D0": "主体",
+      "D1": "动作",
+      "D2": "属性",
+      "D3": "外部扰动",
+      "D4-P": "现价偏离中枢比例",
+      "D5-I": "基本面积分稳态值",
+      "D6-D": "涨跌速率微分",
+      "D7": "筹码箱体区间向量",
+      "D8": "行情周期相位",
+      "D9": "凯利安全仓位系数",
+      "D10": "球面风险模长"
+    }
   },
   "lighting": {
-    "L1_liquidity": "成交量流动性光照",
-    "L2_sentiment": "题材情绪光照",
-    "L3_policy": "产业政策光照",
-    "L4_prosperity": "产业链景气光照"
+    "dimensions": 4,
+    "names": ["L1 成交量流动性光照", "L2 题材情绪光照", "L3 产业政策光照", "L4 产业链景气光照"]
   },
-  "kmp": {
-    "threshold_noise": 0.25,
-    "threshold_buffer": 0.50,
-    "threshold_normal": 0.75,
-    "threshold_knowledge": 0.75
+  "sphere_risk": {
+    "threshold_capital_preservation": 0.48,
+    "threshold_steady": 0.50,
+    "threshold_fuse": 0.68
   },
-  "push_api": {
-    "mslab_endpoint": "http://localhost:8501/api/push-vector",
-    "push_interval_sec": 5,
-    "max_batch_size": 50
+  "kmp_routing": {
+    "noise_threshold": 0.25,
+    "buffer_threshold": 0.50,
+    "normal_threshold": 0.75,
+    "knowledge_threshold": 0.75
   },
-  "compute": {
-    "scheduler_endpoint": "../geom-compute",
-    "report_interval_sec": 10
+  "mslab": {
+    "endpoint": "http://localhost:8501/api/push-vector",
+    "status": "connected"
   },
-  "billing": {
-    "tokens_per_vector": 256,
-    "tokens_per_kmp_match": 128,
-    "price_per_1k_tokens": 0.0015
+  "storage": {
+    "total_capacity_gb": 100,
+    "warning_watermark": 0.7,
+    "critical_watermark": 0.9,
+    "hot_ratio": 0.3,
+    "warm_ratio": 0.5,
+    "cold_ratio": 0.2
   },
-  "security": {
-    "rbac_roles": ["admin", "quant", "operator", "viewer"],
-    "max_export_batch": 100,
-    "audit_log_enabled": true
-  },
-  "private_engine": {
-    "path": "../private_moodmind_engine",
-    "note": "闭源私有内核 - 工程层不触碰、不实现、不依赖",
-    "blocked_items": [
-      "11维向量底层计算公式",
-      "I/P/D三维PID自控迭代逻辑",
-      "四维光照动态行业权重算法",
-      "超球面风险模长求解公式",
-      "0.48/0.50/0.68三阈值底层判定逻辑",
-      "改良KMP周期匹配LPS底层源码",
-      "行情相位/箱体中枢/筹码结构私有算子",
-      "凯利仓位安全系数内核"
-    ]
-  }
+  "rbac_roles": ["admin", "quant", "operator", "viewer"]
 }

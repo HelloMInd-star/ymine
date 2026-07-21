@@ -1,434 +1,746 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>💜 MoodMind-Lab · 金融向量实验室</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MoodMind-Lab · 金融向量实验室</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'PingFang SC', 'Microsoft YaHei', sans-serif;
-            background: radial-gradient(ellipse at 20% 10%, #1a0a2e 0%, #0f0a1e 40%, #050310 100%);
-            color: rgba(255,255,255,0.85);
+            font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #0a0a1a 0%, #1a0a2e 50%, #0a1a2e 100%);
             min-height: 100vh;
+            color: #e0e0ff;
             overflow-x: hidden;
         }
-        #stars { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 3s infinite;
+        }
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
         .container {
-            position: relative; z-index: 1;
-            max-width: 1200px;
+            position: relative;
+            z-index: 1;
+            max-width: 1400px;
             margin: 0 auto;
-            padding: 48px 32px 40px;
+            padding: 40px 20px;
         }
-        .version-badge {
-            display: inline-block;
-            padding: 4px 14px;
-            background: rgba(168,85,247,0.12);
-            border: 1px solid rgba(168,85,247,0.3);
-            border-radius: 20px;
-            font-size: 12px;
-            color: #c4b5fd;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-            margin-bottom: 16px;
+        header {
+            text-align: center;
+            padding: 40px 0;
+            border-bottom: 1px solid rgba(147, 112, 219, 0.3);
+            margin-bottom: 40px;
         }
-        h1 {
-            font-size: 44px;
-            font-weight: 800;
-            background: linear-gradient(135deg, #f1f5f9 0%, #c4b5fd 25%, #a78bfa 50%, #60a5fa 75%, #f1f5f9 100%);
-            background-size: 300% 300%;
+        .logo {
+            font-size: 72px;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #9370db, #663399, #ba55d3);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            animation: gradientFlow 8s ease-in-out infinite;
-            letter-spacing: -1px;
-            margin-bottom: 10px;
+            background-clip: text;
+            filter: drop-shadow(0 0 30px rgba(147, 112, 219, 0.5));
         }
-        @keyframes gradientFlow {
-            0%,100% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
+        h1 {
+            font-size: 42px;
+            font-weight: 700;
+            background: linear-gradient(90deg, #9370db, #da70d6, #87ceeb);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 15px;
+            letter-spacing: 2px;
         }
         .subtitle {
-            font-size: 16px;
-            color: rgba(255,255,255,0.4);
-            font-weight: 300;
-            line-height: 1.7;
-            margin-bottom: 32px;
-            max-width: 800px;
+            font-size: 18px;
+            color: #9370db;
+            letter-spacing: 4px;
+            margin-bottom: 25px;
         }
-        .hero-pills {
-            display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 28px;
+        .batch-status {
+            display: inline-flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
         }
-        .pill {
-            padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 600;
-            border: 1px solid;
+        .batch-badge {
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 1px;
         }
-        .pill-private { background: rgba(168,85,247,0.12); border-color: rgba(168,85,247,0.3); color: #c4b5fd; }
-        .pill-public { background: rgba(59,130,246,0.12); border-color: rgba(59,130,246,0.3); color: #93c5fd; }
-        .pill-green { background: rgba(34,197,94,0.12); border-color: rgba(34,197,94,0.3); color: #6ee7b7; }
-        .quick-links {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-            gap: 16px; margin: 32px 0;
+        .batch-completed {
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+            box-shadow: 0 0 20px rgba(46, 204, 113, 0.4);
         }
-        .link-card {
-            background: linear-gradient(135deg, rgba(168,85,247,0.06), rgba(59,130,246,0.03));
-            border: 1px solid rgba(168,85,247,0.15);
-            border-radius: 16px;
-            padding: 24px;
-            text-decoration: none;
-            color: inherit;
-            transition: all 0.3s ease;
-            display: block;
+        .batch-pending {
+            background: rgba(149, 165, 166, 0.3);
+            border: 1px solid rgba(149, 165, 166, 0.5);
+            color: #95a5a6;
         }
-        .link-card:hover {
-            transform: translateY(-3px);
-            border-color: rgba(168,85,247,0.4);
-            box-shadow: 0 12px 40px rgba(168,85,247,0.15);
-        }
-        .link-card .icon { font-size: 32px; margin-bottom: 12px; }
-        .link-card .title {
-            font-size: 17px; font-weight: 700; color: #e9d5ff; margin-bottom: 6px;
-        }
-        .link-card .desc {
-            font-size: 13px; color: rgba(255,255,255,0.45); line-height: 1.6;
-        }
-        .link-card .url {
-            font-size: 11px; color: rgba(255,255,255,0.25); margin-top: 10px;
-            font-family: 'SF Mono', Consolas, monospace;
-        }
-        .section-title {
-            font-size: 22px; font-weight: 700; color: #c4b5fd;
-            margin: 40px 0 18px; padding-bottom: 10px;
-            border-bottom: 1px solid rgba(168,85,247,0.15);
-        }
-        .arch-grid {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 14px; margin: 16px 0;
-        }
-        .arch-box {
-            background: rgba(0,0,0,0.3); border-radius: 14px; padding: 20px;
-            border: 1px solid rgba(255,255,255,0.05);
-        }
-        .arch-box.private {
-            border-color: rgba(239,68,68,0.2);
-            background: linear-gradient(135deg, rgba(239,68,68,0.04), rgba(0,0,0,0.3));
-        }
-        .arch-box.public {
-            border-color: rgba(59,130,246,0.2);
-            background: linear-gradient(135deg, rgba(59,130,246,0.04), rgba(0,0,0,0.3));
-        }
-        .arch-box.extern {
-            border-color: rgba(34,197,94,0.2);
-            background: linear-gradient(135deg, rgba(34,197,94,0.04), rgba(0,0,0,0.3));
-        }
-        .arch-box h4 {
-            font-size: 14px; font-weight: 700; margin-bottom: 10px;
-            display: flex; align-items: center; gap: 8px;
-        }
-        .arch-box.private h4 { color: #fca5a5; }
-        .arch-box.public h4 { color: #93c5fd; }
-        .arch-box.extern h4 { color: #6ee7b7; }
-        .arch-box ul { list-style: none; }
-        .arch-box li {
-            font-size: 12px; color: rgba(255,255,255,0.5); line-height: 2;
-            padding-left: 14px; position: relative;
-        }
-        .arch-box li::before {
-            content: "•"; position: absolute; left: 0; color: rgba(255,255,255,0.2);
-        }
-        .redline-box {
-            background: rgba(239,68,68,0.06);
-            border-left: 4px solid #ef4444;
-            border-radius: 0 12px 12px 0;
-            padding: 18px 22px;
-            margin: 20px 0;
-        }
-        .redline-box h4 { color: #fca5a5; font-size: 14px; margin-bottom: 10px; }
-        .redline-box li {
-            font-size: 12px; color: rgba(255,255,255,0.5); line-height: 1.9;
-            list-style: none; padding-left: 16px; position: relative;
-        }
-        .redline-box li::before {
-            content: "❌"; position: absolute; left: 0; font-size: 10px;
-        }
-        .vec-dims {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 10px; margin: 16px 0;
-        }
-        .dim-card {
-            background: rgba(0,0,0,0.25); border-radius: 10px; padding: 14px;
-            border: 1px solid rgba(255,255,255,0.04);
-        }
-        .dim-card.pub { border-left: 3px solid #60a5fa; }
-        .dim-card.priv { border-left: 3px solid #a855f7; }
-        .dim-card .dim-name { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.75); }
-        .dim-card .dim-desc { font-size: 11px; color: rgba(255,255,255,0.35); margin-top: 4px; line-height: 1.5; }
-        .dim-card .dim-tag {
-            display: inline-block; font-size: 9px; padding: 1px 6px; border-radius: 4px;
-            margin-left: 6px; font-weight: 600;
-        }
-        .dim-card.pub .dim-tag { background: rgba(59,130,246,0.2); color: #93c5fd; }
-        .dim-card.priv .dim-tag { background: rgba(168,85,247,0.2); color: #c4b5fd; }
-        .nav-bar {
-            display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px;
+        .nav-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 50px;
         }
         .nav-btn {
-            padding: 8px 16px; border-radius: 10px;
-            background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1);
-            color: rgba(255,255,255,0.6); text-decoration: none; font-size: 13px;
-            transition: all 0.2s;
+            padding: 15px 35px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+            letter-spacing: 1px;
         }
-        .nav-btn:hover { background: rgba(168,85,247,0.1); border-color: rgba(168,85,247,0.3); color: #c4b5fd; }
-        .nav-btn.primary {
-            background: linear-gradient(135deg, #a855f7, #7c3aed);
-            border: none; color: white; font-weight: 600;
+        .btn-dashboard {
+            background: linear-gradient(135deg, #9370db, #663399);
+            color: white;
+            box-shadow: 0 4px 20px rgba(147, 112, 219, 0.4);
+        }
+        .btn-dashboard:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(147, 112, 219, 0.6);
+        }
+        .btn-ymine {
+            background: linear-gradient(135deg, #1e3a5f, #2c5282);
+            color: #87ceeb;
+            border: 1px solid rgba(135, 206, 235, 0.4);
+        }
+        .btn-ymine:hover {
+            background: linear-gradient(135deg, #2c5282, #3b6fa0);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(44, 82, 130, 0.5);
+        }
+        .btn-mslab {
+            background: linear-gradient(135deg, #2d5016, #3d6b1e);
+            color: #90ee90;
+            border: 1px solid rgba(144, 238, 144, 0.4);
+        }
+        .btn-mslab:hover {
+            background: linear-gradient(135deg, #3d6b1e, #4d8628);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(61, 107, 30, 0.5);
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        .card {
+            background: rgba(20, 10, 40, 0.6);
+            border: 1px solid rgba(147, 112, 219, 0.25);
+            border-radius: 16px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+        .card:hover {
+            border-color: rgba(147, 112, 219, 0.5);
+            box-shadow: 0 10px 40px rgba(147, 112, 219, 0.2);
+            transform: translateY(-5px);
+        }
+        .card-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: #ba55d3;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .card-icon {
+            font-size: 28px;
+        }
+        .vector-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+        .vector-dim {
+            padding: 12px 15px;
+            border-radius: 8px;
+            font-size: 13px;
+        }
+        .dim-public {
+            background: rgba(52, 152, 219, 0.15);
+            border-left: 3px solid #3498db;
+            color: #87ceeb;
+        }
+        .dim-private {
+            background: rgba(155, 89, 182, 0.15);
+            border-left: 3px solid #9b59b6;
+            color: #dda0dd;
+        }
+        .dim-label {
+            font-weight: 700;
+            margin-right: 8px;
+        }
+        .lighting-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .lighting-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+        }
+        .lighting-bar {
+            flex: 1;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .lighting-fill {
+            height: 100%;
+            border-radius: 4px;
+            animation: pulse-light 2s infinite;
+        }
+        @keyframes pulse-light {
+            0%, 100% { opacity: 0.7; }
+            50% { opacity: 1; }
+        }
+        .l1 { background: linear-gradient(90deg, #f39c12, #f1c40f); width: 72%; }
+        .l2 { background: linear-gradient(90deg, #e74c3c, #e91e63); width: 85%; }
+        .l3 { background: linear-gradient(90deg, #3498db, #00bcd4); width: 45%; }
+        .l4 { background: linear-gradient(90deg, #27ae60, #8bc34a); width: 60%; }
+        .rbac-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .role-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.25);
+        }
+        .role-dot {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        .role-info {
+            flex: 1;
+        }
+        .role-name {
+            font-weight: 700;
+            font-size: 15px;
+            margin-bottom: 4px;
+        }
+        .role-desc {
+            font-size: 12px;
+            color: #888;
+            line-height: 1.5;
+        }
+        .risk-gauge {
+            text-align: center;
+            padding: 20px;
+        }
+        .gauge-circle {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            background: conic-gradient(
+                #27ae60 0deg 173deg,
+                #f39c12 173deg 180deg,
+                #e74c3c 180deg 245deg,
+                rgba(255,255,255,0.1) 245deg 360deg
+            );
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            position: relative;
+        }
+        .gauge-inner {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            background: #0a0a1a;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .gauge-value {
+            font-size: 36px;
+            font-weight: 700;
+            color: #2ecc71;
+        }
+        .gauge-label {
+            font-size: 12px;
+            color: #888;
+        }
+        .gauge-legend {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            font-size: 13px;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .legend-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+        .kmp-placeholder {
+            text-align: center;
+            padding: 40px 20px;
+            color: #666;
+        }
+        .kmp-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+        .storage-bars {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+        .storage-tier {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .storage-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+        }
+        .storage-bar {
+            height: 24px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .storage-fill {
+            height: 100%;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            padding-left: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            color: rgba(0, 0, 0, 0.7);
+        }
+        .hot { background: linear-gradient(90deg, #e74c3c, #c0392b); width: 30%; }
+        .warm { background: linear-gradient(90deg, #f39c12, #e67e22); width: 50%; }
+        .cold { background: linear-gradient(90deg, #3498db, #2980b9); width: 20%; }
+        .total-capacity {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(147, 112, 219, 0.1);
+            border-radius: 10px;
+        }
+        .capacity-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #9370db;
+        }
+        .capacity-label {
+            font-size: 13px;
+            color: #888;
+            margin-top: 5px;
         }
         footer {
-            text-align: center; margin-top: 60px; padding-top: 24px;
-            border-top: 1px solid rgba(255,255,255,0.04);
-            font-size: 12px; color: rgba(255,255,255,0.25);
+            text-align: center;
+            padding: 40px 0;
+            border-top: 1px solid rgba(147, 112, 219, 0.2);
+            margin-top: 40px;
+            color: #666;
+            font-size: 13px;
         }
-        @media (max-width: 768px) {
-            .container { padding: 28px 16px; }
-            h1 { font-size: 30px; }
-            .quick-links { grid-template-columns: 1fr; }
-            .arch-grid { grid-template-columns: 1fr; }
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 15px;
+        }
+        .footer-link {
+            color: #9370db;
+            text-decoration: none;
+        }
+        .footer-link:hover {
+            text-decoration: underline;
+        }
+        .daily-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            text-align: center;
+        }
+        .stat-item {
+            padding: 20px 10px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+        }
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #da70d6;
+        }
+        .stat-label {
+            font-size: 12px;
+            color: #888;
+            margin-top: 5px;
+        }
+        .alert-panel {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .alert-item {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            font-size: 13px;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+        .alert-info { background: rgba(52, 152, 219, 0.15); border-left: 3px solid #3498db; }
+        .alert-success { background: rgba(46, 204, 113, 0.15); border-left: 3px solid #2ecc71; }
+        .alert-warning { background: rgba(243, 156, 18, 0.15); border-left: 3px solid #f39c12; }
+        .alert-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-top: 5px;
+            flex-shrink: 0;
         }
     </style>
 </head>
 <body>
-    <canvas id="stars"></canvas>
+    <div class="stars" id="stars"></div>
     <div class="container">
-        <div class="version-badge">💜 MoodMind-Lab v1.0 · 金融向量实验室</div>
-        <h1>💜 MoodMind-Lab・金融向量实验室</h1>
-        <div class="subtitle">
-            Game-OS V3.0 集群核心平行实验室，与 MS-Lab 通用心智向量实验室完全平级。<br/>
-            挂载于「几何心智空间全域算力底座 &amp; Y.Mine 总控台」，11 维时序金融向量建模 · 四维光照环境 · 改良 KMP 周期匹配 · 球面风控内核。<br/>
-            <b style="color:#fca5a5">核心原则：公私彻底隔离 — 金融底层数理公式/权重/周期/估值仅存私有引擎，工程层只接收最终结果。</b>
-        </div>
+        <header>
+            <div class="logo">🧠</div>
+            <h1>MoodMind-Lab · 金融向量实验室</h1>
+            <p class="subtitle">GEOMETRIC MIND SPACE · FINANCIAL VECTOR LABORATORY</p>
+            <div class="batch-status">
+                <span class="batch-badge batch-completed">✅ Batch1 骨架完工</span>
+                <span class="batch-badge batch-pending">⏳ Batch2 核心算法（待开发）</span>
+                <span class="batch-badge batch-pending">⏳ Batch3 生产部署（待开发）</span>
+            </div>
+            <div class="nav-buttons">
+                <a href="http://localhost:8510" class="nav-btn btn-dashboard" target="_blank">
+                    📊 进入金融数据大盘
+                </a>
+                <a href="http://localhost:8090" class="nav-btn btn-ymine" target="_blank">
+                    🏛️ Y.Mine 总控台
+                </a>
+                <a href="http://localhost:8501" class="nav-btn btn-mslab" target="_blank">
+                    🧬 MS-Lab 通用实验室
+                </a>
+            </div>
+        </header>
 
-        <div class="hero-pills">
-            <span class="pill pill-private">🔒 private_moodmind_engine（闭源不入工程）</span>
-            <span class="pill pill-public">📊 public_dashboard（公开层）</span>
-            <span class="pill pill-public">📤 public_api（对外推送）</span>
-            <span class="pill pill-green">✅ Batch1 已交付</span>
-        </div>
+        <div class="grid">
+            <div class="card">
+                <div class="card-title">
+                    <span class="card-icon">🧭</span>
+                    11维金融向量体系
+                </div>
+                <div class="vector-grid">
+                    <div class="vector-dim dim-public"><span class="dim-label">D0</span>主体</div>
+                    <div class="vector-dim dim-public"><span class="dim-label">D1</span>动作</div>
+                    <div class="vector-dim dim-public"><span class="dim-label">D2</span>属性</div>
+                    <div class="vector-dim dim-public"><span class="dim-label">D3</span>外部扰动</div>
+                    <div class="vector-dim dim-private"><span class="dim-label">D4-P</span>现价偏离中枢</div>
+                    <div class="vector-dim dim-private"><span class="dim-label">D5-I</span>积分稳态值</div>
+                    <div class="vector-dim dim-private"><span class="dim-label">D6-D</span>涨跌速率微分</div>
+                    <div class="vector-dim dim-private"><span class="dim-label">D7</span>筹码箱体向量</div>
+                    <div class="vector-dim dim-private"><span class="dim-label">D8</span>行情周期相位</div>
+                    <div class="vector-dim dim-private"><span class="dim-label">D9</span>凯利仓位系数</div>
+                    <div class="vector-dim dim-private" style="grid-column: span 2;"><span class="dim-label">D10</span>球面风险模长（全局风控）</div>
+                </div>
+                <p style="margin-top: 15px; font-size: 12px; color: #666; line-height: 1.6;">
+                    蓝色：公共4维（与MS-Lab通用）｜紫色：金融私有7维（闭源内核）
+                </p>
+            </div>
 
-        <div class="nav-bar">
-            <a href="http://localhost:8502" target="_blank" class="nav-btn primary">📊 打开金融数据大盘 →</a>
-            <a href="http://localhost:8501" target="_blank" class="nav-btn">🧠 MS-Lab 通用实验室</a>
-            <a href="../geom-compute/index.html" class="nav-btn">🏗️ 几何算力底座</a>
-            <a href="../index.html" class="nav-btn">🏠 Y.Mine 总控台</a>
-        </div>
+            <div class="card">
+                <div class="card-title">
+                    <span class="card-icon">💡</span>
+                    四维光照环境模型
+                </div>
+                <p style="font-size: 13px; color: #aaa; margin-bottom: 20px; line-height: 1.6;">
+                    四维光照仅展示最终结果，动态行业权重算法为私有内核，不对外公开。
+                </p>
+                <div class="lighting-list">
+                    <div class="lighting-item">
+                        <span style="width: 50px; font-size: 13px; font-weight: 600; color: #f1c40f;">L1</span>
+                        <div class="lighting-bar"><div class="lighting-fill l1"></div></div>
+                        <span style="font-size: 12px; color: #888; width: 40px;">72%</span>
+                    </div>
+                    <div class="lighting-item">
+                        <span style="width: 50px; font-size: 13px; font-weight: 600; color: #e91e63;">L2</span>
+                        <div class="lighting-bar"><div class="lighting-fill l2"></div></div>
+                        <span style="font-size: 12px; color: #888; width: 40px;">85%</span>
+                    </div>
+                    <div class="lighting-item">
+                        <span style="width: 50px; font-size: 13px; font-weight: 600; color: #00bcd4;">L3</span>
+                        <div class="lighting-bar"><div class="lighting-fill l3"></div></div>
+                        <span style="font-size: 12px; color: #888; width: 40px;">45%</span>
+                    </div>
+                    <div class="lighting-item">
+                        <span style="width: 50px; font-size: 13px; font-weight: 600; color: #8bc34a;">L4</span>
+                        <div class="lighting-bar"><div class="lighting-fill l4"></div></div>
+                        <span style="font-size: 12px; color: #888; width: 40px;">60%</span>
+                    </div>
+                </div>
+                <div style="margin-top: 15px; font-size: 12px; color: #888; display: grid; grid-template-columns: 1fr 1fr; gap: 5px;">
+                    <div>L1 成交量流动性</div>
+                    <div>L2 题材情绪</div>
+                    <div>L3 产业政策</div>
+                    <div>L4 产业链景气</div>
+                </div>
+            </div>
 
-        <div class="quick-links">
-            <a href="http://localhost:8502" target="_blank" class="link-card">
-                <div class="icon">📊</div>
-                <div class="title">金融数据大盘（Streamlit）</div>
-                <div class="desc">11维向量总库、四维光照、KMP匹配、球面风控、算力对接、MS-Lab推送、计费审计 全9页面</div>
-                <div class="url">http://localhost:8502</div>
-            </a>
-            <a href="../ms-lab/index.html" target="_blank" class="link-card">
-                <div class="icon">🧠</div>
-                <div class="title">MS-Lab 通用心智实验室</div>
-                <div class="desc">平级公共底座：接收MoodMind推送的向量+分值，自动路由四库（无金融逻辑）</div>
-                <div class="url">http://localhost:8501</div>
-            </a>
-            <a href="../geom-compute/index.html" class="link-card">
-                <div class="icon">🖥️</div>
-                <div class="title">几何心智算力底座</div>
-                <div class="desc">上报显存/耗时/冷热标签，接收错峰/精度/暂停/配额调度指令</div>
-                <div class="url">../geom-compute/index.html</div>
-            </a>
-            <a href="../index.html" class="link-card">
-                <div class="icon">🏠</div>
-                <div class="title">Y.Mine 数理操作系统总控</div>
-                <div class="desc">聚合展示、状态巡检、算力调度总入口（已新增MoodMind一级入口）</div>
-                <div class="url">../index.html</div>
-            </a>
-        </div>
+            <div class="card">
+                <div class="card-title">
+                    <span class="card-icon">🔐</span>
+                    RBAC 四级权限面板
+                </div>
+                <div class="rbac-panel">
+                    <div class="role-item">
+                        <div class="role-dot" style="background: #ff4757;"></div>
+                        <div class="role-info">
+                            <div class="role-name" style="color: #ff4757;">admin · 超级管理员</div>
+                            <div class="role-desc">全部权限：私有维度、公式查看、配置修改、用户管理</div>
+                        </div>
+                    </div>
+                    <div class="role-item">
+                        <div class="role-dot" style="background: #9b59b6;"></div>
+                        <div class="role-info">
+                            <div class="role-name" style="color: #9b59b6;">quant · 量化研究员</div>
+                            <div class="role-desc">向量/光照/KMP/风控查看权限，回测权限，无配置修改权</div>
+                        </div>
+                    </div>
+                    <div class="role-item">
+                        <div class="role-dot" style="background: #3498db;"></div>
+                        <div class="role-info">
+                            <div class="role-name" style="color: #3498db;">operator · 运维操作员</div>
+                            <div class="role-desc">存储/算力/告警/审计监控权限，服务重启权，无金融数据权限</div>
+                        </div>
+                    </div>
+                    <div class="role-item">
+                        <div class="role-dot" style="background: #2ecc71;"></div>
+                        <div class="role-info">
+                            <div class="role-name" style="color: #2ecc71;">viewer · 只读访客</div>
+                            <div class="role-desc">仅公开大盘基础统计数据查看权限</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-        <div class="section-title">📐 11维金融向量体系</div>
-        <div class="vec-dims">
-            <div class="dim-card pub">
-                <div class="dim-name">D0 主体<span class="dim-tag">公共4维</span></div>
-                <div class="dim-desc">与MS-Lab通用：主体编码</div>
+            <div class="card">
+                <div class="card-title">
+                    <span class="card-icon">⚠️</span>
+                    球面风险模长仪表盘
+                </div>
+                <div class="risk-gauge">
+                    <div class="gauge-circle">
+                        <div class="gauge-inner">
+                            <div class="gauge-value">0.42</div>
+                            <div class="gauge-label">当前风险值</div>
+                        </div>
+                    </div>
+                    <div class="gauge-legend">
+                        <div class="legend-item">
+                            <div class="legend-dot" style="background: #27ae60;"></div>
+                            <span>稳态 ≤0.50</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-dot" style="background: #f39c12;"></div>
+                            <span>预警 0.48-0.68</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-dot" style="background: #e74c3c;"></div>
+                            <span>熔断 ≥0.68</span>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="dim-card pub">
-                <div class="dim-name">D1 动作<span class="dim-tag">公共4维</span></div>
-                <div class="dim-desc">与MS-Lab通用：动作编码</div>
+
+            <div class="card">
+                <div class="card-title">
+                    <span class="card-icon">💾</span>
+                    金融总库总容量
+                </div>
+                <div class="total-capacity">
+                    <div class="capacity-value">62.4 / 100 GB</div>
+                    <div class="capacity-label">总库实时容量 · 水位 62.4%</div>
+                </div>
+                <div class="storage-bars">
+                    <div class="storage-tier">
+                        <div class="storage-header">
+                            <span style="color: #e74c3c;">🔥 热数据（噪声库/实时）</span>
+                            <span>18.7 GB</span>
+                        </div>
+                        <div class="storage-bar"><div class="storage-fill hot">HOT 30%</div></div>
+                    </div>
+                    <div class="storage-tier">
+                        <div class="storage-header">
+                            <span style="color: #f39c12;">🌡️ 温数据（常规库/缓冲）</span>
+                            <span>31.2 GB</span>
+                        </div>
+                        <div class="storage-bar"><div class="storage-fill warm">WARM 50%</div></div>
+                    </div>
+                    <div class="storage-tier">
+                        <div class="storage-header">
+                            <span style="color: #3498db;">❄️ 冷数据（知识库/长效）</span>
+                            <span>12.5 GB</span>
+                        </div>
+                        <div class="storage-bar"><div class="storage-fill cold">COLD 20%</div></div>
+                    </div>
+                </div>
             </div>
-            <div class="dim-card pub">
-                <div class="dim-name">D2 属性<span class="dim-tag">公共4维</span></div>
-                <div class="dim-desc">与MS-Lab通用：属性编码</div>
+
+            <div class="card">
+                <div class="card-title">
+                    <span class="card-icon">📈</span>
+                    向量日产量
+                </div>
+                <div class="daily-stats">
+                    <div class="stat-item">
+                        <div class="stat-value">2,847</div>
+                        <div class="stat-label">今日新增向量</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">+12.4%</div>
+                        <div class="stat-label">时序增量</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">76.3%</div>
+                        <div class="stat-label">入库成功率</div>
+                    </div>
+                </div>
+                <div style="margin-top: 20px; padding: 15px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+                    <div style="font-size: 13px; color: #aaa; margin-bottom: 10px;">KMP 四级路由分布：</div>
+                    <div style="display: flex; height: 20px; border-radius: 10px; overflow: hidden; font-size: 10px;">
+                        <div style="background: #7f8c8d; width: 15%; display: flex; align-items: center; justify-content: center;">噪声</div>
+                        <div style="background: #f39c12; width: 25%; display: flex; align-items: center; justify-content: center;">缓冲</div>
+                        <div style="background: #3498db; width: 40%; display: flex; align-items: center; justify-content: center;">常规</div>
+                        <div style="background: #9b59b6; width: 20%; display: flex; align-items: center; justify-content: center; color: white;">知识</div>
+                    </div>
+                </div>
             </div>
-            <div class="dim-card pub">
-                <div class="dim-name">D3 外部扰动<span class="dim-tag">公共4维</span></div>
-                <div class="dim-desc">与MS-Lab通用：外扰编码</div>
+
+            <div class="card">
+                <div class="card-title">
+                    <span class="card-icon">🔗</span>
+                    KMP 周期匹配热度
+                </div>
+                <div class="kmp-placeholder">
+                    <div class="kmp-icon">🔗</div>
+                    <p style="font-size: 15px; color: #888; margin-bottom: 10px;">KMP 匹配面板占位</p>
+                    <p style="font-size: 12px; color: #555;">Batch2 将上线：相似度分值热力图、高同源范式沉淀列表、LPS匹配详情</p>
+                </div>
             </div>
-            <div class="dim-card priv">
-                <div class="dim-name">D4-P 现价偏离中枢<span class="dim-tag">🔒私有</span></div>
-                <div class="dim-desc">Proportional 偏离比例（PID-P分量）</div>
-            </div>
-            <div class="dim-card priv">
-                <div class="dim-name">D5-I 基本面积分稳态<span class="dim-tag">🔒私有</span></div>
-                <div class="dim-desc">Integral 积分稳态值（PID-I分量）</div>
-            </div>
-            <div class="dim-card priv">
-                <div class="dim-name">D6-D 涨跌速率微分<span class="dim-tag">🔒私有</span></div>
-                <div class="dim-desc">Derivative 变化速率（PID-D分量）</div>
-            </div>
-            <div class="dim-card priv">
-                <div class="dim-name">D7 筹码箱体区间<span class="dim-tag">🔒私有</span></div>
-                <div class="dim-desc">箱体中枢/筹码结构向量</div>
-            </div>
-            <div class="dim-card priv">
-                <div class="dim-name">D8 行情周期相位<span class="dim-tag">🔒私有</span></div>
-                <div class="dim-desc">KMP匹配相位定位</div>
-            </div>
-            <div class="dim-card priv">
-                <div class="dim-name">D9 凯利安全仓位<span class="dim-tag">🔒私有</span></div>
-                <div class="dim-desc">Kelly Criterion 安全系数</div>
-            </div>
-            <div class="dim-card priv">
-                <div class="dim-name">D10 球面风险模长<span class="dim-tag">🔒私有</span></div>
-                <div class="dim-desc">超球面全局风控值（三级阈值）</div>
+
+            <div class="card">
+                <div class="card-title">
+                    <span class="card-icon">🚨</span>
+                    独立告警中心
+                </div>
+                <div class="alert-panel">
+                    <div class="alert-item alert-success">
+                        <div class="alert-dot" style="background: #2ecc71;"></div>
+                        <div>
+                            <div style="font-weight: 600; margin-bottom: 3px;">[系统] Batch1骨架搭建完成</div>
+                            <div style="color: #888; font-size: 11px;">2026-07-21 06:30 · MoodMind-Lab</div>
+                        </div>
+                    </div>
+                    <div class="alert-item alert-info">
+                        <div class="alert-dot" style="background: #3498db;"></div>
+                        <div>
+                            <div style="font-weight: 600; margin-bottom: 3px;">[信息] 金融向量总库挂载成功</div>
+                            <div style="color: #888; font-size: 11px;">2026-07-21 06:28 · 存储模块</div>
+                        </div>
+                    </div>
+                    <div class="alert-item alert-warning">
+                        <div class="alert-dot" style="background: #f39c12;"></div>
+                        <div>
+                            <div style="font-weight: 600; margin-bottom: 3px;">[提醒] MS-Lab推送通道待对接</div>
+                            <div style="color: #888; font-size: 11px;">2026-07-21 06:25 · API模块</div>
+                        </div>
+                    </div>
+                    <div class="alert-item alert-info">
+                        <div class="alert-dot" style="background: #3498db;"></div>
+                        <div>
+                            <div style="font-weight: 600; margin-bottom: 3px;">[信息] RBAC权限系统加载完成</div>
+                            <div style="color: #888; font-size: 11px;">2026-07-21 06:22 · 安全模块</div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-
-        <div class="section-title">💡 四维光照环境（结果展示，权重私有）</div>
-        <div class="arch-grid">
-            <div class="arch-box public"><h4>💧 L1 成交量流动性光照</h4><ul><li>市场流动性实时评分</li><li>成交量/换手/资金流向</li></ul></div>
-            <div class="arch-box public"><h4>🎭 L2 题材情绪光照</h4><ul><li>市场情绪与题材热度</li><li>舆情/热度/动量评分</li></ul></div>
-            <div class="arch-box public"><h4>📜 L3 产业政策光照</h4><ul><li>政策/监管/产业方向</li><li>政策利好/利空权重</li></ul></div>
-            <div class="arch-box public"><h4>🏭 L4 产业链景气光照</h4><ul><li>产业链上下游景气度</li><li>行业轮动/景气传导</li></ul></div>
-        </div>
-
-        <div class="section-title">🏗️ 公私三层隔离架构</div>
-        <div class="arch-grid">
-            <div class="arch-box private">
-                <h4>🔒 private_moodmind_engine（不入工程）</h4>
-                <ul>
-                    <li>11维向量底层计算公式</li>
-                    <li>I/P/D 三维PID自控迭代逻辑</li>
-                    <li>四维光照动态行业权重算法</li>
-                    <li>超球面风险模长求解公式</li>
-                    <li>0.48/0.50/0.68三阈值底层判定</li>
-                    <li>改良KMP周期匹配LPS底层源码</li>
-                    <li>行情相位/箱体中枢/筹码算子</li>
-                    <li>凯利仓位安全系数内核</li>
-                </ul>
-            </div>
-            <div class="arch-box public">
-                <h4>📊 public_dashboard（工程可见）</h4>
-                <ul>
-                    <li>金融实验室独立首页UI</li>
-                    <li>金融专用数据大盘</li>
-                    <li>向量入库/状态统计/时序趋势</li>
-                    <li>光照四维结果可视化</li>
-                    <li>KMP匹配分值展示面板</li>
-                    <li>球面风险阈值仪表盘</li>
-                    <li>独立Token计费/算力上报</li>
-                    <li>独立审计日志/告警中心</li>
-                </ul>
-            </div>
-            <div class="arch-box extern">
-                <h4>🌐 外部对接层（只读）</h4>
-                <ul>
-                    <li>→ MS-Lab：推送11维向量+分值</li>
-                    <li>→ 算力底座：显存/耗时/冷热上报</li>
-                    <li>← 算力底座：错峰/精度/暂停指令</li>
-                    <li>→ Y.Mine总控：聚合展示/巡检</li>
-                    <li>← 行情数据源：原始行情接入</li>
-                    <li>MS-Lab自动路由四库：</li>
-                    <li>&lt;25% 噪声库丢弃</li>
-                    <li>25-50% 缓冲库复检</li>
-                    <li>50-75% 常规库存放</li>
-                    <li>≥75% 知识库长效沉淀</li>
-                </ul>
-            </div>
-        </div>
-
-        <div class="redline-box">
-            <h4>🚫 开发红线（绝对禁止工程层触碰）</h4>
-            <ul>
-                <li>不写代码、不实现、不公开、不入工程层：所有金融底层数理内核</li>
-                <li>工程仅接收最终结果、最终分值、最终状态</li>
-                <li>MS-Lab全程无金融逻辑、无权重计算、无内核泄露</li>
-                <li>总控台只做聚合展示/巡检/调度，不介入业务内核</li>
-                <li>私有引擎目录 private_moodmind_engine/ 为空目录占位，永远不提交代码</li>
-            </ul>
-        </div>
-
-        <div class="section-title">📂 目录结构</div>
-        <pre style="background:rgba(0,0,0,0.3);border-radius:12px;padding:20px;font-size:12px;line-height:1.8;color:rgba(255,255,255,0.55);overflow-x:auto;font-family:'SF Mono',Consolas,monospace;">
-moodmind-lab/
-├── public_dashboard/          <span style="color:#93c5fd"># ✅ 公开仪表盘（Streamlit 9页面）</span>
-│   ├── app.py                 <span style="color:#93c5fd"># 主仪表盘入口</span>
-│   ├── moodmind_config.py     <span style="color:#93c5fd"># 配置</span>
-│   ├── moodmind_types.py      <span style="color:#93c5fd"># 数据类型定义</span>
-│   ├── moodmind_engine_stub.py<span style="color:#93c5fd"># 公开stub层（仅模拟接收结果）</span>
-│   ├── moodmind_billing.py    <span style="color:#93c5fd"># Token计费</span>
-│   ├── moodmind_audit.py      <span style="color:#93c5fd"># RBAC权限+审计</span>
-│   ├── moodmind_alert.py      <span style="color:#93c5fd"># 独立告警中心</span>
-│   ├── moodmind_compute.py    <span style="color:#93c5fd"># 算力底座双向对接</span>
-│   └── moodmind_push.py       <span style="color:#93c5fd"># 向MS-Lab推送通道</span>
-├── public_api/                <span style="color:#93c5fd"># ✅ 对外推送接口</span>
-├── market_data_source/        <span style="color:#93c5fd"># ✅ 行情原始数据接入层</span>
-├── vector_export_layer/       <span style="color:#93c5fd"># ✅ 11维向量输出层（仅结果）</span>
-├── kmp_score_service/         <span style="color:#93c5fd"># ✅ KMP分值推送（仅分值）</span>
-├── moodmind_storage_main/     <span style="color:#93c5fd"># ✅ 金融向量总库持久化</span>
-├── billing_log/               <span style="color:#93c5fd"># ✅ 独立计费日志</span>
-├── alert_log/                 <span style="color:#93c5fd"># ✅ 金融独立告警</span>
-├── audit_security/            <span style="color:#93c5fd"># ✅ 权限/审计/加密适配</span>
-├── private_moodmind_engine/   <span style="color:#fca5a5"># 🔒 【核心禁区】空目录占位，永远不提交代码</span>
-├── config/lab_config.json
-├── scripts/start.sh           <span style="color:#93c5fd"># 一键启动脚本</span>
-├── docs/
-├── requirements.txt
-└── index.html                 <span style="color:#93c5fd"># 当前入口页</span>
-        </pre>
 
         <footer>
-            💜 MoodMind-Lab · 金融向量实验室 v1.0 · Game-OS V3.0 集群平行实验室<br/>
-            与 MS-Lab 完全平级 · 挂载于几何心智空间全域算力底座 & Y.Mine总控台
+            <p>🧠 MoodMind-Lab · 金融向量实验室 | Game-OS V3.0 集群 | 几何心智空间全域算力底座</p>
+            <p style="margin-top: 8px; color: #9b59b6;">⛔ 公私隔离红线：金融数理公式/权重/周期/估值内核仅存于私有引擎，绝不入工程层</p>
+            <div class="footer-links">
+                <a href="http://localhost:8510" class="footer-link" target="_blank">📊 Streamlit 数据大盘 (8510)</a>
+                <a href="http://localhost:8090" class="footer-link" target="_blank">🏛️ Y.Mine 总控台 (8090)</a>
+                <a href="http://localhost:8501" class="footer-link" target="_blank">🧬 MS-Lab (8501)</a>
+            </div>
         </footer>
     </div>
 
     <script>
-        const canvas = document.getElementById('stars');
-        const ctx = canvas.getContext('2d');
-        let stars = [];
-        function resize() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            stars = [];
-            for (let i = 0; i < 120; i++) {
-                stars.push({
-                    x: Math.random() * canvas.width,
-                    y: Math.random() * canvas.height,
-                    r: Math.random() * 1.2 + 0.2,
-                    a: Math.random(),
-                    s: Math.random() * 0.02 + 0.005,
-                    c: Math.random() > 0.7 ? '#c4b5fd' : (Math.random() > 0.5 ? '#93c5fd' : '#ffffff')
-                });
-            }
+        const starsContainer = document.getElementById('stars');
+        for (let i = 0; i < 150; i++) {
+            const star = document.createElement('div');
+            star.className = 'star';
+            star.style.left = Math.random() * 100 + '%';
+            star.style.top = Math.random() * 100 + '%';
+            star.style.width = Math.random() * 3 + 1 + 'px';
+            star.style.height = star.style.width;
+            star.style.animationDelay = Math.random() * 3 + 's';
+            star.style.animationDuration = (Math.random() * 2 + 2) + 's';
+            starsContainer.appendChild(star);
         }
-        function draw() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            for (const s of stars) {
-                s.a += s.s;
-                if (s.a > 1 || s.a < 0) s.s = -s.s;
-                ctx.beginPath();
-                ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-                ctx.fillStyle = s.c;
-                ctx.globalAlpha = Math.abs(s.a) * 0.6;
-                ctx.fill();
-            }
-            ctx.globalAlpha = 1;
-            requestAnimationFrame(draw);
-        }
-        window.addEventListener('resize', resize);
-        resize(); draw();
     </script>
 </body>
 </html>
