@@ -26,20 +26,23 @@ python -m http.server "$STATIC_PORT" -d public_static \
 STATIC_PID=$!
 echo $STATIC_PID > "$PID_DIR/static.pid"
 
-(
-    cd "$PROJECT_ROOT/moodmind_dashboard"
-    streamlit run app.py \
-        --server.port "$DASH_PORT" \
-        --server.address 0.0.0.0 \
-        --server.headless true \
-        --browser.gatherUsageStats false \
-        --theme.base dark \
-        > "$LOG_DIR/dashboard.log" 2>&1 &
-    echo $! > "$PID_DIR/dashboard.pid"
-)
+cd "$PROJECT_ROOT/moodmind_dashboard"
+streamlit run app.py \
+    --server.port "$DASH_PORT" \
+    --server.address 0.0.0.0 \
+    --server.headless true \
+    --browser.gatherUsageStats false \
+    --theme.base dark \
+    > "$LOG_DIR/dashboard.log" 2>&1 &
+DASH_PID=$!
+echo $DASH_PID > "$PID_DIR/dashboard.pid"
 
 sleep 4
 echo ""
 echo "✅ 启动完成"
 echo "   🧠 首页 : http://localhost:$STATIC_PORT"
 echo "   📊 大盘 : http://localhost:$DASH_PORT"
+echo ""
+echo "💡 提示：如需同时启动 Y.Mine 总控台(8090) 和 MS-Lab(8501)，请分别执行："
+echo "   cd /workspace && python -m http.server 8090"
+echo "   cd /workspace/ms-lab/mslab_dashboard && streamlit run app.py --server.port 8501"
