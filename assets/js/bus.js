@@ -242,6 +242,16 @@
                 bigBlind: 10, rationalityScore: null, timestamp: 0
             }
         },
+        poker: {
+            partition: 'PIPELINE',
+            storageKey: 'pipeline_pokerState',
+            eventName: 'poker-state-update',
+            defaultValue: {
+                stage: 'idle', equity: 0.5, kellyFraction: 0, kellyAction: null,
+                groundTruth: 0.5, coneState: 'calm', gamma: 0, pot: 0, stack: 0,
+                pnl: 0, handsPlayed: 0, dcfPassed: false, brandVolume: null, timestamp: 0
+            }
+        },
         valuation: {
             partition: 'PIPELINE',
             storageKey: 'pipeline_valuationAnchor',
