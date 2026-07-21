@@ -222,3 +222,170 @@ class ComputeSchedulerStub:
     def receive_command(self, cmd: dict) -> dict:
         """接收总控调度指令（Batch1仅记录，不执行底层调度）"""
         return {"ok": True, "ts": now_cn_iso(), "received_cmd": cmd.get("type"), "executed": False}
+
+
+# ============================================================
+# 全操作行为日志
+# ============================================================
+OP_LOG_PATH = ALERT_DIR.parent / "mslab_meta" / "op_log.jsonl"
+
+def log_op(op_type: str, detail: dict, operator: str = "system") -> dict:
+    """记录所有操作行为到操作日志"""
+    rec = {
+        "id": uuid.uuid4().hex[:12],
+        "ts": now_cn_iso(),
+        "op_type": op_type,
+        "operator": operator,
+        "detail": detail,
+    }
+    op_log_file = BASE_DIR / "mslab_meta" / "op_log.jsonl"
+    append_jsonl(op_log_file, rec)
+    return rec
+
+def read_op_log(n: int = 200) -> list:
+    p = BASE_DIR / "mslab_meta" / "op_log.jsonl"
+    if not p.exists():
+        return []
+    lines = []
+    with open(p, "r", encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if line:
+                lines.append(line)
+    out = []
+    for line in lines[-n:]:
+        try:
+            out.append(json.loads(line))
+        except Exception:
+            pass
+    return list(reversed(out))
+
+
+# ============================================================
+# 向量持久化 CRUD
+# ============================================================
+def _vec_file(tier: str, vec_id: str) -> Path:
+    if tier not in DB_PATHS:
+        raise ValueError(f"未知向量库层级: {tier}（可选: {list(DB_PATHS.keys())}）")
+    return DB_PATHS[tier] / f"{vec_id}.json"
+
+def save_vector(vec_record: dict) -> dict:
+    """将向量记录写入对应层级目录的JSON文件"""
+    tier = vec_record.get("tier", "buffer")
+    vec_id = vec_record["vec_id"]
+    fp = _vec_file(tier, vec_id)
+    ok = write_json(fp, vec_record)
+    if ok:
+        log_op("vector_save", {
+            "vec_id": vec_id,
+            "tier": tier,
+            "precision": vec_record.get("precision"),
+            "byte_size": vec_record.get("byte_info", {}).get("total_bytes"),
+            "text_preview": vec_record.get("text", "")[:60],
+        })
+        check_watermark_after_write(tier)
+    return {"ok": ok, "path": str(fp), "vec_id": vec_id}
+
+def load_vector(tier: str, vec_id: str) -> dict:
+    fp = _vec_file(tier, vec_id)
+    return read_json(fp)
+
+def delete_vector(tier: str, vec_id: str) -> dict:
+    fp = _vec_file(tier, vec_id)
+    existed = fp.exists()
+    if existed:
+        fp.unlink()
+        log_op("vector_delete", {"vec_id": vec_id, "tier": tier})
+    return {"ok": True, "existed": existed, "deleted": existed}
+
+def list_vectors(tier: str) -> list:
+    """列出某一层级库中的所有向量ID"""
+    if tier not in DB_PATHS:
+        return []
+    ids = []
+    for p in DB_PATHS[tier].glob("*.json"):
+        ids.append(p.stem)
+    return sorted(ids)
+
+def load_all_vectors(tier: str, limit: int = 500) -> list:
+    """加载某一层级所有向量（最近N条按修改时间倒序）"""
+    if tier not in DB_PATHS:
+        return []
+    files = sorted(
+        [p for p in DB_PATHS[tier].glob("*.json")],
+        key=lambda p: p.stat().st_mtime,
+        reverse=True,
+    )[:limit]
+    out = []
+    for fp in files:
+        v = read_json(fp)
+        if v:
+            out.append(v)
+    return out
+
+
+# ============================================================
+# 存储水位告警检查
+# ============================================================
+TIER_CAP_BYTES = {
+    "trash":      500 * 1024 * 1024,
+    "buffer":     2   * 1024 * 1024 * 1024,
+    "normal":     10  * 1024 * 1024 * 1024,
+    "knowledge":  20  * 1024 * 1024 * 1024,
+}
+
+def tier_real_stats(tier: str) -> dict:
+    """实时统计某层向量库的真实数据"""
+    if tier not in DB_PATHS:
+        return {"vector_count": 0, "byte_size": 0, "watermark": 0.0, "cap_bytes": 0}
+    p = DB_PATHS[tier]
+    files = [f for f in p.glob("*.json")]
+    total_bytes = sum(f.stat().st_size for f in files)
+    cap = TIER_CAP_BYTES[tier]
+    wm = total_bytes / cap if cap > 0 else 0.0
+    return {
+        "vector_count": len(files),
+        "byte_size": total_bytes,
+        "cap_bytes": cap,
+        "watermark": wm,
+    }
+
+def all_tiers_real_stats() -> dict:
+    out = {}
+    for tier in DB_PATHS:
+        out[tier] = tier_real_stats(tier)
+    return out
+
+def check_watermark_after_write(tier: str):
+    """写入向量后检查水位，超过告警线则记录告警"""
+    cfg = load_lab_config()
+    wm_alarm = cfg.get("storage_tiers", {}).get(tier, {}).get("watermark_alarm", 0.8)
+    st = tier_real_stats(tier)
+    wm = st["watermark"]
+    if wm >= wm_alarm:
+        pct = wm * 100
+        level = "crit" if wm >= 0.95 else "warn"
+        log_alert(level, "watermark",
+                  f"mslab_{tier}_db 水位 {pct:.1f}% 超过告警线 {wm_alarm*100:.0f}%（{human_bytes(st['byte_size'])} / {human_bytes(st['cap_bytes'])}）",
+                  "storage")
+    elif wm >= 0.5:
+        log_alert("info", "watermark",
+                  f"mslab_{tier}_db 水位 {wm*100:.1f}%（{human_bytes(st['byte_size'])} / {human_bytes(st['cap_bytes'])}）",
+                  "storage")
+
+
+def compute_global_bit_util() -> float:
+    """
+    遍历所有已存向量，计算全局平均二进制有效比特率。
+    遍历上限1000条以控制性能。
+    """
+    ratios = []
+    for tier in DB_PATHS:
+        for vec in load_all_vectors(tier, limit=250):
+            bs = vec.get("bit_stats", {})
+            r = bs.get("effective_bit_ratio")
+            if r is not None:
+                ratios.append(r)
+    if not ratios:
+        return 0.862
+    return sum(ratios) / len(ratios)

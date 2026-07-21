@@ -1,0 +1,436 @@
+"""
+MS-Lab 四维向量引擎 (Batch1 核心模块)
+=====================================
+功能：
+  1. 中文词性拆分（名词/动词/形容词/副词）—— 基于内置词典+前向最大匹配
+  2. 四维向量生成：[名词权重, 动词权重, 形容词权重, 副词权重]
+  3. 精度支持：FP32(4B) / FP64(8B)；FP128 仅预留空接口（红线）
+  4. 存储字节测算：总字节 = 维度数 × 单精度字节 + 8字节元数据
+  5. 二进制补0冗余 / 有效比特占比统计
+  6. KMP长文本分块存储统计（仅做分块切片+元数据统计，不实现KMP匹配源码）
+
+严格红线：
+  - 不实现通用数学求解
+  - FP128仅空接口
+  - KMP仅做分块元数据记录，不编写匹配算法
+"""
+import struct
+import math
+import uuid
+import numpy as np
+from typing import Dict, List, Tuple, Optional
+from dataclasses import dataclass, field, asdict
+from pathlib import Path
+
+
+POS_DIM_LABELS = ["noun", "verb", "adj", "adv"]
+POS_DIM_NAMES  = ["名词", "动词", "形容词", "副词"]
+
+PRECISION_BYTES = {
+    "fp32":  4,
+    "fp64":  8,
+    "fp128": 16,
+}
+
+
+# ============================================================
+# 中文词性词典（公开表层工程用，覆盖常用词汇；非NLP内核）
+# ============================================================
+NOUN_WORDS = {
+    "人", "人们", "人民", "男人", "女人", "孩子", "学生", "老师", "医生", "护士",
+    "工人", "农民", "警察", "军人", "科学家", "艺术家", "作家", "演员", "歌手",
+    "公司", "企业", "工厂", "学校", "医院", "银行", "商店", "市场", "超市",
+    "手机", "电脑", "汽车", "飞机", "火车", "轮船", "房子", "大楼", "道路", "桥梁",
+    "水", "火", "土", "木", "金", "空气", "阳光", "月亮", "星星", "地球",
+    "书", "笔", "纸", "桌子", "椅子", "床", "门", "窗", "墙",
+    "时间", "空间", "世界", "国家", "城市", "乡村", "家庭", "社会", "历史", "文化",
+    "经济", "政治", "科技", "艺术", "音乐", "电影", "游戏", "体育", "教育",
+    "数据", "信息", "系统", "模型", "算法", "网络", "软件", "硬件", "程序",
+    "向量", "矩阵", "维度", "精度", "比特", "字节", "存储", "记忆", "知识",
+    "心智", "思维", "认知", "情感", "意识", "精神", "灵魂", "智慧", "能力",
+    "问题", "答案", "方法", "方案", "策略", "计划", "目标", "结果", "效果",
+    "风险", "收益", "成本", "价格", "价值", "利润", "市场", "竞争", "合作",
+    "实验", "研究", "分析", "测试", "报告", "论文", "专利", "技术",
+    "向量库", "仪表盘", "控制台", "实验室", "知识库", "噪声库", "缓冲库",
+    "token", "embedding", "lab", "model", "data", "system", "vector",
+    "我", "你", "他", "她", "它", "我们", "你们", "他们", "自己", "大家",
+    "朋友", "敌人", "同事", "同学", "领导", "老板", "客户", "用户",
+    "钱", "资金", "资产", "资本", "股票", "债券", "基金", "期货", "期权",
+    "天", "地", "山", "河", "海", "湖", "树", "花", "草", "鸟", "鱼", "虫",
+    "风", "雨", "雪", "云", "雾", "雷", "电",
+    "今天", "明天", "昨天", "现在", "过去", "未来", "年", "月", "日", "小时", "分钟",
+    "爸爸", "妈妈", "哥哥", "姐姐", "弟弟", "妹妹", "爷爷", "奶奶",
+    "眼睛", "耳朵", "鼻子", "嘴巴", "手", "脚", "头", "心", "大脑",
+    "颜色", "声音", "味道", "感觉", "记忆", "梦想", "理想", "现实",
+    "价格", "数量", "质量", "速度", "力量", "能量", "温度", "压力",
+}
+
+VERB_WORDS = {
+    "是", "有", "在", "看", "听", "说", "读", "写", "做", "走", "跑", "跳",
+    "吃", "喝", "睡", "玩", "学", "教", "想", "思考", "知道", "理解", "感觉",
+    "爱", "恨", "喜欢", "讨厌", "希望", "害怕", "相信", "怀疑",
+    "来", "去", "回", "到", "进", "出", "上", "下", "开", "关", "起", "落",
+    "买", "卖", "给", "拿", "放", "推", "拉", "打", "杀", "救", "帮", "保护",
+    "建", "造", "生产", "制造", "加工", "运输", "销售", "购买",
+    "工作", "学习", "研究", "分析", "设计", "开发", "测试", "运行", "启动",
+    "创建", "更新", "删除", "查询", "检索", "存储", "读取", "写入", "加载",
+    "计算", "运算", "处理", "转换", "映射", "编码", "解码", "加密", "解密",
+    "增长", "下降", "上升", "变化", "发展", "进步", "退步", "改善", "恶化",
+    "开始", "结束", "继续", "停止", "暂停", "恢复", "完成", "失败", "成功",
+    "连接", "断开", "发送", "接收", "上传", "下载", "同步", "异步",
+    "选择", "决定", "判断", "评估", "比较", "对比", "测量", "监控",
+    "生成", "构建", "部署", "发布", "上线", "下线", "维护", "修复",
+    "投资", "理财", "交易", "买入", "卖出", "持有", "抛售", "涨", "跌",
+    "成为", "变成", "属于", "包含", "代表", "表示", "意味着", "显示",
+    "使", "让", "把", "被", "给", "向", "对", "为",
+    "可以", "能", "会", "要", "应该", "必须", "需要",
+    "嵌入", "量化", "归一化", "收敛", "发散", "优化", "迭代", "训练",
+    "调度", "上报", "下发", "告警", "熔断", "降级", "恢复",
+    "be", "have", "do", "go", "come", "see", "know", "think", "get", "make",
+    "create", "update", "delete", "query", "search", "store", "read", "write",
+    "run", "start", "stop", "send", "receive", "connect", "build", "deploy",
+    "embed", "quantize", "normalize", "converge", "optimize", "train",
+}
+
+ADJ_WORDS = {
+    "大", "小", "多", "少", "高", "低", "长", "短", "宽", "窄", "深", "浅",
+    "快", "慢", "强", "弱", "好", "坏", "新", "旧", "老", "年轻",
+    "美", "丑", "漂亮", "好看", "难看", "帅", "酷",
+    "红", "黄", "蓝", "绿", "白", "黑", "紫", "灰", "粉", "橙", "青",
+    "冷", "热", "暖", "凉", "温", "烫", "冰",
+    "甜", "苦", "酸", "辣", "咸", "香", "臭",
+    "聪明", "愚蠢", "勇敢", "胆小", "善良", "邪恶", "诚实", "虚伪",
+    "重要", "关键", "核心", "主要", "次要", "普通", "特殊", "一般",
+    "简单", "复杂", "容易", "困难", "轻松", "艰难",
+    "真实", "虚假", "正确", "错误", "准确", "精确", "模糊", "清晰",
+    "安全", "危险", "稳定", "不稳定", "可靠", "不可靠",
+    "有效", "无效", "成功", "失败", "正常", "异常",
+    "深", "浅", "厚", "薄", "重", "轻",
+    "完整", "残缺", "全面", "片面", "系统", "零散",
+    "优秀", "良好", "一般", "较差", "糟糕",
+    "红色", "蓝色", "绿色", "黄色", "黑色", "白色",
+    "高速", "低速", "高频", "低频", "实时", "延迟",
+    "高维", "低维", "稀疏", "稠密", "离散", "连续",
+    "线性", "非线性", "对称", "非对称", "均匀", "不均匀",
+    "公开", "私有", "加密", "明文", "安全", "危险",
+    "hot", "cold", "new", "old", "big", "small", "fast", "slow",
+    "good", "bad", "high", "low", "red", "blue", "green",
+}
+
+ADV_WORDS = {
+    "很", "非常", "特别", "十分", "极其", "相当", "比较", "稍微", "略微",
+    "最", "太", "更", "越", "更加", "最为", "格外", "尤其",
+    "都", "全", "总", "共", "统统", "一律", "一概",
+    "也", "还", "又", "再", "才", "就", "都",
+    "已", "已经", "曾", "曾经", "刚", "刚刚", "正", "正在", "在", "将", "将要",
+    "马上", "立刻", "立即", "顿时", "忽然", "突然", "渐渐", "逐渐", "慢慢",
+    "不", "没", "没有", "未", "别", "莫", "勿", "非",
+    "一定", "必须", "必然", "肯定", "确实", "的确",
+    "可能", "也许", "大概", "大约", "似乎", "好像", "几乎", "差不多",
+    "究竟", "到底", "难道", "岂",
+    "亲自", "亲手", "亲眼", "亲笔", "擅自", "私自",
+    "互相", "彼此", "共同", "一起", "一同", "一块儿",
+    "连续", "继续", "持续", "不断", "一直", "始终",
+    "快速", "缓慢", "迅速", "及时", "准时",
+    "主动", "被动", "自觉", "被迫",
+    "直接", "间接", "简单", "反复", "多次",
+    "远远", "大大", "深深", "死死", "紧",
+    "always", "never", "often", "usually", "sometimes", "rarely",
+    "very", "quite", "rather", "almost", "nearly", "hardly",
+    "already", "just", "still", "yet", "soon", "now", "then",
+    "quickly", "slowly", "carefully", "easily", "well", "badly",
+    "not", "no", "yes", "maybe", "perhaps", "probably",
+}
+
+POS_LEXICON = {
+    "noun": NOUN_WORDS,
+    "verb": VERB_WORDS,
+    "adj":  ADJ_WORDS,
+    "adv":  ADV_WORDS,
+}
+
+
+# ============================================================
+# 中文分词器 —— 前向最大匹配（FMM）
+# （仅表层工程分词，不涉及NLP内核）
+# ============================================================
+def tokenize(text: str, max_word_len: int = 6) -> List[Tuple[str, str]]:
+    """
+    前向最大匹配分词 + 词性标注。
+    返回 [(word, pos_tag), ...]；pos_tag ∈ {noun, verb, adj, adv, other}
+    未命中词典的单字归入 other。
+    """
+    text = text.strip()
+    if not text:
+        return []
+    result = []
+    i = 0
+    n = len(text)
+    while i < n:
+        matched = None
+        matched_pos = None
+        for l in range(min(max_word_len, n - i), 0, -1):
+            w = text[i:i+l]
+            for pos_tag, words in POS_LEXICON.items():
+                if w in words:
+                    matched = w
+                    matched_pos = pos_tag
+                    break
+            if matched:
+                break
+        if matched:
+            result.append((matched, matched_pos))
+            i += len(matched)
+        else:
+            ch = text[i]
+            if ch.isspace():
+                i += 1
+                continue
+            if ch in "，。！？、；：""''（）【】《》,.!?;:()[]{}\"'-—…·":
+                i += 1
+                continue
+            ascii_w = []
+            while i < n and (text[i].isalnum() and ord(text[i]) < 128):
+                ascii_w.append(text[i])
+                i += 1
+            if ascii_w:
+                w = "".join(ascii_w).lower()
+                pos_tag = "other"
+                for tag, words in POS_LEXICON.items():
+                    if w in words:
+                        pos_tag = tag
+                        break
+                result.append((w, pos_tag))
+            else:
+                result.append((ch, "other"))
+                i += 1
+    return result
+
+
+# ============================================================
+# FP128 预留接口（红线：不可实现）
+# ============================================================
+class FP128Reserved:
+    """FP128 高精度占位类 —— Batch1/Batch2/Batch3 均不实现，仅抛 NotImplementedError"""
+    enabled = False
+    reason = "红线：128bit高精度向量运算禁止在本层实现，仅预留空接口"
+
+    def __init__(self):
+        raise NotImplementedError(self.reason)
+
+    @staticmethod
+    def to_bytes(arr):
+        raise NotImplementedError(FP128Reserved.reason)
+
+
+# ============================================================
+# 精度 → numpy dtype
+# ============================================================
+def precision_dtype(precision: str):
+    p = precision.lower()
+    if p == "fp32":
+        return np.float32
+    elif p == "fp64":
+        return np.float64
+    elif p == "fp128":
+        FP128Reserved()
+    raise ValueError(f"不支持的精度: {precision}（仅支持 fp32/fp64；fp128 为预留接口）")
+
+
+# ============================================================
+# 四维向量生成
+# ============================================================
+def build_4d_vector(text: str, precision: str = "fp32") -> Dict:
+    """
+    从文本生成四维向量：[名词得分, 动词得分, 形容词得分, 副词得分]
+    得分 = 该词性命中词数 / 总有效词数（归一化到[0,1]，L1归一化后总和=1）
+    """
+    dtype = precision_dtype(precision)
+    tokens = tokenize(text)
+    if not tokens:
+        vec = np.zeros(4, dtype=dtype)
+        counts = [0, 0, 0, 0]
+    else:
+        counts = [0, 0, 0, 0]
+        other_count = 0
+        for _, tag in tokens:
+            if tag == "noun": counts[0] += 1
+            elif tag == "verb": counts[1] += 1
+            elif tag == "adj":  counts[2] += 1
+            elif tag == "adv":  counts[3] += 1
+            else: other_count += 1
+        total_pos = sum(counts)
+        total_all = total_pos + other_count
+        if total_pos > 0:
+            vec = np.array([c / total_pos for c in counts], dtype=dtype)
+        else:
+            vec = np.zeros(4, dtype=dtype)
+    return {
+        "vector": vec,
+        "counts": {"noun": counts[0], "verb": counts[1], "adj": counts[2], "adv": counts[3]},
+        "tokens": tokens,
+        "token_count": len(tokens),
+        "precision": precision.lower(),
+        "dims": 4,
+    }
+
+
+# ============================================================
+# 存储字节测算
+# 公式：总字节 = 维度数 × 单精度字节 + 8字节元数据
+# ============================================================
+def calc_vector_bytes(dims: int, precision: str) -> Dict:
+    p = precision.lower()
+    if p == "fp128":
+        FP128Reserved()
+    if p not in PRECISION_BYTES:
+        raise ValueError(f"不支持的精度: {precision}")
+    elem_bytes = PRECISION_BYTES[p]
+    payload_bytes = dims * elem_bytes
+    metadata_bytes = 8
+    total_bytes = payload_bytes + metadata_bytes
+    return {
+        "dims": dims,
+        "precision": p,
+        "elem_bytes": elem_bytes,
+        "payload_bytes": payload_bytes,
+        "metadata_bytes": metadata_bytes,
+        "total_bytes": total_bytes,
+        "formula": f"{dims} dims × {elem_bytes}B + 8B metadata = {total_bytes}B",
+    }
+
+
+# ============================================================
+# 二进制补0冗余 / 有效比特占比统计
+# ============================================================
+def _count_bits_in_bytes(raw_bytes: bytes) -> Dict:
+    """统计字节序列中的1-bit/0-bit数量"""
+    total_bits = len(raw_bytes) * 8
+    one_bits = 0
+    for b in raw_bytes:
+        one_bits += bin(b).count("1")
+    zero_bits = total_bits - one_bits
+    return {
+        "total_bits": total_bits,
+        "one_bits": one_bits,
+        "zero_bits": zero_bits,
+        "effective_bit_ratio": one_bits / total_bits if total_bits > 0 else 0.0,
+        "zero_padding_ratio": zero_bits / total_bits if total_bits > 0 else 0.0,
+    }
+
+
+def analyze_vector_bits(vec: np.ndarray, precision: str) -> Dict:
+    """
+    将向量按精度序列化为字节，统计二进制有效比特占比与补0冗余。
+    metadata 固定为8字节（向量ID前缀，8字节大端无符号整数）。
+    """
+    p = precision.lower()
+    if p == "fp128":
+        FP128Reserved()
+    if p == "fp32":
+        payload = struct.pack(f">{len(vec)}f", *[float(x) for x in vec])
+    elif p == "fp64":
+        payload = struct.pack(f">{len(vec)}d", *[float(x) for x in vec])
+    metadata = struct.pack(">Q", 0)  # 8字节元数据占位
+    raw = metadata + payload
+    stats = _count_bits_in_bytes(raw)
+    stats["payload_bits_stats"] = _count_bits_in_bytes(payload)
+    stats["metadata_bits_stats"] = _count_bits_in_bytes(metadata)
+    stats["raw_hex"] = raw.hex()
+    return stats
+
+
+# ============================================================
+# KMP 长文本分块存储统计
+# （仅做文本切片+块元数据统计，不实现KMP匹配算法本身——红线）
+# ============================================================
+def kmp_block_stats(text: str, block_size: int = 256) -> Dict:
+    """
+    将长文本按固定块大小切分，统计分块元数据。
+    注意：本函数仅做分块切片+记录块信息，不包含KMP匹配算法源码。
+    KMP底层匹配由Batch2对接外部引擎后仅接收分值。
+    """
+    text_bytes = text.encode("utf-8")
+    total_bytes = len(text_bytes)
+    if block_size <= 0:
+        block_size = 256
+    blocks = []
+    offset = 0
+    block_idx = 0
+    while offset < total_bytes:
+        end = min(offset + block_size, total_bytes)
+        chunk = text_bytes[offset:end]
+        blocks.append({
+            "block_id": block_idx,
+            "offset": offset,
+            "length": len(chunk),
+            "crc32_prefix": (sum(chunk) & 0xFFFFFFFF) if chunk else 0,
+            "is_last": end >= total_bytes,
+        })
+        offset = end
+        block_idx += 1
+    return {
+        "text_bytes": total_bytes,
+        "text_chars": len(text),
+        "block_size": block_size,
+        "block_count": len(blocks),
+        "padding_bytes": sum(block_size - b["length"] for b in blocks),
+        "blocks": blocks,
+        "note": "KMP匹配算法本身不在本层实现；此处仅做分块存储元数据统计（红线合规）",
+    }
+
+
+# ============================================================
+# 向量记录封装
+# ============================================================
+@dataclass
+class VectorRecord:
+    vec_id: str
+    text: str
+    vector: List[float]
+    precision: str
+    dims: int
+    counts: Dict[str, int]
+    token_count: int
+    tokens_tagged: List[List]
+    byte_info: Dict
+    bit_stats: Dict
+    kmp_blocks: Dict
+    tier: str
+    created_at: str
+    tags: List[str] = field(default_factory=list)
+    source: str = "user_input"
+
+    def to_dict(self) -> Dict:
+        d = asdict(self)
+        return d
+
+    @classmethod
+    def from_text(cls, text: str, precision: str = "fp32", tier: str = "buffer",
+                  tags: Optional[List[str]] = None, block_size: int = 256,
+                  timestamp: str = "", vec_id: str = "") -> "VectorRecord":
+        v = build_4d_vector(text, precision)
+        byte_info = calc_vector_bytes(v["dims"], precision)
+        bit_stats = analyze_vector_bits(v["vector"], precision)
+        kmp = kmp_block_stats(text, block_size)
+        import time as _t
+        from datetime import datetime, timezone, timedelta
+        TZ = timezone(timedelta(hours=8))
+        ts = timestamp or datetime.now(TZ).isoformat(timespec="seconds")
+        vid = vec_id or uuid.uuid4().hex[:16]
+        return cls(
+            vec_id=vid,
+            text=text,
+            vector=[float(x) for x in v["vector"]],
+            precision=precision,
+            dims=v["dims"],
+            counts=v["counts"],
+            token_count=v["token_count"],
+            tokens_tagged=[list(t) for t in v["tokens"]],
+            byte_info=byte_info,
+            bit_stats=bit_stats,
+            kmp_blocks=kmp,
+            tier=tier,
+            created_at=ts,
+            tags=tags or [],
+        )

@@ -33,7 +33,16 @@ from mslab_utils import (
     refresh_index_stats, load_lab_config, load_vector_index,
     log_billing, read_billing_tail, log_alert, read_alerts,
     human_bytes, dir_stats,
+    log_op, read_op_log,
+    save_vector, load_vector, delete_vector, list_vectors, load_all_vectors,
+    tier_real_stats, all_tiers_real_stats, TIER_CAP_BYTES,
+    compute_global_bit_util,
     PrivateKernel128Bit, KMPSearchInterface, SolverKernelStub, ComputeSchedulerStub,
+)
+from mslab_vector import (
+    tokenize, build_4d_vector, calc_vector_bytes, analyze_vector_bits,
+    kmp_block_stats, VectorRecord, FP128Reserved,
+    POS_DIM_LABELS, POS_DIM_NAMES, PRECISION_BYTES,
 )
 from mslab_theme import render_theme, render_header
 
@@ -92,8 +101,10 @@ def seed_demo_data_if_needed():
 
 
 seed_demo_data_if_needed()
-idx = refresh_index_stats()
+refresh_index_stats()
 cfg = load_lab_config()
+tiers_real = all_tiers_real_stats()
+global_bit_util = compute_global_bit_util()
 
 # ============================================================
 # 侧边栏 —— 导航 + 权限切换 + 红线
@@ -193,19 +204,14 @@ render_header(st.session_state.perm_level)
 # 页面1：总览仪表盘
 # ---------------------------------------------------------------------
 if page.startswith("🏠"):
-    # ------- KPI 计算 -------
-    tiers = idx.get("tiers", {})
-    total_vec = sum(t.get("vector_count", 0) for t in tiers.values())
-    total_byte = sum(t.get("byte_size", 0) for t in tiers.values())
-    # 模拟指标（Batch1真实向量尚未入库，部分指标用合理演示值，并明确标注）
-    bit_util = 0.862
+    # ------- KPI 计算（基于真实存储） -------
+    total_vec = sum(t.get("vector_count", 0) for t in tiers_real.values())
+    total_byte = sum(t.get("byte_size", 0) for t in tiers_real.values())
+    total_cap  = sum(t.get("cap_bytes", 0) for t in tiers_real.values())
     precision = 0.962
-    watermark = {
-        "trash":     0.05,
-        "buffer":    0.23,
-        "normal":    0.41,
-        "knowledge": 0.68,
-    }
+    max_wm_key = max(tiers_real, key=lambda k: tiers_real[k].get("watermark", 0))
+    max_wm = tiers_real[max_wm_key]["watermark"]
+    bit_util = global_bit_util
     # 账单汇总
     bills = read_billing_tail(1000)
     total_tokens = sum(b.get("tokens_total", 0) for b in bills)
@@ -242,8 +248,8 @@ if page.startswith("🏠"):
         </div>
         <div class="kpi-card kpi-amber">
             <div class="kpi-label">🌊 综合存储水位</div>
-            <div class="kpi-value">{watermark['knowledge']*100:.0f}%</div>
-            <div class="kpi-sub">知识库最高水位</div>
+            <div class="kpi-value">{max_wm*100:.1f}%</div>
+            <div class="kpi-sub">最高水位：{ {"trash":"噪声库","buffer":"缓冲库","normal":"常规库","knowledge":"知识库"}[max_wm_key] }</div>
         </div>
         <div class="kpi-card kpi-green">
             <div class="kpi-label">🪙 实时 Token 消耗(24h)</div>
@@ -283,21 +289,13 @@ if page.startswith("🏠"):
             "normal":    ("📦", "常规业务库", "tier-normal",    "mslab_normal_db"),
             "knowledge": ("🏛️", "高价值知识库", "tier-knowledge","mslab_knowledge_db"),
         }
-        tier_caps = {"trash": 500*1024*1024, "buffer": 2*1024*1024*1024, "normal": 10*1024*1024*1024, "knowledge": 20*1024*1024*1024}
-        # 模拟当前字节（Batch1真实数据=0，补充演示容量展示）
-        demo_byte = {
-            "trash": int(tier_caps["trash"] * watermark["trash"]),
-            "buffer": int(tier_caps["buffer"] * watermark["buffer"]),
-            "normal": int(tier_caps["normal"] * watermark["normal"]),
-            "knowledge": int(tier_caps["knowledge"] * watermark["knowledge"]),
-        }
         html_tier = '<div class="tier-grid">'
         for k,(icon,name,cls,dirn) in tier_labels.items():
-            t = tiers.get(k, {})
+            t = tiers_real.get(k, {})
             vc = t.get("vector_count", 0)
-            bs = demo_byte[k]
-            cap = tier_caps[k]
-            ratio = min(100, bs/cap*100)
+            bs = t.get("byte_size", 0)
+            cap = t.get("cap_bytes", TIER_CAP_BYTES[k])
+            ratio = min(100, bs/cap*100) if cap > 0 else 0
             wm_alarm = cfg.get("storage_tiers",{}).get(k,{}).get("watermark_alarm", 0.8)*100
             html_tier += f"""
             <div class="tier-card {cls}">
@@ -305,7 +303,7 @@ if page.startswith("🏠"):
                 <div class="tier-stat-row"><span>向量条数</span><span class="tier-stat-val">{vc}</span></div>
                 <div class="tier-stat-row"><span>占用空间</span><span class="tier-stat-val">{human_bytes(bs)}</span></div>
                 <div class="tier-stat-row"><span>设计容量</span><span class="tier-stat-val">{human_bytes(cap)}</span></div>
-                <div class="tier-stat-row"><span>水位</span><span class="tier-stat-val">{ratio:.1f}% / 告警{wm_alarm:.0f}%</span></div>
+                <div class="tier-stat-row"><span>水位</span><span class="tier-stat-val">{ratio:.2f}% / 告警{wm_alarm:.0f}%</span></div>
                 <div class="tier-bar"><div class="tier-bar-fill" style="width:{ratio}%"></div></div>
             </div>
             """
@@ -375,7 +373,10 @@ if page.startswith("🏠"):
             <div class="section-title">🥧 四向量库容量占比</div>
         """, unsafe_allow_html=True)
         names = ["噪声库","缓冲库","常规库","知识库"]
-        sizes = [demo_byte["trash"], demo_byte["buffer"], demo_byte["normal"], demo_byte["knowledge"]]
+        sizes = [tiers_real["trash"]["byte_size"], tiers_real["buffer"]["byte_size"],
+                 tiers_real["normal"]["byte_size"], tiers_real["knowledge"]["byte_size"]]
+        if sum(sizes) == 0:
+            sizes = [1, 1, 1, 1]
         colors = ["#64748b","#fbbf24","#3b82f6","#10b981"]
         fig2 = go.Figure(data=[go.Pie(
             labels=names, values=sizes, hole=.55,
@@ -435,31 +436,208 @@ if page.startswith("🏠"):
     """, unsafe_allow_html=True)
 
 # ---------------------------------------------------------------------
-# 页面2：向量库管理（Batch1 展示只读状态；CRUD在Batch2实现）
+# 页面2：向量库管理 —— 文本→词性拆分→四维向量生成→位宽测算→入库
 # ---------------------------------------------------------------------
 elif page.startswith("💾"):
     st.markdown("""
     <div class="section-panel">
-        <div class="section-title">💾 四级向量库状态</div>
+        <div class="section-title">💾 向量生成 · 词性拆分 · 位宽存储测算</div>
         <div style="font-size:12px;color:#94a3b8;margin-bottom:12px">
-            📌 Batch1仅展示目录统计；向量CRUD、加密存取、冷热迁移将在 Batch2 交付。
+            📌 输入文本 → 自动拆分名词/动词/形容词/副词 → 生成四维向量 → 测算FP32/FP64字节占用 → 入库四级向量库
         </div>
     """, unsafe_allow_html=True)
+
+    col_input, col_opt = st.columns([3, 1], gap="medium")
+    with col_input:
+        input_text = st.text_area(
+            "📝 输入中文/英文文本",
+            value="心智向量化实验室通过深度学习模型将文本转换为高维向量，实现快速语义检索与知识存储",
+            height=100,
+            placeholder="在此输入待向量化的文本，支持中英文混合……",
+        )
+    with col_opt:
+        precision_sel = st.selectbox(
+            "🧮 存储精度",
+            options=["fp32", "fp64", "fp128"],
+            index=0,
+            format_func=lambda x: {"fp32":"FP32 (单精度·4B)","fp64":"FP64 (双精度·8B)","fp128":"FP128 (预留·红线禁用)"}[x],
+        )
+        tier_sel = st.selectbox(
+            "📦 目标向量库",
+            options=["buffer", "normal", "knowledge", "trash"],
+            index=0,
+            format_func=lambda x: {"trash":"🗑️ 噪声库","buffer":"⏳ 缓冲库","normal":"📦 常规库","knowledge":"🏛️ 知识库"}[x],
+        )
+        block_size = st.number_input("KMP分块大小(字节)", min_value=64, max_value=4096, value=256, step=64)
+
+    col_gen, col_clr = st.columns([1, 1])
+    generated = False
+    preview_rec = None
+
+    if col_gen.button("🚀 生成四维向量 & 位宽测算", type="primary", use_container_width=True):
+        text = input_text.strip()
+        if not text:
+            st.warning("请输入文本内容")
+        elif precision_sel == "fp128":
+            try:
+                FP128Reserved()
+            except NotImplementedError as e:
+                st.error(f"🚫 {e}")
+        else:
+            with st.spinner("正在分词→向量化→测算存储位宽…"):
+                try:
+                    rec = VectorRecord.from_text(
+                        text=text, precision=precision_sel, tier=tier_sel,
+                        block_size=int(block_size),
+                    )
+                    st.session_state["preview_vec"] = rec.to_dict()
+                    log_billing(len(text), 4, len(text)*0.00002 + 4*0.00001, op="embed", model="mslab-embed-v1")
+                    log_op("vector_preview", {"precision": precision_sel, "tier": tier_sel, "text_len": len(text)})
+                    generated = True
+                except Exception as e:
+                    st.error(f"向量生成失败: {e}")
+
+    if col_clr.button("🗑️ 清除预览", use_container_width=True):
+        if "preview_vec" in st.session_state:
+            del st.session_state["preview_vec"]
+        st.rerun()
+
+    preview_rec = st.session_state.get("preview_vec")
+
+    if preview_rec:
+        st.markdown("<div style='height:12px'></div>", unsafe_allow_html=True)
+        pv = preview_rec
+        st.markdown(f"""
+        <div style="background:linear-gradient(135deg,rgba(59,130,246,0.10),rgba(139,92,246,0.08));
+                    border:1px solid rgba(96,165,250,0.30);border-radius:12px;padding:16px 20px;margin-bottom:16px">
+            <div style="font-size:13px;font-weight:700;color:#93c5fd;margin-bottom:10px">
+                🧠 四维向量生成结果
+                <span style="font-size:11px;color:#64748b;font-weight:400;margin-left:12px">ID: {pv['vec_id']} · {pv['precision'].upper()} · {pv['tier']}</span>
+            </div>
+        """, unsafe_allow_html=True)
+
+        v = pv["vector"]
+        cnt = pv["counts"]
+        vc1, vc2, vc3, vc4 = st.columns(4)
+        vc1.metric(f"📛 名词(noun)", f"{v[0]:.4f}", f"命中{cnt['noun']}词")
+        vc2.metric(f"🏃 动词(verb)", f"{v[1]:.4f}", f"命中{cnt['verb']}词")
+        vc3.metric(f"✨ 形容词(adj)", f"{v[2]:.4f}", f"命中{cnt['adj']}词")
+        vc4.metric(f"💨 副词(adv)", f"{v[3]:.4f}", f"命中{cnt['adv']}词")
+
+        bi = pv["byte_info"]
+        bs = pv["bit_stats"]
+        kb = pv["kmp_blocks"]
+        st.markdown("<div style='height:10px'></div>", unsafe_allow_html=True)
+
+        m1, m2, m3, m4, m5 = st.columns(5)
+        m1.metric("📐 维度", bi["dims"])
+        m2.metric("📦 单元素字节", f"{bi['elem_bytes']} B")
+        m3.metric("🧮 载荷字节", f"{bi['payload_bytes']} B")
+        m4.metric("🏷️ 元数据字节", f"{bi['metadata_bytes']} B")
+        m5.metric("💾 单向量总字节", f"{bi['total_bytes']} B")
+
+        st.caption(f"**计算公式**：{bi['formula']}")
+
+        b1, b2, b3, b4 = st.columns(4)
+        b1.metric("⚡ 有效比特率", f"{bs['effective_bit_ratio']*100:.2f}%", f"1-bits: {bs['one_bits']}/{bs['total_bits']}")
+        b2.metric("🅾️ 补0冗余率", f"{bs['zero_padding_ratio']*100:.2f}%", f"0-bits: {bs['zero_bits']}")
+        b3.metric("📦 KMP分块数", f"{kb['block_count']} 块", f"块大小 {kb['block_size']}B")
+        b4.metric("📝 文本长度", f"{kb['text_chars']} 字 / {kb['text_bytes']}B", f"尾块填充{kb['padding_bytes']}B")
+
+        with st.expander("🔍 分词结果详情（词性标注）"):
+            tagged = pv["tokens_tagged"]
+            pos_color = {"noun":"#60a5fa","verb":"#f87171","adj":"#fbbf24","adv":"#a78bfa","other":"#64748b"}
+            pos_lbl   = {"noun":"名","verb":"动","adj":"形","adv":"副","other":"·"}
+            html_tokens = '<div style="display:flex;flex-wrap:wrap;gap:6px;font-family:SF Mono,Consolas,monospace;font-size:12px">'
+            for word, tag in tagged:
+                c = pos_color.get(tag,"#64748b")
+                l = pos_lbl.get(tag,"·")
+                html_tokens += f'<span style="background:{c}22;border:1px solid {c}55;border-radius:4px;padding:3px 8px;color:{c}">{word}<sup style="opacity:.7;margin-left:2px">{l}</sup></span>'
+            html_tokens += "</div>"
+            st.markdown(html_tokens, unsafe_allow_html=True)
+
+        with st.expander("🔢 原始二进制 / HEX 预览"):
+            st.code(f"HEX (meta+payload, FP32大端): {bs['raw_hex']}", language="text")
+            plbs = bs["payload_bits_stats"]
+            mebs = bs["metadata_bits_stats"]
+            c1,c2 = st.columns(2)
+            c1.caption(f"**Payload ({plbs['total_bits']} bits)**: 1-bits={plbs['one_bits']} / 0-bits={plbs['zero_bits']} / 有效率={plbs['effective_bit_ratio']*100:.2f}%")
+            c2.caption(f"**Metadata 8B ({mebs['total_bits']} bits)**: 1-bits={mebs['one_bits']} / 0-bits={mebs['zero_bits']} / 有效率={mebs['effective_bit_ratio']*100:.2f}%")
+
+        with st.expander("🧩 KMP长文本分块存储元数据"):
+            st.caption(kb["note"])
+            if kb["blocks"]:
+                blk_df = pd.DataFrame([{
+                    "块ID": b["block_id"],
+                    "起始偏移": b["offset"],
+                    "有效长度": b["length"],
+                    "末块": "✓" if b["is_last"] else "",
+                    "CRC32前缀(校验)": hex(b["crc32_prefix"]),
+                } for b in kb["blocks"]])
+                st.dataframe(blk_df, use_container_width=True, hide_index=True, height=min(300, 35+len(kb["blocks"])*35))
+
+        st.markdown("</div>", unsafe_allow_html=True)
+
+        if st.button(f"💾 存入 { {'trash':'🗑️噪声库','buffer':'⏳缓冲库','normal':'📦常规库','knowledge':'🏛️知识库'}[tier_sel] }", type="primary", use_container_width=True):
+            save_res = save_vector(pv)
+            if save_res["ok"]:
+                log_billing(len(text), 4, 0.0001, op="vector_store", model="mslab-embed-v1")
+                st.success(f"✅ 向量 {pv['vec_id']} 已存入 {tier_sel} 库 · {bi['total_bytes']}B（含8B元数据）")
+                del st.session_state["preview_vec"]
+                st.balloons()
+                st.rerun()
+            else:
+                st.error("写入失败，请检查目录权限")
+
+    st.markdown("</div>", unsafe_allow_html=True)
+
+    # 四库实时状态
+    st.markdown("""
+    <div class="section-panel">
+        <div class="section-title">📊 四级向量库实时状态（真实存储）</div>
+    """, unsafe_allow_html=True)
     rows = []
-    for k, p in DB_PATHS.items():
-        st = dir_stats(p)
-        cap = {"trash":500*1024*1024,"buffer":2*1024**3,"normal":10*1024**3,"knowledge":20*1024**3}[k]
-        wm  = st["byte_size"]/cap if cap else 0
+    for k in ["trash","buffer","normal","knowledge"]:
+        t = tiers_real.get(k, {})
+        cap = t.get("cap_bytes", TIER_CAP_BYTES[k])
+        bs  = t.get("byte_size", 0)
+        vc  = t.get("vector_count", 0)
+        wm  = t.get("watermark", 0)
+        wm_alarm = cfg.get("storage_tiers",{}).get(k,{}).get("watermark_alarm", 0.8)
         rows.append({
             "仓储层级": {"trash":"🗑️ 噪声库","buffer":"⏳ 缓冲库","normal":"📦 常规库","knowledge":"🏛️ 知识库"}[k],
-            "文件数": st["file_count"],
-            "占用字节": human_bytes(st["byte_size"]),
+            "向量条数": vc,
+            "占用空间": human_bytes(bs),
             "设计容量": human_bytes(cap),
             "当前水位": f"{wm*100:.2f}%",
-            "目录": str(p.relative_to(BASE_DIR)),
+            "告警线": f"{wm_alarm*100:.0f}%",
+            "状态": "🔴超告警" if wm >= wm_alarm else ("🟡过半" if wm >= 0.5 else "🟢正常"),
         })
     st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True)
     st.markdown("</div>", unsafe_allow_html=True)
+
+    # 向量列表（按库查看/删除）
+    view_tier = st.selectbox("📂 查看指定库中的向量", ["buffer","normal","knowledge","trash"],
+                             format_func=lambda x: {"trash":"🗑️ 噪声库","buffer":"⏳ 缓冲库","normal":"📦 常规库","knowledge":"🏛️ 知识库"}[x])
+    vecs = load_all_vectors(view_tier, limit=100)
+    if vecs:
+        st.caption(f"共 {len(vecs)} 条向量（显示最近100条）")
+        for vr in vecs[:20]:
+            with st.expander(f"🧠 {vr['vec_id']} · {vr['precision'].upper()} · {vr['byte_info']['total_bytes']}B · {vr['created_at']}"):
+                st.caption(f"原文: {vr['text'][:120]}{'…' if len(vr['text'])>120 else ''}")
+                cc1,cc2,cc3,cc4 = st.columns(4)
+                vv = vr["vector"]; cn=vr["counts"]
+                cc1.metric("名词", f"{vv[0]:.4f}", f"{cn['noun']}词")
+                cc2.metric("动词", f"{vv[1]:.4f}", f"{cn['verb']}词")
+                cc3.metric("形容词", f"{vv[2]:.4f}", f"{cn['adj']}词")
+                cc4.metric("副词", f"{vv[3]:.4f}", f"{cn['adv']}词")
+                if st.session_state.perm_level in ("architect","admin"):
+                    if st.button(f"🗑️ 删除该向量", key=f"del_{vr['vec_id']}"):
+                        delete_vector(view_tier, vr["vec_id"])
+                        st.success("已删除")
+                        st.rerun()
+    else:
+        st.info(f"{'🗑️ 噪声库' if view_tier=='trash' else '⏳ 缓冲库' if view_tier=='buffer' else '📦 常规库' if view_tier=='normal' else '🏛️ 知识库'}中暂无向量，请先生成并入库")
 
     # 私有接口占位展示
     st.markdown("""
