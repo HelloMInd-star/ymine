@@ -99,13 +99,13 @@
         };
     }
 
-    // Check fuse baseline 0.6
+    // Check fuse baseline 0.68 (global standard)
     function checkFuse(riskConcentration) {
         var risk = safeNum(riskConcentration, 0);
-        if (risk > 0.6) {
+        if (risk > 0.68) {
             return {
                 halted: true,
-                reason: 'RISK_EXCEEDS_0.6_FUSE',
+                reason: 'RISK_EXCEEDS_0.68_FUSE',
                 riskLevel: risk
             };
         }
@@ -607,7 +607,7 @@
                     moduleId: MODULE_ID,
                     privateEngineConnected: false, // 【需私有引擎接入后改为true】
                     placeholderNote: '【需在私有circle认知引擎内配置填充】',
-                    fuseBaseline: 0.6
+                    fuseBaseline: 0.68
                 });
             default:
                 return buildError(404, 'UNKNOWN_OPERATION: ' + operation);

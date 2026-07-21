@@ -560,7 +560,7 @@
                     </div>
                 </div>
                 <div class="status-badges">
-                    <span class="badge-fuse ok" id="fuseBadge">🛡️ 熔断: 0.6 正常</span>
+                    <span class="badge-fuse ok" id="fuseBadge">🛡️ 熔断: 0.68 正常</span>
                     <span class="badge-ver">v2.1 · GAME-OS</span>
                 </div>
             </div>
@@ -1132,23 +1132,23 @@
             document.getElementById('dPolicy').textContent = document.getElementById('policySlider').value;
             document.getElementById('dShock').textContent = document.getElementById('shockSlider').value;
 
-            // Check fuse (0.6 baseline = 60/100 shock)
+            // Check fuse (0.68 baseline = 68/100 shock, global standard)
             var shock = parseInt(document.getElementById('shockSlider').value);
             var fuse = document.getElementById('fuseBadge');
             fuse.style.background = '';
             fuse.style.color = '';
-            if (shock >= 60) {
+            if (shock >= 68) {
                 fuse.className = 'badge-fuse';
                 fuse.style.background = 'rgba(248,113,113,0.1)';
                 fuse.style.borderColor = 'rgba(248,113,113,0.3)';
                 fuse.style.color = 'var(--circle-red)';
                 fuse.textContent = '🛑 熔断触发·操作锁死';
-            } else if (shock > 45) {
+            } else if (shock > 50) {
                 fuse.className = 'badge-fuse warn';
                 fuse.textContent = '⚠️ 扰动接近熔断阈值';
             } else {
                 fuse.className = 'badge-fuse ok';
-                fuse.textContent = '🛡️ 熔断: 0.6 正常';
+                fuse.textContent = '🛡️ 熔断: 0.68 正常';
             }
         }
 
@@ -1166,12 +1166,12 @@
             var policy = parseInt(document.getElementById('policySlider').value);
             var shock = parseInt(document.getElementById('shockSlider').value);
 
-            // Frontend double-check: fuse baseline 0.6 = 60/100
-            if (shock >= 60) {
+            // Frontend double-check: fuse baseline 0.68 = 68/100 (global standard)
+            if (shock >= 68) {
                 var notice = document.getElementById('dynamicResult');
                 notice.className = 'result-notice show error';
-                notice.textContent = '🛑 FUSE_TRIGGERED: RISK_EXCEEDS_0.6_FUSE · Operation locked';
-                reportFuseStatus('HALTED', 'RISK_EXCEEDS_0.6');
+                notice.textContent = '🛑 FUSE_TRIGGERED: RISK_EXCEEDS_0.68_FUSE · Operation locked';
+                reportFuseStatus('HALTED', 'RISK_EXCEEDS_0.68');
                 return;
             }
 
