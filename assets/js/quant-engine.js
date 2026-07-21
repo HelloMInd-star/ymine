@@ -11,6 +11,12 @@
 (function(global) {
     'use strict';
 
+    var THRESHOLDS = (global.YBus && global.YBus.THRESHOLDS) || Object.freeze({
+        BREAKEVEN: 0.48,
+        STEADY: 0.50,
+        FUSE: 0.68
+    });
+
     var STEPS = [
         { id: 0, name: '宏观海选', icon: '🌊', channel: 'macroFunnel' },
         { id: 1, name: '信息清洗ETL', icon: '🧹', channel: null },
@@ -413,12 +419,11 @@
                     var low = Math.min(open, close) * (1 - Math.abs(gaussianRandom()) * volBase * 0.5);
                     low = Math.max(0.1, low);
                     var curGameState = 'CALM';
-                    if (curCone >= 0.68) curGameState = 'BLACK_SWAN';
-                    else if (curCone >= 0.6) curGameState = 'MELTDOWN';
-                    else if (curCone >= 0.5) curGameState = 'EXTREME';
-                    else if (curCone >= 0.4) curGameState = 'TENSION';
-                    var suggestedPos = curCone >= 0.68 ? 0 : (curCone >= 0.6 ? 0.1 : (curCone >= 0.5 ? 0.25 : (regime === 'BLUE_OCEAN' ? 0.6 : 0.4)));
-                    var hedgingReq = curCone >= 0.68 ? 1.0 : (curCone >= 0.6 ? 0.6 : (curCone >= 0.5 ? 0.3 : 0));
+                    if (curCone >= THRESHOLDS.FUSE) curGameState = 'BLACK_SWAN';
+                    else if (curCone >= THRESHOLDS.STEADY) curGameState = 'MELTDOWN';
+                    else if (curCone >= THRESHOLDS.BREAKEVEN) curGameState = 'TENSION';
+                    var suggestedPos = curCone >= THRESHOLDS.FUSE ? 0 : (curCone >= THRESHOLDS.STEADY ? 0.1 : (curCone >= THRESHOLDS.BREAKEVEN ? 0.25 : (regime === 'BLUE_OCEAN' ? 0.5 : 0.3)));
+                    var hedgingReq = curCone >= THRESHOLDS.FUSE ? 1.0 : (curCone >= THRESHOLDS.STEADY ? 0.6 : (curCone >= THRESHOLDS.BREAKEVEN ? 0.3 : 0));
                     kline.push({
                         day: d,
                         date: now + d * 86400000,
@@ -451,7 +456,7 @@
                     peak = Math.max(peak, p[k].high);
                     var dd = peak > 0 ? (peak - p[k].low) / peak : 0;
                     maxDD = Math.max(maxDD, dd);
-                    if (p[k].coneC >= 0.68) fuseHit = true;
+                    if (p[k].coneC >= THRESHOLDS.FUSE) fuseHit = true;
                 }
                 mcPaths.push(p);
                 mcFinalValues.push(finalP / startPrice);
@@ -495,12 +500,12 @@
             var entryHigh = startPrice * 0.99;
             var stopLoss = startPrice * 0.92;
             var takeProfit = tgt.bull;
-            var finalCone = safeNum(endKline.coneC, 0.4);
-            var rawRecommendation = finalCone >= 0.68 ? 0 : (finalCone >= 0.6 ? 0.1 : (finalCone >= 0.5 ? 0.2 : (regime === 'BLUE_OCEAN' ? 0.5 : 0.3)));
+            var finalCone = safeNum(endKline.coneC, THRESHOLDS.BREAKEVEN - 0.08);
+            var rawRecommendation = finalCone >= THRESHOLDS.FUSE ? 0 : (finalCone >= THRESHOLDS.STEADY ? 0.1 : (finalCone >= THRESHOLDS.BREAKEVEN ? 0.2 : (regime === 'BLUE_OCEAN' ? 0.5 : 0.3)));
             var warnLevel = 'LOW';
-            if (finalCone >= 0.68) warnLevel = 'EXTREME';
-            else if (finalCone >= 0.6) warnLevel = 'HIGH';
-            else if (finalCone >= 0.5) warnLevel = 'MEDIUM';
+            if (finalCone >= THRESHOLDS.FUSE) warnLevel = 'EXTREME';
+            else if (finalCone >= THRESHOLDS.STEADY) warnLevel = 'HIGH';
+            else if (finalCone >= THRESHOLDS.BREAKEVEN) warnLevel = 'MEDIUM';
 
             var result = {
                 simulationId: generateId(),
@@ -722,10 +727,10 @@
             if (posAdj.forceDefensiveMode) cappedPosition = 0;
 
             var hedgeAdj = safeNum(posAdj.hedgingAdjustment, 0.1);
-            var macroCone = safeNum(simRisk.coneC, 0.4);
+            var macroCone = safeNum(simRisk.coneC, THRESHOLDS.BREAKEVEN - 0.08);
             var hedgingRequired = hedgeAdj;
-            if (macroCone > 0.6) hedgingRequired = Math.max(hedgingRequired, 0.4);
-            if (macroCone > 0.68) hedgingRequired = 1.0;
+            if (macroCone > THRESHOLDS.STEADY) hedgingRequired = Math.max(hedgingRequired, 0.4);
+            if (macroCone > THRESHOLDS.FUSE) hedgingRequired = 1.0;
 
             var fuseInput = {
                 cone: macroCone,
@@ -756,7 +761,7 @@
                     reductions: [],
                     hedgingRequired: hedgingRequired,
                     budgetMultiplier: 1,
-                    coneDistanceToFuse: 0.68 - macroCone
+                    coneDistanceToFuse: THRESHOLDS.FUSE - macroCone
                 };
             }
             enforced.actual = safeNum(enforced.actual, 0);
@@ -794,7 +799,7 @@
                     hedgeRatio: enforced.hedgingRequired * 0.5, cost: 0.002, efficiency: 0.85,
                     triggerCondition: '组合回撤触发'
                 });
-                if (macroCone > 0.6 || safeNum(tiltSig.tiltLevel, 0) > 0.5) {
+                if (macroCone > THRESHOLDS.STEADY || safeNum(tiltSig.tiltLevel, 0) > THRESHOLDS.STEADY) {
                     hedgeInstruments.push({
                         type: 'GOLD', ticker: 'GLD', name: '黄金ETF',
                         hedgeRatio: enforced.hedgingRequired * 0.3, cost: 0.001, efficiency: 0.5,
@@ -815,7 +820,7 @@
             enforced.fuseIds.forEach(function(id) { warnings.push('⚠️ ' + id); });
             if (rationality.rationalityState === 'LIMBIC_TILT') warnings.push('🟡 检测到情绪偏差，建议降仓冷静');
             if (rationality.rationalityState === 'EXTREME_TILT') warnings.push('🔴 极度情绪上头，强制防御模式');
-            if (macroCone >= 0.6) warnings.push('🟠 圆锥浓度逼近熔断线，请警惕');
+            if (macroCone >= THRESHOLDS.STEADY) warnings.push('🟠 圆锥浓度进入警戒区，逼近0.68熔断线');
             if (valDCF.npvNegative) warnings.push('🟠 DCF净现值为负，估值风险');
             if (valDCF.irrBelowHurdle) warnings.push('🟠 IRR低于门槛回报率');
 
@@ -891,13 +896,13 @@
 
             if (global.YBus && global.YBus.publish) {
                 global.YBus.publish('riskFuse', {
-                    status: enforced.halted ? 'halted' : (macroCone >= 0.6 ? 'warning' : 'idle'),
+                    status: enforced.halted ? 'halted' : (macroCone >= THRESHOLDS.STEADY ? 'warning' : 'idle'),
                     coneC: macroCone,
                     zScore: safeNum(simRisk.zScore, 0),
                     mdd: safeNum(simRisk.mdd, 0.3),
                     warnings: warnings,
                     timestamp: now
-                });
+                }, { trusted: true });
             }
 
             return result;
@@ -922,7 +927,7 @@
                 regime: regime,
                 switchedAt: Date.now(),
                 reason: reason || 'manual'
-            });
+            }, { trusted: true });
         }
     }
 
@@ -956,9 +961,9 @@
             pipeline.lastUpdatedAt = Date.now();
             if (channel && result) {
                 context.pipeline[channel] = result;
-                if (global.YBus && global.YBus.publish) global.YBus.publish(channel, result);
+                if (global.YBus && global.YBus.publish) global.YBus.publish(channel, result, { trusted: true });
             }
-            if (global.YBus && global.YBus.publish) global.YBus.publish('quantPipeline', pipeline);
+            if (global.YBus && global.YBus.publish) global.YBus.publish('quantPipeline', pipeline, { trusted: true });
         }
 
         try {
@@ -972,7 +977,7 @@
                 if (result && result.riskStatus && result.riskStatus.halted && stepId !== 8) {
                     pipeline.halted = true;
                     pipeline.haltReason = '风控熔断于Step ' + stepId;
-                    if (global.YBus && global.YBus.publish) global.YBus.publish('quantPipeline', pipeline);
+                    if (global.YBus && global.YBus.publish) global.YBus.publish('quantPipeline', pipeline, { trusted: true });
                 }
             }
 
@@ -1047,8 +1052,8 @@
             pipeline.currentStep = 9;
 
             if (global.YBus && global.YBus.publish) {
-                global.YBus.publish('engineOutput', engineOutput);
-                global.YBus.publish('quantPipeline', pipeline);
+                global.YBus.publish('engineOutput', engineOutput, { trusted: true });
+                global.YBus.publish('quantPipeline', pipeline, { trusted: true });
             }
 
             return engineOutput;
@@ -1073,8 +1078,8 @@
             };
             pipeline.engineOutput = errorOutput;
             if (global.YBus && global.YBus.publish) {
-                global.YBus.publish('engineOutput', errorOutput);
-                global.YBus.publish('quantPipeline', pipeline);
+                global.YBus.publish('engineOutput', errorOutput, { trusted: true });
+                global.YBus.publish('quantPipeline', pipeline, { trusted: true });
             }
             console.error('[QuantEngine] Pipeline failed:', e);
             throw e;
@@ -1109,14 +1114,14 @@
             var result = STEP_MODULES[stepId](currentInput, context);
             if (channel) {
                 context.pipeline[channel] = result;
-                if (global.YBus && global.YBus.publish) global.YBus.publish(channel, result);
+                if (global.YBus && global.YBus.publish) global.YBus.publish(channel, result, { trusted: true });
             }
             currentInput = result;
             pipeline.currentStep = stepId;
             if (pipeline.completedSteps.indexOf(stepId) === -1) pipeline.completedSteps.push(stepId);
         }
         pipeline.lastUpdatedAt = Date.now();
-        if (global.YBus && global.YBus.publish) global.YBus.publish('quantPipeline', pipeline);
+        if (global.YBus && global.YBus.publish) global.YBus.publish('quantPipeline', pipeline, { trusted: true });
         return currentInput;
     }
 
@@ -1129,12 +1134,12 @@
         pipeline.haltReason = reason || '手动紧急停机';
         pipeline.lastUpdatedAt = Date.now();
         if (global.YBus && global.YBus.publish) {
-            global.YBus.publish('quantPipeline', pipeline);
+            global.YBus.publish('quantPipeline', pipeline, { trusted: true });
             global.YBus.publish('riskFuse', {
                 status: 'halted',
                 warnings: ['🔴 紧急停机：' + (reason || '未知原因')],
                 timestamp: Date.now()
-            });
+            }, { trusted: true });
         }
     }
 
