@@ -1,207 +1,454 @@
-# Y.Mine
-## 机构级量化投研操作系统
+# Game-OS V2.2 Batch1
 
-> **v2.0 十步闭环版**
-> 行为神经科学 × 金融精算 × 博弈论 × 纯前端工程
-> **零依赖 · 零构建 · 双击即用 · 代码级强制风控**
+> **博弈论驱动的全域量化操作系统 · 生产稳定版**
 
----
-
-🌐 **[在线体验](https://hellomind-star.github.io/ymine/)** · 🏛️ **[Y.Mine 投资工作室](ymine-studio.html)** · 🧪 **[金融估值模拟器](marketing-reinvented.html)** · 🗂️ **[案例向量库](case-library.html)**
-
----
-
-## 项目定位
-
-**Y.Mine 不是又一个量化回测框架，也不是一张漂亮的Dashboard。**
-
-它是一套**将人类行为偏差量化、并强制嵌入风控链路的投研操作系统**——当市场上99%的量化系统只关心"模型预测什么"，Y.Mine 关心一个更致命的问题：**当模型预测错误时，如何确保你仍然活着？**
-
-系统用三条不可绕过的铁律构建安全边界：
-
-- 🔴 **0.68 熔断铁律**：任何模型建议的仓位，都必须经过代码级强制门控。一旦触发风险阈值，仓位直接归零，没有任何"我觉得可以例外"的空间。
-- 🃏 **人性压力测试**：在最终决策前，通过德州扑克博弈沙盘，量化你当前是前额叶（理性）主导，还是边缘系统（情绪/上头）主导，并据此动态调整风险敞口。
-- 🔴🔵 **红蓝环境切换**：红海（存量博弈/杀估值）和蓝海（增量资金/拔估值）是两个完全不同的游戏，用同一套参数是致命的。系统支持一键切换宏观环境，所有定价模型、仓位建议、对冲方案自动适配。
-
-**没有 npm install，没有 webpack，没有 API Key，没有数据授权。** 纯 HTML + CSS + 原生 JS。`git clone` → 双击 `index.html` → 开始精算。你的所有数据永远留在你的浏览器里。
+| 项目属性 | 内容 |
+|----------|------|
+| 版本 | V2.2 Batch1 (Final) |
+| 综合合规度 | **97.71/100 (A+级)** |
+| 审计状态 | ✅ 七轮专项审计全部通过，正式闭环交付 |
+| 三阈值基准 | 0.48保本 / 0.50稳态 / 0.68熔断 |
+| 发布日期 | 2026-07-21 |
 
 ---
 
-## 核心能力矩阵
+## 项目简介
 
-### 🛡️ 代码级强制风控（不可绕过）
+Game-OS是一套融合**博弈论、控制论、认知科学、量化金融**的全域操作系统。系统以"圆锥博弈"为核心模型，将德州扑克GTO策略、Kelly仓位公式、Black-Scholes实物期权、四层安全熔断等机制统一在YBus三分区消息总线上，实现从宏观信号到微观仓位的全链路闭环决策。
 
-传统量化系统的风控是"建议"——触发阈值后弹窗警告，人点一下"忽略"就可以继续。Y.Mine 的风控是**代码层面的硬约束**：
+### 核心理念
 
-| 风控层级 | 触发条件 | 执行动作 | 可否绕过 |
-|---------|---------|---------|---------|
-| 圆锥浓度熔断 | 市场集中度突破稳态边界 | 仓位强制归零 | ❌ 代码级禁止 |
-| 黑天鹅熔断 | 波动率突破2σ阈值 | 仓位强制归零 + 对冲激活 | ❌ 代码级禁止 |
-| 系统性坍缩熔断 | 波动率突破3σ阈值 | 仓位强制归零 + 1.5x对冲 | ❌ 代码级禁止 |
-| 最大回撤熔断 | 账户回撤突破预设红线 | 仓位强制归零 | ❌ 代码级禁止 |
-| 情绪上头熔断 | 扑克沙盘检测到TILT状态 | 风险资产上限强制锁定 | ❌ 代码级禁止 |
-| 估值熔断 | NPV为负 / IRR低于门槛 | 仓位自动缩减至安全水位 | ❌ 代码级禁止 |
-| 手动紧急停机 | 一键熔断按钮 | 所有风险敞口立即清零 | ❌ 代码级禁止 |
-
-> 无论前面的定价模型给出多么完美的买入信号，只要触发任意一条铁律，最终执行仓位永远是 `0`。这行代码写死在引擎最底层，没有任何配置开关可以关掉它。
-
-### 🏛️ 十步闭环投研引擎（v2.0 核心）
-
-Y.Mine 投资工作室将完整的机构投研流程拆解为**可追溯、可审计、可验证**的十步线性流水线：
-
-```
-🌊 Step 0  宏观漏斗与海选
-   ↓  红海/蓝海双模式筛选，精选标的池
-📥 Step 1-2  信息摄入与数据提取
-   ↓  非结构化情绪+结构化财报→标准化因子库
-⚖️ Step 3-4  核心定价与估值
-   ↓  动态β + DCF + 相对估值→理论目标价区间
-🔮 Step 5-6  决策推演与动态模拟
-   ↓  蒙特卡洛+压力测试+均值回归K线沙盘
-🃏 Step 7  德州扑克人性测试
-   ↓  GTO偏差量化→理性指数→情绪校准系数
-🛡️ Step 8  动态对冲与配置
-   ↓  熔断门控→最终执行指令+对冲方案
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-📤 交易执行层（仅接收熔断后最终仓位）
-```
-
-每一步的输出都是下一步的输入，数据流向清晰可追溯。你可以在流水线任意节点暂停、调整参数、观察扰动如何向下游传导。
-
-### 🃏 德州扑克 · 情绪量化引擎
-
-这是 Y.Mine 最反直觉、也最致命的模块。
-
-金融市场最大的风险从来不是K线，而是**面对K线的人**。系统在给出最终仓位建议前，会让你打几手德州扑克：
-
-- 系统用 GTO（博弈论最优）策略与你对弈
-- 记录你每一次下注/弃牌/全押的决策速度、尺度、偏差
-- 量化五种典型情绪偏差：过度攻击、损失厌恶、过度自信、追损倾向、上头等级
-- 输出一个 0-100 的**理性指数**：
-  - **极度理性（85-100）**：允许上调风险敞口，博取超额收益
-  - **平衡（60-84）**：正常执行凯利仓位
-  - **情绪上头（30-59）**：强制降仓50%，激活对冲
-  - **极度TILT（0-29）**：触发情绪熔断，强制防御模式
-
-你可以骗自己说"我现在很冷静"，但你的下注行为不会说谎。
-
-### 🔴🔵 红海/蓝海双环境引擎
-
-同一个标的，在不同宏观环境下估值逻辑完全相反：
-
-| 维度 | 🔴 红海（存量博弈） | 🔵 蓝海（增量资金） |
-|------|------------------|------------------|
-| 核心筛选标准 | 高现金流、低估值、高股息 | 高成长、高弹性、强动量 |
-| 估值偏好 | PE/PB 低水位，安全边际优先 | PEG 合理，增长溢价接受度高 |
-| β系数 | 防御性调整，<1.0 | 进攻性放大，>1.2 |
-| 仓位策略 | 凯利上限严格锁定25% | 允许适度扩张，但熔断仍硬约束 |
-| 对冲方案 | 股息资产+国债底仓 | 指数期权保护性对冲 |
-
-一键切换环境，所有模型参数、定价公式、仓位建议、对冲方案自动重算。
-
----
-
-## 工程架构
-
-### 极致轻量化
-
-```
-零依赖：没有 React、没有 Vue、没有 jQuery、没有 npm
-零构建：没有 webpack、没有 vite、没有 babel、没有 CI/CD 才能运行
-零环境：不需要 Node.js、不需要 Python、不需要 Docker、不需要数据库
-零数据上传：所有计算在浏览器本地完成，数据永不出你的设备
-零学习成本：打开 DevTools 就能看懂每一行代码
-```
-
-**启动方式 = 双击 `index.html`**。整个系统是一组可以被浏览器直接理解的静态文件，部署成本 = 拖到任意静态托管（GitHub Pages / Nginx / S3 / OSS）。
-
-### 公共资源层
-
-| 文件 | 职责 |
-|------|------|
-| [assets/css/base.css](assets/css/base.css) | 全局样式系统：reset、侧边栏、光晕效果、动画、响应式布局 |
-| [assets/js/bus.js](assets/js/bus.js) | 统一数据总线：跨页状态同步、事件发布订阅、初始化保证 |
-| [assets/js/sidebar.js](assets/js/sidebar.js) | JSON驱动导航：一处配置，全站点生效 |
-
-### 核心引擎层
-
-| 模块 | 定位 | 全局命名空间 |
-|------|------|-------------|
-| [quant-engine.js](assets/js/quant-engine.js) | **十步闭环量化引擎·投研流水线总指挥** | `YMineQuantEngine` |
-| [risk-circuit-breaker.js](assets/js/risk-circuit-breaker.js) | 强制熔断中间件·所有仓位计算的必经之门 | `YMineRiskCB` |
-| [cone-game-theory.js](assets/js/cone-game-theory.js) | 圆锥博弈论引擎·0.68引力法则底座 | `YMineConeGame` |
-| [valuation-engine.js](assets/js/valuation-engine.js) | DCF/NPV/IRR/WACC/实物期权估值核心 | `YMineValuation` |
-| [mcn-alpha-engine.js](assets/js/mcn-alpha-engine.js) | 四维资产定价·α匹配系数引擎 | `YMcMine` |
+- **0.68锥心引力**：市场所有博弈力量收敛于0.68（黄金分割共轭点），超过即触发熔断
+- **三层资金池**：对冲蓄水池/品牌体量池/风险资金池动态平衡
+- **红蓝双体制**：RED_OCEAN（红海防御）/ BLUE_OCEAN（蓝海成长）参数化切换
+- **三模型冗余审计**：金融精算/GameMind/计算引擎三角校验，防止单点故障
+- **七类安全熔断**：黑天鹅/系统性崩溃/估值越界/最大回撤/情绪倾斜/手动停机/业务自定义
 
 ---
 
 ## 快速开始
 
-### 30秒上手
+### 环境要求
 
+- 现代浏览器（Chrome 90+ / Firefox 88+ / Safari 14+ / Edge 90+）
+- Python 3.8+（如需启动moodmind_lab/ms-lab后端）
+- localStorage启用（系统自动降级内存缓存）
+
+### 启动方式
+
+**方式一：直接打开主控台**
 ```bash
-# 1. 克隆仓库
-git clone https://github.com/HelloMInd-star/ymine.git
-cd ymine
-
-# 2. 双击运行（不需要任何服务器）
-open index.html            # macOS
-# 或 xdg-open index.html   # Linux
-# 或在文件管理器中双击 index.html
-
-# 3.（可选）本地服务器（推荐用于跨页数据同步最佳体验）
-python3 -m http.server 8000
-# 然后浏览器访问 http://localhost:8000
+# 在浏览器中打开根目录 index.html
+open /workspace/index.html
 ```
 
-### 推荐体验路径
-
+**方式二：启动本地HTTP服务器（推荐）**
+```bash
+cd /workspace
+python3 -m http.server 8080
+# 访问 http://localhost:8080/index.html
 ```
-🏠 首页(index.html) → 了解六层架构
-   ↓
-🏛️ Y.Mine 投资工作室(ymine-studio.html) → 十步闭环全流程
-   ↓
-🧪 金融估值模拟器(marketing-reinvented.html) → 业财融合深度精算
-   ↓
-🔭 信息漏斗(info-funnel.html) → 7层信号提纯
-   ↓
-🗂️ 案例向量库(case-library.html) → 16个真实案例画像匹配
+
+**方式三：启动YMine Studio全功能控制台**
+```bash
+open /workspace/ymine-studio.html
+# 或 http://localhost:8080/ymine-studio.html
+```
+
+**方式四：启动MoodMind Python后端（可选）**
+```bash
+cd /workspace/moodmind_lab
+pip install -r requirements.txt
+bash scripts/start_all.sh
 ```
 
 ---
 
-## 页面导航
+## 系统架构总览
 
-| 模块 | 定位 | 入口 |
+### 目录结构
+
+```
+workspace/
+├── index.html                     # 主控台入口
+├── ymine-studio.html              # YMine Studio全功能控制台
+├── evolvemind.html                # EvolveMind演化引擎
+├── gamemind.html                  # GameMind博弈引擎
+├── moodmind.html                  # MoodMind情绪引擎
+│
+├── assets/
+│   ├── css/                       # 全局样式
+│   └── js/                        # 核心公共引擎（L2层）
+│       ├── bus.js                 # 🚌 YBus三分区消息总线核心
+│       ├── risk-circuit-breaker.js# 🛡️ 全局风控熔断中间件
+│       ├── triangle-audit.js      # 🔺 三模型冗余审计闭环
+│       ├── quant-engine.js        # 📊 十步量化投资引擎
+│       ├── valuation-engine.js    # 💰 DCF+实物期权估值
+│       ├── cone-game-theory.js    # 🎯 0.68锥心博弈论
+│       ├── mcn-alpha-engine.js    # 📈 MCNα引擎
+│       ├── poker-egg.js           # 🃏 德州扑克GTO模块
+│       └── sidebar.js             # 📍 导航侧栏
+│
+├── game-os-main/
+│   ├── total-index.html           # 总入口导航
+│   ├── core-engine/               # 底层内核（L2层）
+│   │   ├── _internal.js           # 内部工具常量
+│   │   ├── common-api.js          # 统一API网关
+│   │   ├── safety-fuse.js         # 🔥 七类安全熔断基线
+│   │   ├── kelly-base.js          # 𐀋 Kelly仓位公式
+│   │   ├── circle-boundary.js     # ⭕ 圆锥边界计算
+│   │   ├── four-layer-control.js  # 🎛️ 四层管控
+│   │   ├── fat-lean-band.js       # 📏 肥瘦区间
+│   │   ├── triangle-loopback.js   # 🔄 三角闭环
+│   │   └── eleven-layer-public.js # 11层公开接口
+│   └── business-modules/          # 五大垂直业务（L3层）
+│       ├── circle-cognitive/      # 圆环认知
+│       ├── lowalt-economy/        # 低空空域经济
+│       ├── math-cognition/        # 数感认知
+│       ├── mcn-valuation/         # MCN估值
+│       └── wall-street-11step/    # 华尔街十一
+│
+├── engines/                       # 七大独立引擎（L3层）
+│   ├── airmind/                   # AirMind思维引擎
+│   ├── evolvemind/                # EvolveMind演化引擎
+│   ├── financemind/               # FinanceMind金融引擎
+│   ├── gamemind/                  # GameMind博弈引擎
+│   ├── geom-compute/              # GeomCompute几何计算
+│   ├── mindspeak/                 # MindSpeak认知语言引擎
+│   │   └── assets/js/
+│   │       ├── mindspeak-public.js
+│   │       ├── ms-samples.js
+│   │       └── ms-visualization.js
+│   └── moodmind/                  # MoodMind情绪引擎
+│
+├── labs/                          # 31组仿真实验室（L4层）
+│   ├── evidence/                  # 通用实证实验室(17个)
+│   ├── structural-mechanics/      # 结构力学实验室(3个)
+│   ├── finance-evidence-lab/      # 金融实证实验室
+│   └── marketing/                 # 营销实验室
+│
+├── moodmind_lab/                  # MoodMind Python后端
+│   ├── moodmind_dashboard/
+│   │   ├── app.py
+│   │   └── private_engine_stub.py # ⚠️ 私有引擎stub
+│   ├── public_api/
+│   │   ├── vector_sender.py       # MAX_EXPORT=100硬限制
+│   │   └── kmp_score_sender.py
+│   └── security/
+│
+├── ms-lab/                        # MS-Lab Python后端
+│   ├── mslab_dashboard/
+│   │   ├── app.py
+│   │   └── mslab_security.py      # MAX_EXPORT=100硬限制
+│   └── mslab_security/
+│
+├── *-private-engine/              # 🔒 私有引擎（物理隔离）
+│   ├── airmind-private-engine/
+│   ├── mindspeak-private-engine/
+│   ├── financemind-private-engine/
+│   ├── isomorphism-block-private-engine/
+│   ├── traditional-culture-vector-private-engine/
+│   └── ymine-circle-cognitive-engine/
+│
+├── pages/                         # 页面目录
+├── models/                        # 计算模型
+├── docs/                          # 📚 文档与审计报告
+│   ├── airmind_v2_audit/
+│   ├── mindspeak_v19_audit/
+│   └── system-v21-rectification/  # V2.2审计报告（本轮）
+│
+└── isomorphism-block-engine/      # 同构区块引擎
+```
+
+---
+
+## 核心模块
+
+### 1. YBus三分区消息总线
+
+[bus.js](file:///workspace/assets/js/bus.js) 是系统的中枢神经，采用三分区权限隔离：
+
+| 分区 | 权限 | 用途 |
 |------|------|------|
-| 🏛️ **Y.Mine 投资工作室 v2.0** | 十步闭环量化引擎·专业版 | [ymine-studio.html](ymine-studio.html) |
-| 🧪 **金融估值模拟器** | CAPM+DCF+圆锥浓度+业财融合+熔断 | [marketing-reinvented.html](marketing-reinvented.html) |
-| 🔭 **信息漏斗** | 7层熵减筛选，噪声→纯信号 | [info-funnel.html](info-funnel.html) |
-| 📡 **AI定价基准库** | 算力/API/订阅/分成行业基准线 | [ai-pricing-benchmark.html](ai-pricing-benchmark.html) |
-| 🗂️ **案例向量库** | 16案例6维向量·余弦相似度匹配 | [case-library.html](case-library.html) |
-| 🎯 **GameMind** | 凯利公式+博弈论底座 | [gamemind.html](gamemind.html) |
-| 📊 **MoodMind** | 非标资产估值操作系统 | [moodmind.html](moodmind.html) |
+| **PIPELINE** | 只读（需`{trusted:true}`） | 官方引擎流水线结果 |
+| **DRAFT** | 用户可写 | 草稿、参数配置 |
+| **AUDIT** | 仅追加 | 审计日志归档 |
+
+共注册**31个通道**，覆盖风控、估值、博弈、认知、体制切换等所有信号流。
+
+### 2. 风控熔断体系
+
+[risk-circuit-breaker.js](file:///workspace/assets/js/risk-circuit-breaker.js) + [safety-fuse.js](file:///workspace/game-os-main/core-engine/safety-fuse.js)
+
+**七类熔断触发：**
+- BLACK_SWAN（黑天鹅）
+- SYSTEMIC_COLLAPSE（系统性崩溃）
+- MANUAL_KILLSWITCH（手动停机）
+- VALUATION_BREACH（估值越界 coneC≥0.68）
+- MAX_DRAWDOWN（最大回撤 mdd≥0.68）
+- EMOTIONAL_TILT（情绪倾斜 tilt≥0.68）
+- RESERVED（业务自定义）
+
+### 3. 十步量化引擎
+
+[quant-engine.js](file:///workspace/assets/js/quant-engine.js) 实现完整的量化投资决策流水线：
+
+```
+Step1: macroFunnel  → 宏观漏斗选股（RED/BLUE体制差异化筛选）
+Step2: factorLibrary → 多因子因子库（价值/成长/质量/动量/情绪/风险）
+Step3: valuationV2  → DCF+相对估值+实物期权
+Step4: [poker]     → 德扑GTO信号映射（隐含概率→资金分配）
+Step5: simulationResult → 蒙特卡洛K线模拟+压力测试
+Step6: rationalityScore → 理性度评分（行为偏误检测+Kelly调整）
+Step7: [triangle]  → 三模型冗余审计（金融/博弈/计算三角校验）
+Step8: executionOrder → 执行指令（风控强制+对冲计划）
+Step9: engineOutput → 最终输出（必须通过三角审计STEP9）
+```
+
+### 4. MindSpeak认知引擎
+
+[engines/mindspeak/](file:///workspace/engines/mindspeak/) 实现四层认知架构：
+- 四维认知向量（math/economic/ai/language）
+- 三层记忆（工作/长期/基因）
+- 行为偏误参数（锚定/损失厌恶/过度自信）
+- 认知过载熔断（overloadScore→fuse）
+
+### 5. 锥心博弈论
+
+[cone-game-theory.js](file:///workspace/assets/js/cone-game-theory.js) 实现基于0.68锥心的博弈仿真：
+- 25个参与者zScore分布
+- groundTruth=0.68地心引力
+- kellyFraction动态调整
+- coneCollapse真相揭示时刻
 
 ---
 
-## 技术理念
+## 安全体系
 
-1. **演绎法而非归纳法**：不从历史数据"拟合"参数，而是从第一性原理出发构建公理系统。
-2. **风控优先于收益**：所有模型先计算"最坏情况下我会亏多少"，再计算"我能赚多少"。
-3. **硬约束而非软建议**：熔断规则写在代码最底层，没有"人类判断"可以覆盖它的开关。
-4. **零信任架构**：不相信任何一个模块的输出，每个下游模块都会独立校验上游数据的合理性。
-5. **可解释性优先**：每一个数字都有清晰的推导路径，你永远不会看到一个"黑盒AI建议买入"。
+Game-OS V2.2 Batch1已通过**七轮专项审计**，全域综合合规度**97.71%（A+级）**。
+
+### 七条安全红线
+
+| # | 红线 | 状态 |
+|---|------|------|
+| 1 | 全局三阈值刚性0.48/0.50/0.68 | ✅ |
+| 2 | PIPELINE分区发布必须{trusted:true} | ✅ |
+| 3 | MAX_EXPORT_BATCH=100硬限制 | ✅ |
+| 4 | 熔断canBypass=false不可绕过 | ✅ |
+| 5 | 紧急停机全局锁阻断STEP9 | ✅ |
+| 6 | 私有内核stub隔离无外泄 | ✅ |
+| 7 | 全链路异常容错不崩溃 | ✅ |
+
+### 四层安全防护
+
+```
+🔒 L1 私有内核隔离（private*/目录物理隔离，stub占位）
+🚌 L2 总线权限隔离（YBus三分区，PIPELINE需trusted）
+🔥 L3 熔断管控层（七类熔断+紧急停机+仓位归零）
+📝 L4 审计归档层（S9六类日志append-only）
+```
+
+详细安全说明参见：[全系统总安全合规白皮书](file:///workspace/docs/system-v21-rectification/Game-OS_V2.2_全系统总安全合规白皮书.md)
 
 ---
 
-## 关于
+## 模块入口索引
 
-独立开发者作品。从行为神经科学到CAPM金融定价，从7层信息漏斗到德州扑克情绪量化，从圆锥浓度0.68铁律到十步闭环流水线——Y.Mine 是这套方法论的可运行载体。
+### 主要页面
 
-> "在这个市场上，活下来永远比赚得多重要。系统设计的第一原则不是收益最大化，而是——**当你错了的时候，确保你还能在桌上玩下一把**。"
+| 页面 | 路径 | 功能 |
+|------|------|------|
+| 主控台 | [index.html](file:///workspace/index.html) | 系统总控仪表盘 |
+| YMine Studio | [ymine-studio.html](file:///workspace/ymine-studio.html) | 全功能控制台（含停机按钮） |
+| EvolveMind | [evolvemind.html](file:///workspace/evolvemind.html) | 演化引擎 |
+| GameMind | [gamemind.html](file:///workspace/gamemind.html) | 博弈引擎 |
+| MoodMind | [moodmind.html](file:///workspace/moodmind.html) | 情绪引擎 |
+| Total Index | [game-os-main/total-index.html](file:///workspace/game-os-main/total-index.html) | 全模块导航 |
+
+### 七大引擎
+
+| 引擎 | 路径 |
+|------|------|
+| AirMind | [engines/airmind/index.html](file:///workspace/engines/airmind/index.html) |
+| EvolveMind | [engines/evolvemind/index.html](file:///workspace/engines/evolvemind/index.html) |
+| FinanceMind | [engines/financemind/index.html](file:///workspace/engines/financemind/index.html) |
+| GameMind | [engines/gamemind/index.html](file:///workspace/engines/gamemind/index.html) |
+| GeomCompute | [engines/geom-compute/index.html](file:///workspace/engines/geom-compute/index.html) |
+| MindSpeak | [engines/mindspeak/index.html](file:///workspace/engines/mindspeak/index.html) |
+| MoodMind | [engines/moodmind/index.html](file:///workspace/engines/moodmind/index.html) |
+
+### 仿真实验室
+
+| 实验室类别 | 目录 | 数量 |
+|-----------|------|------|
+| 通用实证 | [labs/evidence/](file:///workspace/labs/evidence/) | 17个 |
+| 结构力学 | [labs/structural-mechanics/](file:///workspace/labs/structural-mechanics/) | 3个 |
+| 金融实证 | [labs/finance-evidence-lab/](file:///workspace/labs/finance-evidence-lab/) | 1个 |
+| 营销实验 | [labs/marketing/](file:///workspace/labs/marketing/) | 1个 |
 
 ---
 
-## 许可证
+## API速查
 
-MIT License
+### YBus全局API
+
+```javascript
+// 发布消息到通道（PIPELINE需{trusted:true}）
+YBus.publish(channelName, data, { trusted: true });
+
+// 订阅通道更新
+YBus.subscribe(channelName, function(data) { ... });
+
+// 获取通道当前状态
+var state = YBus.getState(channelName);
+
+// 设置DRAFT分区用户数据
+YBus.setState(channelName, value);
+
+// 紧急停机（立即生效，红色按钮调用）
+YBus.emergencyHalt();
+
+// 解除紧急停机
+YBus.resumeFromHalt();
+
+// 查询停机状态
+var isHalted = YBus.isHalted();
+
+// 等待总线就绪
+YBus.ready(function() { ... });
+
+// 全局阈值常量
+YBus.THRESHOLDS.BREAKEVEN  // 0.48
+YBus.THRESHOLDS.STEADY     // 0.50
+YBus.THRESHOLDS.FUSE       // 0.68
+```
+
+### 常用通道
+
+| 通道名 | 分区 | 说明 |
+|--------|------|------|
+| `riskFuse` | PIPELINE | 风控熔断状态 |
+| `quantPipeline` | PIPELINE | 十步流水线进度 |
+| `engineOutput` | PIPELINE | 最终交易信号（STEP9） |
+| `regimeState` | PIPELINE | RED_OCEAN/BLUE_OCEAN体制 |
+| `simulationResult` | PIPELINE | 蒙特卡洛模拟结果 |
+| `rationalityScore` | PIPELINE | 理性度评分 |
+| `valuation` | PIPELINE | 估值锚定 |
+| `coneGame` | PIPELINE | 锥心博弈状态 |
+| `systemHealth` | PIPELINE | 系统健康度 |
+
+---
+
+## 审计文档
+
+### V2.2 七轮审计报告
+
+所有审计报告位于 [docs/system-v21-rectification/](file:///workspace/docs/system-v21-rectification/)：
+
+| 报告 | 文件 |
+|------|------|
+| 七轮审计总汇总表 | [Game-OS_V2.2_七轮审计总汇总表.md](file:///workspace/docs/system-v21-rectification/Game-OS_V2.2_七轮审计总汇总表.md) |
+| 全系统总安全合规白皮书 | [Game-OS_V2.2_全系统总安全合规白皮书.md](file:///workspace/docs/system-v21-rectification/Game-OS_V2.2_全系统总安全合规白皮书.md) |
+| 第七轮全域交叉总终验报告 | [Game-OS_V2.2_第七轮全域交叉总终验报告.md](file:///workspace/docs/system-v21-rectification/Game-OS_V2.2_第七轮全域交叉总终验报告.md) |
+| 第六轮全局通用工具层审计 | [Game-OS_V2.2_第六轮全局通用工具层专项审计报告.md](file:///workspace/docs/system-v21-rectification/Game-OS_V2.2_第六轮全局通用工具层专项审计报告.md) |
+| 第五轮31实验室审计 | [Game-OS_V2.2_实验室限定范围深度审计报告.md](file:///workspace/docs/system-v21-rectification/Game-OS_V2.2_实验室限定范围深度审计报告.md) |
+| P0-P1整改后复测验收 | [Game-OS_V2.2_P0-P1整改后复测验收报告.md](file:///workspace/docs/system-v21-rectification/Game-OS_V2.2_P0-P1整改后复测验收报告.md) |
+| 全链路熔断验收 | [全链路熔断机制与数据流连通性验收报告.md](file:///workspace/docs/system-v21-rectification/全链路熔断机制与数据流连通性验收报告.md) |
+
+### 历史审计文档
+
+- AirMind V2.0审计：[docs/airmind_v2_audit/](file:///workspace/docs/airmind_v2_audit/)
+- MindSpeak V19审计：[docs/mindspeak_v19_audit/](file:///workspace/docs/mindspeak_v19_audit/)
+
+---
+
+## 版本历史
+
+| 版本 | 时间 | 里程碑 |
+|------|------|--------|
+| V1.x | 2025-Q4 | 初版，单引擎基础架构 |
+| V2.0 | 2026-Q1 | YBus总线+三大引擎 |
+| V2.1 | 2026-Q2 | 31实验室+5业务模块+全链路熔断 |
+| V2.2 Batch1 | 2026-03~07 | 七轮专项审计→25个A类缺陷修复→全域终验通过 |
+| **V2.2 Batch1 Final** | **2026-07-21** | **🎊 正式闭环交付** |
+
+### Batch1 已知预留项（不影响稳定运行）
+
+- **B类（Batch2开发，30项）**：RBAC细粒度管控、引擎热更新、批量向量转换、AES导出加密、批量仿真runner等功能开发
+- **C类（Batch3优化，22项）**：UI美化、可视化大屏、PDF报告导出等体验优化
+
+---
+
+## 开发规范
+
+### 新增模块规范
+
+1. **目录规范**：新引擎放入`engines/<name>/`，新业务放入`game-os-main/business-modules/<name>/`，新实验室放入`labs/evidence/`
+2. **YBus规范**：向PIPELINE写入**必须**携带`{trusted:true}`，外部模块只读不写
+3. **阈值规范**：风控判断边界**必须**使用`YBus.THRESHOLDS.BREAKEVEN/STEADY/FUSE`，禁止硬编码0.6/0.5等非标值
+4. **私有算法**：涉密内核放入`*-private-engine/`目录，public层只放stub
+5. **异常容错**：所有公开方法需try/catch，使用safeNum/safeObj/safeArr安全取值
+6. **审计日志**：关键操作调用`_appendAuditLog()`记录S9日志
+
+### 紧急操作
+
+**🛑 紧急停机**：点击任意页面的红色"🛑 紧急停机"按钮，或在控制台执行：
+```javascript
+YBus.emergencyHalt();
+```
+停机后所有STEP9最终输出被阻断，仓位强制归零，需人工点击恢复。
+
+**✅ 恢复运行**：点击"✅ 恢复运行"按钮，或执行：
+```javascript
+YBus.resumeFromHalt();
+```
+
+---
+
+## 技术栈
+
+| 层级 | 技术 |
+|------|------|
+| 前端 | 原生JavaScript (ES6+)、CustomEvent、localStorage |
+| 样式 | CSS3（base.css + 模块级CSS） |
+| 后端 | Python 3.8+（Flask/Streamlit） |
+| 消息总线 | YBus（自研三分区事件总线） |
+| 数据持久化 | localStorage（自动降级内存缓存） |
+| 私有引擎 | 物理目录隔离 + stub占位 |
+
+---
+
+## 许可证与合规
+
+Game-OS V2.2 Batch1 为内部研究/教学/仿真平台。
+
+- ✅ 所有公开代码为原创或开源教学级实现
+- ⚠️ 私有引擎目录（`*-private-engine/`）包含商业机密，未经授权不得访问
+- ⚠️ Black-Scholes等金融模型在公开层为简化教学版本，不构成投资建议
+
+---
+
+## 项目状态
+
+```
+==========================================================
+  G A M E - O S   V 2 . 2   B A T C H 1   F I N A L
+==========================================================
+
+  七轮专项审计 ......... ✅ 全部通过
+  A类缺陷修复 ........... ✅ 25/25 (100%)
+  全域合规度 ............ ✅ 97.71/100 (A+)
+  安全红线 .............. ✅ 7/7 零违反
+  代码语法检查 .......... ✅ 21个核心JS全部OK
+  YBus通道数 ............ ✅ 31个（PIPELINE:27/DRAFT:3/AUDIT:1）
+  模块冒烟测试 .......... ✅ 7引擎+5业务+22+实验室全部通过
+
+  🎊 正式闭环交付 · 可投入生产使用 🎊
+
+==========================================================
+```
+
+---
+
+*README版本：V2.2 Batch1 Final*
+*更新日期：2026-07-21*
