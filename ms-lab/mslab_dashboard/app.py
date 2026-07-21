@@ -27,7 +27,7 @@ import plotly.express as px
 import streamlit as st
 
 from mslab_utils import (
-    BASE_DIR, DB_PATHS, META_DIR, BILLING_DIR, ALERT_DIR, SEC_DIR,
+    BASE_DIR, DB_PATHS, META_DIR, BILLING_DIR, ALERT_DIR, SEC_DIR, COMPUTE_DIR,
     TZ_CN, now_cn, now_cn_iso,
     read_json, write_json, append_jsonl,
     refresh_index_stats, load_lab_config, load_vector_index,
@@ -41,7 +41,8 @@ from mslab_utils import (
     build_hot_cache, cache_status, hot_cache_search,
     load_pricing_config, save_pricing_config, calc_billing, log_billing_v2,
     check_duplicate, should_downgrade, auto_route_and_store,
-    HOT_VECTOR_CACHE, WARM_VECTOR_CACHE,
+    HOT_VECTOR_CACHE, WARM_VECTOR_CACHE, COMPUTE_STATE,
+    has_permission, check_export_limit, audit_log, MAX_EXPORT_BATCH,
 )
 from mslab_vector import (
     tokenize, build_4d_vector, calc_vector_bytes, analyze_vector_bits,
@@ -50,6 +51,20 @@ from mslab_vector import (
     cosine_similarity, classify_tier_by_similarity, count_tokens_in_text,
     estimate_output_tokens, vector_fingerprint, text_normalize, downgrade_precision,
     REFERENCE_KNOWLEDGE_VEC, ROUTE_THRESHOLDS,
+)
+from mslab_math import (
+    solve_binary_linear, solve_ratio, list_templates,
+    TEMPLATE_BINARY_LINEAR, TEMPLATE_RATIO, MathResult,
+)
+from mslab_security import (
+    encrypt_text, decrypt_text, text_hash, get_key,
+    ROLE_ADMIN, ROLE_ARCHITECT, ROLE_OPERATOR, ROLE_LABELS, ROLE_RANK, PERMISSIONS,
+    KEY_SEED_64BIT_HEX, KEY_128BIT_RESERVED, read_audit_log as _read_audit_log,
+)
+from mslab_compute import (
+    build_report, send_report, read_reports, inject_command, fetch_commands,
+    apply_command, default_compute_state,
+    estimate_vram, estimate_compute_time, hot_cold_label,
 )
 from mslab_theme import render_theme, render_header
 
@@ -156,7 +171,8 @@ with st.sidebar:
 
     page = st.radio(
         "📂 导航",
-        ["🏠 总览仪表盘", "💾 向量库管理", "🔍 检索测试", "💰 Token 计费", "🚨 告警中心", "⚙️ 权限与设置"],
+        ["🏠 总览仪表盘", "💾 向量库管理", "📐 数学模板", "🔍 检索测试",
+         "💰 Token 计费", "🖥️ 算力对接", "🛡️ 安全审计", "🚨 告警中心", "⚙️ 权限与设置"],
         index=0,
         label_visibility="collapsed",
     )
@@ -404,6 +420,106 @@ if page.startswith("🏠"):
         st.plotly_chart(fig2, use_container_width=True)
         st.markdown("</div>", unsafe_allow_html=True)
 
+    # ------- 第三排：四库水位 · 冷热分布 · 算力上报 -------
+    col_e, col_f, col_g = st.columns(3, gap="large")
+
+    with col_e:
+        st.markdown("""
+        <div class="section-panel">
+            <div class="section-title">🌊 四库水位（vs 告警线）</div>
+        """, unsafe_allow_html=True)
+        tier_keys = ["trash", "buffer", "normal", "knowledge"]
+        tier_short = {"trash":"噪声","buffer":"缓冲","normal":"常规","knowledge":"知识"}
+        wm_vals = [tiers_real[k]["watermark"]*100 for k in tier_keys]
+        wm_alarm = [cfg.get("storage_tiers",{}).get(k,{}).get("watermark_alarm",0.8)*100 for k in tier_keys]
+        fig3 = go.Figure()
+        fig3.add_trace(go.Bar(x=[tier_short[k] for k in tier_keys], y=wm_vals,
+                             name="当前水位%", marker_color="#60a5fa", width=0.55,
+                             text=[f"{v:.1f}%" for v in wm_vals], textposition="outside"))
+        fig3.add_trace(go.Scatter(x=[tier_short[k] for k in tier_keys], y=wm_alarm,
+                                  mode="markers+lines", name="告警线%",
+                                  line=dict(color="#f87171", width=2, dash="dash"),
+                                  marker=dict(size=9, symbol="diamond", color="#f87171")))
+        fig3.update_layout(
+            template="plotly_dark", paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
+            height=260, margin=dict(l=10,r=10,t=20,b=30),
+            yaxis=dict(range=[0,110], gridcolor="rgba(129,140,248,0.1)", title="%"),
+            legend=dict(orientation="h", y=1.1, x=0),
+        )
+        st.plotly_chart(fig3, use_container_width=True)
+        st.markdown("</div>", unsafe_allow_html=True)
+
+    with col_f:
+        st.markdown("""
+        <div class="section-panel">
+            <div class="section-title">🔥 冷热标签分布（缓存命中）</div>
+        """, unsafe_allow_html=True)
+        try:
+            cs_status = cache_status()
+            hot_hits  = cs_status.get("hot_hits", 0)
+            warm_hits = cs_status.get("warm_hits", 0)
+            miss      = cs_status.get("misses", 0)
+            total_q   = hot_hits + warm_hits + miss
+            hit_rate  = (hot_hits+warm_hits)/total_q*100 if total_q else 0
+            cat_names = ["Hot(常驻)","Warm(软缓存)","Miss(落盘)"]
+            cat_vals  = [cs_status.get("hot_count",0), cs_status.get("warm_count",0),
+                         max(0, total_vec - cs_status.get("hot_count",0) - cs_status.get("warm_count",0))]
+            fig4 = go.Figure(data=[go.Pie(
+                labels=cat_names, values=[max(1,v) for v in cat_vals], hole=.55,
+                marker=dict(colors=["#ef4444","#fbbf24","#475569"],
+                            line=dict(color="rgba(14,20,42,1)", width=2)),
+                textfont=dict(color="#e2e8f0", size=11),
+            )])
+            fig4.update_layout(
+                template="plotly_dark", paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
+                height=260, margin=dict(l=10,r=10,t=10,b=10),
+                annotations=[dict(text=f"命中率<br>{hit_rate:.1f}%",
+                                  x=0.5, y=0.5, font_size=12, font_color="#6ee7b7",
+                                  showarrow=False)],
+            )
+            st.plotly_chart(fig4, use_container_width=True)
+        except Exception:
+            st.info("缓存统计待入库向量后显示")
+        st.markdown("</div>", unsafe_allow_html=True)
+
+    with col_g:
+        st.markdown("""
+        <div class="section-panel">
+            <div class="section-title">🖥️ 算力上报概览（最近20条）</div>
+        """, unsafe_allow_html=True)
+        try:
+            reps = read_reports(BASE_DIR, n=20)
+            if reps:
+                rrs = reps[::-1]
+                fig5 = go.Figure()
+                fig5.add_trace(go.Scatter(
+                    x=[r.get("ts","")[-8:] for r in rrs],
+                    y=[r.get("vram",{}).get("total_mb",0) for r in rrs],
+                    mode="lines+markers", name="VRAM(MB)",
+                    line=dict(color="#60a5fa", width=2),
+                ))
+                fig5.add_trace(go.Scatter(
+                    x=[r.get("ts","")[-8:] for r in rrs],
+                    y=[r.get("est_compute_time",{}).get("time_sec",0)*1000 for r in rrs],
+                    mode="lines", name="耗时(ms)",
+                    line=dict(color="#a78bfa", width=1.5, dash="dot"), yaxis="y2",
+                ))
+                fig5.update_layout(
+                    template="plotly_dark", paper_bgcolor="rgba(0,0,0,0)",
+                    plot_bgcolor="rgba(0,0,0,0)", height=260,
+                    margin=dict(l=10,r=10,t=20,b=30),
+                    yaxis=dict(gridcolor="rgba(129,140,248,0.1)", title="VRAM(MB)"),
+                    yaxis2=dict(gridcolor="rgba(129,140,248,0.05)",
+                                title="耗时(ms)", overlaying="y", side="right"),
+                    legend=dict(orientation="h", y=1.1, x=0),
+                )
+                st.plotly_chart(fig5, use_container_width=True)
+            else:
+                st.info("暂无上报记录 · 入库一个向量即自动上报")
+        except Exception:
+            st.info("算力通道待初始化")
+        st.markdown("</div>", unsafe_allow_html=True)
+
     # ------- 最新告警列表 -------
     st.markdown("""
     <div class="section-panel">
@@ -438,8 +554,8 @@ if page.startswith("🏠"):
         </div>
         <div class="batch-row">
             <span class="batch-chip batch-done">✅ Batch1：工程骨架+仪表盘+监控面板</span>
-            <span class="batch-chip batch-next">⏳ Batch2：向量CRUD+AES加密+KMP检索接口+冷热迁移</span>
-            <span class="batch-chip batch-todo">📋 Batch3：三级权限落地+总控主动推送+审计日志+验收</span>
+            <span class="batch-chip batch-done">✅ Batch2：向量CRUD+AES加密+KMP检索接口+冷热迁移</span>
+            <span class="batch-chip batch-done">✅ Batch3：数学模板·算力对接·安全体系·全套可视化·总控跳转</span>
         </div>
     </div>
     """, unsafe_allow_html=True)
@@ -842,7 +958,82 @@ elif page.startswith("💾"):
     st.markdown("</div>", unsafe_allow_html=True)
 
 # ---------------------------------------------------------------------
-# 页面3：检索测试（Batch1仅界面外壳，KMP在Batch2对接）
+# 页面3：数学模板（二元一次方程组 + 比例，仅硬编码数值代入）
+# ---------------------------------------------------------------------
+elif page.startswith("📐"):
+    st.markdown("""
+    <div class="section-panel">
+        <div class="section-title">📐 数学模板运算（固定模板·数值代入）</div>
+        <div style="font-size:12px;color:#94a3b8;margin-bottom:12px">
+            ⚠️ 仅支持两套硬编码模板：<b>二元一次方程组</b>（克莱姆法则）与<b>比例</b>（交叉相乘）。
+            不具备任何自主解方程能力，仅做纯数值代入。
+        </div>
+    """, unsafe_allow_html=True)
+
+    templates = list_templates()
+    tpl_opts = {f"{t['tid']} · {t['name']}": t["tid"] for t in templates}
+    sel_tpl_label = st.selectbox("选择模板", list(tpl_opts.keys()))
+    sel_tpl = tpl_opts[sel_tpl_label]
+    tpl_meta = next(t for t in templates if t["tid"] == sel_tpl)
+
+    st.markdown(f"""
+    <div style="background:#0f2033;border:1px solid #1e40af;padding:10px 14px;border-radius:8px;
+                font-family:'JetBrains Mono','Courier New',monospace;font-size:13px;color:#93c5fd;margin:8px 0 14px">
+        📝 公式原型：<code style="color:#6ee7b7;background:transparent">{tpl_meta['formula']}</code><br/>
+        <span style="color:#94a3b8;font-size:11px">{tpl_meta['description']}</span>
+    </div>
+    """, unsafe_allow_html=True)
+
+    if sel_tpl == TEMPLATE_BINARY_LINEAR:
+        st.markdown("**方程组：** `a1·x + b1·y = c1`；`a2·x + b2·y = c2`")
+        c1, c2, c3 = st.columns(3)
+        a1 = c1.number_input("a1", value=2.0, step=0.1, format="%.4f")
+        b1 = c2.number_input("b1", value=3.0, step=0.1, format="%.4f")
+        cc1= c3.number_input("c1", value=13.0, step=0.1, format="%.4f")
+        c4, c5, c6 = st.columns(3)
+        a2 = c4.number_input("a2", value=1.0, step=0.1, format="%.4f")
+        b2 = c5.number_input("b2", value=-1.0, step=0.1, format="%.4f")
+        cc2= c6.number_input("c2", value=-1.0, step=0.1, format="%.4f")
+        if st.button("🧮 代入计算", type="primary", use_container_width=True):
+            r = solve_binary_linear(a1, b1, cc1, a2, b2, cc2)
+            audit_log(st.session_state.perm_level, "math_solve_binary",
+                      {"a1":a1,"b1":b1,"c1":cc1,"a2":a2,"b2":b2,"c2":cc2, "ok":r.success})
+            if r.success:
+                st.success(f"✅ 解：**x = {r.outputs['x']:.6f}**，**y = {r.outputs['y']:.6f}**")
+                st.code(
+                    f"D  = a1·b2 − b1·a2 = {a1}×{b2} − {b1}×{a2} = {r.meta['D']:.6f}\n"
+                    f"Dx = c1·b2 − b1·c2 = {cc1}×{b2} − {b1}×{cc2} = {r.meta['Dx']:.6f}\n"
+                    f"Dy = a1·c2 − c1·a2 = {a1}×{cc2} − {cc1}×{a2} = {r.meta['Dy']:.6f}\n"
+                    f"x = Dx/D = {r.outputs['x']:.6f}\n"
+                    f"y = Dy/D = {r.outputs['y']:.6f}",
+                    language="text"
+                )
+            else:
+                st.error(f"❌ {r.error}")
+
+    elif sel_tpl == TEMPLATE_RATIO:
+        st.markdown("**比例式：** `a : b = c : x`  →  x = b·c / a")
+        c1, c2, c3 = st.columns(3)
+        a = c1.number_input("外项 a", value=2.0, step=0.1, format="%.4f")
+        b = c2.number_input("内项 b", value=6.0, step=0.1, format="%.4f")
+        c = c3.number_input("内项 c", value=4.0, step=0.1, format="%.4f")
+        if st.button("🧮 代入计算", type="primary", use_container_width=True):
+            r = solve_ratio(a, b, c)
+            audit_log(st.session_state.perm_level, "math_solve_ratio",
+                      {"a":a,"b":b,"c":c, "ok":r.success})
+            if r.success:
+                st.success(f"✅ 解：**x = {r.outputs['x']:.6f}**")
+                st.code(
+                    f"x = b·c / a = {b}×{c} / {a} = {r.outputs['x']:.6f}",
+                    language="text"
+                )
+            else:
+                st.error(f"❌ {r.error}")
+
+    st.markdown("</div>", unsafe_allow_html=True)
+
+# ---------------------------------------------------------------------
+# 页面4：检索测试（Batch1仅界面外壳，KMP在Batch2对接）
 # ---------------------------------------------------------------------
 elif page.startswith("🔍"):
     st.markdown("""
@@ -976,7 +1167,266 @@ elif page.startswith("💰"):
             st.rerun()
 
 # ---------------------------------------------------------------------
-# 页面5：告警中心
+# 页面6：算力对接（上报显存/耗时/冷热，接收错峰/精度调整指令）
+# ---------------------------------------------------------------------
+elif page.startswith("🖥️"):
+    st.markdown("""
+    <div class="section-panel">
+        <div class="section-title">🖥️ 算力底座双向对接</div>
+        <div style="font-size:12px;color:#94a3b8;margin-bottom:12px">
+            向上层 <b>几何心智空间算力错峰调度底座</b> 上报：预估显存占用 · 算力耗时 · 冷热标签；
+            下发：错峰延迟（ms） · 精度降级（FP32） · 暂停/恢复 · 配额限制（条/分钟）。
+            对接方式：文件队列 stub（可替换为gRPC/HTTP）。
+        </div>
+    """, unsafe_allow_html=True)
+
+    cs = COMPUTE_STATE
+    colL, colR = st.columns([1.2, 1], gap="large")
+    with colL:
+        st.markdown("#### 📊 当前算力状态")
+        cs_df = pd.DataFrame([{
+            "paused": cs["paused"],
+            "force_fp32 (精度降级)": cs["force_fp32"],
+            "delay_ms (错峰延迟)": cs["delay_ms"],
+            "quota_per_min (配额)": cs["quota_per_min"],
+        }])
+        st.dataframe(cs_df.T.rename(columns={0:"value"}), use_container_width=True)
+
+        st.markdown("#### 🧮 显存/耗时/冷热 估算器")
+        n_vec  = st.number_input("向量条数", 1, 1000000, 1, step=100)
+        dims   = st.selectbox("维度", [4, 128, 384, 768, 1536], index=0)
+        prec   = st.selectbox("精度", ["fp32", "fp64"], index=0)
+        t_chars= st.number_input("文本字符数", 0, 1000000, 64, step=32)
+        tkn_in = st.number_input("输入Token数", 1, 100000, 64, step=64)
+        tkn_out= st.number_input("输出Token数", 0, 100000, 9, step=8)
+        blocks = st.number_input("KMP块数", 0, 1024, 0, step=1)
+        tier_sel = st.selectbox("目标冷热层", ["trash","buffer","normal","knowledge"], index=2)
+        sim_in   = st.slider("相似度", 0.0, 1.0, 0.62, 0.01)
+
+        vram = estimate_vram(int(n_vec), int(dims), prec, int(t_chars))
+        t    = estimate_compute_time(int(n_vec), int(tkn_in), int(tkn_out),
+                                     prec, with_kmp_blocks=(int(blocks)>0), kmp_blocks=int(blocks))
+        hc   = hot_cold_label(tier_sel, float(sim_in))
+        est_col1, est_col2, est_col3 = st.columns(3)
+        est_col1.metric("预估显存", f"{vram['total_mb']:.2f} MB",
+                        f"payload {vram['payload_bytes']/1024:.1f}KB + reserved {vram['reserved_bytes']/1024/1024:.1f}MB")
+        est_col2.metric("预估耗时", f"{t['total_ms']:.2f} ms",
+                        f"embed {t['embed_ms']:.2f}ms + out {t['output_ms']:.2f}ms")
+        est_col3.metric("冷热标签", hc, f"tier={tier_sel} sim={sim_in}")
+
+        if st.button("📤 手动上报一次（模拟入库触发）", type="primary"):
+            if not has_permission(st.session_state.perm_level, "compute_report"):
+                st.error("❌ 权限不足：需要 operator 及以上角色")
+            else:
+                rpt = build_report(
+                    num_vectors=int(n_vec), tokens_in=int(tkn_in), tokens_out=int(tkn_out),
+                    precision=prec, tier=tier_sel, similarity=float(sim_in),
+                    text_total_chars=int(t_chars), kmp_blocks=int(blocks),
+                    extra={"source": "manual_dashboard"},
+                )
+                resp = send_report(BASE_DIR, rpt)
+                audit_log(st.session_state.perm_level, "compute_report",
+                          {"report_id": rpt["id"], "vram_mb": vram["total_mb"],
+                           "time_ms": t["total_ms"], "label": hc})
+                st.success(f"已上报 report_id={rpt['id']}")
+                st.json(rpt)
+
+    with colR:
+        st.markdown("#### 📥 下发指令面板（模拟算力底座下发）")
+        if not has_permission(st.session_state.perm_level, "compute_cmd_inject"):
+            st.warning("⚠️ 注入指令需要 architect/admin 角色")
+        else:
+            with st.form("cmd_form"):
+                cmd_type = st.selectbox("指令类型", [
+                    ("stagger",        "⏱️ 错峰延迟（delay_ms）"),
+                    ("downgrade_precision", "⬇️ 精度降级到FP32"),
+                    ("pause",          "⏸️ 暂停入库"),
+                    ("resume",         "▶️ 恢复入库"),
+                    ("quota_limit",    "📊 配额限制（vectors_per_min）"),
+                    ("noop",           "💓 心跳空操作"),
+                ], format_func=lambda x: x[1])
+                cmd_key = cmd_type[0]
+                delay_ms = st.number_input("错峰延迟ms(stagger)", 0, 30000, 500, step=100)
+                qpm      = st.number_input("配额条/分钟(quota_limit)", 1, 1000, 60, step=10)
+                reason   = st.text_input("原因(source)", "auto-scheduled during peak")
+                submitted = st.form_submit_button("📨 注入指令", use_container_width=True)
+                if submitted:
+                    params = {}
+                    if cmd_key == "stagger":      params = {"delay_ms": int(delay_ms)}
+                    if cmd_key == "quota_limit":  params = {"vectors_per_min": int(qpm)}
+                    inject_command(BASE_DIR, cmd_key, params, source=reason or "dashboard")
+                    audit_log(st.session_state.perm_level, "compute_cmd_inject",
+                              {"cmd": cmd_key, "params": params})
+                    st.success("指令已注入，下一次入库将被应用")
+
+        st.markdown("#### 📬 未应用指令（点击立即拉取应用）")
+        pending = fetch_commands(BASE_DIR, mark_applied=False)
+        if not pending:
+            st.info("✅ 队列为空")
+        else:
+            for c in pending:
+                st.markdown(f"""
+                <div style="background:#0b2238;border:1px solid #1e40af;border-radius:6px;padding:6px 10px;
+                            font-size:11px;margin:4px 0;color:#cbd5e1">
+                    <b style="color:#fbbf24">{c['cmd']}</b> · src={c.get('source','')}<br/>
+                    params=<code style="color:#93c5fd">{c.get('params',{})}</code><br/>
+                    <span style="color:#64748b">{c.get('ts','')}</span>
+                </div>
+                """, unsafe_allow_html=True)
+            if st.button("✅ 立即应用全部待处理指令"):
+                for c in pending:
+                    apply_command(c, cs)
+                fetch_commands(BASE_DIR, mark_applied=True)
+                audit_log(st.session_state.perm_level, "compute_cmd_apply_batch",
+                          {"count": len(pending)})
+                st.success(f"已应用 {len(pending)} 条指令到全局 COMPUTE_STATE")
+                st.rerun()
+
+    st.markdown("#### 📜 最近上报记录（最近20条）")
+    reports = read_reports(BASE_DIR, n=20)
+    if reports:
+        rdf = pd.DataFrame([{
+            "ts": r.get("ts",""),
+            "task": r.get("task",""),
+            "label": r.get("hot_cold_label",""),
+            "tier": r.get("target_tier",""),
+            "vram_mb": r.get("vram_estimate",{}).get("total_mb"),
+            "time_ms": r.get("time_estimate_ms",0),
+            "precision": r.get("precision",""),
+            "paused": "paused" if cs["paused"] else "running",
+            "rid": r.get("id",""),
+        } for r in reports])
+        st.dataframe(rdf, use_container_width=True, height=280)
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(x=[r.get("ts","")[-8:] for r in reports][::-1],
+                                 y=[r.get("vram_estimate",{}).get("total_mb",0) for r in reports][::-1],
+                                 mode="lines+markers", name="VRAM(MB)",
+                                 line=dict(color="#60a5fa", width=2)))
+        fig.add_trace(go.Bar(x=[r.get("ts","")[-8:] for r in reports][::-1],
+                             y=[r.get("time_estimate_ms",0) for r in reports][::-1],
+                             name="耗时(ms)", marker_color="#a78bfa", opacity=0.6, yaxis="y2"))
+        fig.update_layout(
+            template="plotly_dark", paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
+            title="上报时序：显存占用 vs 算力耗时", height=320,
+            yaxis=dict(title="VRAM (MB)"),
+            yaxis2=dict(title="耗时 (ms)", overlaying="y", side="right"),
+            margin=dict(l=10,r=10,t=40,b=30),
+            legend=dict(orientation="h", y=1.12),
+        )
+        st.plotly_chart(fig, use_container_width=True)
+    else:
+        st.info("暂无上报记录（入库一个向量或点击手动上报即可生成）")
+
+    st.markdown("</div>", unsafe_allow_html=True)
+
+# ---------------------------------------------------------------------
+# 页面7：安全审计（AES-256-GCM / RBAC / 导出限制 / 两级密钥）
+# ---------------------------------------------------------------------
+elif page.startswith("🛡️"):
+    st.markdown("""
+    <div class="section-panel">
+        <div class="section-title">🛡️ 安全体系 · 加密 · 权限 · 审计</div>
+        <div style="font-size:12px;color:#94a3b8;margin-bottom:12px">
+            AES-256-GCM 原文加密存储 · RBAC 三级权限 · 禁止全库批量导出（单次≤100条） · 原文不嵌入向量内部<br/>
+            两级密钥：64bit 种子已写入工程（HKDF派生256bit密钥），128bit 密钥仅预留参数位（调用即抛 NotImplementedError）
+        </div>
+    """, unsafe_allow_html=True)
+
+    role = st.session_state.perm_level
+    is_admin = has_permission(role, "security_manage")
+
+    colL, colR = st.columns([1, 1], gap="large")
+    with colL:
+        st.markdown("#### 🔑 两级密钥状态")
+        key64_seed = KEY_SEED_64BIT_HEX
+        st.code(
+            f"[64bit 工程密钥 · 已加载]\n"
+            f"seed (hex, 16 hex chars / 64 bit) = {key64_seed}\n"
+            f"HKDF-SHA256 → AES-256 KEY (hex, 64 chars) = {get_key(256).hex()}\n\n"
+            f"[128bit 外部密钥 · 预留位]\n"
+            f"KEY_128BIT_RESERVED = {repr(KEY_128BIT_RESERVED)}\n"
+            f"（调用 get_key(128) 将抛 NotImplementedError，等待KMS注入）",
+            language="text"
+        )
+        with st.expander("🧪 加解密自检"):
+            pt = st.text_input("待加密文本", value="MindSpeak-机密测试文本-2026")
+            if st.button("🔒 加密 → 🔓 解密 自测"):
+                try:
+                    enc = encrypt_text(pt)
+                    dt = decrypt_text(enc)
+                    ok = (dt == pt)
+                    st.success(f"自测{'通过 ✅' if ok else '失败 ❌'}")
+                    st.json({"ciphertext_b64": enc["ciphertext_b64"][:64]+"...", "roundtrip": ok})
+                    audit_log(role, "crypto_self_test", {"ok": ok})
+                except NotImplementedError as e:
+                    st.error(f"128bit预留位触发：{e}")
+
+        st.markdown("#### 👥 RBAC 权限矩阵")
+        perm_rows = []
+        for perm in sorted(PERMISSIONS.keys()):
+            perm_rows.append({
+                "权限点": perm,
+                "最低角色": PERMISSIONS[perm],
+                "admin": "✓" if ROLE_RANK[ROLE_ADMIN] >= ROLE_RANK[PERMISSIONS[perm]] else "-",
+                "architect": "✓" if ROLE_RANK[ROLE_ARCHITECT] >= ROLE_RANK[PERMISSIONS[perm]] else "-",
+                "operator": "✓" if ROLE_RANK[ROLE_OPERATOR] >= ROLE_RANK[PERMISSIONS[perm]] else "-",
+            })
+        st.dataframe(pd.DataFrame(perm_rows), use_container_width=True, height=280)
+
+    with colR:
+        st.markdown("#### 🚫 批量导出限制")
+        st.info(f"硬编码单次最大导出：**{MAX_EXPORT_BATCH} 条**（禁止全库批量导出）")
+        exp_n = st.number_input("模拟导出条数", 1, 100000, 50, step=10)
+        ok, msg = check_export_limit(int(exp_n))
+        if ok:
+            st.success(f"✅ {msg}：{exp_n} ≤ {MAX_EXPORT_BATCH}，允许导出")
+        else:
+            st.error(f"❌ {msg}：{exp_n} > {MAX_EXPORT_BATCH}，拒绝")
+
+        if is_admin:
+            st.markdown("#### 🔐 原文分离存储验证")
+            st.markdown(
+                "入库流程已自动启用：向量文件仅存 `[SECURE]<text_hash>` 引用，"
+                "原文以 AES-256-GCM 存入 `sec/text/<hash>.json`，向量内部不保留明文。"
+            )
+            sec_dir = SEC_DIR / "text"
+            if sec_dir.exists():
+                sec_files = list(sec_dir.glob("*.json"))
+                st.metric("已加密原文文件数", len(sec_files))
+                if sec_files and st.button("👁️ 查看最近3个加密文件元信息"):
+                    for p in sorted(sec_files, key=lambda x:x.stat().st_mtime, reverse=True)[:3]:
+                        st.code(p.read_text()[:400], language="json")
+            else:
+                st.info("尚无加密原文（入库一个带文本的向量后自动生成）")
+        else:
+            st.warning("⚠️ 查看加密原文需要 admin 权限（请切换到 👑 最高管理员）")
+
+    st.markdown("#### 📜 安全审计日志（最近100条）")
+    audit_entries = _read_audit_log(BASE_DIR, n=100)
+    if audit_entries:
+        adf = pd.DataFrame([{
+            "ts": e.get("ts",""),
+            "role": e.get("role",""),
+            "action": e.get("action",""),
+            "detail": json.dumps(e.get("detail",{}), ensure_ascii=False)[:120],
+        } for e in audit_entries])
+        st.dataframe(adf, use_container_width=True, height=280)
+        # 审计行为按角色统计
+        arc = pd.DataFrame(audit_entries)
+        if not arc.empty:
+            agg = arc.groupby(["role","action"]).size().reset_index(name="count")
+            fig = px.bar(agg, x="action", y="count", color="role", barmode="group",
+                         title="审计日志：各角色·各操作次数", height=300)
+            fig.update_layout(template="plotly_dark", paper_bgcolor="rgba(0,0,0,0)",
+                              plot_bgcolor="rgba(0,0,0,0)", margin=dict(l=10,r=10,t=40,b=40))
+            st.plotly_chart(fig, use_container_width=True)
+    else:
+        st.info("暂无审计日志")
+
+    st.markdown("</div>", unsafe_allow_html=True)
+
+# ---------------------------------------------------------------------
+# 页面8：告警中心
 # ---------------------------------------------------------------------
 elif page.startswith("🚨"):
     st.markdown("""

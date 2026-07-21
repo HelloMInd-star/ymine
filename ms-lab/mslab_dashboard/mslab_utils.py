@@ -1,9 +1,10 @@
 """
-MS-Lab 通用工具模块 (Batch2)
+MS-Lab 通用工具模块 (Batch3)
 红线声明：本模块仅提供监控数据读取、JSON持久化、日志记录、
-         计费计量、冷热缓存、自动分流入库等表层工程能力；
+         计费计量、冷热缓存、自动分流入库、加密存储、算力对接等表层工程能力；
 禁止实现通用数学求解库、128bit高精度运算、KMP底层匹配、算力调度博弈算法。
 Batch2新增：自动相似度分流、冷热内存缓存、Token计费增强、FP64→FP32自动降级、向量去重。
+Batch3新增：AES-256-GCM原文分离加密存储、算力底座上报/指令接收、三级RBAC权限校验。
 """
 import json
 import os
@@ -11,6 +12,17 @@ import time
 import uuid
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
+
+from mslab_security import (
+    store_text_secure, load_text_secure, delete_text_secure,
+    has_permission, check_export_limit, audit_log, MAX_EXPORT_BATCH,
+    ROLE_ADMIN, ROLE_ARCHITECT, ROLE_OPERATOR, ROLE_RANK,
+)
+from mslab_compute import (
+    build_report, send_report, fetch_commands, apply_command,
+    default_compute_state, estimate_vram, estimate_compute_time,
+)
+
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -24,8 +36,13 @@ META_DIR    = BASE_DIR / "mslab_meta"
 BILLING_DIR = BASE_DIR / "mslab_billing"
 ALERT_DIR   = BASE_DIR / "mslab_alert"
 SEC_DIR     = BASE_DIR / "mslab_security"
+COMPUTE_DIR = BASE_DIR / "mslab_compute"
 
 TZ_CN = timezone(timedelta(hours=8))
+
+COMPUTE_STATE = default_compute_state()
+
+TEXT_SECURE_PREFIX = "[SECURE]"
 
 def now_cn() -> str:
     return datetime.now(TZ_CN).strftime("%Y-%m-%d %H:%M:%S")
@@ -272,10 +289,44 @@ def _vec_file(tier: str, vec_id: str) -> Path:
     return DB_PATHS[tier] / f"{vec_id}.json"
 
 def save_vector(vec_record: dict) -> dict:
-    """将向量记录写入对应层级目录的JSON文件"""
+    """将向量记录写入对应层级目录的JSON文件（原文AES-256-GCM分离加密存储）"""
     tier = vec_record.get("tier", "buffer")
     vec_id = vec_record["vec_id"]
     fp = _vec_file(tier, vec_id)
+
+    # Batch3: 原文加密分离存储
+    plaintext = vec_record.get("text", "")
+    if plaintext and not plaintext.startswith(TEXT_SECURE_PREFIX):
+        sec_meta = store_text_secure(BASE_DIR, vec_id, plaintext,
+                                     tier=tier,
+                                     precision=vec_record.get("precision", "fp32"))
+        vec_record["text"] = TEXT_SECURE_PREFIX + sec_meta["text_hash"]
+        vec_record["text_ref"] = sec_meta["text_ref"]
+        vec_record["text_hash"] = sec_meta["text_hash"]
+        vec_record["text_encrypted"] = True
+        vec_record["text_len"] = sec_meta["text_len"]
+
+    # 算力指令检查（Batch3：入库前拉取并应用底座指令）
+    try:
+        pending_cmds = fetch_commands(BASE_DIR, mark_applied=True)
+        for cmd in pending_cmds:
+            effect = apply_command(cmd, COMPUTE_STATE)
+            log_op("compute_cmd_applied", {"cmd": cmd["cmd"], "effect": effect["effect"], "cmd_id": cmd["cmd_id"]})
+    except Exception:
+        pending_cmds = []
+
+    if COMPUTE_STATE.get("paused"):
+        return {"ok": False, "error": "算力底座下发pause指令，入库任务已暂停", "vec_id": vec_id}
+    if COMPUTE_STATE.get("force_fp32") and vec_record.get("precision") == "fp64":
+        try:
+            from mslab_vector import downgrade_precision
+            vec_record = downgrade_precision(vec_record)
+            log_alert("warn", "compute", "算力底座指令强制FP64→FP32降级", "compute")
+        except Exception:
+            pass
+    if COMPUTE_STATE.get("delay_ms", 0) > 0:
+        time.sleep(min(COMPUTE_STATE["delay_ms"], 5000) / 1000.0)
+
     ok = write_json(fp, vec_record)
     if ok:
         log_op("vector_save", {
@@ -283,20 +334,62 @@ def save_vector(vec_record: dict) -> dict:
             "tier": tier,
             "precision": vec_record.get("precision"),
             "byte_size": vec_record.get("byte_info", {}).get("total_bytes"),
-            "text_preview": vec_record.get("text", "")[:60],
+            "text_encrypted": vec_record.get("text_encrypted", False),
         })
         check_watermark_after_write(tier)
+
+        # Batch3: 上报算力底座
+        try:
+            tok_in = 0
+            tok_out = 9
+            if "token_usage" in vec_record:
+                tok_in = vec_record["token_usage"].get("input", {}).get("total_tokens", 0)
+                tok_out = vec_record["token_usage"].get("output", {}).get("total_tokens", 9)
+            rpt = build_report(
+                num_vectors=1,
+                tokens_in=tok_in,
+                tokens_out=tok_out,
+                precision=vec_record.get("precision", "fp32"),
+                tier=tier,
+                similarity=vec_record.get("route_info", {}).get("similarity", 0),
+                text_total_chars=vec_record.get("text_len", len(plaintext)),
+                kmp_blocks=vec_record.get("kmp_blocks", {}).get("block_count", 0),
+            )
+            send_report(BASE_DIR, rpt)
+        except Exception:
+            pass
+
     return {"ok": ok, "path": str(fp), "vec_id": vec_id}
+
+
+def _decrypt_vec_text(v: dict) -> dict:
+    """内部函数：加载向量时自动解密text字段（对调用方透明）"""
+    if v.get("text", "").startswith(TEXT_SECURE_PREFIX) and v.get("text_encrypted"):
+        pt = load_text_secure(BASE_DIR, v["vec_id"])
+        if pt is not None:
+            v["_text_secure"] = True
+            v["text"] = pt
+    return v
+
 
 def load_vector(tier: str, vec_id: str) -> dict:
     fp = _vec_file(tier, vec_id)
-    return read_json(fp)
+    v = read_json(fp)
+    if v:
+        v = _decrypt_vec_text(v)
+    return v
+
 
 def delete_vector(tier: str, vec_id: str) -> dict:
     fp = _vec_file(tier, vec_id)
     existed = fp.exists()
     if existed:
         fp.unlink()
+        # Batch3: 同步删除加密原文
+        try:
+            delete_text_secure(BASE_DIR, vec_id)
+        except Exception:
+            pass
         log_op("vector_delete", {"vec_id": vec_id, "tier": tier})
     return {"ok": True, "existed": existed, "deleted": existed}
 
@@ -309,8 +402,8 @@ def list_vectors(tier: str) -> list:
         ids.append(p.stem)
     return sorted(ids)
 
-def load_all_vectors(tier: str, limit: int = 500) -> list:
-    """加载某一层级所有向量（最近N条按修改时间倒序）"""
+def load_all_vectors(tier: str, limit: int = 500, auto_decrypt: bool = True) -> list:
+    """加载某一层级所有向量（最近N条按修改时间倒序）；默认自动解密原文"""
     if tier not in DB_PATHS:
         return []
     files = sorted(
@@ -322,6 +415,8 @@ def load_all_vectors(tier: str, limit: int = 500) -> list:
     for fp in files:
         v = read_json(fp)
         if v:
+            if auto_decrypt:
+                v = _decrypt_vec_text(v)
             out.append(v)
     return out
 
