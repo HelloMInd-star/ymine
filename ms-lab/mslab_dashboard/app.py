@@ -98,21 +98,37 @@ cfg = load_lab_config()
 # ============================================================
 # 侧边栏 —— 导航 + 权限切换 + 红线
 # ============================================================
+# 静态服务基址（总控台HTTP服务器端口）
+# ============================================================
+STATIC_BASE = "http://localhost:8090"
+
 with st.sidebar:
-    st.markdown("""
+    st.markdown(f"""
     <div style="padding:10px 4px 14px 4px; border-bottom:1px solid rgba(129,140,248,0.15); margin-bottom:12px">
         <div style="font-size:15px; font-weight:700; color:#e0e7ff; display:flex; align-items:center; gap:8px">
             🧠 MS-Lab 控制台
         </div>
         <div style="font-size:11px; color:#7a86b4; margin-top:4px; font-family:monospace">
-            v1.0-Batch1
+            v1.0-Batch1 · Streamlit :8501
         </div>
-        <div style="margin-top:10px">
-            <a href="../../engines/geom-compute/index.html" target="_self"
+        <div style="margin-top:10px;display:flex;flex-direction:column;gap:6px">
+            <a href="{STATIC_BASE}/index.html" target="_blank"
+               style="display:inline-flex;align-items:center;gap:6px;font-size:11px;color:#fcd34d;
+                      background:rgba(251,191,36,0.10);border:1px solid rgba(251,191,36,0.35);
+                      padding:5px 10px;border-radius:6px;text-decoration:none">
+               🏠 返回 Y.Mine 总控台
+            </a>
+            <a href="{STATIC_BASE}/engines/geom-compute/index.html" target="_blank"
                style="display:inline-flex;align-items:center;gap:6px;font-size:11px;color:#93c5fd;
                       background:rgba(59,130,246,0.12);border:1px solid rgba(59,130,246,0.35);
                       padding:5px 10px;border-radius:6px;text-decoration:none">
-               🏗️ 回到几何算力中控台
+               🏗️ 几何算力中控台
+            </a>
+            <a href="{STATIC_BASE}/ms-lab/index.html" target="_blank"
+               style="display:inline-flex;align-items:center;gap:6px;font-size:11px;color:#6ee7b7;
+                      background:rgba(52,211,153,0.10);border:1px solid rgba(52,211,153,0.35);
+                      padding:5px 10px;border-radius:6px;text-decoration:none">
+               🧠 MS-Lab 入口页
             </a>
         </div>
     </div>
