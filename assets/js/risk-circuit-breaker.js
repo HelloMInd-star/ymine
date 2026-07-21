@@ -230,7 +230,7 @@
 
     if (typeof YBus !== 'undefined' && YBus.publish) {
         global.YMineRiskCB.on(function(evt) {
-            YBus.publish('riskFuse', evt);
+            YBus.publish('riskFuse', evt, { trusted: true });
         });
     }
 })(typeof window !== 'undefined' ? window : this);
