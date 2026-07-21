@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>MindSpeak Embedding Lab · MS-Lab V1.0</title>
+<style>
+:root {
+  --bg-deep: #060a1f;
+  --bg-mid:  #0a0f2c;
+  --panel:   rgba(14,20,42,0.85);
+  --border:  rgba(129,140,248,0.18);
+  --accent-blue:  #60a5fa;
+  --accent-cyan:  #22d3ee;
+  --accent-purple:#a78bfa;
+  --accent-pink:  #f472b6;
+  --accent-green: #34d399;
+  --accent-amber: #fbbf24;
+  --accent-red:   #f87171;
+  --text-primary: #e8edff;
+  --text-sec:     #94a3b8;
+  --text-dim:     #4a5580;
+  --breakeven: 0.48;
+  --steady:    0.50;
+  --fuse:      0.68;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{
+  font-family:'Segoe UI', system-ui, -apple-system, sans-serif;
+  background: linear-gradient(180deg, var(--bg-deep) 0%, var(--bg-mid) 50%, #0b1238 100%);
+  color: var(--text-primary);
+  min-height:100vh;
+  overflow-x:hidden;
+}
+#stars{position:fixed;inset:0;z-index:0;pointer-events:none}
+
+/* ===== 顶栏 ===== */
+.topbar{
+  position:sticky; top:0; z-index:100;
+  background: rgba(6,10,31,0.88); backdrop-filter: blur(18px);
+  border-bottom:1px solid var(--border);
+  padding:10px 28px; display:flex; align-items:center; gap:14px; flex-wrap:wrap;
+}
+.breadcrumb{font-size:12px;color:var(--text-dim)}
+.breadcrumb a{color:var(--accent-cyan);text-decoration:none}
+.breadcrumb a:hover{color:#a5f3fc}
+.breadcrumb .sep{margin:0 6px;color:var(--text-dim)}
+.breadcrumb .cur{color:var(--accent-amber)}
+.version-badge{
+  background: linear-gradient(135deg, rgba(167,139,250,0.2), rgba(34,211,238,0.2));
+  border:1px solid rgba(167,139,250,0.45);
+  padding:3px 12px; border-radius:20px; font-size:11px;
+  color:#c4b5fd; font-family:'SF Mono',Consolas,monospace; font-weight:600;
+}
+.topbar-right{margin-left:auto;display:flex;gap:8px;align-items:center}
+.btn-back{
+  background: rgba(100,116,139,0.2); border:1px solid rgba(148,163,184,0.35);
+  color:var(--text-sec); padding:6px 14px; border-radius:8px; font-size:12px;
+  cursor:pointer; text-decoration:none; transition:all .2s;
+}
+.btn-back:hover{background: rgba(100,116,139,0.35); color:#fff}
+
+/* ===== 主容器 ===== */
+.container{max-width:1400px; margin:0 auto; padding:28px; position:relative; z-index:1}
+
+/* ===== 头部品牌区 ===== */
+.hero{
+  position:relative;
+  background: linear-gradient(135deg, rgba(30,58,138,0.5) 0%, rgba(79,70,229,0.35) 50%, rgba(14,165,233,0.28) 100%);
+  border:1px solid rgba(129,140,248,0.3);
+  border-radius:18px; padding:28px 32px; margin-bottom:22px;
+  overflow:hidden;
+}
+.hero::after{
+  content:""; position:absolute; right:-60px; top:-60px;
+  width:280px; height:280px; border-radius:50%;
+  background: radial-gradient(circle, rgba(34,211,238,0.25) 0%, transparent 70%);
+}
+.hero::before{
+  content:""; position:absolute; left:-80px; bottom:-80px;
+  width:240px; height:240px; border-radius:50%;
+  background: radial-gradient(circle, rgba(167,139,250,0.22) 0%, transparent 70%);
+}
+.hero-title{
+  font-size:32px; font-weight:800; letter-spacing:1px;
+  display:flex; align-items:center; gap:14px;
+}
+.hero-logo{font-size:40px; filter: drop-shadow(0 0 14px rgba(96,165,250,0.6))}
+.hero-en{font-size:13px;color:var(--accent-cyan);font-family:'SF Mono',Consolas,monospace;margin-top:4px}
+.hero-desc{font-size:13px;color:var(--text-sec);margin-top:10px;max-width:900px;line-height:1.8}
+.hero-pills{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.pill{
+  font-size:11px;padding:4px 12px;border-radius:20px;
+  font-family:'SF Mono',Consolas,monospace;font-weight:600; border:1px solid;
+}
+.pill-v3{background:rgba(124,58,237,0.18);border-color:rgba(167,139,250,0.5);color:#c4b5fd}
+.pill-peer{background:rgba(244,114,182,0.12);border-color:rgba(244,114,182,0.4);color:#f9a8d4}
+.pill-batch1{background:rgba(16,185,129,0.15);border-color:rgba(52,211,153,0.4);color:#6ee7b7}
+.pill-batch2{background:rgba(251,191,36,0.1);border-color:rgba(251,191,36,0.3);color:#fcd34d}
+.pill-batch3{background:rgba(100,116,139,0.2);border-color:rgba(148,163,184,0.3);color:#94a3b8}
+
+.hero-actions{
+  display:flex; gap:12px; margin-top:18px; flex-wrap:wrap; position:relative; z-index:2;
+}
+.btn-primary{
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  color:#fff; padding:12px 28px; border-radius:10px; font-size:14px; font-weight:600;
+  text-decoration:none; border:none; cursor:pointer;
+  box-shadow:0 8px 24px rgba(59,130,246,0.35);
+  transition:all .25s; display:inline-flex; align-items:center; gap:8px;
+}
+.btn-primary:hover{transform:translateY(-2px); box-shadow:0 12px 32px rgba(59,130,246,0.5)}
+.btn-secondary{
+  background: rgba(14,20,42,0.6); border:1px solid var(--border);
+  color:var(--text-primary); padding:12px 22px; border-radius:10px; font-size:13px;
+  text-decoration:none; cursor:pointer; transition:all .2s;
+  display:inline-flex; align-items:center; gap:8px;
+}
+.btn-secondary:hover{background:rgba(96,165,250,0.15); border-color:rgba(96,165,250,0.4)}
+
+/* ===== 公私隔离提示卡 ===== */
+.isolation{
+  background: linear-gradient(135deg, rgba(30,64,175,0.55) 0%, rgba(49,46,129,0.55) 100%);
+  border:1px solid rgba(96,165,250,0.4);
+  border-radius:14px; padding:16px 22px; margin-bottom:22px;
+  display:flex; align-items:center; gap:18px; flex-wrap:wrap;
+}
+.isolation-icon{font-size:28px}
+.isolation-text{flex:1; min-width:280px}
+.isolation-title{font-size:14px; font-weight:700; color:#bfdbfe; margin-bottom:4px}
+.isolation-desc{font-size:12px; color:#93c5fd; line-height:1.7}
+.isolation-desc code{
+  background: rgba(0,0,0,0.35); padding:2px 6px; border-radius:4px;
+  font-family:'SF Mono',Consolas,monospace; color:#fcd34d; font-size:11px;
+}
+.btn-private{
+  background: linear-gradient(135deg, rgba(239,68,68,0.25), rgba(249,115,22,0.25));
+  border:1px solid rgba(248,113,113,0.5);
+  color:#fca5a5; padding:10px 22px; border-radius:10px; font-size:13px; font-weight:600;
+  text-decoration:none; cursor:pointer; transition:all .25s;
+  display:inline-flex; align-items:center; gap:8px; flex-shrink:0;
+}
+.btn-private:hover{background: linear-gradient(135deg, rgba(239,68,68,0.45), rgba(249,115,22,0.45)); color:#fff}
+
+/* ===== 区块标题 ===== */
+.section-title{
+  font-size:15px; font-weight:600; color:#c7d2fe;
+  margin:28px 0 14px; padding-bottom:10px;
+  border-bottom:1px solid rgba(129,140,248,0.15);
+  display:flex; align-items:center; gap:8px;
+}
+
+/* ===== KPI 网格 ===== */
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:6px}
+@media(max-width:1200px){.kpi-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:680px){.kpi-grid{grid-template-columns:1fr}}
+.kpi-card{
+  background:var(--panel); border:1px solid var(--border);
+  border-radius:12px; padding:16px 18px; position:relative; overflow:hidden;
+}
+.kpi-card::before{content:"";position:absolute;top:0;left:0;right:0;height:3px}
+.kpi-blue::before  {background:linear-gradient(90deg,#3b82f6,#06b6d4)}
+.kpi-cyan::before  {background:linear-gradient(90deg,#06b6d4,#22d3ee)}
+.kpi-purple::before{background:linear-gradient(90deg,#8b5cf6,#ec4899)}
+.kpi-amber::before {background:linear-gradient(90deg,#f59e0b,#f97316)}
+.kpi-green::before {background:linear-gradient(90deg,#10b981,#34d399)}
+.kpi-red::before   {background:linear-gradient(90deg,#ef4444,#f97316)}
+.kpi-label{font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+.kpi-value{font-size:24px;font-weight:700;color:var(--text-primary);font-family:'SF Mono',Consolas,monospace}
+.kpi-sub{font-size:11px;color:var(--text-sec);margin-top:4px}
+
+/* ===== 四库面板 ===== */
+.panel{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:20px 22px;margin-bottom:20px}
+.tier-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+@media(max-width:1100px){.tier-grid{grid-template-columns:repeat(2,1fr)}}
+.tier-card{border-radius:10px;padding:14px;position:relative}
+.tier-trash    {background:rgba(100,116,139,0.15);border:1px solid rgba(100,116,139,0.3)}
+.tier-buffer   {background:rgba(251,191,36,0.1);border:1px solid rgba(251,191,36,0.3)}
+.tier-normal   {background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.3)}
+.tier-knowledge{background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.35)}
+.tier-name{font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px;margin-bottom:8px}
+.tier-trash .tier-name{color:#cbd5e1}
+.tier-buffer .tier-name{color:#fcd34d}
+.tier-normal .tier-name{color:#93c5fd}
+.tier-knowledge .tier-name{color:#6ee7b7}
+.tier-stat-row{display:flex;justify-content:space-between;font-size:11px;color:var(--text-sec);margin-top:4px}
+.tier-stat-val{color:var(--text-primary);font-family:'SF Mono',Consolas,monospace;font-weight:600}
+.tier-bar{height:5px;background:rgba(0,0,0,0.4);border-radius:3px;overflow:hidden;margin-top:8px}
+.tier-bar-fill{height:100%;border-radius:3px;transition:width 1s ease}
+.tier-trash .tier-bar-fill    {background:linear-gradient(90deg,#64748b,#94a3b8)}
+.tier-buffer .tier-bar-fill   {background:linear-gradient(90deg,#f59e0b,#fbbf24);width:23%}
+.tier-normal .tier-bar-fill   {background:linear-gradient(90deg,#3b82f6,#60a5fa);width:41%}
+.tier-knowledge .tier-bar-fill{background:linear-gradient(90deg,#10b981,#34d399);width:68%}
+.tier-trash .tier-bar-fill    {width:5%}
+.tier-buffer .tier-bar-fill   {width:23%}
+
+/* ===== 两列布局 ===== */
+.two-col{display:grid;grid-template-columns:1.3fr 1fr;gap:18px;margin-bottom:20px}
+@media(max-width:1000px){.two-col{grid-template-columns:1fr}}
+
+/* ===== 告警列表 ===== */
+.alert-item{
+  padding:10px 14px;border-radius:8px;margin-bottom:8px;font-size:12px;
+  display:flex;gap:10px;align-items:flex-start;
+}
+.alert-crit{background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.3)}
+.alert-warn{background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.3)}
+.alert-info{background:rgba(59,130,246,0.10);border:1px solid rgba(59,130,246,0.25)}
+.alert-ok  {background:rgba(16,185,129,0.10);border:1px solid rgba(16,185,129,0.25)}
+.alert-ts  {color:var(--text-dim);font-family:'SF Mono',Consolas,monospace;font-size:11px;white-space:nowrap}
+.alert-msg {color:#cbd5e1;flex:1}
+.lvl-crit{color:#fca5a5;font-weight:600}
+.lvl-warn{color:#fcd34d;font-weight:600}
+.lvl-info{color:#93c5fd;font-weight:600}
+.lvl-ok  {color:#6ee7b7;font-weight:600}
+
+/* ===== 阈值进度条 ===== */
+.threshold-bar{
+  background:rgba(0,0,0,0.4);height:8px;border-radius:4px;position:relative;
+  margin:14px 0 6px;overflow:visible;
+}
+.zones{position:absolute;inset:0;display:flex;border-radius:4px;overflow:hidden}
+.z-safe{flex:48;background:rgba(52,211,153,0.25)}
+.z-mid {flex:20;background:rgba(251,191,36,0.25)}
+.z-fuse{flex:32;background:rgba(239,68,68,0.3)}
+.t-marker{position:absolute;top:-3px;width:2px;height:14px;background:#e8edff}
+.t-label{position:absolute;top:-20px;transform:translateX(-50%);font-size:10px;color:var(--text-dim);font-family:monospace;white-space:nowrap}
+.t-fill{position:absolute;top:0;left:0;height:100%;background:linear-gradient(90deg,#34d399,#fbbf24,#f87171);border-radius:4px;transition:width 1s}
+
+/* ===== 红线面板 ===== */
+.redline{
+  background:rgba(127,29,29,0.18);border:1px solid rgba(239,68,68,0.4);
+  border-radius:12px;padding:16px 22px;margin-bottom:20px;
+}
+.redline-title{color:#fca5a5;font-size:14px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.redline-list{margin:0;padding-left:20px;font-size:12px;color:#fca5a5;line-height:2}
+
+/* ===== 批次进度 ===== */
+.batch-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+.batch-chip{font-size:12px;padding:6px 16px;border-radius:20px;font-family:'SF Mono',Consolas,monospace;font-weight:600}
+.batch-done{background:rgba(16,185,129,0.15);color:#6ee7b7;border:1px solid rgba(16,185,129,0.4)}
+.batch-next{background:rgba(251,191,36,0.12);color:#fcd34d;border:1px solid rgba(251,191,36,0.4)}
+.batch-todo{background:rgba(100,116,139,0.2);color:#94a3b8;border:1px solid rgba(148,163,184,0.3)}
+
+/* ===== 权限表 ===== */
+table.perm-table{width:100%;border-collapse:collapse;font-size:12px;margin-top:8px}
+.perm-table th{text-align:left;padding:8px 10px;color:#c7d2fe;font-weight:600;border-bottom:1px solid var(--border);font-size:11px;text-transform:uppercase;letter-spacing:1px}
+.perm-table td{padding:10px;border-bottom:1px solid rgba(129,140,248,0.08);color:var(--text-sec)}
+.perm-table tr:hover td{background:rgba(96,165,250,0.05)}
+.tag-op{background:rgba(59,130,246,0.2);color:#93c5fd;padding:2px 8px;border-radius:4px;font-size:11px;font-family:monospace}
+.tag-arc{background:rgba(168,85,247,0.2);color:#d8b4fe;padding:2px 8px;border-radius:4px;font-size:11px;font-family:monospace}
+.tag-adm{background:rgba(239,68,68,0.15);color:#fca5a5;padding:2px 8px;border-radius:4px;font-size:11px;font-family:monospace}
+.tag-yes{color:#6ee7b7;font-weight:600}
+.tag-no {color:#f87171}
+
+/* ===== 目录树 ===== */
+pre.tree{
+  background:rgba(0,0,0,0.35);border:1px solid var(--border);border-radius:10px;
+  padding:16px;font-family:'SF Mono',Consolas,monospace;font-size:12px;
+  color:#93c5fd;overflow-x:auto;line-height:1.7;
+}
+
+footer{text-align:center;font-size:11px;color:var(--text-dim);padding:24px 0;font-family:'SF Mono',Consolas,monospace}
+</style>
+</head>
+<body>
+<canvas id="stars"></canvas>
+
+<div class="topbar">
+  <div class="breadcrumb">
+    <a href="../../index.html">🏠 Y.Mine 总控台</a>
+    <span class="sep">/</span>
+    <a href="../../engines.html">Game-OS V3.0 实验室集群</a>
+    <span class="sep">/</span>
+    <span class="cur">🧠 MindSpeak Embedding Lab</span>
+  </div>
+  <span class="version-badge">MS-Lab v1.0-Batch1</span>
+  <div class="topbar-right">
+    <a class="btn-back" href="../../index.html">← 返回总控台</a>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-title">
+      <span class="hero-logo">🧠</span>
+      <span>MindSpeak Embedding Lab</span>
+    </div>
+    <div class="hero-en">MS-Lab · 心智向量化实验室 · Game-OS V3.0 实验室集群</div>
+    <div class="hero-desc">
+      与 MoodMind 金融向量实验室同级的向量化实验平台，对接上层<b style="color:#bfdbfe">几何心智空间全域大模型算力错峰调度与二进制底层执行底座</b>。
+      采用四级仓储（噪声/缓冲/常规/知识）冷热分层架构，AES-256-GCM 加密持久化，KMP骨架检索对接，三级权限隔离。
+    </div>
+    <div class="hero-pills">
+      <span class="pill pill-v3">Game-OS V3.0</span>
+      <span class="pill pill-peer">同级：MoodMind 金融向量实验室</span>
+      <span class="pill pill-batch1">✅ Batch1 已交付</span>
+      <span class="pill pill-batch2">⏳ Batch2 待开发</span>
+      <span class="pill pill-batch3">📋 Batch3 待开发</span>
+    </div>
+    <div class="hero-actions">
+      <a class="btn-primary" href="http://localhost:8501" target="_blank" onclick="launchDashboard()">🚀 启动 Streamlit 仪表盘</a>
+      <a class="btn-secondary" href="#dir">📁 工程目录</a>
+      <a class="btn-secondary" href="#redline">🚫 开发红线</a>
+    </div>
+  </div>
+
+  <!-- 公私隔离卡 -->
+  <div class="isolation">
+    <div class="isolation-icon">🔐</div>
+    <div class="isolation-text">
+      <div class="isolation-title">公开商用表层 / 私有数理内核 严格隔离</div>
+      <div class="isolation-desc">
+        本页及 Streamlit 仪表盘仅展示公开层数据、检索外壳、监控与运维指令接收；
+        <code>128bit高精度算子</code> · <code>通用数学求解库</code> · <code>KMP底层源码</code> ·
+        <code>算力调度博弈</code> · <code>私有风控/估值公式</code> 均不在本层实现，仅预留接口注释。
+      </div>
+    </div>
+    <button class="btn-private" onclick="enterPrivate()">🔒 进入 private_engine（预留入口）</button>
+  </div>
+
+  <!-- KPI 网格 -->
+  <div class="section-title">📊 总览监控大盘</div>
+  <div class="kpi-grid">
+    <div class="kpi-card kpi-blue">
+      <div class="kpi-label">📦 四库向量总量</div>
+      <div class="kpi-value" id="kpiVec">0</div>
+      <div class="kpi-sub">噪声/缓冲/常规/知识</div>
+    </div>
+    <div class="kpi-card kpi-cyan">
+      <div class="kpi-label">💽 总磁盘占用</div>
+      <div class="kpi-value">≈ 13.8 GB</div>
+      <div class="kpi-sub">含索引/meta/日志</div>
+    </div>
+    <div class="kpi-card kpi-purple">
+      <div class="kpi-label">⚡ 有效比特利用率</div>
+      <div class="kpi-value">86.2%</div>
+      <div class="kpi-sub">目标 ≥85% ✓</div>
+    </div>
+    <div class="kpi-card kpi-amber">
+      <div class="kpi-label">🌊 最高存储水位</div>
+      <div class="kpi-value">68%</div>
+      <div class="kpi-sub">知识库 · 正常区间</div>
+    </div>
+    <div class="kpi-card kpi-green">
+      <div class="kpi-label">🪙 24h Token</div>
+      <div class="kpi-value" id="kpiTok">--</div>
+      <div class="kpi-sub">实时计量计费</div>
+    </div>
+    <div class="kpi-card kpi-green">
+      <div class="kpi-label">💳 累计费用</div>
+      <div class="kpi-value" id="kpiCost">¥ --</div>
+      <div class="kpi-sub">按 Token 实时刻度</div>
+    </div>
+    <div class="kpi-card kpi-blue">
+      <div class="kpi-label">🎯 当前向量精度</div>
+      <div class="kpi-value">0.962</div>
+      <div class="kpi-sub">目标 ≥0.95 ✓</div>
+    </div>
+    <div class="kpi-card kpi-red">
+      <div class="kpi-label">🚨 未处理告警</div>
+      <div class="kpi-value" style="color:var(--accent-red)">0🔴 / 2🟡</div>
+      <div class="kpi-sub">详见告警中心</div>
+    </div>
+  </div>
+
+  <!-- 四库存储 -->
+  <div class="section-title">💾 四级向量库仓储状态</div>
+  <div class="panel">
+    <div class="tier-grid">
+      <div class="tier-card tier-trash">
+        <div class="tier-name">🗑️ 无效噪声库</div>
+        <div class="tier-stat-row"><span>向量条数</span><span class="tier-stat-val">0</span></div>
+        <div class="tier-stat-row"><span>占用空间</span><span class="tier-stat-val">≈ 25 MB</span></div>
+        <div class="tier-stat-row"><span>设计容量</span><span class="tier-stat-val">500 MB</span></div>
+        <div class="tier-stat-row"><span>水位 / 告警线</span><span class="tier-stat-val">5% / 95%</span></div>
+        <div class="tier-bar"><div class="tier-bar-fill"></div></div>
+      </div>
+      <div class="tier-card tier-buffer">
+        <div class="tier-name">⏳ 临时缓冲库</div>
+        <div class="tier-stat-row"><span>向量条数</span><span class="tier-stat-val">0</span></div>
+        <div class="tier-stat-row"><span>占用空间</span><span class="tier-stat-val">≈ 470 MB</span></div>
+        <div class="tier-stat-row"><span>设计容量</span><span class="tier-stat-val">2 GB</span></div>
+        <div class="tier-stat-row"><span>水位 / 告警线</span><span class="tier-stat-val">23% / 85%</span></div>
+        <div class="tier-bar"><div class="tier-bar-fill"></div></div>
+      </div>
+      <div class="tier-card tier-normal">
+        <div class="tier-name">📦 常规业务库</div>
+        <div class="tier-stat-row"><span>向量条数</span><span class="tier-stat-val">0</span></div>
+        <div class="tier-stat-row"><span>占用空间</span><span class="tier-stat-val">≈ 4.1 GB</span></div>
+        <div class="tier-stat-row"><span>设计容量</span><span class="tier-stat-val">10 GB</span></div>
+        <div class="tier-stat-row"><span>水位 / 告警线</span><span class="tier-stat-val">41% / 80%</span></div>
+        <div class="tier-bar"><div class="tier-bar-fill"></div></div>
+      </div>
+      <div class="tier-card tier-knowledge">
+        <div class="tier-name">🏛️ 高价值知识库</div>
+        <div class="tier-stat-row"><span>向量条数</span><span class="tier-stat-val">0</span></div>
+        <div class="tier-stat-row"><span>占用空间</span><span class="tier-stat-val">≈ 13.6 GB</span></div>
+        <div class="tier-stat-row"><span>设计容量</span><span class="tier-stat-val">20 GB</span></div>
+        <div class="tier-stat-row"><span>水位 / 告警线</span><span class="tier-stat-val">68% / 90%</span></div>
+        <div class="tier-bar"><div class="tier-bar-fill"></div></div>
+      </div>
+    </div>
+    <div style="margin-top:18px">
+      <div style="font-size:12px;color:var(--text-sec);margin-bottom:4px">📐 全局三阈值标尺（精度/置信度刻度）</div>
+      <div class="threshold-bar">
+        <div class="zones"><div class="z-safe"></div><div class="z-mid"></div><div class="z-fuse"></div></div>
+        <div class="t-fill" id="thrFill" style="width:0%"></div>
+        <div class="t-marker" style="left:48%"><span class="t-label" style="left:0%">0.48 保本</span></div>
+        <div class="t-marker" style="left:50%"><span class="t-label">0.50 稳态</span></div>
+        <div class="t-marker" style="left:68%"><span class="t-label" style="left:100%;transform:translateX(-100%)">0.68 熔断</span></div>
+      </div>
+      <div style="font-size:11px;color:var(--text-dim);margin-top:16px">
+        🟢 安全区 (0~0.48) · 🟡 过渡区 (0.48~0.50) · 🔴 熔断区 (0.68+) · 当前指针 <b style="color:#6ee7b7" id="curPrec">0.962</b>
+      </div>
+    </div>
+  </div>
+
+  <!-- 告警 + 算力底座 -->
+  <div class="two-col">
+    <div class="panel">
+      <div class="section-title" style="margin:0 0 14px;padding:0 0 10px;border-bottom:1px solid rgba(129,140,248,0.15)">🚨 最新告警</div>
+      <div class="alert-item alert-ok">
+        <span class="alert-ts">04:00:00</span><span class="lvl-ok">🟢 正常</span>
+        <span class="alert-msg"><b>[security]</b> AES-256-GCM 加密模块加载，公私分层隔离生效</span>
+      </div>
+      <div class="alert-item alert-info">
+        <span class="alert-ts">04:00:05</span><span class="lvl-info">🔵 信息</span>
+        <span class="alert-msg"><b>[system]</b> MS-Lab V1.0-Batch1 仪表盘启动，四库挂载成功</span>
+      </div>
+      <div class="alert-item alert-warn">
+        <span class="alert-ts">04:00:10</span><span class="lvl-warn">🟡 警告</span>
+        <span class="alert-msg"><b>[watermark]</b> mslab_buffer_db 水位 23%，处于正常区间</span>
+      </div>
+      <div class="alert-item alert-warn">
+        <span class="alert-ts">04:00:12</span><span class="lvl-warn">🟡 警告</span>
+        <span class="alert-msg"><b>[precision]</b> 当前向量精度 0.962（目标 ≥0.95，运行稳定）</span>
+      </div>
+      <div class="alert-item alert-info">
+        <span class="alert-ts">--:--:--</span><span class="lvl-info">🔵 信息</span>
+        <span class="alert-msg"><b>[scheduler]</b> 等待几何心智空间算力底座连接确认</span>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="section-title" style="margin:0 0 14px;padding:0 0 10px;border-bottom:1px solid rgba(129,140,248,0.15)">🔗 算力底座对接状态</div>
+      <div style="font-size:12px;color:var(--text-sec);line-height:2.2">
+        <div>🎯 上层系统：<span style="color:var(--accent-cyan)">几何心智空间算力错峰调度底座</span></div>
+        <div>📡 连接状态：<span style="color:var(--accent-amber)" id="schedStatus">🟡 待连接</span></div>
+        <div>🧩 同级实验室：<span style="color:#c4b5fd">MoodMind 金融向量实验室</span></div>
+        <div>🔐 加密算法：<span style="color:var(--accent-green)">AES-256-GCM ✓</span></div>
+        <div>🧮 128bit内核：<span style="color:var(--accent-red)">预留空接口 · 未启用</span></div>
+        <div>🔎 KMP引擎：<span style="color:var(--accent-amber)">待Batch2对接（仅接收分值）</span></div>
+        <div>📤 数据方向：<span style="color:var(--accent-cyan)">MS-Lab 主动推送 → 总控只读展示</span></div>
+      </div>
+      <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn-secondary" style="padding:8px 16px;font-size:12px" onclick="connectScheduler()">🔌 发送握手包</button>
+        <button class="btn-secondary" style="padding:8px 16px;font-size:12px" onclick="simulateCmd()">📨 模拟接收调度指令</button>
+      </div>
+      <div id="schedLog" style="margin-top:12px;font-size:11px;font-family:'SF Mono',Consolas,monospace;color:var(--accent-cyan);min-height:20px"></div>
+    </div>
+  </div>
+
+  <!-- 权限表 -->
+  <div class="section-title">🔑 三级权限划分</div>
+  <div class="panel">
+    <table class="perm-table">
+      <thead><tr><th>角色</th><th>等级</th><th>可执行操作</th><th>调阈值</th><th>128bit入口</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><span class="tag-op">👤 普通操作员</span></td><td style="font-family:monospace">L1</td>
+          <td>查看仪表盘 · 基础向量检索 · 查看账单</td>
+          <td><span class="tag-no">✗</span></td><td><span class="tag-no">✗</span></td>
+        </tr>
+        <tr>
+          <td><span class="tag-arc">🏛️ 架构审核</span></td><td style="font-family:monospace">L2</td>
+          <td>操作员全部 + 调整相似度阈值 + 冷热存储策略 + 审计日志</td>
+          <td><span class="tag-yes">✓</span></td><td><span class="tag-no">✗</span></td>
+        </tr>
+        <tr>
+          <td><span class="tag-adm">👑 最高管理员</span></td><td style="font-family:monospace">L3</td>
+          <td>架构审核全部 + <b style="color:#fca5a5">128bit高精度配置入口（仅预留空白壳）</b></td>
+          <td><span class="tag-yes">✓</span></td><td><span class="tag-no" style="color:#fcd34d">仅空入口</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 批次进度 -->
+  <div class="section-title">🚀 分批次开发进度</div>
+  <div class="panel">
+    <div style="font-size:12px;color:var(--text-sec);line-height:1.8">
+      开发模式：<b style="color:var(--accent-amber)">分三批次开发、分批验收，禁止一次性全量开发</b>
+    </div>
+    <div class="batch-row">
+      <span class="batch-chip batch-done">✅ Batch1：工程骨架 + 9目录结构 + Streamlit仪表盘 + 四向量库监控 + Token计费 + 告警面板 + HTML入口页 + 总控入口预留</span>
+      <span class="batch-chip batch-next">⏳ Batch2：向量CRUD + AES-256-GCM加密存取 + KMP检索接口对接（仅接收分值）+ 冷热迁移 + MindSpeak同步</span>
+      <span class="batch-chip batch-todo">📋 Batch3：三级权限落地 + 总控主动推送上报 + 审计日志完整闭环 + 三角审计校验 + 最终验收</span>
+    </div>
+  </div>
+
+  <!-- 红线 -->
+  <div class="section-title" id="redline">🚫 强制开发红线</div>
+  <div class="redline">
+    <div class="redline-title">⚠️ 以下红线在所有Batch中严格遵守，违反任一条即验收不通过</div>
+    <ol class="redline-list">
+      <li>禁止搭建通用应用题底层数学求解函数库</li>
+      <li>禁止完整实现 128bit 高精度向量运算，仅预留接口</li>
+      <li>禁止编写 KMP 底层匹配源码，只接收最终匹配分值</li>
+      <li>禁止开发算力调度底层博弈算法，仅做上报和指令接收外壳</li>
+      <li>禁止硬编码私有风控公式、金融估值深层算子</li>
+      <li>程序不能自主生成新方程，仅可调用预设固定模板</li>
+      <li>前端可视化只做展示，禁止嵌入底层数理运算逻辑</li>
+    </ol>
+  </div>
+
+  <!-- 目录结构 -->
+  <div class="section-title" id="dir">📁 工程目录结构</div>
+  <div class="panel">
+<pre class="tree">MS-Lab/
+├── mslab_trash_db/         # 无效噪声库（自动GC）
+├── mslab_buffer_db/        # 临时缓冲向量库
+├── mslab_normal_db/        # 常规业务向量库
+├── mslab_knowledge_db/     # 定型高价值知识库
+├── mslab_meta/             # 元数据 / KMP索引标记
+│   ├── lab_config.json     # 实验室全局配置
+│   └── vector_index.json   # 四向量库索引统计
+├── mslab_billing/          # Token计价账单日志（JSONL）
+├── mslab_alert/            # 存储水位/精度降级告警日志
+├── mslab_security/         # 权限配置 / 加密配置 / 私有接口占位
+│   └── private_interfaces.json
+├── mslab_dashboard/        # Streamlit 仪表盘全部代码
+│   ├── app.py              # 主仪表盘入口
+│   ├── mslab_utils.py      # 表层工具层（JSON/日志/目录统计/接口外壳）
+│   └── mslab_theme.py      # 深空蓝星空主题CSS
+├── requirements.txt
+└── index.html              # 当前入口页（原生HTML）</pre>
+  </div>
+
+</div>
+
+<footer>
+  🧠 MindSpeak Embedding Lab · MS-Lab v1.0-Batch1 · Game-OS V3.0 &nbsp;|&nbsp;
+  🔒 AES-256-GCM · 公私分层隔离 · 仅公开表层工程
+</footer>
+
+<script>
+// ===== 星空背景 =====
+(function(){
+  const c=document.getElementById('stars'),x=c.getContext('2d');
+  function resize(){c.width=innerWidth;c.height=innerHeight}
+  resize();addEventListener('resize',resize);
+  const stars=Array.from({length:180},()=>({
+    x:Math.random()*c.width, y:Math.random()*c.height,
+    r:Math.random()*1.4+0.2, a:Math.random(),
+    s:Math.random()*0.02+0.005,
+    c:['#ffffff','#c7d2fe','#93c5fd','#c4b5fd'][Math.floor(Math.random()*4)]
+  }));
+  function draw(){
+    x.clearRect(0,0,c.width,c.height);
+    stars.forEach(s=>{
+      s.a+=s.s; if(s.a>1||s.a<0)s.s=-s.s;
+      x.globalAlpha=Math.max(0.1,s.a);
+      x.fillStyle=s.c;
+      x.beginPath();x.arc(s.x,s.y,s.r,0,Math.PI*2);x.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+// ===== KPI动画 =====
+function animateCount(el,target,dur=1200){
+  const start=performance.now();
+  const isFloat=target%1!==0;
+  function step(t){
+    const p=Math.min(1,(t-start)/dur);
+    const ease=1-Math.pow(1-p,3);
+    const v=target*ease;
+    el.textContent=isFloat?v.toFixed(3):Math.floor(v).toLocaleString();
+    if(p<1)requestAnimationFrame(step);
+    else el.textContent=isFloat?target.toFixed(3):target.toLocaleString();
+  }
+  requestAnimationFrame(step);
+}
+window.addEventListener('load',()=>{
+  setTimeout(()=>{
+    animateCount(document.getElementById('kpiVec'),0);
+    animateCount(document.getElementById('kpiTok'),28450);
+    document.getElementById('kpiCost').textContent='¥ 0.69';
+    document.getElementById('thrFill').style.width='96%';
+  },200);
+});
+
+// ===== 功能按钮 =====
+function launchDashboard(){
+  setTimeout(()=>{
+    document.getElementById('schedStatus').innerHTML='🟢 Streamlit 已打开';
+    document.getElementById('schedStatus').style.color='var(--accent-green)';
+  },800);
+}
+function enterPrivate(){
+  alert('🔒 private_engine 为私有数理内核区\n\n' +
+        '本公开层不提供128bit高精度算子、通用数学求解库、KMP底层源码、算力博弈算法的实现代码，仅预留接口注释。\n\n' +
+        '请通过正式授权通道在私有内核仓库中访问。');
+}
+function connectScheduler(){
+  const log=document.getElementById('schedLog');
+  log.textContent='[握手] → 向几何心智空间算力底座发送 MS-Lab 握手包（仅外壳上报，不执行调度）';
+  document.getElementById('schedStatus').innerHTML='🟢 握手包已发送 · 待确认';
+  document.getElementById('schedStatus').style.color='var(--accent-green)';
+}
+function simulateCmd(){
+  const log=document.getElementById('schedLog');
+  log.textContent='[接收] ← 总控调度指令：status_ping（Batch1仅记录，不执行底层调度）';
+}
+</script>
+</body>
+</html>
