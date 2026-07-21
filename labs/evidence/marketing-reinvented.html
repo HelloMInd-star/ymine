@@ -5661,7 +5661,7 @@
                 };
 
                 if (typeof YBus !== 'undefined' && YBus.publish) {
-                    YBus.publish('marketingFinance', data);
+                    YBus.publish('marketingFinance', data, {trusted:true});
                 }
 
                 window._marketingFinanceData = data;
@@ -6894,7 +6894,7 @@
                             mispricingSignal: field.valuationAnchor.mispricingSignal,
                             valuationGap: field.valuationAnchor.valuationGap,
                             timestamp: Date.now()
-                        });
+                        }, {trusted:true});
                     }
                 } catch(e) {
                     console.warn('Valuation anchor init failed:', e);
@@ -7045,7 +7045,7 @@
                         entropy: snapshot.entropy,
                         tick: snapshot.tick,
                         timestamp: snapshot.timestamp
-                    });
+                    }, {trusted:true});
                     YBus.publish('kellyConfig', {
                         p: 0.5 + snapshot.zScore * 0.1,
                         b: 1.0,
@@ -7061,7 +7061,7 @@
                         private_domain: snapshot.decision.distribution.private_domain,
                         state: snapshot.state.id,
                         timestamp: snapshot.timestamp
-                    });
+                    }, {trusted:true});
                     if (snapshot.brandVolume) {
                         YBus.publish('brandVolume', {
                             V: snapshot.brandVolume.V,
@@ -7072,7 +7072,7 @@
                             freezeReason: snapshot.brandVolume.freezeReason,
                             totalDeposited: snapshot.brandVolume.totalDeposited,
                             timestamp: snapshot.timestamp
-                        });
+                        }, {trusted:true});
                     }
                     if (snapshot.hedgeReservoir) {
                         YBus.publish('hedgeReservoir', {
@@ -7084,7 +7084,7 @@
                             lastInjection: snapshot.hedgeReservoir.lastInjection,
                             injectionSource: snapshot.hedgeReservoir.injectionSource,
                             timestamp: snapshot.timestamp
-                        });
+                        }, {trusted:true});
                     }
                     if (snapshot.pokerBridge) {
                         YBus.publish('pokerEgg', {
@@ -7097,7 +7097,7 @@
                             kellyAdjustment: snapshot.pokerBridge.kellyBias,
                             bigBlind: snapshot.pokerBridge.bigBlind,
                             timestamp: snapshot.timestamp
-                        });
+                        }, {trusted:true});
                     }
                     if (snapshot.valuationAnchor && snapshot.valuationAnchor.enabled) {
                         YBus.publish('valuation', {
@@ -7113,7 +7113,7 @@
                             valuationGap: snapshot.valuationAnchor.valuationGap,
                             mispricingSignal: snapshot.valuationAnchor.mispricingSignal,
                             timestamp: snapshot.timestamp
-                        });
+                        }, {trusted:true});
                     }
                     const modulesConnected = ['coneGame','kellyConfig','distribution','marketingCost','finance','riskVector','brandVolume','hedgeReservoir','pokerEgg','valuation'].filter(function(k) {
                         try { return YBus.getState(k) !== null; } catch(e) { return false; }
@@ -7126,7 +7126,7 @@
                         lastAudit: Date.now(),
                         criticalErrors: 0,
                         warnings: 0
-                    });
+                    }, {trusted:true});
                 }
 
                 if (snapshot.state.level >= 2 && typeof window.updateMarketingFinance === 'function') {
@@ -7507,7 +7507,7 @@
                         lastAudit: Date.now(),
                         criticalErrors: 0,
                         warnings: 0
-                    });
+                    }, {trusted:true});
                 }, 500);
             });
 
