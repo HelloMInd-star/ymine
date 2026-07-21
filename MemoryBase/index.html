@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>🧠 MemoryBase · 公共底层记忆基座 V1.0</title>
+    <link rel="stylesheet" href="../assets/css/base.css?v=2">
+    <script src="../assets/js/bus.js?v=3"></script>
+    <script src="../assets/js/triangle-audit.js?v=3"></script>
+    <style>
+        :root {
+            --mb-deep: #070d1f;
+            --mb-card: rgba(255, 255, 255, 0.03);
+            --mb-border: rgba(255, 255, 255, 0.06);
+            --mb-cyan: #22d3ee;
+            --mb-purple: #a78bfa;
+            --mb-gold: #fbbf24;
+            --mb-emerald: #10b981;
+            --mb-red: #f87171;
+            --mb-orange: #fb923c;
+            --mb-blue: #60a5fa;
+            --mb-pink: #f472b6;
+        }
+        * { box-sizing: border-box; }
+        body {
+            background: var(--mb-deep);
+            color: #e2e8f0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            margin: 0; padding: 0;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        body::before {
+            content: '';
+            position: fixed; inset: 0;
+            background:
+                radial-gradient(2px 2px at 10% 20%, rgba(34,211,238,0.4), transparent),
+                radial-gradient(1px 1px at 30% 60%, rgba(167,139,250,0.35), transparent),
+                radial-gradient(2px 2px at 50% 10%, rgba(255,255,255,0.5), transparent),
+                radial-gradient(1px 1px at 70% 40%, rgba(96,165,250,0.3), transparent),
+                radial-gradient(2px 2px at 90% 80%, rgba(251,191,36,0.3), transparent),
+                radial-gradient(1px 1px at 20% 90%, rgba(255,255,255,0.35), transparent),
+                radial-gradient(1px 1px at 60% 70%, rgba(16,185,129,0.25), transparent),
+                radial-gradient(2px 2px at 80% 20%, rgba(244,114,182,0.25), transparent);
+            background-size: 500px 500px;
+            pointer-events: none; z-index: 0;
+            animation: starTwinkle 8s ease-in-out infinite alternate;
+        }
+        @keyframes starTwinkle {
+            0% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+        .mb-container {
+            max-width: 1500px;
+            margin: 0 auto;
+            padding: 24px;
+            position: relative; z-index: 1;
+        }
+        .top-nav {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 24px; flex-wrap: wrap; gap: 12px;
+        }
+        .breadcrumb {
+            font-size: 12px; color: rgba(255,255,255,0.4);
+            display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+        }
+        .breadcrumb a { color: var(--mb-cyan); text-decoration: none; }
+        .breadcrumb a:hover { color: #67e8f9; }
+        .breadcrumb .sep { color: rgba(255,255,255,0.2); }
+        .back-home {
+            padding: 8px 16px; background: rgba(34,211,238,0.12);
+            border: 1px solid rgba(34,211,238,0.3); border-radius: 8px;
+            color: var(--mb-cyan); text-decoration: none; font-size: 12px;
+            font-weight: 600; transition: all 0.2s;
+        }
+        .back-home:hover {
+            background: rgba(34,211,238,0.2); border-color: rgba(34,211,238,0.5);
+            transform: translateX(-2px); box-shadow: 0 4px 16px rgba(34,211,238,0.15);
+        }
+        .header-banner {
+            background: linear-gradient(135deg, rgba(34,211,238,0.12), rgba(167,139,250,0.10), rgba(96,165,250,0.08));
+            border: 1.5px solid rgba(34,211,238,0.3);
+            border-radius: 18px;
+            padding: 28px 32px;
+            margin-bottom: 24px;
+            position: relative; overflow: hidden;
+            backdrop-filter: blur(12px);
+        }
+        .header-banner::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+            background: linear-gradient(90deg, transparent, var(--mb-cyan), var(--mb-purple), var(--mb-blue), transparent);
+        }
+        .header-banner::after {
+            content: ''; position: absolute; inset: 0;
+            background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.04) 50%, transparent 100%);
+            transform: translateX(-100%); animation: mbScan 6s linear infinite;
+            pointer-events: none;
+        }
+        @keyframes mbScan { to { transform: translateX(100%); } }
+        .header-top { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px; }
+        .header-title h1 {
+            font-size: 30px; font-weight: 800; margin: 0 0 10px;
+            background: linear-gradient(135deg, #e0f7fa, var(--mb-cyan), var(--mb-purple), var(--mb-blue));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text; letter-spacing: -0.5px;
+        }
+        .header-sub { font-size: 13px; color: rgba(255,255,255,0.5); line-height: 1.7; max-width: 700px; }
+        .header-tags { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+        .htag {
+            font-size: 10px; padding: 4px 10px; border-radius: 6px;
+            border: 1px solid; background: rgba(0,0,0,0.25); font-weight: 600;
+        }
+        .htag.core { color: var(--mb-cyan); border-color: rgba(34,211,238,0.4); }
+        .htag.filter { color: var(--mb-purple); border-color: rgba(167,139,250,0.4); }
+        .htag.storage { color: var(--mb-emerald); border-color: rgba(16,185,129,0.4); }
+        .htag.retrieval { color: var(--mb-gold); border-color: rgba(251,191,36,0.4); }
+        .version-pill {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 8px 16px; background: rgba(34,211,238,0.1);
+            border: 1px solid rgba(34,211,238,0.25); border-radius: 20px;
+            color: var(--mb-cyan); font-size: 11px; font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+        .version-pill .dot { width: 6px; height: 6px; background: var(--mb-cyan); border-radius: 50%; animation: pulse 2s infinite; }
+        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+        .lego-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+        .lego-block {
+            background: var(--mb-card);
+            border: 1.5px solid var(--mb-border);
+            border-radius: 14px;
+            padding: 22px;
+            backdrop-filter: blur(8px);
+            position: relative;
+            transition: all 0.25s;
+            overflow: hidden;
+        }
+        .lego-block::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+        }
+        .lego-block:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.35);
+        }
+        .lego-block.w-12 { grid-column: span 12; }
+        .lego-block.w-8 { grid-column: span 8; }
+        .lego-block.w-6 { grid-column: span 6; }
+        .lego-block.w-4 { grid-column: span 4; }
+        .lego-block.w-3 { grid-column: span 3; }
+        @media (max-width: 1100px) {
+            .lego-block.w-8, .lego-block.w-6, .lego-block.w-4, .lego-block.w-3 { grid-column: span 12; }
+        }
+        .block-title {
+            font-size: 14px; font-weight: 700; margin: 0 0 16px;
+            display: flex; align-items: center; gap: 10px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .block-title .bicon { font-size: 20px; }
+
+        .lego-block.input-block::before { background: linear-gradient(90deg, var(--mb-cyan), var(--mb-blue)); }
+        .lego-block.input-block .block-title { color: var(--mb-cyan); }
+        .lego-block.stats-block::before { background: linear-gradient(90deg, var(--mb-gold), var(--mb-orange)); }
+        .lego-block.stats-block .block-title { color: var(--mb-gold); }
+        .lego-block.funnel-block::before { background: linear-gradient(90deg, var(--mb-purple), var(--mb-pink), var(--mb-cyan), var(--mb-emerald)); }
+        .lego-block.funnel-block .block-title { color: var(--mb-purple); }
+
+        .input-tabs { display: flex; gap: 8px; margin-bottom: 16px; }
+        .input-tab {
+            padding: 8px 18px; border-radius: 10px; cursor: pointer;
+            font-size: 12px; font-weight: 600; border: 1px solid var(--mb-border);
+            background: var(--mb-card); color: rgba(255,255,255,0.5);
+            transition: all 0.2s;
+        }
+        .input-tab:hover { border-color: rgba(255,255,255,0.15); color: #fff; }
+        .input-tab.active {
+            background: rgba(34,211,238,0.12); border-color: rgba(34,211,238,0.35);
+            color: var(--mb-cyan);
+        }
+        .input-area { display: none; }
+        .input-area.active { display: block; }
+        .single-input-row {
+            display: flex; gap: 10px; margin-bottom: 12px;
+        }
+        .single-input-row input {
+            flex: 1; padding: 12px 16px; background: rgba(0,0,0,0.25);
+            border: 1px solid var(--mb-border); border-radius: 10px;
+            color: #e2e8f0; font-size: 13px; outline: none;
+            font-family: inherit;
+            transition: border-color 0.2s;
+        }
+        .single-input-row input:focus { border-color: rgba(34,211,238,0.4); }
+        .single-input-row input::placeholder { color: rgba(255,255,255,0.25); }
+        .btn-primary {
+            padding: 12px 24px; background: linear-gradient(135deg, rgba(34,211,238,0.2), rgba(96,165,250,0.15));
+            border: 1px solid rgba(34,211,238,0.4); border-radius: 10px;
+            color: var(--mb-cyan); font-size: 12px; font-weight: 700;
+            cursor: pointer; transition: all 0.2s; white-space: nowrap;
+        }
+        .btn-primary:hover {
+            background: linear-gradient(135deg, rgba(34,211,238,0.3), rgba(96,165,250,0.25));
+            border-color: rgba(34,211,238,0.6);
+            box-shadow: 0 4px 20px rgba(34,211,238,0.2);
+        }
+        textarea.multi-input {
+            width: 100%; min-height: 180px; padding: 14px 16px;
+            background: rgba(0,0,0,0.25); border: 1px solid var(--mb-border);
+            border-radius: 10px; color: #e2e8f0; font-size: 13px;
+            outline: none; font-family: inherit; resize: vertical;
+            line-height: 1.7; transition: border-color 0.2s;
+        }
+        textarea.multi-input:focus { border-color: rgba(34,211,238,0.4); }
+        textarea.multi-input::placeholder { color: rgba(255,255,255,0.25); line-height: 1.7; }
+        .import-row { display: flex; gap: 10px; margin-top: 12px; align-items: center; flex-wrap: wrap; }
+        .btn-secondary {
+            padding: 10px 18px; background: rgba(167,139,250,0.1);
+            border: 1px solid rgba(167,139,250,0.3); border-radius: 8px;
+            color: var(--mb-purple); font-size: 11px; font-weight: 600;
+            cursor: pointer; transition: all 0.2s;
+        }
+        .btn-secondary:hover {
+            background: rgba(167,139,250,0.2); border-color: rgba(167,139,250,0.5);
+        }
+        .hint-text { font-size: 11px; color: rgba(255,255,255,0.3); }
+
+        .stats-grid {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
+        }
+        .stat-card {
+            background: rgba(0,0,0,0.2); border: 1px solid var(--mb-border);
+            border-radius: 10px; padding: 16px; text-align: center;
+        }
+        .stat-value {
+            font-size: 32px; font-weight: 900; font-family: 'SF Mono', ui-monospace, monospace;
+            margin-bottom: 6px;
+        }
+        .stat-label { font-size: 10px; color: rgba(255,255,255,0.35); text-transform: uppercase; letter-spacing: 1px; }
+        .stat-card.total .stat-value { color: var(--mb-cyan); }
+        .stat-card.noise .stat-value { color: var(--mb-orange); }
+        .stat-card.valid .stat-value { color: var(--mb-emerald); }
+        .stat-bar {
+            height: 4px; background: rgba(255,255,255,0.05); border-radius: 2px;
+            margin-top: 10px; overflow: hidden;
+        }
+        .stat-bar-fill { height: 100%; border-radius: 2px; transition: width 0.5s ease; }
+        .stat-card.total .stat-bar-fill { background: linear-gradient(90deg, var(--mb-cyan), var(--mb-blue)); width: 0%; }
+        .stat-card.noise .stat-bar-fill { background: linear-gradient(90deg, var(--mb-orange), var(--mb-red)); width: 0%; }
+        .stat-card.valid .stat-bar-fill { background: linear-gradient(90deg, var(--mb-emerald), var(--mb-gold)); width: 0%; }
+
+        .funnel-container {
+            display: flex; flex-direction: column; align-items: center; gap: 0;
+            padding: 10px 0;
+        }
+        .funnel-layer {
+            position: relative;
+            display: flex; align-items: center; justify-content: center;
+            padding: 22px 20px;
+            margin: 4px 0;
+            border-radius: 10px;
+            text-align: center;
+            transition: all 0.3s;
+            cursor: default;
+        }
+        .funnel-layer::before {
+            content: ''; position: absolute; inset: 0; border-radius: 10px;
+            opacity: 0.12;
+        }
+        .funnel-layer:hover { transform: scale(1.02); }
+        .funnel-layer .layer-num {
+            font-family: 'SF Mono', monospace; font-size: 14px; font-weight: 800;
+            margin-right: 14px; opacity: 0.7;
+        }
+        .funnel-layer .layer-icon { font-size: 24px; margin-right: 14px; }
+        .funnel-layer .layer-info { text-align: left; }
+        .funnel-layer .layer-name { font-size: 14px; font-weight: 700; margin-bottom: 3px; }
+        .funnel-layer .layer-desc { font-size: 10px; opacity: 0.55; }
+
+        .funnel-layer.l1 {
+            width: 100%;
+            background: rgba(248,113,113,0.06);
+            border: 1.5px solid rgba(248,113,113,0.25);
+        }
+        .funnel-layer.l1::before { background: var(--mb-red); }
+        .funnel-layer.l1 .layer-name { color: #fca5a5; }
+        .funnel-layer.l1 .layer-num { color: var(--mb-red); }
+
+        .funnel-layer.l2 {
+            width: 88%;
+            background: rgba(251,146,60,0.06);
+            border: 1.5px solid rgba(251,146,60,0.25);
+        }
+        .funnel-layer.l2::before { background: var(--mb-orange); }
+        .funnel-layer.l2 .layer-name { color: #fdba74; }
+        .funnel-layer.l2 .layer-num { color: var(--mb-orange); }
+
+        .funnel-layer.l3 {
+            width: 72%;
+            background: rgba(167,139,250,0.06);
+            border: 1.5px solid rgba(167,139,250,0.25);
+        }
+        .funnel-layer.l3::before { background: var(--mb-purple); }
+        .funnel-layer.l3 .layer-name { color: #c4b5fd; }
+        .funnel-layer.l3 .layer-num { color: var(--mb-purple); }
+
+        .funnel-layer.l4 {
+            width: 55%;
+            background: rgba(16,185,129,0.06);
+            border: 1.5px solid rgba(16,185,129,0.25);
+        }
+        .funnel-layer.l4::before { background: var(--mb-emerald); }
+        .funnel-layer.l4 .layer-name { color: #6ee7b7; }
+        .funnel-layer.l4 .layer-num { color: var(--mb-emerald); }
+
+        .funnel-arrow {
+            font-size: 18px; color: rgba(255,255,255,0.15);
+            margin: 2px 0;
+        }
+        .funnel-output {
+            margin-top: 12px;
+            padding: 14px 28px;
+            background: linear-gradient(135deg, rgba(16,185,129,0.1), rgba(34,211,238,0.08));
+            border: 1.5px solid rgba(16,185,129,0.3);
+            border-radius: 10px;
+            text-align: center;
+            font-size: 12px; font-weight: 600; color: #6ee7b7;
+        }
+        .funnel-output .out-icon { font-size: 18px; margin-right: 8px; }
+
+        .module-nav {
+            display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px;
+            margin-top: 8px;
+        }
+        .module-card {
+            background: rgba(0,0,0,0.2); border: 1px solid var(--mb-border);
+            border-radius: 10px; padding: 14px 12px;
+            text-align: center; text-decoration: none;
+            transition: all 0.2s; cursor: pointer;
+        }
+        .module-card:hover { transform: translateY(-2px); }
+        .module-card .m-icon { font-size: 24px; margin-bottom: 6px; display: block; }
+        .module-card .m-name { font-size: 10px; font-weight: 600; color: rgba(255,255,255,0.5); }
+        .module-card.m-filter { border-color: rgba(248,113,113,0.2); }
+        .module-card.m-filter:hover { border-color: rgba(248,113,113,0.4); box-shadow: 0 6px 20px rgba(248,113,113,0.1); }
+        .module-card.m-filter .m-name { color: #fca5a5; }
+        .module-card.m-storage { border-color: rgba(251,146,60,0.2); }
+        .module-card.m-storage:hover { border-color: rgba(251,146,60,0.4); box-shadow: 0 6px 20px rgba(251,146,60,0.1); }
+        .module-card.m-storage .m-name { color: #fdba74; }
+        .module-card.m-music { border-color: rgba(244,114,182,0.2); }
+        .module-card.m-music:hover { border-color: rgba(244,114,182,0.4); box-shadow: 0 6px 20px rgba(244,114,182,0.1); }
+        .module-card.m-music .m-name { color: #f9a8d4; }
+        .module-card.m-kmp { border-color: rgba(251,191,36,0.2); }
+        .module-card.m-kmp:hover { border-color: rgba(251,191,36,0.4); box-shadow: 0 6px 20px rgba(251,191,36,0.1); }
+        .module-card.m-kmp .m-name { color: #fde68a; }
+        .module-card.m-manual { border-color: rgba(96,165,250,0.2); }
+        .module-card.m-manual:hover { border-color: rgba(96,165,250,0.4); box-shadow: 0 6px 20px rgba(96,165,250,0.1); }
+        .module-card.m-manual .m-name { color: #93c5fd; }
+        .module-status {
+            display: inline-block; font-size: 8px; margin-top: 4px;
+            padding: 1px 5px; border-radius: 3px; font-weight: 700;
+        }
+        .ms-dev { background: rgba(248,113,113,0.12); color: var(--mb-red); }
+
+        .notice-bar {
+            background: rgba(34,211,238,0.04); border: 1px solid rgba(34,211,238,0.15);
+            border-radius: 10px; padding: 14px 18px; font-size: 11px;
+            color: rgba(255,255,255,0.45); line-height: 1.8;
+        }
+        .notice-bar strong { color: var(--mb-cyan); }
+    </style>
+</head>
+<body>
+<div class="mb-container">
+
+    <div class="top-nav">
+        <div class="breadcrumb">
+            <a href="../index.html">🏠 总控台</a><span class="sep">›</span>
+            <span style="color:var(--mb-cyan)">🧠 MemoryBase 记忆基座</span>
+        </div>
+        <a href="../index.html" class="back-home">← 返回总控台</a>
+    </div>
+
+    <div class="header-banner">
+        <div class="header-top">
+            <div class="header-title">
+                <h1>🧠 MemoryBase · 公共底层记忆基座</h1>
+                <div class="header-sub">
+                    Game-OS V2.1 全域公共记忆底座 · 四级净化漏斗 · 三层存储架构 · KMP模糊匹配检索 · 兼容盘活全部历史方案数据
+                </div>
+                <div class="header-tags">
+                    <span class="htag core">🔒 核心基座</span>
+                    <span class="htag filter">🔻 四级过滤</span>
+                    <span class="htag storage">💾 三层存储</span>
+                    <span class="htag retrieval">🔍 KMP检索</span>
+                </div>
+            </div>
+            <div class="version-pill">
+                <span class="dot"></span>
+                BATCH 1 · 基础底座搭建中
+            </div>
+        </div>
+    </div>
+
+    <div class="lego-grid">
+
+        <div class="lego-block w-8 input-block">
+            <div class="block-title">
+                <span class="bicon">📥</span> 原始记忆输入
+            </div>
+            <div class="input-tabs">
+                <div class="input-tab active" onclick="switchInput('single')">✏️ 单行输入</div>
+                <div class="input-tab" onclick="switchInput('multi')">📋 批量导入</div>
+            </div>
+            <div id="inputSingle" class="input-area active">
+                <div class="single-input-row">
+                    <input type="text" id="singleText" placeholder="输入一条记忆文本、方案片段、知识点、对话记录..." oninput="updateStats()" />
+                    <button class="btn-primary" onclick="submitSingle()">🔽 送入净化</button>
+                </div>
+                <div class="hint-text">💡 支持方案描述、决策逻辑、知识点、对话摘要、经验总结等任意文本记忆</div>
+            </div>
+            <div id="inputMulti" class="input-area">
+                <textarea class="multi-input" id="multiText" placeholder="批量粘贴多行记忆文本，每行一条...&#10;&#10;示例：&#10;凯利公式最优仓位 f*=(bp-q)/b&#10;0.50是资本结构稳态中轴线&#10;WACC含MM税盾模型，最优杠杆锁定0.50&#10;三角审计三模型并行±0.02校验" oninput="updateStats()"></textarea>
+                <div class="import-row">
+                    <button class="btn-primary" onclick="submitMulti()">🔽 批量送入净化</button>
+                    <button class="btn-secondary">📁 导入TXT文件</button>
+                    <span class="hint-text">支持批量粘贴，自动按换行符拆分</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="lego-block w-4 stats-block">
+            <div class="block-title">
+                <span class="bicon">📊</span> 实时内容统计
+            </div>
+            <div class="stats-grid">
+                <div class="stat-card total">
+                    <div class="stat-value" id="statTotal">0</div>
+                    <div class="stat-label">总字符量</div>
+                    <div class="stat-bar"><div class="stat-bar-fill" id="barTotal"></div></div>
+                </div>
+                <div class="stat-card noise">
+                    <div class="stat-value" id="statNoise">0%</div>
+                    <div class="stat-label">语气词无效占比</div>
+                    <div class="stat-bar"><div class="stat-bar-fill" id="barNoise"></div></div>
+                </div>
+                <div class="stat-card valid">
+                    <div class="stat-value" id="statValid">0%</div>
+                    <div class="stat-label">干货有效占比</div>
+                    <div class="stat-bar"><div class="stat-bar-fill" id="barValid"></div></div>
+                </div>
+            </div>
+            <div class="notice-bar" style="margin-top:14px">
+                <strong>📐 估算规则：</strong>语气词/寒暄/连接词等无效内容按经验比例估算，仅供预处理参考，不代表最终净化结果。
+            </div>
+        </div>
+
+        <div class="lego-block w-12 funnel-block">
+            <div class="block-title">
+                <span class="bicon">🔻</span> 四级净化漏斗 · 静态结构
+            </div>
+            <div class="funnel-container">
+                <div class="funnel-layer l1">
+                    <span class="layer-num">L1</span>
+                    <span class="layer-icon">🧹</span>
+                    <div class="layer-info">
+                        <div class="layer-name">粗滤降噪层</div>
+                        <div class="layer-desc">去除寒暄/语气词/重复冗余/乱码符号 · 基础文本清洗</div>
+                    </div>
+                </div>
+                <div class="funnel-arrow">▼</div>
+                <div class="funnel-layer l2">
+                    <span class="layer-num">L2</span>
+                    <span class="layer-icon">🏷️</span>
+                    <div class="layer-info">
+                        <div class="layer-name">业务标签分拣层</div>
+                        <div class="layer-desc">金融/游戏/几何算力/营销/情绪/认知 领域标签自动分类路由</div>
+                    </div>
+                </div>
+                <div class="funnel-arrow">▼</div>
+                <div class="funnel-layer l3">
+                    <span class="layer-num">L3</span>
+                    <span class="layer-icon">🧮</span>
+                    <div class="layer-info">
+                        <div class="layer-name">四维结构化校验层</div>
+                        <div class="layer-desc">实体提取·关系抽取·公式识别·数值标准化 四维向量化</div>
+                    </div>
+                </div>
+                <div class="funnel-arrow">▼</div>
+                <div class="funnel-layer l4">
+                    <span class="layer-num">L4</span>
+                    <span class="layer-icon">🔒</span>
+                    <div class="layer-info">
+                        <div class="layer-name">球面公理终审层</div>
+                        <div class="layer-desc">Game-OS 11条公理一致性校验·球面半径约束·三角审计闸门</div>
+                    </div>
+                </div>
+                <div class="funnel-output">
+                    <span class="out-icon">✅</span> 净化完成 · 注入三层存储
+                </div>
+            </div>
+        </div>
+
+        <div class="lego-block w-12">
+            <div class="block-title" style="color:var(--mb-blue)">
+                <span class="bicon">🧩</span> MemoryBase 五大子模块导航
+            </div>
+            <div class="module-nav">
+                <div class="module-card m-filter">
+                    <span class="m-icon">🔻</span>
+                    <div class="m-name">filter_funnel</div>
+                    <div class="m-name" style="font-size:9px;opacity:0.6;margin-top:2px">过滤漏斗</div>
+                    <span class="module-status ms-dev">待开发</span>
+                </div>
+                <div class="module-card m-storage">
+                    <span class="m-icon">💾</span>
+                    <div class="m-name">storage_three</div>
+                    <div class="m-name" style="font-size:9px;opacity:0.6;margin-top:2px">三层存储</div>
+                    <span class="module-status ms-dev">待开发</span>
+                </div>
+                <div class="module-card m-music">
+                    <span class="m-icon">🎵</span>
+                    <div class="m-name">music_sub_lib</div>
+                    <div class="m-name" style="font-size:9px;opacity:0.6;margin-top:2px">音乐子库</div>
+                    <span class="module-status ms-dev">待开发</span>
+                </div>
+                <div class="module-card m-kmp">
+                    <span class="m-icon">🔍</span>
+                    <div class="m-name">kmp_retrieval</div>
+                    <div class="m-name" style="font-size:9px;opacity:0.6;margin-top:2px">KMP检索</div>
+                    <span class="module-status ms-dev">待开发</span>
+                </div>
+                <div class="module-card m-manual">
+                    <span class="m-icon">🎛️</span>
+                    <div class="m-name">manual_control</div>
+                    <div class="m-name" style="font-size:9px;opacity:0.6;margin-top:2px">人工管控</div>
+                    <span class="module-status ms-dev">待开发</span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="notice-bar" style="margin-bottom:24px">
+        <strong>🔒 机密参数隔离声明：</strong>
+        本页面为前端可视化底座，所有独家核心公式（相似度阈值算法、球面半径计算、跨领域映射规则、KMP匹配权重等）
+        均存放于各子模块私有内核文件中，前端不暴露原始核心代码。前端仅负责流程展示和数据面板可视化。
+    </div>
+
+</div>
+
+<script>
+(function(){
+    const NOISE_WORDS = ['的','了','吗','呢','啊','吧','呀','哦','嗯','哈','嘿','哎','唉','喔','噢','呃','那个','这个','就是','然后','其实','感觉','觉得','可能','应该','大概','也许','或许','差不多','基本上','总体来说','怎么说呢','你知道吗','我觉得吧'];
+
+    window.switchInput = function(mode){
+        document.querySelectorAll('.input-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.input-area').forEach(a => a.classList.remove('active'));
+        event.target.classList.add('active');
+        document.getElementById('input' + mode.charAt(0).toUpperCase() + mode.slice(1)).classList.add('active');
+        updateStats();
+    };
+
+    function getCurrentText(){
+        const singleActive = document.getElementById('inputSingle').classList.contains('active');
+        return singleActive ? document.getElementById('singleText').value : document.getElementById('multiText').value;
+    }
+
+    window.updateStats = function(){
+        const text = getCurrentText();
+        const total = text.length;
+        let noiseCount = 0;
+        NOISE_WORDS.forEach(w => {
+            const regex = new RegExp(w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g');
+            const matches = text.match(regex);
+            if(matches) noiseCount += matches.length * w.length;
+        });
+        noiseCount = Math.min(noiseCount, total * 0.8);
+        const noisePct = total > 0 ? Math.round((noiseCount / total) * 100) : 0;
+        const validPct = total > 0 ? 100 - noisePct : 0;
+
+        document.getElementById('statTotal').textContent = total.toLocaleString();
+        document.getElementById('statNoise').textContent = noisePct + '%';
+        document.getElementById('statValid').textContent = validPct + '%';
+
+        const totalPct = Math.min(total / 2000 * 100, 100);
+        document.getElementById('barTotal').style.width = totalPct + '%';
+        document.getElementById('barNoise').style.width = noisePct + '%';
+        document.getElementById('barValid').style.width = validPct + '%';
+    };
+
+    window.submitSingle = function(){
+        const text = document.getElementById('singleText').value.trim();
+        if(!text){ alert('请输入记忆文本'); return; }
+        alert('📥 已接收：' + text.substring(0,50) + (text.length>50?'...':'') + '\n\n（Batch 1 仅做静态结构，动态净化流程待后续批次开发）');
+    };
+
+    window.submitMulti = function(){
+        const text = document.getElementById('multiText').value.trim();
+        if(!text){ alert('请输入批量记忆文本'); return; }
+        const lines = text.split('\n').filter(l => l.trim());
+        alert('📥 已接收 ' + lines.length + ' 条批量记忆\n\n（Batch 1 仅做静态结构，动态净化流程待后续批次开发）');
+    };
+
+    console.log('%c🧠 MemoryBase V1.0 · Batch 1 基础底座 initialized','color:#22d3ee;font-weight:bold;font-size:13px;');
+})();
+</script>
+</body>
+</html>
