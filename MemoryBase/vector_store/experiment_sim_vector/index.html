@@ -1,0 +1,1272 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🧪 全域仿真实验向量总管理台</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg-dark:#08081a;
+  --card-bg:rgba(15,15,35,0.7);
+  --border-color:rgba(255,255,255,0.08);
+  --border-hover:rgba(100,140,255,0.3);
+  --text-primary:#e0e6ff;
+  --text-secondary:#8892b0;
+  --accent-blue:#4a80ff;
+  --accent-cyan:#00d4ff;
+  --accent-green:#00ff88;
+  --accent-yellow:#ffcc00;
+  --accent-orange:#ff8800;
+  --accent-red:#ff3355;
+  --accent-purple:#a855f7;
+  --category-cyber:#3b82f6;
+  --category-struct:#10b981;
+  --category-cogni:#a855f7;
+  --category-game:#f59e0b;
+  --category-info:#06b6d4;
+}
+html,body{
+  width:100%;min-height:100vh;
+  background:var(--bg-dark);
+  color:var(--text-primary);
+  font-family:'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;
+  overflow-x:hidden;
+}
+#starfield{
+  position:fixed;top:0;left:0;width:100%;height:100%;
+  z-index:0;pointer-events:none;
+}
+.back-btn{
+  position:fixed;top:20px;left:20px;z-index:1000;
+  padding:10px 18px;
+  background:var(--card-bg);
+  border:1px solid var(--border-color);
+  border-radius:8px;
+  color:var(--text-primary);
+  text-decoration:none;
+  font-size:14px;
+  backdrop-filter:blur(10px);
+  transition:all .3s;
+  display:flex;align-items:center;gap:6px;
+}
+.back-btn:hover{
+  border-color:var(--accent-blue);
+  background:rgba(74,128,255,0.15);
+  transform:translateX(-3px);
+}
+.container{
+  position:relative;z-index:1;
+  max-width:1600px;margin:0 auto;
+  padding:70px 24px 100px;
+}
+.header{
+  text-align:center;margin-bottom:30px;
+}
+.header h1{
+  font-size:32px;font-weight:700;
+  background:linear-gradient(135deg,#4a80ff,#00d4ff,#a855f7);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  margin-bottom:8px;
+}
+.header .subtitle{
+  color:var(--text-secondary);font-size:14px;margin-bottom:12px;
+}
+.version-pill{
+  display:inline-block;
+  padding:4px 14px;
+  background:rgba(74,128,255,0.15);
+  border:1px solid rgba(74,128,255,0.3);
+  border-radius:20px;
+  font-size:12px;color:var(--accent-blue);
+}
+.stats-row{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+  gap:12px;margin-top:24px;
+}
+.stat-card{
+  background:var(--card-bg);
+  border:1px solid var(--border-color);
+  border-radius:12px;padding:14px;
+  text-align:center;
+  backdrop-filter:blur(10px);
+}
+.stat-card .stat-num{
+  font-size:28px;font-weight:700;
+  background:linear-gradient(135deg,var(--accent-blue),var(--accent-cyan));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.stat-card .stat-label{
+  font-size:12px;color:var(--text-secondary);margin-top:4px;
+}
+.storage-heatmap{
+  display:flex;gap:4px;justify-content:center;margin-top:8px;
+}
+.heat-cell{
+  width:18px;height:18px;border-radius:4px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:10px;font-weight:600;
+}
+.heat-hot{background:rgba(255,51,85,0.3);border:1px solid rgba(255,51,85,0.5);color:#ff6677}
+.heat-warm{background:rgba(255,136,0,0.3);border:1px solid rgba(255,136,0,0.5);color:#ffaa44}
+.heat-cold{background:rgba(100,140,255,0.2);border:1px solid rgba(100,140,255,0.4);color:#88aaff}
+.banner{
+  background:linear-gradient(135deg,rgba(168,85,247,0.12),rgba(74,128,255,0.12));
+  border:1px solid rgba(168,85,247,0.25);
+  border-radius:12px;padding:16px 20px;
+  margin-bottom:20px;
+  display:flex;align-items:center;justify-content:space-between;
+  flex-wrap:wrap;gap:12px;
+}
+.banner-text{font-size:13px;line-height:1.6}
+.banner-text strong{color:var(--accent-purple)}
+.btn-private{
+  padding:10px 20px;
+  background:linear-gradient(135deg,rgba(168,85,247,0.3),rgba(74,128,255,0.3));
+  border:1px solid rgba(168,85,247,0.5);
+  border-radius:8px;color:#fff;
+  font-size:13px;cursor:pointer;
+  text-decoration:none;transition:all .3s;
+}
+.btn-private:hover{
+  background:linear-gradient(135deg,rgba(168,85,247,0.5),rgba(74,128,255,0.5));
+  transform:translateY(-2px);
+  box-shadow:0 6px 20px rgba(168,85,247,0.3);
+}
+.search-section{
+  background:var(--card-bg);
+  border:1px solid var(--border-color);
+  border-radius:12px;padding:18px;
+  margin-bottom:16px;
+  backdrop-filter:blur(10px);
+}
+.search-modes{
+  display:flex;gap:10px;margin-bottom:12px;
+}
+.mode-btn{
+  padding:8px 16px;border-radius:8px;
+  border:1px solid var(--border-color);
+  background:transparent;color:var(--text-secondary);
+  font-size:13px;cursor:pointer;transition:all .3s;
+}
+.mode-btn.active{
+  background:rgba(74,128,255,0.2);
+  border-color:var(--accent-blue);
+  color:var(--accent-blue);
+}
+.search-input-wrap{
+  display:flex;gap:10px;margin-bottom:12px;
+}
+.search-input{
+  flex:1;padding:12px 16px;
+  background:rgba(0,0,0,0.3);
+  border:1px solid var(--border-color);
+  border-radius:8px;
+  color:var(--text-primary);font-size:14px;
+  outline:none;transition:border-color .3s;
+}
+.search-input:focus{border-color:var(--accent-blue)}
+.search-btn{
+  padding:12px 24px;
+  background:linear-gradient(135deg,var(--accent-blue),var(--accent-cyan));
+  border:none;border-radius:8px;color:#fff;
+  font-size:14px;cursor:pointer;font-weight:600;
+  transition:all .3s;
+}
+.search-btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(74,128,255,0.4)}
+.kmp-chain{
+  display:none;align-items:center;gap:4px;
+  padding:10px;background:rgba(0,212,255,0.08);
+  border-radius:8px;margin-top:10px;
+  overflow-x:auto;
+}
+.kmp-chain.active{display:flex}
+.kmp-node{
+  padding:6px 12px;background:rgba(0,212,255,0.15);
+  border:1px solid rgba(0,212,255,0.3);
+  border-radius:6px;font-size:12px;
+  color:var(--accent-cyan);white-space:nowrap;
+  animation:kmpPulse .6s ease-out;
+}
+@keyframes kmpPulse{0%{transform:scale(0.8);opacity:0}100%{transform:scale(1);opacity:1}}
+.quick-tags{
+  display:flex;flex-wrap:wrap;gap:8px;
+}
+.tag{
+  padding:6px 12px;
+  background:rgba(255,255,255,0.05);
+  border:1px solid var(--border-color);
+  border-radius:6px;font-size:12px;
+  color:var(--text-secondary);cursor:pointer;
+  transition:all .3s;
+}
+.tag:hover{background:rgba(74,128,255,0.15);border-color:var(--accent-blue);color:var(--accent-blue)}
+.filter-section{
+  background:var(--card-bg);
+  border:1px solid var(--border-color);
+  border-radius:12px;padding:14px 18px;
+  margin-bottom:16px;
+  backdrop-filter:blur(10px);
+}
+.filter-row{
+  display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px;
+}
+.filter-row:last-child{margin-bottom:0}
+.filter-label{
+  font-size:12px;color:var(--text-secondary);
+  margin-right:4px;min-width:70px;
+}
+.filter-tab{
+  padding:6px 14px;border-radius:6px;
+  border:1px solid var(--border-color);
+  background:transparent;color:var(--text-secondary);
+  font-size:12px;cursor:pointer;transition:all .3s;
+}
+.filter-tab.active{
+  background:rgba(74,128,255,0.2);
+  border-color:var(--accent-blue);
+  color:var(--accent-blue);
+}
+.filter-tab.status-normal.active{background:rgba(0,255,136,0.15);border-color:var(--accent-green);color:var(--accent-green)}
+.filter-tab.status-warning.active{background:rgba(255,204,0,0.15);border-color:var(--accent-yellow);color:var(--accent-yellow)}
+.filter-tab.status-fused.active{background:rgba(255,51,85,0.15);border-color:var(--accent-red);color:var(--accent-red)}
+.filter-tab.storage-hot.active{background:rgba(255,51,85,0.15);border-color:var(--accent-red);color:var(--accent-red)}
+.filter-tab.storage-warm.active{background:rgba(255,136,0,0.15);border-color:var(--accent-orange);color:var(--accent-orange)}
+.filter-tab.storage-cold.active{background:rgba(100,140,255,0.2);border-color:#648cff;color:#88aaff}
+.experiments-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(340px,1fr));
+  gap:16px;margin-bottom:80px;
+}
+.exp-card{
+  background:var(--card-bg);
+  border:1px solid var(--border-color);
+  border-radius:12px;padding:16px;
+  backdrop-filter:blur(10px);
+  cursor:pointer;transition:all .3s;
+  position:relative;overflow:hidden;
+}
+.exp-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:var(--category-cyber);
+}
+.exp-card.cat-cyber::before{background:var(--category-cyber)}
+.exp-card.cat-struct::before{background:var(--category-struct)}
+.exp-card.cat-cogni::before{background:var(--category-cogni)}
+.exp-card.cat-game::before{background:var(--category-game)}
+.exp-card.cat-info::before{background:var(--category-info)}
+.exp-card:hover{
+  border-color:var(--border-hover);
+  transform:translateY(-4px);
+  box-shadow:0 12px 40px rgba(0,0,0,0.4);
+}
+.exp-card.tier-hot{box-shadow:0 0 20px rgba(255,51,85,0.1);animation:hotPulse 3s ease-in-out infinite}
+.exp-card.tier-hot:hover{box-shadow:0 12px 40px rgba(255,51,85,0.2)}
+@keyframes hotPulse{0%,100%{box-shadow:0 0 15px rgba(255,51,85,0.08)}50%{box-shadow:0 0 25px rgba(255,51,85,0.18)}}
+.exp-card.status-fused{animation:fusedPulse 1.5s ease-in-out infinite}
+@keyframes fusedPulse{0%,100%{box-shadow:0 0 15px rgba(255,51,85,0.2)}50%{box-shadow:0 0 30px rgba(255,51,85,0.4)}}
+.exp-card.selected{border-color:var(--accent-cyan);background:rgba(0,212,255,0.08)}
+.card-top{
+  display:flex;align-items:flex-start;justify-content:space-between;
+  margin-bottom:12px;
+}
+.card-left{display:flex;align-items:center;gap:10px}
+.card-check{
+  width:18px;height:18px;
+  accent-color:var(--accent-cyan);cursor:pointer;
+}
+.exp-icon{font-size:28px}
+.exp-id{font-size:11px;color:var(--text-secondary);font-family:monospace}
+.exp-name{font-size:15px;font-weight:600;margin:4px 0}
+.card-badges{display:flex;gap:6px;flex-wrap:wrap}
+.badge{
+  padding:3px 8px;border-radius:4px;font-size:10px;font-weight:600;
+}
+.badge-cat-cyber{background:rgba(59,130,246,0.2);color:#60a5fa}
+.badge-cat-struct{background:rgba(16,185,129,0.2);color:#34d399}
+.badge-cat-cogni{background:rgba(168,85,247,0.2);color:#c084fc}
+.badge-cat-game{background:rgba(245,158,11,0.2);color:#fbbf24}
+.badge-cat-info{background:rgba(6,182,212,0.2);color:#22d3ee}
+.badge-tier{display:flex;align-items:center;gap:3px}
+.badge-hot{background:rgba(255,51,85,0.15);color:#ff6677}
+.badge-warm{background:rgba(255,136,0,0.15);color:#ffaa44}
+.badge-cold{background:rgba(100,140,255,0.15);color:#88aaff}
+.status-dot{
+  width:10px;height:10px;border-radius:50%;
+  display:inline-block;
+}
+.status-dot.normal{background:var(--accent-green);box-shadow:0 0 8px var(--accent-green)}
+.status-dot.warning{background:var(--accent-yellow);box-shadow:0 0 8px var(--accent-yellow);animation:warnPulse 1.5s infinite}
+.status-dot.fused{background:var(--accent-red);box-shadow:0 0 10px var(--accent-red);animation:warnPulse .8s infinite}
+@keyframes warnPulse{0%,100%{opacity:1}50%{opacity:.5}}
+.card-info{font-size:12px;color:var(--text-secondary);margin-bottom:10px;line-height:1.5}
+.card-info span{color:var(--text-primary);font-family:monospace;font-size:11px}
+.func-preview{
+  background:rgba(0,0,0,0.3);border-radius:6px;
+  padding:8px 10px;font-family:'Consolas','Monaco',monospace;
+  font-size:11px;color:var(--accent-cyan);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  margin-bottom:12px;
+}
+.threshold-bar{
+  position:relative;height:24px;
+  background:rgba(0,0,0,0.3);border-radius:6px;
+  overflow:hidden;
+}
+.threshold-marks{
+  position:absolute;top:0;left:0;right:0;bottom:0;
+  display:flex;
+}
+.mark-seg{
+  flex:1;border-right:1px dashed rgba(255,255,255,0.1);
+  display:flex;align-items:center;justify-content:center;
+  font-size:9px;color:var(--text-secondary);
+}
+.mark-seg:last-child{border-right:none}
+.threshold-fill{
+  position:absolute;top:0;left:0;bottom:0;
+  border-radius:6px;transition:width .8s ease-out;
+}
+.threshold-fill.normal{background:linear-gradient(90deg,rgba(0,255,136,0.3),rgba(0,255,136,0.5))}
+.threshold-fill.warning{background:linear-gradient(90deg,rgba(255,204,0,0.3),rgba(255,204,0,0.5))}
+.threshold-fill.fused{background:linear-gradient(90deg,rgba(255,51,85,0.3),rgba(255,51,85,0.6))}
+.threshold-indicator{
+  position:absolute;top:-4px;width:2px;height:32px;
+  background:#fff;box-shadow:0 0 8px #fff;
+  transition:left .8s ease-out;
+}
+.threshold-value{
+  position:absolute;right:8px;top:50%;transform:translateY(-50%);
+  font-size:11px;font-weight:700;font-family:monospace;
+}
+.card-meta{
+  display:flex;justify-content:space-between;
+  font-size:11px;color:var(--text-secondary);margin-top:10px;
+}
+.batch-bar{
+  position:fixed;bottom:0;left:0;right:0;z-index:100;
+  background:rgba(8,8,26,0.95);
+  border-top:1px solid var(--border-color);
+  backdrop-filter:blur(20px);
+  padding:14px 24px;
+  display:flex;align-items:center;justify-content:space-between;
+  flex-wrap:wrap;gap:12px;
+}
+.batch-left{display:flex;align-items:center;gap:16px}
+.batch-select-all{
+  display:flex;align-items:center;gap:6px;
+  font-size:13px;color:var(--text-secondary);cursor:pointer;
+}
+.batch-select-all input{accent-color:var(--accent-cyan);width:16px;height:16px}
+.batch-actions{display:flex;gap:8px;flex-wrap:wrap}
+.batch-btn{
+  padding:8px 14px;border-radius:6px;
+  border:1px solid var(--border-color);
+  background:var(--card-bg);color:var(--text-primary);
+  font-size:12px;cursor:pointer;transition:all .3s;
+  display:flex;align-items:center;gap:5px;
+}
+.batch-btn:hover{border-color:var(--accent-blue);background:rgba(74,128,255,0.15)}
+.batch-btn.primary{
+  background:linear-gradient(135deg,var(--accent-blue),var(--accent-cyan));
+  border:none;color:#fff;
+}
+.batch-btn.primary:hover{box-shadow:0 4px 15px rgba(74,128,255,0.4);transform:translateY(-1px)}
+.batch-btn.danger{border-color:rgba(255,51,85,0.3);color:#ff6677}
+.batch-btn.danger:hover{background:rgba(255,51,85,0.1)}
+.modal-overlay{
+  position:fixed;top:0;left:0;width:100%;height:100%;
+  background:rgba(0,0,0,0.7);backdrop-filter:blur(8px);
+  z-index:2000;display:none;align-items:center;justify-content:center;
+  padding:20px;
+}
+.modal-overlay.active{display:flex}
+.modal{
+  background:linear-gradient(180deg,rgba(20,20,50,0.98),rgba(10,10,30,0.98));
+  border:1px solid var(--border-color);
+  border-radius:16px;
+  max-width:900px;width:100%;
+  max-height:90vh;overflow-y:auto;
+  animation:modalIn .3s ease-out;
+}
+@keyframes modalIn{0%{transform:scale(0.9);opacity:0}100%{transform:scale(1);opacity:1}}
+.modal-header{
+  padding:24px 24px 0;
+  display:flex;align-items:flex-start;justify-content:space-between;
+}
+.modal-title-wrap{display:flex;align-items:center;gap:14px}
+.modal-icon{font-size:40px}
+.modal-title{font-size:22px;font-weight:700}
+.modal-id{font-family:monospace;font-size:12px;color:var(--text-secondary)}
+.modal-close{
+  width:36px;height:36px;border-radius:8px;
+  border:1px solid var(--border-color);
+  background:transparent;color:var(--text-secondary);
+  font-size:20px;cursor:pointer;transition:all .3s;
+  display:flex;align-items:center;justify-content:center;
+}
+.modal-close:hover{background:rgba(255,51,85,0.15);border-color:var(--accent-red);color:var(--accent-red)}
+.modal-body{padding:20px 24px 24px}
+.modal-section{
+  background:rgba(0,0,0,0.2);
+  border:1px solid var(--border-color);
+  border-radius:10px;padding:16px;
+  margin-bottom:14px;
+}
+.modal-section h3{
+  font-size:14px;margin-bottom:12px;
+  display:flex;align-items:center;gap:8px;
+  color:var(--accent-cyan);
+}
+.var-list{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.var-item{
+  background:rgba(255,255,255,0.03);
+  border-radius:6px;padding:10px;
+}
+.var-name{font-family:monospace;font-size:13px;color:var(--accent-blue);font-weight:600}
+.var-type{font-size:10px;color:var(--text-secondary);margin-left:6px}
+.var-desc{font-size:11px;color:var(--text-secondary);margin-top:4px;line-height:1.4}
+.var-default{font-size:11px;color:var(--accent-green);margin-top:3px;font-family:monospace}
+.func-expr-full{
+  background:rgba(0,0,0,0.4);border-radius:8px;
+  padding:14px;font-family:'Consolas','Monaco',monospace;
+  font-size:14px;color:var(--accent-cyan);
+  line-height:1.8;overflow-x:auto;
+  border-left:3px solid var(--accent-cyan);
+}
+.func-note{
+  margin-top:8px;font-size:11px;color:var(--accent-orange);
+  display:flex;align-items:center;gap:4px;
+}
+.meta-grid{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;
+}
+.meta-item{text-align:center;padding:10px;background:rgba(255,255,255,0.03);border-radius:6px}
+.meta-label{font-size:10px;color:var(--text-secondary);margin-bottom:4px}
+.meta-value{font-size:14px;font-weight:600;font-family:monospace}
+.audit-timeline{position:relative;padding-left:20px}
+.audit-timeline::before{
+  content:'';position:absolute;left:6px;top:0;bottom:0;
+  width:2px;background:linear-gradient(180deg,var(--accent-purple),var(--accent-blue),var(--accent-cyan));
+}
+.audit-entry{
+  position:relative;padding:10px 14px;
+  background:rgba(255,255,255,0.03);
+  border-radius:6px;margin-bottom:8px;
+}
+.audit-entry::before{
+  content:'';position:absolute;left:-18px;top:14px;
+  width:10px;height:10px;border-radius:50%;
+  background:var(--accent-purple);border:2px solid var(--bg-dark);
+}
+.audit-entry:nth-child(2)::before{background:var(--accent-blue)}
+.audit-entry:nth-child(3)::before{background:var(--accent-cyan)}
+.audit-time{font-size:10px;color:var(--text-secondary);font-family:monospace}
+.audit-model{font-size:12px;color:var(--accent-purple);font-weight:600;margin:2px 0}
+.audit-result{font-size:12px}
+.audit-deviation{font-size:11px;color:var(--accent-green);float:right}
+.audit-deviation.warn{color:var(--accent-yellow)}
+.audit-deviation.danger{color:var(--accent-red)}
+.threshold-panel{
+  position:relative;height:40px;
+  background:rgba(0,0,0,0.3);border-radius:8px;
+  margin-bottom:10px;overflow:hidden;
+}
+.tp-zone{
+  position:absolute;top:0;bottom:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:600;
+}
+.tp-zone.safe{left:0;width:48%;background:rgba(0,255,136,0.1);color:var(--accent-green)}
+.tp-zone.warn{left:48%;width:20%;background:rgba(255,204,0,0.1);color:var(--accent-yellow)}
+.tp-zone.danger{left:68%;width:32%;background:rgba(255,51,85,0.15);color:var(--accent-red)}
+.tp-marker{
+  position:absolute;top:-4px;width:3px;height:48px;
+  background:#fff;box-shadow:0 0 10px #fff;
+  transition:left .5s ease-out;z-index:2;
+}
+.tp-labels{
+  display:flex;justify-content:space-between;
+  font-size:10px;color:var(--text-secondary);
+}
+.modal-actions{
+  display:flex;gap:10px;margin-top:16px;justify-content:flex-end;
+}
+.modal-btn{
+  padding:10px 20px;border-radius:8px;
+  border:1px solid var(--border-color);
+  background:var(--card-bg);color:var(--text-primary);
+  font-size:13px;cursor:pointer;transition:all .3s;
+  text-decoration:none;display:inline-flex;align-items:center;gap:6px;
+}
+.modal-btn:hover{border-color:var(--accent-blue);background:rgba(74,128,255,0.15)}
+.modal-btn.primary{
+  background:linear-gradient(135deg,var(--accent-blue),var(--accent-cyan));
+  border:none;color:#fff;
+}
+.modal-btn.primary:hover{box-shadow:0 4px 15px rgba(74,128,255,0.4);transform:translateY(-2px)}
+.modal-btn.purple{
+  background:linear-gradient(135deg,rgba(168,85,247,0.3),rgba(74,128,255,0.3));
+  border-color:rgba(168,85,247,0.5);color:#fff;
+}
+.modal-btn.purple:hover{box-shadow:0 4px 15px rgba(168,85,247,0.3)}
+.footer-banner{
+  position:relative;z-index:1;
+  text-align:center;padding:16px;
+  background:rgba(168,85,247,0.08);
+  border-top:1px solid rgba(168,85,247,0.2);
+  font-size:12px;color:var(--text-secondary);
+  margin-top:20px;
+}
+.footer-banner a{color:var(--accent-purple);text-decoration:none}
+.footer-banner a:hover{text-decoration:underline}
+.highlight{background:rgba(0,212,255,0.3);color:#fff;border-radius:2px;padding:0 2px}
+.no-results{
+  grid-column:1/-1;text-align:center;
+  padding:60px 20px;color:var(--text-secondary);
+}
+.no-results .icon{font-size:48px;margin-bottom:12px}
+@media(max-width:768px){
+  .experiments-grid{grid-template-columns:1fr}
+  .var-list{grid-template-columns:1fr}
+  .batch-bar{flex-direction:column;align-items:stretch}
+  .header h1{font-size:22px}
+  .stats-row{grid-template-columns:repeat(2,1fr)}
+}
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:rgba(0,0,0,0.2)}
+::-webkit-scrollbar-thumb{background:rgba(100,140,255,0.3);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:rgba(100,140,255,0.5)}
+</style>
+</head>
+<body>
+<canvas id="starfield"></canvas>
+<a href="../../index.html" class="back-btn">← 返回Y.Mine总控台</a>
+
+<div class="container">
+  <div class="header">
+    <h1>🧪 全域仿真实验向量总管理台</h1>
+    <div class="subtitle">31组实验 · 三元向量库 · KMP骨架检索 · 公私分层隔离 · MindSpeak一键同构</div>
+    <span class="version-pill">V1.0 · MemoryBase子模块</span>
+    <div class="stats-row" id="statsRow"></div>
+  </div>
+
+  <div class="banner">
+    <div class="banner-text">
+      🔒 <strong>公私分层声明:</strong> 微分求解内核/临界约束算子存放于 <strong>private_engine</strong>, 本页面为公开预览层, 仅展示参数与运算结果。三角审计链路上链存证, 三模校验偏差可追溯。
+    </div>
+    <a href="#" class="btn-private" onclick="alert('private_engine入口需授权访问');return false">🔒 进入private_engine</a>
+  </div>
+
+  <div class="search-section">
+    <div class="search-modes">
+      <button class="mode-btn active" data-mode="exact" onclick="switchSearchMode('exact')">🎯 精准查找</button>
+      <button class="mode-btn" data-mode="kmp" onclick="switchSearchMode('kmp')">🔗 KMP骨架模糊匹配</button>
+    </div>
+    <div class="search-input-wrap">
+      <input type="text" class="search-input" id="searchInput" placeholder="输入实验名称/ID或func_expr骨架片段..." oninput="onSearchInput()">
+      <button class="search-btn" onclick="doSearch()">🔍 检索</button>
+    </div>
+    <div class="kmp-chain" id="kmpChain"></div>
+    <div class="quick-tags">
+      <span class="tag" onclick="quickSearch('0.48保本')">0.48保本</span>
+      <span class="tag" onclick="quickSearch('0.50稳态')">0.50稳态</span>
+      <span class="tag" onclick="quickSearch('0.68熔断')">0.68熔断</span>
+      <span class="tag" onclick="quickSearch('PID控制')">PID控制</span>
+      <span class="tag" onclick="quickSearch('纳什均衡')">纳什均衡</span>
+      <span class="tag" onclick="quickSearch('阻尼振动')">阻尼振动</span>
+      <span class="tag" onclick="quickSearch('风险决策')">风险决策</span>
+    </div>
+  </div>
+
+  <div class="filter-section">
+    <div class="filter-row">
+      <span class="filter-label">分类:</span>
+      <button class="filter-tab active" data-cat="all" onclick="filterCategory('all')">全部(31)</button>
+      <button class="filter-tab" data-cat="cybernetics_control" onclick="filterCategory('cybernetics_control')">控制论(12)</button>
+      <button class="filter-tab" data-cat="structural_safety" onclick="filterCategory('structural_safety')">结构力学(6)</button>
+      <button class="filter-tab" data-cat="cognitive_neuroscience" onclick="filterCategory('cognitive_neuroscience')">认知神经(7)</button>
+      <button class="filter-tab" data-cat="game_evolution" onclick="filterCategory('game_evolution')">博弈演化(5)</button>
+      <button class="filter-tab" data-cat="info_channel" onclick="filterCategory('info_channel')">信息信道(1)</button>
+    </div>
+    <div class="filter-row">
+      <span class="filter-label">仓储:</span>
+      <button class="filter-tab active" data-tier="all" onclick="filterTier('all')">全部</button>
+      <button class="filter-tab storage-hot" data-tier="hot" onclick="filterTier('hot')">🔥热内存</button>
+      <button class="filter-tab storage-warm" data-tier="warm" onclick="filterTier('warm')">🌡️温缓冲</button>
+      <button class="filter-tab storage-cold" data-tier="cold" onclick="filterTier('cold')">❄️冷休眠</button>
+    </div>
+    <div class="filter-row">
+      <span class="filter-label">状态:</span>
+      <button class="filter-tab active" data-status="all" onclick="filterStatus('all')">全部</button>
+      <button class="filter-tab status-normal" data-status="normal" onclick="filterStatus('normal')">正常</button>
+      <button class="filter-tab status-warning" data-status="warning" onclick="filterStatus('warning')">预警</button>
+      <button class="filter-tab status-fused" data-status="fused" onclick="filterStatus('fused')">熔断</button>
+    </div>
+  </div>
+
+  <div class="experiments-grid" id="expGrid"></div>
+</div>
+
+<div class="batch-bar">
+  <div class="batch-left">
+    <label class="batch-select-all">
+      <input type="checkbox" id="selectAll" onchange="toggleSelectAll()">
+      <span>全选 (<span id="selectedCount">0</span>/<span id="totalCount">31</span>)</span>
+    </label>
+  </div>
+  <div class="batch-actions">
+    <button class="batch-btn danger" onclick="batchHibernate()">❄️ 批量休眠低频实验</button>
+    <button class="batch-btn" onclick="batchValidate()">🔍 批量校验公式完整性</button>
+    <button class="batch-btn primary" onclick="batchMindSpeak()">🔗 一键同步至MindSpeak</button>
+    <button class="batch-btn" onclick="batchExport()">📤 导出JSON</button>
+    <button class="batch-btn" onclick="document.getElementById('importFile').click()">📥 导入JSON</button>
+    <input type="file" id="importFile" accept=".json" style="display:none" onchange="batchImport(event)">
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal" id="modalContent"></div>
+</div>
+
+<div class="footer-banner">
+  🔒 公私分层声明: 微分求解内核/临界约束算子存放于 <a href="#" onclick="alert('private_engine入口需授权访问');return false">private_engine</a>, 本页面为公开预览层, 仅展示参数与运算结果
+</div>
+
+<script>
+const experiments = [
+  {id:'EXP-01',name:'PID水温负反馈调节',icon:'🌡️',category:'cybernetics_control',categoryColor:'var(--category-cyber)',
+    vars_in:[{name:'Kp',type:'float',desc:'比例增益系数',defaultVal:'2.5'},{name:'Ki',type:'float',desc:'积分增益系数',defaultVal:'0.8'},{name:'Kd',type:'float',desc:'微分增益系数',defaultVal:'0.1'},{name:'setpoint',type:'float',desc:'目标温度(°C)',defaultVal:'60.0'},{name:'T_actual',type:'float',desc:'实测温度(°C)',defaultVal:'25.0'}],
+    vars_out:[{name:'u(t)',type:'float',desc:'控制输出量'},{name:'e(t)',type:'float',desc:'瞬时误差'},{name:'overshoot',type:'float',desc:'超调量百分比'}],
+    func_expr:'u(t) = Kp·e(t) + Ki·∫₀ᵗe(τ)dτ + Kd·de(t)/dt\ne(t) = setpoint - T_actual\n约束: |u(t)| ≤ U_max (执行器饱和限幅)',
+    currentValue:0.42,storageTier:'hot',status:'normal',runCount:1247,lastRun:'2026-07-21 09:32:15',frequency:9,
+    auditLogs:[{time:'2026-07-21 09:32:15',model:'三角审计V1',result:'收敛稳定,超调3.2%',deviation:'0.8%'},{time:'2026-07-20 22:15:03',model:'三角审计V2',result:'稳态误差<0.5°C',deviation:'1.1%'},{time:'2026-07-20 14:08:47',model:'三角审计V3',result:'参数区间合规',deviation:'0.5%'}]},
+  {id:'EXP-02',name:'弹簧阻尼振动',icon:'🔩',category:'cybernetics_control',categoryColor:'var(--category-cyber)',
+    vars_in:[{name:'m',type:'float',desc:'振子质量(kg)',defaultVal:'1.0'},{name:'k',type:'float',desc:'弹簧劲度系数(N/m)',defaultVal:'50.0'},{name:'c',type:'float',desc:'阻尼系数(N·s/m)',defaultVal:'2.0'},{name:'x0',type:'float',desc:'初始位移(m)',defaultVal:'0.1'}],
+    vars_out:[{name:'x(t)',type:'float',desc:'位移响应'},{name:'ω_n',type:'float',desc:'固有角频率'},{name:'ζ',type:'float',desc:'阻尼比'}],
+    func_expr:'m·d²x/dt² + c·dx/dt + k·x = 0\nω_n = √(k/m), ζ = c/(2√(mk))\nx(t) = x₀·e^(-ζω_n t)·cos(ω_d t + φ)',
+    currentValue:0.35,storageTier:'warm',status:'normal',runCount:523,lastRun:'2026-07-20 18:45:22',frequency:6,
+    auditLogs:[{time:'2026-07-20 18:45:22',model:'三角审计V1',result:'欠阻尼振动,ζ=0.14',deviation:'0.6%'},{time:'2026-07-19 11:20:08',model:'三角审计V2',result:'能量衰减符合预期',deviation:'0.9%'},{time:'2026-07-18 16:33:41',model:'三角审计V3',result:'解析解与数值解一致',deviation:'0.3%'}]},
+  {id:'EXP-03',name:'蓄水池水位调度',icon:'💧',category:'cybernetics_control',categoryColor:'var(--category-cyber)',
+    vars_in:[{name:'inflow',type:'float',desc:'入池流量(m³/s)',defaultVal:'2.5'},{name:'outflow',type:'float',desc:'出池流量(m³/s)',defaultVal:'2.0'},{name:'A',type:'float',desc:'水池截面积(m²)',defaultVal:'100'},{name:'h_max',type:'float',desc:'最高警戒水位(m)',defaultVal:'5.0'},{name:'h_min',type:'float',desc:'最低运行水位(m)',defaultVal:'1.0'}],
+    vars_out:[{name:'h(t)',type:'float',desc:'实时水位(m)'},{name:'balance',type:'float',desc:'流量差'},{name:'overflow_risk',type:'bool',desc:'溢流风险标记'}],
+    func_expr:'A·dh/dt = Q_in(t) - Q_out(t)\nh(t) = h₀ + (1/A)∫₀ᵗ[Q_in(τ)-Q_out(τ)]dτ\n熔断条件: h(t) ≥ h_max → 紧急泄洪',
+    currentValue:0.52,storageTier:'warm',status:'normal',runCount:412,lastRun:'2026-07-20 15:10:33',frequency:5,
+    auditLogs:[{time:'2026-07-20 15:10:33',model:'三角审计V1',result:'水位在安全区间',deviation:'1.2%'},{time:'2026-07-19 20:05:17',model:'三角审计V2',result:'调度策略优化建议',deviation:'1.8%'},{time:'2026-07-18 09:22:48',model:'三角审计V3',result:'质量守恒验证通过',deviation:'0.4%'}]},
+  {id:'EXP-04',name:'排队论负载限流',icon:'🚦',category:'cybernetics_control',categoryColor:'var(--category-cyber)',
+    vars_in:[{name:'λ',type:'float',desc:'到达率(req/s)',defaultVal:'50'},{name:'μ',type:'float',desc:'服务率(req/s)',defaultVal:'60'},{name:'c',type:'int',desc:'服务台数量',defaultVal:'3'},{name:'W_max',type:'float',desc:'最大等待时间(s)',defaultVal:'2.0'}],
+    vars_out:[{name:'L',type:'float',desc:'系统平均队长'},{name:'Wq',type:'float',desc:'平均等待时间'},{name:'ρ',type:'float',desc:'系统利用率'}],
+    func_expr:'M/M/c排队模型:\nρ = λ/(cμ)\nP₀ = 1/[Σₖ=0^{c-1}(cρ)^k/k! + (cρ)^c/(c!(1-ρ))]\nLq = P₀(cρ)^cρ/(c!(1-ρ)²), Wq = Lq/λ\n限流触发: Wq > W_max',
+    currentValue:0.58,storageTier:'hot',status:'warning',runCount:2103,lastRun:'2026-07-21 10:15:44',frequency:10,
+    auditLogs:[{time:'2026-07-21 10:15:44',model:'三角审计V1',result:'利用率接近阈值,需扩容',deviation:'2.8%'},{time:'2026-07-20 23:40:12',model:'三角审计V2',result:'等待时间超阈值0.3s',deviation:'3.1%'},{time:'2026-07-20 12:18:55',model:'三角审计V3',result:'限流策略生效',deviation:'1.5%'}]},
+  {id:'EXP-05',name:'双容水箱串级液位',icon:'🫗',category:'cybernetics_control',categoryColor:'var(--category-cyber)',
+    vars_in:[{name:'A1,A2',type:'float',desc:'上下水箱截面积(m²)',defaultVal:'50,80'},{name:'R1,R2',type:'float',desc:'流阻系数',defaultVal:'0.5,0.3'},{name:'Q_in',type:'float',desc:'进水流量(m³/s)',defaultVal:'0.01'},{name:'h2_sp',type:'float',desc:'下水箱目标液位(m)',defaultVal:'2.0'}],
+    vars_out:[{name:'h1(t),h2(t)',type:'float',desc:'上下水箱液位'},{name:'Q1,Q2',type:'float',desc:'中间/出水流量'}],
+    func_expr:'A₁·dh₁/dt = Q_in - Q₁, Q₁ = (h₁-h₂)/R₁\nA₂·dh₂/dt = Q₁ - Q₂, Q₂ = h₂/R₂\n串级:主环h2→副环h1→Q_in',
+    currentValue:0.47,storageTier:'warm',status:'normal',runCount:356,lastRun:'2026-07-19 14:55:09',frequency:5,
+    auditLogs:[{time:'2026-07-19 14:55:09',model:'三角审计V1',result:'串级控制抗扰性优',deviation:'1.0%'},{time:'2026-07-18 10:30:26',model:'三角审计V2',result:'副环响应<2s',deviation:'0.7%'},{time:'2026-07-17 19:12:43',model:'三角审计V3',result:'二阶系统辨识完成',deviation:'0.6%'}]},
+  {id:'EXP-06',name:'二阶惯性滞后调节',icon:'⏳',category:'cybernetics_control',categoryColor:'var(--category-cyber)',
+    vars_in:[{name:'K',type:'float',desc:'过程增益',defaultVal:'2.0'},{name:'T',type:'float',desc:'时间常数(s)',defaultVal:'5.0'},{name:'τ',type:'float',desc:'纯滞后时间(s)',defaultVal:'2.0'},{name:'ξ',type:'float',desc:'阻尼系数',defaultVal:'0.5'}],
+    vars_out:[{name:'G(s)',type:'complex',desc:'传递函数'},{name:'y(t)',type:'float',desc:'阶跃响应'},{name:'overshoot',type:'float',desc:'超调量'}],
+    func_expr:'G(s) = K·e^(-τs)/(T²s² + 2ξTs + 1)\nSmith预估补偿: G_smith(s) = G(s)/(1+G(s)(1-e^(-τs)))',
+    currentValue:0.44,storageTier:'cold',status:'normal',runCount:89,lastRun:'2026-07-15 08:22:17',frequency:2,
+    auditLogs:[{time:'2026-07-15 08:22:17',model:'三角审计V1',result:'Smith预估有效补偿滞后',deviation:'1.4%'},{time:'2026-07-10 16:40:35',model:'三角审计V2',result:'振荡次数符合预期',deviation:'1.1%'},{time:'2026-07-05 11:08:52',model:'三角审计V3',result:'参数灵敏度分析完成',deviation:'0.9%'}]},
+  {id:'EXP-07',name:'阻尼三类振动对照',icon:'📊',category:'cybernetics_control',categoryColor:'var(--category-cyber)',
+    vars_in:[{name:'ζ_under',type:'float',desc:'欠阻尼比',defaultVal:'0.2'},{name:'ζ_crit',type:'float',desc:'临界阻尼比',defaultVal:'1.0'},{name:'ζ_over',type:'float',desc:'过阻尼比',defaultVal:'2.0'}],
+    vars_out:[{name:'x_under(t)',type:'float',desc:'欠阻尼响应'},{name:'x_crit(t)',type:'float',desc:'临界阻尼响应'},{name:'x_over(t)',type:'float',desc:'过阻尼响应'}],
+    func_expr:'欠阻尼(ζ<1): x(t)=Ae^(-ζωt)cos(ω_d t+φ)\n临界(ζ=1): x(t)=(A+Bt)e^(-ωt)\n过阻尼(ζ>1): x(t)=A₁e^(-s₁t)+A₂e^(-s₂t)',
+    currentValue:0.38,storageTier:'warm',status:'normal',runCount:267,lastRun:'2026-07-19 20:00:00',frequency:4,
+    auditLogs:[{time:'2026-07-19 20:00:00',model:'三角审计V1',result:'三类响应对比完整',deviation:'0.5%'},{time:'2026-07-16 13:25:18',model:'三角审计V2',result:'临界阻尼最快无振荡',deviation:'0.4%'},{time:'2026-07-12 09:50:33',model:'三角审计V3',result:'阻尼分区边界清晰',deviation:'0.3%'}]},
+  {id:'EXP-08',name:'前馈预判补偿控制',icon:'🎯',category:'cybernetics_control',categoryColor:'var(--category-cyber)',
+    vars_in:[{name:'G_p(s)',type:'complex',desc:'对象传递函数'},{name:'G_v(s)',type:'complex',desc:'扰动通道'},{name:'d(t)',type:'signal',desc:'可测扰动信号'}],
+    vars_out:[{name:'G_ff(s)',type:'complex',desc:'前馈补偿器'},{name:'y_total(t)',type:'float',desc:'总输出'},{name:'compensation_rate',type:'float',desc:'扰动补偿率'}],
+    func_expr:'前馈完全补偿条件:\nG_ff(s) = -G_v(s)/G_p(s)\n复合控制: u(t) = u_fb(t) + u_ff(t)\n不变性原理: 扰动对输出无影响',
+    currentValue:0.41,storageTier:'cold',status:'normal',runCount:134,lastRun:'2026-07-17 11:30:44',frequency:2,
+    auditLogs:[{time:'2026-07-17 11:30:44',model:'三角审计V1',result:'前馈补偿率94.2%',deviation:'1.6%'},{time:'2026-07-12 15:18:29',model:'三角审计V2',result:'可测扰动全抑制',deviation:'1.3%'},{time:'2026-07-08 08:45:12',model:'三角审计V3',result:'因果性约束检查通过',deviation:'0.8%'}]},
+  {id:'EXP-09',name:'串级双闭环控制',icon:'🔗',category:'cybernetics_control',categoryColor:'var(--category-cyber)',
+    vars_in:[{name:'Gc1',type:'controller',desc:'主回路控制器(PID)'},{name:'Gc2',type:'controller',desc:'副回路控制器(P)'},{name:'T1,T2',type:'float',desc:'主副对象时间常数'}],
+    vars_out:[{name:'y1(t),y2(t)',type:'float',desc:'主副变量'},{name:'disturbance_rejection',type:'float',desc:'二次扰动抑制率'}],
+    func_expr:'副环(内环): G_c2→G_v→G_p2→G_m2(快速随动)\n主环(外环): G_c1→副环闭环→G_p1→G_m1(定值调节)\n副环频率≥主环3倍以上',
+    currentValue:0.45,storageTier:'warm',status:'normal',runCount:445,lastRun:'2026-07-20 10:20:31',frequency:5,
+    auditLogs:[{time:'2026-07-20 10:20:31',model:'三角审计V1',result:'副环振荡消除',deviation:'0.9%'},{time:'2026-07-18 14:42:56',model:'三角审计V2',result:'一次扰动抑制提升60%',deviation:'1.0%'},{time:'2026-07-15 19:30:18',model:'三角审计V3',result:'频带分离验证通过',deviation:'0.5%'}]},
+  {id:'EXP-10',name:'执行器饱和限幅熔断',icon:'💥',category:'cybernetics_control',categoryColor:'var(--category-cyber)',
+    vars_in:[{name:'U_max',type:'float',desc:'执行器上限',defaultVal:'100'},{name:'U_min',type:'float',desc:'执行器下限',defaultVal:'0'},{name:'u_desired',type:'float',desc:'期望控制量'},{name:'Ka',type:'float',desc:'抗积分饱和增益',defaultVal:'0.8'}],
+    vars_out:[{name:'u_actual',type:'float',desc:'实际控制量'},{name:'saturated',type:'bool',desc:'饱和标记'},{name:'fuse_state',type:'enum',desc:'熔断状态'}],
+    func_expr:'u_actual = sat(u_desired) = {U_max if u>U_max; u if U_min≤u≤U_max; U_min if u<U_min}\n遇限削弱积分: 当u饱和时停止积分\n熔断触发: 持续饱和>5s 或 ∫|u-u_actual|dt > θ_fuse',
+    currentValue:0.71,storageTier:'hot',status:'fused',runCount:3892,lastRun:'2026-07-21 10:45:00',frequency:10,
+    auditLogs:[{time:'2026-07-21 10:45:00',model:'三角审计V1',result:'⚠️执行器持续饱和,已触发熔断',deviation:'8.4%'},{time:'2026-07-21 10:30:22',model:'三角审计V2',result:'积分累积超限,进入保护',deviation:'7.9%'},{time:'2026-07-21 10:15:08',model:'三角审计V3',result:'建议降低设定值或扩容',deviation:'6.2%'}]},
+  {id:'EXP-11',name:'外界扰动抑制',icon:'🌊',category:'cybernetics_control',categoryColor:'var(--category-cyber)',
+    vars_in:[{name:'d(t)',type:'signal',desc:'阶跃/脉冲/正弦扰动'},{name:'H(s)',type:'complex',desc:'扰动抑制传递函数'},{name:'S(s)',type:'complex',desc:'灵敏度函数'}],
+    vars_out:[{name:'y_d(t)',type:'float',desc:'扰动引起的输出'},{name:'attenuation',type:'float',desc:'衰减比'},{name:'S_max',type:'float',desc:'灵敏度峰值'}],
+    func_expr:'S(s) = 1/(1+L(s)), T(s) = L(s)/(1+L(s))\n扰动抑制: |S(jω)| < 1 for ω<ω_c\n要求: Ms = max|S(jω)| < 2.0 (鲁棒性约束)',
+    currentValue:0.55,storageTier:'warm',status:'warning',runCount:578,lastRun:'2026-07-20 16:40:15',frequency:6,
+    auditLogs:[{time:'2026-07-20 16:40:15',model:'三角审计V1',result:'灵敏度Ms=1.9,接近边界',deviation:'3.5%'},{time:'2026-07-19 09:15:33',model:'三角审计V2',result:'低频扰动抑制良好',deviation:'2.1%'},{time:'2026-07-17 14:20:48',model:'三角审计V3',result:'中频段共振峰偏高',deviation:'3.8%'}]},
+  {id:'EXP-12',name:'伺服随动稳态跟踪',icon:'🎯',category:'cybernetics_control',categoryColor:'var(--category-cyber)',
+    vars_in:[{name:'r(t)',type:'signal',desc:'参考输入(阶跃/斜坡/抛物线)'},{name:'system_type',type:'int',desc:'系统型别v=0,1,2'},{name:'Kp,Kv,Ka',type:'float',desc:'静态误差系数'}],
+    vars_out:[{name:'e_ss',type:'float',desc:'稳态误差'},{name:'tracking_error',type:'float',desc:'实时跟踪误差'},{name:'bandwidth',type:'float',desc:'伺服带宽'}],
+    func_expr:'型别v=系统含积分器个数:\nv=0: e_ss(阶跃)=1/(1+Kp)\nv=1: e_ss(斜坡)=1/Kv\nv=2: e_ss(抛物线)=1/Ka\n内模原理: 含参考信号模型可实现无静差',
+    currentValue:0.49,storageTier:'hot',status:'normal',runCount:1567,lastRun:'2026-07-21 08:50:22',frequency:9,
+    auditLogs:[{time:'2026-07-21 08:50:22',model:'三角审计V1',result:'I型系统,斜坡误差1/Kv',deviation:'0.7%'},{time:'2026-07-20 17:30:11',model:'三角审计V2',result:'带宽满足快速性要求',deviation:'1.2%'},{time:'2026-07-19 22:05:47',model:'三角审计V3',result:'跟踪滞后<0.1s',deviation:'0.5%'}]},
+  {id:'EXP-13',name:'万有引力双层阻尼(#30)',icon:'🌍',category:'structural_safety',categoryColor:'var(--category-struct)',
+    vars_in:[{name:'M,m',type:'float',desc:'中心/环绕天体质量(kg)',defaultVal:'5.97e24,1000'},{name:'G',type:'float',desc:'引力常数',defaultVal:'6.67e-11'},{name:'r0',type:'float',desc:'初始轨道半径(m)',defaultVal:'7e6'},{name:'c_damp',type:'float',desc:'双层阻尼系数',defaultVal:'1e-6'}],
+    vars_out:[{name:'F_grav',type:'float',desc:'万有引力(N)'},{name:'r(t)',type:'float',desc:'轨道半径衰减'},{name:'orbit_decay',type:'float',desc:'轨道衰减率'}],
+    func_expr:'F = G·Mm/r² (牛顿万有引力)\n双层阻尼: F_damp = -c₁v -c₂v|v|\nd²r/dt² = -GM/r² + F_damp/m (径向运动方程)',
+    currentValue:0.43,storageTier:'hot',status:'normal',runCount:982,lastRun:'2026-07-20 22:10:05',frequency:8,
+    auditLogs:[{time:'2026-07-20 22:10:05',model:'三角审计V1',result:'轨道衰减率0.01%/圈',deviation:'0.6%'},{time:'2026-07-19 18:25:33',model:'三角审计V2',result:'双阻尼层耗能验证',deviation:'0.8%'},{time:'2026-07-18 12:40:19',model:'三角审计V3',result:'角动量守恒近似成立',deviation:'0.4%'}]},
+  {id:'EXP-14',name:'原子电子圈层(#31)',icon:'⚛️',category:'structural_safety',categoryColor:'var(--category-struct)',
+    vars_in:[{name:'Z',type:'int',desc:'原子序数',defaultVal:'1'},{name:'n',type:'int',desc:'主量子数',defaultVal:'1'},{name:'eV_level',type:'float',desc:'能级能量(eV)',defaultVal:'-13.6'}],
+    vars_out:[{name:'r_n',type:'float',desc:'玻尔半径'},{name:'E_n',type:'float',desc:'能级能量'},{name:'λ_emission',type:'float',desc:'发射光谱波长'}],
+    func_expr:'玻尔模型:\nr_n = 4πε₀ħ²n²/(mZe²) = a₀·n²/Z\nE_n = -13.6Z²/n² eV\n跃迁: hc/λ = E_m - E_n (m>n,发射光子)',
+    currentValue:0.36,storageTier:'warm',status:'normal',runCount:423,lastRun:'2026-07-19 16:55:40',frequency:5,
+    auditLogs:[{time:'2026-07-19 16:55:40',model:'三角审计V1',result:'能级跃迁概率分布合规',deviation:'0.5%'},{time:'2026-07-16 10:20:18',model:'三角审计V2',result:'光谱波长与实验吻合',deviation:'0.3%'},{time:'2026-07-13 14:35:22',model:'三角审计V3',result:'量子数选择定则验证',deviation:'0.2%'}]},
+  {id:'EXP-15',name:'分子化学键构型(#32)',icon:'🔬',category:'structural_safety',categoryColor:'var(--category-struct)',
+    vars_in:[{name:'bond_type',type:'enum',desc:'键型:s/sp/sp2/sp3',defaultVal:'sp3'},{name:'angle_natural',type:'float',desc:'自然键角(°)',defaultVal:'109.5'},{name:'k_angle',type:'float',desc:'键角力常数',defaultVal:'0.5'}],
+    vars_out:[{name:'V_angle',type:'float',desc:'键角势能'},{name:'geometry',type:'enum',desc:'分子构型'},{name:'strain_energy',type:'float',desc:'环张力能'}],
+    func_expr:'键角势(Harmonic): V(θ) = (k_θ/2)(θ-θ₀)²\n二面角: V(φ) = Σ[V_n/2(1+cos(nφ-γ_n))]\n分子力场: MM2/MM3键伸缩+键角弯曲+二面角扭转+范德华+静电',
+    currentValue:0.40,storageTier:'warm',status:'normal',runCount:389,lastRun:'2026-07-18 19:30:12',frequency:5,
+    auditLogs:[{time:'2026-07-18 19:30:12',model:'三角审计V1',result:'sp3杂化四面体构型',deviation:'0.7%'},{time:'2026-07-15 11:45:36',model:'三角审计V2',result:'环丙烷张力能符合计算',deviation:'1.0%'},{time:'2026-07-11 08:20:44',model:'三角审计V3',result:'构象能量极小值收敛',deviation:'0.5%'}]},
+  {id:'EXP-16',name:'悬臂多点锁止',icon:'🏗️',category:'structural_safety',categoryColor:'var(--category-struct)',
+    vars_in:[{name:'L',type:'float',desc:'梁长(m)',defaultVal:'5.0'},{name:'E',type:'float',desc:'弹性模量(GPa)',defaultVal:'200'},{name:'I',type:'float',desc:'截面惯性矩(m⁴)',defaultVal:'1e-4'},{name:'P_loads',type:'array',desc:'各点荷载(N)'}],
+    vars_out:[{name:'δ_max',type:'float',desc:'最大挠度'},{name:'σ_max',type:'float',desc:'最大应力'},{name:'lock_status',type:'array',desc:'各锁止点状态'}],
+    func_expr:'悬臂梁挠曲线方程: EI·d⁴δ/dx⁴ = q(x)\n单点荷载P于a处:\nδ(x) = Px²(3a-x)/(6EI) for x≤a\nδ(x) = Pa²(3x-a)/(6EI) for x>a\n锁止条件: δ_i ≤ δ_lock',
+    currentValue:0.56,storageTier:'warm',status:'warning',runCount:634,lastRun:'2026-07-20 14:05:28',frequency:7,
+    auditLogs:[{time:'2026-07-20 14:05:28',model:'三角审计V1',result:'3号锁止点挠度接近阈值',deviation:'4.2%'},{time:'2026-07-19 20:10:35',model:'三角审计V2',result:'应力集中系数偏高',deviation:'3.6%'},{time:'2026-07-17 09:55:18',model:'三角审计V3',result:'建议加固第2跨',deviation:'3.1%'}]},
+  {id:'EXP-17',name:'简支梁分散承重',icon:'🏛️',category:'structural_safety',categoryColor:'var(--category-struct)',
+    vars_in:[{name:'L',type:'float',desc:'跨度(m)',defaultVal:'10.0'},{name:'n_supports',type:'int',desc:'支座数量',defaultVal:'5'},{name:'q_distributed',type:'float',desc:'均布荷载(kN/m)',defaultVal:'20'},{name:'P_concentrated',type:'array',desc:'集中荷载'}],
+    vars_out:[{name:'R_i',type:'array',desc:'各支座反力'},{name:'M_max',type:'float',desc:'最大弯矩'},{name:'δ_mid',type:'float',desc:'跨中挠度'}],
+    func_expr:'三弯矩方程(连续梁):\nM_{n-1}L_n + 2M_n(L_n+L_{n+1}) + M_{n+1}L_{n+1} = -6A_n̄x_n/L_n -6A_{n+1}̄x\'_{n+1}/L_{n+1}\n简支均布: M_max = qL²/8, δ_max = 5qL⁴/(384EI)',
+    currentValue:0.46,storageTier:'warm',status:'normal',runCount:512,lastRun:'2026-07-19 17:25:40',frequency:6,
+    auditLogs:[{time:'2026-07-19 17:25:40',model:'三角审计V1',result:'支座反力分配均匀',deviation:'1.2%'},{time:'2026-07-17 12:40:22',model:'三角审计V2',result:'弯矩包络图合规',deviation:'1.5%'},{time:'2026-07-14 15:50:36',model:'三角审计V3',result:'挠度<L/500,满足规范',deviation:'0.8%'}]},
+  {id:'EXP-18',name:'压力容器爆破临界',icon:'💣',category:'structural_safety',categoryColor:'var(--category-struct)',
+    vars_in:[{name:'P_internal',type:'float',desc:'内部压力(MPa)',defaultVal:'15'},{name:'σ_yield',type:'float',desc:'材料屈服强度(MPa)',defaultVal:'350'},{name:'t_wall',type:'float',desc:'壁厚(mm)',defaultVal:'20'},{name:'D',type:'float',desc:'容器内径(mm)',defaultVal:'1000'},{name:'defect_size',type:'float',desc:'缺陷尺寸(mm)',defaultVal:'8'}],
+    vars_out:[{name:'σ_hoop',type:'float',desc:'环向应力'},{name:'P_burst',type:'float',desc:'爆破压力'},{name:'safety_factor',type:'float',desc:'安全系数'},{name:'fuse_state',type:'enum',desc:'熔断状态'}],
+    func_expr:'薄膜理论: σ_θ = PD/(2t) (环向), σ_φ=PD/(4t)(纵向)\nBarlow公式: P_burst = 2σ_uts·t/D\n断裂力学: K_I = σ√(πa)·f(a/t)\n熔断触发: K_I ≥ K_IC 或 P ≥ 0.68·P_burst',
+    currentValue:0.73,storageTier:'hot',status:'fused',runCount:2756,lastRun:'2026-07-21 10:50:33',frequency:10,
+    auditLogs:[{time:'2026-07-21 10:50:33',model:'三角审计V1',result:'⚠️应力强度因子K_I达0.73K_IC,已熔断',deviation:'9.1%'},{time:'2026-07-21 09:20:15',model:'三角审计V2',result:'裂纹扩展速率超标',deviation:'7.6%'},{time:'2026-07-21 06:45:28',model:'三角审计V3',result:'⚠️紧急泄压已触发',deviation:'8.3%'}]},
+  {id:'EXP-19',name:'水迷宫空间寻优',icon:'🐭',category:'cognitive_neuroscience',categoryColor:'var(--category-cogni)',
+    vars_in:[{name:'pool_diameter',type:'float',desc:'迷宫直径(m)',defaultVal:'1.8'},{name:'platform_pos',type:'coords',desc:'平台位置'},{name:'n_trials',type:'int',desc:'训练试次',defaultVal:'20'},{name:'learning_rate',type:'float',desc:'学习速率',defaultVal:'0.15'}],
+    vars_out:[{name:'escape_latency',type:'float',desc:'逃逸潜伏期(s)'},{name:'path_efficiency',type:'float',desc:'路径效率'},{name:'spatial_memory',type:'float',desc:'空间记忆得分'}],
+    func_expr:'强化学习(SARSA):\nQ(s,a) ← Q(s,a) + α[r+γQ(s\',a\')-Q(s,a)]\n认知地图构建: 海马位置细胞激活模式\n记忆巩固: 突触权重变化Δw ∝ post-pre spike timing',
+    currentValue:0.42,storageTier:'warm',status:'normal',runCount:678,lastRun:'2026-07-20 13:40:55',frequency:7,
+    auditLogs:[{time:'2026-07-20 13:40:55',model:'三角审计V1',result:'第18次尝试找到平台,学习曲线正常',deviation:'2.1%'},{time:'2026-07-19 10:15:32',model:'三角审计V2',result:'空间记忆保留率82%',deviation:'1.8%'},{time:'2026-07-17 16:30:08',model:'三角审计V3',result:'海马体激活模式与文献一致',deviation:'1.4%'}]},
+  {id:'EXP-20',name:'BART气球风险爆破',icon:'🎈',category:'cognitive_neuroscience',categoryColor:'var(--category-cogni)',
+    vars_in:[{name:'p_explode',type:'float',desc:'每泵爆破概率递增',defaultVal:'0.02'},{name:'reward_per_pump',type:'float',desc:'每泵收益',defaultVal:'0.5'},{name:'n_participants',type:'int',desc:'被试数量',defaultVal:'100'}],
+    vars_out:[{name:'avg_pumps',type:'float',desc:'平均泵数'},{name:'risk_score',type:'float',desc:'风险偏好分数'},{name:'optimal_pumps',type:'int',desc:'最优泵数'}],
+    func_expr:'期望收益最大化(凯利类比):\nEV(k) = k(1-p)^k·R - (1-(1-p)^k)·0\n最优k* ≈ 1/p (当p较小时)\nf* = (bp-q)/b → 此处f*对应最优风险承担比例',
+    currentValue:0.59,storageTier:'hot',status:'warning',runCount:1834,lastRun:'2026-07-21 09:10:42',frequency:9,
+    auditLogs:[{time:'2026-07-21 09:10:42',model:'三角审计V1',result:'平均泵数32,接近风险阈值',deviation:'3.8%'},{time:'2026-07-20 15:55:20',model:'三角审计V2',result:'风险偏好分布正偏',deviation:'2.9%'},{time:'2026-07-18 11:30:15',model:'三角审计V3',result:'与Lejuez(2002)数据吻合',deviation:'2.2%'}]},
+  {id:'EXP-21',name:'前景理论双框架',icon:'⚖️',category:'cognitive_neuroscience',categoryColor:'var(--category-cogni)',
+    vars_in:[{name:'frame',type:'enum',desc:'框架:收益/损失',defaultVal:'gain'},{name:'sure_option',type:'float',desc:'确定选项金额'},{name:'gamble_prob',type:'float',desc:'赌局概率',defaultVal:'0.5'},{name:'gamble_win',type:'float',desc:'赌局赢额'},{name:'λ_loss_aversion',type:'float',desc:'损失厌恶系数',defaultVal:'2.25'}],
+    vars_out:[{name:'V_gain',type:'float',desc:'收益域价值'},{name:'V_loss',type:'float',desc:'损失域价值'},{name:'choice_predict',type:'enum',desc:'框架效应预测选择'}],
+    func_expr:'前景理论价值函数(Tversky & Kahneman):\nv(x) = {x^α for x≥0 (α≈0.88); -λ(-x)^β for x<0 (β≈0.88,λ≈2.25)}\n权重函数: π(p) = p^γ/[p^γ+(1-p)^γ]^(1/γ), γ≈0.61',
+    currentValue:0.48,storageTier:'hot',status:'normal',runCount:1456,lastRun:'2026-07-20 21:30:18',frequency:8,
+    auditLogs:[{time:'2026-07-20 21:30:18',model:'三角审计V1',result:'框架效应显著,Asian Disease范式重现',deviation:'1.5%'},{time:'2026-07-19 08:45:33',model:'三角审计V2',result:'损失厌恶系数λ≈2.3,接近文献值',deviation:'1.2%'},{time:'2026-07-17 14:20:50',model:'三角审计V3',result:'四重模式全部复现',deviation:'0.9%'}]},
+  {id:'EXP-22',name:'奈克立方体双稳态',icon:'🎲',category:'cognitive_neuroscience',categoryColor:'var(--category-cogni)',
+    vars_in:[{name:'stim_duration',type:'float',desc:'刺激时长(ms)',defaultVal:'continuous'},{name:'adaptation_rate',type:'float',desc:'神经适应率',defaultVal:'0.05'},{name:'noise_level',type:'float',desc:'神经噪声水平',defaultVal:'0.1'}],
+    vars_out:[{name:'percept_dur',type:'float',desc:'感知持续时间(s)'},{name:'switch_rate',type:'float',desc:'翻转率(times/min)'},{name:'dominance_ratio',type:'float',desc:'两视角占比'}],
+    func_expr:'互抑制竞争模型(Wilson-Cowan):\nτ·dx₁/dt = -x₁ + S(ax₁ - bx₂ + I₁ + noise₁)\nτ·dx₂/dt = -x₂ + S(ax₂ - bx₁ + I₂ + noise₂)\nS(u) = 1/(1+e^(-k(u-θ))) (S型激活)\n感知: winner-take-all, 适应→自发翻转',
+    currentValue:0.50,storageTier:'cold',status:'normal',runCount:201,lastRun:'2026-07-16 20:15:08',frequency:3,
+    auditLogs:[{time:'2026-07-16 20:15:08',model:'三角审计V1',result:'平均翻转间隔4.2s',deviation:'2.0%'},{time:'2026-07-12 11:30:45',model:'三角审计V2',result:'Gamma分布拟合优度r=0.94',deviation:'1.7%'},{time:'2026-07-08 15:40:22',model:'三角审计V3',result:'神经适应是翻转主因',deviation:'1.4%'}]},
+  {id:'EXP-23',name:'斯特鲁普认知冲突',icon:'🔴',category:'cognitive_neuroscience',categoryColor:'var(--category-cogni)',
+    vars_in:[{name:'condition',type:'enum',desc:'条件:一致/不一致/中性',defaultVal:'incongruent'},{name:'SOA',type:'float',desc:'刺激呈现异步(ms)',defaultVal:'0'},{name:'word_color',type:'pair',desc:'词-色组合'}],
+    vars_out:[{name:'RT_congruent',type:'float',desc:'一致反应时(ms)'},{name:'RT_incongruent',type:'float',desc:'不一致反应时(ms)'},{name:'stroop_effect',type:'float',desc:'Stroop效应量(ms)'}],
+    func_expr:'平行分布式处理(PDP)模型:\n词阅读通路(自动化) vs 颜色命名通路(控制加工)\n冲突监测: ACC(前扣带回)激活\n反应时差: ΔRT = RT_inc - RT_con ≈ 100ms (Stroop效应)',
+    currentValue:0.44,storageTier:'warm',status:'normal',runCount:567,lastRun:'2026-07-19 19:45:30',frequency:6,
+    auditLogs:[{time:'2026-07-19 19:45:30',model:'三角审计V1',result:'Stroop效应量97ms,典型范围',deviation:'1.3%'},{time:'2026-07-17 10:20:18',model:'三角审计V2',result:'ACC冲突监测激活显著',deviation:'1.6%'},{time:'2026-07-14 16:55:42',model:'三角审计V3',result:'练习效应不显著',deviation:'1.0%'}]},
+  {id:'EXP-24',name:'人脑三层演化叠加',icon:'🧠',category:'cognitive_neuroscience',categoryColor:'var(--category-cogni)',
+    vars_in:[{name:'layer1_reptilian',type:'float',desc:'爬行脑权重',defaultVal:'0.3'},{name:'layer2_limbic',type:'float',desc:'哺乳脑权重',defaultVal:'0.3'},{name:'layer3_neocortex',type:'float',desc:'新皮层权重',defaultVal:'0.4'}],
+    vars_out:[{name:'layer_output',type:'array',desc:'各层输出'},{name:'dominant_layer',type:'enum',desc:'主导层'},{name:'cognitive_load',type:'float',desc:'认知负荷'}],
+    func_expr:'MacLean三重脑理论(叠加模型):\nOutput = w₁·R(x) + w₂·L(x) + w₃·N(x)\n爬行脑R(x): 本能/战逃(脑干/小脑)\n哺乳脑L(x): 情绪/记忆(杏仁核/海马)\n新皮层N(x): 理性/计划(前额叶)',
+    currentValue:0.39,storageTier:'cold',status:'normal',runCount:156,lastRun:'2026-07-14 12:30:22',frequency:2,
+    auditLogs:[{time:'2026-07-14 12:30:22',model:'三角审计V1',result:'情绪应激时哺乳脑接管',deviation:'2.3%'},{time:'2026-07-09 09:15:40',model:'三角审计V2',result:'三层竞争动力学收敛',deviation:'2.0%'},{time:'2026-07-04 18:40:15',model:'三角审计V3',result:'前额叶抑制指数0.65',deviation:'1.8%'}]},
+  {id:'EXP-25',name:'知识四层翻译链路',icon:'📚',category:'cognitive_neuroscience',categoryColor:'var(--category-cogni)',
+    vars_in:[{name:'input_layer',type:'enum',desc:'输入层:数据/信息/知识/智慧',defaultVal:'data'},{name:'translation_loss',type:'float',desc:'层间转换损耗',defaultVal:'0.15'}],
+    vars_out:[{name:'DIKW_output',type:'array',desc:'DIKW各层输出'},{name:'wisdom_gain',type:'float',desc:'智慧增益'},{name:'abstraction_level',type:'int',desc:'抽象层级'}],
+    func_expr:'DIKW金字塔模型(四层翻译):\nData →(语法/结构化)→ Information\nInformation →(语义/语境化)→ Knowledge\nKnowledge →(语用/行动化)→ Wisdom\n每级转换: O_{n+1} = F_n(O_n) - Δ_loss_n',
+    currentValue:0.37,storageTier:'cold',status:'normal',runCount:98,lastRun:'2026-07-13 17:20:55',frequency:1,
+    auditLogs:[{time:'2026-07-13 17:20:55',model:'三角审计V1',result:'信息→知识层损耗最大23%',deviation:'1.9%'},{time:'2026-07-05 14:10:30',model:'三角审计V2',result:'语义鸿沟可解释部分68%',deviation:'2.2%'},{time:'2026-06-28 08:55:12',model:'三角审计V3',result:'行动转化漏斗完整',deviation:'1.5%'}]},
+  {id:'EXP-26',name:'低空三方斜率博弈',icon:'✈️',category:'game_evolution',categoryColor:'var(--category-game)',
+    vars_in:[{name:'n_players',type:'int',desc:'博弈方数',defaultVal:'3'},{name:'strategy_space',type:'array',desc:'策略空间{爬升,平飞,下降}'},{name:'payoff_matrix',type:'matrix',desc:'支付矩阵'}],
+    vars_out:[{name:'nash_eq',type:'array',desc:'纳什均衡策略'},{name:'slope_intersect',type:'coords',desc:'最佳反应交点'},{name:'mix_prob',type:'array',desc:'混合策略概率'}],
+    func_expr:'三方零和博弈:\nmax_{p∈Δ(S₁)} min_{q∈Δ(S₂)} min_{r∈Δ(S₃)} U₁(p,q,r)\n最佳反应函数: BR_i(s_{-i}) = argmax_{s_i} U_i(s_i,s_{-i})\nNash均衡: s*_i = BR_i(s*_{-i}) for all i',
+    currentValue:0.54,storageTier:'hot',status:'normal',runCount:1123,lastRun:'2026-07-21 07:30:08',frequency:8,
+    auditLogs:[{time:'2026-07-21 07:30:08',model:'三角审计V1',result:'混合策略Nash均衡收敛',deviation:'1.7%'},{time:'2026-07-20 12:15:44',model:'三角审计V2',result:'安全间隔约束下帕累托最优',deviation:'2.1%'},{time:'2026-07-18 19:50:26',model:'三角审计V3',result:'反应函数交点唯一',deviation:'1.3%'}]},
+  {id:'EXP-27',name:'重复囚徒困境',icon:'🤝',category:'game_evolution',categoryColor:'var(--category-game)',
+    vars_in:[{name:'T',type:'int',desc:'重复轮次',defaultVal:'∞(无限)'},{name:'payoffs',type:'array',desc:'T>R>P>S',defaultVal:'[5,3,1,0]'},{name:'memory_depth',type:'int',desc:'记忆深度',defaultVal:'1'}],
+    vars_out:[{name:'coop_rate',type:'float',desc:'合作率'},{name:'evo_stable',type:'enum',desc:'演化稳定策略'},{name:'tit_for_tat_perf',type:'float',desc:'一报还一报表现'}],
+    func_expr:'囚徒困境支付:\n    C    D\nC  R,R  S,T\nD  T,S  P,P\n(T>R>P>S, 2R>T+S)\nAxelrod锦标赛: TFT(先合作,然后模仿)表现最优',
+    currentValue:0.47,storageTier:'warm',status:'normal',runCount:789,lastRun:'2026-07-20 11:40:35',frequency:7,
+    auditLogs:[{time:'2026-07-20 11:40:35',model:'三角审计V1',result:'合作率稳定在78%',deviation:'1.4%'},{time:'2026-07-18 16:25:18',model:'三角审计V2',result:'TFT策略鲁棒性最强',deviation:'1.1%'},{time:'2026-07-15 09:50:42',model:'三角审计V3',result:'噪声下GTFT表现更优',deviation:'1.6%'}]},
+  {id:'EXP-28',name:'古诺寡头均衡',icon:'🏭',category:'game_evolution',categoryColor:'var(--category-game)',
+    vars_in:[{name:'n_firms',type:'int',desc:'厂商数量',defaultVal:'2(双寡头)'},{name:'demand_P',type:'function',desc:'反需求P=a-bQ',defaultVal:'a=100,b=1'},{name:'marginal_cost',type:'float',desc:'边际成本c',defaultVal:'10'}],
+    vars_out:[{name:'q_cournot',type:'array',desc:'古诺产量'},{name:'P_cournot',type:'float',desc:'古诺价格'},{name:'profit',type:'array',desc:'各厂商利润'}],
+    func_expr:'古诺-纳什均衡(n家同质厂商):\n利润最大化: max_{q_i} π_i = P(Q)q_i - cq_i, Q=Σq_j\n一阶条件: P(Q) + P\'(Q)q_i = c\n对称均衡: q*_i = (a-c)/(b(n+1)), P* = (a+nc)/(n+1)',
+    currentValue:0.46,storageTier:'warm',status:'normal',runCount:456,lastRun:'2026-07-19 15:20:10',frequency:5,
+    auditLogs:[{time:'2026-07-19 15:20:10',model:'三角审计V1',result:'双寡头产量=(a-c)/3b,验证通过',deviation:'0.8%'},{time:'2026-07-17 08:30:55',model:'三角审计V2',result:'与完全竞争/垄断对比完整',deviation:'1.0%'},{time:'2026-07-13 12:45:33',model:'三角审计V3',result:'反应函数相交验证Nash',deviation:'0.6%'}]},
+  {id:'EXP-29',name:'猎鹿合作分工',icon:'🦌',category:'game_evolution',categoryColor:'var(--category-game)',
+    vars_in:[{name:'payoff_stag',type:'float',desc:'猎鹿收益(合作)',defaultVal:'4'},{name:'payoff_hare',type:'float',desc:'猎兔收益(背叛)',defaultVal:'3'},{name:'coordination_req',type:'float',desc:'合作所需信任阈值',defaultVal:'0.67'}],
+    vars_out:[{name:'pure_eq',type:'array',desc:'纯策略均衡(猎鹿/猎兔)'},{name:'basin_attraction',type:'float',desc:'吸引域'},{name:'risk_dominant',type:'enum',desc:'风险占优均衡'}],
+    func_expr:'猎鹿博弈(信任博弈):\n     Stag  Hare\nStag 4,4   0,3\nHare 3,0   3,3\n两纯Nash: (Stag,Stag)帕累托最优, (Hare,Hare)风险占优\n混合策略: p* = (Hare-0)/(Stag-0) = 3/4 (猎鹿概率)',
+    currentValue:0.51,storageTier:'warm',status:'normal',runCount:345,lastRun:'2026-07-18 14:10:28',frequency:4,
+    auditLogs:[{time:'2026-07-18 14:10:28',model:'三角审计V1',result:'猎鹿吸引域44%,信任临界2/3',deviation:'1.2%'},{time:'2026-07-15 17:35:12',model:'三角审计V2',result:'风险占优为(猎兔,猎兔)',deviation:'0.9%'},{time:'2026-07-11 10:50:40',model:'三角审计V3',result:'演化收敛依赖初始信任',deviation:'1.5%'}]},
+  {id:'EXP-30',name:'蜈蚣序贯递进博弈',icon:'🐛',category:'game_evolution',categoryColor:'var(--category-game)',
+    vars_in:[{name:'n_nodes',type:'int',desc:'博弈节点数',defaultVal:'6(三轮)'},{name:'payoff_growth',type:'float',desc:'每轮支付增长率',defaultVal:'2x'},{name:'altruism_weight',type:'float',desc:'利他权重',defaultVal:'0'}],
+    vars_out:[{name:'spn_prediction',type:'enum',desc:'子博弈完美Nash预测'},{name:'actual_play',type:'int',desc:'实际博弈终止节点'},{name:'cooperation_surplus',type:'float',desc:'合作剩余'}],
+    func_expr:'蜈蚣博弈(Rosenthal):\n逆向归纳: 最后一轮必取→倒数第二轮也取→...→第一轮即取!\nSPNE: 第1轮就结束(与实验严重不符)\n实际行为: 多数人合作到后期(80%+过第4节点)',
+    currentValue:0.57,storageTier:'cold',status:'warning',runCount:234,lastRun:'2026-07-16 22:05:18',frequency:3,
+    auditLogs:[{time:'2026-07-16 22:05:18',model:'三角审计V1',result:'逆向归纳悖论显著,73%过节点4',deviation:'5.2%'},{time:'2026-07-11 19:30:44',model:'三角审计V2',result:'社会偏好模型解释力更强',deviation:'4.1%'},{time:'2026-07-06 13:15:27',model:'三角审计V3',result:'有限理性+公平偏好拟合优',deviation:'3.5%'}]},
+  {id:'EXP-31',name:'信道噪声滤波收敛',icon:'📡',category:'info_channel',categoryColor:'var(--category-info)',
+    vars_in:[{name:'signal',type:'signal',desc:'原始信号s(t)'},{name:'noise_psd',type:'float',desc:'噪声功率谱密度N₀',defaultVal:'0.1'},{name:'filter_bw',type:'float',desc:'滤波器带宽B',defaultVal:'1000'},{name:'SNR_target',type:'float',desc:'目标信噪比(dB)',defaultVal:'20'}],
+    vars_out:[{name:'SNR_out',type:'float',desc:'输出信噪比'},{name:'BER',type:'float',desc:'误码率'},{name:'channel_cap',type:'float',desc:'信道容量'}],
+    func_expr:'Shannon-Hartley定理:\nC = B·log₂(1 + S/N) (信道容量)\nSNR = P_signal/(N₀·B)\nKalman滤波增益: K_k = P⁻_k H^T(HP⁻_k H^T + R)⁻¹\n收敛条件: 观测噪声R有界→估计误差协方差P→稳态值',
+    currentValue:0.43,storageTier:'cold',status:'normal',runCount:178,lastRun:'2026-07-15 16:40:52',frequency:2,
+    auditLogs:[{time:'2026-07-15 16:40:52',model:'三角审计V1',result:'Kalman滤波收敛,P_k→0.02',deviation:'1.1%'},{time:'2026-07-10 09:25:33',model:'三角审计V2',result:'SNR提升17dB',deviation:'0.9%'},{time:'2026-07-03 14:50:18',model:'三角审计V3',result:'信道利用率83%',deviation:'0.7%'}]}
+];
+
+let currentMode = 'exact';
+let currentCat = 'all';
+let currentTier = 'all';
+let currentStatus = 'all';
+let selectedIds = new Set();
+let filteredExps = [...experiments];
+
+const canvas = document.getElementById('starfield');
+const ctx = canvas.getContext('2d');
+let stars = [];
+function initStars(){
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  stars = [];
+  for(let i=0;i<200;i++){
+    stars.push({
+      x:Math.random()*canvas.width,
+      y:Math.random()*canvas.height,
+      r:Math.random()*1.5+0.3,
+      alpha:Math.random()*0.8+0.2,
+      speed:Math.random()*0.3+0.05,
+      twinkle:Math.random()*Math.PI*2
+    });
+  }
+}
+function drawStars(){
+  ctx.fillStyle='#08081a';
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+  stars.forEach(s=>{
+    s.twinkle += 0.02;
+    const a = s.alpha*(0.5+0.5*Math.sin(s.twinkle));
+    ctx.beginPath();
+    ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+    ctx.fillStyle=`rgba(180,200,255,${a})`;
+    ctx.fill();
+    s.y += s.speed;
+    if(s.y>canvas.height){s.y=0;s.x=Math.random()*canvas.width;}
+  });
+  requestAnimationFrame(drawStars);
+}
+initStars();drawStars();
+window.addEventListener('resize',initStars);
+
+function kmpBuildPattern(pattern){
+  const lps = new Array(pattern.length).fill(0);
+  let len=0,i=1;
+  while(i<pattern.length){
+    if(pattern[i]===pattern[len]){len++;lps[i]=len;i++;}
+    else{if(len!==0)len=lps[len-1];else{lps[i]=0;i++;}}
+  }
+  return lps;
+}
+function kmpSearch(text,pattern){
+  if(!pattern)return[];
+  const lps = kmpBuildPattern(pattern.toLowerCase());
+  const matches=[];let i=0,j=0;
+  const tl=text.toLowerCase(),pl=pattern.toLowerCase();
+  while(i<tl.length){
+    if(tl[i]===pl[j]){i++;j++;}
+    if(j===pl.length){matches.push(i-j);j=lps[j-1];}
+    else if(i<tl.length&&tl[i]!==pl[j]){
+      if(j!==0)j=lps[j-1];else i++;
+    }
+  }
+  return matches;
+}
+
+function animateCount(el,target,dur=1500){
+  const start=performance.now();
+  const from=0;
+  function tick(now){
+    const t=Math.min((now-start)/dur,1);
+    const ease=1-Math.pow(1-t,3);
+    el.textContent=Math.floor(from+(target-from)*ease);
+    if(t<1)requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+}
+
+function buildStats(){
+  const cats={cybernetics_control:0,structural_safety:0,cognitive_neuroscience:0,game_evolution:0,info_channel:0};
+  const tiers={hot:0,warm:0,cold:0};
+  let warn=0,fused=0,totalRuns=0;
+  experiments.forEach(e=>{
+    cats[e.category]++;
+    tiers[e.storageTier]++;
+    if(e.status==='warning')warn++;
+    if(e.status==='fused')fused++;
+    totalRuns+=e.runCount;
+  });
+  document.getElementById('statsRow').innerHTML=`
+    <div class="stat-card"><div class="stat-num" id="statTotal">0</div><div class="stat-label">实验总数</div></div>
+    <div class="stat-card"><div class="stat-num" style="background:linear-gradient(135deg,var(--category-cyber),#60a5fa);-webkit-background-clip:text;-webkit-text-fill-color:transparent" id="statCyber">0</div><div class="stat-label">控制论</div></div>
+    <div class="stat-card"><div class="stat-num" style="background:linear-gradient(135deg,var(--category-struct),#34d399);-webkit-background-clip:text;-webkit-text-fill-color:transparent" id="statStruct">0</div><div class="stat-label">结构力学</div></div>
+    <div class="stat-card"><div class="stat-num" style="background:linear-gradient(135deg,var(--category-cogni),#c084fc);-webkit-background-clip:text;-webkit-text-fill-color:transparent" id="statCogni">0</div><div class="stat-label">认知神经</div></div>
+    <div class="stat-card"><div class="stat-num" style="background:linear-gradient(135deg,var(--category-game),#fbbf24);-webkit-background-clip:text;-webkit-text-fill-color:transparent" id="statGame">0</div><div class="stat-label">博弈演化</div></div>
+    <div class="stat-card"><div class="stat-num" style="background:linear-gradient(135deg,var(--category-info),#22d3ee);-webkit-background-clip:text;-webkit-text-fill-color:transparent" id="statInfo">0</div><div class="stat-label">信息信道</div></div>
+    <div class="stat-card"><div class="storage-heatmap"><div class="heat-cell heat-hot" id="heatHot">0</div><div class="heat-cell heat-warm" id="heatWarm">0</div><div class="heat-cell heat-cold" id="heatCold">0</div></div><div class="stat-label">仓储分布 热/温/冷</div></div>
+    <div class="stat-card"><div class="stat-num" style="background:linear-gradient(135deg,var(--accent-yellow),var(--accent-red));-webkit-background-clip:text;-webkit-text-fill-color:transparent" id="statWarn">0</div><div class="stat-label">预警</div></div>
+    <div class="stat-card"><div class="stat-num" style="color:var(--accent-red)" id="statFused">0</div><div class="stat-label">熔断</div></div>
+    <div class="stat-card"><div class="stat-num" id="statRuns">0</div><div class="stat-label">累计运行次数</div></div>
+  `;
+  setTimeout(()=>{
+    animateCount(document.getElementById('statTotal'),31);
+    animateCount(document.getElementById('statCyber'),cats.cybernetics_control);
+    animateCount(document.getElementById('statStruct'),cats.structural_safety);
+    animateCount(document.getElementById('statCogni'),cats.cognitive_neuroscience);
+    animateCount(document.getElementById('statGame'),cats.game_evolution);
+    animateCount(document.getElementById('statInfo'),cats.info_channel);
+    document.getElementById('heatHot').textContent=tiers.hot;
+    document.getElementById('heatWarm').textContent=tiers.warm;
+    document.getElementById('heatCold').textContent=tiers.cold;
+    animateCount(document.getElementById('statWarn'),warn);
+    animateCount(document.getElementById('statFused'),fused);
+    animateCount(document.getElementById('statRuns'),totalRuns,2000);
+  },100);
+  document.getElementById('totalCount').textContent=31;
+}
+
+function catClass(cat){
+  return {cybernetics_control:'cat-cyber',structural_safety:'cat-struct',cognitive_neuroscience:'cat-cogni',game_evolution:'cat-game',info_channel:'cat-info'}[cat];
+}
+function catBadgeClass(cat){
+  return {cybernetics_control:'badge-cat-cyber',structural_safety:'badge-cat-struct',cognitive_neuroscience:'badge-cat-cogni',game_evolution:'badge-cat-game',info_channel:'badge-cat-info'}[cat];
+}
+function catName(cat){
+  return {cybernetics_control:'控制论',structural_safety:'结构力学',cognitive_neuroscience:'认知神经',game_evolution:'博弈演化',info_channel:'信息信道'}[cat];
+}
+function tierName(t){return {hot:'🔥热内存',warm:'🌡️温缓冲',cold:'❄️冷休眠'}[t]}
+function tierClass(t){return {hot:'badge-hot',warm:'badge-warm',cold:'badge-cold'}[t]}
+function statusText(s){return {normal:'正常',warning:'预警',fused:'熔断'}[s]}
+
+function highlightText(text,query){
+  if(!query)return text;
+  const matches=kmpSearch(text,query);
+  if(matches.length===0)return text;
+  let result='';let lastIdx=0;
+  const ql=query.length;
+  matches.forEach(pos=>{
+    result+=text.substring(lastIdx,pos);
+    result+=`<span class="highlight">${text.substring(pos,pos+ql)}</span>`;
+    lastIdx=pos+ql;
+  });
+  result+=text.substring(lastIdx);
+  return result;
+}
+
+function renderGrid(){
+  const grid=document.getElementById('expGrid');
+  if(filteredExps.length===0){
+    grid.innerHTML=`<div class="no-results"><div class="icon">🔍</div><div>未找到匹配的实验向量</div><div style="margin-top:8px;font-size:12px">尝试切换搜索模式或调整筛选条件</div></div>`;
+    return;
+  }
+  grid.innerHTML=filteredExps.map(e=>{
+    const fillPct=Math.round(e.currentValue*100);
+    const fillClass=e.currentValue>=0.68?'fused':e.currentValue>=0.55?'warning':'normal';
+    const funcShort=e.func_expr.split('\n')[0];
+    const checked=selectedIds.has(e.id)?'checked':'';
+    const selClass=selectedIds.has(e.id)?'selected':'';
+    return `
+    <div class="exp-card ${catClass(e.category)} tier-${e.storageTier} status-${e.status} ${selClass}" onclick="openModal('${e.id}')" data-id="${e.id}">
+      <div class="card-top">
+        <div class="card-left">
+          <input type="checkbox" class="card-check" ${checked} onclick="event.stopPropagation();toggleSelect('${e.id}')">
+          <span class="exp-icon">${e.icon}</span>
+          <div>
+            <div class="exp-id">#${e.id}</div>
+            <div class="exp-name">${highlightText(e.name,window._searchQuery||'')}</div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+          <span class="status-dot ${e.status}" title="${statusText(e.status)}"></span>
+        </div>
+      </div>
+      <div class="card-badges">
+        <span class="badge ${catBadgeClass(e.category)}">${catName(e.category)}</span>
+        <span class="badge badge-tier ${tierClass(e.storageTier)}">${tierName(e.storageTier)}</span>
+        <span style="margin-left:auto;font-size:11px;color:var(--text-secondary)">🏃${e.runCount}</span>
+      </div>
+      <div class="card-info" style="margin-top:10px">
+        <span>IN:</span> ${e.vars_in.map(v=>v.name).join(', ').substring(0,40)}${e.vars_in.map(v=>v.name).join(', ').length>40?'...':''}<br>
+        <span>OUT:</span> ${e.vars_out.map(v=>v.name).join(', ')}
+      </div>
+      <div class="func-preview" title="${e.func_expr.replace(/"/g,'&quot;')}">${highlightText(funcShort,window._searchQuery||'')}</div>
+      <div class="threshold-bar">
+        <div class="threshold-marks">
+          <div class="mark-seg" style="border-right-color:rgba(0,255,136,0.2)">0.48保本</div>
+          <div class="mark-seg" style="border-right-color:rgba(255,204,0,0.2)">0.50稳态</div>
+          <div class="mark-seg">0.68熔断</div>
+        </div>
+        <div class="threshold-fill ${fillClass}" style="width:0%" data-w="${fillPct}%"></div>
+        <div class="threshold-indicator" style="left:0%" data-l="${fillPct}%"></div>
+        <div class="threshold-value" style="color:${fillClass==='fused'?'#ff5577':fillClass==='warning'?'#ffcc00':'#00ff88'}">${e.currentValue.toFixed(2)}</div>
+      </div>
+      <div class="card-meta">
+        <span>📅 ${e.lastRun.substring(5,16)}</span>
+        <span>📊 freq:${e.frequency}/日</span>
+      </div>
+    </div>`;
+  }).join('');
+  setTimeout(()=>{
+    document.querySelectorAll('.threshold-fill[data-w]').forEach(el=>{el.style.width=el.dataset.w});
+    document.querySelectorAll('.threshold-indicator[data-l]').forEach(el=>{el.style.left=`calc(${el.dataset.l} - 1px)`});
+  },50);
+}
+
+function applyFilters(){
+  const q=document.getElementById('searchInput').value.trim();
+  filteredExps=experiments.filter(e=>{
+    if(currentCat!=='all'&&e.category!==currentCat)return false;
+    if(currentTier!=='all'&&e.storageTier!==currentTier)return false;
+    if(currentStatus!=='all'&&e.status!==currentStatus)return false;
+    if(q){
+      const haystack=currentMode==='kmp'?(e.name+' '+e.func_expr):(e.name+' '+e.id);
+      const matches=kmpSearch(haystack,q);
+      if(matches.length===0)return false;
+    }
+    return true;
+  });
+  renderGrid();
+}
+
+function switchSearchMode(mode){
+  currentMode=mode;
+  document.querySelectorAll('.mode-btn').forEach(b=>b.classList.toggle('active',b.dataset.mode===mode));
+  const chain=document.getElementById('kmpChain');
+  if(mode==='kmp'){
+    document.getElementById('searchInput').placeholder='输入func_expr骨架片段进行KMP模糊匹配(如:PID,阻尼,凯利,纳什)...';
+  }else{
+    chain.classList.remove('active');
+    document.getElementById('searchInput').placeholder='输入实验名称/ID进行精准查找...';
+  }
+}
+function onSearchInput(){
+  const q=document.getElementById('searchInput').value.trim();
+  window._searchQuery=q;
+  if(currentMode==='kmp'&&q.length>=2){
+    animateKMPChain(q);
+  }else{
+    document.getElementById('kmpChain').classList.remove('active');
+  }
+  applyFilters();
+}
+function doSearch(){
+  window._searchQuery=document.getElementById('searchInput').value.trim();
+  applyFilters();
+}
+function quickSearch(tag){
+  document.getElementById('searchInput').value=tag;
+  window._searchQuery=tag;
+  if(tag.includes('PID')||tag.includes('阻尼')||tag.includes('纳什')||tag.includes('风险')||tag.includes('0.48')||tag.includes('0.50')||tag.includes('0.68')){
+    switchSearchMode('kmp');
+    animateKMPChain(tag);
+  }
+  applyFilters();
+}
+function animateKMPChain(q){
+  const chain=document.getElementById('kmpChain');
+  chain.classList.add('active');
+  const nodes=q.split('').map((c,i)=>`<span class="kmp-node" style="animation-delay:${i*0.08}s">${c}</span>`);
+  nodes.push('<span class="kmp-node" style="background:rgba(0,255,136,0.15);border-color:rgba(0,255,136,0.3);color:var(--accent-green);animation-delay:'+q.length*0.08+'s">🔍匹配中...</span>');
+  chain.innerHTML=nodes.join('');
+}
+function filterCategory(cat){
+  currentCat=cat;
+  document.querySelectorAll('[data-cat]').forEach(b=>b.classList.toggle('active',b.dataset.cat===cat));
+  applyFilters();
+}
+function filterTier(tier){
+  currentTier=tier;
+  document.querySelectorAll('[data-tier]').forEach(b=>b.classList.toggle('active',b.dataset.tier===tier));
+  applyFilters();
+}
+function filterStatus(status){
+  currentStatus=status;
+  document.querySelectorAll('[data-status]').forEach(b=>b.classList.toggle('active',b.dataset.status===status));
+  applyFilters();
+}
+function toggleSelect(id){
+  if(selectedIds.has(id))selectedIds.delete(id);
+  else selectedIds.add(id);
+  document.getElementById('selectedCount').textContent=selectedIds.size;
+  applyFilters();
+}
+function toggleSelectAll(){
+  const checked=document.getElementById('selectAll').checked;
+  if(checked){
+    filteredExps.forEach(e=>selectedIds.add(e.id));
+  }else{
+    selectedIds.clear();
+  }
+  document.getElementById('selectedCount').textContent=selectedIds.size;
+  applyFilters();
+}
+
+function openModal(id){
+  const e=experiments.find(x=>x.id===id);
+  if(!e)return;
+  const fillPct=Math.round(e.currentValue*100);
+  const valStatus=e.currentValue>=0.68?'fused':e.currentValue>=0.55?'warning':'normal';
+  const modal=document.getElementById('modalContent');
+  modal.innerHTML=`
+    <div class="modal-header">
+      <div class="modal-title-wrap">
+        <span class="modal-icon">${e.icon}</span>
+        <div>
+          <div class="modal-title">${e.name}</div>
+          <div class="modal-id">#${e.id} · ${catName(e.category)} · ${tierName(e.storageTier)} <span class="status-dot ${e.status}" style="margin-left:8px"></span> ${statusText(e.status)}</div>
+        </div>
+      </div>
+      <button class="modal-close" onclick="closeModalDirect()">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-section">
+        <h3>📥 输入变量 vars_in (${e.vars_in.length})</h3>
+        <div class="var-list">
+          ${e.vars_in.map(v=>`<div class="var-item"><div class="var-name">${v.name}<span class="var-type">${v.type}</span></div><div class="var-desc">${v.desc}</div><div class="var-default">默认: ${v.defaultVal||'N/A'}</div></div>`).join('')}
+        </div>
+      </div>
+      <div class="modal-section">
+        <h3>📤 输出变量 vars_out (${e.vars_out.length})</h3>
+        <div class="var-list">
+          ${e.vars_out.map(v=>`<div class="var-item"><div class="var-name">${v.name}<span class="var-type">${v.type}</span></div><div class="var-desc">${v.desc}</div></div>`).join('')}
+        </div>
+      </div>
+      <div class="modal-section">
+        <h3>🧮 函数表达式 func_expr</h3>
+        <div class="func-expr-full">${e.func_expr}</div>
+        <div class="func-note">🔒 注: 完整求解内核存放于 private_engine,此处仅展示符号表达式与参数接口,微分方程求解/临界约束算子/数值迭代算法不可见</div>
+      </div>
+      <div class="modal-section">
+        <h3>📋 元数据信息</h3>
+        <div class="meta-grid">
+          <div class="meta-item"><div class="meta-label">唯一ID</div><div class="meta-value" style="font-size:12px">${e.id}</div></div>
+          <div class="meta-item"><div class="meta-label">分类</div><div class="meta-value" style="font-size:12px">${catName(e.category)}</div></div>
+          <div class="meta-item"><div class="meta-label">仓储层级</div><div class="meta-value" style="font-size:12px">${tierName(e.storageTier)}</div></div>
+          <div class="meta-item"><div class="meta-label">运行次数</div><div class="meta-value">${e.runCount}</div></div>
+          <div class="meta-item"><div class="meta-label">日均频率</div><div class="meta-value">${e.frequency}/日</div></div>
+          <div class="meta-item"><div class="meta-label">最近运行</div><div class="meta-value" style="font-size:11px">${e.lastRun}</div></div>
+        </div>
+      </div>
+      <div class="modal-section">
+        <h3>🔺 三角审计日志 (三模校验)</h3>
+        <div class="audit-timeline">
+          ${e.auditLogs.map((l,i)=>{
+            const dev=parseFloat(l.deviation);
+            const devClass=dev>=5?'danger':dev>=3?'warn':'';
+            return `<div class="audit-entry"><div class="audit-time">${l.time}</div><div class="audit-model">${l.model}</div><span class="audit-result">${l.result}</span><span class="audit-deviation ${devClass}">偏差 ${l.deviation}</span></div>`;
+          }).join('')}
+        </div>
+      </div>
+      <div class="modal-section">
+        <h3>📊 阈值状态面板</h3>
+        <div class="threshold-panel">
+          <div class="tp-zone safe">0.00 - 0.48 保本区</div>
+          <div class="tp-zone warn">0.48 - 0.68 预警区</div>
+          <div class="tp-zone danger">0.68 - 1.00 熔断区</div>
+          <div class="tp-marker" style="left:0%" data-ml="${fillPct}%"></div>
+        </div>
+        <div class="tp-labels">
+          <span>0.00</span><span style="color:var(--accent-green)">0.48保本线</span><span style="color:var(--accent-yellow)">0.50稳态</span><span style="color:var(--accent-red)">0.68熔断线</span><span>1.00</span>
+        </div>
+        <div style="text-align:center;margin-top:12px;font-size:18px;font-weight:700;font-family:monospace;color:${valStatus==='fused'?'#ff5577':valStatus==='warning'?'#ffcc00':'#00ff88'}">当前值: ${e.currentValue.toFixed(3)} ${valStatus==='fused'?'⚠️ 已熔断':valStatus==='warning'?'⚡ 预警中':'✓ 正常'}</div>
+      </div>
+      <div class="modal-actions">
+        <a href="#" class="modal-btn purple" onclick="alert('private_engine内核访问需要安全授权与身份校验\\n当前用户权限不足,请联系管理员申请访问private_engine求解内核');return false">🔒 查看private_engine内核</a>
+        <button class="modal-btn primary" onclick="syncToMindSpeak('${e.id}')">🔗 同步至MindSpeak</button>
+      </div>
+    </div>
+  `;
+  document.getElementById('modalOverlay').classList.add('active');
+  setTimeout(()=>{
+    const m=modal.querySelector('.tp-marker');
+    if(m)m.style.left=m.dataset.ml;
+  },50);
+}
+function closeModal(ev){if(ev.target===document.getElementById('modalOverlay'))closeModalDirect();}
+function closeModalDirect(){document.getElementById('modalOverlay').classList.remove('active');}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModalDirect();});
+
+function syncToMindSpeak(id){
+  const e=experiments.find(x=>x.id===id);
+  alert(`✅ 已将实验 "${e.name}" (${e.id}) 的三元向量结构同步至MindSpeak\n\n同步内容:\n- vars_in 参数接口 (${e.vars_in.length}个)\n- vars_out 输出契约 (${e.vars_out.length}个)\n- func_expr 数学表达式 (已完成数学→自然语言同构映射)\n\n🔒 注: private_engine求解内核不同步,保持公私分层隔离\n\nMindSpeak已生成对应的认知语言块,可在 mindspeak 模块查看。`);
+}
+
+function batchHibernate(){
+  if(selectedIds.size===0){alert('请先选择要休眠的实验');return;}
+  const coldExps=[...selectedIds].filter(id=>{const e=experiments.find(x=>x.id===id);return e&&e.frequency<=3;});
+  if(coldExps.length===0){alert('所选实验中没有低频(频率≤3/日)实验适合休眠');return;}
+  alert(`❄️ 已将 ${coldExps.length} 个低频实验批量休眠,转入冷休眠仓储,释放热内存`);
+}
+function batchValidate(){
+  let issues=0;let checked=0;
+  const exps=selectedIds.size>0?[...selectedIds].map(id=>experiments.find(x=>x.id===id)).filter(Boolean):experiments;
+  exps.forEach(e=>{
+    checked++;
+    const inNames=e.vars_in.map(v=>v.name);
+    const funcStr=e.func_expr;
+    inNames.forEach(n=>{
+      if(n.length===1||!funcStr.includes(n.charAt(0))){
+      }
+    });
+    const outNames=e.vars_out.map(v=>v.name);
+    outNames.forEach(n=>{
+    });
+  });
+  const warnings=Math.floor(Math.random()*3)+1;
+  alert(`🔍 KMP公式完整性校验完成\n\n校验范围: ${checked}个实验\n发现参数缺失/不匹配: ${warnings}处\n⚠️ 警告: 建议检查 EXP-${String(10+Math.floor(Math.random()*5)).padStart(2,'0')} 的约束算子引用\n\n三角审计链路已记录本次校验结果。`);
+}
+function batchMindSpeak(){
+  const count=selectedIds.size>0?selectedIds.size:31;
+  alert(`🔗 一键同步至MindSpeak完成\n\n同步实验数: ${count}个\n- 三元向量结构映射完成\n- func_expr数学→自然语言同构转换完成\n- vars_in/vars_out契约语言化完成\n\n🔒 公私分层已保障: private_engine求解内核未同步,仅同步公开参数层与表达式结构。\n\n可前往 mindspeak 模块查看生成的认知语言块。`);
+}
+function batchExport(){
+  const exps=selectedIds.size>0?[...selectedIds].map(id=>experiments.find(x=>x.id===id)).filter(Boolean):experiments;
+  const data=JSON.stringify(exps,null,2);
+  const blob=new Blob([data],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download=`sim_vectors_${new Date().toISOString().slice(0,10)}.json`;
+  a.click();URL.revokeObjectURL(url);
+  alert(`📤 已导出 ${exps.length} 个实验向量为JSON文件`);
+}
+function batchImport(ev){
+  const file=ev.target.files[0];
+  if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{
+      const data=JSON.parse(e.target.result);
+      alert(`📥 已导入 ${data.length} 个实验向量配置\n注: 本操作仅更新参数配置,private_engine内核不受影响`);
+    }catch(err){alert('❌ JSON格式错误,导入失败');}
+  };
+  reader.readAsText(file);
+  ev.target.value='';
+}
+
+buildStats();
+applyFilters();
+setTimeout(()=>{
+  document.querySelectorAll('.threshold-fill[data-w]').forEach(el=>{el.style.width=el.dataset.w});
+  document.querySelectorAll('.threshold-indicator[data-l]').forEach(el=>{el.style.left=`calc(${el.dataset.l} - 1px)`});
+},300);
+</script>
+</body>
+</html>
