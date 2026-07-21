@@ -20,6 +20,7 @@
             --mb-orange: #fb923c;
             --mb-blue: #60a5fa;
             --mb-pink: #f472b6;
+            --mb-gray: #6b7280;
         }
         * { box-sizing: border-box; }
         body {
@@ -46,331 +47,244 @@
             pointer-events: none; z-index: 0;
             animation: starTwinkle 8s ease-in-out infinite alternate;
         }
-        @keyframes starTwinkle {
-            0% { opacity: 0.7; }
-            100% { opacity: 1; }
-        }
-        .mb-container {
-            max-width: 1500px;
-            margin: 0 auto;
-            padding: 24px;
-            position: relative; z-index: 1;
-        }
-        .top-nav {
-            display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 24px; flex-wrap: wrap; gap: 12px;
-        }
-        .breadcrumb {
-            font-size: 12px; color: rgba(255,255,255,0.4);
-            display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
-        }
-        .breadcrumb a { color: var(--mb-cyan); text-decoration: none; }
-        .breadcrumb a:hover { color: #67e8f9; }
-        .breadcrumb .sep { color: rgba(255,255,255,0.2); }
-        .back-home {
-            padding: 8px 16px; background: rgba(34,211,238,0.12);
-            border: 1px solid rgba(34,211,238,0.3); border-radius: 8px;
-            color: var(--mb-cyan); text-decoration: none; font-size: 12px;
-            font-weight: 600; transition: all 0.2s;
-        }
-        .back-home:hover {
-            background: rgba(34,211,238,0.2); border-color: rgba(34,211,238,0.5);
-            transform: translateX(-2px); box-shadow: 0 4px 16px rgba(34,211,238,0.15);
-        }
-        .header-banner {
-            background: linear-gradient(135deg, rgba(34,211,238,0.12), rgba(167,139,250,0.10), rgba(96,165,250,0.08));
-            border: 1.5px solid rgba(34,211,238,0.3);
-            border-radius: 18px;
-            padding: 28px 32px;
-            margin-bottom: 24px;
-            position: relative; overflow: hidden;
-            backdrop-filter: blur(12px);
-        }
-        .header-banner::before {
-            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
-            background: linear-gradient(90deg, transparent, var(--mb-cyan), var(--mb-purple), var(--mb-blue), transparent);
-        }
-        .header-banner::after {
-            content: ''; position: absolute; inset: 0;
-            background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.04) 50%, transparent 100%);
-            transform: translateX(-100%); animation: mbScan 6s linear infinite;
-            pointer-events: none;
-        }
-        @keyframes mbScan { to { transform: translateX(100%); } }
-        .header-top { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px; }
-        .header-title h1 {
-            font-size: 30px; font-weight: 800; margin: 0 0 10px;
-            background: linear-gradient(135deg, #e0f7fa, var(--mb-cyan), var(--mb-purple), var(--mb-blue));
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            background-clip: text; letter-spacing: -0.5px;
-        }
-        .header-sub { font-size: 13px; color: rgba(255,255,255,0.5); line-height: 1.7; max-width: 700px; }
-        .header-tags { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
-        .htag {
-            font-size: 10px; padding: 4px 10px; border-radius: 6px;
-            border: 1px solid; background: rgba(0,0,0,0.25); font-weight: 600;
-        }
-        .htag.core { color: var(--mb-cyan); border-color: rgba(34,211,238,0.4); }
-        .htag.filter { color: var(--mb-purple); border-color: rgba(167,139,250,0.4); }
-        .htag.storage { color: var(--mb-emerald); border-color: rgba(16,185,129,0.4); }
-        .htag.retrieval { color: var(--mb-gold); border-color: rgba(251,191,36,0.4); }
-        .version-pill {
-            display: inline-flex; align-items: center; gap: 8px;
-            padding: 8px 16px; background: rgba(34,211,238,0.1);
-            border: 1px solid rgba(34,211,238,0.25); border-radius: 20px;
-            color: var(--mb-cyan); font-size: 11px; font-weight: 700;
-            letter-spacing: 0.5px;
-        }
-        .version-pill .dot { width: 6px; height: 6px; background: var(--mb-cyan); border-radius: 50%; animation: pulse 2s infinite; }
+        @keyframes starTwinkle { 0%{opacity:.7} 100%{opacity:1} }
         @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
-
-        .lego-grid {
-            display: grid;
-            grid-template-columns: repeat(12, 1fr);
-            gap: 16px;
-            margin-bottom: 20px;
+        @keyframes mbScan { to { transform: translateX(100%); } }
+        @keyframes layerGlow {
+            0%,100% { box-shadow: 0 0 20px transparent; }
+            50% { box-shadow: 0 0 30px var(--glow-color, rgba(34,211,238,0.3)); }
         }
+        @keyframes countUp { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:translateY(0)} }
+
+        .mb-container { max-width:1500px; margin:0 auto; padding:24px; position:relative; z-index:1; }
+        .top-nav { display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; flex-wrap:wrap; gap:12px; }
+        .breadcrumb { font-size:12px; color:rgba(255,255,255,0.4); display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
+        .breadcrumb a { color:var(--mb-cyan); text-decoration:none; }
+        .breadcrumb a:hover { color:#67e8f9; }
+        .breadcrumb .sep { color:rgba(255,255,255,0.2); }
+        .back-home { padding:8px 16px; background:rgba(34,211,238,0.12); border:1px solid rgba(34,211,238,0.3); border-radius:8px; color:var(--mb-cyan); text-decoration:none; font-size:12px; font-weight:600; transition:all 0.2s; }
+        .back-home:hover { background:rgba(34,211,238,0.2); border-color:rgba(34,211,238,0.5); transform:translateX(-2px); box-shadow:0 4px 16px rgba(34,211,238,0.15); }
+
+        .header-banner {
+            background:linear-gradient(135deg, rgba(34,211,238,0.12), rgba(167,139,250,0.10), rgba(96,165,250,0.08));
+            border:1.5px solid rgba(34,211,238,0.3); border-radius:18px; padding:28px 32px; margin-bottom:24px;
+            position:relative; overflow:hidden; backdrop-filter:blur(12px);
+        }
+        .header-banner::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:linear-gradient(90deg,transparent,var(--mb-cyan),var(--mb-purple),var(--mb-blue),transparent); }
+        .header-banner::after { content:''; position:absolute; inset:0; background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,0.04) 50%,transparent 100%); transform:translateX(-100%); animation:mbScan 6s linear infinite; pointer-events:none; }
+        .header-top { display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:16px; }
+        .header-title h1 { font-size:30px; font-weight:800; margin:0 0 10px; background:linear-gradient(135deg,#e0f7fa,var(--mb-cyan),var(--mb-purple),var(--mb-blue)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; letter-spacing:-0.5px; }
+        .header-sub { font-size:13px; color:rgba(255,255,255,0.5); line-height:1.7; max-width:700px; }
+        .header-tags { display:flex; gap:8px; margin-top:14px; flex-wrap:wrap; }
+        .htag { font-size:10px; padding:4px 10px; border-radius:6px; border:1px solid; background:rgba(0,0,0,0.25); font-weight:600; }
+        .htag.core { color:var(--mb-cyan); border-color:rgba(34,211,238,0.4); }
+        .htag.filter { color:var(--mb-purple); border-color:rgba(167,139,250,0.4); }
+        .htag.storage { color:var(--mb-emerald); border-color:rgba(16,185,129,0.4); }
+        .htag.retrieval { color:var(--mb-gold); border-color:rgba(251,191,36,0.4); }
+        .version-pill { display:inline-flex; align-items:center; gap:8px; padding:8px 16px; background:rgba(34,211,238,0.1); border:1px solid rgba(34,211,238,0.25); border-radius:20px; color:var(--mb-cyan); font-size:11px; font-weight:700; letter-spacing:0.5px; }
+        .version-pill .dot { width:6px; height:6px; background:var(--mb-cyan); border-radius:50%; animation:pulse 2s infinite; }
+
+        .lego-grid { display:grid; grid-template-columns:repeat(12,1fr); gap:16px; margin-bottom:20px; }
         .lego-block {
-            background: var(--mb-card);
-            border: 1.5px solid var(--mb-border);
-            border-radius: 14px;
-            padding: 22px;
-            backdrop-filter: blur(8px);
-            position: relative;
-            transition: all 0.25s;
-            overflow: hidden;
+            background:var(--mb-card); border:1.5px solid var(--mb-border); border-radius:14px; padding:22px;
+            backdrop-filter:blur(8px); position:relative; transition:all 0.25s; overflow:hidden;
         }
-        .lego-block::before {
-            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
-        }
-        .lego-block:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 12px 40px rgba(0,0,0,0.35);
-        }
-        .lego-block.w-12 { grid-column: span 12; }
-        .lego-block.w-8 { grid-column: span 8; }
-        .lego-block.w-6 { grid-column: span 6; }
-        .lego-block.w-4 { grid-column: span 4; }
-        .lego-block.w-3 { grid-column: span 3; }
-        @media (max-width: 1100px) {
-            .lego-block.w-8, .lego-block.w-6, .lego-block.w-4, .lego-block.w-3 { grid-column: span 12; }
-        }
-        .block-title {
-            font-size: 14px; font-weight: 700; margin: 0 0 16px;
-            display: flex; align-items: center; gap: 10px;
-            padding-bottom: 12px;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-        }
-        .block-title .bicon { font-size: 20px; }
+        .lego-block::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; }
+        .lego-block:hover { transform:translateY(-3px); box-shadow:0 12px 40px rgba(0,0,0,0.35); }
+        .lego-block.w-12 { grid-column:span 12; }
+        .lego-block.w-8 { grid-column:span 8; }
+        .lego-block.w-6 { grid-column:span 6; }
+        .lego-block.w-4 { grid-column:span 4; }
+        .lego-block.w-3 { grid-column:span 3; }
+        @media (max-width:1100px) { .lego-block.w-8,.lego-block.w-6,.lego-block.w-4,.lego-block.w-3 { grid-column:span 12; } }
+        .block-title { font-size:14px; font-weight:700; margin:0 0 16px; display:flex; align-items:center; gap:10px; padding-bottom:12px; border-bottom:1px solid rgba(255,255,255,0.05); }
+        .block-title .bicon { font-size:20px; }
 
-        .lego-block.input-block::before { background: linear-gradient(90deg, var(--mb-cyan), var(--mb-blue)); }
-        .lego-block.input-block .block-title { color: var(--mb-cyan); }
-        .lego-block.stats-block::before { background: linear-gradient(90deg, var(--mb-gold), var(--mb-orange)); }
-        .lego-block.stats-block .block-title { color: var(--mb-gold); }
-        .lego-block.funnel-block::before { background: linear-gradient(90deg, var(--mb-purple), var(--mb-pink), var(--mb-cyan), var(--mb-emerald)); }
-        .lego-block.funnel-block .block-title { color: var(--mb-purple); }
+        .lego-block.input-block::before { background:linear-gradient(90deg,var(--mb-cyan),var(--mb-blue)); }
+        .lego-block.input-block .block-title { color:var(--mb-cyan); }
+        .lego-block.stats-block::before { background:linear-gradient(90deg,var(--mb-gold),var(--mb-orange)); }
+        .lego-block.stats-block .block-title { color:var(--mb-gold); }
+        .lego-block.funnel-block::before { background:linear-gradient(90deg,var(--mb-purple),var(--mb-pink),var(--mb-cyan),var(--mb-emerald)); }
+        .lego-block.funnel-block .block-title { color:var(--mb-purple); }
+        .lego-block.log-block::before { background:linear-gradient(90deg,var(--mb-blue),var(--mb-purple)); }
+        .lego-block.log-block .block-title { color:var(--mb-blue); }
+        .lego-block.result-block::before { background:linear-gradient(90deg,var(--mb-emerald),var(--mb-gold)); }
+        .lego-block.result-block .block-title { color:var(--mb-emerald); }
 
-        .input-tabs { display: flex; gap: 8px; margin-bottom: 16px; }
-        .input-tab {
-            padding: 8px 18px; border-radius: 10px; cursor: pointer;
-            font-size: 12px; font-weight: 600; border: 1px solid var(--mb-border);
-            background: var(--mb-card); color: rgba(255,255,255,0.5);
-            transition: all 0.2s;
+        .input-tabs { display:flex; gap:8px; margin-bottom:16px; }
+        .input-tab { padding:8px 18px; border-radius:10px; cursor:pointer; font-size:12px; font-weight:600; border:1px solid var(--mb-border); background:var(--mb-card); color:rgba(255,255,255,0.5); transition:all 0.2s; }
+        .input-tab:hover { border-color:rgba(255,255,255,0.15); color:#fff; }
+        .input-tab.active { background:rgba(34,211,238,0.12); border-color:rgba(34,211,238,0.35); color:var(--mb-cyan); }
+        .input-area { display:none; }
+        .input-area.active { display:block; }
+        .single-input-row { display:flex; gap:10px; margin-bottom:12px; }
+        .single-input-row input { flex:1; padding:12px 16px; background:rgba(0,0,0,0.25); border:1px solid var(--mb-border); border-radius:10px; color:#e2e8f0; font-size:13px; outline:none; font-family:inherit; transition:border-color 0.2s; }
+        .single-input-row input:focus { border-color:rgba(34,211,238,0.4); }
+        .single-input-row input::placeholder { color:rgba(255,255,255,0.25); }
+        .btn-primary { padding:12px 24px; background:linear-gradient(135deg,rgba(34,211,238,0.2),rgba(96,165,250,0.15)); border:1px solid rgba(34,211,238,0.4); border-radius:10px; color:var(--mb-cyan); font-size:12px; font-weight:700; cursor:pointer; transition:all 0.2s; white-space:nowrap; }
+        .btn-primary:hover { background:linear-gradient(135deg,rgba(34,211,238,0.3),rgba(96,165,250,0.25)); border-color:rgba(34,211,238,0.6); box-shadow:0 4px 20px rgba(34,211,238,0.2); }
+        .btn-primary:disabled { opacity:0.5; cursor:not-allowed; transform:none !important; }
+        .btn-demo {
+            padding:12px 20px; background:linear-gradient(135deg,rgba(251,191,36,0.18),rgba(251,146,60,0.14));
+            border:1px solid rgba(251,191,36,0.4); border-radius:10px; color:var(--mb-gold);
+            font-size:12px; font-weight:700; cursor:pointer; transition:all 0.2s; white-space:nowrap;
+            margin-left:8px;
         }
-        .input-tab:hover { border-color: rgba(255,255,255,0.15); color: #fff; }
-        .input-tab.active {
-            background: rgba(34,211,238,0.12); border-color: rgba(34,211,238,0.35);
-            color: var(--mb-cyan);
-        }
-        .input-area { display: none; }
-        .input-area.active { display: block; }
-        .single-input-row {
-            display: flex; gap: 10px; margin-bottom: 12px;
-        }
-        .single-input-row input {
-            flex: 1; padding: 12px 16px; background: rgba(0,0,0,0.25);
-            border: 1px solid var(--mb-border); border-radius: 10px;
-            color: #e2e8f0; font-size: 13px; outline: none;
-            font-family: inherit;
-            transition: border-color 0.2s;
-        }
-        .single-input-row input:focus { border-color: rgba(34,211,238,0.4); }
-        .single-input-row input::placeholder { color: rgba(255,255,255,0.25); }
-        .btn-primary {
-            padding: 12px 24px; background: linear-gradient(135deg, rgba(34,211,238,0.2), rgba(96,165,250,0.15));
-            border: 1px solid rgba(34,211,238,0.4); border-radius: 10px;
-            color: var(--mb-cyan); font-size: 12px; font-weight: 700;
-            cursor: pointer; transition: all 0.2s; white-space: nowrap;
-        }
-        .btn-primary:hover {
-            background: linear-gradient(135deg, rgba(34,211,238,0.3), rgba(96,165,250,0.25));
-            border-color: rgba(34,211,238,0.6);
-            box-shadow: 0 4px 20px rgba(34,211,238,0.2);
-        }
-        textarea.multi-input {
-            width: 100%; min-height: 180px; padding: 14px 16px;
-            background: rgba(0,0,0,0.25); border: 1px solid var(--mb-border);
-            border-radius: 10px; color: #e2e8f0; font-size: 13px;
-            outline: none; font-family: inherit; resize: vertical;
-            line-height: 1.7; transition: border-color 0.2s;
-        }
-        textarea.multi-input:focus { border-color: rgba(34,211,238,0.4); }
-        textarea.multi-input::placeholder { color: rgba(255,255,255,0.25); line-height: 1.7; }
-        .import-row { display: flex; gap: 10px; margin-top: 12px; align-items: center; flex-wrap: wrap; }
-        .btn-secondary {
-            padding: 10px 18px; background: rgba(167,139,250,0.1);
-            border: 1px solid rgba(167,139,250,0.3); border-radius: 8px;
-            color: var(--mb-purple); font-size: 11px; font-weight: 600;
-            cursor: pointer; transition: all 0.2s;
-        }
-        .btn-secondary:hover {
-            background: rgba(167,139,250,0.2); border-color: rgba(167,139,250,0.5);
-        }
-        .hint-text { font-size: 11px; color: rgba(255,255,255,0.3); }
+        .btn-demo:hover { background:linear-gradient(135deg,rgba(251,191,36,0.28),rgba(251,146,60,0.22)); border-color:rgba(251,191,36,0.6); box-shadow:0 4px 20px rgba(251,191,36,0.2); }
+        textarea.multi-input { width:100%; min-height:180px; padding:14px 16px; background:rgba(0,0,0,0.25); border:1px solid var(--mb-border); border-radius:10px; color:#e2e8f0; font-size:13px; outline:none; font-family:inherit; resize:vertical; line-height:1.7; transition:border-color 0.2s; }
+        textarea.multi-input:focus { border-color:rgba(34,211,238,0.4); }
+        textarea.multi-input::placeholder { color:rgba(255,255,255,0.25); line-height:1.7; }
+        .import-row { display:flex; gap:10px; margin-top:12px; align-items:center; flex-wrap:wrap; }
+        .btn-secondary { padding:10px 18px; background:rgba(167,139,250,0.1); border:1px solid rgba(167,139,250,0.3); border-radius:8px; color:var(--mb-purple); font-size:11px; font-weight:600; cursor:pointer; transition:all 0.2s; }
+        .btn-secondary:hover { background:rgba(167,139,250,0.2); border-color:rgba(167,139,250,0.5); }
+        .hint-text { font-size:11px; color:rgba(255,255,255,0.3); }
 
-        .stats-grid {
-            display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
-        }
-        .stat-card {
-            background: rgba(0,0,0,0.2); border: 1px solid var(--mb-border);
-            border-radius: 10px; padding: 16px; text-align: center;
-        }
-        .stat-value {
-            font-size: 32px; font-weight: 900; font-family: 'SF Mono', ui-monospace, monospace;
-            margin-bottom: 6px;
-        }
-        .stat-label { font-size: 10px; color: rgba(255,255,255,0.35); text-transform: uppercase; letter-spacing: 1px; }
-        .stat-card.total .stat-value { color: var(--mb-cyan); }
-        .stat-card.noise .stat-value { color: var(--mb-orange); }
-        .stat-card.valid .stat-value { color: var(--mb-emerald); }
-        .stat-bar {
-            height: 4px; background: rgba(255,255,255,0.05); border-radius: 2px;
-            margin-top: 10px; overflow: hidden;
-        }
-        .stat-bar-fill { height: 100%; border-radius: 2px; transition: width 0.5s ease; }
-        .stat-card.total .stat-bar-fill { background: linear-gradient(90deg, var(--mb-cyan), var(--mb-blue)); width: 0%; }
-        .stat-card.noise .stat-bar-fill { background: linear-gradient(90deg, var(--mb-orange), var(--mb-red)); width: 0%; }
-        .stat-card.valid .stat-bar-fill { background: linear-gradient(90deg, var(--mb-emerald), var(--mb-gold)); width: 0%; }
+        .stats-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+        .stat-card { background:rgba(0,0,0,0.2); border:1px solid var(--mb-border); border-radius:10px; padding:16px; text-align:center; }
+        .stat-value { font-size:28px; font-weight:900; font-family:'SF Mono',ui-monospace,monospace; margin-bottom:6px; }
+        .stat-label { font-size:10px; color:rgba(255,255,255,0.35); text-transform:uppercase; letter-spacing:1px; }
+        .stat-card.total .stat-value { color:var(--mb-cyan); }
+        .stat-card.noise .stat-value { color:var(--mb-orange); }
+        .stat-card.valid .stat-value { color:var(--mb-emerald); }
+        .stat-card.discard .stat-value { color:var(--mb-gray); }
+        .stat-card.buffer .stat-value { color:var(--mb-gold); }
+        .stat-card.longterm .stat-value { color:var(--mb-emerald); }
+        .stat-bar { height:4px; background:rgba(255,255,255,0.05); border-radius:2px; margin-top:10px; overflow:hidden; }
+        .stat-bar-fill { height:100%; border-radius:2px; transition:width 0.5s ease; }
+        .stat-card.total .stat-bar-fill { background:linear-gradient(90deg,var(--mb-cyan),var(--mb-blue)); width:0%; }
+        .stat-card.noise .stat-bar-fill { background:linear-gradient(90deg,var(--mb-orange),var(--mb-red)); width:0%; }
+        .stat-card.valid .stat-bar-fill { background:linear-gradient(90deg,var(--mb-emerald),var(--mb-gold)); width:0%; }
 
-        .funnel-container {
-            display: flex; flex-direction: column; align-items: center; gap: 0;
-            padding: 10px 0;
-        }
+        .funnel-stage { position:relative; }
+        #funnelCanvas { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; z-index:2; }
+        .funnel-container { display:flex; flex-direction:column; align-items:center; gap:0; padding:10px 0; position:relative; z-index:1; }
         .funnel-layer {
-            position: relative;
-            display: flex; align-items: center; justify-content: center;
-            padding: 22px 20px;
-            margin: 4px 0;
-            border-radius: 10px;
-            text-align: center;
-            transition: all 0.3s;
-            cursor: default;
+            position:relative; display:flex; align-items:center; justify-content:space-between;
+            padding:18px 22px; margin:4px 0; border-radius:10px; transition:all 0.4s; cursor:default;
+            min-height:70px;
         }
-        .funnel-layer::before {
-            content: ''; position: absolute; inset: 0; border-radius: 10px;
-            opacity: 0.12;
+        .funnel-layer::before { content:''; position:absolute; inset:0; border-radius:10px; opacity:0.10; transition:opacity 0.3s; }
+        .layer-left { display:flex; align-items:center; }
+        .funnel-layer .layer-num { font-family:'SF Mono',monospace; font-size:14px; font-weight:800; margin-right:14px; opacity:0.7; min-width:28px; }
+        .funnel-layer .layer-icon { font-size:24px; margin-right:14px; }
+        .funnel-layer .layer-info { text-align:left; flex:1; }
+        .funnel-layer .layer-name { font-size:14px; font-weight:700; margin-bottom:3px; transition:all 0.3s; }
+        .funnel-layer .layer-desc { font-size:10px; opacity:0.55; transition:all 0.3s; }
+        .layer-status {
+            font-size:10px; font-weight:700; padding:4px 10px; border-radius:6px;
+            background:rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.1);
+            min-width:72px; text-align:center; transition:all 0.3s;
         }
-        .funnel-layer:hover { transform: scale(1.02); }
-        .funnel-layer .layer-num {
-            font-family: 'SF Mono', monospace; font-size: 14px; font-weight: 800;
-            margin-right: 14px; opacity: 0.7;
-        }
-        .funnel-layer .layer-icon { font-size: 24px; margin-right: 14px; }
-        .funnel-layer .layer-info { text-align: left; }
-        .funnel-layer .layer-name { font-size: 14px; font-weight: 700; margin-bottom: 3px; }
-        .funnel-layer .layer-desc { font-size: 10px; opacity: 0.55; }
+        .layer-count { font-family:'SF Mono',monospace; font-size:18px; font-weight:900; margin-left:12px; min-width:44px; text-align:right; opacity:0.3; transition:all 0.3s; }
+        .funnel-layer.active { animation:layerGlow 1.2s ease-in-out infinite; }
+        .funnel-layer.done::before { opacity:0.20; }
+        .funnel-layer.done .layer-count { opacity:1; }
 
-        .funnel-layer.l1 {
-            width: 100%;
-            background: rgba(248,113,113,0.06);
-            border: 1.5px solid rgba(248,113,113,0.25);
-        }
-        .funnel-layer.l1::before { background: var(--mb-red); }
-        .funnel-layer.l1 .layer-name { color: #fca5a5; }
-        .funnel-layer.l1 .layer-num { color: var(--mb-red); }
+        .funnel-layer.l1 { width:100%; background:rgba(248,113,113,0.06); border:1.5px solid rgba(248,113,113,0.25); --glow-color:rgba(248,113,113,0.35); }
+        .funnel-layer.l1::before { background:var(--mb-red); }
+        .funnel-layer.l1 .layer-name { color:#fca5a5; }
+        .funnel-layer.l1 .layer-num { color:var(--mb-red); }
+        .funnel-layer.l1.active { border-color:rgba(248,113,113,0.6); }
+        .funnel-layer.l1.done .layer-status { background:rgba(248,113,113,0.15); border-color:rgba(248,113,113,0.4); color:#fca5a5; }
 
-        .funnel-layer.l2 {
-            width: 88%;
-            background: rgba(251,146,60,0.06);
-            border: 1.5px solid rgba(251,146,60,0.25);
-        }
-        .funnel-layer.l2::before { background: var(--mb-orange); }
-        .funnel-layer.l2 .layer-name { color: #fdba74; }
-        .funnel-layer.l2 .layer-num { color: var(--mb-orange); }
+        .funnel-layer.l2 { width:88%; background:rgba(251,146,60,0.06); border:1.5px solid rgba(251,146,60,0.25); --glow-color:rgba(251,146,60,0.35); }
+        .funnel-layer.l2::before { background:var(--mb-orange); }
+        .funnel-layer.l2 .layer-name { color:#fdba74; }
+        .funnel-layer.l2 .layer-num { color:var(--mb-orange); }
+        .funnel-layer.l2.active { border-color:rgba(251,146,60,0.6); }
+        .funnel-layer.l2.done .layer-status { background:rgba(251,146,60,0.15); border-color:rgba(251,146,60,0.4); color:#fdba74; }
 
-        .funnel-layer.l3 {
-            width: 72%;
-            background: rgba(167,139,250,0.06);
-            border: 1.5px solid rgba(167,139,250,0.25);
-        }
-        .funnel-layer.l3::before { background: var(--mb-purple); }
-        .funnel-layer.l3 .layer-name { color: #c4b5fd; }
-        .funnel-layer.l3 .layer-num { color: var(--mb-purple); }
+        .funnel-layer.l3 { width:72%; background:rgba(167,139,250,0.06); border:1.5px solid rgba(167,139,250,0.25); --glow-color:rgba(167,139,250,0.35); }
+        .funnel-layer.l3::before { background:var(--mb-purple); }
+        .funnel-layer.l3 .layer-name { color:#c4b5fd; }
+        .funnel-layer.l3 .layer-num { color:var(--mb-purple); }
+        .funnel-layer.l3.active { border-color:rgba(167,139,250,0.6); }
+        .funnel-layer.l3.done .layer-status { background:rgba(167,139,250,0.15); border-color:rgba(167,139,250,0.4); color:#c4b5fd; }
 
-        .funnel-layer.l4 {
-            width: 55%;
-            background: rgba(16,185,129,0.06);
-            border: 1.5px solid rgba(16,185,129,0.25);
-        }
-        .funnel-layer.l4::before { background: var(--mb-emerald); }
-        .funnel-layer.l4 .layer-name { color: #6ee7b7; }
-        .funnel-layer.l4 .layer-num { color: var(--mb-emerald); }
+        .funnel-layer.l4 { width:55%; background:rgba(16,185,129,0.06); border:1.5px solid rgba(16,185,129,0.25); --glow-color:rgba(16,185,129,0.35); }
+        .funnel-layer.l4::before { background:var(--mb-emerald); }
+        .funnel-layer.l4 .layer-name { color:#6ee7b7; }
+        .funnel-layer.l4 .layer-num { color:var(--mb-emerald); }
+        .funnel-layer.l4.active { border-color:rgba(16,185,129,0.6); }
+        .funnel-layer.l4.done .layer-status { background:rgba(16,185,129,0.15); border-color:rgba(16,185,129,0.4); color:#6ee7b7; }
 
-        .funnel-arrow {
-            font-size: 18px; color: rgba(255,255,255,0.15);
-            margin: 2px 0;
-        }
+        .funnel-arrow { font-size:18px; color:rgba(255,255,255,0.15); margin:2px 0; z-index:1; position:relative; }
         .funnel-output {
-            margin-top: 12px;
-            padding: 14px 28px;
-            background: linear-gradient(135deg, rgba(16,185,129,0.1), rgba(34,211,238,0.08));
-            border: 1.5px solid rgba(16,185,129,0.3);
-            border-radius: 10px;
-            text-align: center;
-            font-size: 12px; font-weight: 600; color: #6ee7b7;
+            margin-top:12px; padding:14px 28px; background:linear-gradient(135deg,rgba(16,185,129,0.1),rgba(34,211,238,0.08));
+            border:1.5px solid rgba(16,185,129,0.3); border-radius:10px; text-align:center;
+            font-size:12px; font-weight:600; color:#6ee7b7; z-index:1; position:relative; transition:all 0.3s;
         }
-        .funnel-output .out-icon { font-size: 18px; margin-right: 8px; }
+        .funnel-output.done { background:linear-gradient(135deg,rgba(16,185,129,0.2),rgba(34,211,238,0.15)); border-color:rgba(16,185,129,0.6); box-shadow:0 0 25px rgba(16,185,129,0.2); }
+        .funnel-output .out-icon { font-size:18px; margin-right:8px; }
 
-        .module-nav {
-            display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px;
-            margin-top: 8px;
-        }
-        .module-card {
-            background: rgba(0,0,0,0.2); border: 1px solid var(--mb-border);
-            border-radius: 10px; padding: 14px 12px;
-            text-align: center; text-decoration: none;
-            transition: all 0.2s; cursor: pointer;
-        }
-        .module-card:hover { transform: translateY(-2px); }
-        .module-card .m-icon { font-size: 24px; margin-bottom: 6px; display: block; }
-        .module-card .m-name { font-size: 10px; font-weight: 600; color: rgba(255,255,255,0.5); }
-        .module-card.m-filter { border-color: rgba(248,113,113,0.2); }
-        .module-card.m-filter:hover { border-color: rgba(248,113,113,0.4); box-shadow: 0 6px 20px rgba(248,113,113,0.1); }
-        .module-card.m-filter .m-name { color: #fca5a5; }
-        .module-card.m-storage { border-color: rgba(251,146,60,0.2); }
-        .module-card.m-storage:hover { border-color: rgba(251,146,60,0.4); box-shadow: 0 6px 20px rgba(251,146,60,0.1); }
-        .module-card.m-storage .m-name { color: #fdba74; }
-        .module-card.m-music { border-color: rgba(244,114,182,0.2); }
-        .module-card.m-music:hover { border-color: rgba(244,114,182,0.4); box-shadow: 0 6px 20px rgba(244,114,182,0.1); }
-        .module-card.m-music .m-name { color: #f9a8d4; }
-        .module-card.m-kmp { border-color: rgba(251,191,36,0.2); }
-        .module-card.m-kmp:hover { border-color: rgba(251,191,36,0.4); box-shadow: 0 6px 20px rgba(251,191,36,0.1); }
-        .module-card.m-kmp .m-name { color: #fde68a; }
-        .module-card.m-manual { border-color: rgba(96,165,250,0.2); }
-        .module-card.m-manual:hover { border-color: rgba(96,165,250,0.4); box-shadow: 0 6px 20px rgba(96,165,250,0.1); }
-        .module-card.m-manual .m-name { color: #93c5fd; }
-        .module-status {
-            display: inline-block; font-size: 8px; margin-top: 4px;
-            padding: 1px 5px; border-radius: 3px; font-weight: 700;
-        }
-        .ms-dev { background: rgba(248,113,113,0.12); color: var(--mb-red); }
+        .tag-pill { display:inline-block; font-size:9px; padding:2px 7px; border-radius:4px; font-weight:700; margin-left:6px; }
+        .tag-rap { background:rgba(244,114,182,0.15); color:var(--mb-pink); border:1px solid rgba(244,114,182,0.3); }
+        .tag-blue { background:rgba(96,165,250,0.15); color:var(--mb-blue); border:1px solid rgba(96,165,250,0.3); }
+        .tag-trash { background:rgba(107,114,128,0.15); color:var(--mb-gray); border:1px solid rgba(107,114,128,0.3); }
 
-        .notice-bar {
-            background: rgba(34,211,238,0.04); border: 1px solid rgba(34,211,238,0.15);
-            border-radius: 10px; padding: 14px 18px; font-size: 11px;
-            color: rgba(255,255,255,0.45); line-height: 1.8;
+        .result-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:16px; }
+        .result-box {
+            background:rgba(0,0,0,0.25); border:1px solid var(--mb-border); border-radius:10px; padding:14px; min-height:80px;
+            transition:all 0.3s;
         }
-        .notice-bar strong { color: var(--mb-cyan); }
+        .result-box.active { border-color:rgba(255,255,255,0.15); }
+        .result-box.trash { border-color:rgba(107,114,128,0.2); }
+        .result-box.trash.active { border-color:rgba(107,114,128,0.4); box-shadow:0 0 20px rgba(107,114,128,0.1); }
+        .result-box.buffer { border-color:rgba(251,191,36,0.2); }
+        .result-box.buffer.active { border-color:rgba(251,191,36,0.4); box-shadow:0 0 20px rgba(251,191,36,0.1); }
+        .result-box.longterm { border-color:rgba(16,185,129,0.2); }
+        .result-box.longterm.active { border-color:rgba(16,185,129,0.4); box-shadow:0 0 20px rgba(16,185,129,0.1); }
+        .result-title { font-size:11px; font-weight:700; margin-bottom:8px; display:flex; align-items:center; justify-content:space-between; }
+        .result-count { font-family:'SF Mono',monospace; font-size:16px; font-weight:900; }
+        .result-box.trash .result-title { color:var(--mb-gray); }
+        .result-box.buffer .result-title { color:var(--mb-gold); }
+        .result-box.longterm .result-title { color:var(--mb-emerald); }
+        .result-list { max-height:140px; overflow-y:auto; font-size:10px; line-height:1.7; color:rgba(255,255,255,0.5); }
+        .result-list::-webkit-scrollbar { width:3px; }
+        .result-list::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.1); border-radius:2px; }
+        .result-item { padding:3px 6px; margin-bottom:2px; border-radius:4px; background:rgba(255,255,255,0.02); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; animation:countUp 0.3s ease; }
+
+        .log-container { max-height:260px; overflow-y:auto; font-family:'SF Mono',ui-monospace,monospace; font-size:11px; line-height:1.9; padding:4px; }
+        .log-container::-webkit-scrollbar { width:4px; }
+        .log-container::-webkit-scrollbar-thumb { background:rgba(34,211,238,0.2); border-radius:2px; }
+        .log-entry { padding:2px 0; animation:countUp 0.25s ease; }
+        .log-time { color:rgba(255,255,255,0.25); margin-right:8px; }
+        .log-l1 { color:#fca5a5; }
+        .log-l2 { color:#fdba74; }
+        .log-l3 { color:#c4b5fd; }
+        .log-l4 { color:#6ee7b7; }
+        .log-ok { color:var(--mb-emerald); }
+        .log-warn { color:var(--mb-gold); }
+        .log-err { color:var(--mb-gray); }
+        .log-info { color:var(--mb-cyan); }
+        .log-arrow { color:rgba(255,255,255,0.2); margin:0 6px; }
+
+        .module-nav { display:grid; grid-template-columns:repeat(5,1fr); gap:10px; margin-top:8px; }
+        .module-card { background:rgba(0,0,0,0.2); border:1px solid var(--mb-border); border-radius:10px; padding:14px 12px; text-align:center; text-decoration:none; transition:all 0.2s; cursor:pointer; }
+        .module-card:hover { transform:translateY(-2px); }
+        .module-card .m-icon { font-size:24px; margin-bottom:6px; display:block; }
+        .module-card .m-name { font-size:10px; font-weight:600; color:rgba(255,255,255,0.5); }
+        .module-card.m-filter { border-color:rgba(248,113,113,0.2); }
+        .module-card.m-filter:hover { border-color:rgba(248,113,113,0.4); box-shadow:0 6px 20px rgba(248,113,113,0.1); }
+        .module-card.m-filter .m-name { color:#fca5a5; }
+        .module-card.m-storage { border-color:rgba(251,146,60,0.2); }
+        .module-card.m-storage:hover { border-color:rgba(251,146,60,0.4); box-shadow:0 6px 20px rgba(251,146,60,0.1); }
+        .module-card.m-storage .m-name { color:#fdba74; }
+        .module-card.m-music { border-color:rgba(244,114,182,0.2); }
+        .module-card.m-music:hover { border-color:rgba(244,114,182,0.4); box-shadow:0 6px 20px rgba(244,114,182,0.1); }
+        .module-card.m-music .m-name { color:#f9a8d4; }
+        .module-card.m-kmp { border-color:rgba(251,191,36,0.2); }
+        .module-card.m-kmp:hover { border-color:rgba(251,191,36,0.4); box-shadow:0 6px 20px rgba(251,191,36,0.1); }
+        .module-card.m-kmp .m-name { color:#fde68a; }
+        .module-card.m-manual { border-color:rgba(96,165,250,0.2); }
+        .module-card.m-manual:hover { border-color:rgba(96,165,250,0.4); box-shadow:0 6px 20px rgba(96,165,250,0.1); }
+        .module-card.m-manual .m-name { color:#93c5fd; }
+        .module-status { display:inline-block; font-size:8px; margin-top:4px; padding:1px 5px; border-radius:3px; font-weight:700; }
+        .ms-dev { background:rgba(248,113,113,0.12); color:var(--mb-red); }
+        .ms-done { background:rgba(16,185,129,0.12); color:var(--mb-emerald); }
+
+        .notice-bar { background:rgba(34,211,238,0.04); border:1px solid rgba(34,211,238,0.15); border-radius:10px; padding:14px 18px; font-size:11px; color:rgba(255,255,255,0.45); line-height:1.8; }
+        .notice-bar strong { color:var(--mb-cyan); }
     </style>
 </head>
 <body>
@@ -389,18 +303,18 @@
             <div class="header-title">
                 <h1>🧠 MemoryBase · 公共底层记忆基座</h1>
                 <div class="header-sub">
-                    Game-OS V2.1 全域公共记忆底座 · 四级净化漏斗 · 三层存储架构 · KMP模糊匹配检索 · 兼容盘活全部历史方案数据
+                    Game-OS V2.1 全域公共记忆底座 · 四级净化漏斗动态流转 · 粒子动画演示 · 三层存储路由 · 兼容盘活全部历史方案数据
                 </div>
                 <div class="header-tags">
                     <span class="htag core">🔒 核心基座</span>
-                    <span class="htag filter">🔻 四级过滤</span>
+                    <span class="htag filter">🔻 四级过滤·动态</span>
                     <span class="htag storage">💾 三层存储</span>
                     <span class="htag retrieval">🔍 KMP检索</span>
                 </div>
             </div>
             <div class="version-pill">
                 <span class="dot"></span>
-                BATCH 1 · 基础底座搭建中
+                BATCH 2 · 漏斗动态流转就绪
             </div>
         </div>
     </div>
@@ -417,89 +331,157 @@
             </div>
             <div id="inputSingle" class="input-area active">
                 <div class="single-input-row">
-                    <input type="text" id="singleText" placeholder="输入一条记忆文本、方案片段、知识点、对话记录..." oninput="updateStats()" />
-                    <button class="btn-primary" onclick="submitSingle()">🔽 送入净化</button>
+                    <input type="text" id="singleText" placeholder="输入一条记忆文本、方案片段、知识点..." oninput="updateStats()" />
+                    <button class="btn-primary" id="btnSubmitSingle" onclick="submitSingle()">🔽 送入净化</button>
                 </div>
-                <div class="hint-text">💡 支持方案描述、决策逻辑、知识点、对话摘要、经验总结等任意文本记忆</div>
+                <div class="hint-text">💡 支持方案描述、决策逻辑、知识点、对话摘要等任意文本，点击「🎬 一键演示」加载测试数据</div>
             </div>
             <div id="inputMulti" class="input-area">
-                <textarea class="multi-input" id="multiText" placeholder="批量粘贴多行记忆文本，每行一条...&#10;&#10;示例：&#10;凯利公式最优仓位 f*=(bp-q)/b&#10;0.50是资本结构稳态中轴线&#10;WACC含MM税盾模型，最优杠杆锁定0.50&#10;三角审计三模型并行±0.02校验" oninput="updateStats()"></textarea>
+                <textarea class="multi-input" id="multiText" placeholder="批量粘贴多行记忆文本，每行一条..." oninput="updateStats()"></textarea>
                 <div class="import-row">
-                    <button class="btn-primary" onclick="submitMulti()">🔽 批量送入净化</button>
-                    <button class="btn-secondary">📁 导入TXT文件</button>
-                    <span class="hint-text">支持批量粘贴，自动按换行符拆分</span>
+                    <button class="btn-primary" id="btnSubmitMulti" onclick="submitMulti()">🔽 批量送入净化</button>
+                    <button class="btn-demo" onclick="runDemo()">🎬 一键演示</button>
+                    <button class="btn-secondary" onclick="loadDemoText()">📋 加载测试数据</button>
+                    <span class="hint-text">演示包含：语气词/Rap歌词/蓝筹知识/四维数据/公理数据/无效内容</span>
                 </div>
             </div>
         </div>
 
         <div class="lego-block w-4 stats-block">
             <div class="block-title">
-                <span class="bicon">📊</span> 实时内容统计
+                <span class="bicon">📊</span> 流转结果统计
             </div>
             <div class="stats-grid">
-                <div class="stat-card total">
-                    <div class="stat-value" id="statTotal">0</div>
-                    <div class="stat-label">总字符量</div>
-                    <div class="stat-bar"><div class="stat-bar-fill" id="barTotal"></div></div>
+                <div class="stat-card discard">
+                    <div class="stat-value" id="statDiscard">0</div>
+                    <div class="stat-label">废弃垃圾</div>
                 </div>
-                <div class="stat-card noise">
-                    <div class="stat-value" id="statNoise">0%</div>
-                    <div class="stat-label">语气词无效占比</div>
-                    <div class="stat-bar"><div class="stat-bar-fill" id="barNoise"></div></div>
+                <div class="stat-card buffer">
+                    <div class="stat-value" id="statBuffer">0</div>
+                    <div class="stat-label">缓冲库</div>
                 </div>
-                <div class="stat-card valid">
-                    <div class="stat-value" id="statValid">0%</div>
-                    <div class="stat-label">干货有效占比</div>
-                    <div class="stat-bar"><div class="stat-bar-fill" id="barValid"></div></div>
+                <div class="stat-card longterm">
+                    <div class="stat-value" id="statLongterm">0</div>
+                    <div class="stat-label">长期库</div>
                 </div>
             </div>
             <div class="notice-bar" style="margin-top:14px">
-                <strong>📐 估算规则：</strong>语气词/寒暄/连接词等无效内容按经验比例估算，仅供预处理参考，不代表最终净化结果。
+                <strong>📊 三库分流：</strong><br/>
+                · 灰色粒子 → 废弃垃圾库（直接消散）<br/>
+                · 金色粒子 → 缓冲待审库（待人工复核）<br/>
+                · 绿色粒子 → 长期公理库（永久存储）
             </div>
         </div>
 
-        <div class="lego-block w-12 funnel-block">
+        <div class="lego-block w-8 funnel-block">
             <div class="block-title">
-                <span class="bicon">🔻</span> 四级净化漏斗 · 静态结构
+                <span class="bicon">🔻</span> 四级净化漏斗 · 粒子动态流转
+                <span style="margin-left:auto;font-size:10px;color:rgba(255,255,255,0.3);font-weight:400" id="funnelState">等待输入...</span>
             </div>
-            <div class="funnel-container">
-                <div class="funnel-layer l1">
-                    <span class="layer-num">L1</span>
-                    <span class="layer-icon">🧹</span>
-                    <div class="layer-info">
-                        <div class="layer-name">粗滤降噪层</div>
-                        <div class="layer-desc">去除寒暄/语气词/重复冗余/乱码符号 · 基础文本清洗</div>
+            <div class="funnel-stage">
+                <canvas id="funnelCanvas"></canvas>
+                <div class="funnel-container">
+                    <div class="funnel-layer l1" id="layer1">
+                        <div class="layer-left">
+                            <span class="layer-num">L1</span>
+                            <span class="layer-icon">🧹</span>
+                            <div class="layer-info">
+                                <div class="layer-name">粗滤降噪层 <span class="tag-pill tag-trash">剔除语气词</span></div>
+                                <div class="layer-desc">自动剔除口头禅、语气助词、无意义感叹零碎语句</div>
+                            </div>
+                        </div>
+                        <div style="display:flex;align-items:center">
+                            <div class="layer-status" id="status1">待处理</div>
+                            <div class="layer-count" id="count1">0</div>
+                        </div>
+                    </div>
+                    <div class="funnel-arrow">▼</div>
+                    <div class="funnel-layer l2" id="layer2">
+                        <div class="layer-left">
+                            <span class="layer-num">L2</span>
+                            <span class="layer-icon">🏷️</span>
+                            <div class="layer-info">
+                                <div class="layer-name">业务标签分拣层 <span class="tag-pill tag-rap">Rap成长</span> <span class="tag-pill tag-blue">抒情蓝筹</span> <span class="tag-pill tag-trash">噪音废弃</span></div>
+                                <div class="layer-desc">自动三类标签分类：Rap成长库 / 抒情蓝筹库 / 噪音废弃库</div>
+                            </div>
+                        </div>
+                        <div style="display:flex;align-items:center">
+                            <div class="layer-status" id="status2">待处理</div>
+                            <div class="layer-count" id="count2">0</div>
+                        </div>
+                    </div>
+                    <div class="funnel-arrow">▼</div>
+                    <div class="funnel-layer l3" id="layer3">
+                        <div class="layer-left">
+                            <span class="layer-num">L3</span>
+                            <span class="layer-icon">🧮</span>
+                            <div class="layer-info">
+                                <div class="layer-name">四维结构化校验层</div>
+                                <div class="layer-desc">仅可拆解为【主体 · 运动 · 幅值 · 外部扰动】四维的数据放行</div>
+                            </div>
+                        </div>
+                        <div style="display:flex;align-items:center">
+                            <div class="layer-status" id="status3">待处理</div>
+                            <div class="layer-count" id="count3">0</div>
+                        </div>
+                    </div>
+                    <div class="funnel-arrow">▼</div>
+                    <div class="funnel-layer l4" id="layer4">
+                        <div class="layer-left">
+                            <span class="layer-num">L4</span>
+                            <span class="layer-icon">🔒</span>
+                            <div class="layer-info">
+                                <div class="layer-name">球面公理终审层</div>
+                                <div class="layer-desc">符合系统数理公理的数据→长期库，其余→缓冲库待审</div>
+                            </div>
+                        </div>
+                        <div style="display:flex;align-items:center">
+                            <div class="layer-status" id="status4">待处理</div>
+                            <div class="layer-count" id="count4">0</div>
+                        </div>
+                    </div>
+                    <div class="funnel-output" id="funnelOut">
+                        <span class="out-icon">⏳</span> 等待净化流程启动
                     </div>
                 </div>
-                <div class="funnel-arrow">▼</div>
-                <div class="funnel-layer l2">
-                    <span class="layer-num">L2</span>
-                    <span class="layer-icon">🏷️</span>
-                    <div class="layer-info">
-                        <div class="layer-name">业务标签分拣层</div>
-                        <div class="layer-desc">金融/游戏/几何算力/营销/情绪/认知 领域标签自动分类路由</div>
+            </div>
+        </div>
+
+        <div class="lego-block w-4 log-block">
+            <div class="block-title">
+                <span class="bicon">📝</span> 过滤处理日志
+                <button class="btn-secondary" style="margin-left:auto;padding:4px 10px;font-size:9px" onclick="clearLog()">清空</button>
+            </div>
+            <div class="log-container" id="logBox">
+                <div class="log-entry"><span class="log-time">[系统]</span><span class="log-info">四级净化漏斗引擎就绪，等待输入...</span></div>
+            </div>
+        </div>
+
+        <div class="lego-block w-12 result-block">
+            <div class="block-title">
+                <span class="bicon">💾</span> 三层存储路由结果
+            </div>
+            <div class="result-grid">
+                <div class="result-box trash" id="boxTrash">
+                    <div class="result-title">
+                        <span>🗑️ 噪音废弃库</span>
+                        <span class="result-count" id="cntTrash" style="color:var(--mb-gray)">0</span>
                     </div>
+                    <div class="result-list" id="listTrash"></div>
                 </div>
-                <div class="funnel-arrow">▼</div>
-                <div class="funnel-layer l3">
-                    <span class="layer-num">L3</span>
-                    <span class="layer-icon">🧮</span>
-                    <div class="layer-info">
-                        <div class="layer-name">四维结构化校验层</div>
-                        <div class="layer-desc">实体提取·关系抽取·公式识别·数值标准化 四维向量化</div>
+                <div class="result-box buffer" id="boxBuffer">
+                    <div class="result-title">
+                        <span>⏸️ 缓冲待审库</span>
+                        <span class="result-count" id="cntBuffer" style="color:var(--mb-gold)">0</span>
                     </div>
+                    <div class="result-list" id="listBuffer"></div>
                 </div>
-                <div class="funnel-arrow">▼</div>
-                <div class="funnel-layer l4">
-                    <span class="layer-num">L4</span>
-                    <span class="layer-icon">🔒</span>
-                    <div class="layer-info">
-                        <div class="layer-name">球面公理终审层</div>
-                        <div class="layer-desc">Game-OS 11条公理一致性校验·球面半径约束·三角审计闸门</div>
+                <div class="result-box longterm" id="boxLongterm">
+                    <div class="result-title">
+                        <span>✅ 长期公理库</span>
+                        <span class="result-count" id="cntLongterm" style="color:var(--mb-emerald)">0</span>
                     </div>
-                </div>
-                <div class="funnel-output">
-                    <span class="out-icon">✅</span> 净化完成 · 注入三层存储
+                    <div class="result-list" id="listLongterm"></div>
                 </div>
             </div>
         </div>
@@ -513,7 +495,7 @@
                     <span class="m-icon">🔻</span>
                     <div class="m-name">filter_funnel</div>
                     <div class="m-name" style="font-size:9px;opacity:0.6;margin-top:2px">过滤漏斗</div>
-                    <span class="module-status ms-dev">待开发</span>
+                    <span class="module-status ms-done">✓ Batch2完成</span>
                 </div>
                 <div class="module-card m-storage">
                     <span class="m-icon">💾</span>
@@ -546,66 +528,453 @@
 
     <div class="notice-bar" style="margin-bottom:24px">
         <strong>🔒 机密参数隔离声明：</strong>
-        本页面为前端可视化底座，所有独家核心公式（相似度阈值算法、球面半径计算、跨领域映射规则、KMP匹配权重等）
-        均存放于各子模块私有内核文件中，前端不暴露原始核心代码。前端仅负责流程展示和数据面板可视化。
+        本页面演示为前端可视化流程，所有独家核心公式（相似度阈值、球面半径、公理校验规则、四维结构化映射权重等）
+        均存放于各子模块私有内核文件中，前端不暴露原始核心代码。
     </div>
 
 </div>
 
 <script>
 (function(){
-    const NOISE_WORDS = ['的','了','吗','呢','啊','吧','呀','哦','嗯','哈','嘿','哎','唉','喔','噢','呃','那个','这个','就是','然后','其实','感觉','觉得','可能','应该','大概','也许','或许','差不多','基本上','总体来说','怎么说呢','你知道吗','我觉得吧'];
+    const NOISE_WORDS = ['的','了','吗','呢','啊','吧','呀','哦','嗯','哈','嘿','哎','唉','喔','噢','呃','那个','这个','就是','然后','其实','感觉','觉得','可能','应该','大概','也许','或许','差不多','基本上','怎么说呢','你知道吗','我觉得吧','那个那个','就是说','反正','总之','哎呀妈呀'];
+    const AXIOM_KEYWORDS = ['0.50','稳态','中轴线','凯利','WACC','DCF','CAPM','最优','均衡','三角审计','杠杆','球面','11层','公理','f*','MM定理','税盾','几何算力','V模型','S模型','L模型','0.48','0.68'];
 
-    window.switchInput = function(mode){
-        document.querySelectorAll('.input-tab').forEach(t => t.classList.remove('active'));
-        document.querySelectorAll('.input-area').forEach(a => a.classList.remove('active'));
-        event.target.classList.add('active');
-        document.getElementById('input' + mode.charAt(0).toUpperCase() + mode.slice(1)).classList.add('active');
-        updateStats();
-    };
+    const DEMO_TEXTS = [
+        '哎呀妈呀，就是说那个凯利公式最优仓位f*=(bp-q)/b，嗯你知道吗这个真的超级重要',
+        'Flow like water 押韵八拍 节奏感拉满 麦克风握紧 全场都燥起来',
+        '0.50是资本结构稳态中轴线 WACC含MM税盾模型最优杠杆锁定',
+        '三角审计三模型并行±0.02校验 偏差超阈值即触发熔断',
+        'V模型算力消耗0.48基线 S模型稳态0.50 L模型峰值0.68',
+        '啊吧啊吧 嗯嗯啊啊 哈哈哈哈 这个那个 就是说呢',
+        '抒情旋律缓慢流淌 钢琴音符轻柔诉说 情绪在蓝调中沉淀',
+        '市场有效假说CAPM模型 Beta系数系统性风险度量',
+        '哟 这个beat太炸了 freestyle即兴押韵 battle就是要赢',
+        '随便聊聊啦 也没啥特别的 就感觉还行吧'
+    ];
 
-    function getCurrentText(){
-        const singleActive = document.getElementById('inputSingle').classList.contains('active');
-        return singleActive ? document.getElementById('singleText').value : document.getElementById('multiText').value;
+    let particles = [];
+    let isRunning = false;
+    let canvas, ctx;
+    let layerRects = {};
+    let animId = null;
+
+    const results = { trash: [], buffer: [], longterm: [] };
+
+    function $(id){ return document.getElementById(id); }
+    function log(msg, cls='log-info'){
+        const t = new Date();
+        const ts = `${String(t.getMinutes()).padStart(2,'0')}:${String(t.getSeconds()).padStart(2,'0')}.${String(t.getMilliseconds()).padStart(3,'0')}`;
+        const box = $('logBox');
+        const div = document.createElement('div');
+        div.className = 'log-entry';
+        div.innerHTML = `<span class="log-time">[${ts}]</span><span class="${cls}">${msg}</span>`;
+        box.appendChild(div);
+        box.scrollTop = box.scrollHeight;
+    }
+    function clearLog(){ $('logBox').innerHTML = '<div class="log-entry"><span class="log-time">[系统]</span><span class="log-info">日志已清空</span></div>'; }
+
+    function updateLayerState(idx, state, count){
+        const layer = $('layer'+idx);
+        const status = $('status'+idx);
+        const cnt = $('count'+idx);
+        layer.classList.remove('active','done');
+        if(state==='processing'){ layer.classList.add('active'); status.textContent='处理中...'; }
+        else if(state==='done'){ layer.classList.add('done'); status.textContent='✓ 完成'; }
+        else { status.textContent='待处理'; }
+        if(count!==undefined) cnt.textContent = count;
+    }
+    function resetFunnel(){
+        for(let i=1;i<=4;i++){ updateLayerState(i,'idle',0); }
+        $('funnelOut').className='funnel-output'; $('funnelOut').innerHTML='<span class="out-icon">⏳</span> 等待净化流程启动';
+        $('funnelState').textContent='等待输入...';
+        results.trash=[];results.buffer=[];results.longterm=[];
+        updateResultBoxes();
+        particles=[];
+    }
+    function updateResultBoxes(){
+        ['trash','buffer','longterm'].forEach(k=>{
+            $('cnt'+k.charAt(0).toUpperCase()+k.slice(1)).textContent=results[k].length;
+            const list = $('list'+k.charAt(0).toUpperCase()+k.slice(1));
+            list.innerHTML=results[k].map(t=>`<div class="result-item" title="${t}">${t.length>28?t.substring(0,28)+'...':t}</div>`).join('');
+            if(results[k].length>0) $('box'+k.charAt(0).toUpperCase()+k.slice(1)).classList.add('active');
+        });
+        $('statDiscard').textContent=results.trash.length;
+        $('statBuffer').textContent=results.buffer.length;
+        $('statLongterm').textContent=results.longterm.length;
     }
 
+    function initCanvas(){
+        canvas = $('funnelCanvas');
+        ctx = canvas.getContext('2d');
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+        requestAnimationFrame(animate);
+    }
+    function resizeCanvas(){
+        const stage = canvas.parentElement;
+        const rect = stage.getBoundingClientRect();
+        canvas.width = rect.width;
+        canvas.height = rect.height;
+        for(let i=1;i<=4;i++){
+            const el = $('layer'+i);
+            const r = el.getBoundingClientRect();
+            layerRects['l'+i] = {
+                x: r.left - rect.left + r.width/2,
+                y: r.top - rect.top + r.height/2,
+                w: r.width, h: r.height
+            };
+        }
+        const out = $('funnelOut').getBoundingClientRect();
+        layerRects.out = { x: out.left-rect.left+out.width/2, y: out.top-rect.top+out.height/2 };
+    }
+
+    const PARTICLE_COLORS = {
+        input: '#22d3ee', noise:'#6b7280', rap:'#f472b6', blue:'#60a5fa',
+        trash:'#6b7280', buffer:'#fbbf24', longterm:'#10b981', valid:'#a78bfa'
+    };
+
+    function spawnParticles(texts, startLayer){
+        const start = layerRects['l'+startLayer];
+        if(!start) return;
+        texts.forEach((t,idx)=>{
+            setTimeout(()=>{
+                const spread = (start.w||300) * 0.35;
+                particles.push({
+                    x: start.x + (Math.random()-0.5)*spread,
+                    y: start.y - 20,
+                    vx: (Math.random()-0.5)*1.2,
+                    vy: 0.5 + Math.random()*0.8,
+                    life: 1,
+                    type: t.type,
+                    text: t.text,
+                    state: 'enter',
+                    target: 'l'+(startLayer+1),
+                    layer: startLayer,
+                    size: 3 + Math.random()*3,
+                    alpha: 0.8 + Math.random()*0.2,
+                    wobble: Math.random()*Math.PI*2,
+                    wobbleSpeed: 0.03+Math.random()*0.04,
+                    fadeOut: false, outTarget:null
+                });
+            }, idx*60 + Math.random()*100);
+        });
+    }
+
+    function animate(){
+        if(!ctx) return;
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        const now = Date.now();
+        for(let i=particles.length-1;i>=0;i--){
+            const p = particles[i];
+            p.wobble += p.wobbleSpeed;
+            if(p.state==='enter'){
+                const target = layerRects[p.target];
+                if(target){
+                    const dx = target.x - p.x;
+                    const dy = target.y - p.y;
+                    const dist = Math.sqrt(dx*dx+dy*dy);
+                    if(dist < 18){
+                        p.state = 'arrived';
+                        p.arrivedTime = now;
+                        p.vy=0;p.vx=0;
+                    } else {
+                        p.vx += dx/dist*0.15;
+                        p.vy += dy/dist*0.15;
+                        p.vx *= 0.88; p.vy *= 0.88;
+                    }
+                }
+            } else if(p.state==='arrived'){
+                if(now - p.arrivedTime > 350){
+                    routeParticle(p);
+                }
+            } else if(p.state==='todown' || p.state==='totrash' || p.state==='tobuffer' || p.state==='tolongterm'){
+                const tx = p.targetX, ty = p.targetY;
+                const dx = tx - p.x, dy = ty - p.y;
+                const dist = Math.sqrt(dx*dx+dy*dy);
+                if(dist<8){
+                    if(p.state==='tolongterm'||p.state==='tobuffer'||p.state==='totrash'){
+                        p.fadeOut=true;
+                    } else {
+                        p.state='arrived'; p.arrivedTime=now; p.vy=0;p.vx=0;
+                        p.target = 'l'+(p.layer+1);
+                    }
+                } else {
+                    p.vx += dx/dist*0.18;
+                    p.vy += dy/dist*0.18;
+                    p.vx *= 0.85; p.vy *= 0.85;
+                }
+            }
+            if(p.fadeOut){
+                p.life -= 0.025;
+                p.alpha = p.life;
+                p.vy += 0.05;
+                if(p.life<=0){ particles.splice(i,1); continue; }
+            }
+            p.x += p.vx + Math.sin(p.wobble)*0.3;
+            p.y += p.vy;
+            const color = PARTICLE_COLORS[p.type] || '#fff';
+            ctx.save();
+            ctx.globalAlpha = p.alpha;
+            ctx.shadowBlur = 8; ctx.shadowColor = color;
+            ctx.fillStyle = color;
+            ctx.beginPath(); ctx.arc(p.x,p.y,p.size,0,Math.PI*2); ctx.fill();
+            ctx.restore();
+        }
+        animId = requestAnimationFrame(animate);
+    }
+
+    function routeParticle(p){
+        if(p.layer===1){
+            if(p.type==='noise'){
+                const box = $('boxTrash').getBoundingClientRect();
+                const stage = canvas.parentElement.getBoundingClientRect();
+                p.state='totrash';
+                p.targetX = (box.left+box.right)/2 - stage.left;
+                p.targetY = (box.top+box.bottom)/2 - stage.top + 20;
+                setTimeout(()=>{
+                    results.trash.push(p.text);
+                    updateResultBoxes();
+                },200);
+            } else {
+                const nxt = layerRects.l2;
+                if(nxt){
+                    p.state='todown'; p.layer=2;
+                    p.targetX = nxt.x + (Math.random()-0.5)*nxt.w*0.5;
+                    p.targetY = nxt.y;
+                    p.type = p.type;
+                }
+            }
+        } else if(p.layer===2){
+            if(p.type==='trash'){
+                const box = $('boxTrash').getBoundingClientRect();
+                const stage = canvas.parentElement.getBoundingClientRect();
+                p.state='totrash';
+                p.targetX = (box.left+box.right)/2-stage.left;
+                p.targetY = (box.top+box.bottom)/2-stage.top+20;
+                setTimeout(()=>{ results.trash.push(p.text); updateResultBoxes(); },200);
+            } else {
+                const nxt = layerRects.l3;
+                if(nxt){
+                    p.state='todown'; p.layer=3;
+                    p.targetX = nxt.x+(Math.random()-0.5)*nxt.w*0.4;
+                    p.targetY = nxt.y;
+                    p.type='valid';
+                }
+            }
+        } else if(p.layer===3){
+            if(p.type==='trash'){
+                const box = $('boxBuffer').getBoundingClientRect();
+                const stage = canvas.parentElement.getBoundingClientRect();
+                p.state='tobuffer';
+                p.targetX = (box.left+box.right)/2-stage.left;
+                p.targetY = (box.top+box.bottom)/2-stage.top+20;
+                setTimeout(()=>{ results.buffer.push(p.text); updateResultBoxes(); },200);
+            } else {
+                const nxt = layerRects.l4;
+                if(nxt){
+                    p.state='todown'; p.layer=4;
+                    p.targetX = nxt.x+(Math.random()-0.5)*nxt.w*0.3;
+                    p.targetY = nxt.y;
+                }
+            }
+        } else if(p.layer===4){
+            const isAxiom = AXIOM_KEYWORDS.some(k=>p.text.includes(k));
+            const box = isAxiom ? $('boxLongterm') : $('boxBuffer');
+            const stage = canvas.parentElement.getBoundingClientRect();
+            const br = box.getBoundingClientRect();
+            p.state = isAxiom?'tolongterm':'tobuffer';
+            p.targetX = (br.left+br.right)/2-stage.left;
+            p.targetY = (br.top+br.bottom)/2-stage.top+20;
+            p.type = isAxiom?'longterm':'buffer';
+            setTimeout(()=>{
+                if(isAxiom){ results.longterm.push(p.text); } else { results.buffer.push(p.text); }
+                updateResultBoxes();
+            },200);
+        }
+    }
+
+    function processL1_RoughFilter(texts){
+        return new Promise(resolve=>{
+            updateLayerState(1,'processing'); $('funnelState').textContent='L1 粗滤降噪中...';
+            log('▶ L1 粗滤降噪层启动，输入 '+texts.length+' 条原始记忆','log-l1');
+            const cleaned = []; let noiseCount=0;
+            texts.forEach(t=>{
+                let clean = t;
+                NOISE_WORDS.forEach(w=>{ const r=new RegExp(w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'g'); clean=clean.replace(r,''); });
+                clean = clean.replace(/\s+/g,' ').trim();
+                if(clean.length<3){
+                    noiseCount++;
+                    cleaned.push({text:t,type:'noise'});
+                    log(`  ✗ 剔除语气杂质：「${t.substring(0,20)}${t.length>20?'...':''}」灰色粒子消散`,'log-err');
+                } else {
+                    cleaned.push({text:clean,type:'input'});
+                    log(`  ✓ 降噪完成：「${clean.substring(0,25)}${clean.length>25?'...':''}」`,'log-l1');
+                }
+            });
+            updateLayerState(1,'done',texts.length);
+            log(`L1 完成：剔除 ${noiseCount} 条，通过 ${texts.length-noiseCount} 条`,'log-ok');
+            setTimeout(()=>resolve(cleaned), 400);
+        });
+    }
+
+    function processL2_LabelSort(items){
+        return new Promise(resolve=>{
+            updateLayerState(2,'processing'); $('funnelState').textContent='L2 标签分拣中...';
+            log('▶ L2 业务标签分拣层启动','log-l2');
+            const RAP_KEYS = ['flow','押韵','beat','freestyle','battle','麦克风','rap','Rap','燥','拍','节奏','韵脚','diss','MC','hiphop'];
+            const BLUE_KEYS = ['旋律','钢琴','抒情','情绪','蓝调','诉说','轻柔','缓慢','音符','流淌','沉淀','温柔','伤感'];
+            const labeled = []; let trash=0,rap=0,blue=0;
+            items.forEach(it=>{
+                if(it.type==='noise'){ labeled.push(it); return; }
+                const t = it.text;
+                let label = null;
+                if(RAP_KEYS.some(k=>t.toLowerCase().includes(k.toLowerCase()))){ label='rap'; rap++; log(`  ♪ Rap成长库：「${t.substring(0,22)}...」`,'log-l2'); }
+                else if(BLUE_KEYS.some(k=>t.includes(k))){ label='blue'; blue++; log(`  ♫ 抒情蓝筹库：「${t.substring(0,22)}...」`,'log-l2'); }
+                else if(t.length<8 && !/[\d.+\-*/=()%]/.test(t)){ label='trash'; trash++; log(`  ✗ 噪音废弃：「${t}」灰色粒子消散`,'log-err'); }
+                else { label='valid'; log(`  ◆ 业务有效内容：「${t.substring(0,22)}...」`,'log-l2'); }
+                labeled.push({text:it.text,type:label});
+            });
+            updateLayerState(2,'done',items.length-trash);
+            log(`L2 完成：Rap ${rap}条 · 蓝筹 ${blue}条 · 废弃 ${trash}条 · 业务有效 ${items.length-trash-rap-blue}条`,'log-ok');
+            setTimeout(()=>resolve(labeled),400);
+        });
+    }
+
+    function processL3_FourDimCheck(items){
+        return new Promise(resolve=>{
+            updateLayerState(3,'processing'); $('funnelState').textContent='L3 四维结构化校验中...';
+            log('▶ L3 四维结构化校验层启动：主体·运动·幅值·外部扰动','log-l3');
+            const checked = []; let pass=0,fail=0;
+            items.forEach(it=>{
+                if(it.type==='noise'||it.type==='trash'){ checked.push(it); return; }
+                const t = it.text;
+                const hasSubject = /[\u4e00-\u9fa5A-Za-z]{2,}/.test(t);
+                const hasMotion = /(流|增|减|变|动|行|运|升|降|锁|定|校验|熔|断|触发|度量|消|沉淀|燥|押|握紧|诉说)/.test(t);
+                const hasMagnitude = /[\d.+\-*/=()%±]/.test(t) || /(最优|稳态|基线|峰值|系统|全)/.test(t);
+                const hasDisturbance = /(风险|扰动|偏差|阈值|税盾|压力|熔断|超|beat|battle|情绪)/.test(t);
+                const dimCount = [hasSubject,hasMotion,hasMagnitude,hasDisturbance].filter(Boolean).length;
+                if(dimCount>=3 || (hasMagnitude&&hasSubject)){
+                    pass++; checked.push({text:it.text,type:'valid'});
+                    log(`  ✓ 四维拆解通过(${dimCount}/4)：「${t.substring(0,20)}...」`,'log-l3');
+                } else {
+                    fail++; checked.push({text:it.text,type:'trash'});
+                    log(`  ✗ 四维不完整(${dimCount}/4)→缓冲库：「${t.substring(0,20)}...」`,'log-warn');
+                }
+            });
+            updateLayerState(3,'done',pass);
+            log(`L3 完成：结构化通过 ${pass}条 · 不完整→缓冲 ${fail}条`,'log-ok');
+            setTimeout(()=>resolve(checked),400);
+        });
+    }
+
+    function processL4_AxiomFinal(items){
+        return new Promise(resolve=>{
+            updateLayerState(4,'processing'); $('funnelState').textContent='L4 球面公理终审中...';
+            log('▶ L4 球面公理终审层启动：数理公理一致性校验','log-l4');
+            const results_arr = []; let longterm=0,buffer=0;
+            items.forEach(it=>{
+                if(it.type==='noise'||it.type==='trash'){ results_arr.push(it); return; }
+                const t = it.text;
+                const isAxiom = AXIOM_KEYWORDS.some(k=>t.includes(k));
+                if(isAxiom){
+                    longterm++; results_arr.push({text:t,type:'longterm'});
+                    log(`  ✓ 符合公理→长期库：「${t.substring(0,22)}...」`,'log-l4');
+                } else {
+                    buffer++; results_arr.push({text:t,type:'buffer'});
+                    log(`  ⚠ 公理校验待审→缓冲库：「${t.substring(0,22)}...」`,'log-warn');
+                }
+            });
+            updateLayerState(4,'done',longterm+buffer);
+            log(`L4 完成：长期公理库 ${longterm}条 · 缓冲待审 ${buffer}条`,'log-ok');
+            setTimeout(()=>resolve(results_arr),500);
+        });
+    }
+
+    async function runPipeline(texts){
+        if(isRunning) return;
+        isRunning=true;
+        setButtonsDisabled(true);
+        resetFunnel();
+        $('funnelState').textContent='流程启动...';
+        log(`═══ 净化流程启动，共 ${texts.length} 条原始记忆 ═══`,'log-info');
+        await sleep(200); resizeCanvas();
+        const l1Results = await processL1_RoughFilter(texts);
+        spawnParticles(l1Results.map(r=>({text:r.text,type:r.type})), 1);
+        await sleep(900); resizeCanvas();
+        const l2Results = await processL2_LabelSort(l1Results);
+        const toL2 = l2Results.filter(r=>r.type!=='noise');
+        spawnParticles(toL2, 2);
+        await sleep(900); resizeCanvas();
+        const l3Results = await processL3_FourDimCheck(l2Results);
+        const toL3 = l3Results.filter(r=>r.type!=='noise'&&r.type!=='trash');
+        spawnParticles(toL3, 3);
+        await sleep(900); resizeCanvas();
+        const l4Results = await processL4_AxiomFinal(l3Results);
+        const toL4 = l4Results.filter(r=>r.type!=='noise'&&r.type!=='trash');
+        spawnParticles(toL4, 4);
+        await sleep(1200);
+        $('funnelOut').className='funnel-output done';
+        $('funnelOut').innerHTML=`<span class="out-icon">✅</span> 净化完成 · 长期库 ${results.longterm.length}条 · 缓冲库 ${results.buffer.length}条 · 废弃 ${results.trash.length}条`;
+        $('funnelState').textContent=`✓ 全流程完成`;
+        log(`═══ 全流程完成：长期公理库${results.longterm.length}条 · 缓冲待审${results.buffer.length}条 · 废弃${results.trash.length}条 ═══`,'log-ok');
+        isRunning=false; setButtonsDisabled(false);
+    }
+
+    function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
+    function setButtonsDisabled(d){
+        $('btnSubmitSingle').disabled=d; $('btnSubmitMulti').disabled=d;
+    }
+
+    window.switchInput = function(mode){
+        document.querySelectorAll('.input-tab').forEach(t=>t.classList.remove('active'));
+        document.querySelectorAll('.input-area').forEach(a=>a.classList.remove('active'));
+        event.target.classList.add('active');
+        document.getElementById('input'+mode.charAt(0).toUpperCase()+mode.slice(1)).classList.add('active');
+        updateStats();
+    };
+    function getCurrentText(){
+        return $('inputSingle').classList.contains('active') ? $('singleText').value : $('multiText').value;
+    }
     window.updateStats = function(){
         const text = getCurrentText();
         const total = text.length;
-        let noiseCount = 0;
-        NOISE_WORDS.forEach(w => {
-            const regex = new RegExp(w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g');
-            const matches = text.match(regex);
-            if(matches) noiseCount += matches.length * w.length;
+        let noiseCount=0;
+        NOISE_WORDS.forEach(w=>{
+            const r=new RegExp(w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'g');
+            const m=text.match(r); if(m) noiseCount+=m.length*w.length;
         });
-        noiseCount = Math.min(noiseCount, total * 0.8);
-        const noisePct = total > 0 ? Math.round((noiseCount / total) * 100) : 0;
-        const validPct = total > 0 ? 100 - noisePct : 0;
-
-        document.getElementById('statTotal').textContent = total.toLocaleString();
-        document.getElementById('statNoise').textContent = noisePct + '%';
-        document.getElementById('statValid').textContent = validPct + '%';
-
-        const totalPct = Math.min(total / 2000 * 100, 100);
-        document.getElementById('barTotal').style.width = totalPct + '%';
-        document.getElementById('barNoise').style.width = noisePct + '%';
-        document.getElementById('barValid').style.width = validPct + '%';
+        noiseCount=Math.min(noiseCount,total*0.8);
+        $('statDiscard').textContent=results.trash.length;
+        $('statBuffer').textContent=results.buffer.length;
+        $('statLongterm').textContent=results.longterm.length;
     };
-
     window.submitSingle = function(){
-        const text = document.getElementById('singleText').value.trim();
+        const text = $('singleText').value.trim();
         if(!text){ alert('请输入记忆文本'); return; }
-        alert('📥 已接收：' + text.substring(0,50) + (text.length>50?'...':'') + '\n\n（Batch 1 仅做静态结构，动态净化流程待后续批次开发）');
+        runPipeline([text]);
     };
-
     window.submitMulti = function(){
-        const text = document.getElementById('multiText').value.trim();
+        const text = $('multiText').value.trim();
         if(!text){ alert('请输入批量记忆文本'); return; }
-        const lines = text.split('\n').filter(l => l.trim());
-        alert('📥 已接收 ' + lines.length + ' 条批量记忆\n\n（Batch 1 仅做静态结构，动态净化流程待后续批次开发）');
+        const lines = text.split('\n').map(l=>l.trim()).filter(l=>l);
+        runPipeline(lines);
     };
+    window.loadDemoText = function(){
+        $('multiText').value = DEMO_TEXTS.join('\n');
+        updateStats();
+        log('已加载 10 条模拟测试文本到批量导入区','log-info');
+    };
+    window.runDemo = function(){
+        log('🎬 一键演示启动：加载内置测试数据集','log-info');
+        runPipeline([...DEMO_TEXTS]);
+    };
+    window.clearLog = clearLog;
 
-    console.log('%c🧠 MemoryBase V1.0 · Batch 1 基础底座 initialized','color:#22d3ee;font-weight:bold;font-size:13px;');
+    window.addEventListener('load',()=>{
+        initCanvas();
+        setTimeout(resizeCanvas, 300);
+        console.log('%c🧠 MemoryBase V1.0 · Batch 2 四级漏斗动态引擎 initialized','color:#a78bfa;font-weight:bold;font-size:13px;');
+    });
 })();
 </script>
 </body>
