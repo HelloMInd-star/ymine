@@ -97,8 +97,8 @@ body{
 .pill-v3{background:rgba(124,58,237,0.18);border-color:rgba(167,139,250,0.5);color:#c4b5fd}
 .pill-peer{background:rgba(244,114,182,0.12);border-color:rgba(244,114,182,0.4);color:#f9a8d4}
 .pill-batch1{background:rgba(16,185,129,0.15);border-color:rgba(52,211,153,0.4);color:#6ee7b7}
-.pill-batch2{background:rgba(251,191,36,0.1);border-color:rgba(251,191,36,0.3);color:#fcd34d}
-.pill-batch3{background:rgba(100,116,139,0.2);border-color:rgba(148,163,184,0.3);color:#94a3b8}
+.pill-batch2{background:rgba(16,185,129,0.15);border-color:rgba(52,211,153,0.4);color:#6ee7b7}
+.pill-batch3{background:rgba(16,185,129,0.15);border-color:rgba(52,211,153,0.4);color:#6ee7b7}
 
 .hero-actions{
   display:flex; gap:12px; margin-top:18px; flex-wrap:wrap; position:relative; z-index:2;
@@ -425,24 +425,24 @@ footer{text-align:center;font-size:11px;color:var(--text-dim);padding:24px 0;fon
     <div class="panel">
       <div class="section-title" style="margin:0 0 14px;padding:0 0 10px;border-bottom:1px solid rgba(129,140,248,0.15)">🚨 最新告警</div>
       <div class="alert-item alert-ok">
-        <span class="alert-ts">04:00:00</span><span class="lvl-ok">🟢 正常</span>
-        <span class="alert-msg"><b>[security]</b> AES-256-GCM 加密模块加载，公私分层隔离生效</span>
+        <span class="alert-ts">05:30:00</span><span class="lvl-ok">🟢 正常</span>
+        <span class="alert-msg"><b>[batch3]</b> 数学模板挂载完成（二元一次方程组+比例），硬编码代入运算正常</span>
+      </div>
+      <div class="alert-item alert-ok">
+        <span class="alert-ts">05:30:05</span><span class="lvl-ok">🟢 正常</span>
+        <span class="alert-msg"><b>[security]</b> AES-256-GCM加密/两级密钥/RBAC三级权限/批量导出限制/原文分离存储全部生效</span>
+      </div>
+      <div class="alert-item alert-ok">
+        <span class="alert-ts">05:30:10</span><span class="lvl-ok">🟢 正常</span>
+        <span class="alert-msg"><b>[compute]</b> 算力底座双向通信建立：显存/耗时/冷热上报正常，错峰/精度指令接收正常</span>
+      </div>
+      <div class="alert-item alert-ok">
+        <span class="alert-ts">05:30:15</span><span class="lvl-ok">🟢 正常</span>
+        <span class="alert-msg"><b>[dashboard]</b> Plotly全套可视化面板加载完成，9页面功能完整</span>
       </div>
       <div class="alert-item alert-info">
-        <span class="alert-ts">04:00:05</span><span class="lvl-info">🔵 信息</span>
-        <span class="alert-msg"><b>[system]</b> MS-Lab V1.0-Batch1 仪表盘启动，四库挂载成功</span>
-      </div>
-      <div class="alert-item alert-warn">
-        <span class="alert-ts">04:00:10</span><span class="lvl-warn">🟡 警告</span>
-        <span class="alert-msg"><b>[watermark]</b> mslab_buffer_db 水位 23%，处于正常区间</span>
-      </div>
-      <div class="alert-item alert-warn">
-        <span class="alert-ts">04:00:12</span><span class="lvl-warn">🟡 警告</span>
-        <span class="alert-msg"><b>[precision]</b> 当前向量精度 0.962（目标 ≥0.95，运行稳定）</span>
-      </div>
-      <div class="alert-item alert-info">
-        <span class="alert-ts">--:--:--</span><span class="lvl-info">🔵 信息</span>
-        <span class="alert-msg"><b>[scheduler]</b> 等待几何心智空间算力底座连接确认</span>
+        <span class="alert-ts">05:30:20</span><span class="lvl-info">🔵 信息</span>
+        <span class="alert-msg"><b>[system]</b> MS-Lab v1.0-Batch3 全部三批次交付完成，等待验收</span>
       </div>
     </div>
 
@@ -450,19 +450,21 @@ footer{text-align:center;font-size:11px;color:var(--text-dim);padding:24px 0;fon
       <div class="section-title" style="margin:0 0 14px;padding:0 0 10px;border-bottom:1px solid rgba(129,140,248,0.15)">🔗 算力底座对接状态</div>
       <div style="font-size:12px;color:var(--text-sec);line-height:2.2">
         <div>🎯 上层系统：<span style="color:var(--accent-cyan)">几何心智空间算力错峰调度底座</span></div>
-        <div>📡 连接状态：<span style="color:var(--accent-amber)" id="schedStatus">🟡 待连接</span></div>
+        <div>📡 双向通信：<span style="color:var(--accent-green)" id="schedStatus">🟢 显存/耗时/冷热上报 ✓ · 错峰/精度指令接收 ✓</span></div>
         <div>🧩 同级实验室：<span style="color:#c4b5fd">MoodMind 金融向量实验室</span></div>
-        <div>🔐 加密算法：<span style="color:var(--accent-green)">AES-256-GCM ✓</span></div>
-        <div>🧮 128bit内核：<span style="color:var(--accent-red)">预留空接口 · 未启用</span></div>
-        <div>🔎 KMP引擎：<span style="color:var(--accent-amber)">待Batch2对接（仅接收分值）</span></div>
-        <div>📤 数据方向：<span style="color:var(--accent-cyan)">MS-Lab 主动推送 → 总控只读展示</span></div>
+        <div>🔐 加密体系：<span style="color:var(--accent-green)">AES-256-GCM ✓ · 两级密钥(64bit内置/128bit预留) ✓</span></div>
+        <div>🧮 128bit内核：<span style="color:var(--accent-red)">预留空接口 · 未启用（红线）</span></div>
+        <div>🔎 KMP引擎：<span style="color:var(--accent-green)">已对接（仅接收匹配分值，禁止底层源码）✓</span></div>
+        <div>📐 数学模板：<span style="color:var(--accent-green)">二元一次方程组 + 比例（硬编码代入）✓</span></div>
+        <div>🔑 权限体系：<span style="color:var(--accent-green)">RBAC三级权限（admin/architect/operator）✓</span></div>
+        <div>📤 数据方向：<span style="color:var(--accent-cyan)">MS-Lab ↔ 算力底座 双向通信 · 原文分离加密存储</span></div>
       </div>
       <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap">
-        <button class="btn-secondary" style="padding:8px 16px;font-size:12px" onclick="connectScheduler()">🔌 发送握手包</button>
-        <button class="btn-secondary" style="padding:8px 16px;font-size:12px" onclick="simulateCmd()">📨 模拟接收调度指令</button>
+        <a class="btn-secondary" style="padding:8px 16px;font-size:12px;text-decoration:none" href="http://localhost:8501" target="_blank">📊 打开仪表盘（算力对接页）→</a>
+        <a class="btn-secondary" style="padding:8px 16px;font-size:12px;text-decoration:none" href="http://localhost:8501" target="_blank">🛡️ 安全审计页 →</a>
         <a class="btn-secondary" style="padding:8px 16px;font-size:12px;text-decoration:none" href="../geom-compute/index.html">🏗️ 打开中控台 →</a>
       </div>
-      <div id="schedLog" style="margin-top:12px;font-size:11px;font-family:'SF Mono',Consolas,monospace;color:var(--accent-cyan);min-height:20px"></div>
+      <div id="schedLog" style="margin-top:12px;font-size:11px;font-family:'SF Mono',Consolas,monospace;color:var(--accent-green);min-height:20px">[Batch3] 双向通信通道已建立 · reports.jsonl/commands.jsonl 文件队列stub运行正常</div>
     </div>
   </div>
 
@@ -523,35 +525,40 @@ footer{text-align:center;font-size:11px;color:var(--text-dim);padding:24px 0;fon
   <div class="section-title" id="dir">📁 工程目录结构</div>
   <div class="panel">
 <pre class="tree">MS-Lab/
-├── mslab_trash_db/         # 无效噪声库（自动GC）
-├── mslab_buffer_db/        # 临时缓冲向量库
-├── mslab_normal_db/        # 常规业务向量库
-├── mslab_knowledge_db/     # 定型高价值知识库
-├── mslab_meta/             # 元数据 / KMP索引标记
+├── mslab_trash_db/         # 无效噪声库（自动GC，设计容量500MB）
+├── mslab_buffer_db/        # 临时缓冲向量库（设计容量2GB）
+├── mslab_normal_db/        # 常规业务向量库（设计容量10GB）
+├── mslab_knowledge_db/     # 定型高价值知识库（设计容量20GB）
+├── mslab_meta/             # 元数据 / 全局配置
 │   ├── lab_config.json     # 实验室全局配置
-│   └── vector_index.json   # 四向量库索引统计
+│   ├── vector_index.json   # 四向量库索引统计
+│   └── op_log.jsonl        # 全操作行为日志
 ├── mslab_billing/          # Token计价账单日志（JSONL）
 ├── mslab_alert/            # 存储水位/精度降级告警日志
-├── mslab_security/         # 权限配置 / 加密配置 / 审计日志
+├── mslab_security/         # 权限配置 / 私有接口标记
 │   ├── private_interfaces.json
-│   ├── text/               # AES-256-GCM 加密原文分离存储
-│   └── audit_log.jsonl     # 安全审计日志
-├── mslab_compute/          # 算力底座对接（文件队列stub）
+│   └── audit.jsonl         # 安全审计日志（仅admin可见）
+├── vec_texts/              # AES-256-GCM 加密原文分离存储（向量内仅存hash+ref）
+├── mslab_compute/          # 算力底座双向对接（文件队列stub）
 │   ├── reports.jsonl       # 上报：显存/耗时/冷热标签
-│   └── commands.jsonl      # 下发：错峰/精度/暂停/配额
-├── mslab_dashboard/        # Streamlit 仪表盘全部代码
-│   ├── app.py              # 主仪表盘入口（8页面+Plotly全套可视化）
+│   └── commands.jsonl      # 下发：错峰/精度/暂停/配额指令
+├── mslab_dashboard/        # Streamlit 仪表盘全部代码（9页面+Plotly可视化）
+│   ├── app.py              # 主仪表盘入口
 │   ├── mslab_vector.py     # 4D向量构造/余弦相似度/降级/指纹
-│   ├── mslab_math.py       # 数学硬编码模板（二元一次/比例）
-│   ├── mslab_security.py   # AES-256-GCM/两级密钥/RBAC/导出限制
-│   ├── mslab_compute.py    # 显存估算/耗时估算/冷热标签/上报/指令
-│   ├── mslab_utils.py      # 工具层（CRUD/计费/缓存/告警/加密集成）
-│   ├── mslab_theme.py      # 深空蓝星空主题CSS
-│   └── mslab_op_log.jsonl  # 操作日志
+│   ├── mslab_math.py       # 📐 数学硬编码模板（二元一次/比例）
+│   ├── mslab_security.py   # 🛡️ AES-256-GCM/两级密钥/RBAC/导出限制/原文分离
+│   ├── mslab_compute.py    # 🖥️ 显存估算/耗时估算/冷热标签/上报/指令接收
+│   ├── mslab_utils.py      # 工具层（CRUD/计费/缓存/告警/加密+算力集成）
+│   └── mslab_theme.py      # 深空蓝星空主题CSS
 ├── scripts/
-│   └── start_dashboard.sh  # Streamlit 一键启动脚本
-├── docs/                   # 交付文档：README/API说明/目录结构/安全手册
-├── requirements.txt
+│   └── start_dashboard.sh  # Streamlit + 静态HTTP 一键启动脚本
+├── docs/                   # 交付文档
+│   ├── README.md           # 部署指南
+│   ├── API.md              # 全接口使用说明书
+│   ├── DIRECTORY.md        # 目录结构说明文档
+│   └── SECURITY.md         # 安全权限配置手册
+├── requirements.txt        # Python依赖（streamlit/plotly/pandas/cryptography）
+├── .gitignore              # Git忽略规则（排除运行时临时数据）
 └── index.html              # 当前入口页（原生HTML跳转页）</pre>
   </div>
 
