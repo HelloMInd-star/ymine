@@ -285,6 +285,166 @@
 
         .notice-bar { background:rgba(34,211,238,0.04); border:1px solid rgba(34,211,238,0.15); border-radius:10px; padding:14px 18px; font-size:11px; color:rgba(255,255,255,0.45); line-height:1.8; }
         .notice-bar strong { color:var(--mb-cyan); }
+
+        /* ─── Batch 3: 三级仓储仪表盘 ─── */
+        .lego-block.storage-block::before { background:linear-gradient(90deg,#3b82f6,#22d3ee,#10b981); }
+        .lego-block.storage-block .block-title { color:#60a5fa; }
+        .lego-block.music-block::before { background:linear-gradient(90deg,#f472b6,#a78bfa,#6b7280); }
+        .lego-block.music-block .block-title { color:#f472b6; }
+
+        .storage-dashboard { display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; }
+        .storage-tier {
+            border-radius:12px; padding:20px 18px; position:relative; overflow:hidden;
+            transition:all 0.4s; border:1.5px solid;
+        }
+        .storage-tier::before { content:''; position:absolute; inset:0; opacity:0.06; border-radius:12px; pointer-events:none; }
+        .storage-tier::after { content:''; position:absolute; top:0;left:0;right:0;height:3px; }
+        .tier-hot {
+            background:linear-gradient(145deg,rgba(59,130,246,0.12),rgba(34,211,238,0.08));
+            border-color:rgba(59,130,246,0.35);
+        }
+        .tier-hot::before { background:#3b82f6; }
+        .tier-hot::after { background:linear-gradient(90deg,#3b82f6,#22d3ee,#60a5fa); }
+        .tier-hot.active-hot { box-shadow:0 0 30px rgba(59,130,246,0.2),inset 0 0 20px rgba(34,211,238,0.05); border-color:rgba(59,130,246,0.55); }
+        .tier-warm {
+            background:linear-gradient(145deg,rgba(96,165,250,0.07),rgba(147,197,253,0.05));
+            border-color:rgba(96,165,250,0.22);
+        }
+        .tier-warm::before { background:#60a5fa; }
+        .tier-warm::after { background:linear-gradient(90deg,#60a5fa,#93c5fd); }
+        .tier-cold {
+            background:linear-gradient(145deg,rgba(75,85,99,0.08),rgba(55,65,81,0.06));
+            border-color:rgba(107,114,128,0.2);
+        }
+        .tier-cold::before { background:#6b7280; }
+        .tier-cold::after { background:linear-gradient(90deg,#4b5563,#6b7280); }
+        .tier-cold.dormant { opacity:0.45; filter:grayscale(0.6); }
+
+        .tier-header { display:flex; align-items:center; gap:10px; margin-bottom:16px; }
+        .tier-icon { font-size:28px; }
+        .tier-name { font-size:13px; font-weight:700; flex:1; }
+        .tier-hot .tier-name { color:#93c5fd; }
+        .tier-warm .tier-name { color:#93c5fd; }
+        .tier-cold .tier-name { color:#9ca3af; }
+        .tier-badge { font-size:9px; font-weight:700; padding:3px 8px; border-radius:5px; letter-spacing:0.5px; }
+        .badge-hot { background:rgba(34,211,238,0.15); color:#22d3ee; border:1px solid rgba(34,211,238,0.3); }
+        .badge-warm { background:rgba(251,191,36,0.1); color:#fbbf24; border:1px solid rgba(251,191,36,0.25); }
+        .badge-cold { background:rgba(107,114,128,0.12); color:#9ca3af; border:1px solid rgba(107,114,128,0.25); }
+
+        .tier-metrics { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px; }
+        .tier-metric { background:rgba(0,0,0,0.2); border-radius:8px; padding:10px 12px; }
+        .metric-value { font-family:'SF Mono',ui-monospace,monospace; font-size:20px; font-weight:900; }
+        .metric-label { font-size:9px; color:rgba(255,255,255,0.35); margin-top:2px; text-transform:uppercase; letter-spacing:0.5px; }
+        .tier-hot .metric-value { color:#60a5fa; }
+        .tier-warm .metric-value { color:#fbbf24; }
+        .tier-cold .metric-value { color:#9ca3af; }
+
+        .compute-bar { height:5px; background:rgba(255,255,255,0.06); border-radius:3px; overflow:hidden; margin-top:8px; }
+        .compute-fill { height:100%; border-radius:3px; transition:width 1s ease; }
+        .tier-hot .compute-fill { background:linear-gradient(90deg,#3b82f6,#22d3ee); }
+        .tier-warm .compute-fill { background:linear-gradient(90deg,#60a5fa,#fbbf24); }
+        .tier-cold .compute-fill { background:linear-gradient(90deg,#4b5563,#6b7280); }
+
+        .tier-desc { font-size:10px; color:rgba(255,255,255,0.35); line-height:1.6; margin-top:10px; }
+        .scan-hot {
+            position:absolute; top:0; left:-100%; width:60%; height:100%;
+            background:linear-gradient(90deg,transparent,rgba(34,211,238,0.08),transparent);
+            animation:hotScan 3s linear infinite; pointer-events:none;
+        }
+        @keyframes hotScan { to { left:150%; } }
+
+        .countdown-box { display:flex; align-items:center; gap:6px; margin-top:8px; font-size:10px; color:rgba(255,255,255,0.4); font-family:'SF Mono',monospace; }
+        .countdown-val { color:#fbbf24; font-weight:700; font-size:13px; }
+        .tier-cold .countdown-val { color:#6b7280; }
+
+        /* ─── 三大曲风子库面板 ─── */
+        .music-tabs { display:flex; gap:6px; margin-bottom:14px; }
+        .music-tab {
+            flex:1; padding:10px 8px; border-radius:8px; cursor:pointer; text-align:center;
+            font-size:11px; font-weight:700; border:1.5px solid var(--mb-border);
+            background:rgba(0,0,0,0.2); transition:all 0.3s; position:relative; overflow:hidden;
+        }
+        .music-tab .tab-icon { font-size:18px; display:block; margin-bottom:3px; }
+        .music-tab .tab-name { display:block; }
+        .music-tab.rap { color:#f472b6; border-color:rgba(244,114,182,0.2); }
+        .music-tab.rap:hover { border-color:rgba(244,114,182,0.4); }
+        .music-tab.rap.active { background:rgba(244,114,182,0.15); border-color:rgba(244,114,182,0.5); box-shadow:0 0 18px rgba(244,114,182,0.18); }
+        .music-tab.lyric { color:#60a5fa; border-color:rgba(96,165,250,0.2); }
+        .music-tab.lyric:hover { border-color:rgba(96,165,250,0.4); }
+        .music-tab.lyric.active { background:rgba(96,165,250,0.15); border-color:rgba(96,165,250,0.5); box-shadow:0 0 18px rgba(96,165,250,0.18); }
+        .music-tab.noise { color:#9ca3af; border-color:rgba(107,114,128,0.2); }
+        .music-tab.noise:hover { border-color:rgba(107,114,128,0.4); }
+        .music-tab.noise.active { background:rgba(107,114,128,0.15); border-color:rgba(107,114,128,0.5); }
+        .music-tab .tab-count { font-size:9px; opacity:0.6; font-family:'SF Mono',monospace; }
+        .music-tab.active .tab-count { opacity:1; }
+        .music-tab .compute-ind {
+            position:absolute; bottom:0;left:0;right:0;height:2px;
+            transform:scaleX(0); transition:transform 0.4s; transform-origin:left;
+        }
+        .music-tab.rap .compute-ind { background:#f472b6; }
+        .music-tab.lyric .compute-ind { background:#60a5fa; }
+        .music-tab.noise .compute-ind { background:#6b7280; }
+        .music-tab.active .compute-ind { transform:scaleX(1); }
+
+        .music-content { position:relative; min-height:240px; }
+        .music-panel {
+            position:absolute; inset:0; border-radius:10px; padding:16px;
+            background:rgba(0,0,0,0.2); border:1px solid var(--mb-border);
+            transition:all 0.4s; overflow:hidden;
+        }
+        .music-panel.dormant {
+            opacity:0.2; filter:grayscale(1) brightness(0.5);
+            transform:scale(0.97); pointer-events:none;
+            border-color:rgba(255,255,255,0.04);
+        }
+        .music-panel.rap-panel { border-color:rgba(244,114,182,0.2); }
+        .music-panel.rap-panel.active { box-shadow:0 0 25px rgba(244,114,182,0.1); border-color:rgba(244,114,182,0.4); }
+        .music-panel.lyric-panel { border-color:rgba(96,165,250,0.2); }
+        .music-panel.lyric-panel.active { box-shadow:0 0 25px rgba(96,165,250,0.1); border-color:rgba(96,165,250,0.4); }
+        .music-panel.noise-panel { border-color:rgba(107,114,128,0.2); }
+        .music-panel.noise-panel.active { border-color:rgba(107,114,128,0.35); }
+
+        .panel-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:12px; }
+        .pstat { background:rgba(0,0,0,0.25); border-radius:6px; padding:8px 6px; text-align:center; }
+        .pstat-val { font-family:'SF Mono',monospace; font-size:16px; font-weight:900; }
+        .pstat-lbl { font-size:8px; color:rgba(255,255,255,0.3); text-transform:uppercase; letter-spacing:0.5px; margin-top:1px; }
+        .rap-panel .pstat-val { color:#f472b6; }
+        .lyric-panel .pstat-val { color:#60a5fa; }
+        .noise-panel .pstat-val { color:#9ca3af; }
+
+        .isolation-bar { height:4px; background:rgba(255,255,255,0.05); border-radius:2px; margin:10px 0; overflow:hidden; }
+        .isolation-fill { height:100%; border-radius:2px; transition:width 0.8s; }
+        .rap-panel .isolation-fill { background:linear-gradient(90deg,#f472b6,#ec4899); width:0%; }
+        .lyric-panel .isolation-fill { background:linear-gradient(90deg,#60a5fa,#3b82f6); width:0%; }
+        .noise-panel .isolation-fill { background:linear-gradient(90deg,#6b7280,#4b5563); width:0%; }
+        .music-panel.active .isolation-fill { width:100%; }
+
+        .panel-items { max-height:100px; overflow-y:auto; font-size:10px; line-height:1.8; }
+        .panel-items::-webkit-scrollbar { width:3px; }
+        .panel-items::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.1); border-radius:2px; }
+        .pitem { padding:3px 8px; margin-bottom:2px; border-radius:4px; background:rgba(255,255,255,0.02); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .rap-panel .pitem { color:rgba(244,114,182,0.7); border-left:2px solid rgba(244,114,182,0.4); }
+        .lyric-panel .pitem { color:rgba(96,165,250,0.7); border-left:2px solid rgba(96,165,250,0.4); }
+        .noise-panel .pitem { color:rgba(156,163,175,0.6); border-left:2px solid rgba(107,114,128,0.3); }
+
+        .panel-status { font-size:10px; font-weight:600; display:flex; align-items:center; gap:6px; margin-top:8px; }
+        .status-dot { width:6px; height:6px; border-radius:50%; animation:pulse 1.5s infinite; }
+        .rap-panel.active .status-dot { background:#f472b6; box-shadow:0 0 8px #f472b6; }
+        .lyric-panel.active .status-dot { background:#60a5fa; box-shadow:0 0 8px #60a5fa; }
+        .noise-panel .status-dot { background:#6b7280; animation:none; }
+        .rap-panel:not(.active) .status-dot, .lyric-panel:not(.active) .status-dot { background:#4b5563; animation:none; }
+        .panel-status.sleeping { color:rgba(255,255,255,0.25); }
+        .panel-status.running { color:rgba(255,255,255,0.6); }
+
+        .pulse-bar {
+            position:absolute; top:0;left:0;right:0;height:2px;
+            background:linear-gradient(90deg,transparent,currentColor,transparent);
+            opacity:0;
+        }
+        .music-panel.active .pulse-bar { opacity:0.5; animation:hotScan 2.5s linear infinite; }
+        .rap-panel .pulse-bar { color:#f472b6; }
+        .lyric-panel .pulse-bar { color:#60a5fa; }
+        .noise-panel .pulse-bar { color:#6b7280; }
     </style>
 </head>
 <body>
@@ -314,7 +474,7 @@
             </div>
             <div class="version-pill">
                 <span class="dot"></span>
-                BATCH 2 · 漏斗动态流转就绪
+                BATCH 3 · 三级仓储+曲风隔离就绪
             </div>
         </div>
     </div>
@@ -457,31 +617,163 @@
             </div>
         </div>
 
-        <div class="lego-block w-12 result-block">
+        <div class="lego-block w-8 storage-block">
             <div class="block-title">
-                <span class="bicon">💾</span> 三层存储路由结果
+                <span class="bicon">💾</span> 三级分层仓储仪表盘
+                <span style="margin-left:auto;font-size:10px;color:rgba(255,255,255,0.3);font-weight:400">热算力·温存活·冷休眠</span>
             </div>
-            <div class="result-grid">
-                <div class="result-box trash" id="boxTrash">
-                    <div class="result-title">
-                        <span>🗑️ 噪音废弃库</span>
-                        <span class="result-count" id="cntTrash" style="color:var(--mb-gray)">0</span>
+            <div class="storage-dashboard">
+                <div class="storage-tier tier-hot active-hot" id="tierHot">
+                    <div class="scan-hot"></div>
+                    <div class="tier-header">
+                        <span class="tier-icon">🔵</span>
+                        <span class="tier-name">长期同源基准库</span>
+                        <span class="tier-badge badge-hot">🔥 热存储</span>
                     </div>
-                    <div class="result-list" id="listTrash"></div>
+                    <div class="tier-metrics">
+                        <div class="tier-metric">
+                            <div class="metric-value" id="hotTotal">0</div>
+                            <div class="metric-label">总条目</div>
+                        </div>
+                        <div class="tier-metric">
+                            <div class="metric-value" id="hotCompute">78%</div>
+                            <div class="metric-label">热算力占用</div>
+                        </div>
+                        <div class="tier-metric">
+                            <div class="metric-value" id="hotIndex">0</div>
+                            <div class="metric-label">骨架索引</div>
+                        </div>
+                        <div class="tier-metric">
+                            <div class="metric-value" style="color:#22d3ee">实时</div>
+                            <div class="metric-label">检索模式</div>
+                        </div>
+                    </div>
+                    <div class="compute-bar"><div class="compute-fill" id="hotBar" style="width:78%"></div></div>
+                    <div class="tier-desc">⚡ 高频访问区 · 数理公理常驻内存 · KMP实时索引 · 响应时延 &lt;10ms · 全量算力供给</div>
                 </div>
-                <div class="result-box buffer" id="boxBuffer">
-                    <div class="result-title">
-                        <span>⏸️ 缓冲待审库</span>
-                        <span class="result-count" id="cntBuffer" style="color:var(--mb-gold)">0</span>
+
+                <div class="storage-tier tier-warm" id="tierWarm">
+                    <div class="tier-header">
+                        <span class="tier-icon">🟡</span>
+                        <span class="tier-name">中间缓冲复审库</span>
+                        <span class="tier-badge badge-warm">🌤️ 温存储</span>
                     </div>
-                    <div class="result-list" id="listBuffer"></div>
+                    <div class="tier-metrics">
+                        <div class="tier-metric">
+                            <div class="metric-value" id="warmTotal">0</div>
+                            <div class="metric-label">待复审条目</div>
+                        </div>
+                        <div class="tier-metric">
+                            <div class="metric-value" id="warmCompute">22%</div>
+                            <div class="metric-label">算力占用</div>
+                        </div>
+                        <div class="tier-metric">
+                            <div class="metric-value" id="warmPatrol">二分</div>
+                            <div class="metric-label">巡检方式</div>
+                        </div>
+                        <div class="tier-metric">
+                            <div class="countdown-box">⏱ <span class="countdown-val" id="warmCountdown">12:00</span></div>
+                            <div class="metric-label" style="margin-top:6px">下次巡检倒计时</div>
+                        </div>
+                    </div>
+                    <div class="compute-bar"><div class="compute-fill" id="warmBar" style="width:22%"></div></div>
+                    <div class="tier-desc">📋 四维待审区 · 定期二分巡检 · 人工复核闸门 · 公理确认后升入热库 · 不通过则下沉冷库</div>
                 </div>
-                <div class="result-box longterm" id="boxLongterm">
-                    <div class="result-title">
-                        <span>✅ 长期公理库</span>
-                        <span class="result-count" id="cntLongterm" style="color:var(--mb-emerald)">0</span>
+
+                <div class="storage-tier tier-cold dormant" id="tierCold">
+                    <div class="tier-header">
+                        <span class="tier-icon">⚫</span>
+                        <span class="tier-name">冷存淘汰库</span>
+                        <span class="tier-badge badge-cold">❄️ 冷休眠</span>
                     </div>
-                    <div class="result-list" id="listLongterm"></div>
+                    <div class="tier-metrics">
+                        <div class="tier-metric">
+                            <div class="metric-value" id="coldTotal">0</div>
+                            <div class="metric-label">归档总量</div>
+                        </div>
+                        <div class="tier-metric">
+                            <div class="metric-value" style="color:#6b7280">0%</div>
+                            <div class="metric-label">运行算力</div>
+                        </div>
+                        <div class="tier-metric">
+                            <div class="metric-value" style="color:#6b7280">休眠</div>
+                            <div class="metric-label">索引状态</div>
+                        </div>
+                        <div class="tier-metric">
+                            <div class="metric-value" style="color:#6b7280">压缩</div>
+                            <div class="metric-label">存储模式</div>
+                        </div>
+                    </div>
+                    <div class="compute-bar"><div class="compute-fill" style="width:2%"></div></div>
+                    <div class="tier-desc">📦 废弃归档区 · 不占用运行算力 · 高压缩比存档 · 仅在回溯审计时解压唤醒</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="lego-block w-4 music-block">
+            <div class="block-title">
+                <span class="bicon">🎵</span> 三大曲风子库
+                <span style="margin-left:auto;font-size:10px;color:rgba(255,255,255,0.3);font-weight:400">算力隔离切换</span>
+            </div>
+            <div class="music-tabs">
+                <div class="music-tab rap active" onclick="switchMusic('rap')">
+                    <span class="tab-icon">🎤</span>
+                    <span class="tab-name">Rap成长库</span>
+                    <span class="tab-count" id="cntRapTab">0</span>
+                    <div class="compute-ind"></div>
+                </div>
+                <div class="music-tab lyric" onclick="switchMusic('lyric')">
+                    <span class="tab-icon">🎹</span>
+                    <span class="tab-name">抒情蓝筹</span>
+                    <span class="tab-count" id="cntLyricTab">0</span>
+                    <div class="compute-ind"></div>
+                </div>
+                <div class="music-tab noise" onclick="switchMusic('noise')">
+                    <span class="tab-icon">🔇</span>
+                    <span class="tab-name">噪音冷存</span>
+                    <span class="tab-count" id="cntNoiseTab">0</span>
+                    <div class="compute-ind"></div>
+                </div>
+            </div>
+            <div class="music-content">
+                <div class="music-panel rap-panel active" id="panelRap">
+                    <div class="pulse-bar"></div>
+                    <div class="panel-stats">
+                        <div class="pstat"><div class="pstat-val" id="rapTotal">0</div><div class="pstat-lbl">条目数</div></div>
+                        <div class="pstat"><div class="pstat-val" style="color:#fbbf24">45%</div><div class="pstat-lbl">算力配额</div></div>
+                        <div class="pstat"><div class="pstat-val" style="color:#10b981">活跃</div><div class="pstat-lbl">运行状态</div></div>
+                    </div>
+                    <div class="isolation-bar"><div class="isolation-fill"></div></div>
+                    <div class="panel-items" id="rapList"></div>
+                    <div class="panel-status running">
+                        <span class="status-dot"></span> 算力已激活 · 押韵/flow/battle模式在线
+                    </div>
+                </div>
+                <div class="music-panel lyric-panel dormant" id="panelLyric">
+                    <div class="pulse-bar"></div>
+                    <div class="panel-stats">
+                        <div class="pstat"><div class="pstat-val" id="lyricTotal">0</div><div class="pstat-lbl">条目数</div></div>
+                        <div class="pstat"><div class="pstat-val" style="color:#fbbf24">0%</div><div class="pstat-lbl">算力配额</div></div>
+                        <div class="pstat"><div class="pstat-val" style="color:#6b7280">休眠</div><div class="pstat-lbl">运行状态</div></div>
+                    </div>
+                    <div class="isolation-bar"><div class="isolation-fill"></div></div>
+                    <div class="panel-items" id="lyricList"></div>
+                    <div class="panel-status sleeping">
+                        <span class="status-dot"></span> 算力已隔离 · 切换标签激活蓝调音阶模型
+                    </div>
+                </div>
+                <div class="music-panel noise-panel dormant" id="panelNoise">
+                    <div class="pulse-bar"></div>
+                    <div class="panel-stats">
+                        <div class="pstat"><div class="pstat-val" id="noiseTotal">0</div><div class="pstat-lbl">条目数</div></div>
+                        <div class="pstat"><div class="pstat-val" style="color:#6b7280">0%</div><div class="pstat-lbl">算力配额</div></div>
+                        <div class="pstat"><div class="pstat-val" style="color:#6b7280">冻结</div><div class="pstat-lbl">运行状态</div></div>
+                    </div>
+                    <div class="isolation-bar"><div class="isolation-fill"></div></div>
+                    <div class="panel-items" id="noiseList"></div>
+                    <div class="panel-status sleeping">
+                        <span class="status-dot"></span> 冷存归档 · 不占用NPU推理资源
+                    </div>
                 </div>
             </div>
         </div>
@@ -501,13 +793,13 @@
                     <span class="m-icon">💾</span>
                     <div class="m-name">storage_three</div>
                     <div class="m-name" style="font-size:9px;opacity:0.6;margin-top:2px">三层存储</div>
-                    <span class="module-status ms-dev">待开发</span>
+                    <span class="module-status ms-done">✓ Batch3完成</span>
                 </div>
                 <div class="module-card m-music">
                     <span class="m-icon">🎵</span>
                     <div class="m-name">music_sub_lib</div>
                     <div class="m-name" style="font-size:9px;opacity:0.6;margin-top:2px">音乐子库</div>
-                    <span class="module-status ms-dev">待开发</span>
+                    <span class="module-status ms-done">✓ Batch3完成</span>
                 </div>
                 <div class="module-card m-kmp">
                     <span class="m-icon">🔍</span>
@@ -583,24 +875,91 @@
         else { status.textContent='待处理'; }
         if(count!==undefined) cnt.textContent = count;
     }
+    const musicLibs = { rap: [], lyric: [], noise: [] };
+    let activeMusicTab = 'rap';
+    let countdownSec = 720;
+
+    function classifyMusic(text){
+        const RAP_KW = ['flow','Flow','FLOW','押韵','beat','Beat','freestyle','battle','Battle','麦克风','rap','Rap','燥','拍','节奏','韵脚','diss','MC','hiphop','握紧','八拍','即兴'];
+        const LYRIC_KW = ['旋律','钢琴','抒情','情绪','蓝调','诉说','轻柔','缓慢','音符','流淌','沉淀','温柔','伤感','乐章','和弦','吟唱'];
+        for(const k of RAP_KW){ if(text.includes(k)) return 'rap'; }
+        for(const k of LYRIC_KW){ if(text.includes(k)) return 'lyric'; }
+        return 'noise';
+    }
+
+    function updateStorageDashboard(){
+        const ht = results.longterm.length;
+        const wt = results.buffer.length;
+        const ct = results.trash.length;
+        $('hotTotal').textContent = ht;
+        $('hotIndex').textContent = Math.floor(ht * 1.7);
+        $('warmTotal').textContent = wt;
+        $('coldTotal').textContent = ct;
+        const hotPct = Math.min(35 + ht*5, 92);
+        const warmPct = Math.min(8 + wt*4, 45);
+        $('hotCompute').textContent = hotPct+'%';
+        $('warmCompute').textContent = warmPct+'%';
+        $('hotBar').style.width = hotPct+'%';
+        $('warmBar').style.width = warmPct+'%';
+        if(ht > 0) $('tierHot').classList.add('active-hot');
+        if(ct > 0) $('tierCold').classList.remove('dormant');
+        else $('tierCold').classList.add('dormant');
+
+        musicLibs.rap = []; musicLibs.lyric = []; musicLibs.noise = [];
+        [...results.longterm, ...results.buffer, ...results.trash].forEach(t=>{
+            const cat = classifyMusic(t);
+            musicLibs[cat].push(t);
+        });
+        $('rapTotal').textContent = musicLibs.rap.length;
+        $('lyricTotal').textContent = musicLibs.lyric.length;
+        $('noiseTotal').textContent = musicLibs.noise.length;
+        $('cntRapTab').textContent = musicLibs.rap.length;
+        $('cntLyricTab').textContent = musicLibs.lyric.length;
+        $('cntNoiseTab').textContent = musicLibs.noise.length;
+        $('rapList').innerHTML = musicLibs.rap.slice(0,30).map(t=>`<div class="pitem" title="${t}">🎤 ${t.length>22?t.substring(0,22)+'...':t}</div>`).join('') || '<div style="font-size:10px;color:rgba(244,114,182,0.3);text-align:center;padding:20px">暂无Rap成长条目</div>';
+        $('lyricList').innerHTML = musicLibs.lyric.slice(0,30).map(t=>`<div class="pitem" title="${t}">🎹 ${t.length>22?t.substring(0,22)+'...':t}</div>`).join('') || '<div style="font-size:10px;color:rgba(96,165,250,0.3);text-align:center;padding:20px">暂无抒情蓝筹条目</div>';
+        $('noiseList').innerHTML = musicLibs.noise.slice(0,30).map(t=>`<div class="pitem" title="${t}">🔇 ${t.length>22?t.substring(0,22)+'...':t}</div>`).join('') || '<div style="font-size:10px;color:rgba(156,163,175,0.3);text-align:center;padding:20px">暂无噪音废弃条目</div>';
+
+        $('statDiscard').textContent = ct;
+        $('statBuffer').textContent = wt;
+        $('statLongterm').textContent = ht;
+    }
+
+    window.switchMusic = function(tab){
+        activeMusicTab = tab;
+        ['rap','lyric','noise'].forEach(t=>{
+            const tabEl = document.querySelector('.music-tab.'+t);
+            const panel = $('panel'+t.charAt(0).toUpperCase()+t.slice(1));
+            if(t === tab){
+                tabEl.classList.add('active');
+                panel.classList.remove('dormant');
+                panel.classList.add('active');
+            } else {
+                tabEl.classList.remove('active');
+                panel.classList.add('dormant');
+                panel.classList.remove('active');
+            }
+        });
+        log(`🎵 曲风切换：${tab==='rap'?'Rap成长库':tab==='lyric'?'抒情蓝筹库':'噪音冷存库'} · 算力已隔离切换`,'log-info');
+    }
+
+    function startCountdown(){
+        setInterval(()=>{
+            countdownSec--;
+            if(countdownSec <= 0){ countdownSec = 720; log('⏱ 缓冲库二分巡检启动...','log-warn'); }
+            const m = Math.floor(countdownSec/60);
+            const s = countdownSec%60;
+            $('warmCountdown').textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+        }, 1000);
+    }
+
     function resetFunnel(){
         for(let i=1;i<=4;i++){ updateLayerState(i,'idle',0); }
         $('funnelOut').className='funnel-output'; $('funnelOut').innerHTML='<span class="out-icon">⏳</span> 等待净化流程启动';
         $('funnelState').textContent='等待输入...';
         results.trash=[];results.buffer=[];results.longterm=[];
-        updateResultBoxes();
+        updateStorageDashboard();
         particles=[];
-    }
-    function updateResultBoxes(){
-        ['trash','buffer','longterm'].forEach(k=>{
-            $('cnt'+k.charAt(0).toUpperCase()+k.slice(1)).textContent=results[k].length;
-            const list = $('list'+k.charAt(0).toUpperCase()+k.slice(1));
-            list.innerHTML=results[k].map(t=>`<div class="result-item" title="${t}">${t.length>28?t.substring(0,28)+'...':t}</div>`).join('');
-            if(results[k].length>0) $('box'+k.charAt(0).toUpperCase()+k.slice(1)).classList.add('active');
-        });
-        $('statDiscard').textContent=results.trash.length;
-        $('statBuffer').textContent=results.buffer.length;
-        $('statLongterm').textContent=results.longterm.length;
     }
 
     function initCanvas(){
@@ -724,34 +1083,31 @@
     }
 
     function routeParticle(p){
+        const stage = canvas.parentElement.getBoundingClientRect();
+        const outEl = $('funnelOut').getBoundingClientRect();
+        const outX = (outEl.left+outEl.right)/2 - stage.left;
+        const outY = (outEl.top+outEl.bottom)/2 - stage.top;
+
         if(p.layer===1){
             if(p.type==='noise'){
-                const box = $('boxTrash').getBoundingClientRect();
-                const stage = canvas.parentElement.getBoundingClientRect();
                 p.state='totrash';
-                p.targetX = (box.left+box.right)/2 - stage.left;
-                p.targetY = (box.top+box.bottom)/2 - stage.top + 20;
-                setTimeout(()=>{
-                    results.trash.push(p.text);
-                    updateResultBoxes();
-                },200);
+                p.targetX = p.x + (Math.random()-0.5)*200;
+                p.targetY = canvas.height + 30;
+                setTimeout(()=>{ results.trash.push(p.text); updateStorageDashboard(); },300);
             } else {
                 const nxt = layerRects.l2;
                 if(nxt){
                     p.state='todown'; p.layer=2;
                     p.targetX = nxt.x + (Math.random()-0.5)*nxt.w*0.5;
                     p.targetY = nxt.y;
-                    p.type = p.type;
                 }
             }
         } else if(p.layer===2){
             if(p.type==='trash'){
-                const box = $('boxTrash').getBoundingClientRect();
-                const stage = canvas.parentElement.getBoundingClientRect();
                 p.state='totrash';
-                p.targetX = (box.left+box.right)/2-stage.left;
-                p.targetY = (box.top+box.bottom)/2-stage.top+20;
-                setTimeout(()=>{ results.trash.push(p.text); updateResultBoxes(); },200);
+                p.targetX = p.x + (Math.random()-0.5)*180;
+                p.targetY = canvas.height + 30;
+                setTimeout(()=>{ results.trash.push(p.text); updateStorageDashboard(); },300);
             } else {
                 const nxt = layerRects.l3;
                 if(nxt){
@@ -763,12 +1119,10 @@
             }
         } else if(p.layer===3){
             if(p.type==='trash'){
-                const box = $('boxBuffer').getBoundingClientRect();
-                const stage = canvas.parentElement.getBoundingClientRect();
                 p.state='tobuffer';
-                p.targetX = (box.left+box.right)/2-stage.left;
-                p.targetY = (box.top+box.bottom)/2-stage.top+20;
-                setTimeout(()=>{ results.buffer.push(p.text); updateResultBoxes(); },200);
+                p.targetX = outX - 60;
+                p.targetY = outY + 40;
+                setTimeout(()=>{ results.buffer.push(p.text); updateStorageDashboard(); },300);
             } else {
                 const nxt = layerRects.l4;
                 if(nxt){
@@ -779,17 +1133,14 @@
             }
         } else if(p.layer===4){
             const isAxiom = AXIOM_KEYWORDS.some(k=>p.text.includes(k));
-            const box = isAxiom ? $('boxLongterm') : $('boxBuffer');
-            const stage = canvas.parentElement.getBoundingClientRect();
-            const br = box.getBoundingClientRect();
             p.state = isAxiom?'tolongterm':'tobuffer';
-            p.targetX = (br.left+br.right)/2-stage.left;
-            p.targetY = (br.top+br.bottom)/2-stage.top+20;
+            p.targetX = isAxiom ? outX + 40 : outX - 40;
+            p.targetY = outY + 50;
             p.type = isAxiom?'longterm':'buffer';
             setTimeout(()=>{
                 if(isAxiom){ results.longterm.push(p.text); } else { results.buffer.push(p.text); }
-                updateResultBoxes();
-            },200);
+                updateStorageDashboard();
+            },300);
         }
     }
 
@@ -914,9 +1265,10 @@
         spawnParticles(toL4, 4);
         await sleep(1200);
         $('funnelOut').className='funnel-output done';
-        $('funnelOut').innerHTML=`<span class="out-icon">✅</span> 净化完成 · 长期库 ${results.longterm.length}条 · 缓冲库 ${results.buffer.length}条 · 废弃 ${results.trash.length}条`;
+        $('funnelOut').innerHTML=`<span class="out-icon">✅</span> 净化完成 · 热库 ${results.longterm.length}条 · 温库 ${results.buffer.length}条 · 冷库 ${results.trash.length}条`;
         $('funnelState').textContent=`✓ 全流程完成`;
-        log(`═══ 全流程完成：长期公理库${results.longterm.length}条 · 缓冲待审${results.buffer.length}条 · 废弃${results.trash.length}条 ═══`,'log-ok');
+        log(`═══ 全流程完成：长期热库${results.longterm.length}条 · 缓冲温库${results.buffer.length}条 · 冷存淘汰${results.trash.length}条 ═══`,'log-ok');
+        updateStorageDashboard();
         isRunning=false; setButtonsDisabled(false);
     }
 
@@ -973,7 +1325,10 @@
     window.addEventListener('load',()=>{
         initCanvas();
         setTimeout(resizeCanvas, 300);
-        console.log('%c🧠 MemoryBase V1.0 · Batch 2 四级漏斗动态引擎 initialized','color:#a78bfa;font-weight:bold;font-size:13px;');
+        startCountdown();
+        updateStorageDashboard();
+        switchMusic('rap');
+        console.log('%c🧠 MemoryBase V1.0 · Batch 3 三级仓储+曲风隔离 initialized','color:#f472b6;font-weight:bold;font-size:13px;');
     });
 })();
 </script>
