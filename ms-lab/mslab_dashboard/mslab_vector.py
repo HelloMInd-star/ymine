@@ -1,23 +1,23 @@
 """
-MS-Lab 四维向量引擎 (Batch1 核心模块)
+MS-Lab 四维向量引擎 (Batch2 扩展)
 =====================================
-功能：
-  1. 中文词性拆分（名词/动词/形容词/副词）—— 基于内置词典+前向最大匹配
-  2. 四维向量生成：[名词权重, 动词权重, 形容词权重, 副词权重]
-  3. 精度支持：FP32(4B) / FP64(8B)；FP128 仅预留空接口（红线）
-  4. 存储字节测算：总字节 = 维度数 × 单精度字节 + 8字节元数据
-  5. 二进制补0冗余 / 有效比特占比统计
-  6. KMP长文本分块存储统计（仅做分块切片+元数据统计，不实现KMP匹配源码）
-
-严格红线：
-  - 不实现通用数学求解
-  - FP128仅空接口
-  - KMP仅做分块元数据记录，不编写匹配算法
+Batch1 已交付：词性拆分/四维向量/位宽测算/二进制统计/KMP分块
+Batch2 新增：
+  1. 余弦相似度计算
+  2. 四档自动分流路由：<0.25丢弃 / 0.25-0.5缓冲 / 0.5-0.75常规 / ≥0.75知识
+  3. Token计数：1~2汉字=1Token，英文单词≈1Token
+  4. 向量去重指纹哈希
+  5. FP64→FP32精度降级接口
+严格红线：不实现KMP底层匹配算法、不实现128bit运算、不实现通用求解库
 """
 import struct
 import math
+import copy
 import uuid
+import hashlib
+import re
 import numpy as np
+from datetime import datetime, timezone, timedelta
 from typing import Dict, List, Tuple, Optional
 from dataclasses import dataclass, field, asdict
 from pathlib import Path
@@ -413,8 +413,6 @@ class VectorRecord:
         byte_info = calc_vector_bytes(v["dims"], precision)
         bit_stats = analyze_vector_bits(v["vector"], precision)
         kmp = kmp_block_stats(text, block_size)
-        import time as _t
-        from datetime import datetime, timezone, timedelta
         TZ = timezone(timedelta(hours=8))
         ts = timestamp or datetime.now(TZ).isoformat(timespec="seconds")
         vid = vec_id or uuid.uuid4().hex[:16]
@@ -434,3 +432,193 @@ class VectorRecord:
             created_at=ts,
             tags=tags or [],
         )
+
+
+# ============================================================
+# Batch2 新增：余弦相似度计算
+# ============================================================
+def cosine_similarity(v1: List[float], v2: List[float]) -> float:
+    """
+    计算两个向量的余弦相似度，返回值范围 [-1, 1]。
+    对于归一化向量（L2归一化），余弦相似度≈点积；此处使用通用公式。
+    """
+    a = np.array(v1, dtype=np.float64)
+    b = np.array(v2, dtype=np.float64)
+    dot = np.dot(a, b)
+    norm_a = np.linalg.norm(a)
+    norm_b = np.linalg.norm(b)
+    if norm_a < 1e-12 or norm_b < 1e-12:
+        return 0.0
+    return float(dot / (norm_a * norm_b))
+
+
+def batch_cosine_similarity(query: List[float], corpus: List[List[float]]) -> List[float]:
+    """批量计算query与语料库中每个向量的余弦相似度"""
+    q = np.array(query, dtype=np.float64)
+    qn = np.linalg.norm(q)
+    if qn < 1e-12:
+        return [0.0] * len(corpus)
+    q = q / qn
+    results = []
+    for c in corpus:
+        cv = np.array(c, dtype=np.float64)
+        cn = np.linalg.norm(cv)
+        if cn < 1e-12:
+            results.append(0.0)
+        else:
+            results.append(float(np.dot(q, cv / cn)))
+    return results
+
+
+# ============================================================
+# Batch2 新增：四档自动分流路由
+#   ＜1/4(0.25) → trash丢弃
+#   1/4~2/4(0.25~0.5) → buffer缓冲
+#   2/4~3/4(0.5~0.75) → normal常规
+#   ≥3/4(0.75) → knowledge知识库
+# 注意：相似度这里指与"理想高质量向量"的余弦相似度。
+#   基准向量取纯名动高密度方向 [0.5,0.5,0,0]（名词+动词占比高=信息密度高）
+#   形副主导的噪声文本与该基准夹角大→相似度低→流入trash/buffer；
+#   名动主导的高信息文本与该基准夹角小→相似度高→流入knowledge。
+# ============================================================
+REFERENCE_KNOWLEDGE_VEC = [0.50, 0.50, 0.00, 0.00]
+
+ROUTE_THRESHOLDS = [
+    (0.00, 0.25, "trash",     "🗑️ 丢弃（噪声库）"),
+    (0.25, 0.50, "buffer",    "⏳ 缓冲库"),
+    (0.50, 0.75, "normal",    "📦 常规库"),
+    (0.75, 1.01, "knowledge", "🏛️ 知识库"),
+]
+
+def classify_tier_by_similarity(vec: List[float], ref_vec: List[float] = None) -> Dict:
+    """
+    基于与参考高质量向量的余弦相似度，自动路由到四库之一。
+    返回: {tier, similarity, tier_label, tier_desc, auto_routed: True}
+    """
+    if ref_vec is None:
+        ref_vec = REFERENCE_KNOWLEDGE_VEC
+    sim = cosine_similarity(vec, ref_vec)
+    sim_clamped = max(0.0, min(1.0, sim))
+    target_tier = "trash"
+    tier_label = "🗑️ 丢弃"
+    for lo, hi, tier, label in ROUTE_THRESHOLDS:
+        if lo <= sim_clamped < hi:
+            target_tier = tier
+            tier_label = label
+            break
+    return {
+        "tier": target_tier,
+        "similarity": round(sim_clamped, 6),
+        "similarity_pct": round(sim_clamped * 100, 2),
+        "tier_label": tier_label,
+        "reference_vec": ref_vec,
+        "auto_routed": True,
+        "thresholds": [
+            {"min": lo, "max": hi, "tier": t, "label": lbl}
+            for lo, hi, t, lbl in ROUTE_THRESHOLDS
+        ],
+    }
+
+
+# ============================================================
+# Batch2 新增：Token 计数规则
+#   - 1~2个汉字(CJK字符) = 1个Token
+#   - 每个英文单词≈1Token
+#   - 标点/空格不计费Token，但计入字符长度
+#   - 输出Token按向量维度数+元数据开销估算
+# ============================================================
+def count_tokens_in_text(text: str) -> Dict:
+    """
+    计算输入文本的Token消耗。
+    规则：连续CJK汉字每2个计1Token（不足2个按1计）；
+          连续ASCII字母/数字组成的单词计1Token；
+          纯标点/空白不计Token。
+    """
+    cjk_chars = 0
+    ascii_words = 0
+    i = 0
+    n = len(text)
+    while i < n:
+        ch = text[i]
+        code = ord(ch)
+        if 0x4E00 <= code <= 0x9FFF or 0x3400 <= code <= 0x4DBF or 0xF900 <= code <= 0xFAFF:
+            cjk_chars += 1
+            i += 1
+        elif ch.isalnum() and code < 128:
+            while i < n and text[i].isalnum() and ord(text[i]) < 128:
+                i += 1
+            ascii_words += 1
+        else:
+            i += 1
+    cjk_tokens = (cjk_chars + 1) // 2 if cjk_chars > 0 else 0
+    total_tokens = cjk_tokens + ascii_words
+    return {
+        "total_tokens": total_tokens,
+        "cjk_chars": cjk_chars,
+        "cjk_tokens": cjk_tokens,
+        "ascii_words": ascii_words,
+        "total_chars": len(text),
+        "rule": "1~2汉字=1Token, 英文单词≈1Token, 标点不计",
+    }
+
+
+def estimate_output_tokens(precision: str = "fp32", dims: int = 4, with_metadata: bool = True) -> Dict:
+    """
+    估算输出Token数（向量序列化后用于计费）。
+    规则：每个浮点分量≈1Token，元数据额外固定5Token。
+    """
+    elem_token = dims
+    meta_token = 5 if with_metadata else 0
+    total = elem_token + meta_token
+    return {
+        "dims": dims,
+        "element_tokens": elem_token,
+        "metadata_tokens": meta_token,
+        "total_tokens": total,
+        "precision": precision,
+    }
+
+
+# ============================================================
+# Batch2 新增：向量去重指纹
+# ============================================================
+def vector_fingerprint(vec: List[float], precision: str = "fp32", text_norm: str = "") -> str:
+    """
+    生成向量指纹：将向量按精度量化后做SHA256，可用于检测重复向量。
+    text_norm: 可选，去空白后的原文，参与哈希增强去重准确性。
+    """
+    if precision == "fp64":
+        quantized = tuple(round(x, 10) for x in vec)
+    else:
+        quantized = tuple(round(x, 6) for x in vec)
+    raw = f"{precision}|{'|'.join(f'{v:.10f}' for v in quantized)}|{text_norm.strip()}"
+    return hashlib.sha256(raw.encode("utf-8")).hexdigest()[:24]
+
+
+def text_normalize(text: str) -> str:
+    """归一化文本：去空白、标点、转小写，用于去重比对"""
+    t = re.sub(r"\s+", "", text)
+    t = re.sub(r"[，。！？、；：\"\"''（）【】《》,.!?;:()\[\]{}\"'\-—…·]", "", t)
+    return t.lower()
+
+
+# ============================================================
+# Batch2 新增：精度降级（FP64→FP32）
+# ============================================================
+def downgrade_precision(vec_record: Dict) -> Dict:
+    """
+    将FP64向量降级为FP32，重新计算字节占用和比特统计。
+    返回新的向量记录dict（不修改原对象）。
+    """
+    if vec_record.get("precision") != "fp64":
+        return vec_record
+    new_rec = copy.deepcopy(vec_record)
+    new_rec["precision"] = "fp32"
+    new_vec = [float(np.float32(x)) for x in vec_record["vector"]]
+    new_rec["vector"] = new_vec
+    new_rec["byte_info"] = calc_vector_bytes(new_rec["dims"], "fp32")
+    arr = np.array(new_vec, dtype=np.float32)
+    new_rec["bit_stats"] = analyze_vector_bits(arr, "fp32")
+    new_rec["downgraded_from"] = "fp64"
+    new_rec["downgraded_at"] = datetime.now(timezone(timedelta(hours=8))).isoformat(timespec="seconds")
+    return new_rec

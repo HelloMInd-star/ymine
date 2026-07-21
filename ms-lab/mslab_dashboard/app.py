@@ -38,11 +38,18 @@ from mslab_utils import (
     tier_real_stats, all_tiers_real_stats, TIER_CAP_BYTES,
     compute_global_bit_util,
     PrivateKernel128Bit, KMPSearchInterface, SolverKernelStub, ComputeSchedulerStub,
+    build_hot_cache, cache_status, hot_cache_search,
+    load_pricing_config, save_pricing_config, calc_billing, log_billing_v2,
+    check_duplicate, should_downgrade, auto_route_and_store,
+    HOT_VECTOR_CACHE, WARM_VECTOR_CACHE,
 )
 from mslab_vector import (
     tokenize, build_4d_vector, calc_vector_bytes, analyze_vector_bits,
     kmp_block_stats, VectorRecord, FP128Reserved,
     POS_DIM_LABELS, POS_DIM_NAMES, PRECISION_BYTES,
+    cosine_similarity, classify_tier_by_similarity, count_tokens_in_text,
+    estimate_output_tokens, vector_fingerprint, text_normalize, downgrade_precision,
+    REFERENCE_KNOWLEDGE_VEC, ROUTE_THRESHOLDS,
 )
 from mslab_theme import render_theme, render_header
 
@@ -105,6 +112,8 @@ refresh_index_stats()
 cfg = load_lab_config()
 tiers_real = all_tiers_real_stats()
 global_bit_util = compute_global_bit_util()
+build_hot_cache()
+pricing_cfg = load_pricing_config()
 
 # ============================================================
 # 侧边栏 —— 导航 + 权限切换 + 红线
@@ -436,14 +445,18 @@ if page.startswith("🏠"):
     """, unsafe_allow_html=True)
 
 # ---------------------------------------------------------------------
-# 页面2：向量库管理 —— 文本→词性拆分→四维向量生成→位宽测算→入库
+# 页面2：向量库管理 —— Batch2增强：自动分流/Token计费/降级/去重/冷热缓存
 # ---------------------------------------------------------------------
 elif page.startswith("💾"):
     st.markdown("""
     <div class="section-panel">
-        <div class="section-title">💾 向量生成 · 词性拆分 · 位宽存储测算</div>
+        <div class="section-title">💾 向量生成 · 词性拆分 · 相似度自动分流入库</div>
         <div style="font-size:12px;color:#94a3b8;margin-bottom:12px">
-            📌 输入文本 → 自动拆分名词/动词/形容词/副词 → 生成四维向量 → 测算FP32/FP64字节占用 → 入库四级向量库
+            📌 Batch2新功能：<b style="color:#fcd34d">余弦相似度四档自动分流</b> ·
+            <b style="color:#6ee7b7">Token输入/输出分别计费</b> ·
+            <b style="color:#f87171">FP64水位超90%自动降级FP32</b> ·
+            <b style="color:#a78bfa">向量指纹去重</b> ·
+            <b style="color:#93c5fd">冷热缓存（知识库常驻内存）</b>
         </div>
     """, unsafe_allow_html=True)
 
@@ -451,30 +464,59 @@ elif page.startswith("💾"):
     with col_input:
         input_text = st.text_area(
             "📝 输入中文/英文文本",
-            value="心智向量化实验室通过深度学习模型将文本转换为高维向量，实现快速语义检索与知识存储",
+            value="深度学习模型通过大规模知识训练快速构建高维语义向量空间，实现精准智能检索和稳定的知识存储系统",
             height=100,
             placeholder="在此输入待向量化的文本，支持中英文混合……",
         )
     with col_opt:
+        storage_mode = st.radio(
+            "📦 入库模式",
+            options=["auto", "manual"],
+            format_func=lambda x: {"auto":"🤖 自动相似度分流","manual":"✋ 手动指定库"}[x],
+            index=0,
+            horizontal=True,
+        )
         precision_sel = st.selectbox(
             "🧮 存储精度",
             options=["fp32", "fp64", "fp128"],
             index=0,
             format_func=lambda x: {"fp32":"FP32 (单精度·4B)","fp64":"FP64 (双精度·8B)","fp128":"FP128 (预留·红线禁用)"}[x],
         )
-        tier_sel = st.selectbox(
-            "📦 目标向量库",
-            options=["buffer", "normal", "knowledge", "trash"],
-            index=0,
-            format_func=lambda x: {"trash":"🗑️ 噪声库","buffer":"⏳ 缓冲库","normal":"📦 常规库","knowledge":"🏛️ 知识库"}[x],
-        )
+        if storage_mode == "manual":
+            tier_sel = st.selectbox(
+                "📦 目标向量库",
+                options=["buffer", "normal", "knowledge", "trash"],
+                index=0,
+                format_func=lambda x: {"trash":"🗑️ 噪声库","buffer":"⏳ 缓冲库","normal":"📦 常规库","knowledge":"🏛️ 知识库"}[x],
+            )
+        else:
+            st.info("🤖 自动分流：相似度＜25%丢弃 / 25-50%缓冲 / 50-75%常规 / ≥75%知识库")
         block_size = st.number_input("KMP分块大小(字节)", min_value=64, max_value=4096, value=256, step=64)
+        auto_downgrade = st.checkbox("🔻 水位超90%自动FP64→FP32", value=True)
+        skip_dup = st.checkbox("🔁 自动去重（指纹+文本）", value=True)
+
+    # Token费用预览（实时计算）
+    text = input_text.strip()
+    if text:
+        tok_in_info = count_tokens_in_text(text)
+        tok_out_info = estimate_output_tokens(precision_sel if precision_sel != "fp128" else "fp32", 4)
+        bill_preview = calc_billing(tok_in_info["total_tokens"], tok_out_info["total_tokens"], pricing_cfg)
+        tok1, tok2, tok3, tok4 = st.columns(4)
+        tok1.metric("📥 输入Tokens", f"{tok_in_info['total_tokens']}", f"CJK{tok_in_info['cjk_tokens']}+EN{tok_in_info['ascii_words']}")
+        tok2.metric("📤 输出Tokens", f"{tok_out_info['total_tokens']}", f"向量{tok_out_info['element_tokens']}+meta{tok_out_info['metadata_tokens']}")
+        tok3.metric("💰 预估费用", f"¥{bill_preview['total_cost']:.6f}", f"入¥{bill_preview['input_cost']:.6f}+出¥{bill_preview['output_cost']:.6f}")
+        if storage_mode == "auto" and precision_sel != "fp128":
+            _tmp_rec = VectorRecord.from_text(text, precision_sel, "buffer", block_size=int(block_size))
+            _route = classify_tier_by_similarity(_tmp_rec.vector)
+            tier_pred = _route["tier"]
+            tier_icon = {"trash":"🗑️","buffer":"⏳","normal":"📦","knowledge":"🏛️"}[tier_pred]
+            tok4.metric("🤖 预测路由", f"{tier_icon} {tier_pred}", f"相似度{_route['similarity_pct']}%")
+        else:
+            tok4.metric("📂 目标库", f"{tier_sel if storage_mode=='manual' else '-'}", "手动模式")
 
     col_gen, col_clr = st.columns([1, 1])
-    generated = False
-    preview_rec = None
 
-    if col_gen.button("🚀 生成四维向量 & 位宽测算", type="primary", use_container_width=True):
+    if col_gen.button("🚀 生成四维向量 & 自动分流入库", type="primary", use_container_width=True):
         text = input_text.strip()
         if not text:
             st.warning("请输入文本内容")
@@ -484,35 +526,117 @@ elif page.startswith("💾"):
             except NotImplementedError as e:
                 st.error(f"🚫 {e}")
         else:
-            with st.spinner("正在分词→向量化→测算存储位宽…"):
+            with st.spinner("正在分词→向量化→相似度路由→计费→入库…"):
                 try:
                     rec = VectorRecord.from_text(
-                        text=text, precision=precision_sel, tier=tier_sel,
+                        text=text, precision=precision_sel,
+                        tier="buffer" if storage_mode=="auto" else tier_sel,
                         block_size=int(block_size),
                     )
-                    st.session_state["preview_vec"] = rec.to_dict()
-                    log_billing(len(text), 4, len(text)*0.00002 + 4*0.00001, op="embed", model="mslab-embed-v1")
-                    log_op("vector_preview", {"precision": precision_sel, "tier": tier_sel, "text_len": len(text)})
-                    generated = True
+                    rec_dict = rec.to_dict()
+                    if storage_mode == "auto":
+                        result = auto_route_and_store(rec_dict, auto_downgrade=auto_downgrade, skip_duplicate=skip_dup)
+                        st.session_state["last_store_result"] = result
+                        st.session_state["preview_vec"] = rec_dict
+                        log_op("vector_auto_store", {
+                            "precision": precision_sel, "auto_mode": True,
+                            "target_tier": result.get("route",{}).get("tier"),
+                            "similarity": result.get("route",{}).get("similarity"),
+                            "text_len": len(text),
+                        })
+                    else:
+                        if skip_dup:
+                            dup = check_duplicate(rec_dict, tier_sel)
+                            if dup["is_duplicate"]:
+                                st.warning(f"🔁 检测到重复向量 {dup['duplicate_id']}@{dup['duplicate_tier']}（{dup['match_type']}），跳过入库")
+                                st.session_state["preview_vec"] = rec_dict
+                            else:
+                                rec_dict["fingerprint"] = vector_fingerprint(rec_dict["vector"], precision_sel, text_normalize(text))
+                                dg = should_downgrade(tier_sel, precision_sel)
+                                final_rec = rec_dict
+                                downgraded_flag = False
+                                if dg["should_downgrade"] and auto_downgrade:
+                                    final_rec = downgrade_precision(rec_dict)
+                                    downgraded_flag = True
+                                    st.warning(f"⚠️ {dg['reason']}，已自动降级为FP32")
+                                tok_in_info = count_tokens_in_text(text)
+                                tok_out_info = estimate_output_tokens(final_rec["precision"], 4)
+                                bill = log_billing_v2(tok_in_info["total_tokens"], tok_out_info["total_tokens"], op="embed_manual",
+                                                     extra={"tier": tier_sel, "precision": final_rec["precision"]})
+                                save_res = save_vector(final_rec)
+                                if save_res["ok"]:
+                                    if tier_sel == "knowledge":
+                                        HOT_VECTOR_CACHE[final_rec["vec_id"]] = {
+                                            "vec_id": final_rec["vec_id"], "vector": final_rec["vector"],
+                                            "precision": final_rec["precision"], "text": text[:80],
+                                            "similarity": 0, "tier": "knowledge", "_loaded_at": now_cn_iso(),
+                                        }
+                                    elif tier_sel == "normal":
+                                        warm_cache_put(final_rec)
+                                    st.success(f"✅ 向量已存入{tier_sel}库 · {final_rec['byte_info']['total_bytes']}B · ¥{bill['cost_rmb']:.6f}" +
+                                               ("（已降级FP32）" if downgraded_flag else ""))
+                                    del st.session_state["preview_vec"]
+                                    st.balloons()
+                                    st.rerun()
+                                else:
+                                    st.error("写入失败")
+                        else:
+                            save_res = save_vector(rec_dict)
+                            if save_res["ok"]:
+                                tok_in_info = count_tokens_in_text(text)
+                                tok_out_info = estimate_output_tokens(precision_sel, 4)
+                                log_billing_v2(tok_in_info["total_tokens"], tok_out_info["total_tokens"], op="embed_manual_nodedup",
+                                              extra={"tier": tier_sel})
+                                st.success(f"✅ 向量已存入{tier_sel}库 · {rec_dict['byte_info']['total_bytes']}B")
+                                del st.session_state["preview_vec"]
+                                st.balloons()
+                                st.rerun()
                 except Exception as e:
+                    st.exception(e)
                     st.error(f"向量生成失败: {e}")
 
     if col_clr.button("🗑️ 清除预览", use_container_width=True):
-        if "preview_vec" in st.session_state:
-            del st.session_state["preview_vec"]
+        for k in ["preview_vec","last_store_result"]:
+            if k in st.session_state:
+                del st.session_state[k]
         st.rerun()
 
     preview_rec = st.session_state.get("preview_vec")
+    last_result = st.session_state.get("last_store_result")
 
-    if preview_rec:
+    # 自动分流结果展示
+    if last_result and storage_mode == "auto":
+        st.markdown("<div style='height:10px'></div>", unsafe_allow_html=True)
+        res = last_result
+        route = res.get("route", {})
+        bg_color = {"trash":"rgba(100,116,139,0.15)","buffer":"rgba(251,191,36,0.12)",
+                    "normal":"rgba(59,130,246,0.12)","knowledge":"rgba(16,185,129,0.12)"}.get(route.get("tier"),"rgba(59,130,246,0.1)")
+        bd_color = {"trash":"rgba(100,116,139,0.4)","buffer":"rgba(251,191,36,0.4)",
+                    "normal":"rgba(59,130,246,0.4)","knowledge":"rgba(16,185,129,0.4)"}.get(route.get("tier"),"rgba(59,130,246,0.4)")
+        if res.get("ok"):
+            st.success(f"✅ 自动入库成功！路由到 {route.get('tier_label')}（相似度 {route.get('similarity_pct')}%）")
+        elif res.get("skipped"):
+            st.warning(f"🔁 {res['steps'][-1]}")
+        if res.get("warnings"):
+            for w in res["warnings"]:
+                st.warning(w)
+        if "billing" in res:
+            b = res["billing"]
+            st.info(f"💰 计费：输入{b['tokens_in']}tok × ¥{b['pricing']['in_per_1k']}/1K + 输出{b['tokens_out']}tok × ¥{b['pricing']['out_per_1k']}/1K = **¥{b['cost_rmb']:.6f}**")
+        with st.expander("📋 详细执行步骤"):
+            for i, step in enumerate(res.get("steps",[]), 1):
+                st.markdown(f"{i}. {step}")
+
+    if preview_rec and not (last_result and last_result.get("ok")):
         st.markdown("<div style='height:12px'></div>", unsafe_allow_html=True)
         pv = preview_rec
+        pv_tier = pv.get("tier", tier_sel if storage_mode=="manual" else classify_tier_by_similarity(pv["vector"])["tier"])
         st.markdown(f"""
         <div style="background:linear-gradient(135deg,rgba(59,130,246,0.10),rgba(139,92,246,0.08));
                     border:1px solid rgba(96,165,250,0.30);border-radius:12px;padding:16px 20px;margin-bottom:16px">
             <div style="font-size:13px;font-weight:700;color:#93c5fd;margin-bottom:10px">
-                🧠 四维向量生成结果
-                <span style="font-size:11px;color:#64748b;font-weight:400;margin-left:12px">ID: {pv['vec_id']} · {pv['precision'].upper()} · {pv['tier']}</span>
+                🧠 四维向量预览
+                <span style="font-size:11px;color:#64748b;font-weight:400;margin-left:12px">ID: {pv['vec_id']} · {pv['precision'].upper()}</span>
             </div>
         """, unsafe_allow_html=True)
 
@@ -523,6 +647,32 @@ elif page.startswith("💾"):
         vc2.metric(f"🏃 动词(verb)", f"{v[1]:.4f}", f"命中{cnt['verb']}词")
         vc3.metric(f"✨ 形容词(adj)", f"{v[2]:.4f}", f"命中{cnt['adj']}词")
         vc4.metric(f"💨 副词(adv)", f"{v[3]:.4f}", f"命中{cnt['adv']}词")
+
+        # 路由预测条
+        if storage_mode == "auto":
+            route = classify_tier_by_similarity(v)
+            st.markdown("<div style='height:10px'></div>", unsafe_allow_html=True)
+            st.markdown(f"""
+            <div style="background:rgba(0,0,0,0.25);border-radius:8px;padding:10px 14px;margin-bottom:8px">
+                <div style="font-size:12px;color:#94a3b8;margin-bottom:6px">
+                    🤖 与参考知识向量 <code>[0.50,0.50,0.00,0.00]</code>（纯名动高密度方向）余弦相似度 =
+                    <b style="color:#fcd34d;font-family:monospace">{route['similarity_pct']}%</b>
+                    → 预测路由：<b style="color:#6ee7b7">{route['tier_label']}</b>
+                </div>
+                <div style="display:flex;gap:2px;height:10px;border-radius:5px;overflow:hidden">
+                    <div style="flex:25;background:rgba(100,116,139,0.5)" title="0-25% trash"></div>
+                    <div style="flex:25;background:rgba(251,191,36,0.5)" title="25-50% buffer"></div>
+                    <div style="flex:25;background:rgba(59,130,246,0.5)" title="50-75% normal"></div>
+                    <div style="flex:25;background:rgba(16,185,129,0.5)" title="75-100% knowledge"></div>
+                </div>
+                <div style="position:relative;height:14px;margin-top:-12px">
+                    <div style="position:absolute;left:{route['similarity_pct']}%;transform:translateX(-50%);width:2px;height:14px;background:#fff"></div>
+                </div>
+                <div style="display:flex;justify-content:space-between;font-size:10px;color:#64748b;margin-top:2px">
+                    <span>0%</span><span>25%</span><span>50%</span><span>75%</span><span>100%</span>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
 
         bi = pv["byte_info"]
         bs = pv["bit_stats"]
@@ -535,7 +685,6 @@ elif page.startswith("💾"):
         m3.metric("🧮 载荷字节", f"{bi['payload_bytes']} B")
         m4.metric("🏷️ 元数据字节", f"{bi['metadata_bytes']} B")
         m5.metric("💾 单向量总字节", f"{bi['total_bytes']} B")
-
         st.caption(f"**计算公式**：{bi['formula']}")
 
         b1, b2, b3, b4 = st.columns(4)
@@ -557,7 +706,7 @@ elif page.startswith("💾"):
             st.markdown(html_tokens, unsafe_allow_html=True)
 
         with st.expander("🔢 原始二进制 / HEX 预览"):
-            st.code(f"HEX (meta+payload, FP32大端): {bs['raw_hex']}", language="text")
+            st.code(f"HEX (meta+payload): {bs['raw_hex']}", language="text")
             plbs = bs["payload_bits_stats"]
             mebs = bs["metadata_bits_stats"]
             c1,c2 = st.columns(2)
@@ -578,32 +727,35 @@ elif page.startswith("💾"):
 
         st.markdown("</div>", unsafe_allow_html=True)
 
-        if st.button(f"💾 存入 { {'trash':'🗑️噪声库','buffer':'⏳缓冲库','normal':'📦常规库','knowledge':'🏛️知识库'}[tier_sel] }", type="primary", use_container_width=True):
-            save_res = save_vector(pv)
-            if save_res["ok"]:
-                log_billing(len(text), 4, 0.0001, op="vector_store", model="mslab-embed-v1")
-                st.success(f"✅ 向量 {pv['vec_id']} 已存入 {tier_sel} 库 · {bi['total_bytes']}B（含8B元数据）")
-                del st.session_state["preview_vec"]
-                st.balloons()
-                st.rerun()
-            else:
-                st.error("写入失败，请检查目录权限")
+    st.markdown("</div>", unsafe_allow_html=True)
 
+    # 冷热缓存状态
+    cst = cache_status()
+    st.markdown("""
+    <div class="section-panel">
+        <div class="section-title">🔥 冷热内存缓存状态</div>
+    """, unsafe_allow_html=True)
+    cc1, cc2, cc3 = st.columns(3)
+    cc1.metric("🔴 HOT 知识库常驻", f"{cst['hot']['count']} 条", cst['hot']['policy'])
+    cc2.metric("🟡 WARM 常规库LRU", f"{cst['warm']['count']} / {cst['warm']['max']} 条", cst['warm']['policy'])
+    cc3.metric("🔵 COLD 缓冲/噪声", "磁盘直读", cst['cold']['policy'])
     st.markdown("</div>", unsafe_allow_html=True)
 
     # 四库实时状态
+    tiers_real_now = all_tiers_real_stats()
     st.markdown("""
     <div class="section-panel">
         <div class="section-title">📊 四级向量库实时状态（真实存储）</div>
     """, unsafe_allow_html=True)
     rows = []
     for k in ["trash","buffer","normal","knowledge"]:
-        t = tiers_real.get(k, {})
+        t = tiers_real_now.get(k, {})
         cap = t.get("cap_bytes", TIER_CAP_BYTES[k])
         bs  = t.get("byte_size", 0)
         vc  = t.get("vector_count", 0)
         wm  = t.get("watermark", 0)
         wm_alarm = cfg.get("storage_tiers",{}).get(k,{}).get("watermark_alarm", 0.8)
+        dg_note = "⚠️FP64将自动降级" if wm >= 0.90 else ""
         rows.append({
             "仓储层级": {"trash":"🗑️ 噪声库","buffer":"⏳ 缓冲库","normal":"📦 常规库","knowledge":"🏛️ 知识库"}[k],
             "向量条数": vc,
@@ -611,20 +763,29 @@ elif page.startswith("💾"):
             "设计容量": human_bytes(cap),
             "当前水位": f"{wm*100:.2f}%",
             "告警线": f"{wm_alarm*100:.0f}%",
-            "状态": "🔴超告警" if wm >= wm_alarm else ("🟡过半" if wm >= 0.5 else "🟢正常"),
+            "状态": ("🔴超告警" if wm >= wm_alarm else ("🟡过半" if wm >= 0.5 else "🟢正常")) + (f" {dg_note}" if dg_note else ""),
         })
     st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True)
     st.markdown("</div>", unsafe_allow_html=True)
 
     # 向量列表（按库查看/删除）
-    view_tier = st.selectbox("📂 查看指定库中的向量", ["buffer","normal","knowledge","trash"],
+    view_tier = st.selectbox("📂 查看指定库中的向量", ["knowledge","normal","buffer","trash"],
                              format_func=lambda x: {"trash":"🗑️ 噪声库","buffer":"⏳ 缓冲库","normal":"📦 常规库","knowledge":"🏛️ 知识库"}[x])
     vecs = load_all_vectors(view_tier, limit=100)
     if vecs:
-        st.caption(f"共 {len(vecs)} 条向量（显示最近100条）")
+        cache_note = " 🔥热缓存" if view_tier == "knowledge" else (" 🟡温缓存" if view_tier == "normal" else "")
+        st.caption(f"共 {len(vecs)} 条向量（显示最近100条）{cache_note}")
         for vr in vecs[:20]:
-            with st.expander(f"🧠 {vr['vec_id']} · {vr['precision'].upper()} · {vr['byte_info']['total_bytes']}B · {vr['created_at']}"):
+            sim_info = vr.get("route_info", {})
+            fp_info = vr.get("fingerprint", "")[:12]
+            dg_info = f" ←FP64降级" if vr.get("downgraded_from") else ""
+            title = f"🧠 {vr['vec_id']} · {vr['precision'].upper()}{dg_info} · {vr['byte_info']['total_bytes']}B · {vr['created_at']}"
+            if sim_info:
+                title += f" · 相似度{sim_info.get('similarity_pct',0)}%"
+            with st.expander(title):
                 st.caption(f"原文: {vr['text'][:120]}{'…' if len(vr['text'])>120 else ''}")
+                if fp_info:
+                    st.caption(f"指纹: `{fp_info}…`")
                 cc1,cc2,cc3,cc4 = st.columns(4)
                 vv = vr["vector"]; cn=vr["counts"]
                 cc1.metric("名词", f"{vv[0]:.4f}", f"{cn['noun']}词")
@@ -634,15 +795,19 @@ elif page.startswith("💾"):
                 if st.session_state.perm_level in ("architect","admin"):
                     if st.button(f"🗑️ 删除该向量", key=f"del_{vr['vec_id']}"):
                         delete_vector(view_tier, vr["vec_id"])
-                        st.success("已删除")
+                        if vr["vec_id"] in HOT_VECTOR_CACHE:
+                            del HOT_VECTOR_CACHE[vr["vec_id"]]
+                        if vr["vec_id"] in WARM_VECTOR_CACHE:
+                            del WARM_VECTOR_CACHE[vr["vec_id"]]
+                        st.success("已删除（缓存已同步清理）")
                         st.rerun()
     else:
-        st.info(f"{'🗑️ 噪声库' if view_tier=='trash' else '⏳ 缓冲库' if view_tier=='buffer' else '📦 常规库' if view_tier=='normal' else '🏛️ 知识库'}中暂无向量，请先生成并入库")
+        st.info(f"{'🗑️ 噪声库' if view_tier=='trash' else '⏳ 缓冲库' if view_tier=='buffer' else '📦 常规库' if view_tier=='normal' else '🏛️ 知识库'}中暂无向量")
 
     # 私有接口占位展示
     st.markdown("""
     <div class="section-panel">
-        <div class="section-title">🔒 私有内核接口占位（Batch1均为禁用空壳）</div>
+        <div class="section-title">🔒 私有内核接口占位（均为禁用空壳）</div>
     """, unsafe_allow_html=True)
     colx, coly, colz = st.columns(3)
     with colx:
@@ -708,41 +873,106 @@ elif page.startswith("🔍"):
 elif page.startswith("💰"):
     st.markdown("""
     <div class="section-panel">
-        <div class="section-title">💰 Token 计量计费</div>
+        <div class="section-title">💰 Token 计量计费 (Batch2 增强)</div>
+        <div style="font-size:12px;color:#94a3b8;margin-bottom:12px">
+            📌 Token规则：<b style="color:#fcd34d">1~2汉字 = 1Token</b>，英文单词≈1Token，标点不计；
+            输入输出分别计价；支持自定义单价；FP64降级FP32可节省约50%存储Token开销。
+        </div>
     """, unsafe_allow_html=True)
-    bills = read_billing_tail(500)
-    if bills:
-        df = pd.DataFrame(bills)
-        total_in = int(df["tokens_in"].sum())
+
+    # 单价配置
+    with st.expander("⚙️ 自定义单价配置", expanded=False):
+        pcfg = load_pricing_config()
+        pi, po, ps = st.columns(3)
+        in_price  = pi.number_input("📥 输入单价 (¥/1K Tokens)",  0.0001, 1.0, float(pcfg.get("input_price_per_1k", 0.002)), step=0.001, format="%.4f")
+        out_price = po.number_input("📤 输出单价 (¥/1K Tokens)",  0.0001, 1.0, float(pcfg.get("output_price_per_1k", 0.004)), step=0.001, format="%.4f")
+        sto_price = ps.number_input("💾 存储单价 (¥/KB/月)",     0.00001, 0.1, float(pcfg.get("storage_price_per_kb_month", 0.001)), step=0.0001, format="%.5f")
+        if st.button("💾 保存单价配置", type="primary"):
+            save_pricing_config({"input_price_per_1k": in_price, "output_price_per_1k": out_price, "storage_price_per_kb_month": sto_price})
+            st.success("✅ 单价已更新，后续计费使用新单价")
+            st.rerun()
+        st.caption(f"当前生效单价：输入 ¥{in_price}/1Ktok · 输出 ¥{out_price}/1Ktok · 存储 ¥{sto_price}/KB/月")
+
+    # Token规则计算器
+    with st.expander("🧮 Token规则验证计算器", expanded=False):
+        demo_text = st.text_input("输入文本以计算Token", value="心智向量化实验室通过深度学习模型快速将文本转换为高维向量")
+        if demo_text:
+            tki = count_tokens_in_text(demo_text)
+            tko = estimate_output_tokens("fp32", 4)
+            b = calc_billing(tki["total_tokens"], tko["total_tokens"],
+                             {"input_price_per_1k": in_price, "output_price_per_1k": out_price})
+            rc1, rc2, rc3, rc4 = st.columns(4)
+            rc1.metric("汉字数", tki["cjk_chars"], f"→{tki['cjk_tokens']}tok")
+            rc2.metric("英文单词", tki["ascii_words"])
+            rc3.metric("输入Tokens", tki["total_tokens"])
+            rc4.metric("预估费用", f"¥{b['total_cost']:.6f}")
+            st.caption(b["formula"])
+
+    # 读取计费记录（合并老版billing_records.jsonl和新版token_billing.jsonl）
+    bills_all = []
+    legacy_path = BILLING_DIR / "billing_records.jsonl"
+    v2_path = BILLING_DIR / "token_billing.jsonl"
+    for p in [legacy_path, v2_path]:
+        if p.exists():
+            try:
+                with open(p, "r", encoding="utf-8") as f:
+                    for line in f:
+                        line = line.strip()
+                        if line:
+                            try:
+                                bills_all.append(json.loads(line))
+                            except:
+                                pass
+            except:
+                pass
+
+    if bills_all:
+        def norm(r):
+            return {
+                "ts": r.get("ts", ""),
+                "op": r.get("op", "embed"),
+                "model": r.get("model", "mslab-embed-v1"),
+                "tokens_in":  int(r.get("tokens_in",  r.get("tokens", 0)) or 0),
+                "tokens_out": int(r.get("tokens_out", r.get("tokens_out", 4)) or 0),
+                "cost_rmb":   float(r.get("cost_rmb", r.get("cost", 0)) or 0),
+                "tier": (r.get("extra") or {}).get("tier", "") if isinstance(r.get("extra"), dict) else "",
+            }
+        norm_rows = [norm(r) for r in bills_all]
+        df = pd.DataFrame(norm_rows)
+        df["tokens_total"] = df["tokens_in"] + df["tokens_out"]
+        total_in  = int(df["tokens_in"].sum())
         total_out = int(df["tokens_out"].sum())
-        total = int(df["tokens_total"].sum())
+        total_tok = int(df["tokens_total"].sum())
         cost = float(df["cost_rmb"].sum())
+        total_cost_in  = float((df["tokens_in"]  * in_price / 1000.0).sum()) if "tokens_in" in df else 0
+        total_cost_out = float((df["tokens_out"] * out_price / 1000.0).sum()) if "tokens_out" in df else 0
+
         c1,c2,c3,c4 = st.columns(4)
-        c1.metric("Tokens 输入", f"{total_in:,}")
-        c2.metric("Tokens 输出", f"{total_out:,}")
-        c3.metric("Tokens 合计", f"{total:,}")
-        c4.metric("累计费用(¥)", f"{cost:.4f}")
+        c1.metric("📥 输入Tokens", f"{total_in:,}", f"费用 ¥{total_cost_in:.4f}")
+        c2.metric("📤 输出Tokens", f"{total_out:,}", f"费用 ¥{total_cost_out:.4f}")
+        c3.metric("🔢 Tokens 合计", f"{total_tok:,}")
+        c4.metric("💰 累计费用(¥)", f"{cost:.4f}")
         st.markdown("<div style='height:10px'></div>", unsafe_allow_html=True)
-        df_show = df[["ts","op","model","tokens_in","tokens_out","tokens_total","cost_rmb"]].copy()
-        df_show.columns = ["时间","操作类型","模型","输入Tokens","输出Tokens","合计Tokens","费用(¥)"]
+
+        df_show = df[["ts","op","model","tokens_in","tokens_out","tokens_total","tier","cost_rmb"]].copy()
+        df_show.columns = ["时间","操作类型","模型","输入Tokens","输出Tokens","合计Tokens","入库层级","费用(¥)"]
         df_show = df_show.sort_values("时间", ascending=False).reset_index(drop=True)
-        st.dataframe(df_show, use_container_width=True, hide_index=True, height=420)
+        st.dataframe(df_show, use_container_width=True, hide_index=True, height=380)
         csv = df_show.to_csv(index=False).encode("utf-8-sig")
         st.download_button("📥 导出计费记录 CSV", csv, "mslab_billing.csv", "text/csv")
     else:
-        st.info("暂无计费记录")
+        st.info("暂无计费记录，请先在「向量库管理」生成向量触发计费")
     st.markdown("</div>", unsafe_allow_html=True)
 
-    # 模拟一次查询计费（仅用于演示Token计数）
+    # 模拟查询计费
     with st.expander("🧪 模拟一次查询请求（验证计费日志）"):
         ci, co = st.columns(2)
         tin  = ci.number_input("输入Tokens", 10, 10000, 256)
         tout = co.number_input("输出Tokens", 10, 5000, 128)
         if st.button("📝 写入演示计费记录"):
-            c = (tin+tout)*0.00002
-            rec = log_billing(int(tin), int(tout), c, op="query")
-            log_alert("info", "billing", f"新计费记录 {rec['id']} ¥{c:.6f}", "billing")
-            st.success(f"已写入：{rec['id']}  ¥{c:.6f}")
+            b = calc_billing(int(tin), int(tout), {"input_price_per_1k": in_price, "output_price_per_1k": out_price})
+            rec = log_billing_v2(int(tin), int(tout), op="query_demo")
+            st.success(f"已写入：{rec['id']}  ¥{rec['cost_rmb']:.6f}（入¥{b['input_cost']:.6f} + 出¥{b['output_cost']:.6f}）")
             st.rerun()
 
 # ---------------------------------------------------------------------
