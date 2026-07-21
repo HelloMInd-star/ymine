@@ -97,6 +97,26 @@
             border: 1px solid rgba(149, 165, 166, 0.5);
             color: #95a5a6;
         }
+        .redline-banner {
+            background: linear-gradient(90deg, rgba(231,76,60,0.2), rgba(192,57,43,0.1));
+            border: 1px solid rgba(231,76,60,0.5);
+            border-radius: 10px;
+            padding: 15px 20px;
+            margin: 0 auto 25px auto;
+            max-width: 900px;
+            font-size: 13px;
+            color: #f5b7b1;
+            text-align: left;
+            line-height: 1.8;
+        }
+        .redline-banner b { color: #e74c3c; }
+        .redline-banner .rl-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: #e74c3c;
+            margin-bottom: 8px;
+            text-align: center;
+        }
         .nav-buttons {
             display: flex;
             gap: 20px;
@@ -458,9 +478,17 @@
             <h1>MoodMind-Lab · 金融向量实验室</h1>
             <p class="subtitle">GEOMETRIC MIND SPACE · FINANCIAL VECTOR LABORATORY</p>
             <div class="batch-status">
-                <span class="batch-badge batch-completed">✅ Batch1 骨架完工</span>
+                <span class="batch-badge batch-completed">✅ Batch1 骨架完工（红线强制）</span>
                 <span class="batch-badge batch-pending">⏳ Batch2 核心算法（待开发）</span>
                 <span class="batch-badge batch-pending">⏳ Batch3 生产部署（待开发）</span>
+            </div>
+            <div class="redline-banner">
+                <div class="rl-title">🔴 Batch1 强制开发红线已启用</div>
+                <div>① <b>11维公式/IPD/光照权重</b>完全不写 → 页面占位，128bit接口仅抛 <b>NotImplementedError</b></div>
+                <div>② <b>KMP底层LPS源码</b>完全不实现 → 仅预留 <b>receive_final_score(score)</b> 分值接收字段</div>
+                <div>③ <b>128bit高精度接口</b>（共8个方法）全部抛 <b>NotImplementedError</b></div>
+                <div>④ <b>批量导出硬上限100条/次</b>，硬编码 <b>MAX_EXPORT_BATCH_SIZE=100</b>，UI无法修改</div>
+                <div style="margin-top:8px;color:#e6b0aa;">数据大盘侧栏【🔴红线验证】页面可实时验证39个私有接口均正确抛异常</div>
             </div>
             <div class="nav-buttons">
                 <a href="http://localhost:8510" class="nav-btn btn-dashboard" target="_blank">
