@@ -4,471 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MoodMind-Lab · 金融向量实验室</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
-            background: linear-gradient(135deg, #0a0a1a 0%, #1a0a2e 50%, #0a1a2e 100%);
-            min-height: 100vh;
-            color: #e0e0ff;
-            overflow-x: hidden;
-        }
-        .stars {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 0;
-        }
-        .star {
-            position: absolute;
-            background: white;
-            border-radius: 50%;
-            animation: twinkle 3s infinite;
-        }
-        @keyframes twinkle {
-            0%, 100% { opacity: 0.3; }
-            50% { opacity: 1; }
-        }
-        .container {
-            position: relative;
-            z-index: 1;
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 40px 20px;
-        }
-        header {
-            text-align: center;
-            padding: 40px 0;
-            border-bottom: 1px solid rgba(147, 112, 219, 0.3);
-            margin-bottom: 40px;
-        }
-        .logo {
-            font-size: 72px;
-            margin-bottom: 20px;
-            background: linear-gradient(135deg, #9370db, #663399, #ba55d3);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            filter: drop-shadow(0 0 30px rgba(147, 112, 219, 0.5));
-        }
-        h1 {
-            font-size: 42px;
-            font-weight: 700;
-            background: linear-gradient(90deg, #9370db, #da70d6, #87ceeb);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 15px;
-            letter-spacing: 2px;
-        }
-        .subtitle {
-            font-size: 18px;
-            color: #9370db;
-            letter-spacing: 4px;
-            margin-bottom: 25px;
-        }
-        .batch-status {
-            display: inline-flex;
-            gap: 15px;
-            margin-bottom: 30px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-        .batch-badge {
-            padding: 8px 20px;
-            border-radius: 20px;
-            font-size: 14px;
-            font-weight: 600;
-            letter-spacing: 1px;
-        }
-        .batch-completed {
-            background: linear-gradient(135deg, #27ae60, #2ecc71);
-            box-shadow: 0 0 20px rgba(46, 204, 113, 0.4);
-        }
-        .batch-pending {
-            background: rgba(149, 165, 166, 0.3);
-            border: 1px solid rgba(149, 165, 166, 0.5);
-            color: #95a5a6;
-        }
-        .redline-banner {
-            background: linear-gradient(90deg, rgba(231,76,60,0.2), rgba(192,57,43,0.1));
-            border: 1px solid rgba(231,76,60,0.5);
-            border-radius: 10px;
-            padding: 15px 20px;
-            margin: 0 auto 25px auto;
-            max-width: 900px;
-            font-size: 13px;
-            color: #f5b7b1;
-            text-align: left;
-            line-height: 1.8;
-        }
-        .redline-banner b { color: #e74c3c; }
-        .redline-banner .rl-title {
-            font-size: 15px;
-            font-weight: 700;
-            color: #e74c3c;
-            margin-bottom: 8px;
-            text-align: center;
-        }
-        .nav-buttons {
-            display: flex;
-            gap: 20px;
-            justify-content: center;
-            flex-wrap: wrap;
-            margin-bottom: 50px;
-        }
-        .nav-btn {
-            padding: 15px 35px;
-            border: none;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            transition: all 0.3s ease;
-            letter-spacing: 1px;
-        }
-        .btn-dashboard {
-            background: linear-gradient(135deg, #9370db, #663399);
-            color: white;
-            box-shadow: 0 4px 20px rgba(147, 112, 219, 0.4);
-        }
-        .btn-dashboard:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 30px rgba(147, 112, 219, 0.6);
-        }
-        .btn-ymine {
-            background: linear-gradient(135deg, #1e3a5f, #2c5282);
-            color: #87ceeb;
-            border: 1px solid rgba(135, 206, 235, 0.4);
-        }
-        .btn-ymine:hover {
-            background: linear-gradient(135deg, #2c5282, #3b6fa0);
-            transform: translateY(-3px);
-            box-shadow: 0 8px 30px rgba(44, 82, 130, 0.5);
-        }
-        .btn-mslab {
-            background: linear-gradient(135deg, #2d5016, #3d6b1e);
-            color: #90ee90;
-            border: 1px solid rgba(144, 238, 144, 0.4);
-        }
-        .btn-mslab:hover {
-            background: linear-gradient(135deg, #3d6b1e, #4d8628);
-            transform: translateY(-3px);
-            box-shadow: 0 8px 30px rgba(61, 107, 30, 0.5);
-        }
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-            gap: 30px;
-            margin-bottom: 40px;
-        }
-        .card {
-            background: rgba(20, 10, 40, 0.6);
-            border: 1px solid rgba(147, 112, 219, 0.25);
-            border-radius: 16px;
-            padding: 30px;
-            backdrop-filter: blur(10px);
-            transition: all 0.3s ease;
-        }
-        .card:hover {
-            border-color: rgba(147, 112, 219, 0.5);
-            box-shadow: 0 10px 40px rgba(147, 112, 219, 0.2);
-            transform: translateY(-5px);
-        }
-        .card-title {
-            font-size: 22px;
-            font-weight: 700;
-            color: #ba55d3;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        .card-icon {
-            font-size: 28px;
-        }
-        .vector-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-        }
-        .vector-dim {
-            padding: 12px 15px;
-            border-radius: 8px;
-            font-size: 13px;
-        }
-        .dim-public {
-            background: rgba(52, 152, 219, 0.15);
-            border-left: 3px solid #3498db;
-            color: #87ceeb;
-        }
-        .dim-private {
-            background: rgba(155, 89, 182, 0.15);
-            border-left: 3px solid #9b59b6;
-            color: #dda0dd;
-        }
-        .dim-label {
-            font-weight: 700;
-            margin-right: 8px;
-        }
-        .lighting-list {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-        .lighting-item {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            padding: 12px;
-            background: rgba(0, 0, 0, 0.2);
-            border-radius: 8px;
-        }
-        .lighting-bar {
-            flex: 1;
-            height: 8px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 4px;
-            overflow: hidden;
-        }
-        .lighting-fill {
-            height: 100%;
-            border-radius: 4px;
-            animation: pulse-light 2s infinite;
-        }
-        @keyframes pulse-light {
-            0%, 100% { opacity: 0.7; }
-            50% { opacity: 1; }
-        }
-        .l1 { background: linear-gradient(90deg, #f39c12, #f1c40f); width: 72%; }
-        .l2 { background: linear-gradient(90deg, #e74c3c, #e91e63); width: 85%; }
-        .l3 { background: linear-gradient(90deg, #3498db, #00bcd4); width: 45%; }
-        .l4 { background: linear-gradient(90deg, #27ae60, #8bc34a); width: 60%; }
-        .rbac-panel {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-        .role-item {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            padding: 15px;
-            border-radius: 10px;
-            background: rgba(0, 0, 0, 0.25);
-        }
-        .role-dot {
-            width: 14px;
-            height: 14px;
-            border-radius: 50%;
-            flex-shrink: 0;
-        }
-        .role-info {
-            flex: 1;
-        }
-        .role-name {
-            font-weight: 700;
-            font-size: 15px;
-            margin-bottom: 4px;
-        }
-        .role-desc {
-            font-size: 12px;
-            color: #888;
-            line-height: 1.5;
-        }
-        .risk-gauge {
-            text-align: center;
-            padding: 20px;
-        }
-        .gauge-circle {
-            width: 180px;
-            height: 180px;
-            border-radius: 50%;
-            background: conic-gradient(
-                #27ae60 0deg 173deg,
-                #f39c12 173deg 180deg,
-                #e74c3c 180deg 245deg,
-                rgba(255,255,255,0.1) 245deg 360deg
-            );
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 20px;
-            position: relative;
-        }
-        .gauge-inner {
-            width: 140px;
-            height: 140px;
-            border-radius: 50%;
-            background: #0a0a1a;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-        .gauge-value {
-            font-size: 36px;
-            font-weight: 700;
-            color: #2ecc71;
-        }
-        .gauge-label {
-            font-size: 12px;
-            color: #888;
-        }
-        .gauge-legend {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            font-size: 13px;
-        }
-        .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .legend-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-        }
-        .kmp-placeholder {
-            text-align: center;
-            padding: 40px 20px;
-            color: #666;
-        }
-        .kmp-icon {
-            font-size: 48px;
-            margin-bottom: 15px;
-            opacity: 0.5;
-        }
-        .storage-bars {
-            display: flex;
-            flex-direction: column;
-            gap: 18px;
-        }
-        .storage-tier {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-        .storage-header {
-            display: flex;
-            justify-content: space-between;
-            font-size: 13px;
-        }
-        .storage-bar {
-            height: 24px;
-            background: rgba(255, 255, 255, 0.08);
-            border-radius: 12px;
-            overflow: hidden;
-        }
-        .storage-fill {
-            height: 100%;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            padding-left: 12px;
-            font-size: 11px;
-            font-weight: 600;
-            color: rgba(0, 0, 0, 0.7);
-        }
-        .hot { background: linear-gradient(90deg, #e74c3c, #c0392b); width: 30%; }
-        .warm { background: linear-gradient(90deg, #f39c12, #e67e22); width: 50%; }
-        .cold { background: linear-gradient(90deg, #3498db, #2980b9); width: 20%; }
-        .total-capacity {
-            text-align: center;
-            margin-bottom: 20px;
-            padding: 15px;
-            background: rgba(147, 112, 219, 0.1);
-            border-radius: 10px;
-        }
-        .capacity-value {
-            font-size: 32px;
-            font-weight: 700;
-            color: #9370db;
-        }
-        .capacity-label {
-            font-size: 13px;
-            color: #888;
-            margin-top: 5px;
-        }
-        footer {
-            text-align: center;
-            padding: 40px 0;
-            border-top: 1px solid rgba(147, 112, 219, 0.2);
-            margin-top: 40px;
-            color: #666;
-            font-size: 13px;
-        }
-        .footer-links {
-            display: flex;
-            justify-content: center;
-            gap: 30px;
-            margin-top: 15px;
-        }
-        .footer-link {
-            color: #9370db;
-            text-decoration: none;
-        }
-        .footer-link:hover {
-            text-decoration: underline;
-        }
-        .daily-stats {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
-            text-align: center;
-        }
-        .stat-item {
-            padding: 20px 10px;
-            background: rgba(0, 0, 0, 0.2);
-            border-radius: 10px;
-        }
-        .stat-value {
-            font-size: 28px;
-            font-weight: 700;
-            color: #da70d6;
-        }
-        .stat-label {
-            font-size: 12px;
-            color: #888;
-            margin-top: 5px;
-        }
-        .alert-panel {
-            max-height: 300px;
-            overflow-y: auto;
-        }
-        .alert-item {
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 10px;
-            font-size: 13px;
-            display: flex;
-            align-items: flex-start;
-            gap: 10px;
-        }
-        .alert-info { background: rgba(52, 152, 219, 0.15); border-left: 3px solid #3498db; }
-        .alert-success { background: rgba(46, 204, 113, 0.15); border-left: 3px solid #2ecc71; }
-        .alert-warning { background: rgba(243, 156, 18, 0.15); border-left: 3px solid #f39c12; }
-        .alert-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            margin-top: 5px;
-            flex-shrink: 0;
-        }
-    </style>
+    <link rel="stylesheet" href="assets/deepspace.css">
 </head>
 <body>
     <div class="stars" id="stars"></div>
@@ -483,32 +19,23 @@
                 <span class="batch-badge batch-pending">⏳ Batch3 生产部署（待开发）</span>
             </div>
             <div class="redline-banner">
-                <div class="rl-title">🔴 Batch1 强制开发红线已启用</div>
+                <div class="rl-title">🔴 Batch1 强制开发红线 / 7 条全局红线已启用</div>
                 <div>① <b>11维公式/IPD/光照权重</b>完全不写 → 页面占位，128bit接口仅抛 <b>NotImplementedError</b></div>
                 <div>② <b>KMP底层LPS源码</b>完全不实现 → 仅预留 <b>receive_final_score(score)</b> 分值接收字段</div>
                 <div>③ <b>128bit高精度接口</b>（共8个方法）全部抛 <b>NotImplementedError</b></div>
-                <div>④ <b>批量导出硬上限100条/次</b>，硬编码 <b>MAX_EXPORT_BATCH_SIZE=100</b>，UI无法修改</div>
-                <div style="margin-top:8px;color:#e6b0aa;">数据大盘侧栏【🔴红线验证】页面可实时验证39个私有接口均正确抛异常</div>
+                <div>④ <b>批量导出硬上限100条/次</b>，硬编码 <b>MAX_EXPORT_BATCH=100</b>，UI无法修改</div>
+                <div style="margin-top:6px;color:#e6b0aa;">⑤ 禁止球面风险模长/0.48/0.50/0.68风控底层运算 ⑥ 禁止通用数学求解库 ⑦ private_moodmind_engine 不入工程仓库</div>
             </div>
             <div class="nav-buttons">
-                <a href="http://localhost:8510" class="nav-btn btn-dashboard" target="_blank">
-                    📊 进入金融数据大盘
-                </a>
-                <a href="http://localhost:8090" class="nav-btn btn-ymine" target="_blank">
-                    🏛️ Y.Mine 总控台
-                </a>
-                <a href="http://localhost:8501" class="nav-btn btn-mslab" target="_blank">
-                    🧬 MS-Lab 通用实验室
-                </a>
+                <a href="http://localhost:8510" class="nav-btn btn-dashboard" target="_blank">📊 进入金融数据大盘</a>
+                <a href="http://localhost:8090" class="nav-btn btn-ymine" target="_blank">🏛️ Y.Mine 数理操作总控台</a>
+                <a href="http://localhost:8501" class="nav-btn btn-mslab" target="_blank">🧬 返回 MS-Lab</a>
             </div>
         </header>
 
         <div class="grid">
             <div class="card">
-                <div class="card-title">
-                    <span class="card-icon">🧭</span>
-                    11维金融向量体系
-                </div>
+                <div class="card-title"><span class="card-icon">🧭</span>11维金融向量体系（简介）</div>
                 <div class="vector-grid">
                     <div class="vector-dim dim-public"><span class="dim-label">D0</span>主体</div>
                     <div class="vector-dim dim-public"><span class="dim-label">D1</span>动作</div>
@@ -522,223 +49,176 @@
                     <div class="vector-dim dim-private"><span class="dim-label">D9</span>凯利仓位系数</div>
                     <div class="vector-dim dim-private" style="grid-column: span 2;"><span class="dim-label">D10</span>球面风险模长（全局风控）</div>
                 </div>
-                <p style="margin-top: 15px; font-size: 12px; color: #666; line-height: 1.6;">
-                    蓝色：公共4维（与MS-Lab通用）｜紫色：金融私有7维（闭源内核）
-                </p>
+                <p style="margin-top:15px;font-size:12px;color:#666;line-height:1.6;">蓝色：公共4维（与MS-Lab通用）｜紫色：金融私有7维（闭源内核，Batch1不实现）</p>
             </div>
 
             <div class="card">
-                <div class="card-title">
-                    <span class="card-icon">💡</span>
-                    四维光照环境模型
-                </div>
-                <p style="font-size: 13px; color: #aaa; margin-bottom: 20px; line-height: 1.6;">
-                    四维光照仅展示最终结果，动态行业权重算法为私有内核，不对外公开。
-                </p>
+                <div class="card-title"><span class="card-icon">💡</span>四维光照环境模型（说明）</div>
+                <p style="font-size:13px;color:#aaa;margin-bottom:20px;line-height:1.6;">四维光照仅展示最终结果，动态行业权重算法为私有内核，不对外公开。</p>
                 <div class="lighting-list">
                     <div class="lighting-item">
-                        <span style="width: 50px; font-size: 13px; font-weight: 600; color: #f1c40f;">L1</span>
+                        <span style="width:50px;font-size:13px;font-weight:600;color:#f1c40f;">L1</span>
                         <div class="lighting-bar"><div class="lighting-fill l1"></div></div>
-                        <span style="font-size: 12px; color: #888; width: 40px;">72%</span>
+                        <span style="font-size:12px;color:#888;width:40px;">72%</span>
                     </div>
                     <div class="lighting-item">
-                        <span style="width: 50px; font-size: 13px; font-weight: 600; color: #e91e63;">L2</span>
+                        <span style="width:50px;font-size:13px;font-weight:600;color:#e91e63;">L2</span>
                         <div class="lighting-bar"><div class="lighting-fill l2"></div></div>
-                        <span style="font-size: 12px; color: #888; width: 40px;">85%</span>
+                        <span style="font-size:12px;color:#888;width:40px;">85%</span>
                     </div>
                     <div class="lighting-item">
-                        <span style="width: 50px; font-size: 13px; font-weight: 600; color: #00bcd4;">L3</span>
+                        <span style="width:50px;font-size:13px;font-weight:600;color:#00bcd4;">L3</span>
                         <div class="lighting-bar"><div class="lighting-fill l3"></div></div>
-                        <span style="font-size: 12px; color: #888; width: 40px;">45%</span>
+                        <span style="font-size:12px;color:#888;width:40px;">45%</span>
                     </div>
                     <div class="lighting-item">
-                        <span style="width: 50px; font-size: 13px; font-weight: 600; color: #8bc34a;">L4</span>
+                        <span style="width:50px;font-size:13px;font-weight:600;color:#8bc34a;">L4</span>
                         <div class="lighting-bar"><div class="lighting-fill l4"></div></div>
-                        <span style="font-size: 12px; color: #888; width: 40px;">60%</span>
+                        <span style="font-size:12px;color:#888;width:40px;">60%</span>
                     </div>
                 </div>
-                <div style="margin-top: 15px; font-size: 12px; color: #888; display: grid; grid-template-columns: 1fr 1fr; gap: 5px;">
-                    <div>L1 成交量流动性</div>
-                    <div>L2 题材情绪</div>
-                    <div>L3 产业政策</div>
-                    <div>L4 产业链景气</div>
+                <div style="margin-top:15px;font-size:12px;color:#888;display:grid;grid-template-columns:1fr 1fr;gap:5px;">
+                    <div>L1 成交量流动性</div><div>L2 题材情绪</div>
+                    <div>L3 产业政策</div><div>L4 产业链景气</div>
                 </div>
             </div>
 
             <div class="card">
-                <div class="card-title">
-                    <span class="card-icon">🔐</span>
-                    RBAC 四级权限面板
-                </div>
+                <div class="card-title"><span class="card-icon">🔐</span>RBAC 三级权限面板（演示）</div>
                 <div class="rbac-panel">
                     <div class="role-item">
-                        <div class="role-dot" style="background: #ff4757;"></div>
+                        <div class="role-dot" style="background:#ff4757;"></div>
                         <div class="role-info">
-                            <div class="role-name" style="color: #ff4757;">admin · 超级管理员</div>
-                            <div class="role-desc">全部权限：私有维度、公式查看、配置修改、用户管理</div>
+                            <div class="role-name" style="color:#ff4757;">admin · 管理员</div>
+                            <div class="role-desc">最高权限：全部功能/配置/用户/审计/私有维度查看</div>
                         </div>
                     </div>
                     <div class="role-item">
-                        <div class="role-dot" style="background: #9b59b6;"></div>
+                        <div class="role-dot" style="background:#f39c12;"></div>
                         <div class="role-info">
-                            <div class="role-name" style="color: #9b59b6;">quant · 量化研究员</div>
-                            <div class="role-desc">向量/光照/KMP/风控查看权限，回测权限，无配置修改权</div>
+                            <div class="role-name" style="color:#f39c12;">architect · 架构审核</div>
+                            <div class="role-desc">向量/光照/KMP/风控审核权，策略上线审批，无用户管理</div>
                         </div>
                     </div>
                     <div class="role-item">
-                        <div class="role-dot" style="background: #3498db;"></div>
+                        <div class="role-dot" style="background:#3498db;"></div>
                         <div class="role-info">
-                            <div class="role-name" style="color: #3498db;">operator · 运维操作员</div>
-                            <div class="role-desc">存储/算力/告警/审计监控权限，服务重启权，无金融数据权限</div>
-                        </div>
-                    </div>
-                    <div class="role-item">
-                        <div class="role-dot" style="background: #2ecc71;"></div>
-                        <div class="role-info">
-                            <div class="role-name" style="color: #2ecc71;">viewer · 只读访客</div>
-                            <div class="role-desc">仅公开大盘基础统计数据查看权限</div>
+                            <div class="role-name" style="color:#3498db;">operator · 操作员</div>
+                            <div class="role-desc">存储/算力/告警/导出监控权，服务重启，无金融数据写入权</div>
                         </div>
                     </div>
                 </div>
             </div>
 
             <div class="card">
-                <div class="card-title">
-                    <span class="card-icon">⚠️</span>
-                    球面风险模长仪表盘
-                </div>
+                <div class="card-title"><span class="card-icon">⚠️</span>球面风险模长仪表盘</div>
                 <div class="risk-gauge">
                     <div class="gauge-circle">
                         <div class="gauge-inner">
                             <div class="gauge-value">0.42</div>
-                            <div class="gauge-label">当前风险值</div>
+                            <div class="gauge-label">当前风险值（占位）</div>
                         </div>
                     </div>
                     <div class="gauge-legend">
-                        <div class="legend-item">
-                            <div class="legend-dot" style="background: #27ae60;"></div>
-                            <span>稳态 ≤0.50</span>
-                        </div>
-                        <div class="legend-item">
-                            <div class="legend-dot" style="background: #f39c12;"></div>
-                            <span>预警 0.48-0.68</span>
-                        </div>
-                        <div class="legend-item">
-                            <div class="legend-dot" style="background: #e74c3c;"></div>
-                            <span>熔断 ≥0.68</span>
-                        </div>
+                        <div class="legend-item"><div class="legend-dot" style="background:#27ae60;"></div><span>稳态 ≤0.48</span></div>
+                        <div class="legend-item"><div class="legend-dot" style="background:#f39c12;"></div><span>预警 0.48-0.68</span></div>
+                        <div class="legend-item"><div class="legend-dot" style="background:#e74c3c;"></div><span>熔断 ≥0.68</span></div>
                     </div>
                 </div>
             </div>
 
             <div class="card">
-                <div class="card-title">
-                    <span class="card-icon">💾</span>
-                    金融总库总容量
-                </div>
+                <div class="card-title"><span class="card-icon">💾</span>金融总库总容量（四级仓库）</div>
                 <div class="total-capacity">
                     <div class="capacity-value">62.4 / 100 GB</div>
                     <div class="capacity-label">总库实时容量 · 水位 62.4%</div>
                 </div>
                 <div class="storage-bars">
                     <div class="storage-tier">
-                        <div class="storage-header">
-                            <span style="color: #e74c3c;">🔥 热数据（噪声库/实时）</span>
-                            <span>18.7 GB</span>
-                        </div>
-                        <div class="storage-bar"><div class="storage-fill hot">HOT 30%</div></div>
+                        <div class="storage-header"><span style="color:#95a5a6;">🗑️ 噪声库 trash</span><span>9.3 GB</span></div>
+                        <div class="storage-bar"><div class="storage-fill" style="background:linear-gradient(90deg,#7f8c8d,#95a5a6);width:15%;">15%</div></div>
                     </div>
                     <div class="storage-tier">
-                        <div class="storage-header">
-                            <span style="color: #f39c12;">🌡️ 温数据（常规库/缓冲）</span>
-                            <span>31.2 GB</span>
-                        </div>
-                        <div class="storage-bar"><div class="storage-fill warm">WARM 50%</div></div>
+                        <div class="storage-header"><span style="color:#f39c12;">⏳ 缓冲库 buffer</span><span>15.6 GB</span></div>
+                        <div class="storage-bar"><div class="storage-fill warm">25%</div></div>
                     </div>
                     <div class="storage-tier">
-                        <div class="storage-header">
-                            <span style="color: #3498db;">❄️ 冷数据（知识库/长效）</span>
-                            <span>12.5 GB</span>
-                        </div>
-                        <div class="storage-bar"><div class="storage-fill cold">COLD 20%</div></div>
+                        <div class="storage-header"><span style="color:#3498db;">📦 常规库 normal</span><span>24.9 GB</span></div>
+                        <div class="storage-bar"><div class="storage-fill cold">40%</div></div>
+                    </div>
+                    <div class="storage-tier">
+                        <div class="storage-header"><span style="color:#9b59b6;">🧠 知识库 knowledge</span><span>12.6 GB</span></div>
+                        <div class="storage-bar"><div class="storage-fill hot" style="background:linear-gradient(90deg,#9b59b6,#8e44ad);width:20%;">20%</div></div>
                     </div>
                 </div>
             </div>
 
             <div class="card">
-                <div class="card-title">
-                    <span class="card-icon">📈</span>
-                    向量日产量
-                </div>
+                <div class="card-title"><span class="card-icon">📈</span>向量日产量模拟面板</div>
                 <div class="daily-stats">
-                    <div class="stat-item">
-                        <div class="stat-value">2,847</div>
-                        <div class="stat-label">今日新增向量</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-value">+12.4%</div>
-                        <div class="stat-label">时序增量</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-value">76.3%</div>
-                        <div class="stat-label">入库成功率</div>
-                    </div>
+                    <div class="stat-item"><div class="stat-value">2,847</div><div class="stat-label">今日新增向量</div></div>
+                    <div class="stat-item"><div class="stat-value">+12.4%</div><div class="stat-label">时序增量</div></div>
+                    <div class="stat-item"><div class="stat-value">76.3%</div><div class="stat-label">入库成功率</div></div>
                 </div>
-                <div style="margin-top: 20px; padding: 15px; background: rgba(0,0,0,0.2); border-radius: 8px;">
-                    <div style="font-size: 13px; color: #aaa; margin-bottom: 10px;">KMP 四级路由分布：</div>
-                    <div style="display: flex; height: 20px; border-radius: 10px; overflow: hidden; font-size: 10px;">
-                        <div style="background: #7f8c8d; width: 15%; display: flex; align-items: center; justify-content: center;">噪声</div>
-                        <div style="background: #f39c12; width: 25%; display: flex; align-items: center; justify-content: center;">缓冲</div>
-                        <div style="background: #3498db; width: 40%; display: flex; align-items: center; justify-content: center;">常规</div>
-                        <div style="background: #9b59b6; width: 20%; display: flex; align-items: center; justify-content: center; color: white;">知识</div>
+                <div style="margin-top:20px;padding:15px;background:rgba(0,0,0,0.2);border-radius:8px;">
+                    <div style="font-size:13px;color:#aaa;margin-bottom:10px;">四级路由分布（KMP匹配占位）：</div>
+                    <div style="display:flex;height:20px;border-radius:10px;overflow:hidden;font-size:10px;">
+                        <div style="background:#7f8c8d;width:15%;display:flex;align-items:center;justify-content:center;">噪声</div>
+                        <div style="background:#f39c12;width:25%;display:flex;align-items:center;justify-content:center;">缓冲</div>
+                        <div style="background:#3498db;width:40%;display:flex;align-items:center;justify-content:center;">常规</div>
+                        <div style="background:#9b59b6;width:20%;display:flex;align-items:center;justify-content:center;color:white;">知识</div>
                     </div>
                 </div>
             </div>
 
             <div class="card">
-                <div class="card-title">
-                    <span class="card-icon">🔗</span>
-                    KMP 周期匹配热度
-                </div>
+                <div class="card-title"><span class="card-icon">🔗</span>KMP 匹配热度（空白占位）</div>
                 <div class="kmp-placeholder">
                     <div class="kmp-icon">🔗</div>
-                    <p style="font-size: 15px; color: #888; margin-bottom: 10px;">KMP 匹配面板占位</p>
-                    <p style="font-size: 12px; color: #555;">Batch2 将上线：相似度分值热力图、高同源范式沉淀列表、LPS匹配详情</p>
+                    <p style="font-size:15px;color:#888;margin-bottom:10px;">KMP 匹配面板占位</p>
+                    <p style="font-size:12px;color:#555;">Batch2 将上线：相似度分值热力图、高同源范式沉淀列表、LPS匹配详情</p>
+                    <p style="font-size:11px;color:#444;margin-top:8px;">当前仅预留 <code style="color:#9b59b6;background:rgba(0,0,0,0.3);padding:2px 6px;border-radius:4px;">receive_final_score(score: float)</code> 分值接收入口</p>
                 </div>
             </div>
 
             <div class="card">
-                <div class="card-title">
-                    <span class="card-icon">🚨</span>
-                    独立告警中心
+                <div class="card-title"><span class="card-icon">💡</span>四维光照结果展示位（预留）</div>
+                <div class="kmp-placeholder">
+                    <div class="kmp-icon">💡</div>
+                    <p style="font-size:15px;color:#888;margin-bottom:10px;">四维光照结果展示面板占位</p>
+                    <p style="font-size:12px;color:#555;">Batch3 将上线：四维光照趋势、周期相位走势、球面风险阈值时序图</p>
                 </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title"><span class="card-icon">🚨</span>独立告警中心</div>
                 <div class="alert-panel">
                     <div class="alert-item alert-success">
-                        <div class="alert-dot" style="background: #2ecc71;"></div>
+                        <div class="alert-dot" style="background:#2ecc71;"></div>
                         <div>
-                            <div style="font-weight: 600; margin-bottom: 3px;">[系统] Batch1骨架搭建完成</div>
-                            <div style="color: #888; font-size: 11px;">2026-07-21 06:30 · MoodMind-Lab</div>
+                            <div style="font-weight:600;margin-bottom:3px;">[系统] Batch1骨架搭建完成，目录结构对齐交付文档</div>
+                            <div style="color:#888;font-size:11px;">2026-07-21 07:10 · MoodMind-Lab</div>
                         </div>
                     </div>
                     <div class="alert-item alert-info">
-                        <div class="alert-dot" style="background: #3498db;"></div>
+                        <div class="alert-dot" style="background:#3498db;"></div>
                         <div>
-                            <div style="font-weight: 600; margin-bottom: 3px;">[信息] 金融向量总库挂载成功</div>
-                            <div style="color: #888; font-size: 11px;">2026-07-21 06:28 · 存储模块</div>
+                            <div style="font-weight:600;margin-bottom:3px;">[信息] 金融向量总库四级目录挂载成功 (trash/buffer/normal/knowledge)</div>
+                            <div style="color:#888;font-size:11px;">2026-07-21 07:08 · 存储模块</div>
                         </div>
                     </div>
                     <div class="alert-item alert-warning">
-                        <div class="alert-dot" style="background: #f39c12;"></div>
+                        <div class="alert-dot" style="background:#f39c12;"></div>
                         <div>
-                            <div style="font-weight: 600; margin-bottom: 3px;">[提醒] MS-Lab推送通道待对接</div>
-                            <div style="color: #888; font-size: 11px;">2026-07-21 06:25 · API模块</div>
+                            <div style="font-weight:600;margin-bottom:3px;">[提醒] MS-Lab推送通道待对接（Batch2任务）</div>
+                            <div style="color:#888;font-size:11px;">2026-07-21 07:05 · API模块</div>
                         </div>
                     </div>
                     <div class="alert-item alert-info">
-                        <div class="alert-dot" style="background: #3498db;"></div>
+                        <div class="alert-dot" style="background:#3498db;"></div>
                         <div>
-                            <div style="font-weight: 600; margin-bottom: 3px;">[信息] RBAC权限系统加载完成</div>
-                            <div style="color: #888; font-size: 11px;">2026-07-21 06:22 · 安全模块</div>
+                            <div style="font-weight:600;margin-bottom:3px;">[信息] 7条全局开发红线已加载，39个私有接口NotImplementedError</div>
+                            <div style="color:#888;font-size:11px;">2026-07-21 07:02 · 安全模块</div>
                         </div>
                     </div>
                 </div>
@@ -747,10 +227,10 @@
 
         <footer>
             <p>🧠 MoodMind-Lab · 金融向量实验室 | Game-OS V3.0 集群 | 几何心智空间全域算力底座</p>
-            <p style="margin-top: 8px; color: #9b59b6;">⛔ 公私隔离红线：金融数理公式/权重/周期/估值内核仅存于私有引擎，绝不入工程层</p>
+            <p style="margin-top:8px;color:#9b59b6;">⛔ 公私隔离红线：金融数理公式/权重/周期/估值内核仅存于 private_moodmind_engine，绝不入工程层</p>
             <div class="footer-links">
                 <a href="http://localhost:8510" class="footer-link" target="_blank">📊 Streamlit 数据大盘 (8510)</a>
-                <a href="http://localhost:8090" class="footer-link" target="_blank">🏛️ Y.Mine 总控台 (8090)</a>
+                <a href="http://localhost:8090" class="footer-link" target="_blank">🏛️ Y.Mine 数理操作总控台 (8090)</a>
                 <a href="http://localhost:8501" class="footer-link" target="_blank">🧬 MS-Lab (8501)</a>
             </div>
         </footer>

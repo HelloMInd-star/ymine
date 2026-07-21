@@ -1,0 +1,47 @@
+{
+  "version": "1.0",
+  "roles": [
+    {
+      "role_id": "admin",
+      "role_name": "管理员",
+      "level": 3,
+      "permissions": [
+        "vector.read", "vector.write", "vector.export",
+        "lighting.read", "lighting.configure",
+        "kmp.read", "kmp.score_receive",
+        "risk.read", "risk.configure",
+        "storage.admin", "billing.read", "alert.manage",
+        "user.manage", "config.modify", "audit.read",
+        "private.dimensions.view"
+      ]
+    },
+    {
+      "role_id": "architect",
+      "role_name": "架构审核",
+      "level": 2,
+      "permissions": [
+        "vector.read", "vector.export",
+        "lighting.read",
+        "kmp.read", "kmp.score_receive",
+        "risk.read",
+        "storage.read", "billing.read", "alert.read",
+        "audit.read", "strategy.approve"
+      ]
+    },
+    {
+      "role_id": "operator",
+      "role_name": "操作员",
+      "level": 1,
+      "permissions": [
+        "vector.read",
+        "lighting.read",
+        "kmp.read",
+        "risk.read",
+        "storage.monitor", "service.restart", "alert.handle",
+        "export.limited"
+      ]
+    }
+  ],
+  "default_role": "operator",
+  "session_timeout_minutes": 120
+}
