@@ -593,7 +593,37 @@
         const data={c1:L.c1,c2:L.c2,disturbance:L.cdist,stability:stability,score:L.score,env:env,mod:mod,pid:_pidCorrection,timestamp:Date.now()};
         lsSet('pipeline_exp30_damping',data);
         if(typeof YBus!=='undefined'&&YBus.publish){
-            try{YBus.publish('simulatorOutput',{valuationScore:L.score,equilibriumScore:attStab,loadScore:L.cdist,riskLevel:_fuseTriggered?'FUSE':'HIGH',keyMetrics:{coneC:L.cdist,haltProbability:_fuseTriggered?1:L.turb},timestamp:Date.now()},{trusted:true});}catch(_){}
+            try{
+                const riskMag = L.cdist;
+                const fuseHit = riskMag >= (YBus.THRESHOLDS ? YBus.THRESHOLDS.FUSE : 0.68);
+                const breakevenHit = riskMag >= (YBus.THRESHOLDS ? YBus.THRESHOLDS.BREAKEVEN : 0.48);
+                YBus.publish('gameEquilibrium',{
+                    engine:'StructuralMechanics',
+                    timestamp:Date.now(),
+                    model:'double_damping',
+                    participants:[],
+                    nashStability:attStab,
+                    c1Disturbance:L.c1,
+                    c2Disturbance:L.c2,
+                    syntheticShock:L.score,
+                    regime:env,
+                    spaceEnvironment:mod,
+                    equilibriumPrice:L.score,
+                    centipedeProgress:null
+                },{trusted:true});
+                YBus.publish('riskThreshold',{
+                    engine:'Exp30-Damping',
+                    timestamp:Date.now(),
+                    breakevenLine:YBus.THRESHOLDS?YBus.THRESHOLDS.BREAKEVEN:0.48,
+                    steadyAxis:YBus.THRESHOLDS?YBus.THRESHOLDS.STEADY:0.50,
+                    fuseLine:YBus.THRESHOLDS?YBus.THRESHOLDS.FUSE:0.68,
+                    currentRiskLevel:riskMag,
+                    breakevenWarning:breakevenHit,
+                    fuseTriggered:fuseHit,
+                    riskFlags:fuseHit?['FUSE_0.68_TRIGGERED']:(breakevenHit?['BREAKEVEN_0.48_WARNING']:[]),
+                    source:'exp30-gravity'
+                },{trusted:true});
+            }catch(_){}
         }
     }
 

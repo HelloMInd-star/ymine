@@ -257,7 +257,7 @@ class KMPEngineStub:
         if not 0.0 <= similarity_score <= 1.0:
             raise ValueError(f"KMP相似度分值必须在[0,1]区间，收到: {similarity_score}")
         if similarity_score < 0.25:
-            tier = "noise"
+            tier = "trash"
             route = "trash_db"
         elif similarity_score < 0.50:
             tier = "buffer"
@@ -438,7 +438,7 @@ def get_batch1_mock_data() -> Dict[str, Any]:
             "warm": {"pct": 50, "gb": 31.2, "color": "#f39c12"},
             "cold": {"pct": 20, "gb": 12.5, "color": "#3498db"}
         },
-        "kmp_route_dist": {"noise": 15, "buffer": 25, "normal": 40, "knowledge": 20},
+        "kmp_route_dist": {"trash": 15, "buffer": 25, "normal": 40, "knowledge": 20},
         "sphere_risk_magnitude": 0.42,
         "lighting": {"L1": 72, "L2": 85, "L3": 45, "L4": 60},
         "kmp_today_total": 12847,

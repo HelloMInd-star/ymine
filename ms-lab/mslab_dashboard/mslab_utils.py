@@ -697,6 +697,147 @@ def should_downgrade(tier: str, current_precision: str) -> dict:
 
 
 # ============================================================
+# 全局三套刚性阈值强制校验（0.48保本线 / 0.50稳态中轴线 / 0.68熔断线）
+# ============================================================
+def check_global_rigid_thresholds(similarity: float) -> dict:
+    """
+    校验全局三套刚性阈值是否触发：
+      - sim ≥ 0.68 → 熔断线触发（高风险/高价值，需标记+审计）
+      - 0.48 ≤ sim < 0.50 → 保本线~中轴线缓冲区间（优先回落至buffer稳态区间）
+      - sim < 0.48 → 低于保本线（低价值数据，告警）
+    返回: {breakeven_warning, steady_buffer, fuse_triggered, flags, reason}
+    """
+    cfg = load_lab_config()
+    th = cfg.get("thresholds", {})
+    BREAKEVEN = th.get("breakeven", 0.48)
+    STEADY    = th.get("steady_state", 0.50)
+    FUSE      = th.get("fuse_line", 0.68)
+
+    flags = []
+    fuse_triggered = False
+    breakeven_warning = False
+    steady_buffer = False
+    reason = ""
+
+    if similarity >= FUSE:
+        fuse_triggered = True
+        flags.append("FUSE_0.68_TRIGGERED")
+        reason = f"相似度{similarity:.4f} ≥ 熔断线{FUSE}，触发熔断标记（高价值/高风险数据）"
+    elif similarity >= BREAKEVEN and similarity < STEADY:
+        steady_buffer = True
+        flags.append("STEADY_BUFFER_ZONE")
+        reason = f"相似度{similarity:.4f} 处于保本线{BREAKEVEN}~稳态中轴线{STEADY}缓冲区间"
+    elif similarity < BREAKEVEN:
+        breakeven_warning = True
+        flags.append("BREAKEVEN_0.48_WARNING")
+        reason = f"相似度{similarity:.4f} < 保本线{BREAKEVEN}，低价值数据告警"
+    else:
+        reason = f"相似度{similarity:.4f} 处于正常区间 [{STEADY}, {FUSE})"
+
+    return {
+        "breakeven": BREAKEVEN,
+        "steady": STEADY,
+        "fuse": FUSE,
+        "similarity": similarity,
+        "breakeven_warning": breakeven_warning,
+        "steady_buffer": steady_buffer,
+        "fuse_triggered": fuse_triggered,
+        "flags": flags,
+        "reason": reason,
+    }
+
+
+def apply_steady_buffer_fallback(route_result: dict, th_check: dict) -> dict:
+    """
+    0.5稳态缓冲区间回落机制：
+    当相似度落在[0.48, 0.50)保本线~中轴线区间时，强制回落至buffer库（稳态缓冲）
+    避免在trash/normal边界频繁抖动。
+    """
+    import copy
+    rr = copy.deepcopy(route_result)
+    if th_check["steady_buffer"]:
+        rr["tier"] = "buffer"
+        rr["tier_label"] = "⏳ 缓冲库（稳态回落）"
+        rr["steady_fallback_applied"] = True
+        rr["fallback_reason"] = f"相似度{th_check['similarity']:.4f} ∈ [0.48, 0.50)，回落至0.5稳态缓冲区"
+    return rr
+
+
+# ============================================================
+# 向量自动升降级（跨库迁移）
+# ============================================================
+def retier_and_migrate_vector(vec_id: str, current_tier: str, new_tier: str,
+                                reason: str = "auto_retier") -> dict:
+    """
+    将向量从一个库迁移到另一个库（升降级）：
+    1. 读取原向量
+    2. 删除原文件
+    3. 更新tier字段写入新库
+    4. 更新冷热缓存
+    """
+    if current_tier == new_tier:
+        return {"ok": True, "migrated": False, "reason": "同级无需迁移"}
+    if current_tier not in DB_PATHS or new_tier not in DB_PATHS:
+        return {"ok": False, "error": f"无效层级: {current_tier}→{new_tier}"}
+
+    v = load_vector(current_tier, vec_id)
+    if not v:
+        return {"ok": False, "error": f"向量不存在: {current_tier}/{vec_id}"}
+
+    old_tier = v.get("tier", current_tier)
+    v["tier"] = new_tier
+    v["retier_history"] = v.get("retier_history", [])
+    v["retier_history"].append({
+        "from": old_tier,
+        "to": new_tier,
+        "reason": reason,
+        "ts": now_cn_iso(),
+    })
+
+    delete_vector(current_tier, vec_id)
+    save_result = save_vector(v)
+    if save_result["ok"]:
+        HOT_VECTOR_CACHE.pop(vec_id, None)
+        WARM_VECTOR_CACHE.pop(vec_id, None)
+        if new_tier == "knowledge":
+            HOT_VECTOR_CACHE[vec_id] = {
+                "vec_id": vec_id, "vector": v["vector"], "precision": v.get("precision"),
+                "text": v.get("text", "")[:80], "similarity": v.get("route_info", {}).get("similarity", 0),
+                "tier": "knowledge", "_loaded_at": now_cn_iso(),
+            }
+        elif new_tier == "normal":
+            warm_cache_put(v)
+        log_op("vector_retier", {"vec_id": vec_id, "from": old_tier, "to": new_tier, "reason": reason})
+    return {"ok": save_result["ok"], "migrated": save_result["ok"], "from": old_tier, "to": new_tier}
+
+
+def batch_retier_scan(limit_per_tier: int = 100) -> dict:
+    """
+    批量扫描已入库向量，根据当前相似度重新判定层级，自动升降级。
+    用于：1) 阈值规则更新后重新分流  2) 定期巡检修正错分数据
+    """
+    from mslab_vector import classify_tier_by_similarity
+    migrated = []
+    scanned = 0
+    for tier in ["trash", "buffer", "normal", "knowledge"]:
+        vec_ids = list_vectors(tier)[:limit_per_tier]
+        for vid in vec_ids:
+            scanned += 1
+            v = load_vector(tier, vid)
+            if not v or "vector" not in v:
+                continue
+            route = classify_tier_by_similarity(v["vector"])
+            th_check = check_global_rigid_thresholds(route["similarity"])
+            route = apply_steady_buffer_fallback(route, th_check)
+            target = route["tier"]
+            if target != tier:
+                res = retier_and_migrate_vector(vid, tier, target, "batch_scan_retier")
+                if res.get("migrated"):
+                    migrated.append({"vec_id": vid, "from": tier, "to": target, "sim": route["similarity"]})
+    return {"scanned": scanned, "migrated_count": len(migrated), "migrated": migrated}
+
+
+# ============================================================
 # Batch2 新增：自动分流入库（端到端）
 # ============================================================
 def auto_route_and_store(vec_record: dict, auto_downgrade: bool = True,
@@ -720,11 +861,26 @@ def auto_route_and_store(vec_record: dict, auto_downgrade: bool = True,
     }
 
     route = classify_tier_by_similarity(vec_record["vector"])
+
+    th_check = check_global_rigid_thresholds(route["similarity"])
+    route = apply_steady_buffer_fallback(route, th_check)
+    vec_record["threshold_check"] = th_check
+
     target_tier = route["tier"]
     vec_record["tier"] = target_tier
     vec_record["route_info"] = route
     result["route"] = route
+    result["threshold_check"] = th_check
     result["steps"].append(f"相似度{route['similarity_pct']}% → 自动路由到{route['tier_label']}")
+    if th_check["fuse_triggered"]:
+        result["warnings"].append(f"🔴 {th_check['reason']}（熔断标记）")
+        log_alert("crit", "fuse", th_check["reason"], "threshold")
+    elif th_check["breakeven_warning"]:
+        result["warnings"].append(f"🟡 {th_check['reason']}")
+        log_alert("warn", "threshold", th_check["reason"], "threshold")
+    elif route.get("steady_fallback_applied"):
+        result["steps"].append(f"🔵 {route['fallback_reason']}")
+        log_alert("info", "threshold", route["fallback_reason"], "threshold")
 
     tok_in = count_tokens_in_text(vec_record.get("text", ""))
     tok_out = estimate_output_tokens(vec_record.get("precision", "fp32"), vec_record.get("dims", 4))

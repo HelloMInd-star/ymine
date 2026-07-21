@@ -16,18 +16,20 @@ def page_risk():
         color = "#2ecc71" if mag < 0.48 else "#f39c12" if mag < 0.68 else "#e74c3c"
         st.markdown(f'<div class="metric-card"><div class="metric-value" style="color:{color};">{mag}</div><div class="metric-label">风险模长 |M|（占位）</div></div>', unsafe_allow_html=True)
     with c2:
-        st.markdown('<div class="metric-card"><div class="metric-value" style="color:#2ecc71;">0.48</div><div class="metric-label">稳态阈值</div></div>', unsafe_allow_html=True)
+        st.markdown('<div class="metric-card"><div class="metric-value" style="color:#2ecc71;">0.48</div><div class="metric-label">保本线</div></div>', unsafe_allow_html=True)
     with c3:
-        st.markdown('<div class="metric-card"><div class="metric-value" style="color:#f39c12;">0.50</div><div class="metric-label">预警阈值</div></div>', unsafe_allow_html=True)
+        st.markdown('<div class="metric-card"><div class="metric-value" style="color:#f39c12;">0.50</div><div class="metric-label">稳态中轴线</div></div>', unsafe_allow_html=True)
     with c4:
-        st.markdown('<div class="metric-card"><div class="metric-value" style="color:#e74c3c;">0.68</div><div class="metric-label">熔断阈值</div></div>', unsafe_allow_html=True)
+        st.markdown('<div class="metric-card"><div class="metric-value" style="color:#e74c3c;">0.68</div><div class="metric-label">熔断线</div></div>', unsafe_allow_html=True)
 
     st.divider()
     st.markdown("#### 风险态占位展示")
     if mag < 0.48:
-        st.success(f"🟢 当前风险值 {mag} 处于稳态区间 [0, 0.48) —— Batch1 模拟状态")
+        st.success(f"🟢 当前风险值 {mag} 低于保本线 0.48，处于安全稳态区间 —— Batch1 模拟状态")
+    elif mag < 0.50:
+        st.info(f"🔵 当前风险值 {mag} 处于保本线~中轴线 [0.48, 0.50) 缓冲区间 —— Batch1 模拟状态")
     elif mag < 0.68:
-        st.warning(f"🟡 当前风险值 {mag} 处于预警区间 [0.48, 0.68) —— Batch1 模拟状态")
+        st.warning(f"🟡 当前风险值 {mag} 处于预警区间 [0.50, 0.68) —— Batch1 模拟状态")
     else:
         st.error(f"🔴 当前风险值 {mag} 触发熔断 ≥0.68 —— Batch1 模拟状态")
 
