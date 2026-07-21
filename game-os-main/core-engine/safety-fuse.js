@@ -1,8 +1,8 @@
 /**
- * Game-OS Core Engine · 0.6 Fuse Safety Baseline
+ * Game-OS Core Engine · 0.68 Fuse Safety Baseline
  * ============================================================
  * LAYER 1: Core Public Axiom Module
- * Contains: Global 0.6 fuse baseline constant, universal fuse
+ * Contains: Global 0.68 fuse baseline constant, universal fuse
  *           trigger entry, 7 fuse categories framework, forced
  *           position-to-zero logic, reset condition framework.
  * DOES NOT contain: Per-industry fuse trigger thresholds

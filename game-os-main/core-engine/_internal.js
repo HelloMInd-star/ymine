@@ -20,7 +20,7 @@
     var CORE_LOCKED = true;
 
     var GLOBAL_CONSTANTS = Object.freeze({
-        FUSE_BASELINE: 0.6,
+        FUSE_BASELINE: 0.68,
         GOV_BASELINE_SLOPE: 0.5,
         KELLY_OPTIMAL_MIN: 0.30,
         KELLY_OPTIMAL_MAX: 0.50,
