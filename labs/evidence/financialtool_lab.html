@@ -1,0 +1,1108 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>🧪 金融工具实验室 · 概念验证原型</title>
+    <link rel="stylesheet" href="../../assets/css/base.css">
+    <script src="../../assets/js/bus.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <style>
+        body {
+            background: radial-gradient(ellipse at 30% 30%, #120b24, #0b0b1a 70%, #05030a);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            width: 100%;
+            margin: 0 auto;
+            background: rgba(18, 11, 36, 0.6);
+            border-radius: 32px;
+            padding: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            box-shadow: 0 30px 80px rgba(40, 10, 80, 0.4);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .breadcrumb a {
+            color: rgba(255,255,255,0.5);
+            text-decoration: none;
+            transition: color .2s;
+        }
+        .breadcrumb a:hover {
+            color: rgba(255,255,255,0.8);
+        }
+        .breadcrumb .sep {
+            color: rgba(255,255,255,0.2);
+        }
+        .breadcrumb .current {
+            color: rgba(255,255,255,0.7);
+        }
+
+        .page-banner {
+            background: linear-gradient(135deg, rgba(167, 139, 250, 0.12), rgba(59, 130, 246, 0.08));
+            border: 1.5px solid rgba(167, 139, 250, 0.3);
+            border-radius: 16px;
+            padding: 20px 24px;
+            margin-bottom: 28px;
+            position: relative;
+            overflow: hidden;
+        }
+        .page-banner::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+            transform: translateX(-100%);
+            animation: bannerScan 5s linear infinite;
+        }
+        @keyframes bannerScan { to { transform: translateX(100%); } }
+        .page-banner h1 {
+            font-size: 22px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #f1f5f9, #a78bfa, #60a5fa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+        .page-banner p {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.5);
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        .section-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 14px;
+            padding: 20px 24px;
+            margin-bottom: 20px;
+        }
+        .section-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #e2e8f0;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .section-title .icon {
+            font-size: 18px;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+        .btn {
+            padding: 10px 20px;
+            border-radius: 10px;
+            border: 1px solid;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(167, 139, 250, 0.2));
+            border-color: rgba(59, 130, 246, 0.5);
+            color: #93c5fd;
+        }
+        .btn-primary:hover {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.3), rgba(167, 139, 250, 0.3));
+            border-color: rgba(59, 130, 246, 0.8);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.2);
+        }
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.03);
+            border-color: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.6);
+        }
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: rgba(255, 255, 255, 0.2);
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .data-table-wrapper {
+            overflow-x: auto;
+            margin-bottom: 16px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        th, td {
+            padding: 10px 12px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+        th {
+            background: rgba(167, 139, 250, 0.08);
+            color: #c4b5fd;
+            font-weight: 600;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        td {
+            background: rgba(255, 255, 255, 0.01);
+            color: rgba(255, 255, 255, 0.7);
+        }
+        td input {
+            width: 80px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            padding: 6px 8px;
+            color: #e2e8f0;
+            font-size: 13px;
+            text-align: center;
+            font-family: 'SF Mono', ui-monospace, monospace;
+        }
+        td input:focus {
+            outline: none;
+            border-color: rgba(167, 139, 250, 0.5);
+            box-shadow: 0 0 0 2px rgba(167, 139, 250, 0.1);
+        }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+        .result-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 18px;
+        }
+        .result-card.highlight {
+            border-color: rgba(167, 139, 250, 0.3);
+            background: linear-gradient(135deg, rgba(167, 139, 250, 0.06), rgba(59, 130, 246, 0.04));
+        }
+        .result-label {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.4);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 8px;
+        }
+        .result-value {
+            font-size: 24px;
+            font-weight: 700;
+            font-family: 'SF Mono', ui-monospace, monospace;
+        }
+        .result-value.purple { color: #c4b5fd; }
+        .result-value.blue { color: #93c5fd; }
+        .result-value.green { color: #86efac; }
+        .result-value.red { color: #fca5a5; }
+        .result-value.yellow { color: #fde68a; }
+        .result-desc {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.3);
+            margin-top: 6px;
+            line-height: 1.5;
+        }
+
+        .altitude-bar-wrapper {
+            margin-top: 12px;
+        }
+        .altitude-bar {
+            height: 24px;
+            background: linear-gradient(90deg, #3b82f6, #22c55e, #eab308, #ef4444);
+            border-radius: 12px;
+            position: relative;
+            overflow: hidden;
+        }
+        .altitude-marker {
+            position: absolute;
+            top: -4px;
+            width: 4px;
+            height: 32px;
+            background: white;
+            border-radius: 2px;
+            box-shadow: 0 0 12px rgba(255,255,255,0.8);
+            transition: left 0.5s ease;
+        }
+        .altitude-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 6px;
+            font-size: 10px;
+            color: rgba(255,255,255,0.4);
+            font-family: 'SF Mono', ui-monospace, monospace;
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .chart-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 14px;
+            padding: 20px;
+        }
+        .chart-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #e2e8f0;
+            margin-bottom: 12px;
+        }
+        .chart-container {
+            width: 100%;
+            height: 320px;
+        }
+
+        .vector-panel {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+        .vector-item {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 16px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        .vector-item:hover {
+            border-color: rgba(167, 139, 250, 0.3);
+            transform: translateY(-2px);
+        }
+        .vector-key {
+            font-size: 22px;
+            font-weight: 800;
+            margin-bottom: 4px;
+        }
+        .vector-name {
+            font-size: 11px;
+            color: rgba(255,255,255,0.5);
+            margin-bottom: 8px;
+        }
+        .vector-value {
+            font-size: 18px;
+            font-weight: 700;
+            font-family: 'SF Mono', ui-monospace, monospace;
+        }
+
+        .interpretation-card {
+            background: linear-gradient(135deg, rgba(251, 191, 36, 0.08), rgba(249, 115, 22, 0.06));
+            border: 1px solid rgba(251, 191, 36, 0.25);
+            border-radius: 14px;
+            padding: 20px 24px;
+            margin-bottom: 20px;
+        }
+        .interpretation-label {
+            font-size: 12px;
+            color: #fbbf24;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        .interpretation-text {
+            font-size: 15px;
+            color: #fde68a;
+            line-height: 1.7;
+        }
+
+        .methodology-section {
+            margin-top: 24px;
+        }
+        .methodology-card {
+            background: rgba(255, 255, 255, 0.015);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 12px;
+            padding: 18px 20px;
+            margin-bottom: 12px;
+        }
+        .methodology-card h4 {
+            font-size: 13px;
+            font-weight: 600;
+            color: #a78bfa;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .methodology-card p {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.5);
+            line-height: 1.7;
+            margin: 0;
+        }
+
+        details.collapsible {
+            background: rgba(255, 255, 255, 0.015);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 12px;
+            padding: 16px 20px;
+        }
+        details.collapsible summary {
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.7);
+            list-style: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        details.collapsible summary::-webkit-details-marker {
+            display: none;
+        }
+        details.collapsible summary::after {
+            content: '▼';
+            margin-left: auto;
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.3);
+            transition: transform 0.3s;
+        }
+        details.collapsible[open] summary::after {
+            transform: rotate(180deg);
+        }
+        details.collapsible .collapsible-body {
+            padding-top: 16px;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+            margin-top: 16px;
+        }
+
+        .kmp-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        .kmp-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 14px;
+        }
+        .kmp-card .kmp-key {
+            font-size: 18px;
+            font-weight: 700;
+            color: #60a5fa;
+            margin-bottom: 4px;
+        }
+        .kmp-card .kmp-label {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 6px;
+        }
+        .kmp-card .kmp-desc {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.35);
+            line-height: 1.5;
+        }
+
+        .ipd-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+        .ipd-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 14px;
+        }
+        .ipd-card .ipd-key {
+            font-size: 18px;
+            font-weight: 700;
+            color: #34d399;
+            margin-bottom: 4px;
+        }
+        .ipd-card .ipd-label {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 6px;
+        }
+        .ipd-card .ipd-desc {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.35);
+            line-height: 1.5;
+        }
+
+        .footer-note {
+            text-align: center;
+            margin-top: 32px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        .layer-stats {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            margin-top: 12px;
+        }
+        .layer-stat {
+            text-align: center;
+            padding: 8px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+        }
+        .layer-stat .layer-label {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.4);
+            margin-bottom: 4px;
+        }
+        .layer-stat .layer-value {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.7);
+            font-family: 'SF Mono', ui-monospace, monospace;
+        }
+
+        @media (max-width: 1000px) {
+            .charts-grid { grid-template-columns: 1fr; }
+            .vector-panel { grid-template-columns: repeat(2, 1fr); }
+            .kmp-grid, .ipd-grid { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 680px) {
+            .container { padding: 24px 20px; border-radius: 20px; }
+            .vector-panel { grid-template-columns: 1fr 1fr; }
+            .result-grid { grid-template-columns: 1fr; }
+            .layer-stats { grid-template-columns: repeat(3, 1fr); }
+        }
+    </style>
+</head>
+<body>
+    <div id="glow"></div>
+    <div class="container">
+        <div class="breadcrumb">
+            <a href="../../index.html">🏠 总控台</a>
+            <span class="sep">›</span>
+            <a href="lab-section.html">🧪 实证实验室</a>
+            <span class="sep">›</span>
+            <span class="current">金融工具实验室</span>
+        </div>
+
+        <div class="page-banner">
+            <h1>🧪 金融工具实验室 · 概念验证原型</h1>
+            <p>本页面展示箱体海拔 + Dev-I 七维向量分析框架的方法论与交互逻辑。当前使用模拟数据，实际应用需接入真实行情数据。</p>
+        </div>
+
+        <div class="section-card">
+            <div class="section-title"><span class="icon">📊</span>模块1：数据输入区</div>
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="loadSampleData()">📥 加载示例数据</button>
+                <button class="btn btn-primary" onclick="calculate()">🧮 测算</button>
+                <button class="btn btn-secondary" onclick="resetData()">🔄 重置</button>
+            </div>
+            <div class="data-table-wrapper">
+                <table id="dataTable">
+                    <thead>
+                        <tr>
+                            <th>日期</th>
+                            <th>收盘价</th>
+                            <th>成交量</th>
+                            <th>日期</th>
+                            <th>收盘价</th>
+                            <th>成交量</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dataTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="resultsSection" style="display:none;">
+            <div class="section-card">
+                <div class="section-title"><span class="icon">📐</span>模块2：核心计算展示</div>
+                <div class="result-grid">
+                    <div class="result-card">
+                        <div class="result-label">A1 · 箱体顶价</div>
+                        <div class="result-value red" id="boxTop">-</div>
+                        <div class="result-desc">MAX(所有收盘价)</div>
+                    </div>
+                    <div class="result-card">
+                        <div class="result-label">A2 · 箱体底价</div>
+                        <div class="result-value green" id="boxBottom">-</div>
+                        <div class="result-desc">MIN(所有收盘价)</div>
+                    </div>
+                    <div class="result-card">
+                        <div class="result-label">A3 · 箱体总高度</div>
+                        <div class="result-value purple" id="boxHeight">-</div>
+                        <div class="result-desc">顶价 - 底价</div>
+                    </div>
+                    <div class="result-card highlight">
+                        <div class="result-label">B · 当前海拔 (最新一日)</div>
+                        <div class="result-value blue" id="currentAltitude">-</div>
+                        <div class="result-desc">0%（谷底）→ 100%（峰顶）</div>
+                        <div class="altitude-bar-wrapper">
+                            <div class="altitude-bar">
+                                <div class="altitude-marker" id="altitudeMarker" style="left: 0%;"></div>
+                            </div>
+                            <div class="altitude-labels">
+                                <span>0% 谷底</span>
+                                <span>50% 中轴</span>
+                                <span>100% 峰顶</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="result-card">
+                        <div class="result-label">C · V_standard（标准容积·均匀基准）</div>
+                        <div class="result-value yellow" id="vStandard">-</div>
+                        <div class="result-desc">总成交量 × 箱体中轴高度（均匀分布重心）</div>
+                    </div>
+                    <div class="result-card">
+                        <div class="result-label">D · V_real（真实山体容积）</div>
+                        <div class="result-value purple" id="vReal">-</div>
+                        <div class="result-desc">Σ(每层成交量 × 该层中间高度)</div>
+                    </div>
+                    <div class="result-card highlight">
+                        <div class="result-label">E · Dev-I（海拔容积偏离差值）</div>
+                        <div class="result-value" id="devI" style="color: #c4b5fd;">-</div>
+                        <div class="result-desc">(V_real - V_standard) / V_standard</div>
+                    </div>
+                </div>
+
+                <div class="section-title" style="margin-top:20px;"><span class="icon">🏔️</span>分层统计（5层）</div>
+                <div class="layer-stats" id="layerStats"></div>
+            </div>
+
+            <div class="interpretation-card" id="interpretationCard">
+                <div class="interpretation-label">📋 结果解读</div>
+                <div class="interpretation-text" id="interpretationText">点击「测算」按钮查看分析结果...</div>
+            </div>
+
+            <div class="section-card">
+                <div class="section-title"><span class="icon">📈</span>模块3：可视化展示</div>
+                <div class="charts-grid">
+                    <div class="chart-card">
+                        <div class="chart-title">🏔️ 图表1：真实山体分布图（柱状图）</div>
+                        <div class="chart-container" id="mountainChart"></div>
+                    </div>
+                    <div class="chart-card">
+                        <div class="chart-title">📈 图表2：海拔走势图（折线图）</div>
+                        <div class="chart-container" id="altitudeChart"></div>
+                    </div>
+                </div>
+
+                <div class="section-title" style="margin-top:24px;"><span class="icon">🧭</span>图表3：八维向量展示面板</div>
+                <div class="vector-panel">
+                    <div class="vector-item">
+                        <div class="vector-key" style="color:#60a5fa;">I</div>
+                        <div class="vector-name">箱体海拔</div>
+                        <div class="vector-value" style="color:#93c5fd;" id="vecI">-</div>
+                    </div>
+                    <div class="vector-item">
+                        <div class="vector-key" style="color:#34d399;">P</div>
+                        <div class="vector-name">坡度动量</div>
+                        <div class="vector-value" style="color:#6ee7b7;" id="vecP">-</div>
+                    </div>
+                    <div class="vector-item">
+                        <div class="vector-key" style="color:#fbbf24;">D</div>
+                        <div class="vector-name">阻尼衰减</div>
+                        <div class="vector-value" style="color:#fde68a;" id="vecD">-</div>
+                    </div>
+                    <div class="vector-item">
+                        <div class="vector-key" style="color:#f87171;">S</div>
+                        <div class="vector-name">市场博弈熵</div>
+                        <div class="vector-value" style="color:#fca5a5;" id="vecS">-</div>
+                    </div>
+                    <div class="vector-item" style="border-color:rgba(167,139,250,0.3);background:linear-gradient(135deg,rgba(167,139,250,0.08),rgba(0,0,0,0.1));">
+                        <div class="vector-key" style="color:#c4b5fd;">Dev-I</div>
+                        <div class="vector-name">山体容积偏差</div>
+                        <div class="vector-value" style="color:#c4b5fd;" id="vecDevI">-</div>
+                    </div>
+                    <div class="vector-item">
+                        <div class="vector-key" style="color:#22d3ee;">Dev1</div>
+                        <div class="vector-name">箱体均值回归差</div>
+                        <div class="vector-value" style="color:#67e8f9;" id="vecDev1">-</div>
+                    </div>
+                    <div class="vector-item">
+                        <div class="vector-key" style="color:#f472b6;">Dev2</div>
+                        <div class="vector-name">历史结构相似度差</div>
+                        <div class="vector-value" style="color:#f9a8d4;" id="vecDev2">-</div>
+                    </div>
+                    <div class="vector-item">
+                        <div class="vector-key" style="color:#a78bfa;">Dev3</div>
+                        <div class="vector-name">内在公允估值差</div>
+                        <div class="vector-value" style="color:#c4b5fd;" id="vecDev3">-</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="methodology-section">
+            <div class="section-title"><span class="icon">📚</span>方法论说明</div>
+            <div class="methodology-card">
+                <h4>📦 箱体海拔方法论</h4>
+                <p>将一段时期内的价格波动区间定义为"箱体"，当前价格在箱体中的百分比位置即为"海拔"。海拔 = (当前价 - 箱底) / (箱顶 - 箱底) × 100%</p>
+            </div>
+            <div class="methodology-card">
+                <h4>🏔️ Dev-I 方法论</h4>
+                <p>Dev-I = (V_real - V_standard) / V_standard。V_standard 假设筹码均匀分布在箱体内；V_real 根据实际成交量在价格层上的分布加权计算。Dev-I 为正表示山体重心上移，为负表示山体重心下移。</p>
+            </div>
+            <div class="methodology-card">
+                <h4>🧭 八维向量说明</h4>
+                <p>系统将市场状态描述为 8 维向量：I(海拔), P(坡度), D(阻尼), S(熵), Dev-I(山体偏差), Dev1(单点回归差), Dev2(历史相似度差), Dev3(内在估值差)。</p>
+            </div>
+        </div>
+
+        <div style="margin-top:20px;">
+            <details class="collapsible">
+                <summary>🔬 KMP + IPD 跨域映射说明</summary>
+                <div class="collapsible-body">
+                    <div class="section-title" style="font-size:13px;margin-bottom:12px;"><span class="icon">🧩</span>KMP 映射</div>
+                    <div class="kmp-grid">
+                        <div class="kmp-card">
+                            <div class="kmp-key">K</div>
+                            <div class="kmp-label">知识层</div>
+                            <div class="kmp-desc">语言、逻辑、认知 → 定义问题边界</div>
+                        </div>
+                        <div class="kmp-card">
+                            <div class="kmp-key">M</div>
+                            <div class="kmp-label">数学层</div>
+                            <div class="kmp-desc">向量、概率、拓扑 → 将认知转化为可计算结构</div>
+                        </div>
+                        <div class="kmp-card">
+                            <div class="kmp-key">P</div>
+                            <div class="kmp-label">物理层</div>
+                            <div class="kmp-desc">海拔、阻尼、熵、力学 → 用物理规律描述系统演化</div>
+                        </div>
+                    </div>
+                    <div class="section-title" style="font-size:13px;margin-bottom:12px;margin-top:16px;"><span class="icon">📍</span>IPD 映射（补充）</div>
+                    <div class="ipd-grid">
+                        <div class="ipd-card">
+                            <div class="ipd-key">I</div>
+                            <div class="ipd-label">箱体海拔</div>
+                            <div class="ipd-desc">价格在箱体中的物理位置</div>
+                        </div>
+                        <div class="ipd-card">
+                            <div class="ipd-key">P</div>
+                            <div class="ipd-label">坡度动量</div>
+                            <div class="ipd-desc">价格运动速度</div>
+                        </div>
+                        <div class="ipd-card">
+                            <div class="ipd-key">D</div>
+                            <div class="ipd-label">阻尼衰减</div>
+                            <div class="ipd-desc">趋势受到的阻力</div>
+                        </div>
+                    </div>
+                </div>
+            </details>
+        </div>
+
+        <div class="footer-note">
+            ⚠️ 当前为模拟数据，仅展示方法论，不构成投资建议。
+        </div>
+    </div>
+
+    <script>
+        const SAMPLE_DATA = [
+            { date: 'D1', close: 10.00, volume: 10000 },
+            { date: 'D2', close: 10.50, volume: 12000 },
+            { date: 'D3', close: 9.80, volume: 15000 },
+            { date: 'D4', close: 9.50, volume: 18000 },
+            { date: 'D5', close: 9.80, volume: 14000 },
+            { date: 'D6', close: 10.20, volume: 16000 },
+            { date: 'D7', close: 10.80, volume: 20000 },
+            { date: 'D8', close: 11.00, volume: 25000 },
+            { date: 'D9', close: 10.60, volume: 18000 },
+            { date: 'D10', close: 10.20, volume: 12000 },
+            { date: 'D11', close: 9.90, volume: 10000 },
+            { date: 'D12', close: 10.10, volume: 11000 },
+            { date: 'D13', close: 10.30, volume: 13000 },
+            { date: 'D14', close: 10.50, volume: 14000 },
+            { date: 'D15', close: 11.20, volume: 30000 },
+            { date: 'D16', close: 11.50, volume: 35000 },
+            { date: 'D17', close: 11.00, volume: 22000 },
+            { date: 'D18', close: 10.50, volume: 15000 },
+            { date: 'D19', close: 10.00, volume: 10000 },
+            { date: 'D20', close: 9.80, volume: 12000 }
+        ];
+
+        let currentData = JSON.parse(JSON.stringify(SAMPLE_DATA));
+        let mountainChartInstance = null;
+        let altitudeChartInstance = null;
+        const LAYERS = 5;
+
+        function renderDataTable() {
+            const tbody = document.getElementById('dataTableBody');
+            tbody.innerHTML = '';
+            const half = Math.ceil(currentData.length / 2);
+            for (let i = 0; i < half; i++) {
+                const row = document.createElement('tr');
+                const leftIdx = i;
+                const rightIdx = i + half;
+
+                let html = `<td>${currentData[leftIdx].date}</td>`;
+                html += `<td><input type="number" step="0.01" value="${currentData[leftIdx].close.toFixed(2)}" data-idx="${leftIdx}" data-field="close"></td>`;
+                html += `<td><input type="number" value="${currentData[leftIdx].volume}" data-idx="${leftIdx}" data-field="volume"></td>`;
+
+                if (rightIdx < currentData.length) {
+                    html += `<td>${currentData[rightIdx].date}</td>`;
+                    html += `<td><input type="number" step="0.01" value="${currentData[rightIdx].close.toFixed(2)}" data-idx="${rightIdx}" data-field="close"></td>`;
+                    html += `<td><input type="number" value="${currentData[rightIdx].volume}" data-idx="${rightIdx}" data-field="volume"></td>`;
+                } else {
+                    html += '<td></td><td></td><td></td>';
+                }
+                row.innerHTML = html;
+                tbody.appendChild(row);
+            }
+        }
+
+        function readTableData() {
+            const inputs = document.querySelectorAll('#dataTableBody input');
+            inputs.forEach(input => {
+                const idx = parseInt(input.dataset.idx);
+                const field = input.dataset.field;
+                const val = parseFloat(input.value) || 0;
+                if (field === 'close') {
+                    currentData[idx].close = val;
+                } else {
+                    currentData[idx].volume = val;
+                }
+            });
+        }
+
+        function loadSampleData() {
+            currentData = JSON.parse(JSON.stringify(SAMPLE_DATA));
+            renderDataTable();
+        }
+
+        function resetData() {
+            loadSampleData();
+            document.getElementById('resultsSection').style.display = 'none';
+        }
+
+        function calculate() {
+            readTableData();
+            if (currentData.length < 2) {
+                alert('请输入至少2条数据');
+                return;
+            }
+
+            const closes = currentData.map(d => d.close);
+            const volumes = currentData.map(d => d.volume);
+            const boxTop = Math.max(...closes);
+            const boxBottom = Math.min(...closes);
+            const boxHeight = boxTop - boxBottom;
+            const totalVolume = volumes.reduce((a, b) => a + b, 0);
+            const vStandard = totalVolume * (boxHeight / 2);
+
+            const altitudes = closes.map(c => (c - boxBottom) / boxHeight * 100);
+            const currentAltitude = altitudes[altitudes.length - 1];
+
+            const layerHeight = boxHeight / LAYERS;
+            const layerVolumes = new Array(LAYERS).fill(0);
+            const layerLabels = [];
+            const layerMids = [];
+
+            for (let i = 0; i < LAYERS; i++) {
+                const low = boxBottom + i * layerHeight;
+                const high = boxBottom + (i + 1) * layerHeight;
+                const mid = (low + high) / 2;
+                layerMids.push(mid);
+                layerLabels.push(`${low.toFixed(2)}-${high.toFixed(2)}`);
+            }
+
+            currentData.forEach(d => {
+                let layerIdx = Math.floor((d.close - boxBottom) / layerHeight);
+                if (layerIdx >= LAYERS) layerIdx = LAYERS - 1;
+                if (layerIdx < 0) layerIdx = 0;
+                layerVolumes[layerIdx] += d.volume;
+            });
+
+            let vReal = 0;
+            for (let i = 0; i < LAYERS; i++) {
+                const layerMidHeight = layerMids[i] - boxBottom;
+                vReal += layerVolumes[i] * layerMidHeight;
+            }
+
+            const devI = boxHeight > 0 ? (vReal - vStandard) / vStandard : 0;
+
+            const P = calculateSlopeMomentum(altitudes);
+            const D = calculateDamping(altitudes);
+            const S = calculateEntropy(layerVolumes, totalVolume);
+            const Dev1 = currentAltitude / 100 - 0.5;
+            const Dev2 = calculateHistoricalSimilarity(closes);
+            const Dev3 = boxHeight > 0 ? ((closes[closes.length - 1] - (boxTop + boxBottom) / 2) / boxHeight) : 0;
+
+            document.getElementById('resultsSection').style.display = 'block';
+            document.getElementById('boxTop').textContent = boxTop.toFixed(2);
+            document.getElementById('boxBottom').textContent = boxBottom.toFixed(2);
+            document.getElementById('boxHeight').textContent = boxHeight.toFixed(2);
+            document.getElementById('currentAltitude').textContent = currentAltitude.toFixed(1) + '%';
+            document.getElementById('altitudeMarker').style.left = Math.min(100, Math.max(0, currentAltitude)) + '%';
+            document.getElementById('vStandard').textContent = formatNumber(vStandard);
+            document.getElementById('vReal').textContent = formatNumber(vReal);
+            document.getElementById('devI').textContent = devI.toFixed(3);
+
+            const devIEl = document.getElementById('devI');
+            if (devI > 0.1) {
+                devIEl.style.color = '#f87171';
+            } else if (devI < -0.1) {
+                devIEl.style.color = '#22c55e';
+            } else {
+                devIEl.style.color = '#fbbf24';
+            }
+
+            renderLayerStats(layerLabels, layerVolumes, layerMids, boxBottom);
+
+            let interpText = '';
+            const interpCard = document.getElementById('interpretationCard');
+            if (devI > 0.1) {
+                interpText = '山体重心显著上移，高位筹码密集，上行阻力较大';
+                interpCard.style.background = 'linear-gradient(135deg, rgba(248, 113, 113, 0.08), rgba(239, 68, 68, 0.06))';
+                interpCard.style.borderColor = 'rgba(248, 113, 113, 0.3)';
+                document.querySelector('.interpretation-label').style.color = '#f87171';
+                document.querySelector('.interpretation-text').style.color = '#fca5a5';
+            } else if (devI < -0.1) {
+                interpText = '山体重心显著下移，筹码沉淀在谷底，上方抛压较轻';
+                interpCard.style.background = 'linear-gradient(135deg, rgba(34, 197, 94, 0.08), rgba(22, 163, 74, 0.06))';
+                interpCard.style.borderColor = 'rgba(34, 197, 94, 0.3)';
+                document.querySelector('.interpretation-label').style.color = '#22c55e';
+                document.querySelector('.interpretation-text').style.color = '#86efac';
+            } else {
+                interpText = '筹码分布相对均匀，震荡市特征';
+                interpCard.style.background = 'linear-gradient(135deg, rgba(251, 191, 36, 0.08), rgba(245, 158, 11, 0.06))';
+                interpCard.style.borderColor = 'rgba(251, 191, 36, 0.3)';
+                document.querySelector('.interpretation-label').style.color = '#fbbf24';
+                document.querySelector('.interpretation-text').style.color = '#fde68a';
+            }
+            document.getElementById('interpretationText').textContent = interpText;
+
+            document.getElementById('vecI').textContent = (currentAltitude / 100).toFixed(3);
+            document.getElementById('vecP').textContent = P.toFixed(3);
+            document.getElementById('vecD').textContent = D.toFixed(3);
+            document.getElementById('vecS').textContent = S.toFixed(3);
+            document.getElementById('vecDevI').textContent = devI.toFixed(3);
+            document.getElementById('vecDev1').textContent = Dev1.toFixed(3);
+            document.getElementById('vecDev2').textContent = Dev2.toFixed(3);
+            document.getElementById('vecDev3').textContent = Dev3.toFixed(3);
+
+            setTimeout(() => {
+                renderMountainChart(layerLabels, layerVolumes);
+                renderAltitudeChart(currentData.map(d => d.date), altitudes);
+            }, 100);
+        }
+
+        function renderLayerStats(labels, volumes, mids, boxBottom) {
+            const container = document.getElementById('layerStats');
+            container.innerHTML = '';
+            const totalVol = volumes.reduce((a, b) => a + b, 0);
+            for (let i = 0; i < LAYERS; i++) {
+                const pct = totalVol > 0 ? (volumes[i] / totalVol * 100).toFixed(1) : 0;
+                const layerHeight = mids[i] - boxBottom;
+                const div = document.createElement('div');
+                div.className = 'layer-stat';
+                const colorStyle = i < 2 ? 'color:#60a5fa;' : i < 4 ? 'color:#fbbf24;' : 'color:#f87171;';
+                div.innerHTML = `
+                    <div class="layer-label">L${i+1}层</div>
+                    <div class="layer-value" style="${colorStyle}">${labels[i]}</div>
+                    <div class="layer-value" style="margin-top:4px;font-size:11px;color:rgba(255,255,255,0.5);">${formatNumber(volumes[i])} (${pct}%)</div>
+                `;
+                container.appendChild(div);
+            }
+        }
+
+        function calculateSlopeMomentum(altitudes) {
+            if (altitudes.length < 3) return 0;
+            const n = altitudes.length;
+            let sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0;
+            for (let i = 0; i < n; i++) {
+                sumX += i;
+                sumY += altitudes[i];
+                sumXY += i * altitudes[i];
+                sumX2 += i * i;
+            }
+            const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
+            return Math.max(-1, Math.min(1, slope / 50));
+        }
+
+        function calculateDamping(altitudes) {
+            if (altitudes.length < 4) return 0;
+            let changes = [];
+            for (let i = 1; i < altitudes.length; i++) {
+                changes.push(Math.abs(altitudes[i] - altitudes[i-1]));
+            }
+            const recent = changes.slice(-5);
+            const early = changes.slice(0, 5);
+            const recentAvg = recent.reduce((a, b) => a + b, 0) / recent.length;
+            const earlyAvg = early.reduce((a, b) => a + b, 0) / early.length;
+            if (earlyAvg === 0) return 0;
+            return Math.max(0, Math.min(1, 1 - recentAvg / earlyAvg));
+        }
+
+        function calculateEntropy(volumes, total) {
+            if (total === 0) return 0;
+            let entropy = 0;
+            const n = volumes.length;
+            volumes.forEach(v => {
+                if (v > 0) {
+                    const p = v / total;
+                    entropy -= p * Math.log(p) / Math.log(n);
+                }
+            });
+            return entropy;
+        }
+
+        function calculateHistoricalSimilarity(closes) {
+            if (closes.length < 10) return 0;
+            const first = closes.slice(0, 5);
+            const last = closes.slice(-5);
+            const firstMean = first.reduce((a, b) => a + b, 0) / first.length;
+            const lastMean = last.reduce((a, b) => a + b, 0) / last.length;
+            const range = Math.max(...closes) - Math.min(...closes);
+            if (range === 0) return 0;
+            return (lastMean - firstMean) / range;
+        }
+
+        function formatNumber(n) {
+            if (n >= 1000000) return (n / 1000000).toFixed(2) + 'M';
+            if (n >= 1000) return (n / 1000).toFixed(2) + 'K';
+            return n.toFixed(2);
+        }
+
+        function renderMountainChart(labels, volumes) {
+            const dom = document.getElementById('mountainChart');
+            if (mountainChartInstance) {
+                mountainChartInstance.dispose();
+            }
+            mountainChartInstance = echarts.init(dom, null, { renderer: 'canvas' });
+            const colors = ['#3b82f6', '#60a5fa', '#eab308', '#f97316', '#ef4444'];
+            const option = {
+                backgroundColor: 'transparent',
+                tooltip: {
+                    trigger: 'axis',
+                    backgroundColor: 'rgba(20, 10, 40, 0.9)',
+                    borderColor: 'rgba(167, 139, 250, 0.3)',
+                    textStyle: { color: '#e2e8f0' }
+                },
+                grid: { left: '3%', right: '4%', bottom: '10%', top: '8%', containLabel: true },
+                xAxis: {
+                    type: 'category',
+                    data: labels,
+                    axisLine: { lineStyle: { color: 'rgba(255,255,255,0.1)' } },
+                    axisLabel: { color: 'rgba(255,255,255,0.5)', fontSize: 10, rotate: 15 },
+                    axisTick: { show: false }
+                },
+                yAxis: {
+                    type: 'value',
+                    axisLine: { show: false },
+                    splitLine: { lineStyle: { color: 'rgba(255,255,255,0.05)' } },
+                    axisLabel: { color: 'rgba(255,255,255,0.4)', fontSize: 10 }
+                },
+                series: [{
+                    type: 'bar',
+                    data: volumes.map((v, i) => ({
+                        value: v,
+                        itemStyle: {
+                            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                                { offset: 0, color: colors[i] },
+                                { offset: 1, color: 'rgba(0,0,0,0.3)' }
+                            ]),
+                            borderRadius: [4, 4, 0, 0]
+                        }
+                    })),
+                    barWidth: '60%'
+                }]
+            };
+            mountainChartInstance.setOption(option);
+        }
+
+        function renderAltitudeChart(dates, altitudes) {
+            const dom = document.getElementById('altitudeChart');
+            if (altitudeChartInstance) {
+                altitudeChartInstance.dispose();
+            }
+            altitudeChartInstance = echarts.init(dom, null, { renderer: 'canvas' });
+            const option = {
+                backgroundColor: 'transparent',
+                tooltip: {
+                    trigger: 'axis',
+                    backgroundColor: 'rgba(20, 10, 40, 0.9)',
+                    borderColor: 'rgba(167, 139, 250, 0.3)',
+                    textStyle: { color: '#e2e8f0' },
+                    formatter: params => `${params[0].axisValue}<br/>海拔: ${params[0].value.toFixed(1)}%`
+                },
+                grid: { left: '3%', right: '4%', bottom: '3%', top: '12%', containLabel: true },
+                xAxis: {
+                    type: 'category',
+                    data: dates,
+                    axisLine: { lineStyle: { color: 'rgba(255,255,255,0.1)' } },
+                    axisLabel: { color: 'rgba(255,255,255,0.5)', fontSize: 10 },
+                    axisTick: { show: false }
+                },
+                yAxis: {
+                    type: 'value',
+                    min: 0,
+                    max: 100,
+                    axisLine: { show: false },
+                    splitLine: { lineStyle: { color: 'rgba(255,255,255,0.05)' } },
+                    axisLabel: { color: 'rgba(255,255,255,0.4)', fontSize: 10, formatter: '{value}%' }
+                },
+                series: [{
+                    type: 'line',
+                    data: altitudes,
+                    smooth: true,
+                    symbol: 'circle',
+                    symbolSize: 6,
+                    lineStyle: { color: '#a78bfa', width: 2 },
+                    itemStyle: { color: '#c4b5fd', borderWidth: 2, borderColor: 'rgba(167,139,250,0.5)' },
+                    areaStyle: {
+                        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                            { offset: 0, color: 'rgba(167, 139, 250, 0.25)' },
+                            { offset: 1, color: 'rgba(167, 139, 250, 0.02)' }
+                        ])
+                    },
+                    markLine: {
+                        silent: true,
+                        symbol: 'none',
+                        lineStyle: { type: 'dashed', width: 1 },
+                        data: [
+                            { yAxis: 100, lineStyle: { color: 'rgba(248, 113, 113, 0.5)' }, label: { formatter: '箱顶 100%', color: 'rgba(248,113,113,0.7)', fontSize: 10, position: 'end' } } },
+                            { yAxis: 0, lineStyle: { color: 'rgba(34, 197, 94, 0.5)' }, label: { formatter: '箱底 0%', color: 'rgba(34,197,94,0.7)', fontSize: 10, position: 'end' } } },
+                            { yAxis: 50, lineStyle: { color: 'rgba(251, 191, 36, 0.3)' }, label: { formatter: '中轴', color: 'rgba(251,191,36,0.5)', fontSize: 9 } } }
+                        ]
+                    }
+                }]
+            };
+            altitudeChartInstance.setOption(option);
+        }
+
+        window.addEventListener('resize', () => {
+            if (mountainChartInstance) mountainChartInstance.resize();
+            if (altitudeChartInstance) altitudeChartInstance.resize();
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderDataTable();
+            setTimeout(() => calculate(), 300);
+        });
+    </script>
+</body>
+</html>
