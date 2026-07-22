@@ -22,7 +22,7 @@ echo "🧠 MoodMind-Lab · Batch1 启动中..."
 echo "   静态首页  :$STATIC_PORT"
 echo "   Streamlit :$DASH_PORT"
 
-python -m http.server "$STATIC_PORT" -d public_static \
+python -m http.server "$STATIC_PORT" --bind 0.0.0.0 -d public_static \
     > "$LOG_DIR/static.log" 2>&1 &
 STATIC_PID=$!
 echo $STATIC_PID > "$PID_DIR/static.pid"
@@ -47,5 +47,5 @@ echo "   🧠 首页 : http://localhost:$STATIC_PORT"
 echo "   📊 大盘 : http://localhost:$DASH_PORT"
 echo ""
 echo "💡 提示：如需同时启动 Y.Mine 总控台(8090) 和 MS-Lab(8501)，请分别执行："
-echo "   cd /workspace && python -m http.server 8090"
-echo "   cd /workspace/ms-lab && streamlit run app.py --server.port 8501"
+echo "   cd /workspace && python -m http.server 8090 --bind 0.0.0.0"
+echo "   cd /workspace/ms-lab && python -m streamlit run mslab_dashboard/app.py --server.port 8501 --server.address 0.0.0.0"
