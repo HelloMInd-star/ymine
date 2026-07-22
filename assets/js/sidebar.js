@@ -52,7 +52,7 @@
         {
             label: '🔬 认知科研实验组',
             items: [
-                { href: 'labs/evidence/circle-lab.html', icon: '🧠', text: '认知画圈实验', tag: '底层引擎', activeTag: true },
+                { href: 'labs/evidence/circle-lab.html', icon: '🧠', text: '认知画圈引擎', tag: '底层引擎', activeTag: true },
                 { href: 'labs/evidence/business-learning-evidence.html', icon: '📊', text: '市场证据实验室', tag: '上层实证', activeTag: true },
                 { href: 'labs/marketing/index.html', icon: '📡', text: '营销实证实验室', tag: '上层实证', activeTag: true },
                 { href: 'labs/evidence/finance-risk-simulator.html', icon: '🧪', text: '金融精算模拟器', tag: '数理工具', activeTag: true },
