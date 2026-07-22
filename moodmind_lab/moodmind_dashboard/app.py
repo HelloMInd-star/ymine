@@ -32,7 +32,7 @@ with st.sidebar:
     st.markdown("---")
     st.markdown("### 🔗 快速跳转")
     st.markdown('[🏛️ 返回 Y.Mine 总控台](http://localhost:8090)')
-    st.markdown('[📈 MoodMind 实验室首页](http://localhost:8100)')
+    st.markdown('[📈 MoodMind 实验室首页](http://localhost:8090/moodmind/)')
     st.markdown('[🧬 前往 MS-Lab](http://localhost:8501)')
     st.markdown("---")
     st.markdown("🔴 **红线状态：已启用**")
