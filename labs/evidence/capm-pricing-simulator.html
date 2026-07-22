@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>⚖️ 资本定价模拟器 · CAPM + WACC + DCF + 圆锥浓度</title>
+    <link rel="stylesheet" href="../../assets/css/base.css">
+    <script src="../../assets/js/bus.js"></script>
+    <script src="../../game-os-main/core-engine/circle-boundary.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <style>
+        body {
+            background: radial-gradient(ellipse at 30% 30%, #120b24, #0b0b1a 70%, #05030a);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1400px;
+            width: 100%;
+            margin: 0 auto;
+            background: rgba(18, 11, 36, 0.6);
+            border-radius: 32px;
+            padding: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            box-shadow: 0 30px 80px rgba(40, 10, 80, 0.4);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .breadcrumb a { color: rgba(255,255,255,0.5); text-decoration: none; transition: color .2s; }
+        .breadcrumb a:hover { color: rgba(255,255,255,0.8); }
+        .breadcrumb .sep { color: rgba(255,255,255,0.2); }
+        .breadcrumb .current { color: rgba(255,255,255,0.7); }
+
+        .page-banner {
+            background: linear-gradient(135deg, rgba(251,191,36,0.1), rgba(16,185,129,0.08), rgba(167,139,250,0.06));
+            border: 1.5px solid rgba(251,191,36,0.25);
+            border-radius: 16px;
+            padding: 20px 24px;
+            margin-bottom: 28px;
+            position: relative;
+            overflow: hidden;
+        }
+        .page-banner::before {
+            content: '';
+            position: absolute; inset: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.04), transparent);
+            transform: translateX(-100%);
+            animation: bannerScan 6s linear infinite;
+        }
+        @keyframes bannerScan { to { transform: translateX(100%); } }
+        .page-banner h1 {
+            font-size: 22px; font-weight: 700;
+            background: linear-gradient(135deg, #fef3c7, #fbbf24, #10b981, #a78bfa);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+            margin-bottom: 8px;
+        }
+        .page-banner p { font-size: 14px; color: rgba(255,255,255,0.5); line-height: 1.6; margin: 0; }
+
+        .section-card {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 14px;
+            padding: 20px 24px;
+            margin-bottom: 20px;
+        }
+        .section-title {
+            font-size: 15px; font-weight: 600; color: #e2e8f0;
+            margin-bottom: 16px; display: flex; align-items: center; gap: 8px;
+        }
+        .section-title .icon { font-size: 18px; }
+
+        .input-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 14px;
+            margin-bottom: 16px;
+        }
+        .input-group { display: flex; flex-direction: column; gap: 6px; }
+        .input-group label {
+            font-size: 11px; color: rgba(255,255,255,0.4);
+            text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;
+        }
+        .input-group .input-row {
+            display: flex; align-items: center; gap: 6px;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px; padding: 0 12px;
+            transition: border-color .2s;
+        }
+        .input-group .input-row:focus-within {
+            border-color: rgba(251,191,36,0.5);
+            box-shadow: 0 0 0 2px rgba(251,191,36,0.1);
+        }
+        .input-group input {
+            flex: 1; background: transparent; border: none;
+            padding: 10px 0; color: #e2e8f0; font-size: 14px;
+            font-family: 'SF Mono', ui-monospace, monospace; outline: none;
+        }
+        .input-group .unit { font-size: 11px; color: rgba(255,255,255,0.3); font-family: 'SF Mono', monospace; }
+
+        .btn-group { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
+        .btn {
+            padding: 10px 20px; border-radius: 10px; border: 1px solid;
+            font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.3s;
+            font-family: inherit;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, rgba(251,191,36,0.2), rgba(16,185,129,0.15));
+            border-color: rgba(251,191,36,0.5); color: #fbbf24;
+        }
+        .btn-primary:hover {
+            background: linear-gradient(135deg, rgba(251,191,36,0.3), rgba(16,185,129,0.25));
+            border-color: rgba(251,191,36,0.8);
+            transform: translateY(-1px); box-shadow: 0 6px 20px rgba(251,191,36,0.2);
+        }
+        .btn-secondary {
+            background: rgba(255,255,255,0.03); border-color: rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.6);
+        }
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.2);
+            color: rgba(255,255,255,0.8);
+        }
+
+        .preset-chips { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+        .preset-chip {
+            padding: 6px 14px; border-radius: 8px; font-size: 12px; font-weight: 500;
+            background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.6); cursor: pointer; transition: all .2s;
+        }
+        .preset-chip:hover { background: rgba(251,191,36,0.1); border-color: rgba(251,191,36,0.3); color: #fbbf24; }
+        .preset-chip.active { background: rgba(251,191,36,0.15); border-color: rgba(251,191,36,0.4); color: #fbbf24; }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 14px; margin-bottom: 20px;
+        }
+        .result-card {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 12px; padding: 18px;
+        }
+        .result-card.gold {
+            border-color: rgba(251,191,36,0.3);
+            background: linear-gradient(135deg, rgba(251,191,36,0.06), rgba(255,255,255,0.02));
+        }
+        .result-card.green {
+            border-color: rgba(16,185,129,0.3);
+            background: linear-gradient(135deg, rgba(16,185,129,0.06), rgba(255,255,255,0.02));
+        }
+        .result-card.purple {
+            border-color: rgba(167,139,250,0.3);
+            background: linear-gradient(135deg, rgba(167,139,250,0.06), rgba(255,255,255,0.02));
+        }
+        .result-label {
+            font-size: 11px; color: rgba(255,255,255,0.4);
+            text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px;
+        }
+        .result-value { font-size: 26px; font-weight: 700; font-family: 'SF Mono', ui-monospace, monospace; }
+        .result-value.gold { color: #fbbf24; }
+        .result-value.green { color: #34d399; }
+        .result-value.purple { color: #c4b5fd; }
+        .result-value.blue { color: #60a5fa; }
+        .result-value.red { color: #f87171; }
+        .result-desc { font-size: 11px; color: rgba(255,255,255,0.3); margin-top: 6px; line-height: 1.5; }
+        .result-formula {
+            font-size: 11px; color: rgba(251,191,36,0.5); margin-top: 8px;
+            font-family: 'SF Mono', monospace; padding-top: 8px;
+            border-top: 1px solid rgba(255,255,255,0.04);
+        }
+
+        .charts-grid {
+            display: grid; grid-template-columns: 1fr 1fr;
+            gap: 20px; margin-bottom: 20px;
+        }
+        .chart-card {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 14px; padding: 20px;
+        }
+        .chart-title { font-size: 14px; font-weight: 600; color: #e2e8f0; margin-bottom: 12px; }
+        .chart-container { width: 100%; height: 320px; }
+
+        .signal-card {
+            border-radius: 14px; padding: 20px 24px; margin-bottom: 20px;
+            border: 1px solid;
+        }
+        .signal-card.bullish {
+            background: linear-gradient(135deg, rgba(16,185,129,0.08), rgba(34,197,94,0.04));
+            border-color: rgba(16,185,129,0.3);
+        }
+        .signal-card.bearish {
+            background: linear-gradient(135deg, rgba(248,113,113,0.08), rgba(239,68,68,0.04));
+            border-color: rgba(248,113,113,0.3);
+        }
+        .signal-card.neutral {
+            background: linear-gradient(135deg, rgba(251,191,36,0.08), rgba(245,158,11,0.04));
+            border-color: rgba(251,191,36,0.3);
+        }
+        .signal-label {
+            font-size: 12px; text-transform: uppercase; letter-spacing: 0.8px;
+            font-weight: 600; margin-bottom: 10px;
+        }
+        .signal-card.bullish .signal-label { color: #34d399; }
+        .signal-card.bearish .signal-label { color: #f87171; }
+        .signal-card.neutral .signal-label { color: #fbbf24; }
+        .signal-text { font-size: 15px; line-height: 1.7; }
+        .signal-card.bullish .signal-text { color: #86efac; }
+        .signal-card.bearish .signal-text { color: #fca5a5; }
+        .signal-card.neutral .signal-text { color: #fde68a; }
+
+        .methodology-card {
+            background: rgba(255,255,255,0.015);
+            border: 1px solid rgba(255,255,255,0.04);
+            border-radius: 12px; padding: 18px 20px; margin-bottom: 12px;
+        }
+        .methodology-card h4 {
+            font-size: 13px; font-weight: 600; color: #fbbf24;
+            margin-bottom: 10px; display: flex; align-items: center; gap: 6px;
+        }
+        .methodology-card p { font-size: 13px; color: rgba(255,255,255,0.5); line-height: 1.7; margin: 0; }
+        .methodology-card .formula {
+            display: inline-block; background: rgba(251,191,36,0.08);
+            border: 1px solid rgba(251,191,36,0.15); border-radius: 6px;
+            padding: 4px 10px; font-family: 'SF Mono', monospace;
+            color: #fbbf24; font-size: 12px; margin: 4px 0;
+        }
+
+        .footer-note {
+            text-align: center; margin-top: 32px; padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.04);
+            font-size: 12px; color: rgba(255,255,255,0.3);
+        }
+
+        .threshold-bar { margin-top: 12px; }
+        .threshold-track {
+            height: 8px; background: linear-gradient(90deg, #22c55e, #eab308, #f97316, #ef4444);
+            border-radius: 4px; position: relative;
+        }
+        .threshold-marker {
+            position: absolute; top: -4px; width: 3px; height: 16px;
+            background: white; border-radius: 2px;
+            box-shadow: 0 0 8px rgba(255,255,255,0.8);
+            transition: left 0.5s ease;
+        }
+        .threshold-labels {
+            display: flex; justify-content: space-between; margin-top: 6px;
+            font-size: 10px; color: rgba(255,255,255,0.35);
+            font-family: 'SF Mono', monospace;
+        }
+
+        @media (max-width: 1000px) { .charts-grid { grid-template-columns: 1fr; } }
+        @media (max-width: 680px) {
+            .container { padding: 24px 20px; border-radius: 20px; }
+            .result-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div id="glow"></div>
+    <div class="container">
+        <div class="breadcrumb">
+            <a href="../../index.html">🏠 总控台</a>
+            <span class="sep">›</span>
+            <a href="lab-section.html">🧪 实证实验室</a>
+            <span class="sep">›</span>
+            <span class="current">资本定价模拟器</span>
+        </div>
+
+        <div class="page-banner">
+            <h1>⚖️ 资本定价模拟器 · CAPM + WACC + DCF + 圆锥浓度校准</h1>
+            <p>核心公式：Ke = Rf + β × (Rm - Rf) + ConeAdjustment · 内含WACC/DCF/蒙特卡洛三重定价验证 · 圆锥浓度对接认知画圈内核</p>
+        </div>
+
+        <div class="section-card">
+            <div class="section-title"><span class="icon">🎛️</span>参数输入区</div>
+            <div class="preset-chips">
+                <span class="preset-chip active" onclick="loadPreset('stable')">🏦 价值股（低β）</span>
+                <span class="preset-chip" onclick="loadPreset('growth')">🚀 成长股（高β）</span>
+                <span class="preset-chip" onclick="loadPreset('tech')">💻 科技股</span>
+                <span class="preset-chip" onclick="loadPreset('bond')">📜 类债资产</span>
+            </div>
+            <div class="input-grid">
+                <div class="input-group">
+                    <label>无风险利率 Rf</label>
+                    <div class="input-row"><input type="number" id="rf" value="3.0" step="0.1"><span class="unit">%</span></div>
+                </div>
+                <div class="input-group">
+                    <label>市场风险溢价 Rm-Rf</label>
+                    <div class="input-row"><input type="number" id="mp" value="5.5" step="0.1"><span class="unit">%</span></div>
+                </div>
+                <div class="input-group">
+                    <label>β 系数</label>
+                    <div class="input-row"><input type="number" id="beta" value="1.0" step="0.1"><span class="unit">倍</span></div>
+                </div>
+                <div class="input-group">
+                    <label>债务成本 Kd</label>
+                    <div class="input-row"><input type="number" id="kd" value="5.0" step="0.1"><span class="unit">%</span></div>
+                </div>
+                <div class="input-group">
+                    <label>企业所得税率</label>
+                    <div class="input-row"><input type="number" id="tax" value="21" step="1"><span class="unit">%</span></div>
+                </div>
+                <div class="input-group">
+                    <label>权益权重</label>
+                    <div class="input-row"><input type="number" id="ew" value="70" step="5"><span class="unit">%</span></div>
+                </div>
+                <div class="input-group">
+                    <label>圆锥浓度 ρ</label>
+                    <div class="input-row"><input type="number" id="cone" value="0.4" step="0.05" min="0" max="1"><span class="unit">0-1</span></div>
+                </div>
+                <div class="input-group">
+                    <label>当前股价</label>
+                    <div class="input-row"><input type="number" id="price" value="100" step="1"><span class="unit">元</span></div>
+                </div>
+                <div class="input-group">
+                    <label>初始自由现金流 FCF</label>
+                    <div class="input-row"><input type="number" id="fcf" value="5.0" step="0.5"><span class="unit">元/股</span></div>
+                </div>
+                <div class="input-group">
+                    <label>增长率 g</label>
+                    <div class="input-row"><input type="number" id="growth" value="8" step="0.5"><span class="unit">%</span></div>
+                </div>
+                <div class="input-group">
+                    <label>永续增长率</label>
+                    <div class="input-row"><input type="number" id="tg" value="2.5" step="0.1"><span class="unit">%</span></div>
+                </div>
+                <div class="input-group">
+                    <label>DCF 年数</label>
+                    <div class="input-row"><input type="number" id="years" value="10" step="1"><span class="unit">年</span></div>
+                </div>
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="calculate()">🧮 开始定价</button>
+                <button class="btn btn-secondary" onclick="runMonteCarlo()">🎲 蒙特卡洛模拟</button>
+                <button class="btn btn-secondary" onclick="resetPreset()">🔄 重置</button>
+            </div>
+        </div>
+
+        <div id="resultsSection" style="display:none;">
+            <div class="section-card">
+                <div class="section-title"><span class="icon">📐</span>核心定价结果</div>
+                <div class="result-grid">
+                    <div class="result-card gold">
+                        <div class="result-label">CAPM 权益成本 Ke</div>
+                        <div class="result-value gold" id="keVal">-</div>
+                        <div class="result-desc">投资者要求的必要回报率</div>
+                        <div class="result-formula">Ke = Rf + β × (Rm-Rf)</div>
+                    </div>
+                    <div class="result-card">
+                        <div class="result-label">税盾后债务成本 Kd(1-T)</div>
+                        <div class="result-value blue" id="kdAfterTaxVal">-</div>
+                        <div class="result-desc">利息抵税后的实际债务成本</div>
+                        <div class="result-formula">Kd' = Kd × (1 - Tax)</div>
+                    </div>
+                    <div class="result-card green">
+                        <div class="result-label">WACC 加权资本成本</div>
+                        <div class="result-value green" id="waccVal">-</div>
+                        <div class="result-desc">企业整体加权平均资本成本</div>
+                        <div class="result-formula">WACC = E/V×Ke + D/V×Kd(1-T)</div>
+                    </div>
+                    <div class="result-card purple">
+                        <div class="result-label">圆锥浓度调整后 Ke</div>
+                        <div class="result-value purple" id="keAdjustedVal">-</div>
+                        <div class="result-desc">考虑认知画圈集中度的风险溢价</div>
+                        <div class="result-formula">Ke' = Ke + ρ × 2%</div>
+                    </div>
+                    <div class="result-card gold">
+                        <div class="result-label">DCF 内在价值</div>
+                        <div class="result-value gold" id="dcfVal">-</div>
+                        <div class="result-desc">未来自由现金流折现现值</div>
+                        <div class="result-formula">V = Σ FCFt/(1+WACC)^t + TV</div>
+                    </div>
+                    <div class="result-card">
+                        <div class="result-label">估值差（安全边际）</div>
+                        <div class="result-value" id="gapVal">-</div>
+                        <div class="result-desc">(内在价值 - 当前价) / 当前价</div>
+                        <div class="threshold-bar">
+                            <div class="threshold-track">
+                                <div class="threshold-marker" id="gapMarker" style="left:50%;"></div>
+                            </div>
+                            <div class="threshold-labels">
+                                <span>-30% 低估</span>
+                                <span>0% 合理</span>
+                                <span>+30% 高估</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="signal-card neutral" id="signalCard">
+                <div class="signal-label" id="signalLabel">📋 定价信号</div>
+                <div class="signal-text" id="signalText">点击「开始定价」查看分析结果...</div>
+            </div>
+
+            <div class="section-card">
+                <div class="section-title"><span class="icon">📊</span>可视化分析</div>
+                <div class="charts-grid">
+                    <div class="chart-card">
+                        <div class="chart-title">📈 DCF 现金流折现分布图</div>
+                        <div class="chart-container" id="dcfChart"></div>
+                    </div>
+                    <div class="chart-card">
+                        <div class="chart-title">🎯 安全边际与敏感性热力图</div>
+                        <div class="chart-container" id="sensitivityChart"></div>
+                    </div>
+                </div>
+                <div class="charts-grid" style="margin-top:20px;">
+                    <div class="chart-card">
+                        <div class="chart-title">🔺 资本成本构成饼图</div>
+                        <div class="chart-container" id="waccChart"></div>
+                    </div>
+                    <div class="chart-card">
+                        <div class="chart-title">🎲 蒙特卡洛估值分布</div>
+                        <div class="chart-container" id="mcChart"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div style="margin-top:24px;">
+            <div class="section-title"><span class="icon">📚</span>方法论说明</div>
+            <div class="methodology-card">
+                <h4>📐 CAPM 资本资产定价模型</h4>
+                <p>
+                    <span class="formula">E[R] = Rf + β × (Rm - Rf)</span><br>
+                    其中 Rf 为无风险利率（通常取10年期国债收益率），β为系统性风险系数（=1表示与市场同步，>1为进攻型，<1为防御型），Rm-Rf为市场风险溢价。
+                </p>
+            </div>
+            <div class="methodology-card">
+                <h4>🏦 WACC 加权平均资本成本</h4>
+                <p>
+                    <span class="formula">WACC = (E/V)×Ke + (D/V)×Kd×(1-T)</span><br>
+                    企业整体融资成本，是DCF折现率的基础。MM税盾理论：利息支出可抵税，故债务成本需乘以(1-税率)。
+                </p>
+            </div>
+            <div class="methodology-card">
+                <h4>💰 DCF 自由现金流折现</h4>
+                <p>
+                    <span class="formula">V = Σ FCFt/(1+WACC)^t + TV/(1+WACC)^n</span><br>
+                    其中终值 TV = FCFn×(1+g)/(WACC-g)，g为永续增长率。圆锥浓度ρ校准：当市场认知集中度高时（ρ>0.5），要求额外2%风险溢价。
+                </p>
+            </div>
+            <div class="methodology-card">
+                <h4>🔺 圆锥浓度校准 · 对接认知画圈内核</h4>
+                <p>
+                    当认知圈收缩（ρ>0.68熔断线），共识高度集中 → 逆向风险增大 → 要求额外风险溢价；<br>
+                    当认知圈发散（ρ<0.48保本线），分歧大 → 逆向投资机会，安全边际充足。<br>
+                    铁律：ρ≥0.68时触发熔断，强制要求≥5%额外安全边际。
+                </p>
+            </div>
+        </div>
+
+        <div class="footer-note">
+            ⚠️ 本页面为数理模型演示工具，所有计算基于经典公司理财理论，不构成投资建议。投资有风险，入市需谨慎。
+        </div>
+    </div>
+
+    <script>
+        const PRESETS = {
+            stable: { rf:3.5, mp:5.0, beta:0.7, kd:4.5, tax:21, ew:80, cone:0.35, price:80, fcf:6.0, growth:5, tg:2.5, years:10 },
+            growth: { rf:3.0, mp:6.5, beta:1.5, kd:5.5, tax:21, ew:85, cone:0.6, price:150, fcf:4.0, growth:15, tg:3.0, years:10 },
+            tech:   { rf:3.0, mp:6.0, beta:1.3, kd:5.0, tax:15, ew:90, cone:0.55, price:200, fcf:8.0, growth:20, tg:3.5, years:10 },
+            bond:   { rf:4.0, mp:3.0, beta:0.3, kd:4.0, tax:25, ew:50, cone:0.25, price:100, fcf:7.0, growth:2, tg:2.0, years:10 }
+        };
+
+        let charts = {};
+
+        function $(id) { return document.getElementById(id); }
+
+        function loadPreset(name) {
+            const p = PRESETS[name];
+            if (!p) return;
+            document.querySelectorAll('.preset-chip').forEach(c => c.classList.remove('active'));
+            event.target.classList.add('active');
+            Object.keys(p).forEach(k => { if ($(k)) $(k).value = p[k]; });
+            calculate();
+        }
+
+        function resetPreset() { loadPreset('stable'); }
+
+        function getInputs() {
+            return {
+                rf: parseFloat($('rf').value)/100,
+                mp: parseFloat($('mp').value)/100,
+                beta: parseFloat($('beta').value),
+                kd: parseFloat($('kd').value)/100,
+                tax: parseFloat($('tax').value)/100,
+                ew: parseFloat($('ew').value)/100,
+                cone: parseFloat($('cone').value),
+                price: parseFloat($('price').value),
+                fcf: parseFloat($('fcf').value),
+                growth: parseFloat($('growth').value)/100,
+                tg: parseFloat($('tg').value)/100,
+                years: parseInt($('years').value)
+            };
+        }
+
+        function num(v, dec) { return (v*100).toFixed(dec || 2) + '%'; }
+        function money(v) { return '¥' + v.toFixed(2); }
+
+        function calculate() {
+            const i = getInputs();
+            const dw = 1 - i.ew;
+            const ke = i.rf + i.beta * i.mp;
+            const kdAfterTax = i.kd * (1 - i.tax);
+            const wacc = i.ew * ke + dw * kdAfterTax;
+            const coneAdj = i.cone * 0.02;
+            const keAdj = ke + coneAdj;
+            const waccAdj = i.ew * keAdj + dw * kdAfterTax;
+
+            let pv = 0;
+            const fcfs = [];
+            const discFcfs = [];
+            let curFcf = i.fcf;
+            const discRate = waccAdj;
+            for (let t = 1; t <= i.years; t++) {
+                const gt = t <= 3 ? i.growth : Math.max(0.03, i.growth * Math.pow(0.85, t-3));
+                curFcf = curFcf * (1 + gt);
+                const df = Math.pow(1 + discRate, t);
+                const dcf = curFcf / df;
+                fcfs.push(curFcf);
+                discFcfs.push(dcf);
+                pv += dcf;
+            }
+            const tv = fcfs[fcfs.length-1] * (1 + i.tg) / Math.max(0.001, discRate - i.tg);
+            const tvPv = tv / Math.pow(1 + discRate, i.years);
+            const intrinsic = pv + tvPv;
+            const gap = (intrinsic - i.price) / i.price;
+
+            $('resultsSection').style.display = 'block';
+            $('keVal').textContent = num(ke);
+            $('kdAfterTaxVal').textContent = num(kdAfterTax);
+            $('waccVal').textContent = num(wacc);
+            $('keAdjustedVal').textContent = num(keAdj);
+            $('dcfVal').textContent = money(intrinsic);
+            const gapEl = $('gapVal');
+            gapEl.textContent = (gap*100).toFixed(1) + '%';
+            gapEl.style.color = gap > 0.15 ? '#34d399' : gap < -0.1 ? '#f87171' : '#fbbf24';
+
+            const markerPos = Math.max(0, Math.min(100, 50 + gap*100/0.6*50));
+            $('gapMarker').style.left = markerPos + '%';
+
+            const sig = $('signalCard');
+            const sigLab = $('signalLabel');
+            const sigTxt = $('signalText');
+            sig.className = 'signal-card';
+            if (gap > 0.2) {
+                sig.classList.add('bullish');
+                sigLab.textContent = '🟢 显著低估信号';
+                sigTxt.textContent = `DCF内在价值${money(intrinsic)}较当前价${money(i.price)}高出${(gap*100).toFixed(1)}%，安全边际充足。若圆锥浓度ρ=${i.cone}处于合理区间(<0.48)，可考虑分批建仓。`;
+            } else if (gap > 0.05) {
+                sig.classList.add('bullish');
+                sigLab.textContent = '🟢 轻度低估';
+                sigTxt.textContent = `内在价值${money(intrinsic)}略高于当前价${money(i.price)}，存在${(gap*100).toFixed(1)}%的上行空间，估值合理偏低，可继续持有。`;
+            } else if (gap < -0.2) {
+                sig.classList.add('bearish');
+                sigLab.textContent = '🔴 显著高估信号';
+                sigTxt.textContent = `DCF内在价值${money(intrinsic)}较当前价${money(i.price)}低${Math.abs(gap*100).toFixed(1)}%，估值泡沫明显。若圆锥浓度ρ>${i.cone}接近0.68熔断线，建议减仓避险。`;
+            } else if (gap < -0.05) {
+                sig.classList.add('bearish');
+                sigLab.textContent = '🔴 轻度高估';
+                sigTxt.textContent = `当前价${money(i.price)}高于内在价值${money(intrinsic)}约${Math.abs(gap*100).toFixed(1)}%，估值偏高，需警惕回调风险。`;
+            } else {
+                sig.classList.add('neutral');
+                sigLab.textContent = '🟡 估值合理区间';
+                sigTxt.textContent = `当前价${money(i.price)}与DCF内在价值${money(intrinsic)}偏差${(gap*100).toFixed(1)}%，处于合理区间(-5%~+5%)，建议持有观望，等待更好的买点。`;
+            }
+
+            if (i.cone >= 0.68) {
+                sigTxt.textContent += ' ⚠️ 圆锥浓度≥0.68熔断线！市场共识高度一致，逆向风险极大，建议强制降低仓位。';
+            }
+
+            setTimeout(() => renderCharts(fcfs, discFcfs, tv, tvPv, i, waccAdj, intrinsic), 100);
+            return { fcfs, discFcfs, pv, tv, tvPv, intrinsic, gap, wacc: waccAdj, ke, kdAfterTax, ew: i.ew, dw };
+        }
+
+        function renderCharts(fcfs, discFcfs, tv, tvPv, i, wacc, intrinsic) {
+            const years = fcfs.map((_,idx) => 'Y'+(idx+1));
+
+            const dcfDom = $('dcfChart');
+            if (charts.dcf) charts.dcf.dispose();
+            charts.dcf = echarts.init(dcfDom);
+            charts.dcf.setOption({
+                backgroundColor: 'transparent',
+                tooltip: { trigger: 'axis', backgroundColor: 'rgba(20,10,40,0.9)', borderColor: 'rgba(251,191,36,0.3)', textStyle: { color: '#e2e8f0' } },
+                legend: { data: ['FCF预测','折现FCF'], textStyle: { color: 'rgba(255,255,255,0.5)', fontSize: 11 }, top: 0 },
+                grid: { left: '3%', right: '4%', bottom: '10%', top: '15%', containLabel: true },
+                xAxis: { type: 'category', data: [...years, 'TV'], axisLine: { lineStyle: { color: 'rgba(255,255,255,0.1)' } }, axisLabel: { color: 'rgba(255,255,255,0.4)', fontSize: 10 }, axisTick: { show: false } },
+                yAxis: { type: 'value', axisLine: { show: false }, splitLine: { lineStyle: { color: 'rgba(255,255,255,0.05)' } }, axisLabel: { color: 'rgba(255,255,255,0.4)', fontSize: 10, formatter: '¥{value}' } },
+                series: [
+                    { name: 'FCF预测', type: 'bar', data: [...fcfs.map(v=>v.toFixed(2)), tv.toFixed(2)], itemStyle: { color: new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'#fbbf24'},{offset:1,color:'rgba(251,191,36,0.2)'}]), borderRadius: [4,4,0,0] }, barWidth: '40%' },
+                    { name: '折现FCF', type: 'bar', data: [...discFcfs.map(v=>v.toFixed(2)), tvPv.toFixed(2)], itemStyle: { color: new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'#10b981'},{offset:1,color:'rgba(16,185,129,0.2)'}]), borderRadius: [4,4,0,0] }, barWidth: '40%' }
+                ]
+            });
+
+            const waccDom = $('waccChart');
+            if (charts.wacc) charts.wacc.dispose();
+            charts.wacc = echarts.init(waccDom);
+            charts.wacc.setOption({
+                backgroundColor: 'transparent',
+                tooltip: { trigger: 'item', backgroundColor: 'rgba(20,10,40,0.9)', borderColor: 'rgba(167,139,250,0.3)', textStyle: { color: '#e2e8f0' }, formatter: '{b}: {d}%' },
+                series: [{
+                    type: 'pie', radius: ['40%', '70%'], center: ['50%', '55%'],
+                    label: { color: 'rgba(255,255,255,0.6)', fontSize: 11, formatter: '{b}\n{d}%' },
+                    data: [
+                        { value: (i.ew*(i.rf+i.beta*i.mp+i.cone*0.02)*100).toFixed(2), name: '权益成本Ke\'', itemStyle: { color: '#fbbf24' } },
+                        { value: ((1-i.ew)*i.kd*(1-i.tax)*100).toFixed(2), name: '税盾债务成本', itemStyle: { color: '#60a5fa' } }
+                    ]
+                }]
+            });
+
+            const sensDom = $('sensitivityChart');
+            if (charts.sens) charts.sens.dispose();
+            charts.sens = echarts.init(sensDom);
+            const betaRange = [-0.3,-0.2,-0.1,0,0.1,0.2,0.3];
+            const growthRange = [-0.03,-0.02,-0.01,0,0.01,0.02,0.03];
+            const sensData = [];
+            const minVal = Math.max(0.1, wacc);
+            betaRange.forEach(db => {
+                growthRange.forEach(dg => {
+                    const b = Math.max(0.2, i.beta + db);
+                    const g = Math.max(0, i.growth + dg);
+                    const k = i.rf + b * i.mp + i.cone*0.02;
+                    const w = i.ew*k + (1-i.ew)*i.kd*(1-i.tax);
+                    let p=0, cf=i.fcf;
+                    for(let t=1;t<=i.years;t++){
+                        const gt=t<=3?g:Math.max(0.03,g*Math.pow(0.85,t-3));
+                        cf=cf*(1+gt);
+                        p+=cf/Math.pow(1+w,t);
+                    }
+                    const tV=cf*(1+i.tg)/Math.max(0.001,w-i.tg);
+                    p+=tV/Math.pow(1+w,i.years);
+                    const vGap = (p - i.price)/i.price;
+                    sensData.push([db.toFixed(1), (dg*100).toFixed(0)+'%', vGap]);
+                });
+            });
+            charts.sens.setOption({
+                backgroundColor: 'transparent',
+                tooltip: { backgroundColor: 'rgba(20,10,40,0.9)', borderColor: 'rgba(167,139,250,0.3)', textStyle: { color: '#e2e8f0' }, formatter: p => `β偏差: ${p.data[0]}<br>增长偏差: ${p.data[1]}<br>估值差: ${(p.data[2]*100).toFixed(1)}%` },
+                grid: { left: '3%', right: '10%', bottom: '10%', top: '8%', containLabel: true },
+                xAxis: { type: 'category', data: betaRange.map(v=>v.toFixed(1)), name: 'β偏差', nameTextStyle: { color: 'rgba(255,255,255,0.4)', fontSize: 10 }, axisLine: { lineStyle: { color: 'rgba(255,255,255,0.1)' } }, axisLabel: { color: 'rgba(255,255,255,0.4)', fontSize: 10 } },
+                yAxis: { type: 'category', data: growthRange.map(v=>(v*100).toFixed(0)+'%'), name: 'g偏差', nameTextStyle: { color: 'rgba(255,255,255,0.4)', fontSize: 10 }, axisLine: { lineStyle: { color: 'rgba(255,255,255,0.1)' } }, axisLabel: { color: 'rgba(255,255,255,0.4)', fontSize: 10 } },
+                visualMap: { min: -0.3, max: 0.3, calculable: true, orient: 'vertical', right: 0, top: 'center', inRange: { color: ['#ef4444','#fbbf24','#22c55e'] }, textStyle: { color: 'rgba(255,255,255,0.4)', fontSize: 10 } },
+                series: [{ type: 'heatmap', data: sensData.map(d=>[d[0],d[1],d[2].toFixed(3)]), label: { show: true, color: 'rgba(255,255,255,0.7)', fontSize: 9, formatter: p => (p.data[2]*100).toFixed(0)+'%' } }]
+            });
+        }
+
+        function runMonteCarlo() {
+            const baseResult = calculate();
+            if (!baseResult) return;
+            const i = getInputs();
+            const RUNS = 500;
+            const results = [];
+            for (let r = 0; r < RUNS; r++) {
+                const rfS = i.rf + (Math.random()-0.5)*0.02;
+                const mpS = i.mp + (Math.random()-0.5)*0.02;
+                const betaS = Math.max(0.2, i.beta + (Math.random()-0.5)*0.6);
+                const kdS = i.kd + (Math.random()-0.5)*0.02;
+                const gS = Math.max(0, i.growth + (Math.random()-0.5)*0.06);
+                const coneS = Math.max(0.1, Math.min(0.9, i.cone + (Math.random()-0.5)*0.2));
+                const kS = rfS + betaS*mpS + coneS*0.02;
+                const wS = i.ew*kS + (1-i.ew)*kdS*(1-i.tax);
+                let pvS=0, cf=i.fcf;
+                for(let t=1;t<=i.years;t++){
+                    const gt=t<=3?gS:Math.max(0.02,gS*Math.pow(0.85,t-3));
+                    cf=cf*(1+gt+(Math.random()-0.5)*0.04);
+                    pvS+=Math.max(0,cf)/Math.pow(1+wS,t);
+                }
+                const tV=cf*(1+i.tg)/Math.max(0.005,wS-i.tg);
+                pvS+=tV/Math.pow(1+wS,i.years);
+                results.push(pvS);
+            }
+            results.sort((a,b)=>a-b);
+            const mean = results.reduce((a,b)=>a+b,0)/RUNS;
+            const p5 = results[Math.floor(RUNS*0.05)];
+            const p50 = results[Math.floor(RUNS*0.5)];
+            const p95 = results[Math.floor(RUNS*0.95)];
+
+            const mcDom = $('mcChart');
+            if (charts.mc) charts.mc.dispose();
+            charts.mc = echarts.init(mcDom);
+            const bins = 30;
+            const minV = results[0], maxV = results[RUNS-1];
+            const binW = (maxV-minV)/bins;
+            const histData = new Array(bins).fill(0);
+            const binLabels = [];
+            for(let b=0;b<bins;b++){ binLabels.push((minV+b*binW).toFixed(0)); }
+            results.forEach(v => { const idx = Math.min(bins-1, Math.floor((v-minV)/binW)); histData[idx]++; });
+            charts.mc.setOption({
+                backgroundColor: 'transparent',
+                tooltip: { trigger: 'axis', backgroundColor: 'rgba(20,10,40,0.9)', borderColor: 'rgba(167,139,250,0.3)', textStyle: { color: '#e2e8f0' } },
+                grid: { left: '3%', right: '4%', bottom: '14%', top: '10%', containLabel: true },
+                xAxis: { type: 'category', data: binLabels, axisLine: { lineStyle: { color: 'rgba(255,255,255,0.1)' } }, axisLabel: { color: 'rgba(255,255,255,0.4)', fontSize: 9, rotate: 30 }, axisTick: { show: false } },
+                yAxis: { type: 'value', axisLine: { show: false }, splitLine: { lineStyle: { color: 'rgba(255,255,255,0.05)' } }, axisLabel: { color: 'rgba(255,255,255,0.4)', fontSize: 10 } },
+                series: [{
+                    type: 'bar', data: histData, barWidth: '80%',
+                    itemStyle: {
+                        color: function(params) {
+                            const v = minV + params.dataIndex*binW;
+                            if (v < i.price*0.9) return '#ef4444';
+                            if (v > i.price*1.1) return '#22c55e';
+                            return '#fbbf24';
+                        },
+                        borderRadius: [2,2,0,0]
+                    },
+                    markLine: {
+                        silent: true, symbol: 'none', lineStyle: { type: 'dashed' },
+                        data: [
+                            { xAxis: binLabels.findIndex((_,idx) => minV+idx*binW >= i.price), lineStyle: { color: '#fff', width: 2 }, label: { formatter: '当前价 ¥'+i.price, color: '#fff', fontSize: 10 } },
+                            { xAxis: binLabels.findIndex((_,idx) => minV+idx*binW >= mean), lineStyle: { color: '#a78bfa', width: 1.5 }, label: { formatter: '均值 ¥'+mean.toFixed(0), color: '#c4b5fd', fontSize: 10 } }
+                        ]
+                    }
+                }]
+            });
+
+            const sigCard = document.getElementById('signalCard');
+            const sigTxt = document.getElementById('signalText');
+            const mcNote = document.createElement('div');
+            mcNote.style.marginTop = '10px';
+            mcNote.style.fontSize = '13px';
+            mcNote.style.opacity = '0.8';
+            mcNote.innerHTML = `🎲 蒙特卡洛结果（${RUNS}次模拟）：均值 ¥${mean.toFixed(2)} · 5%分位 ¥${p5.toFixed(2)} · 中位数 ¥${p50.toFixed(2)} · 95%分位 ¥${p95.toFixed(2)}`;
+            const existing = sigCard.querySelector('.mc-note');
+            if (existing) existing.remove();
+            mcNote.className = 'mc-note';
+            sigCard.appendChild(mcNote);
+        }
+
+        window.addEventListener('resize', () => { Object.values(charts).forEach(c => c && c.resize()); });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => calculate(), 300);
+        });
+    </script>
+</body>
+</html>
