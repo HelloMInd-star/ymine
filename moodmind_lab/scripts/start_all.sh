@@ -27,11 +27,13 @@ STATIC_PID=$!
 echo $STATIC_PID > "$PID_DIR/static.pid"
 
 cd "$PROJECT_ROOT/moodmind_dashboard"
-streamlit run app.py \
+python -m streamlit run app.py \
     --server.port "$DASH_PORT" \
     --server.address 0.0.0.0 \
     --server.headless true \
     --browser.gatherUsageStats false \
+    --server.enableCORS false \
+    --server.enableXsrfProtection false \
     --theme.base dark \
     > "$LOG_DIR/dashboard.log" 2>&1 &
 DASH_PID=$!
