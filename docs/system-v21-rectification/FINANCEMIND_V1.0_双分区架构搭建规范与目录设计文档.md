@@ -323,7 +323,7 @@ YBus.publish('riskThreshold', payload, { trusted: true });
     <!-- 5. 画圈公共数理内核 -->
     <script src="../../game-os-main/core-engine/circle-boundary.js?v=1"></script>
     <!-- 6. FinanceMind模块脚本 -->
-    <script src="js/bus-subscribe.js?v=1"></script>
+    <script src="../../engines/financemind/js/bus-subscribe.js"></script>
     <style>/* 模块级样式 */</style>
 </head>
 <body>

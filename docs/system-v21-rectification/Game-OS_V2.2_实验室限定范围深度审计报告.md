@@ -41,7 +41,7 @@
 
 ### A-01 [Low] `__pycache__`编译缓存目录残留于工作区
 
-- **位置**: [moodmind_lab/moodmind_dashboard/__pycache__/](file:///workspace/moodmind_lab/moodmind_dashboard/__pycache__/)
+- **位置**: `moodmind_lab/moodmind_dashboard/__pycache__/`（⚠️ 已清理，目录已删除）
 - **问题描述**: Python编译缓存目录`__pycache__/`存在于版本工作区（含`private_engine_stub.cpython-314.pyc`），应通过`.gitignore`排除或清理，避免二进制缓存文件污染工程目录
 - **影响范围**: 工程目录整洁度；不影响功能运行
 - **能否当下整改**: ✅ **可当下整改**

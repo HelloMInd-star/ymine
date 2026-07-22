@@ -8,7 +8,7 @@
 
 相关文档：
 - [营销学：元架构的"吞噬"与"重构"](./marketing-reinvented.md)
-- [6小时吞噬6个陌生领域](./cross-domain-mapping.html)
+- [6小时吞噬6个陌生领域](../labs/evidence/cross-domain-mapping.html)
 
 ---
 

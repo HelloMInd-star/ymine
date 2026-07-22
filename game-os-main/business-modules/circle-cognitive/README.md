@@ -12,7 +12,7 @@
 | 系统版本 | v2.1 · GAME-OS |
 | 理论溯源 | 认知神经科学 · 运动-认知耦合理论 |
 | 核心架构 | **3→1→1→3→100** |
-| 入口页面 | [`circle-lab.html`](file:///workspace/circle-lab.html) |
+| 入口页面 | [`circle-lab.html`](../../../labs/evidence/circle-lab.html) |
 | 接入位置 | Y.MINE 总控台 · 核心方法论系统 |
 
 ---

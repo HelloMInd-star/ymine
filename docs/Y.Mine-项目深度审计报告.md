@@ -19,11 +19,11 @@
 
 | 层级 | 核心模块 | 关键概念 |
 |------|---------|---------|
-| L0 神经科学 | [circle-lab.html](file:///workspace/circle-lab.html) | 小脑-皮层运动-认知耦合、行为代理模型 |
-| L1 信号提纯 | [info-funnel.html](file:///workspace/info-funnel.html) | 7层信息漏斗，100%噪声→20%纯信号 |
-| L2 精算内核 | [marketing-reinvented.html](file:///workspace/marketing-reinvented.html) | 6维风险向量 + 圆锥浓度模型 + CAPM |
+| L0 神经科学 | [circle-lab.html](../labs/evidence/circle-lab.html) | 小脑-皮层运动-认知耦合、行为代理模型 |
+| L1 信号提纯 | [info-funnel.html](../labs/evidence/info-funnel.html) | 7层信息漏斗，100%噪声→20%纯信号 |
+| L2 精算内核 | [marketing-reinvented.html](../labs/evidence/marketing-reinvented.html) | 6维风险向量 + 圆锥浓度模型 + CAPM |
 | L3 铁律阈值 | 算法层内置 | 0.48生死线 / 0.50定价权基准线 / 0.68稳态上限线 |
-| L4 案例对标 | [case-library.html](file:///workspace/case-library.html) | 16案例6维向量矩阵，余弦相似度+欧氏距离匹配 |
+| L4 案例对标 | [case-library.html](../labs/evidence/case-library.html) | 16案例6维向量矩阵，余弦相似度+欧氏距离匹配 |
 | L5 输出闭环 | 定价模拟器 | 5输入→4输出，6灯风控熔断 |
 
 ### 1.3 核心算法清单
@@ -105,7 +105,7 @@
 
 没有前后端分离（因为根本没有后端），但也没有最基本的关注点分离：
 - 数学计算、Canvas绘制、DOM操作、事件监听、localStorage读写全部耦合
-- 例如[general-game-os.html](file:///workspace/general-game-os.html)中5个Canvas模块，每个都是200行左右自包含IIFE，内部既有`ctx.fillStyle`又有凯利公式计算
+- 例如[general-game-os.html](../labs/evidence/general-game-os.html)中5个Canvas模块，每个都是200行左右自包含IIFE，内部既有`ctx.fillStyle`又有凯利公式计算
 - 7个总线对象全部挂在`window`全局，无命名空间、无模块系统、无状态管理
 
 #### 🟡 P1：CSS重复度40%+
@@ -115,8 +115,8 @@
 #### 🟡 P1：文档与代码不同步
 
 - README标注v1.3，各HTML版本号不一致
-- [marketing-reinvented.md](file:///workspace/marketing-reinvented.md)描述设计思路，HTML已演化出更多功能
-- [pricing-decoder.md](file:///workspace/pricing-decoder.md)提到部分构想未在HTML中完全实现
+- [marketing-reinvented.md](./marketing-reinvented.md)描述设计思路，HTML已演化出更多功能
+- [pricing-decoder.md](./pricing-decoder.md)提到部分构想未在HTML中完全实现
 
 #### 🟢 P2：模块边界概念驱动而非功能驱动
 
@@ -199,7 +199,7 @@ README声称circle-bus-update→创始人画像，但这个映射目前是概念
 
 #### 冗余1：Canvas可视化重复造轮子
 
-[general-game-os.html](file:///workspace/general-game-os.html)中5个Canvas模块（博弈底座/低空经济/精算映射/物流底座/算力底座）：
+[general-game-os.html](../labs/evidence/general-game-os.html)中5个Canvas模块（博弈底座/低空经济/精算映射/物流底座/算力底座）：
 - 结构完全同构（滑块→状态计算→Canvas绘制→数值展示）
 - 但代码是5份独立实现，每份都有自己的网格绘制、动画循环、滑块绑定
 - 后两个（物流/算力）README明确标注"结构完全同构"，代码却完全重复

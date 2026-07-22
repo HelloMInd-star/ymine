@@ -313,17 +313,17 @@ YBus.publish('riskThreshold', payload, { trusted: true });
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>🏛️ FinanceMind · [页面标题]</title>
     <!-- 1. 基础样式 -->
-    <link rel="stylesheet" href="../../assets/css/base.css?v=2">
+    <link rel="stylesheet" href="../../../assets/css/base.css">
     <!-- 2. YBus总线（必须最先加载） -->
-    <script src="../../assets/js/bus.js?v=3"></script>
+    <script src="../../../assets/js/bus.js"></script>
     <!-- 3. 数据归一化 -->
-    <script src="../../models/common/normalizer.js?v=3"></script>
+    <script src="../../../models/common/normalizer.js"></script>
     <!-- 4. 三角审计引擎（riskThreshold发布前置依赖） -->
-    <script src="../../assets/js/triangle-audit.js?v=3"></script>
+    <script src="../../../assets/js/triangle-audit.js"></script>
     <!-- 5. 画圈公共数理内核 -->
-    <script src="../../game-os-main/core-engine/circle-boundary.js?v=1"></script>
+    <script src="../../../game-os-main/core-engine/circle-boundary.js"></script>
     <!-- 6. FinanceMind模块脚本 -->
-    <script src="js/bus-subscribe.js?v=1"></script>
+    <script src="../js/bus-subscribe.js"></script>
     <style>/* 模块级样式 */</style>
 </head>
 <body>
