@@ -259,6 +259,28 @@
             font-family: 'SF Mono', monospace;
         }
 
+        .cone-canvas-wrap {
+            background: rgba(0,0,0,0.2);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 12px;
+            padding: 10px;
+            position: relative; width: 100%; display: flex; justify-content: center;
+            margin: 10px 0;
+        }
+        #coneCanvas { display: block; max-width: 100%; height: auto; border-radius: 8px; }
+        .cone-caption { font-size: 11px; color: rgba(255,255,255,0.3); text-align: center; margin-top: 8px; }
+        .cone-slider-row {
+            display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-top: 12px;
+        }
+        .cone-slider-item label { font-size: 11px; color: rgba(255,255,255,0.4); display: block; margin-bottom: 6px; }
+        .cone-slider-item .val { font-size: 18px; font-weight: 700; font-family: 'SF Mono', monospace; color: #a78bfa; }
+        .cone-slider-item .val.green { color: #22c55e; }
+        .cone-slider-item .val.yellow { color: #facc15; }
+        .cone-slider-item .val.red { color: #ef4444; }
+        .cone-slider-item .val.blue { color: #60a5fa; }
+        .cone-slider-item input[type="range"] { width: 100%; accent-color: #a78bfa; height: 4px; background: rgba(255,255,255,0.08); border-radius: 4px; -webkit-appearance: none; appearance: none; }
+        .cone-slider-item input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 14px; height: 14px; border-radius: 50%; background: #a78bfa; cursor: pointer; box-shadow: 0 0 12px rgba(167,139,250,0.4); }
+
         @media (max-width: 1000px) { .charts-grid { grid-template-columns: 1fr; } }
         @media (max-width: 680px) {
             .container { padding: 24px 20px; border-radius: 20px; }
@@ -344,6 +366,31 @@
                 <button class="btn btn-primary" onclick="calculate()">🧮 开始定价</button>
                 <button class="btn btn-secondary" onclick="runMonteCarlo()">🎲 蒙特卡洛模拟</button>
                 <button class="btn btn-secondary" onclick="resetPreset()">🔄 重置</button>
+            </div>
+        </div>
+
+        <div class="section-card">
+            <div class="section-title"><span class="icon">🔺</span>圆锥浓度校准 · 认知画圈可视化</div>
+            <div class="cone-canvas-wrap">
+                <canvas id="coneCanvas" width="750" height="400"></canvas>
+            </div>
+            <div class="cone-caption">立体圆锥 · 浓度球 = h高度处的溶质浓度C · 0.48保本线 / 0.50稳态中轴 / 0.68熔断线</div>
+            <div class="cone-slider-row">
+                <div class="cone-slider-item">
+                    <label>🔺 基础浓度 ρ</label>
+                    <div class="val" id="coneRhoVal">0.40</div>
+                    <input type="range" id="coneSlider" min="0.1" max="0.9" step="0.01" value="0.4">
+                </div>
+                <div class="cone-slider-item">
+                    <label>📊 浓度高度 h</label>
+                    <div class="val blue" id="coneHVal">0.50</div>
+                    <input type="range" id="coneHSlider" min="0.2" max="0.9" step="0.01" value="0.5">
+                </div>
+                <div class="cone-slider-item">
+                    <label>⚗️ 实际浓度 C</label>
+                    <div class="val green" id="coneCVal">0.33</div>
+                    <div class="val yellow" id="coneRiskStatus" style="font-size:13px; margin-top:4px;">✅ 安全区</div>
+                </div>
             </div>
         </div>
 
@@ -498,7 +545,7 @@
                 kd: parseFloat($('kd').value)/100,
                 tax: parseFloat($('tax').value)/100,
                 ew: parseFloat($('ew').value)/100,
-                cone: parseFloat($('cone').value),
+                cone: window._coneState ? window._coneState.rho : parseFloat($('cone').value),
                 price: parseFloat($('price').value),
                 fcf: parseFloat($('fcf').value),
                 growth: parseFloat($('growth').value)/100,
@@ -751,8 +798,249 @@
 
         window.addEventListener('resize', () => { Object.values(charts).forEach(c => c && c.resize()); });
 
+        (function() {
+            const canvas = document.getElementById('coneCanvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+
+            const CW = 750;
+            const CH = 400;
+            canvas.width = CW;
+            canvas.height = CH;
+
+            const cx = CW * 0.48;
+            const by = CH * 0.78;
+            const ty = CH * 0.10;
+            const cH = by - ty;
+            const bR = 170;
+
+            const layerBottom = 0.10;
+            const layerMid = 0.60;
+            const layerTop = 0.30;
+
+            window._coneState = { rho: 0.40, hRatio: 0.50, M: 0.105 };
+
+            const coneSlider = document.getElementById('coneSlider');
+            const coneHSlider = document.getElementById('coneHSlider');
+            const coneRhoVal = document.getElementById('coneRhoVal');
+            const coneHValEl = document.getElementById('coneHVal');
+            const coneCVal = document.getElementById('coneCVal');
+            const coneRiskStatus = document.getElementById('coneRiskStatus');
+            const coneInput = document.getElementById('cone');
+
+            function calcConc() {
+                const r = bR * (1 - window._coneState.hRatio);
+                const hv = cH * window._coneState.hRatio;
+                const vol = (1/3) * Math.PI * r * r * hv;
+                const totalVol = (1/3) * Math.PI * bR * bR * cH;
+                const nVol = vol / Math.max(totalVol, 0.001);
+                return Math.min((window._coneState.M * window._coneState.rho) / Math.max(nVol, 0.01), 1.5);
+            }
+
+            function gR(hr) { return bR * (1 - hr); }
+            function gY(hr) { return by - hr * cH; }
+
+            function updateUI() {
+                const C = calcConc();
+                coneCVal.textContent = C.toFixed(2);
+                if (coneInput) coneInput.value = window._coneState.rho.toFixed(2);
+                coneRhoVal.textContent = window._coneState.rho.toFixed(2);
+                coneHValEl.textContent = window._coneState.hRatio.toFixed(2);
+
+                coneCVal.className = 'val';
+                coneRiskStatus.className = 'val';
+                coneRiskStatus.style.fontSize = '13px';
+                coneRiskStatus.style.marginTop = '4px';
+
+                if (C >= 0.68) {
+                    coneRiskStatus.textContent = '⚠️ 熔断风险';
+                    coneCVal.classList.add('red'); coneRiskStatus.classList.add('red');
+                } else if (C >= 0.50) {
+                    coneRiskStatus.textContent = '🟡 接近稳态';
+                    coneCVal.classList.add('yellow'); coneRiskStatus.classList.add('yellow');
+                } else if (C >= 0.48) {
+                    coneRiskStatus.textContent = '✅ 稳态区间';
+                    coneCVal.classList.add('green'); coneRiskStatus.classList.add('green');
+                } else {
+                    coneRiskStatus.textContent = '🔵 保本以下';
+                    coneCVal.classList.add('blue'); coneRiskStatus.classList.add('blue');
+                }
+
+                if (document.getElementById('resultsSection') && document.getElementById('resultsSection').style.display !== 'none') {
+                    clearTimeout(window._cct);
+                    window._cct = setTimeout(calculate, 50);
+                }
+            }
+
+            function drawEllipse(x, y, rw, rh, color, lw, fill) {
+                ctx.beginPath();
+                for (let j = 0; j <= 60; j++) {
+                    const a = (j / 60) * Math.PI * 2;
+                    const px = x + rw * Math.cos(a);
+                    const pz = rw * Math.sin(a) * 0.35;
+                    const py = y + pz * 0.4;
+                    j === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+                }
+                ctx.closePath();
+                if (fill) { ctx.fillStyle = fill; ctx.fill(); }
+                if (lw) { ctx.strokeStyle = color; ctx.lineWidth = lw; ctx.stroke(); }
+            }
+
+            function drawCone() {
+                ctx.clearRect(0, 0, CW, CH);
+
+                ctx.strokeStyle = 'rgba(255,255,255,0.02)';
+                ctx.lineWidth = 0.5;
+                for (let i = 0; i <= 10; i++) {
+                    ctx.beginPath(); ctx.moveTo((i/10)*CW, 0); ctx.lineTo((i/10)*CW, CH); ctx.stroke();
+                    ctx.beginPath(); ctx.moveTo(0, (i/10)*CH); ctx.lineTo(CW, (i/10)*CH); ctx.stroke();
+                }
+
+                const colors = {
+                    bottom: { f: 'rgba(251,146,60,0.15)', s: 'rgba(251,146,60,0.3)' },
+                    mid:    { f: 'rgba(250,204,21,0.12)', s: 'rgba(250,204,21,0.25)' },
+                    top:    { f: 'rgba(167,139,250,0.15)', s: 'rgba(167,139,250,0.3)' }
+                };
+
+                const steps = 80;
+                for (let i = 0; i < steps; i++) {
+                    const r1 = i / steps, r2 = (i+1) / steps;
+                    const col = r1 < layerBottom ? colors.bottom : (r1 < layerBottom+layerMid ? colors.mid : colors.top);
+                    ctx.beginPath();
+                    for (let j = 0; j <= 40; j++) {
+                        const a = (j/40)*Math.PI*2;
+                        const x1 = cx + gR(r1)*Math.cos(a), z1 = gR(r1)*Math.sin(a)*0.35, y1 = gY(r1)+z1*0.4;
+                        j===0 ? ctx.moveTo(x1,y1) : ctx.lineTo(x1,y1);
+                    }
+                    for (let j = 40; j >= 0; j--) {
+                        const a = (j/40)*Math.PI*2;
+                        const x2 = cx + gR(r2)*Math.cos(a), z2 = gR(r2)*Math.sin(a)*0.35, y2 = gY(r2)+z2*0.4;
+                        ctx.lineTo(x2,y2);
+                    }
+                    ctx.closePath();
+                    ctx.fillStyle = col.f; ctx.fill();
+                    ctx.strokeStyle = col.s; ctx.lineWidth = 0.5; ctx.stroke();
+                }
+
+                ctx.strokeStyle = 'rgba(250,204,21,0.5)';
+                ctx.lineWidth = 2;
+                ctx.setLineDash([6,6]);
+                ctx.beginPath(); ctx.moveTo(cx, by+20); ctx.lineTo(cx, ty-10); ctx.stroke();
+                ctx.setLineDash([]);
+
+                ctx.fillStyle = 'rgba(250,204,21,0.6)';
+                ctx.font = '12px sans-serif'; ctx.textAlign='center'; ctx.textBaseline='top';
+                ctx.fillText('⬆ 中轴线 = 稳态中轴', cx, ty-26);
+
+                [
+                    { hr: layerBottom/2, lbl: '防御型基础', col: 'rgba(251,146,60,0.5)' },
+                    { hr: layerBottom+layerMid/2, lbl: '定价权基准', col: 'rgba(250,204,21,0.5)' },
+                    { hr: layerBottom+layerMid+layerTop/2, lbl: '高端稀缺', col: 'rgba(167,139,250,0.5)' }
+                ].forEach(l => {
+                    drawEllipse(cx, gY(l.hr), gR(l.hr), gR(l.hr)*0.35, l.col, 2, null);
+                    ctx.fillStyle = l.col; ctx.font='11px sans-serif'; ctx.textAlign='left'; ctx.textBaseline='middle';
+                    ctx.fillText(l.lbl, cx+gR(l.hr)*0.6+6, gY(l.hr));
+                });
+
+                ctx.setLineDash([3,3]);
+                drawEllipse(cx, gY(0.48), gR(0.48), gR(0.48)*0.35, 'rgba(34,197,94,0.55)', 1.5, null);
+                ctx.setLineDash([]);
+                ctx.fillStyle='rgba(34,197,94,0.65)'; ctx.font='10px sans-serif'; ctx.textAlign='left';
+                ctx.fillText('✅ 0.48 保本线', cx+gR(0.48)*0.55+4, gY(0.48)-6);
+
+                ctx.setLineDash([2,2]);
+                drawEllipse(cx, gY(0.50), gR(0.50), gR(0.50)*0.35, 'rgba(250,204,21,0.45)', 1.5, null);
+                ctx.setLineDash([]);
+
+                ctx.setLineDash([4,4]);
+                drawEllipse(cx, gY(0.68), gR(0.68), gR(0.68)*0.35, 'rgba(239,68,68,0.6)', 2, null);
+                ctx.setLineDash([]);
+                ctx.fillStyle='rgba(239,68,68,0.7)';
+                ctx.fillText('⚠ 0.68 熔断线', cx+gR(0.68)*0.55+4, gY(0.68)-8);
+
+                const C = calcConc();
+                const hr = window._coneState.hRatio;
+                const rh = gR(hr), yh = gY(hr);
+
+                let bc, bg;
+                if (C >= 0.68) { bc='rgba(239,68,68,0.7)'; bg='rgba(239,68,68,0.25)'; }
+                else if (C >= 0.50) { bc='rgba(250,204,21,0.7)'; bg='rgba(250,204,21,0.25)'; }
+                else if (C >= 0.48) { bc='rgba(34,197,94,0.7)'; bg='rgba(34,197,94,0.25)'; }
+                else { bc='rgba(96,165,250,0.7)'; bg='rgba(96,165,250,0.25)'; }
+
+                const br = Math.min(rh*0.55, 28 + C*20);
+                const grad = ctx.createRadialGradient(cx, yh, 0, cx, yh, br*1.6);
+                grad.addColorStop(0, bc); grad.addColorStop(0.5, bg); grad.addColorStop(1, 'rgba(0,0,0,0)');
+                ctx.fillStyle = grad;
+                ctx.beginPath(); ctx.ellipse(cx, yh, br*1.6, br*0.85, 0, 0, Math.PI*2); ctx.fill();
+                ctx.fillStyle = bc;
+                ctx.beginPath(); ctx.ellipse(cx, yh, br*0.6, br*0.32, 0, 0, Math.PI*2); ctx.fill();
+
+                ctx.fillStyle='rgba(255,255,255,0.08)'; ctx.font='11px sans-serif'; ctx.textAlign='center'; ctx.textBaseline='top';
+                ctx.fillText('水平切面 = 实际成交定价区间', cx, by+26);
+                ctx.fillStyle='rgba(167,139,250,0.2)'; ctx.textBaseline='bottom';
+                ctx.fillText('稀缺价值 · 高毛利区', cx, ty+8);
+                ctx.fillStyle='rgba(251,146,60,0.25)'; ctx.textBaseline='top';
+                ctx.fillText('大众基础 · 规模化区', cx, by-10);
+
+                const ly = CH-32, lx = CW*0.58;
+                ctx.textAlign='left'; ctx.textBaseline='middle'; ctx.font='10px sans-serif';
+                [[bc,'浓度球 C'],['rgba(239,68,68,0.6)','0.68熔断'],['rgba(250,204,21,0.5)','稳态中轴']].forEach((it,i) => {
+                    ctx.fillStyle = it[0]; ctx.fillRect(lx+i*85, ly-5, 12, 10);
+                    ctx.fillStyle='rgba(255,255,255,0.2)'; ctx.fillText(it[1], lx+i*85+18, ly);
+                });
+            }
+
+            if (coneSlider) coneSlider.addEventListener('input', function() {
+                window._coneState.rho = parseFloat(this.value);
+                if (coneInput) coneInput.value = this.value;
+                updateUI(); drawCone();
+            });
+            if (coneHSlider) coneHSlider.addEventListener('input', function() {
+                window._coneState.hRatio = parseFloat(this.value); updateUI(); drawCone();
+            });
+            if (coneInput) coneInput.addEventListener('input', function() {
+                const v = parseFloat(this.value);
+                if (!isNaN(v) && v>=0.1 && v<=0.9) {
+                    window._coneState.rho = v;
+                    if (coneSlider) coneSlider.value = v;
+                    updateUI(); drawCone();
+                }
+            });
+
+            window._updateConeFromPreset = function(rho, h) {
+                if (rho !== undefined) {
+                    window._coneState.rho = rho;
+                    if (coneSlider) coneSlider.value = rho;
+                    if (coneInput) coneInput.value = rho;
+                }
+                if (h !== undefined) {
+                    window._coneState.hRatio = h;
+                    if (coneHSlider) coneHSlider.value = h;
+                }
+                updateUI(); drawCone();
+            };
+
+            updateUI();
+            drawCone();
+        })();
+
+        const _origLoadPreset = loadPreset;
+        loadPreset = function(name) {
+            _origLoadPreset(name);
+            const p = PRESETS[name];
+            if (p && window._updateConeFromPreset) {
+                window._updateConeFromPreset(p.cone, 0.50);
+            }
+        };
+
         document.addEventListener('DOMContentLoaded', () => {
-            setTimeout(() => calculate(), 300);
+            setTimeout(() => {
+                if (window._updateConeFromPreset) {
+                    window._updateConeFromPreset(0.40, 0.50);
+                }
+                calculate();
+            }, 300);
         });
     </script>
 </body>
