@@ -582,8 +582,100 @@
                 sigTxt.textContent += ' ⚠️ 圆锥浓度≥0.68熔断线！市场共识高度一致，逆向风险极大，建议强制降低仓位。';
             }
 
-            setTimeout(() => renderCharts(fcfs, discFcfs, tv, tvPv, i, waccAdj, intrinsic), 100);
+            setTimeout(() => {
+                renderCharts(fcfs, discFcfs, tv, tvPv, i, waccAdj, intrinsic);
+                setTimeout(() => runMonteCarloSimulation(i), 100);
+            }, 100);
             return { fcfs, discFcfs, pv, tv, tvPv, intrinsic, gap, wacc: waccAdj, ke, kdAfterTax, ew: i.ew, dw };
+        }
+
+        function runMonteCarloSimulation(i) {
+            const RUNS = 500;
+            const results = [];
+            for (let r = 0; r < RUNS; r++) {
+                const rfS = i.rf + (Math.random()-0.5)*0.02;
+                const mpS = i.mp + (Math.random()-0.5)*0.02;
+                const betaS = Math.max(0.2, i.beta + (Math.random()-0.5)*0.6);
+                const kdS = i.kd + (Math.random()-0.5)*0.02;
+                const gS = Math.max(0, i.growth + (Math.random()-0.5)*0.06);
+                const coneS = Math.max(0.1, Math.min(0.9, i.cone + (Math.random()-0.5)*0.2));
+                const kS = rfS + betaS*mpS + coneS*0.02;
+                const wS = i.ew*kS + (1-i.ew)*kdS*(1-i.tax);
+                let pvS=0, cf=i.fcf;
+                for(let t=1;t<=i.years;t++){
+                    const gt=t<=3?gS:Math.max(0.02,gS*Math.pow(0.85,t-3));
+                    cf=cf*(1+gt+(Math.random()-0.5)*0.04);
+                    pvS+=Math.max(0,cf)/Math.pow(1+wS,t);
+                }
+                const tV=cf*(1+i.tg)/Math.max(0.005,wS-i.tg);
+                pvS+=tV/Math.pow(1+wS,i.years);
+                results.push(pvS);
+            }
+            results.sort((a,b)=>a-b);
+            const mean = results.reduce((a,b)=>a+b,0)/RUNS;
+            const p5 = results[Math.floor(RUNS*0.05)];
+            const p50 = results[Math.floor(RUNS*0.5)];
+            const p95 = results[Math.floor(RUNS*0.95)];
+
+            renderMcChart(results, i, mean, p5, p50, p95, RUNS);
+            return { results, mean, p5, p50, p95 };
+        }
+
+        function renderMcChart(results, i, mean, p5, p50, p95, RUNS) {
+            const mcDom = $('mcChart');
+            if (charts.mc) charts.mc.dispose();
+            charts.mc = echarts.init(mcDom);
+            const bins = 30;
+            const minV = results[0], maxV = results[results.length-1];
+            const binW = (maxV-minV)/bins;
+            const histData = new Array(bins).fill(0);
+            const binLabels = [];
+            for(let b=0;b<bins;b++){ binLabels.push((minV+b*binW).toFixed(0)); }
+            results.forEach(v => { const idx = Math.min(bins-1, Math.floor((v-minV)/binW)); histData[idx]++; });
+            charts.mc.setOption({
+                backgroundColor: 'transparent',
+                tooltip: { trigger: 'axis', backgroundColor: 'rgba(20,10,40,0.9)', borderColor: 'rgba(167,139,250,0.3)', textStyle: { color: '#e2e8f0' } },
+                grid: { left: '3%', right: '4%', bottom: '14%', top: '10%', containLabel: true },
+                xAxis: { type: 'category', data: binLabels, name: '估值区间 (¥)', nameTextStyle: { color: 'rgba(255,255,255,0.4)', fontSize: 10 }, axisLine: { lineStyle: { color: 'rgba(255,255,255,0.1)' } }, axisLabel: { color: 'rgba(255,255,255,0.4)', fontSize: 9, rotate: 30 }, axisTick: { show: false } },
+                yAxis: { type: 'value', name: '频次', nameTextStyle: { color: 'rgba(255,255,255,0.4)', fontSize: 10 }, axisLine: { show: false }, splitLine: { lineStyle: { color: 'rgba(255,255,255,0.05)' } }, axisLabel: { color: 'rgba(255,255,255,0.4)', fontSize: 10 } },
+                series: [{
+                    type: 'bar', data: histData, barWidth: '80%',
+                    itemStyle: {
+                        color: function(params) {
+                            const v = minV + params.dataIndex*binW;
+                            if (v < i.price*0.9) return '#ef4444';
+                            if (v > i.price*1.1) return '#22c55e';
+                            return '#fbbf24';
+                        },
+                        borderRadius: [2,2,0,0]
+                    },
+                    markLine: {
+                        silent: true, symbol: 'none', lineStyle: { type: 'dashed' },
+                        data: [
+                            { xAxis: binLabels.findIndex((_,idx) => minV+idx*binW >= i.price), lineStyle: { color: '#fff', width: 2 }, label: { formatter: '当前价 ¥'+i.price, color: '#fff', fontSize: 10 } },
+                            { xAxis: binLabels.findIndex((_,idx) => minV+idx*binW >= mean), lineStyle: { color: '#a78bfa', width: 1.5 }, label: { formatter: '均值 ¥'+mean.toFixed(0), color: '#c4b5fd', fontSize: 10 } }
+                        ]
+                    }
+                }]
+            });
+
+            const sigCard = document.getElementById('signalCard');
+            const existing = sigCard.querySelector('.mc-note');
+            if (existing) existing.remove();
+            const mcNote = document.createElement('div');
+            mcNote.className = 'mc-note';
+            mcNote.style.marginTop = '10px';
+            mcNote.style.fontSize = '13px';
+            mcNote.style.opacity = '0.85';
+            mcNote.style.paddingTop = '10px';
+            mcNote.style.borderTop = '1px solid rgba(255,255,255,0.08)';
+            mcNote.innerHTML = `🎲 <strong>蒙特卡洛模拟结果</strong>（${RUNS}次随机抽样）：均值 <span style="color:#c4b5fd">¥${mean.toFixed(2)}</span> · 5%分位 <span style="color:#f87171">¥${p5.toFixed(2)}</span>（悲观）· 中位数 <span style="color:#fbbf24">¥${p50.toFixed(2)}</span> · 95%分位 <span style="color:#34d399">¥${p95.toFixed(2)}</span>（乐观）`;
+            sigCard.appendChild(mcNote);
+        }
+
+        function runMonteCarlo() {
+            const i = getInputs();
+            runMonteCarloSimulation(i);
         }
 
         function renderCharts(fcfs, discFcfs, tv, tvPv, i, wacc, intrinsic) {
@@ -655,87 +747,6 @@
                 visualMap: { min: -0.3, max: 0.3, calculable: true, orient: 'vertical', right: 0, top: 'center', inRange: { color: ['#ef4444','#fbbf24','#22c55e'] }, textStyle: { color: 'rgba(255,255,255,0.4)', fontSize: 10 } },
                 series: [{ type: 'heatmap', data: sensData.map(d=>[d[0],d[1],d[2].toFixed(3)]), label: { show: true, color: 'rgba(255,255,255,0.7)', fontSize: 9, formatter: p => (p.data[2]*100).toFixed(0)+'%' } }]
             });
-        }
-
-        function runMonteCarlo() {
-            const baseResult = calculate();
-            if (!baseResult) return;
-            const i = getInputs();
-            const RUNS = 500;
-            const results = [];
-            for (let r = 0; r < RUNS; r++) {
-                const rfS = i.rf + (Math.random()-0.5)*0.02;
-                const mpS = i.mp + (Math.random()-0.5)*0.02;
-                const betaS = Math.max(0.2, i.beta + (Math.random()-0.5)*0.6);
-                const kdS = i.kd + (Math.random()-0.5)*0.02;
-                const gS = Math.max(0, i.growth + (Math.random()-0.5)*0.06);
-                const coneS = Math.max(0.1, Math.min(0.9, i.cone + (Math.random()-0.5)*0.2));
-                const kS = rfS + betaS*mpS + coneS*0.02;
-                const wS = i.ew*kS + (1-i.ew)*kdS*(1-i.tax);
-                let pvS=0, cf=i.fcf;
-                for(let t=1;t<=i.years;t++){
-                    const gt=t<=3?gS:Math.max(0.02,gS*Math.pow(0.85,t-3));
-                    cf=cf*(1+gt+(Math.random()-0.5)*0.04);
-                    pvS+=Math.max(0,cf)/Math.pow(1+wS,t);
-                }
-                const tV=cf*(1+i.tg)/Math.max(0.005,wS-i.tg);
-                pvS+=tV/Math.pow(1+wS,i.years);
-                results.push(pvS);
-            }
-            results.sort((a,b)=>a-b);
-            const mean = results.reduce((a,b)=>a+b,0)/RUNS;
-            const p5 = results[Math.floor(RUNS*0.05)];
-            const p50 = results[Math.floor(RUNS*0.5)];
-            const p95 = results[Math.floor(RUNS*0.95)];
-
-            const mcDom = $('mcChart');
-            if (charts.mc) charts.mc.dispose();
-            charts.mc = echarts.init(mcDom);
-            const bins = 30;
-            const minV = results[0], maxV = results[RUNS-1];
-            const binW = (maxV-minV)/bins;
-            const histData = new Array(bins).fill(0);
-            const binLabels = [];
-            for(let b=0;b<bins;b++){ binLabels.push((minV+b*binW).toFixed(0)); }
-            results.forEach(v => { const idx = Math.min(bins-1, Math.floor((v-minV)/binW)); histData[idx]++; });
-            charts.mc.setOption({
-                backgroundColor: 'transparent',
-                tooltip: { trigger: 'axis', backgroundColor: 'rgba(20,10,40,0.9)', borderColor: 'rgba(167,139,250,0.3)', textStyle: { color: '#e2e8f0' } },
-                grid: { left: '3%', right: '4%', bottom: '14%', top: '10%', containLabel: true },
-                xAxis: { type: 'category', data: binLabels, axisLine: { lineStyle: { color: 'rgba(255,255,255,0.1)' } }, axisLabel: { color: 'rgba(255,255,255,0.4)', fontSize: 9, rotate: 30 }, axisTick: { show: false } },
-                yAxis: { type: 'value', axisLine: { show: false }, splitLine: { lineStyle: { color: 'rgba(255,255,255,0.05)' } }, axisLabel: { color: 'rgba(255,255,255,0.4)', fontSize: 10 } },
-                series: [{
-                    type: 'bar', data: histData, barWidth: '80%',
-                    itemStyle: {
-                        color: function(params) {
-                            const v = minV + params.dataIndex*binW;
-                            if (v < i.price*0.9) return '#ef4444';
-                            if (v > i.price*1.1) return '#22c55e';
-                            return '#fbbf24';
-                        },
-                        borderRadius: [2,2,0,0]
-                    },
-                    markLine: {
-                        silent: true, symbol: 'none', lineStyle: { type: 'dashed' },
-                        data: [
-                            { xAxis: binLabels.findIndex((_,idx) => minV+idx*binW >= i.price), lineStyle: { color: '#fff', width: 2 }, label: { formatter: '当前价 ¥'+i.price, color: '#fff', fontSize: 10 } },
-                            { xAxis: binLabels.findIndex((_,idx) => minV+idx*binW >= mean), lineStyle: { color: '#a78bfa', width: 1.5 }, label: { formatter: '均值 ¥'+mean.toFixed(0), color: '#c4b5fd', fontSize: 10 } }
-                        ]
-                    }
-                }]
-            });
-
-            const sigCard = document.getElementById('signalCard');
-            const sigTxt = document.getElementById('signalText');
-            const mcNote = document.createElement('div');
-            mcNote.style.marginTop = '10px';
-            mcNote.style.fontSize = '13px';
-            mcNote.style.opacity = '0.8';
-            mcNote.innerHTML = `🎲 蒙特卡洛结果（${RUNS}次模拟）：均值 ¥${mean.toFixed(2)} · 5%分位 ¥${p5.toFixed(2)} · 中位数 ¥${p50.toFixed(2)} · 95%分位 ¥${p95.toFixed(2)}`;
-            const existing = sigCard.querySelector('.mc-note');
-            if (existing) existing.remove();
-            mcNote.className = 'mc-note';
-            sigCard.appendChild(mcNote);
         }
 
         window.addEventListener('resize', () => { Object.values(charts).forEach(c => c && c.resize()); });
