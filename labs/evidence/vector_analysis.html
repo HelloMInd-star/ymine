@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>📊 七维向量分析平台 · 箱体海拔 + Dev-I</title>
+    <link rel="stylesheet" href="../../assets/css/base.css">
+    <script src="../../assets/js/bus.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <style>
+        body {
+            background: radial-gradient(ellipse at 30% 30%, #120b24, #0b0b1a 70%, #05030a);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            background: rgba(18, 11, 36, 0.6);
+            border-radius: 32px;
+            padding: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            box-shadow: 0 30px 80px rgba(40, 10, 80, 0.4);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+        .breadcrumb {
+            display: flex; align-items: center; gap: 8px;
+            font-size: 13px; margin-bottom: 20px; flex-wrap: wrap;
+        }
+        .breadcrumb a { color: rgba(255,255,255,0.5); text-decoration: none; transition: color .2s; }
+        .breadcrumb a:hover { color: rgba(255,255,255,0.8); }
+        .breadcrumb .sep { color: rgba(255,255,255,0.2); }
+        .breadcrumb .current { color: rgba(255,255,255,0.7); }
+
+        .page-banner {
+            background: linear-gradient(135deg, rgba(99,102,241,0.1), rgba(168,85,247,0.08), rgba(236,72,153,0.06));
+            border: 1.5px solid rgba(139,92,246,0.25);
+            border-radius: 16px;
+            padding: 20px 24px;
+            margin-bottom: 28px;
+            position: relative;
+            overflow: hidden;
+        }
+        .page-banner::before {
+            content: '';
+            position: absolute; inset: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.04), transparent);
+            transform: translateX(-100%);
+            animation: bannerScan 6s linear infinite;
+        }
+        @keyframes bannerScan { to { transform: translateX(100%); } }
+        .page-banner h1 {
+            font-size: 22px; font-weight: 700;
+            background: linear-gradient(135deg, #c4b5fd, #a78bfa, #f472b6, #c4b5fd);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+            margin-bottom: 8px;
+        }
+        .page-banner p { font-size: 14px; color: rgba(255,255,255,0.5); line-height: 1.6; margin: 0; }
+
+        .mode-tabs {
+            display: flex; gap: 0; margin-bottom: 24px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 12px; padding: 4px;
+            border: 1px solid rgba(255,255,255,0.06);
+            width: fit-content;
+        }
+        .mode-tab {
+            padding: 10px 24px; border-radius: 8px;
+            font-size: 14px; font-weight: 600; cursor: pointer;
+            transition: all .25s; border: none; background: transparent;
+            color: rgba(255,255,255,0.5); font-family: inherit;
+        }
+        .mode-tab:hover { color: rgba(255,255,255,0.8); }
+        .mode-tab.active {
+            background: linear-gradient(135deg, rgba(139,92,246,0.25), rgba(168,85,247,0.15));
+            color: #c4b5fd;
+            box-shadow: 0 2px 12px rgba(139,92,246,0.15);
+        }
+
+        .section-card {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 14px;
+            padding: 20px 24px;
+            margin-bottom: 20px;
+        }
+        .section-title {
+            font-size: 15px; font-weight: 600; color: #e2e8f0;
+            margin-bottom: 16px; display: flex; align-items: center; gap: 8px;
+        }
+        .section-title .icon { font-size: 18px; }
+
+        .case-chips { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
+        .case-chip {
+            padding: 10px 20px; border-radius: 10px; font-size: 13px; font-weight: 600;
+            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.6); cursor: pointer; transition: all .25s;
+            font-family: inherit;
+        }
+        .case-chip:hover {
+            background: rgba(139,92,246,0.1);
+            border-color: rgba(139,92,246,0.3);
+            color: #c4b5fd;
+            transform: translateY(-1px);
+        }
+        .case-chip.active {
+            background: linear-gradient(135deg, rgba(139,92,246,0.2), rgba(168,85,247,0.12));
+            border-color: rgba(139,92,246,0.5);
+            color: #c4b5fd;
+            box-shadow: 0 4px 16px rgba(139,92,246,0.2);
+        }
+
+        .case-info {
+            margin: 16px 0;
+            padding: 14px 18px;
+            background: rgba(139,92,246,0.05);
+            border: 1px solid rgba(139,92,246,0.12);
+            border-radius: 10px;
+        }
+        .case-info .case-name {
+            font-size: 16px; font-weight: 700; color: #e2e8f0; margin-bottom: 6px;
+        }
+        .case-info .case-name .industry-tag {
+            font-size: 11px; font-weight: 500; color: #a78bfa;
+            background: rgba(167,139,250,0.1);
+            border: 1px solid rgba(167,139,250,0.2);
+            padding: 2px 10px; border-radius: 12px; margin-left: 10px;
+        }
+        .case-info .case-feature {
+            font-size: 13px; color: rgba(255,255,255,0.5); line-height: 1.6;
+        }
+
+        .vector-numbers {
+            display: flex; gap: 14px; flex-wrap: wrap; margin: 14px 0;
+        }
+        .vec-badge {
+            display: flex; align-items: center; gap: 6px;
+            background: rgba(0,0,0,0.25);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 8px; padding: 6px 12px;
+            font-family: 'SF Mono', ui-monospace, monospace; font-size: 12px;
+        }
+        .vec-badge .dim-name { color: rgba(255,255,255,0.4); font-weight: 600; }
+        .vec-badge .dim-val { color: #a78bfa; font-weight: 700; }
+        .vec-badge.pos .dim-val { color: #fbbf24; }
+        .vec-badge.neg .dim-val { color: #60a5fa; }
+
+        #radarChart { width: 100%; height: 460px; }
+
+        .interpretation-card {
+            background: linear-gradient(135deg, rgba(139,92,246,0.06), rgba(59,130,246,0.04));
+            border: 1px solid rgba(139,92,246,0.2);
+            border-radius: 12px; padding: 20px 24px;
+            margin-top: 4px;
+        }
+        .interpretation-card .interp-label {
+            font-size: 12px; color: rgba(167,139,250,0.7); font-weight: 600;
+            text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 10px;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .interpretation-card .interp-text {
+            font-size: 14px; color: rgba(255,255,255,0.75); line-height: 1.85;
+        }
+
+        .custom-form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 14px;
+            margin-bottom: 18px;
+        }
+        .custom-input-group { display: flex; flex-direction: column; gap: 6px; }
+        .custom-input-group label {
+            font-size: 12px; color: rgba(255,255,255,0.5);
+            display: flex; align-items: center; gap: 6px; font-weight: 600;
+        }
+        .custom-input-group label .dim-full { color: rgba(255,255,255,0.35); font-weight: 400; font-size: 11px; }
+        .custom-input-group .input-row {
+            display: flex; align-items: center; gap: 8px;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px; padding: 0 14px;
+            transition: border-color .2s;
+        }
+        .custom-input-group .input-row:focus-within {
+            border-color: rgba(139,92,246,0.5);
+            box-shadow: 0 0 0 2px rgba(139,92,246,0.1);
+        }
+        .custom-input-group input {
+            flex: 1; background: transparent; border: none;
+            padding: 10px 0; color: #e2e8f0; font-size: 14px;
+            font-family: 'SF Mono', ui-monospace, monospace; outline: none;
+            width: 100%;
+        }
+        .custom-input-group .unit { font-size: 11px; color: rgba(255,255,255,0.3); font-family: 'SF Mono', monospace; white-space: nowrap; }
+        .custom-input-group input[type="range"] {
+            padding: 0; -webkit-appearance: none; appearance: none;
+            height: 4px; background: rgba(255,255,255,0.08);
+            border-radius: 4px; margin-top: 4px;
+        }
+        .custom-input-group input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none; appearance: none;
+            width: 12px; height: 12px; border-radius: 50%;
+            background: #a78bfa; cursor: pointer;
+            box-shadow: 0 0 10px rgba(167,139,250,0.4);
+        }
+
+        .btn-group { display: flex; gap: 10px; flex-wrap: wrap; }
+        .btn {
+            padding: 10px 22px; border-radius: 10px; border: 1px solid;
+            font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.3s;
+            font-family: inherit;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, rgba(139,92,246,0.25), rgba(168,85,247,0.15));
+            border-color: rgba(139,92,246,0.5); color: #c4b5fd;
+        }
+        .btn-primary:hover {
+            background: linear-gradient(135deg, rgba(139,92,246,0.35), rgba(168,85,247,0.25));
+            border-color: rgba(139,92,246,0.8);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(139,92,246,0.25);
+        }
+        .btn-secondary {
+            background: rgba(255,255,255,0.03); border-color: rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.6);
+        }
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.2);
+            color: rgba(255,255,255,0.8);
+        }
+
+        .mode-panel { display: none; }
+        .mode-panel.active { display: block; }
+
+        .methodology {
+            margin-top: 12px;
+        }
+        .method-toggle {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 12px 18px; cursor: pointer; user-select: none;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 12px;
+            transition: all .2s;
+        }
+        .method-toggle:hover { background: rgba(255,255,255,0.04); }
+        .method-toggle .label {
+            font-size: 14px; font-weight: 600; color: #e2e8f0;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .method-toggle .arrow {
+            color: rgba(255,255,255,0.4); transition: transform .3s; font-size: 12px;
+        }
+        .method-toggle.open .arrow { transform: rotate(180deg); }
+        .method-body {
+            max-height: 0; overflow: hidden;
+            transition: max-height 0.4s ease, padding 0.3s ease;
+            padding: 0 18px;
+        }
+        .method-body.open {
+            max-height: 2000px;
+            padding: 20px 18px 10px;
+        }
+        .method-body-inner {
+            border-top: 1px solid rgba(255,255,255,0.04);
+            padding-top: 16px;
+        }
+
+        .dim-table {
+            width: 100%; border-collapse: collapse; margin: 12px 0 18px;
+            font-size: 13px;
+        }
+        .dim-table th {
+            text-align: left; padding: 10px 14px;
+            background: rgba(139,92,246,0.08);
+            border-bottom: 1px solid rgba(139,92,246,0.15);
+            color: #c4b5fd; font-weight: 600; font-size: 12px;
+            text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .dim-table td {
+            padding: 10px 14px;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            color: rgba(255,255,255,0.7);
+        }
+        .dim-table tr:hover td { background: rgba(255,255,255,0.02); }
+        .dim-table .dim-code {
+            font-family: 'SF Mono', monospace; font-weight: 700;
+            color: #a78bfa; font-size: 13px;
+        }
+        .dim-table .dim-range {
+            font-family: 'SF Mono', monospace;
+            color: rgba(255,255,255,0.4); font-size: 12px;
+        }
+
+        .method-block {
+            margin-bottom: 18px;
+        }
+        .method-block h4 {
+            font-size: 14px; font-weight: 700; color: #e2e8f0;
+            margin-bottom: 10px; display: flex; align-items: center; gap: 8px;
+        }
+        .method-block p, .method-block li {
+            font-size: 13px; color: rgba(255,255,255,0.6); line-height: 1.75;
+        }
+        .method-block ul { padding-left: 20px; margin: 8px 0; }
+        .method-block li { margin-bottom: 4px; }
+        .method-block .kmp-tag {
+            display: inline-block; padding: 2px 8px; border-radius: 4px;
+            font-size: 11px; font-weight: 700; font-family: 'SF Mono', monospace;
+            margin-right: 4px;
+        }
+        .kmp-tag.k { background: rgba(251,191,36,0.15); color: #fbbf24; }
+        .kmp-tag.m { background: rgba(96,165,250,0.15); color: #60a5fa; }
+        .kmp-tag.p { background: rgba(167,139,250,0.15); color: #a78bfa; }
+
+        .disclaimer {
+            text-align: center;
+            margin-top: 24px;
+            padding: 14px;
+            font-size: 12px;
+            color: rgba(255,255,255,0.25);
+            border-top: 1px solid rgba(255,255,255,0.04);
+        }
+
+        .radar-legend {
+            display: flex; gap: 16px; flex-wrap: wrap; justify-content: center;
+            margin-top: 8px; font-size: 12px; color: rgba(255,255,255,0.4);
+        }
+        .radar-legend .lg-item { display: flex; align-items: center; gap: 6px; }
+        .radar-legend .lg-dot { width: 10px; height: 10px; border-radius: 50%; }
+
+        .hidden { display: none !important; }
+
+        @media (max-width: 768px) {
+            .container { padding: 24px 18px; border-radius: 20px; }
+            .custom-form-grid { grid-template-columns: 1fr; }
+            #radarChart { height: 360px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="breadcrumb">
+            <a href="../../index.html">🏠 总控台</a>
+            <span class="sep">›</span>
+            <a href="lab-section.html">🧪 实证实验室</a>
+            <span class="sep">›</span>
+            <span class="current">📊 七维向量分析平台</span>
+        </div>
+
+        <div class="page-banner">
+            <h1>📊 七维向量分析平台</h1>
+            <p>箱体海拔 + Dev-I 山体容积偏差 · I/P/D/S + Dev-I/Dev1/Dev2/Dev3 跨行业七维向量对比 · 对接认知画圈内核</p>
+        </div>
+
+        <div class="mode-tabs">
+            <button class="mode-tab active" data-mode="preset" onclick="switchMode('preset')">🎯 预设案例</button>
+            <button class="mode-tab" data-mode="custom" onclick="switchMode('custom')">⚙️ 自定义数据</button>
+        </div>
+
+        <div id="presetPanel" class="mode-panel active">
+            <div class="section-card">
+                <div class="section-title"><span class="icon">🏢</span>选择行业案例</div>
+                <div class="case-chips" id="caseChips"></div>
+                <div class="case-info" id="caseInfo"></div>
+            </div>
+
+            <div class="section-card">
+                <div class="section-title"><span class="icon">📡</span>七维向量雷达图</div>
+                <div id="radarChart"></div>
+                <div class="radar-legend" id="radarLegend" style="display:none;"></div>
+            </div>
+
+            <div class="section-card">
+                <div class="section-title"><span class="icon">📋</span>向量解读</div>
+                <div class="interpretation-card">
+                    <div class="interp-label">🔍 分析结论</div>
+                    <div class="interp-text" id="presetInterp"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="customPanel" class="mode-panel">
+            <div class="section-card">
+                <div class="section-title"><span class="icon">🎛️</span>自定义七维向量输入</div>
+                <p style="font-size:12px;color:rgba(255,255,255,0.4);margin:0 0 14px;">请输入 8 个维度的值（I/P/D/S 为 0~1 范围，Dev 系列含正负偏差）：</p>
+                <div class="custom-form-grid" id="customForm"></div>
+                <div class="btn-group">
+                    <button class="btn btn-primary" onclick="generateCustomAnalysis()">🧮 生成分析</button>
+                    <button class="btn btn-secondary" onclick="resetCustomForm()">🔄 重置</button>
+                </div>
+            </div>
+
+            <div id="customResult" class="hidden">
+                <div class="section-card">
+                    <div class="section-title"><span class="icon">📡</span>七维向量雷达图</div>
+                    <div id="customRadarChart" style="width:100%;height:460px;"></div>
+                </div>
+                <div class="section-card">
+                    <div class="section-title"><span class="icon">📋</span>向量解读</div>
+                    <div class="interpretation-card">
+                        <div class="interp-label">🔍 自动分析结论</div>
+                        <div class="interp-text" id="customInterp"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="methodology">
+            <div class="method-toggle" id="methodToggle" onclick="toggleMethod()">
+                <span class="label">📚 方法论说明 · KMP/IPD 映射 · 维度定义</span>
+                <span class="arrow">▼</span>
+            </div>
+            <div class="method-body" id="methodBody">
+                <div class="method-body-inner">
+                    <div class="method-block">
+                        <h4>📐 七维向量定义表</h4>
+                        <table class="dim-table">
+                            <thead>
+                                <tr><th>维度</th><th>名称</th><th>含义</th><th>取值范围</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr><td class="dim-code">I</td><td>箱体海拔</td><td>当前价格在箱体中的百分比位置</td><td class="dim-range">0 ~ 1</td></tr>
+                                <tr><td class="dim-code">P</td><td>坡度动量</td><td>海拔的变化速度（趋势强度）</td><td class="dim-range">-1 ~ +1</td></tr>
+                                <tr><td class="dim-code">D</td><td>阻尼衰减</td><td>趋势受到的阻力（均值回归速度）</td><td class="dim-range">0 ~ 1</td></tr>
+                                <tr><td class="dim-code">S</td><td>市场博弈熵</td><td>市场不确定性 / 混乱度</td><td class="dim-range">0 ~ 1</td></tr>
+                                <tr><td class="dim-code">Dev-I</td><td>山体容积偏差</td><td>真实山体与标准均匀山体的偏离值</td><td class="dim-range">-1 ~ +1</td></tr>
+                                <tr><td class="dim-code">Dev1</td><td>箱体均值回归差</td><td>当前价格偏离箱体重心的程度</td><td class="dim-range">0 ~ 1</td></tr>
+                                <tr><td class="dim-code">Dev2</td><td>历史结构相似度差</td><td>当前形态与历史相似形态的差异</td><td class="dim-range">0 ~ 1</td></tr>
+                                <tr><td class="dim-code">Dev3</td><td>内在公允估值差</td><td>市场价格与内在价值的偏离</td><td class="dim-range">-1 ~ +1</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="method-block">
+                        <h4>🧬 KMP 三层映射框架</h4>
+                        <ul>
+                            <li><span class="kmp-tag k">K</span> <strong>知识层（Knowledge）</strong>：市场认知、投资者心理、宏观逻辑 → 定义问题边界</li>
+                            <li><span class="kmp-tag m">M</span> <strong>数学层（Mathematics）</strong>：向量、概率、统计、拓扑结构 → 将认知转化为可计算结构</li>
+                            <li><span class="kmp-tag p">P</span> <strong>物理层（Physics）</strong>：海拔、阻尼、熵、力学、容积 → 用物理规律描述系统演化</li>
+                        </ul>
+                    </div>
+
+                    <div class="method-block">
+                        <h4>⚙️ IPD 物理层映射</h4>
+                        <ul>
+                            <li><strong>I（箱体海拔）</strong>：当前位置的高度 → 价格在箱体中的相对位置</li>
+                            <li><strong>P（坡度动量）</strong>：位置变化的速率 → 趋势强度</li>
+                            <li><strong>D（阻尼衰减）</strong>：运动的阻力 → 均值回归速度</li>
+                        </ul>
+                    </div>
+
+                    <div class="method-block">
+                        <h4>🔺 认知画圈内核对接</h4>
+                        <p>七维向量体系直接对接认知画圈（Cognitive Circle）内核：</p>
+                        <ul>
+                            <li>Dev-I 对应圆锥浓度校准中的浓度偏差量，反映筹码分布形态</li>
+                            <li>当 ρ 浓度 > 0.68 熔断线时，S（博弈熵）通常 > 0.6，方向不明朗</li>
+                            <li>I < 0.3 且 Dev-I < -0.1 时，认知圈处于底部收敛区，对应逆向布局机会</li>
+                            <li>I > 0.7 且 Dev-I > 0.1 时，认知圈顶部扩散，共识极度一致 → 反转风险</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="disclaimer">
+            ⚠️ 所有数据为模拟数据，仅展示方法论框架，不构成投资建议。
+        </div>
+    </div>
+
+    <script>
+    (function() {
+        var DIMENSIONS = [
+            { key: 'I',    name: 'I',    fullName: '箱体海拔',       min: 0,   max: 1,   tooltip: '当前价格在箱体中的百分比位置（0=箱底，1=箱顶）' },
+            { key: 'P',    name: 'P',    fullName: '坡度动量',       min: -1,  max: 1,   tooltip: '海拔的变化速度，正值上升、负值下降，绝对值越大趋势越强' },
+            { key: 'D',    name: 'D',    fullName: '阻尼衰减',       min: 0,   max: 1,   tooltip: '趋势受到的阻力，0=无阻力，1=完全阻尼' },
+            { key: 'S',    name: 'S',    fullName: '市场博弈熵',     min: 0,   max: 1,   tooltip: '市场不确定性/混乱度，0=高度共识，1=完全分歧' },
+            { key: 'DevI', name: 'Dev-I', fullName: '山体容积偏差', min: -1,  max: 1,   tooltip: '真实山体与标准均匀山体的偏离值，负值=筹码沉淀底部，正值=堆积顶部' },
+            { key: 'Dev1', name: 'Dev1', fullName: '箱体均值回归差', min: 0,   max: 1,   tooltip: '当前价格偏离箱体重心的程度' },
+            { key: 'Dev2', name: 'Dev2', fullName: '历史结构相似度差', min: 0, max: 1,  tooltip: '当前形态与历史相似形态的差异程度' },
+            { key: 'Dev3', name: 'Dev3', fullName: '内在公允估值差', min: -1,  max: 1,   tooltip: '市场价格与内在价值的偏离，负值=低估，正值=高估' }
+        ];
+
+        var CASES = [
+            {
+                id: 'new-energy',
+                name: '新能源储能',
+                example: '阳光电源 / 宁德时代',
+                icon: '🏭',
+                color: '#10b981',
+                colorRgba: 'rgba(16,185,129,',
+                industry: '技术密集型 · 政策驱动 · 资本开支大',
+                data: { I: 0.45, P: 0.06, D: 0.18, S: 0.32, DevI: -0.35, Dev1: 0.08, Dev2: 0.22, Dev3: -0.12 },
+                interp: '新能源储能行业处于政策红利期，资本开支较大但增长确定性较高。I=0.45表明价格处于箱体中部偏低位置，P=0.06显示温和上升动量，D=0.18阻力较小说明趋势延续性强。S=0.32（不确定性较低）反映市场共识度较高。Dev-I=-0.35为明显负值，表明筹码主要沉淀在箱体底部，上方阻力较小，符合技术积累和产能扩张阶段特征。Dev3=-0.12小幅低估，估值尚未完全反映长期价值。综合判断：适合中长期布局，关注政策落地和产能释放节奏。'
+            },
+            {
+                id: 'ai-llm',
+                name: '大模型公司',
+                example: '月之暗面 / 智谱',
+                icon: '🤖',
+                color: '#a78bfa',
+                colorRgba: 'rgba(167,139,250,',
+                industry: '技术驱动 · 高研发投入 · 商业模式尚未完全定型',
+                data: { I: 0.52, P: 0.03, D: 0.42, S: 0.58, DevI: -0.28, Dev1: 0.05, Dev2: 0.48, Dev3: 0.25 },
+                interp: '大模型公司处于技术探索和商业模式验证期。I=0.52位于箱体中部，P=0.03缓慢上升但D=0.42阻力较大，说明上行过程中面临较大分歧和抛压。S=0.58（不确定性较高）反映市场对该类公司定价存在较大分歧。Dev-I=-0.28表明主力资金正在逐步布局，中下部有筹码沉淀，但高位尚未堆积大量筹码。Dev2=0.48（历史相似度差较大）说明当前形态在历史上缺乏可靠参照。Dev3=0.25表明估值略偏高。综合判断：适合关注技术突破节点和商业化落地信号，中长期持有需要一定的容忍度。'
+            },
+            {
+                id: 'mcn',
+                name: 'MCN/内容平台',
+                example: '抖音 / 小红书',
+                icon: '📱',
+                color: '#f472b6',
+                colorRgba: 'rgba(244,114,182,',
+                industry: '流量驱动 · 内容生态 · 用户运营 · 轻资产',
+                data: { I: 0.72, P: -0.05, D: 0.38, S: 0.46, DevI: 0.32, Dev1: 0.18, Dev2: 0.35, Dev3: 0.18 },
+                interp: 'MCN/内容平台行业处于成熟期，流量红利逐渐收窄，市场竞争激烈。I=0.72处于箱体偏高位，P=-0.05动量向下转为负，表明趋势开始走弱。D=0.38中等阻力意味着下行过程不会一蹴而就，会有反复博弈。S=0.46中等不确定性反映市场对头部平台仍有分歧。Dev-I=0.32为明显正值，高位筹码堆积较多，上行面临较大抛压，是典型的顶部筹码密集形态。Dev1=0.18表明价格已偏离箱体重心向上。Dev3=0.18小幅高估。综合判断：当前估值偏高，存在均值回归压力，适合关注用户增长数据、内容生态活跃度和商业化变现效率，短期以防守为主。'
+            }
+        ];
+
+        var currentCaseId = 'ai-llm';
+        var presetChart = null;
+        var customChart = null;
+
+        function normalizeForRadar(v, dim) {
+            var range = dim.max - dim.min;
+            return Math.max(0, Math.min(100, ((v - dim.min) / range) * 100));
+        }
+
+        function buildRadarOption(data, color, colorRgba, name) {
+            var indicator = DIMENSIONS.map(function(d) {
+                return { name: d.name, max: 100, min: 0, tooltip: { formatter: function() { return d.fullName + '：' + d.tooltip; } } };
+            });
+            var seriesData = DIMENSIONS.map(function(d) { return normalizeForRadar(data[d.key], d); });
+
+            var thresholdData = DIMENSIONS.map(function(d) {
+                if (d.key === 'I') return normalizeForRadar(0.48, d);
+                if (d.key === 'P') return normalizeForRadar(0, d);
+                if (d.key === 'D') return normalizeForRadar(0.5, d);
+                if (d.key === 'S') return normalizeForRadar(0.5, d);
+                if (d.key === 'DevI') return normalizeForRadar(0, d);
+                if (d.key === 'Dev1') return normalizeForRadar(0.5, d);
+                if (d.key === 'Dev2') return normalizeForRadar(0.5, d);
+                if (d.key === 'Dev3') return normalizeForRadar(0, d);
+                return 50;
+            });
+
+            return {
+                tooltip: {
+                    trigger: 'item',
+                    backgroundColor: 'rgba(15,10,30,0.92)',
+                    borderColor: 'rgba(167,139,250,0.3)',
+                    borderWidth: 1,
+                    textStyle: { color: '#e2e8f0', fontSize: 12 },
+                    formatter: function(params) {
+                        if (params.seriesName === '稳态中轴') return '<b>稳态中轴参考线</b><br/>各维度的中性基准位置';
+                        var html = '<b>' + params.seriesName + '</b><br/>';
+                        var dimKeys = ['I','P','D','S','DevI','Dev1','Dev2','Dev3'];
+                        params.value.forEach(function(v, i) {
+                            var dim = DIMENSIONS[i];
+                            var originalVal = data[dim.key];
+                            var displayVal = (typeof originalVal === 'number') ? originalVal.toFixed(2) : v.toFixed(0);
+                            html += '<span style="color:' + dimColors[dim.key] + '">' + dim.name + '</span> ' + dim.fullName + '：<b>' + displayVal + '</b><br/>';
+                        });
+                        return html;
+                    }
+                },
+                radar: {
+                    indicator: indicator,
+                    shape: 'polygon',
+                    splitNumber: 4,
+                    axisName: {
+                        color: '#c4b5fd',
+                        fontSize: 13,
+                        fontWeight: 700,
+                        fontFamily: 'SF Mono, ui-monospace, monospace',
+                        formatter: function(value) {
+                            var dim = DIMENSIONS.find(function(d){ return d.name === value; });
+                            return dim ? dim.name : value;
+                        }
+                    },
+                    axisLine: { lineStyle: { color: 'rgba(255,255,255,0.08)' } },
+                    splitLine: { lineStyle: { color: 'rgba(255,255,255,0.06)' } },
+                    splitArea: {
+                        areaStyle: {
+                            color: ['rgba(167,139,250,0.02)', 'rgba(167,139,250,0.04)', 'rgba(167,139,250,0.02)', 'rgba(167,139,250,0.04)']
+                        }
+                    },
+                    center: ['50%', '52%'],
+                    radius: '68%'
+                },
+                series: [{
+                    type: 'radar',
+                    name: '稳态中轴',
+                    data: [{
+                        value: thresholdData,
+                        name: '稳态中轴',
+                        lineStyle: { color: 'rgba(255,255,255,0.15)', width: 1, type: 'dashed' },
+                        itemStyle: { color: 'rgba(255,255,255,0.2)' },
+                        areaStyle: { color: 'rgba(255,255,255,0.02)' },
+                        symbol: 'none'
+                    }]
+                }, {
+                    type: 'radar',
+                    name: name,
+                    data: [{
+                        value: seriesData,
+                        name: name,
+                        lineStyle: { color: color, width: 2.5 },
+                        itemStyle: { color: color },
+                        areaStyle: { color: colorRgba + '0.18)' },
+                        symbol: 'circle',
+                        symbolSize: 6
+                    }]
+                }]
+            };
+        }
+
+        var dimColors = { I: '#60a5fa', P: '#fbbf24', D: '#f87171', S: '#a78bfa', DevI: '#34d399', Dev1: '#f472b6', Dev2: '#22d3ee', Dev3: '#fb923c' };
+
+        function buildMultiCaseOption(activeCase) {
+            var indicator = DIMENSIONS.map(function(d) {
+                return { name: d.name, max: 100, min: 0 };
+            });
+            var series = CASES.map(function(c) {
+                var vals = DIMENSIONS.map(function(d) { return normalizeForRadar(c.data[d.key], d); });
+                var isActive = c.id === activeCase;
+                return {
+                    value: vals,
+                    name: c.name,
+                    lineStyle: { color: c.color, width: isActive ? 2.8 : 1.2, opacity: isActive ? 1 : 0.3 },
+                    itemStyle: { color: c.color, opacity: isActive ? 1 : 0.3 },
+                    areaStyle: { color: c.colorRgba + (isActive ? '0.15)' : '0.03)') },
+                    symbol: isActive ? 'circle' : 'none',
+                    symbolSize: isActive ? 6 : 0
+                };
+            });
+
+            var thresholdData = DIMENSIONS.map(function(d) {
+                if (d.key === 'I') return normalizeForRadar(0.48, d);
+                if (d.key === 'P') return normalizeForRadar(0, d);
+                if (d.key === 'D') return normalizeForRadar(0.5, d);
+                if (d.key === 'S') return normalizeForRadar(0.5, d);
+                if (d.key === 'DevI') return normalizeForRadar(0, d);
+                if (d.key === 'Dev1') return normalizeForRadar(0.5, d);
+                if (d.key === 'Dev2') return normalizeForRadar(0.5, d);
+                if (d.key === 'Dev3') return normalizeForRadar(0, d);
+                return 50;
+            });
+
+            return {
+                tooltip: {
+                    trigger: 'item',
+                    backgroundColor: 'rgba(15,10,30,0.92)',
+                    borderColor: 'rgba(167,139,250,0.3)',
+                    borderWidth: 1,
+                    textStyle: { color: '#e2e8f0', fontSize: 12 }
+                },
+                legend: {
+                    data: CASES.map(function(c){ return c.name; }),
+                    bottom: 4,
+                    textStyle: { color: 'rgba(255,255,255,0.5)', fontSize: 12 },
+                    itemWidth: 12, itemHeight: 8,
+                    inactiveColor: 'rgba(255,255,255,0.15)'
+                },
+                radar: {
+                    indicator: indicator,
+                    shape: 'polygon',
+                    splitNumber: 4,
+                    axisName: {
+                        color: '#c4b5fd', fontSize: 13, fontWeight: 700,
+                        fontFamily: 'SF Mono, ui-monospace, monospace'
+                    },
+                    axisLine: { lineStyle: { color: 'rgba(255,255,255,0.08)' } },
+                    splitLine: { lineStyle: { color: 'rgba(255,255,255,0.06)' } },
+                    splitArea: {
+                        areaStyle: { color: ['rgba(167,139,250,0.02)','rgba(167,139,250,0.04)','rgba(167,139,250,0.02)','rgba(167,139,250,0.04)'] }
+                    },
+                    center: ['50%', '50%'],
+                    radius: '62%'
+                },
+                series: [{
+                    type: 'radar',
+                    data: series
+                }]
+            };
+        }
+
+        function renderCaseChips() {
+            var container = document.getElementById('caseChips');
+            container.innerHTML = CASES.map(function(c) {
+                return '<button class="case-chip' + (c.id === currentCaseId ? ' active' : '') + '" data-id="' + c.id + '" onclick="selectCase(\'' + c.id + '\')">' + c.icon + ' ' + c.name + '</button>';
+            }).join('');
+        }
+
+        function updateCaseInfo(c) {
+            var info = document.getElementById('caseInfo');
+            info.innerHTML = '<div class="case-name">' + c.icon + ' ' + c.name + ' <span class="industry-tag">' + c.industry.split(' · ')[0] + '</span></div>'
+                + '<div class="case-feature"><strong>代表企业：</strong>' + c.example + ' ｜ <strong>行业特征：</strong>' + c.industry + '</div>'
+                + '<div class="vector-numbers">' + DIMENSIONS.map(function(d) {
+                    var v = c.data[d.key];
+                    var cls = v > 0.05 ? 'pos' : (v < -0.05 ? 'neg' : '');
+                    return '<div class="vec-badge ' + cls + '"><span class="dim-name">' + d.name + '</span><span class="dim-val">' + v.toFixed(2) + '</span></div>';
+                }).join('') + '</div>';
+            document.getElementById('presetInterp').textContent = c.interp;
+        }
+
+        function renderPresetChart() {
+            var c = CASES.find(function(x){ return x.id === currentCaseId; });
+            if (!c) return;
+            if (!presetChart) presetChart = echarts.init(document.getElementById('radarChart'), null, { renderer: 'canvas' });
+            var opt = buildMultiCaseOption(currentCaseId);
+            presetChart.setOption(opt, true);
+        }
+
+        function selectCase(id) {
+            currentCaseId = id;
+            var c = CASES.find(function(x){ return x.id === id; });
+            if (!c) return;
+            renderCaseChips();
+            updateCaseInfo(c);
+            renderPresetChart();
+        }
+
+        function switchMode(mode) {
+            document.querySelectorAll('.mode-tab').forEach(function(t) {
+                t.classList.toggle('active', t.dataset.mode === mode);
+            });
+            document.getElementById('presetPanel').classList.toggle('active', mode === 'preset');
+            document.getElementById('customPanel').classList.toggle('active', mode === 'custom');
+            if (mode === 'preset' && presetChart) {
+                setTimeout(function(){ presetChart.resize(); }, 50);
+            }
+            if (mode === 'custom' && customChart) {
+                setTimeout(function(){ customChart.resize(); }, 50);
+            }
+        }
+
+        function buildCustomForm() {
+            var container = document.getElementById('customForm');
+            var defaults = { I: 0.52, P: 0.03, D: 0.42, S: 0.58, DevI: -0.28, Dev1: 0.05, Dev2: 0.48, Dev3: 0.25 };
+            container.innerHTML = DIMENSIONS.map(function(d) {
+                var def = defaults[d.key];
+                var step = (d.min < 0) ? 0.01 : 0.01;
+                return '<div class="custom-input-group">'
+                    + '<label>' + d.name + ' <span class="dim-full">' + d.fullName + '</span></label>'
+                    + '<div class="input-row">'
+                    + '<input type="number" id="cin_' + d.key + '" value="' + def.toFixed(2) + '" step="' + step + '" min="' + d.min + '" max="' + d.max + '" onchange="syncSliderFromInput(\'' + d.key + '\')">'
+                    + '<span class="unit">' + d.min + '~' + d.max + '</span>'
+                    + '</div>'
+                    + '<input type="range" id="csl_' + d.key + '" min="' + d.min + '" max="' + d.max + '" step="' + step + '" value="' + def + '" oninput="syncInputFromSlider(\'' + d.key + '\')">'
+                    + '</div>';
+            }).join('');
+        }
+
+        window.syncSliderFromInput = function(key) {
+            var inp = document.getElementById('cin_' + key);
+            var sl = document.getElementById('csl_' + key);
+            if (inp && sl) sl.value = inp.value;
+        };
+
+        window.syncInputFromSlider = function(key) {
+            var inp = document.getElementById('cin_' + key);
+            var sl = document.getElementById('csl_' + key);
+            if (inp && sl) inp.value = parseFloat(sl.value).toFixed(2);
+        };
+
+        function getCustomData() {
+            var data = {};
+            DIMENSIONS.forEach(function(d) {
+                var el = document.getElementById('cin_' + d.key);
+                var v = parseFloat(el.value);
+                if (isNaN(v)) v = 0;
+                v = Math.max(d.min, Math.min(d.max, v));
+                data[d.key] = v;
+            });
+            return data;
+        }
+
+        function generateCustomInterpretation(data) {
+            var lines = [];
+            var I = data.I, P = data.P, D = data.D, S = data.S, DevI = data.DevI, Dev1 = data.Dev1, Dev2 = data.Dev2, Dev3 = data.Dev3;
+
+            if (I < 0.3 && DevI < -0.1) {
+                lines.push('📍 <strong>位置判定：</strong>该标的处于底部区域（I=' + I.toFixed(2) + '），Dev-I=' + DevI.toFixed(2) + '为负值表明筹码沉淀在谷底，上方抛压较轻。认知圈处于收敛区，适合关注布局机会。');
+            } else if (I > 0.7 && DevI > 0.1) {
+                lines.push('📍 <strong>位置判定：</strong>该标的处于高位区域（I=' + I.toFixed(2) + '），Dev-I=' + DevI.toFixed(2) + '为正值表明高位筹码堆积，上行阻力较大，需注意回调风险。认知圈顶部扩散，共识极度一致时需警惕反转。');
+            } else if (I < 0.4) {
+                lines.push('📍 <strong>位置判定：</strong>该标的位于箱体偏低区域（I=' + I.toFixed(2) + '），价格接近箱底，安全边际相对较高，但需结合Dev-I判断筹码分布。');
+            } else if (I > 0.6) {
+                lines.push('📍 <strong>位置判定：</strong>该标的位于箱体偏高区域（I=' + I.toFixed(2) + '），价格接近箱顶，需警惕上行阻力。');
+            } else {
+                lines.push('📍 <strong>位置判定：</strong>该标的位于箱体中部区域（I=' + I.toFixed(2) + '），价格处于相对均衡位置，方向尚不明朗。');
+            }
+
+            if (P > 0.08 && D < 0.2) {
+                lines.push('📈 <strong>趋势判定：</strong>P=' + P.toFixed(2) + '表明趋势动量较强向上，D=' + D.toFixed(2) + '阻力较小，处于加速上涨阶段，趋势延续概率高。');
+            } else if (P < -0.08 && D < 0.2) {
+                lines.push('📉 <strong>趋势判定：</strong>P=' + P.toFixed(2) + '表明趋势动量较强向下，D=' + D.toFixed(2) + '阻力较小，处于加速下跌阶段，需注意风险控制。');
+            } else if (P > 0.03) {
+                lines.push('📈 <strong>趋势判定：</strong>P=' + P.toFixed(2) + '温和向上，但D=' + D.toFixed(2) + (D > 0.3 ? '阻力较大，上行过程可能有反复。' : '阻力适中，趋势维持温和上行。'));
+            } else if (P < -0.03) {
+                lines.push('📉 <strong>趋势判定：</strong>P=' + P.toFixed(2) + '趋势向下，D=' + D.toFixed(2) + (D > 0.3 ? '阻力较大，下行过程中可能有反弹。' : '阻力适中，维持温和下行。'));
+            } else {
+                lines.push('⏸️ <strong>趋势判定：</strong>P=' + P.toFixed(2) + '接近零，当前无明显趋势方向，处于横盘整理阶段。');
+            }
+
+            if (S > 0.6 && Math.abs(DevI) < 0.1) {
+                lines.push('🎲 <strong>博弈状态：</strong>S=' + S.toFixed(2) + '市场不确定性较高，Dev-I≈0表明筹码分散均匀，市场处于方向选择阶段，等待催化剂出现。');
+            } else if (S < 0.3) {
+                lines.push('🎯 <strong>博弈状态：</strong>S=' + S.toFixed(2) + '不确定性较低，市场共识度较高，方向相对明确。');
+            } else if (S > 0.5) {
+                lines.push('🎲 <strong>博弈状态：</strong>S=' + S.toFixed(2) + '不确定性较高，多空分歧较大，市场存在博弈机会但波动风险也大。');
+            } else {
+                lines.push('⚖️ <strong>博弈状态：</strong>S=' + S.toFixed(2) + '中等不确定性，多空力量相对均衡。');
+            }
+
+            if (Dev3 < -0.15) {
+                lines.push('💰 <strong>估值判定：</strong>Dev3=' + Dev3.toFixed(2) + '为明显负值，内在公允估值高于市价，存在安全边际，可能被低估。');
+            } else if (Dev3 > 0.15) {
+                lines.push('💰 <strong>估值判定：</strong>Dev3=' + Dev3.toFixed(2) + '为明显正值，市价高于内在公允价值，估值偏高，存在均值回归压力。');
+            } else {
+                lines.push('💰 <strong>估值判定：</strong>Dev3=' + Dev3.toFixed(2) + '接近零，价格相对接近内在价值，估值处于合理区间。');
+            }
+
+            if (Dev2 > 0.5) {
+                lines.push('🕰️ <strong>历史参照：</strong>Dev2=' + Dev2.toFixed(2) + '较高，当前形态与历史相似度低，历史参照可靠性较弱，需保持灵活判断。');
+            } else {
+                lines.push('🕰️ <strong>历史参照：</strong>Dev2=' + Dev2.toFixed(2) + '较低，当前形态与历史有一定相似度，可参照历史规律辅助判断。');
+            }
+
+            var inBottom = I < 0.3 && DevI < -0.1;
+            var inTop = I > 0.7 && DevI > 0.1;
+            var inAccUp = P > 0.08 && D < 0.2;
+            var inAccDown = P < -0.08 && D < 0.2;
+            var inChaos = S > 0.6 && Math.abs(DevI) < 0.1;
+
+            if (!inBottom && !inTop && !inAccUp && !inAccDown && !inChaos) {
+                lines.push('🔄 <strong>综合判断：</strong>该标的处于震荡均衡状态，各维度信号没有形成强烈共振，需关注后续方向选择。建议结合关键催化剂事件和板块轮动节奏，等待信号明确后再做决策。');
+            }
+
+            return lines.join('<br/><br/>');
+        }
+
+        window.generateCustomAnalysis = function() {
+            var data = getCustomData();
+            var resultEl = document.getElementById('customResult');
+            resultEl.classList.remove('hidden');
+
+            if (!customChart) customChart = echarts.init(document.getElementById('customRadarChart'), null, { renderer: 'canvas' });
+            var opt = buildRadarOption(data, '#a78bfa', 'rgba(167,139,250,', '自定义向量');
+            customChart.setOption(opt, true);
+
+            document.getElementById('customInterp').innerHTML = generateCustomInterpretation(data);
+
+            setTimeout(function() {
+                customChart.resize();
+                resultEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 100);
+        };
+
+        window.resetCustomForm = function() {
+            var defaults = { I: 0.52, P: 0.03, D: 0.42, S: 0.58, DevI: -0.28, Dev1: 0.05, Dev2: 0.48, Dev3: 0.25 };
+            DIMENSIONS.forEach(function(d) {
+                var v = defaults[d.key];
+                document.getElementById('cin_' + d.key).value = v.toFixed(2);
+                document.getElementById('csl_' + d.key).value = v;
+            });
+            document.getElementById('customResult').classList.add('hidden');
+        };
+
+        window.selectCase = selectCase;
+        window.switchMode = switchMode;
+        window.generateCustomAnalysis = generateCustomAnalysis;
+        window.resetCustomForm = resetCustomForm;
+
+        window.toggleMethod = function() {
+            var tog = document.getElementById('methodToggle');
+            var body = document.getElementById('methodBody');
+            tog.classList.toggle('open');
+            body.classList.toggle('open');
+        };
+
+        function init() {
+            renderCaseChips();
+            var defaultCase = CASES.find(function(c){ return c.id === currentCaseId; });
+            if (defaultCase) updateCaseInfo(defaultCase);
+            renderPresetChart();
+            buildCustomForm();
+
+            window.addEventListener('resize', function() {
+                if (presetChart) presetChart.resize();
+                if (customChart) customChart.resize();
+            });
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+    })();
+    </script>
+</body>
+</html>
