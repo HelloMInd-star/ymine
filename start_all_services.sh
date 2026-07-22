@@ -14,8 +14,8 @@ pkill -f "streamlit.*8510" 2>/dev/null || true
 pkill -f "streamlit.*8501" 2>/dev/null || true
 sleep 2
 
-# 确保MoodMind符号链接存在
-ln -sfn moodmind_lab/public_static /workspace/moodmind
+# 确保MoodMind符号链接存在（绝对路径）
+ln -sfn /workspace/moodmind_lab/public_static /workspace/moodmind
 
 echo "🚀 启动服务..."
 
