@@ -1547,6 +1547,232 @@
             .lab-metric-value.green { color:#4ade80; }
             @media (max-width:768px) { .lab-grid { grid-template-columns:repeat(2,1fr); } .lab-cat-desc { display:none; } }
             @media (max-width:480px) { .lab-grid { grid-template-columns:1fr; } }
+
+            /* ===== 实证验证总览区块样式 ===== */
+            .empirical-overview {
+                background: linear-gradient(135deg, rgba(34,211,238,0.08), rgba(167,139,250,0.06));
+                border: 1.5px solid rgba(34,211,238,0.3);
+                border-radius: 16px;
+                padding: 22px 26px;
+                margin-bottom: 24px;
+                position: relative;
+                overflow: hidden;
+            }
+            .empirical-overview::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 3px;
+                background: linear-gradient(90deg, #22d3ee, #a78bfa, #fbbf24, #4ade80, #f87171);
+            }
+            .eo-header {
+                text-align: center;
+                margin-bottom: 20px;
+            }
+            .eo-title {
+                font-size: 18px;
+                font-weight: 700;
+                color: #f1f5f9;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+                margin-bottom: 8px;
+            }
+            .eo-stats-row {
+                display: flex;
+                justify-content: center;
+                gap: 24px;
+                flex-wrap: wrap;
+                font-size: 12px;
+                color: rgba(255,255,255,0.5);
+            }
+            .eo-stat {
+                display: flex;
+                align-items: center;
+                gap: 5px;
+            }
+            .eo-stat-num {
+                font-family: 'SF Mono', ui-monospace, monospace;
+                color: #22d3ee;
+                font-weight: 600;
+            }
+            .eo-cat-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 10px;
+                margin-bottom: 18px;
+            }
+            .eo-cat-card {
+                background: rgba(255,255,255,0.03);
+                border: 1px solid rgba(255,255,255,0.08);
+                border-radius: 10px;
+                padding: 12px 14px;
+                transition: all 0.25s;
+            }
+            .eo-cat-card:hover {
+                transform: translateY(-2px);
+                background: rgba(255,255,255,0.05);
+            }
+            .eo-cat-head {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                margin-bottom: 6px;
+            }
+            .eo-cat-icon {
+                font-size: 18px;
+            }
+            .eo-cat-name {
+                font-size: 12px;
+                font-weight: 600;
+                color: #f1f5f9;
+            }
+            .eo-cat-count {
+                font-family: 'SF Mono', ui-monospace, monospace;
+                font-size: 10px;
+                padding: 1px 6px;
+                border-radius: 4px;
+                margin-left: auto;
+            }
+            .eo-cat-dims {
+                font-size: 10px;
+                color: rgba(255,255,255,0.4);
+                font-family: 'SF Mono', ui-monospace, monospace;
+            }
+            .eo-cat-card.cyber .eo-cat-count { background: rgba(34,211,238,0.15); color: #22d3ee; }
+            .eo-cat-card.cyber:hover { border-color: rgba(34,211,238,0.4); box-shadow: 0 4px 16px rgba(34,211,238,0.1); }
+            .eo-cat-card.struct .eo-cat-count { background: rgba(251,191,36,0.15); color: #fbbf24; }
+            .eo-cat-card.struct:hover { border-color: rgba(251,191,36,0.4); box-shadow: 0 4px 16px rgba(251,191,36,0.1); }
+            .eo-cat-card.cog .eo-cat-count { background: rgba(167,139,250,0.15); color: #a78bfa; }
+            .eo-cat-card.cog:hover { border-color: rgba(167,139,250,0.4); box-shadow: 0 4px 16px rgba(167,139,250,0.1); }
+            .eo-cat-card.game .eo-cat-count { background: rgba(248,113,113,0.15); color: #f87171; }
+            .eo-cat-card.game:hover { border-color: rgba(248,113,113,0.4); box-shadow: 0 4px 16px rgba(248,113,113,0.1); }
+            .eo-cat-card.info .eo-cat-count { background: rgba(74,222,128,0.15); color: #4ade80; }
+            .eo-cat-card.info:hover { border-color: rgba(74,222,128,0.4); box-shadow: 0 4px 16px rgba(74,222,128,0.1); }
+            .eo-cat-card.psych .eo-cat-count { background: rgba(236,72,153,0.15); color: #f472b6; }
+            .eo-cat-card.psych:hover { border-color: rgba(236,72,153,0.4); box-shadow: 0 4px 16px rgba(236,72,153,0.1); }
+            .eo-cat-card.econ .eo-cat-count { background: rgba(34,197,94,0.15); color: #22c55e; }
+            .eo-cat-card.econ:hover { border-color: rgba(34,197,94,0.4); box-shadow: 0 4px 16px rgba(34,197,94,0.1); }
+            .eo-vec-section {
+                background: rgba(255,255,255,0.02);
+                border: 1px solid rgba(255,255,255,0.06);
+                border-radius: 10px;
+                padding: 14px 16px;
+                margin-bottom: 14px;
+            }
+            .eo-vec-title {
+                font-size: 11px;
+                font-weight: 600;
+                color: rgba(255,255,255,0.5);
+                margin-bottom: 10px;
+                text-align: center;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+            .eo-vec-flow {
+                display: flex;
+                justify-content: center;
+                gap: 8px;
+                flex-wrap: wrap;
+            }
+            .eo-vec-chip {
+                display: inline-flex;
+                align-items: center;
+                gap: 5px;
+                padding: 6px 12px;
+                background: rgba(167,139,250,0.08);
+                border: 1px solid rgba(167,139,250,0.2);
+                border-radius: 20px;
+                font-size: 11px;
+                color: #c4b5fd;
+                font-family: 'SF Mono', ui-monospace, monospace;
+            }
+            .eo-vec-chip .v-num {
+                color: #22d3ee;
+                font-weight: 700;
+            }
+            .eo-flow-section {
+                text-align: center;
+                margin-bottom: 16px;
+            }
+            .eo-flow-chain {
+                display: inline-flex;
+                align-items: center;
+                gap: 10px;
+                font-size: 12px;
+                color: rgba(255,255,255,0.6);
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            .eo-flow-node {
+                padding: 6px 14px;
+                background: rgba(255,255,255,0.05);
+                border: 1px solid rgba(255,255,255,0.1);
+                border-radius: 8px;
+                font-weight: 500;
+            }
+            .eo-flow-node.hl {
+                background: linear-gradient(135deg, rgba(34,211,238,0.15), rgba(167,139,250,0.1));
+                border-color: rgba(34,211,238,0.3);
+                color: #67e8f9;
+            }
+            .eo-flow-arrow {
+                color: rgba(255,255,255,0.2);
+                font-size: 14px;
+            }
+            .eo-enter-btn {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+                width: 100%;
+                padding: 12px;
+                background: linear-gradient(135deg, rgba(34,211,238,0.2), rgba(167,139,250,0.15));
+                border: 1.5px solid rgba(34,211,238,0.4);
+                border-radius: 10px;
+                color: #67e8f9;
+                font-size: 13px;
+                font-weight: 600;
+                text-decoration: none;
+                cursor: pointer;
+                transition: all 0.25s;
+            }
+            .eo-enter-btn:hover {
+                background: linear-gradient(135deg, rgba(34,211,238,0.3), rgba(167,139,250,0.25));
+                border-color: rgba(34,211,238,0.6);
+                transform: translateY(-1px);
+                box-shadow: 0 6px 20px rgba(34,211,238,0.15);
+            }
+            .new-badge {
+                font-size: 9px;
+                background: rgba(236,72,153,0.2);
+                color: #f472b6;
+                border: 1px solid rgba(236,72,153,0.3);
+                padding: 1px 5px;
+                border-radius: 4px;
+                font-weight: 600;
+                margin-left: 4px;
+                vertical-align: middle;
+            }
+            .new-badge.dev {
+                background: rgba(251,191,36,0.2);
+                color: #fbbf24;
+                border-color: rgba(251,191,36,0.3);
+            }
+            .new-badge.econ {
+                background: rgba(34,197,94,0.2);
+                color: #22c55e;
+                border-color: rgba(34,197,94,0.3);
+            }
+            .lab-cat-psych .lab-cat-count { background: rgba(236,72,153,0.15); color: #f472b6; }
+            .lab-cat-econ .lab-cat-count { background: rgba(34,197,94,0.15); color: #22c55e; }
+            .lab-cat-psych .lab-card:hover { border-color: rgba(236,72,153,0.4); box-shadow: 0 6px 20px rgba(236,72,153,0.1); }
+            .lab-cat-econ .lab-card:hover { border-color: rgba(34,197,94,0.4); box-shadow: 0 6px 20px rgba(34,197,94,0.1); }
+            .lab-cat-psych .lab-card:hover .lab-card-btn { background: rgba(236,72,153,0.15); border-color: rgba(236,72,153,0.3); color: #f472b6; }
+            .lab-cat-econ .lab-card:hover .lab-card-btn { background: rgba(34,197,94,0.15); border-color: rgba(34,197,94,0.3); color: #22c55e; }
             </style>
 
             <div class="section-group lab-section">
@@ -1560,9 +1786,115 @@
                     </div>
                 </div>
 
+                <div class="empirical-overview">
+                    <div class="eo-header">
+                        <div class="eo-title">
+                            <span>📊</span>
+                            <span>实证验证总览 · 39组实验验证体系</span>
+                        </div>
+                        <div class="eo-stats-row">
+                            <div class="eo-stat">覆盖<span class="eo-stat-num">7</span>大类别</div>
+                            <div class="eo-stat">映射<span class="eo-stat-num">8</span>个七维向量维度</div>
+                            <div class="eo-stat"><span class="eo-stat-num">25,424</span>次实验运行</div>
+                            <div class="eo-stat"><span class="eo-stat-num">297</span>次部署</div>
+                        </div>
+                    </div>
+
+                    <div class="eo-cat-grid">
+                        <div class="eo-cat-card cyber">
+                            <div class="eo-cat-head">
+                                <span class="eo-cat-icon">⚙️</span>
+                                <span class="eo-cat-name">控制论与系统稳定</span>
+                                <span class="eo-cat-count">12项</span>
+                            </div>
+                            <div class="eo-cat-dims">I（海拔）、D（阻尼）</div>
+                        </div>
+                        <div class="eo-cat-card struct">
+                            <div class="eo-cat-head">
+                                <span class="eo-cat-icon">🏗️</span>
+                                <span class="eo-cat-name">结构力学与冗余安全</span>
+                                <span class="eo-cat-count">7项</span>
+                            </div>
+                            <div class="eo-cat-dims">D（阻尼）、Dev-I</div>
+                        </div>
+                        <div class="eo-cat-card cog">
+                            <div class="eo-cat-head">
+                                <span class="eo-cat-icon">🧠</span>
+                                <span class="eo-cat-name">认知与神经科学</span>
+                                <span class="eo-cat-count">7项</span>
+                            </div>
+                            <div class="eo-cat-dims">S（博弈熵）、Dev1</div>
+                        </div>
+                        <div class="eo-cat-card psych">
+                            <div class="eo-cat-head">
+                                <span class="eo-cat-icon">💭</span>
+                                <span class="eo-cat-name">心理与行为</span>
+                                <span class="new-badge">新增</span>
+                                <span class="eo-cat-count">3项</span>
+                            </div>
+                            <div class="eo-cat-dims">Dev3（偏差校正）</div>
+                        </div>
+                        <div class="eo-cat-card game">
+                            <div class="eo-cat-head">
+                                <span class="eo-cat-icon">♟️</span>
+                                <span class="eo-cat-name">多方博弈演化</span>
+                                <span class="eo-cat-count">5项</span>
+                            </div>
+                            <div class="eo-cat-dims">P（坡度）、Dev-I</div>
+                        </div>
+                        <div class="eo-cat-card econ">
+                            <div class="eo-cat-head">
+                                <span class="eo-cat-icon">📈</span>
+                                <span class="eo-cat-name">经济学与市场</span>
+                                <span class="new-badge econ">新增</span>
+                                <span class="eo-cat-count">4项</span>
+                            </div>
+                            <div class="eo-cat-dims">Dev3（估值偏差）</div>
+                        </div>
+                        <div class="eo-cat-card info">
+                            <div class="eo-cat-head">
+                                <span class="eo-cat-icon">📡</span>
+                                <span class="eo-cat-name">信息与通信信道</span>
+                                <span class="eo-cat-count">1项</span>
+                            </div>
+                            <div class="eo-cat-dims">Dev2（历史依赖）</div>
+                        </div>
+                    </div>
+
+                    <div class="eo-vec-section">
+                        <div class="eo-vec-title">实验 → 七维向量映射总览</div>
+                        <div class="eo-vec-flow">
+                            <span class="eo-vec-chip">I <span class="v-num">海拔</span><span class="v-num"> (5)</span></span>
+                            <span class="eo-vec-chip">P <span class="v-num">坡度</span><span class="v-num"> (4)</span></span>
+                            <span class="eo-vec-chip">D <span class="v-num">阻尼</span><span class="v-num"> (6)</span></span>
+                            <span class="eo-vec-chip">S <span class="v-num">熵</span><span class="v-num"> (4)</span></span>
+                            <span class="eo-vec-chip">Dev-I <span class="v-num">偏差</span><span class="v-num"> (3)</span></span>
+                            <span class="eo-vec-chip">Dev1 <span class="v-num">回归</span><span class="v-num"> (3)</span></span>
+                            <span class="eo-vec-chip">Dev2 <span class="v-num">历史</span><span class="v-num"> (2)</span></span>
+                            <span class="eo-vec-chip" style="background:rgba(236,72,153,0.08);border-color:rgba(236,72,153,0.2);color:#f9a8d4;">Dev3 <span class="v-num" style="color:#f472b6;">估值偏差</span><span class="v-num" style="color:#f472b6;"> (4)</span></span>
+                        </div>
+                    </div>
+
+                    <div class="eo-flow-section">
+                        <div class="eo-flow-chain">
+                            <span class="eo-flow-node hl">39组实验</span>
+                            <span class="eo-flow-arrow">──→</span>
+                            <span class="eo-flow-node">七维向量</span>
+                            <span class="eo-flow-arrow">──→</span>
+                            <span class="eo-flow-node">主线模块</span>
+                            <span class="eo-flow-arrow">──→</span>
+                            <span class="eo-flow-node hl">决策输出</span>
+                        </div>
+                    </div>
+
+                    <a href="MemoryBase/vector_store/experiment_sim_vector/index.html" class="eo-enter-btn">
+                        ▶ 进入全域仿真实验向量总管理台
+                    </a>
+                </div>
+
                 <a href="MemoryBase/vector_store/experiment_sim_vector/index.html" class="lab-base-card" style="background:linear-gradient(135deg,rgba(34,211,238,0.14),rgba(251,191,36,0.08));border-color:rgba(34,211,238,0.4);">
                     <div class="base-tag" style="background:linear-gradient(135deg,#22d3ee,#fbbf24);">🧪 全域仿真实验向量总管理台</div>
-                    <div class="base-title"><span class="icon">📊</span>31组实验三元向量总库 · KMP骨架检索 · 双人工决策闸门</div>
+                    <div class="base-title"><span class="icon">📊</span>39组实验三元向量总库 · KMP骨架检索 · 双人工决策闸门</div>
                     <div class="base-desc">vars_in自变量 / vars_out因变量 / func_expr函数三元结构化存储 · 三级仓储冷热温分配 · 三角审计日志 · MindSpeak一键数理-语言同构 · 公私分层隔离(求解内核在private_engine)</div>
                     <span class="base-arrow" style="color:#22d3ee;">▶</span>
                 </a>
@@ -1597,8 +1929,8 @@
                     <div class="lab-cat-header">
                         <span class="lab-cat-icon">🏗️</span>
                         <span class="lab-cat-name">结构力学与冗余安全类</span>
-                        <span class="lab-cat-count">6项</span>
-                        <span class="lab-cat-desc">宏观落体 · 介观原子 · 微观分子 · 承重 · 冗余 · 爆破临界</span>
+                        <span class="lab-cat-count">7项</span>
+                        <span class="lab-cat-desc">宏观落体 · 介观原子 · 微观分子 · 承重 · 冗余 · 堆积形态 · 爆破临界</span>
                     </div>
                     <div class="lab-grid">
                         <a href="labs/structural-mechanics/exp30-gravity.html" class="lab-card" style="text-decoration:none;color:inherit;border-color:rgba(34,211,238,0.3);background:rgba(34,211,238,0.04);">
@@ -1622,6 +1954,13 @@
                         <div class="lab-card" data-exp="exp-13"><div class="lab-card-icon">📐</div><div class="lab-card-name">悬臂单点vs多点锁止</div><div class="lab-card-desc">悬臂梁在不同支撑下的挠度对比</div><span class="lab-card-btn">▶ 进入演示</span></div>
                         <div class="lab-card" data-exp="exp-14"><div class="lab-card-icon">🏛️</div><div class="lab-card-name">简支梁多点分散承重</div><div class="lab-card-desc">荷载分散至多个支点的冗余设计</div><span class="lab-card-btn">▶ 进入演示</span></div>
                         <div class="lab-card" data-exp="exp-15"><div class="lab-card-icon">💥</div><div class="lab-card-name">压力容器耐压临界爆破</div><div class="lab-card-desc">压力升至0.68临界点时的爆破模拟</div><span class="lab-card-btn">▶ 进入演示</span></div>
+                        <div class="lab-card" style="border-color:rgba(251,191,36,0.3);background:rgba(251,191,36,0.04);">
+                            <div class="lab-card-tag new-badge dev" style="background:rgba(251,191,36,0.15);color:#fbbf24;border-color:rgba(251,191,36,0.3);">Dev-I强化</div>
+                            <div class="lab-card-icon">📊</div>
+                            <div class="lab-card-name" style="color:#fcd34d;">堆积形态与系统偏差实验</div>
+                            <div class="lab-card-desc">不同堆积形态下的系统输出偏差测量 · Dev-I维度强化</div>
+                            <span class="lab-card-btn" style="background:rgba(251,191,36,0.1);border-color:rgba(251,191,36,0.25);color:#fbbf24;">📋 实验规划中</span>
+                        </div>
                     </div>
                 </div>
 
@@ -1643,6 +1982,42 @@
                     </div>
                 </div>
 
+                <div class="lab-category lab-cat-psych">
+                    <div class="lab-cat-header">
+                        <span class="lab-cat-icon">💭</span>
+                        <span class="lab-cat-name">心理与行为类</span>
+                        <span class="new-badge">新增</span>
+                        <span class="lab-cat-count">3项</span>
+                        <span class="lab-cat-desc">认知偏差 · 前景理论 · 决策冲突 · Dev3</span>
+                    </div>
+                    <div class="lab-cat-guide" style="background:rgba(236,72,153,0.05);border-left-color:rgba(236,72,153,0.4);color:rgba(236,72,153,0.65);">
+                        该类别实验专门测量人类决策中的认知偏差，为MoodMind非标资产估值中的前景理论偏差校正提供实证支撑，直接映射七维向量的Dev3（估值偏差）维度。
+                    </div>
+                    <div class="lab-grid">
+                        <div class="lab-card" style="border-color:rgba(236,72,153,0.3);background:rgba(236,72,153,0.04);">
+                            <div class="lab-card-tag new-badge" style="background:rgba(236,72,153,0.12);color:#f472b6;border-color:rgba(236,72,153,0.25);">新增</div>
+                            <div class="lab-card-icon">🧪</div>
+                            <div class="lab-card-name" style="color:#f9a8d4;">认知偏差量化实验</div>
+                            <div class="lab-card-desc">测量损失厌恶、过度自信等偏差系数 → MoodMind前景理论校正</div>
+                            <span class="lab-card-btn" style="background:rgba(236,72,153,0.1);border-color:rgba(236,72,153,0.25);color:#f472b6;">📋 实验规划中</span>
+                        </div>
+                        <div class="lab-card" style="border-color:rgba(236,72,153,0.3);background:rgba(236,72,153,0.04);">
+                            <div class="lab-card-tag new-badge" style="background:rgba(236,72,153,0.12);color:#f472b6;border-color:rgba(236,72,153,0.25);">新增</div>
+                            <div class="lab-card-icon">⚖️</div>
+                            <div class="lab-card-name" style="color:#f9a8d4;">前景理论双框架实验</div>
+                            <div class="lab-card-desc">收益框架vs损失框架决策差异 → 七维向量S（熵）维度</div>
+                            <span class="lab-card-btn" style="background:rgba(236,72,153,0.1);border-color:rgba(236,72,153,0.25);color:#f472b6;">📋 实验规划中</span>
+                        </div>
+                        <div class="lab-card" style="border-color:rgba(236,72,153,0.3);background:rgba(236,72,153,0.04);">
+                            <div class="lab-card-tag new-badge" style="background:rgba(236,72,153,0.12);color:#f472b6;border-color:rgba(236,72,153,0.25);">新增</div>
+                            <div class="lab-card-icon">🔤</div>
+                            <div class="lab-card-name" style="color:#f9a8d4;">斯特鲁普认知冲突实验</div>
+                            <div class="lab-card-desc">认知冲突对决策速度影响 → 七维向量S和Dev1维度</div>
+                            <span class="lab-card-btn" style="background:rgba(236,72,153,0.1);border-color:rgba(236,72,153,0.25);color:#f472b6;">📋 实验规划中</span>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="lab-category lab-cat-game">
                     <div class="lab-cat-header">
                         <span class="lab-cat-icon">♟️</span>
@@ -1656,6 +2031,49 @@
                         <div class="lab-card" data-exp="exp-25"><div class="lab-card-icon">🏭</div><div class="lab-card-name">古诺寡头产能纳什均衡</div><div class="lab-card-desc">寡头竞争产量收敛至古诺均衡</div><span class="lab-card-btn">▶ 进入演示</span></div>
                         <div class="lab-card" data-exp="exp-26"><div class="lab-card-icon">🦌</div><div class="lab-card-name">猎鹿合作分工博弈</div><div class="lab-card-desc">合作猎鹿vs单独猎兔的收益景观</div><span class="lab-card-btn">▶ 进入演示</span></div>
                         <div class="lab-card" data-exp="exp-27"><div class="lab-card-icon">🐛</div><div class="lab-card-name">蜈蚣多轮序贯递进博弈</div><div class="lab-card-desc">多轮take/pass决策节点的逆向归纳</div><span class="lab-card-btn">▶ 进入演示</span></div>
+                    </div>
+                </div>
+
+                <div class="lab-category lab-cat-econ">
+                    <div class="lab-cat-header">
+                        <span class="lab-cat-icon">📈</span>
+                        <span class="lab-cat-name">经济学与市场类</span>
+                        <span class="new-badge econ">新增</span>
+                        <span class="lab-cat-count">4项</span>
+                        <span class="lab-cat-desc">市场均衡 · 估值偏差 · 博弈决策 · Dev3</span>
+                    </div>
+                    <div class="lab-cat-guide" style="background:rgba(34,197,94,0.05);border-left-color:rgba(34,197,94,0.4);color:rgba(34,197,94,0.65);">
+                        该类别实验模拟市场价格形成与价值偏离过程，为11步投研推理系统的"定价估值"环节提供实证依据，直接映射七维向量的Dev3（估值偏差）维度。
+                    </div>
+                    <div class="lab-grid">
+                        <div class="lab-card" style="border-color:rgba(34,197,94,0.3);background:rgba(34,197,94,0.04);">
+                            <div class="lab-card-tag new-badge econ" style="background:rgba(34,197,94,0.12);color:#22c55e;border-color:rgba(34,197,94,0.25);">新增</div>
+                            <div class="lab-card-icon">⚖️</div>
+                            <div class="lab-card-name" style="color:#86efac;">市场均衡实验</div>
+                            <div class="lab-card-desc">供需双方均衡价格形成过程 → 投研推理"定价估值"</div>
+                            <span class="lab-card-btn" style="background:rgba(34,197,94,0.1);border-color:rgba(34,197,94,0.25);color:#22c55e;">📋 实验规划中</span>
+                        </div>
+                        <div class="lab-card" style="border-color:rgba(34,197,94,0.3);background:rgba(34,197,94,0.04);">
+                            <div class="lab-card-tag new-badge econ" style="background:rgba(34,197,94,0.12);color:#22c55e;border-color:rgba(34,197,94,0.25);">新增</div>
+                            <div class="lab-card-icon">📊</div>
+                            <div class="lab-card-name" style="color:#86efac;">估值偏差实验</div>
+                            <div class="lab-card-desc">市场价格偏离内在价值模拟 → 七维向量Dev3维度</div>
+                            <span class="lab-card-btn" style="background:rgba(34,197,94,0.1);border-color:rgba(34,197,94,0.25);color:#22c55e;">📋 实验规划中</span>
+                        </div>
+                        <div class="lab-card" style="border-color:rgba(34,197,94,0.3);background:rgba(34,197,94,0.04);">
+                            <div class="lab-card-tag new-badge econ" style="background:rgba(34,197,94,0.12);color:#22c55e;border-color:rgba(34,197,94,0.25);">新增</div>
+                            <div class="lab-card-icon">🎯</div>
+                            <div class="lab-card-name" style="color:#86efac;">博弈决策实验</div>
+                            <div class="lab-card-desc">多方博弈下决策偏差模拟 → GameMind博弈底座</div>
+                            <span class="lab-card-btn" style="background:rgba(34,197,94,0.1);border-color:rgba(34,197,94,0.25);color:#22c55e;">📋 实验规划中</span>
+                        </div>
+                        <div class="lab-card" style="border-color:rgba(34,197,94,0.3);background:rgba(34,197,94,0.04);">
+                            <div class="lab-card-tag new-badge econ" style="background:rgba(34,197,94,0.12);color:#22c55e;border-color:rgba(34,197,94,0.25);">Dev3实验</div>
+                            <div class="lab-card-icon">💹</div>
+                            <div class="lab-card-name" style="color:#86efac;">市场价格偏离内在价值实验</div>
+                            <div class="lab-card-desc">价格与估算内在价值偏差验证 → 七维向量Dev3直接实验</div>
+                            <span class="lab-card-btn" style="background:rgba(34,197,94,0.1);border-color:rgba(34,197,94,0.25);color:#22c55e;">📋 实验规划中</span>
+                        </div>
                     </div>
                 </div>
 
