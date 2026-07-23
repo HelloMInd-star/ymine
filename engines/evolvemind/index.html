@@ -3,17 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🧬 EvolveMind · 进阶思维认知演化引擎</title>
+    <title>🧠 人机思维交互引擎</title>
     <link rel="stylesheet" href="../../assets/css/base.css">
-    <script src="../../assets/js/bus.js"></script>
-    <script src="../../models/common/normalizer.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
     <style>
+        body {
+            background: #080810;
+        }
+
+        .page-container {
+            max-width: 1400px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 24px 28px 40px;
+        }
+
         .breadcrumb {
             display: flex;
             align-items: center;
             gap: 8px;
             font-size: 13px;
-            margin-bottom: 8px;
+            margin-bottom: 16px;
             flex-wrap: wrap;
         }
         .breadcrumb a {
@@ -21,591 +31,1456 @@
             text-decoration: none;
             transition: color .2s;
         }
-        .breadcrumb a:hover {
-            color: rgba(255,255,255,0.8);
+        .breadcrumb a:hover { color: rgba(255,255,255,0.8); }
+        .breadcrumb .sep { color: rgba(255,255,255,0.2); }
+        .breadcrumb .current { color: rgba(255,255,255,0.7); }
+
+        .nav-actions {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
         }
-        .breadcrumb .sep {
-            color: rgba(255,255,255,0.2);
-        }
-        .breadcrumb .current {
+        .nav-actions a {
+            padding: 6px 14px;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 8px;
             color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            font-size: 12px;
+            transition: all .2s;
+        }
+        .nav-actions a:hover {
+            background: rgba(255,255,255,0.1);
         }
 
-        .container {
-            max-width: 1100px;
-            width: 100%;
-            background: radial-gradient(ellipse at 30% 30%, #120b24, #0b0b1a 70%, #05030a);
-            border-radius: 32px;
-            padding: 48px 40px 40px;
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            box-shadow: 0 30px 80px rgba(40, 10, 80, 0.4);
+        .page-header {
+            text-align: center;
+            margin-bottom: 32px;
+            padding: 28px 20px;
+            background: linear-gradient(135deg, rgba(167,139,250,0.08), rgba(34,211,238,0.06));
+            border: 1px solid rgba(167,139,250,0.15);
+            border-radius: 20px;
             position: relative;
             overflow: hidden;
-            z-index: 1;
-            backdrop-filter: blur(2px);
         }
-
-        /* ===== 头部 ===== */
-        .header {
-            text-align: center;
-            margin-bottom: 40px;
-            opacity: 0;
-            animation: fadeInUp 0.6s ease forwards;
+        .page-header::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.03), transparent);
+            animation: scanLine 4s linear infinite;
         }
-
-        .badge {
-            display: inline-block;
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            color: rgba(255, 255, 255, 0.3);
-            font-size: 13px;
-            padding: 4px 16px;
-            border-radius: 20px;
-            letter-spacing: 0.3px;
-            margin-bottom: 12px;
+        @keyframes scanLine {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
         }
-
-        .header h1 {
-            font-size: 36px;
+        .page-header h1 {
+            font-size: 32px;
             font-weight: 700;
-            color: #f1f5f9;
-            letter-spacing: -0.5px;
-            background: linear-gradient(135deg, #f1f5f9, #a78bfa, #60a5fa, #f1f5f9);
-            background-size: 300% 300%;
+            background: linear-gradient(135deg, #f1f5f9, #a78bfa, #22d3ee);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            animation: gradientFlow 6s ease-in-out infinite;
-        }
-
-        .header .slogan {
-            margin-top: 8px;
-            font-size: 18px;
-            color: rgba(255, 255, 255, 0.4);
-            font-weight: 400;
-        }
-
-        .header .slogan::before {
-            content: "“";
-            color: #a78bfa;
-        }
-        .header .slogan::after {
-            content: "”";
-            color: #a78bfa;
-        }
-
-        @keyframes gradientFlow {
-            0% {
-                background-position: 0% 50%;
-            }
-            50% {
-                background-position: 100% 50%;
-            }
-            100% {
-                background-position: 0% 50%;
-            }
-        }
-
-        @keyframes fadeInUp {
-            0% {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            100% {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* ===== README 摘要 ===== */
-        .readme-summary {
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.04);
-            border-radius: 20px;
-            padding: 24px 28px;
-            margin-bottom: 32px;
-            border-left: 4px solid #a78bfa;
-            opacity: 0;
-            animation: fadeInUp 0.6s ease 0.1s forwards;
-        }
-
-        .readme-summary h2 {
-            font-size: 18px;
-            font-weight: 600;
-            color: rgba(255, 255, 255, 0.8);
             margin-bottom: 8px;
+            position: relative;
+        }
+        .page-header .subtitle {
+            font-size: 14px;
+            color: rgba(255,255,255,0.5);
+            letter-spacing: 2px;
+            position: relative;
         }
 
-        .readme-summary p {
-            color: rgba(255, 255, 255, 0.5);
-            line-height: 1.7;
-            font-size: 15px;
-            margin-bottom: 6px;
+        .section {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+            backdrop-filter: blur(8px);
+        }
+        .section-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: rgba(255,255,255,0.8);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .section-title .num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 22px;
+            height: 22px;
+            background: linear-gradient(135deg, #a78bfa, #22d3ee);
+            border-radius: 6px;
+            font-size: 11px;
+            color: #0b0b1a;
+            font-weight: 700;
         }
 
-        .readme-summary .highlight {
-            color: #a78bfa;
-            font-weight: 500;
-        }
-
-        /* ===== 卡片 ===== */
-        .cards {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 16px;
-            margin: 32px 0 28px;
-        }
-
-        .card {
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.04);
-            border-radius: 20px;
-            padding: 24px 20px 20px;
-            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-            cursor: pointer;
-            text-decoration: none;
-            color: inherit;
+        /* 3.1 用户输入区 */
+        .input-area {
             display: flex;
             flex-direction: column;
-            will-change: transform;
-            opacity: 0;
-            animation: fadeInUp 0.6s ease forwards;
+            gap: 12px;
+        }
+        .input-row {
+            display: flex;
+            gap: 12px;
+        }
+        .input-row textarea {
+            flex: 1;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 12px 16px;
+            color: #f1f5f9;
+            font-size: 14px;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 80px;
+            outline: none;
+            transition: border-color .2s;
+        }
+        .input-row textarea:focus {
+            border-color: rgba(167,139,250,0.5);
+        }
+        .input-row textarea::placeholder {
+            color: rgba(255,255,255,0.3);
+        }
+        .submit-btn {
+            padding: 12px 28px;
+            background: linear-gradient(135deg, #a78bfa, #7c3aed);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all .2s;
+            white-space: nowrap;
+            align-self: stretch;
+        }
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(167,139,250,0.3);
+        }
+        .sample-buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .sample-btn {
+            padding: 8px 14px;
+            background: rgba(34,211,238,0.08);
+            border: 1px solid rgba(34,211,238,0.2);
+            border-radius: 8px;
+            color: #67e8f9;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all .2s;
+        }
+        .sample-btn:hover {
+            background: rgba(34,211,238,0.15);
+            border-color: rgba(34,211,238,0.4);
+        }
+
+        /* 3.2 处理链路 */
+        .pipeline-steps {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 10px;
+        }
+        .step-card {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 12px;
+            padding: 14px 12px;
+            cursor: pointer;
+            transition: all .3s;
             position: relative;
             overflow: hidden;
         }
-
-        .card:nth-child(1) { animation-delay: 0.15s; }
-        .card:nth-child(2) { animation-delay: 0.2s; }
-        .card:nth-child(3) { animation-delay: 0.25s; }
-        .card:nth-child(4) { animation-delay: 0.3s; }
-
-        .card::before {
+        .step-card::before {
             content: '';
             position: absolute;
             top: 0;
-            left: -100%;
+            left: 0;
             width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.03), transparent);
-            transition: left 0.6s ease;
+            height: 3px;
+            background: rgba(255,255,255,0.1);
+            transition: background .3s;
         }
-
-        .card:hover::before {
-            left: 100%;
+        .step-card.active {
+            border-color: rgba(167,139,250,0.4);
+            background: rgba(167,139,250,0.06);
         }
-
-        .card:hover {
-            background: rgba(255, 255, 255, 0.04);
-            border-color: rgba(255, 255, 255, 0.12);
-            transform: translateY(-4px);
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4), 0 0 30px rgba(120, 80, 255, 0.05);
+        .step-card.active::before {
+            background: linear-gradient(90deg, #a78bfa, #22d3ee);
         }
-
-        .card:active {
-            transform: scale(0.96);
-            transition: transform 0.1s;
+        .step-card.completed::before {
+            background: #22c55e;
         }
-
-        .card .icon {
-            font-size: 32px;
-            margin-bottom: 8px;
-            transition: transform 0.3s ease;
+        .step-card:hover {
+            border-color: rgba(255,255,255,0.15);
+            transform: translateY(-2px);
         }
-
-        .card:hover .icon {
-            transform: scale(1.1);
-        }
-
-        .card h3 {
-            font-size: 18px;
+        .step-num {
+            font-size: 11px;
+            color: rgba(255,255,255,0.3);
             font-weight: 600;
-            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 6px;
+        }
+        .step-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: rgba(255,255,255,0.7);
             margin-bottom: 4px;
         }
-
-        .card .desc {
-            font-size: 14px;
-            color: rgba(255, 255, 255, 0.4);
-            line-height: 1.5;
-            flex: 1;
+        .step-preview {
+            font-size: 11px;
+            color: rgba(255,255,255,0.4);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
+        .step-card.active .step-title { color: #c4b5fd; }
+        .step-card.completed .step-title { color: #6ee7b7; }
 
-        .card .tag {
-            display: inline-block;
-            margin-top: 12px;
+        .step-detail {
+            display: none;
+            margin-top: 16px;
+            padding: 16px;
+            background: rgba(0,0,0,0.25);
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+        .step-detail.show { display: block; }
+        .step-detail h4 {
             font-size: 12px;
+            color: rgba(255,255,255,0.6);
+            margin-bottom: 10px;
+        }
+        .tag-cloud {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .tag {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
             font-weight: 500;
-            color: #a78bfa;
-            background: rgba(167, 139, 250, 0.12);
-            padding: 2px 12px;
-            border-radius: 20px;
-            align-self: flex-start;
         }
+        .tag.keyword { background: rgba(96,165,250,0.15); color: #93c5fd; border: 1px solid rgba(96,165,250,0.3); }
+        .tag.emotion { background: rgba(244,114,182,0.15); color: #f9a8d4; border: 1px solid rgba(244,114,182,0.3); }
+        .tag.topic { background: rgba(52,211,153,0.15); color: #6ee7b7; border: 1px solid rgba(52,211,153,0.3); }
 
-        .card .status {
+        .dimension-bars {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .dim-bar-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .dim-label {
+            width: 50px;
             font-size: 12px;
-            color: rgba(255, 255, 255, 0.2);
-            margin-top: 8px;
+            color: rgba(255,255,255,0.6);
+            font-family: 'SF Mono', monospace;
+        }
+        .dim-bar-track {
+            flex: 1;
+            height: 8px;
+            background: rgba(255,255,255,0.08);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .dim-bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            background: linear-gradient(90deg, #a78bfa, #22d3ee);
+            transition: width .5s ease;
+        }
+        .dim-value {
+            width: 40px;
+            font-size: 11px;
+            color: rgba(255,255,255,0.5);
+            text-align: right;
+            font-family: 'SF Mono', monospace;
         }
 
-        /* ===== 底部 ===== */
-        .footer {
+        .vector-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 8px;
+        }
+        .vector-item {
+            padding: 10px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 8px;
+            text-align: center;
+        }
+        .vector-item .v-label {
+            font-size: 11px;
+            color: rgba(255,255,255,0.4);
+            margin-bottom: 4px;
+            font-family: 'SF Mono', monospace;
+        }
+        .vector-item .v-value {
+            font-size: 16px;
+            font-weight: 600;
+            color: #67e8f9;
+            font-family: 'SF Mono', monospace;
+        }
+
+        .binary-output {
+            font-family: 'SF Mono', monospace;
+            font-size: 13px;
+            color: #4ade80;
+            letter-spacing: 2px;
+            line-height: 1.8;
+            word-break: break-all;
+        }
+
+        /* 3.3 & 3.4 图表区域 */
+        .charts-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        .chart-box {
+            height: 320px;
+        }
+        .charts-triple {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 16px;
+        }
+        .chart-box-sm {
+            height: 260px;
+        }
+
+        /* 3.5 01解码器 */
+        .binary-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+        .binary-table th {
+            text-align: left;
+            padding: 10px 12px;
+            color: rgba(255,255,255,0.5);
+            font-weight: 500;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .binary-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            color: rgba(255,255,255,0.7);
+        }
+        .binary-table .dim-col {
+            font-family: 'SF Mono', monospace;
+            font-weight: 600;
+            color: #a78bfa;
+        }
+        .binary-table .val-col {
+            font-family: 'SF Mono', monospace;
+            color: #67e8f9;
+        }
+        .binary-table .bin-col {
+            font-family: 'SF Mono', monospace;
+            color: #4ade80;
+            letter-spacing: 1px;
+        }
+        .binary-table .desc-col .level-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 500;
+        }
+        .level-badge.low { background: rgba(59,130,246,0.15); color: #93c5fd; }
+        .level-badge.mid { background: rgba(251,191,36,0.15); color: #fbbf24; }
+        .level-badge.high { background: rgba(239,68,68,0.15); color: #fca5a5; }
+
+        /* 3.6 海拔-算力联动模拟器 */
+        .altitude-sim {
+            background: linear-gradient(135deg, rgba(34,211,238,0.05), rgba(167,139,250,0.05));
+            border: 1px solid rgba(34,211,238,0.15);
+        }
+        .sim-subtitle {
+            font-size: 12px;
+            color: rgba(255,255,255,0.4);
+            margin-bottom: 16px;
+        }
+        .env-control {
+            margin-bottom: 20px;
+        }
+        .env-label {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding-top: 20px;
-            border-top: 1px solid rgba(255, 255, 255, 0.04);
-            font-size: 14px;
-            color: rgba(255, 255, 255, 0.2);
-            flex-wrap: wrap;
-            gap: 12px;
-            opacity: 0;
-            animation: fadeInUp 0.6s ease 0.35s forwards;
+            margin-bottom: 8px;
+            font-size: 12px;
+        }
+        .env-label span:first-child { color: rgba(255,255,255,0.6); }
+        .env-label .env-value {
+            font-family: 'SF Mono', monospace;
+            color: #67e8f9;
+            font-weight: 600;
+        }
+        .env-slider {
+            width: 100%;
+            height: 8px;
+            -webkit-appearance: none;
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+            outline: none;
+        }
+        .env-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            background: linear-gradient(135deg, #22d3ee, #a78bfa);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 12px rgba(34,211,238,0.4);
+        }
+        .env-tag {
+            display: inline-block;
+            margin-top: 8px;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 500;
         }
 
-        .footer-links a {
-            color: rgba(255, 255, 255, 0.3);
-            text-decoration: none;
-            margin-right: 20px;
-            transition: color 0.2s;
+        .sim-visual {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
         }
-
-        .footer-links a:hover {
-            color: rgba(255, 255, 255, 0.7);
+        .mountain-canvas-wrap {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 12px;
+            padding: 12px;
         }
-
-        .footer-status {
+        #mountainCanvas {
+            width: 100%;
+            height: 200px;
+            display: block;
+        }
+        .layer-bars {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            justify-content: center;
+        }
+        .layer-bar-row {
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 10px;
+        }
+        .layer-name {
+            width: 50px;
+            font-size: 11px;
+            color: rgba(255,255,255,0.5);
+        }
+        .layer-track {
+            flex: 1;
+            height: 20px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+        .layer-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width .4s ease;
+        }
+        .layer-val {
+            width: 45px;
+            font-size: 11px;
+            color: rgba(255,255,255,0.5);
+            font-family: 'SF Mono', monospace;
+            text-align: right;
         }
 
-        .dot {
-            display: inline-block;
-            width: 8px;
-            height: 8px;
-            background: #22c55e;
-            border-radius: 50%;
-            box-shadow: 0 0 12px rgba(34, 197, 94, 0.2);
+        .calc-panel {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+            padding: 16px;
+            background: rgba(0,0,0,0.25);
+            border-radius: 10px;
         }
-
-        /* ===== 底部返回链接 ===== */
-        .back-bottom {
+        .calc-item {
             text-align: center;
-            margin-top: 30px;
+        }
+        .calc-item .cl {
+            font-size: 10px;
+            color: rgba(255,255,255,0.4);
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .calc-item .cv {
+            font-size: 18px;
+            font-weight: 600;
+            font-family: 'SF Mono', monospace;
+        }
+
+        .power-mapping {
+            padding: 16px;
+            background: rgba(0,0,0,0.25);
+            border-radius: 10px;
+        }
+        .power-mapping-title {
+            font-size: 12px;
+            color: rgba(255,255,255,0.6);
+            margin-bottom: 12px;
+        }
+        .power-bars {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .power-bar-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .power-label {
+            width: 80px;
+            font-size: 12px;
+            color: rgba(255,255,255,0.6);
+        }
+        .power-track {
+            flex: 1;
+            height: 14px;
+            background: rgba(255,255,255,0.06);
+            border-radius: 7px;
+            overflow: hidden;
+        }
+        .power-fill {
+            height: 100%;
+            border-radius: 7px;
+            transition: width .5s ease;
+        }
+        .power-val {
+            width: 45px;
+            font-size: 11px;
+            font-family: 'SF Mono', monospace;
+            color: rgba(255,255,255,0.6);
+            text-align: right;
+        }
+        .power-concentration {
+            text-align: center;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid rgba(255,255,255,0.06);
+            font-size: 13px;
+        }
+        .power-concentration .pct {
+            font-size: 20px;
+            font-weight: 700;
+            font-family: 'SF Mono', monospace;
+            color: #fbbf24;
+        }
+
+        /* 3.7 认知日志 */
+        .log-container {
+            height: 180px;
+            overflow-y: auto;
+            background: rgba(0,0,0,0.3);
+            border-radius: 10px;
+            padding: 12px;
+            font-family: 'SF Mono', monospace;
+            font-size: 11px;
+            line-height: 1.8;
+        }
+        .log-container::-webkit-scrollbar { width: 4px; }
+        .log-container::-webkit-scrollbar-track { background: transparent; }
+        .log-container::-webkit-scrollbar-thumb { background: rgba(167,139,250,0.3); border-radius: 2px; }
+        .log-entry { color: rgba(255,255,255,0.6); }
+        .log-entry .ts { color: rgba(167,139,250,0.6); margin-right: 8px; }
+        .log-entry.info { color: rgba(255,255,255,0.6); }
+        .log-entry.success { color: #4ade80; }
+        .log-entry.warn { color: #fbbf24; }
+        .log-entry.process { color: #67e8f9; }
+
+        .footer-note {
+            text-align: center;
             padding-top: 20px;
-            border-top: 1px solid rgba(255, 255, 255, 0.04);
-            opacity: 0;
-            animation: fadeInUp 0.6s ease 0.4s forwards;
+            margin-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.04);
+            font-size: 12px;
+            color: rgba(255,255,255,0.25);
         }
 
-        .back-bottom a {
-            color: rgba(255, 255, 255, 0.3);
-            text-decoration: none;
-            font-size: 14px;
-            transition: color 0.3s ease;
+        @media (max-width: 1100px) {
+            .pipeline-steps { grid-template-columns: repeat(3, 1fr); }
+            .charts-row { grid-template-columns: 1fr; }
+            .charts-triple { grid-template-columns: 1fr; }
+            .sim-visual { grid-template-columns: 1fr; }
         }
-
-        .back-bottom a:hover {
-            color: rgba(255, 255, 255, 0.8);
-        }
-
-        /* ===== 响应式 ===== */
-        @media (max-width: 860px) {
-            .cards {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        @media (max-width: 700px) {
-            .container {
-                padding: 28px 20px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .container {
-                padding: 24px 16px 20px;
-            }
-            .cards {
-                grid-template-columns: 1fr;
-            }
-            .header h1 {
-                font-size: 26px;
-            }
-            .footer {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            .readme-summary {
-                padding: 16px 18px;
-            }
+        @media (max-width: 680px) {
+            .page-container { padding: 16px 12px; }
+            .pipeline-steps { grid-template-columns: repeat(2, 1fr); }
+            .input-row { flex-direction: column; }
+            .page-header h1 { font-size: 22px; }
         }
     </style>
 </head>
 <body>
-
     <div id="glow"></div>
 
-    <div class="container">
-
-        <!-- ===== 面包屑导航 ===== -->
+    <div class="page-container">
         <div class="breadcrumb">
             <a href="../../index.html">Y.Mine总控台</a>
             <span class="sep">›</span>
-            <a href="../../index.html#mind-engines">🧬 三大心智引擎</a>
+            <a href="../../index.html#mind-engines">🧠 三大心智引擎</a>
             <span class="sep">›</span>
-            <span class="current">🧬 EvolveMind · 进阶思维认知演化引擎</span>
-        </div>
-        <div class="nav-actions" style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;">
-            <a href="javascript:history.back()" style="padding:6px 14px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);border-radius:8px;color:rgba(255,255,255,0.7);text-decoration:none;font-size:12px;transition:all .2s;">← 返回上一级</a>
-            <a href="../../index.html" style="padding:6px 14px;background:rgba(52,211,153,0.12);border:1px solid rgba(52,211,153,0.3);border-radius:8px;color:#6ee7b7;text-decoration:none;font-size:12px;transition:all .2s;">🏠 一键返回总控台</a>
-            <a href="../moodmind/index.html" style="padding:6px 14px;background:rgba(168,85,247,0.12);border:1px solid rgba(168,85,247,0.3);border-radius:8px;color:#c4b5fd;text-decoration:none;font-size:12px;transition:all .2s;">💜 下发MoodMind估值中台</a>
-            <a href="../gamemind/index.html" style="padding:6px 14px;background:rgba(251,146,60,0.12);border:1px solid rgba(251,146,60,0.3);border-radius:8px;color:#fdba74;text-decoration:none;font-size:12px;transition:all .2s;">🎯 接入GameMind博弈基座</a>
+            <span class="current">🧠 人机思维交互引擎</span>
         </div>
 
-        <!-- ===== 头部 ===== -->
-        <div class="header">
-            <div class="badge">⚡ 系统已就绪</div>
-            <h1>🧬 EvolveMind · 进阶思维认知演化引擎</h1>
-            <div class="slogan">你给我一个数字，我还你一套系统</div>
+        <div class="nav-actions">
+            <a href="javascript:history.back()">← 返回上一级</a>
+            <a href="../../index.html" style="background:rgba(52,211,153,0.12);border-color:rgba(52,211,153,0.3);color:#6ee7b7;">🏠 一键返回总控台</a>
         </div>
 
-        <!-- ===== README 摘要 ===== -->
-        <div class="readme-summary">
-            <h2>🧠 什么是 EvolveMind？</h2>
-            <p>
-                EvolveMind 是一套<strong style="color: rgba(255,255,255,0.7);">可迁移、可验证、可进化的认知操作系统</strong>。
-                它不是课程，不是题库，不是教学方法。
-                它是一个用同一套结构 <span class="highlight">（3→1→1→3→100）</span> 拆解任何领域问题的框架。
-            </p>
-            <p style="margin-top:6px;">
-                📌 核心路径：<strong style="color: rgba(255,255,255,0.6);">3</strong> → <strong style="color: rgba(255,255,255,0.6);">1</strong> → <strong style="color: rgba(255,255,255,0.6);">1</strong> → <strong style="color: rgba(255,255,255,0.6);">3</strong> → <strong style="color: rgba(255,255,255,0.6);">100</strong>
-            </p>
-            <p style="margin-top:6px; font-size:14px; color:rgba(255,255,255,0.3);">
-                从三个方向 → 收敛到核心 → 设计可迁移架构 → 拆成三个交付维度 → 无限延展
-            </p>
+        <div class="page-header">
+            <h1>🧠 人机思维交互引擎</h1>
+            <div class="subtitle">语言拆解 · 语义映射 · 算力联动 · 01 解码 · 海拔模拟</div>
         </div>
 
-        <!-- ===== 四个卡片 ===== -->
-        <div class="cards">
-
-            <a href="javascript:void(0)" class="card">
-                <div class="icon">📐</div>
-                <h3>数学思维</h3>
-                <div class="desc">鸡兔同笼 · 静态平衡<br>两个变量互相约束</div>
-                <span class="tag">圈静止</span>
-                <div class="status" style="color:#a855f7;">● 已激活</div>
-                <div style="margin-top:8px;"><label style="font-size:11px;color:rgba(255,255,255,0.5);">逻辑推理强度</label><input type="range" id="mathSlider" min="0" max="100" value="50" style="width:100%;margin-top:4px;accent-color:#a855f7;"></div>
-            </a>
-
-            <a href="javascript:void(0)" class="card">
-                <div class="icon">📈</div>
-                <h3>经济思维</h3>
-                <div class="desc">供给需求 · 动态波动<br>市场在圈上运行</div>
-                <span class="tag">圈转动</span>
-                <div class="status" style="color:#22c55e;">● 已激活</div>
-                <div style="margin-top:8px;"><label style="font-size:11px;color:rgba(255,255,255,0.5);">逻辑推理强度</label><input type="range" id="econSlider" min="0" max="100" value="50" style="width:100%;margin-top:4px;accent-color:#22c55e;"></div>
-            </a>
-
-            <a href="javascript:void(0)" class="card">
-                <div class="icon">🤖</div>
-                <h3>AI思维</h3>
-                <div class="desc">人机交互 · 反馈循环<br>信息输入→输出</div>
-                <span class="tag">圈闪烁</span>
-                <div class="status" style="color:#3b82f6;">● 已激活</div>
-                <div style="margin-top:8px;"><label style="font-size:11px;color:rgba(255,255,255,0.5);">逻辑推理强度</label><input type="range" id="aiSlider" min="0" max="100" value="50" style="width:100%;margin-top:4px;accent-color:#3b82f6;"></div>
-            </a>
-
-            <a href="javascript:void(0)" class="card">
-                <div class="icon">🌐</div>
-                <h3>语言思维</h3>
-                <div class="desc">马来/印尼/英语对照<br>用结构拆解语言</div>
-                <span class="tag">圈分叉</span>
-                <div class="status" style="color:#f472b6;">● 已激活</div>
-                <div style="margin-top:8px;"><label style="font-size:11px;color:rgba(255,255,255,0.5);">逻辑推理强度</label><input type="range" id="langSlider" min="0" max="100" value="50" style="width:100%;margin-top:4px;accent-color:#f472b6;"></div>
-            </a>
-
-        </div>
-
-        <div class="data-panel" style="margin-top:24px;padding:20px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:12px;">
-            <h3 style="font-size:14px;color:rgba(255,255,255,0.7);margin:0 0 12px 0;">📡 数据总线输出状态</h3>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:12px;">
-                <div style="padding:12px;background:rgba(168,85,247,0.06);border:1px solid rgba(168,85,247,0.15);border-radius:8px;">
-                    <div style="color:#c4b5fd;font-weight:600;margin-bottom:6px;">🧠 mind-vector 通道</div>
-                    <div style="color:rgba(255,255,255,0.5);font-size:11px;">多维认知向量输出 → MoodMind</div>
-                    <div id="mvStatus" style="margin-top:6px;color:#22c55e;font-size:11px;">● 待输出</div>
+        <div class="section">
+            <div class="section-title"><span class="num">1</span> 用户输入区</div>
+            <div class="input-area">
+                <div class="input-row">
+                    <textarea id="userInput" placeholder="请输入任意中文文本，观察思维交互过程..."></textarea>
+                    <button class="submit-btn" id="submitBtn">🚀 提交处理</button>
                 </div>
-                <div style="padding:12px;background:rgba(52,211,153,0.06);border:1px solid rgba(52,211,153,0.15);border-radius:8px;">
-                    <div style="color:#6ee7b7;font-weight:600;margin-bottom:6px;">⚡ power-schedule 通道</div>
-                    <div style="color:rgba(255,255,255,0.5);font-size:11px;">算力调度负载输出 → 全域</div>
-                    <div id="psStatus" style="margin-top:6px;color:#22c55e;font-size:11px;">● 待输出</div>
+                <div class="sample-buttons">
+                    <button class="sample-btn" data-text="今天市场波动有点大，我想看看风险情况">📊 示例1：市场风险</button>
+                    <button class="sample-btn" data-text="帮我优化一下这个投资策略">💡 示例2：策略优化</button>
+                    <button class="sample-btn" data-text="我感觉有点累，需要休息一下">😌 示例3：休息状态</button>
                 </div>
             </div>
-            <div style="margin-top:12px;display:flex;gap:8px;">
-                <button id="emitCognitiveBtn" style="flex:1;padding:10px;background:linear-gradient(135deg,#a855f7,#7c3aed);border:none;border-radius:8px;color:white;font-size:12px;cursor:pointer;font-weight:600;">🧠 输出认知向量</button>
-                <button id="emitPowerBtn" style="flex:1;padding:10px;background:linear-gradient(135deg,#10b981,#059669);border:none;border-radius:8px;color:white;font-size:12px;cursor:pointer;font-weight:600;">⚡ 调度算力分配</button>
+        </div>
+
+        <div class="section">
+            <div class="section-title"><span class="num">2</span> 处理链路</div>
+            <div class="pipeline-steps" id="pipelineSteps">
+                <div class="step-card" data-step="1" onclick="toggleStepDetail(1)">
+                    <div class="step-num">STEP 01</div>
+                    <div class="step-title">用户输入</div>
+                    <div class="step-preview" id="step1Preview">等待输入...</div>
+                </div>
+                <div class="step-card" data-step="2" onclick="toggleStepDetail(2)">
+                    <div class="step-num">STEP 02</div>
+                    <div class="step-title">语言拆解</div>
+                    <div class="step-preview" id="step2Preview">待执行</div>
+                </div>
+                <div class="step-card" data-step="3" onclick="toggleStepDetail(3)">
+                    <div class="step-num">STEP 03</div>
+                    <div class="step-title">语义映射</div>
+                    <div class="step-preview" id="step3Preview">待执行</div>
+                </div>
+                <div class="step-card" data-step="4" onclick="toggleStepDetail(4)">
+                    <div class="step-num">STEP 04</div>
+                    <div class="step-title">算力调度</div>
+                    <div class="step-preview" id="step4Preview">待执行</div>
+                </div>
+                <div class="step-card" data-step="5" onclick="toggleStepDetail(5)">
+                    <div class="step-num">STEP 05</div>
+                    <div class="step-title">向量输出</div>
+                    <div class="step-preview" id="step5Preview">待执行</div>
+                </div>
+                <div class="step-card" data-step="6" onclick="toggleStepDetail(6)">
+                    <div class="step-num">STEP 06</div>
+                    <div class="step-title">01解码</div>
+                    <div class="step-preview" id="step6Preview">待执行</div>
+                </div>
             </div>
-            <div id="evAuditLog" style="margin-top:10px;padding:8px;background:rgba(0,0,0,0.2);border-radius:6px;font-family:monospace;font-size:10px;color:rgba(255,255,255,0.4);max-height:80px;overflow-y:auto;">
-                [系统] EvolveMind V2.1 已接入YBus全局总线，等待认知运算...
+            <div class="step-detail" id="stepDetail1">
+                <h4>📝 原始输入</h4>
+                <div id="detail1Content" style="color:rgba(255,255,255,0.7);font-size:13px;line-height:1.6;"></div>
+            </div>
+            <div class="step-detail" id="stepDetail2">
+                <h4>🏷️ 语言拆解结果</h4>
+                <div id="detail2Content"></div>
+            </div>
+            <div class="step-detail" id="stepDetail3">
+                <h4>📊 7维度初始映射</h4>
+                <div class="dimension-bars" id="detail3Content"></div>
+            </div>
+            <div class="step-detail" id="stepDetail4">
+                <h4>⚡ 算力分配详情</h4>
+                <div id="detail4Content"></div>
+            </div>
+            <div class="step-detail" id="stepDetail5">
+                <h4>🎯 最终7维认知向量</h4>
+                <div class="vector-list" id="detail5Content"></div>
+            </div>
+            <div class="step-detail" id="stepDetail6">
+                <h4>💾 二进制编码输出</h4>
+                <div class="binary-output" id="detail6Content"></div>
             </div>
         </div>
 
-        <!-- ===== 底部 ===== -->
-        <div class="footer">
-            <div class="footer-links">
-                <a href="javascript:void(0)" style="color:rgba(255,255,255,0.3);text-decoration:none;cursor:pointer;">📖 关于系统</a>
-                <a href="javascript:void(0)" style="color:rgba(255,255,255,0.3);text-decoration:none;cursor:pointer;">📊 数据看板</a>
-                <a href="javascript:void(0)" style="color:rgba(255,255,255,0.3);text-decoration:none;cursor:pointer;">📁 案例库</a>
-                <a href="javascript:void(0)" style="color:rgba(255,255,255,0.3);text-decoration:none;cursor:pointer;">📄 README</a>
+        <div class="charts-row">
+            <div class="section">
+                <div class="section-title"><span class="num">3</span> 认知向量雷达图</div>
+                <div class="chart-box" id="radarChart"></div>
             </div>
-            <div class="footer-status">
-                <span class="dot"></span>
-                <span>系统运行中 · v2.1</span>
+            <div class="section">
+                <div class="section-title"><span class="num">4</span> 算力使用率</div>
+                <div class="chart-box" id="gaugeChart"></div>
             </div>
         </div>
 
-        <!-- ===== 底部返回链接 ===== -->
-        <div class="back-bottom">
-            <a href="../../index.html">← 返回总控台</a>
+        <div class="section">
+            <div class="section-title"><span class="num">4</span> 算力监控面板</div>
+            <div class="charts-triple">
+                <div class="chart-box-sm" id="pieChart"></div>
+                <div class="chart-box-sm" id="barChart"></div>
+                <div class="chart-box-sm" id="lineChart"></div>
+            </div>
         </div>
 
+        <div class="section">
+            <div class="section-title"><span class="num">5</span> 01 解码器</div>
+            <table class="binary-table">
+                <thead>
+                    <tr>
+                        <th>维度</th>
+                        <th>数值 (0~1)</th>
+                        <th>二进制 (8位)</th>
+                        <th>解码说明</th>
+                    </tr>
+                </thead>
+                <tbody id="binaryTableBody">
+                    <tr><td colspan="4" style="text-align:center;color:rgba(255,255,255,0.3);padding:20px;">等待输入数据...</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section altitude-sim">
+            <div class="section-title">🏔️ <span class="num">6</span> 海拔-算力联动模拟器</div>
+            <div class="sim-subtitle">外部环境 → 山体形态 → 等效海拔 → 算力调度</div>
+
+            <div class="env-control">
+                <div class="env-label">
+                    <span>🌬️ 外部环境强度</span>
+                    <span class="env-value" id="envValue">0.50</span>
+                </div>
+                <input type="range" class="env-slider" id="envSlider" min="0" max="100" value="50">
+                <div id="envTag" class="env-tag" style="background:rgba(52,211,153,0.15);color:#6ee7b7;border:1px solid rgba(52,211,153,0.3);">微风</div>
+            </div>
+
+            <div class="sim-visual">
+                <div class="mountain-canvas-wrap">
+                    <canvas id="mountainCanvas"></canvas>
+                </div>
+                <div class="layer-bars" id="layerBars">
+                </div>
+            </div>
+
+            <div class="calc-panel" id="calcPanel">
+                <div class="calc-item">
+                    <div class="cl">底面积</div>
+                    <div class="cv" style="color:#93c5fd;">150</div>
+                </div>
+                <div class="calc-item">
+                    <div class="cl">箱体高度</div>
+                    <div class="cv" style="color:#93c5fd;">80</div>
+                </div>
+                <div class="calc-item">
+                    <div class="cl">分割比例</div>
+                    <div class="cv" style="color:#fbbf24;" id="splitRatio">1:2.5</div>
+                </div>
+                <div class="calc-item">
+                    <div class="cl">等效海拔</div>
+                    <div class="cv" style="color:#f87171;" id="eqAltitude">0.50</div>
+                </div>
+                <div class="calc-item">
+                    <div class="cl">山体容积偏差</div>
+                    <div class="cv" style="color:#a78bfa;" id="volDeviation">+0.00</div>
+                </div>
+            </div>
+
+            <div class="power-mapping">
+                <div class="power-mapping-title">⚡ 算力调度映射</div>
+                <div class="power-bars" id="powerBars">
+                </div>
+                <div class="power-concentration">
+                    海拔 <span id="altLabel" style="color:#67e8f9;">0.50</span> → 算力集中度 <span class="pct" id="powerConc">58%</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title"><span class="num">7</span> 认知日志</div>
+            <div class="log-container" id="logContainer"></div>
+        </div>
+
+        <div class="footer-note">
+            本页面为交互演示，所有数据为模拟数据
+        </div>
     </div>
 
     <script>
     (function() {
         'use strict';
-        const THRESHOLDS = (window.YModels && window.YModels.common && window.YModels.common.THRESHOLDS) || Object.freeze({
-            BREAKEVEN: 0.48, STEADY: 0.50, FUSE: 0.68
-        });
 
-        const state = {
-            math: 0.50, econ: 0.50, ai: 0.50, lang: 0.50,
-            memory: { working: null, longTerm: null, genetic: null },
-            lastEmit: 0
+        const DIMENSIONS = ['I', 'P', 'D', 'S', 'Dev-I', 'Dev1', 'Dev2'];
+        const DIM_FULLNAMES = {
+            'I': '海拔 (Intensity)',
+            'P': '坡度 (Persistence)',
+            'D': '阻尼 (Damping)',
+            'S': '熵值 (Entropy)',
+            'Dev-I': '山体偏差',
+            'Dev1': '均值回归差',
+            'Dev2': '历史相似度'
         };
 
-        function log(msg, level) {
-            const el = document.getElementById('evAuditLog');
-            if (!el) return;
-            const t = new Date().toLocaleTimeString('zh-CN',{hour12:false});
-            const color = level === 'error' ? '#f87171' : level === 'warn' ? '#fbbf24' : 'rgba(255,255,255,0.5)';
-            el.innerHTML += '<div style="color:'+color+';">['+t+'] '+msg+'</div>';
-            el.scrollTop = el.scrollHeight;
-        }
+        const KEYWORD_MAP = {
+            '市场': { dim: 'S', delta: 0.2 },
+            '波动': { dim: 'S', delta: 0.2 },
+            '风险': { dim: 'Dev-I', delta: 0.3 },
+            '危险': { dim: 'Dev-I', delta: 0.3 },
+            '优化': { dim: 'P', delta: 0.2 },
+            '策略': { dim: 'P', delta: 0.2 },
+            '分析': { dim: 'P', delta: 0.15 },
+            '累': { dim: 'I', delta: -0.2, dim2: 'D', delta2: 0.3 },
+            '休息': { dim: 'I', delta: -0.2, dim2: 'D', delta2: 0.3 },
+            '疲惫': { dim: 'I', delta: -0.25, dim2: 'D', delta2: 0.25 },
+            '高位': { dim: 'I', delta: 0.3 },
+            '顶部': { dim: 'I', delta: 0.3 }
+        };
 
-        function clamp01(v){ return Math.max(0, Math.min(1, v)); }
+        const SAMPLES = {
+            '今天市场波动有点大，我想看看风险情况': {
+                keywords: ['市场', '波动', '风险', '看看'],
+                emotions: ['焦虑', '关注'],
+                topics: ['金融', '风险']
+            },
+            '帮我优化一下这个投资策略': {
+                keywords: ['优化', '投资', '策略'],
+                emotions: ['中性', '积极'],
+                topics: ['决策', '优化']
+            },
+            '我感觉有点累，需要休息一下': {
+                keywords: ['累', '休息'],
+                emotions: ['疲惫', '消极'],
+                topics: ['状态', '健康']
+            }
+        };
 
-        function getRiskStatus(v) {
-            if (v >= THRESHOLDS.FUSE) return {text:'🔴 熔断区', color:'#f87171'};
-            if (v > THRESHOLDS.STEADY + 0.02) return {text:'🟡 预警区', color:'#fbbf24'};
-            if (v < THRESHOLDS.BREAKEVEN) return {text:'🟠 保本线下', color:'#fb923c'};
-            return {text:'🟢 稳态', color:'#22c55e'};
-        }
+        let currentState = {
+            vector: { I: 0.5, P: 0.5, D: 0.5, S: 0.5, 'Dev-I': 0.5, Dev1: 0.5, Dev2: 0.5 },
+            powerUsage: 0.5,
+            powerAlloc: { semantic: 0.35, vector: 0.30, cognitive: 0.25, other: 0.10 },
+            powerHistory: [0.4, 0.45, 0.5, 0.52, 0.48, 0.55, 0.5, 0.53, 0.49, 0.5],
+            envStrength: 0.5,
+            processing: false
+        };
 
-        function bindSliders() {
-            const map = [['mathSlider','math'],['econSlider','econ'],['aiSlider','ai'],['langSlider','lang']];
-            map.forEach(([id, key]) => {
-                const el = document.getElementById(id);
-                if (el) {
-                    el.addEventListener('input', function() {
-                        state[key] = parseInt(this.value) / 100;
-                        log('认知维度 '+key+' 更新至 '+(state[key]*100).toFixed(0)+'%');
-                    });
-                }
+        let charts = {};
+        let logCount = 0;
+        const MAX_LOGS = 20;
+
+        function initCharts() {
+            charts.radar = echarts.init(document.getElementById('radarChart'), 'dark');
+            charts.gauge = echarts.init(document.getElementById('gaugeChart'), 'dark');
+            charts.pie = echarts.init(document.getElementById('pieChart'), 'dark');
+            charts.bar = echarts.init(document.getElementById('barChart'), 'dark');
+            charts.line = echarts.init(document.getElementById('lineChart'), 'dark');
+
+            updateRadarChart();
+            updateGaugeChart();
+            updatePieChart();
+            updateBarChart();
+            updateLineChart();
+
+            window.addEventListener('resize', () => {
+                Object.values(charts).forEach(c => c && c.resize());
             });
         }
 
-        function computeCognitiveVector() {
-            const v = {
-                math: state.math,
-                economic: state.econ,
-                ai: state.ai,
-                language: state.lang
-            };
-            const composite = (v.math + v.economic + v.ai + v.language) / 4;
-            const bias = {
-                anchoring: clamp01(0.15 + (1 - v.math) * 0.15),
-                lossAversion: clamp01(0.20 + (1 - v.economic) * 0.20),
-                overconfidence: clamp01(0.12 + v.ai * 0.15)
-            };
-            return { vector: v, composite, bias, overloadScore: clamp01(composite * 0.8 + Math.max(v.math,v.econ,v.ai,v.lang)*0.2) };
-        }
-
-        function computePowerSchedule(cogResult) {
-            const c = cogResult.composite;
-            const overload = cogResult.overloadScore;
-            const peakShave = overload >= THRESHOLDS.FUSE;
-            const v = clamp01(0.3 + c * 0.4);
-            const s = clamp01(0.35 + c * 0.3);
-            const l = clamp01(0.25 + c * 0.35);
-            const total = clamp01((v + s + l) / 3 + (overload - 0.5) * 0.3);
+        function getRadarOption() {
             return {
-                loadV: v, loadS: s, loadL: l, totalDensity: total,
-                computeAllocation: { vModel: v/(v+s+l), sModel: s/(v+s+l), lModel: l/(v+s+l) },
-                peakShaveRequired: peakShave,
-                overloadFuseTriggered: overload >= THRESHOLDS.FUSE
+                backgroundColor: 'transparent',
+                radar: {
+                    indicator: DIMENSIONS.map(d => ({ name: d, max: 1 })),
+                    shape: 'polygon',
+                    splitNumber: 4,
+                    axisName: { color: 'rgba(255,255,255,0.6)', fontSize: 11 },
+                    splitLine: { lineStyle: { color: 'rgba(255,255,255,0.08)' } },
+                    splitArea: { areaStyle: { color: ['rgba(167,139,250,0.02)', 'rgba(34,211,238,0.02)'] } },
+                    axisLine: { lineStyle: { color: 'rgba(255,255,255,0.1)' } }
+                },
+                series: [{
+                    type: 'radar',
+                    data: [{
+                        value: DIMENSIONS.map(d => currentState.vector[d]),
+                        name: '认知向量',
+                        areaStyle: { color: 'rgba(167,139,250,0.25)' },
+                        lineStyle: { color: '#a78bfa', width: 2 },
+                        itemStyle: { color: '#a78bfa' }
+                    }]
+                }]
             };
         }
 
-        function emitMindVector() {
-            if (typeof YBus === 'undefined' || !YBus.publish) { log('YBus不可用，发布失败','error'); return; }
-            const cog = computeCognitiveVector();
-            const rs = getRiskStatus(cog.overloadScore);
-            const data = {
-                engine: 'EvolveMind', version: '2.1.0', timestamp: Date.now(),
-                cognitiveVector: cog.vector,
-                threeTierMemory: state.memory,
-                biasParams: cog.bias,
-                overloadScore: cog.overloadScore,
-                status: cog.overloadScore >= THRESHOLDS.FUSE ? 'FUSED' : cog.overloadScore < THRESHOLDS.BREAKEVEN ? 'BELOW_BREAKEVEN' : 'ACTIVE'
+        function updateRadarChart() {
+            charts.radar.setOption(getRadarOption());
+        }
+
+        function updateGaugeChart() {
+            const pct = Math.round(currentState.powerUsage * 100);
+            charts.gauge.setOption({
+                backgroundColor: 'transparent',
+                series: [{
+                    type: 'gauge',
+                    startAngle: 200,
+                    endAngle: -20,
+                    min: 0,
+                    max: 100,
+                    radius: '90%',
+                    progress: { show: true, width: 18, itemStyle: { color: {
+                        type: 'linear', x: 0, y: 0, x2: 1, y2: 0,
+                        colorStops: [
+                            { offset: 0, color: '#22d3ee' },
+                            { offset: 1, color: '#a78bfa' }
+                        ]
+                    }}},
+                    axisLine: { lineStyle: { width: 18, color: [[1, 'rgba(255,255,255,0.06)']] } },
+                    pointer: { show: false },
+                    axisTick: { show: false },
+                    splitLine: { show: false },
+                    axisLabel: { show: false },
+                    title: { show: false },
+                    detail: {
+                        valueAnimation: true,
+                        fontSize: 36,
+                        fontWeight: 700,
+                        color: '#f1f5f9',
+                        formatter: '{value}%',
+                        offsetCenter: [0, '5%']
+                    },
+                    data: [{ value: pct }]
+                }]
+            });
+        }
+
+        function updatePieChart() {
+            charts.pie.setOption({
+                backgroundColor: 'transparent',
+                title: { text: '模块分配', left: 'center', top: 10, textStyle: { color: 'rgba(255,255,255,0.5)', fontSize: 12, fontWeight: 500 } },
+                tooltip: { trigger: 'item' },
+                series: [{
+                    type: 'pie',
+                    radius: ['40%', '70%'],
+                    center: ['50%', '58%'],
+                    avoidLabelOverlap: false,
+                    itemStyle: { borderRadius: 6, borderColor: '#0b0b1a', borderWidth: 2 },
+                    label: { show: false },
+                    data: [
+                        { value: Math.round(currentState.powerAlloc.semantic * 100), name: '语义解析', itemStyle: { color: '#a78bfa' } },
+                        { value: Math.round(currentState.powerAlloc.vector * 100), name: '向量映射', itemStyle: { color: '#22d3ee' } },
+                        { value: Math.round(currentState.powerAlloc.cognitive * 100), name: '认知输出', itemStyle: { color: '#f472b6' } },
+                        { value: Math.round(currentState.powerAlloc.other * 100), name: '其他', itemStyle: { color: 'rgba(255,255,255,0.2)' } }
+                    ]
+                }]
+            });
+        }
+
+        function updateBarChart() {
+            charts.bar.setOption({
+                backgroundColor: 'transparent',
+                title: { text: '算力分配', left: 'center', top: 10, textStyle: { color: 'rgba(255,255,255,0.5)', fontSize: 12, fontWeight: 500 } },
+                grid: { left: 70, right: 20, top: 50, bottom: 30 },
+                xAxis: { type: 'value', max: 100, axisLine: { show: false }, axisTick: { show: false }, splitLine: { lineStyle: { color: 'rgba(255,255,255,0.05)' } }, axisLabel: { color: 'rgba(255,255,255,0.3)', fontSize: 10 } },
+                yAxis: { type: 'category', data: ['语义解析', '向量映射', '认知输出', '其他'], axisLine: { show: false }, axisTick: { show: false }, axisLabel: { color: 'rgba(255,255,255,0.5)', fontSize: 11 } },
+                series: [{
+                    type: 'bar',
+                    data: [
+                        { value: Math.round(currentState.powerAlloc.semantic * 100), itemStyle: { color: '#a78bfa', borderRadius: [0,4,4,0] } },
+                        { value: Math.round(currentState.powerAlloc.vector * 100), itemStyle: { color: '#22d3ee', borderRadius: [0,4,4,0] } },
+                        { value: Math.round(currentState.powerAlloc.cognitive * 100), itemStyle: { color: '#f472b6', borderRadius: [0,4,4,0] } },
+                        { value: Math.round(currentState.powerAlloc.other * 100), itemStyle: { color: 'rgba(255,255,255,0.2)', borderRadius: [0,4,4,0] } }
+                    ],
+                    barWidth: 16,
+                    label: { show: true, position: 'right', color: 'rgba(255,255,255,0.5)', fontSize: 10, formatter: '{c}%' }
+                }]
+            });
+        }
+
+        function updateLineChart() {
+            charts.line.setOption({
+                backgroundColor: 'transparent',
+                title: { text: '算力趋势', left: 'center', top: 10, textStyle: { color: 'rgba(255,255,255,0.5)', fontSize: 12, fontWeight: 500 } },
+                grid: { left: 40, right: 15, top: 50, bottom: 25 },
+                xAxis: { type: 'category', data: currentState.powerHistory.map((_,i) => i-9), axisLine: { show: false }, axisTick: { show: false }, axisLabel: { color: 'rgba(255,255,255,0.3)', fontSize: 9 } },
+                yAxis: { type: 'value', min: 0, max: 100, axisLine: { show: false }, axisTick: { show: false }, splitLine: { lineStyle: { color: 'rgba(255,255,255,0.05)' } }, axisLabel: { color: 'rgba(255,255,255,0.3)', fontSize: 9, formatter: '{value}%' } },
+                series: [{
+                    type: 'line',
+                    data: currentState.powerHistory.map(v => Math.round(v * 100)),
+                    smooth: true,
+                    symbol: 'circle',
+                    symbolSize: 4,
+                    lineStyle: { color: '#22d3ee', width: 2 },
+                    itemStyle: { color: '#22d3ee' },
+                    areaStyle: { color: { type: 'linear', x: 0, y: 0, x2: 0, y2: 1, colorStops: [{ offset: 0, color: 'rgba(34,211,238,0.25)' }, { offset: 1, color: 'rgba(34,211,238,0)' }] } }
+                }]
+            });
+        }
+
+        function addLog(msg, type) {
+            const container = document.getElementById('logContainer');
+            const t = new Date().toLocaleTimeString('zh-CN', { hour12: false });
+            const entry = document.createElement('div');
+            entry.className = 'log-entry ' + (type || 'info');
+            entry.innerHTML = `<span class="ts">[${t}]</span>${msg}`;
+            container.appendChild(entry);
+            logCount++;
+            if (logCount > MAX_LOGS) {
+                container.removeChild(container.firstChild);
+                logCount--;
+            }
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function toBinary(val) {
+            const n = Math.round(val * 255);
+            return n.toString(2).padStart(8, '0');
+        }
+
+        function getLevel(val) {
+            if (val < 0.3) return { text: '较低', cls: 'low', desc: '' };
+            if (val < 0.6) return { text: '中等', cls: 'mid', desc: '' };
+            return { text: '较高', cls: 'high', desc: '' };
+        }
+
+        function getDecodeDesc(dim, val) {
+            const level = getLevel(val);
+            const descMap = {
+                'I': { low: '海拔较低，价格在箱体下部', mid: '海拔中等，价格位于中部', high: '海拔较高，价格处于箱体上部' },
+                'P': { low: '坡度较小，趋势较弱', mid: '坡度中等，趋势一般', high: '坡度较大，趋势较强' },
+                'D': { low: '阻尼较小，阻力较弱', mid: '阻尼中等，阻力可控', high: '阻尼较大，阻力较强' },
+                'S': { low: '熵值较低，不确定性小', mid: '熵值中等，不确定性一般', high: '熵值较高，不确定性大' },
+                'Dev-I': { low: '山体偏差较小，筹码分布均匀', mid: '山体偏差中等', high: '山体偏差较大，筹码堆积明显' },
+                'Dev1': { low: '均值回归差较小', mid: '均值回归差中等', high: '均值回归差较大' },
+                'Dev2': { low: '历史相似度较低', mid: '历史相似度中等', high: '历史相似度较高' }
             };
-            try {
-                YBus.publish('mindVector', data, {trusted:true});
-                const mvEl = document.getElementById('mvStatus');
-                if (mvEl) mvEl.innerHTML = '● 已发布 · 综合:'+(cog.composite*100).toFixed(1)+'% · '+rs.text;
-                if (mvEl) mvEl.style.color = rs.color;
-                log('mind-vector 发布成功，综合认知度='+(cog.composite*100).toFixed(1)+'%，状态='+data.status, data.status==='FUSED'?'error':'info');
-                if (data.status === 'FUSED') {
-                    log('!!! 认知负载'+(cog.overloadScore*100).toFixed(1)+'%≥0.68熔断线，触发认知过载熔断 !!!','error');
-                    YBus.publish('riskThreshold', { engine:'EvolveMind', timestamp:Date.now(), currentRiskLevel:cog.overloadScore, fuseTriggered:true, breakevenWarning:false, riskFlags:['COGNITIVE_OVERLOAD_FUSE'], source:'mindVector' }, {trusted:true});
+            const lvl = level.cls === 'low' ? 'low' : level.cls === 'mid' ? 'mid' : 'high';
+            return descMap[dim][lvl];
+        }
+
+        function updateBinaryTable() {
+            const tbody = document.getElementById('binaryTableBody');
+            tbody.innerHTML = DIMENSIONS.map(d => {
+                const v = currentState.vector[d];
+                const bin = toBinary(v);
+                const level = getLevel(v);
+                const desc = getDecodeDesc(d, v);
+                return `<tr>
+                    <td class="dim-col">${d}</td>
+                    <td class="val-col">${v.toFixed(2)}</td>
+                    <td class="bin-col">${bin}</td>
+                    <td class="desc-col"><span class="level-badge ${level.cls}">${level.text}</span> ${desc}</td>
+                </tr>`;
+            }).join('');
+        }
+
+        function analyzeText(text) {
+            let result = {
+                keywords: [],
+                emotions: [],
+                topics: [],
+                vector: { I: 0.5, P: 0.5, D: 0.5, S: 0.5, 'Dev-I': 0.5, Dev1: 0.5, Dev2: 0.5 }
+            };
+
+            if (SAMPLES[text]) {
+                result.keywords = [...SAMPLES[text].keywords];
+                result.emotions = [...SAMPLES[text].emotions];
+                result.topics = [...SAMPLES[text].topics];
+            } else {
+                const words = text.split(/[，。！？、\s]+/).filter(w => w.length > 0);
+                result.keywords = words.slice(0, 6);
+                if (/[风险危险波动跌涨]/.test(text)) { result.emotions.push('关注'); result.topics.push('金融'); }
+                if (/[累休息疲惫困]/.test(text)) { result.emotions.push('疲惫'); result.topics.push('状态'); }
+                if (/[优化策略分析计划]/.test(text)) { result.emotions.push('积极'); result.topics.push('决策'); }
+                if (result.emotions.length === 0) result.emotions.push('中性');
+                if (result.topics.length === 0) result.topics.push('通用');
+            }
+
+            Object.keys(KEYWORD_MAP).forEach(kw => {
+                if (text.includes(kw)) {
+                    const mapping = KEYWORD_MAP[kw];
+                    result.vector[mapping.dim] = Math.max(0, Math.min(1, result.vector[mapping.dim] + mapping.delta));
+                    if (mapping.dim2) {
+                        result.vector[mapping.dim2] = Math.max(0, Math.min(1, result.vector[mapping.dim2] + mapping.delta2));
+                    }
                 }
-                state.lastEmit = Date.now();
-            } catch(e) { log('mind-vector 发布失败: '+e.message,'error'); }
+            });
+
+            const len = text.length;
+            if (len < 10) {
+                result.vector.Dev2 = Math.max(0, result.vector.Dev2 - 0.1);
+            } else if (len > 30) {
+                result.vector.S = Math.min(1, result.vector.S + 0.1);
+            }
+
+            return result;
         }
 
-        function emitPowerSchedule() {
-            if (typeof YBus === 'undefined' || !YBus.publish) { log('YBus不可用','error'); return; }
-            const cog = computeCognitiveVector();
-            const ps = computePowerSchedule(cog);
-            const rs = getRiskStatus(ps.totalDensity);
-            const data = Object.assign({ engine:'EvolveMind', timestamp:Date.now() }, ps);
-            try {
-                YBus.publish('powerSchedule', data, {trusted:true});
-                const psEl = document.getElementById('psStatus');
-                if (psEl) psEl.innerHTML = '● 已调度 · 密度:'+(ps.totalDensity*100).toFixed(1)+'% · '+(ps.peakShaveRequired?'🔴需削峰':'🟢正常');
-                if (psEl) psEl.style.color = rs.color;
-                log('power-schedule 发布成功，算力密度='+(ps.totalDensity*100).toFixed(1)+'%，削峰='+ps.peakShaveRequired, ps.overloadFuseTriggered?'error':'info');
-            } catch(e) { log('power-schedule 发布失败: '+e.message,'error'); }
+        function calcPower(text, vector) {
+            const len = text.length;
+            let usage;
+            if (len < 10) usage = 0.3 + Math.random() * 0.1;
+            else if (len < 30) usage = 0.5 + Math.random() * 0.15;
+            else usage = 0.7 + Math.random() * 0.15;
+
+            let semantic = 0.35, vmap = 0.30, cognitive = 0.25, other = 0.10;
+            if (/[优化策略分析]/.test(text)) { semantic += 0.10; cognitive -= 0.05; other -= 0.05; }
+            if (/[感觉累了累休息疲惫]/.test(text)) { cognitive += 0.10; semantic -= 0.05; other -= 0.05; }
+
+            const total = semantic + vmap + cognitive + other;
+            return {
+                usage: Math.min(0.9, usage),
+                alloc: { semantic: semantic/total, vector: vmap/total, cognitive: cognitive/total, other: other/total }
+            };
+        }
+
+        function setStepActive(step) {
+            document.querySelectorAll('.step-card').forEach(c => c.classList.remove('active'));
+            document.getElementById('stepDetail' + step).classList.add('show');
+            const card = document.querySelector(`.step-card[data-step="${step}"]`);
+            if (card) card.classList.add('active');
+        }
+
+        function setStepCompleted(step) {
+            const card = document.querySelector(`.step-card[data-step="${step}"]`);
+            if (card) card.classList.add('completed');
+        }
+
+        function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+        async function processInput(text) {
+            if (currentState.processing) return;
+            currentState.processing = true;
+
+            document.getElementById('userInput').value = text;
+            document.querySelectorAll('.step-card').forEach(c => c.classList.remove('active', 'completed'));
+            document.querySelectorAll('.step-detail').forEach(d => d.classList.remove('show'));
+
+            addLog(`用户输入："${text}"`, 'info');
+            document.getElementById('step1Preview').textContent = text.length > 10 ? text.substring(0, 10) + '...' : text;
+            document.getElementById('detail1Content').textContent = text;
+            setStepActive(1);
+            await sleep(400);
+            setStepCompleted(1);
+
+            setStepActive(2);
+            const analysis = analyzeText(text);
+            document.getElementById('step2Preview').textContent = analysis.keywords.slice(0, 3).join(' / ');
+            document.getElementById('detail2Content').innerHTML = `
+                <div style="margin-bottom:10px;">
+                    <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-bottom:6px;">关键词：</div>
+                    <div class="tag-cloud">${analysis.keywords.map(k => `<span class="tag keyword">${k}</span>`).join('')}</div>
+                </div>
+                <div style="margin-bottom:10px;">
+                    <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-bottom:6px;">情感标签：</div>
+                    <div class="tag-cloud">${analysis.emotions.map(e => `<span class="tag emotion">${e}</span>`).join('')}</div>
+                </div>
+                <div>
+                    <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-bottom:6px;">主题分类：</div>
+                    <div class="tag-cloud">${analysis.topics.map(t => `<span class="tag topic">${t}</span>`).join('')}</div>
+                </div>
+            `;
+            addLog(`关键词提取：${analysis.keywords.join(' / ')}`, 'process');
+            await sleep(500);
+            setStepCompleted(2);
+
+            setStepActive(3);
+            currentState.vector = { ...analysis.vector };
+            const initPreview = DIMENSIONS.slice(0, 3).map(d => `${d}:${currentState.vector[d].toFixed(2)}`).join(' ');
+            document.getElementById('step3Preview').textContent = initPreview;
+            document.getElementById('detail3Content').innerHTML = DIMENSIONS.map(d => `
+                <div class="dim-bar-row">
+                    <div class="dim-label">${d}</div>
+                    <div class="dim-bar-track"><div class="dim-bar-fill" style="width:${currentState.vector[d]*100}%"></div></div>
+                    <div class="dim-value">${currentState.vector[d].toFixed(2)}</div>
+                </div>
+            `).join('');
+            addLog(`语义映射完成，7维度初始值已生成`, 'process');
+            updateRadarChart();
+            await sleep(500);
+            setStepCompleted(3);
+
+            setStepActive(4);
+            const power = calcPower(text, currentState.vector);
+            currentState.powerUsage = power.usage;
+            currentState.powerAlloc = { ...power.alloc };
+            currentState.powerHistory.push(power.usage);
+            if (currentState.powerHistory.length > 10) currentState.powerHistory.shift();
+
+            document.getElementById('step4Preview').textContent = `使用率 ${Math.round(power.usage*100)}%`;
+            document.getElementById('detail4Content').innerHTML = `
+                <div style="font-size:12px;color:rgba(255,255,255,0.6);line-height:2;">
+                    算力使用率：<span style="color:#fbbf24;font-weight:600;">${Math.round(power.usage*100)}%</span><br>
+                    语义解析：${Math.round(power.alloc.semantic*100)}% · 向量映射：${Math.round(power.alloc.vector*100)}%<br>
+                    认知输出：${Math.round(power.alloc.cognitive*100)}% · 其他：${Math.round(power.alloc.other*100)}%
+                </div>
+            `;
+            addLog(`算力调度完成：CPU 使用率 ${Math.round(power.usage*100)}%`, 'success');
+            updateGaugeChart();
+            updatePieChart();
+            updateBarChart();
+            updateLineChart();
+            await sleep(500);
+            setStepCompleted(4);
+
+            setStepActive(5);
+            const vecPreview = DIMENSIONS.slice(0, 3).map(d => currentState.vector[d].toFixed(2)).join(' ');
+            document.getElementById('step5Preview').textContent = vecPreview;
+            document.getElementById('detail5Content').innerHTML = DIMENSIONS.map(d => `
+                <div class="vector-item">
+                    <div class="v-label">${d}</div>
+                    <div class="v-value">${currentState.vector[d].toFixed(2)}</div>
+                </div>
+            `).join('');
+            addLog(`向量输出完成：7维认知向量已生成`, 'success');
+            updateRadarChart();
+            await sleep(400);
+            setStepCompleted(5);
+
+            setStepActive(6);
+            const binStr = DIMENSIONS.map(d => toBinary(currentState.vector[d])).join(' ');
+            document.getElementById('step6Preview').textContent = binStr.substring(0, 15) + '...';
+            document.getElementById('detail6Content').innerHTML = DIMENSIONS.map(d =>
+                `${d} (${currentState.vector[d].toFixed(2)}) → ${toBinary(currentState.vector[d])}`
+            ).join('<br>');
+            addLog(`01 编码完成：输出 7 维二进制向量`, 'success');
+            updateBinaryTable();
+            await sleep(400);
+            setStepCompleted(6);
+
+            addLog(`处理链路完成 ✓`, 'success');
+            currentState.processing = false;
+        }
+
+        function toggleStepDetail(step) {
+            const detail = document.getElementById('stepDetail' + step);
+            const isShown = detail.classList.contains('show');
+            document.querySelectorAll('.step-detail').forEach(d => d.classList.remove('show'));
+            document.querySelectorAll('.step-card').forEach(c => c.classList.remove('active'));
+            if (!isShown) {
+                detail.classList.add('show');
+                document.querySelector(`.step-card[data-step="${step}"]`).classList.add('active');
+            }
+        }
+
+        function drawMountain(strength) {
+            const canvas = document.getElementById('mountainCanvas');
+            const ctx = canvas.getContext('2d');
+            const rect = canvas.getBoundingClientRect();
+            const dpr = window.devicePixelRatio || 1;
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+            ctx.scale(dpr, dpr);
+            const w = rect.width;
+            const h = rect.height;
+
+            ctx.clearRect(0, 0, w, h);
+
+            ctx.fillStyle = 'rgba(0,0,0,0.2)';
+            ctx.fillRect(0, 0, w, h);
+
+            const baseY = h - 20;
+            const cx = w / 2;
+            const peakHeight = 40 + strength * 110;
+            const baseWidth = 80 + (1 - strength) * 60;
+
+            ctx.beginPath();
+            ctx.moveTo(cx - baseWidth, baseY);
+            ctx.quadraticCurveTo(cx - baseWidth * 0.3, baseY - peakHeight * 0.6, cx, baseY - peakHeight);
+            ctx.quadraticCurveTo(cx + baseWidth * 0.3, baseY - peakHeight * 0.6, cx + baseWidth, baseY);
+            ctx.closePath();
+
+            const grad = ctx.createLinearGradient(cx, baseY - peakHeight, cx, baseY);
+            if (strength < 0.3) {
+                grad.addColorStop(0, 'rgba(52,211,153,0.6)');
+                grad.addColorStop(1, 'rgba(52,211,153,0.15)');
+            } else if (strength < 0.6) {
+                grad.addColorStop(0, 'rgba(251,191,36,0.6)');
+                grad.addColorStop(1, 'rgba(251,191,36,0.15)');
+            } else {
+                grad.addColorStop(0, 'rgba(239,68,68,0.6)');
+                grad.addColorStop(1, 'rgba(239,68,68,0.15)');
+            }
+            ctx.fillStyle = grad;
+            ctx.fill();
+
+            ctx.strokeStyle = strength < 0.3 ? 'rgba(52,211,153,0.8)' : strength < 0.6 ? 'rgba(251,191,36,0.8)' : 'rgba(239,68,68,0.8)';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(0, baseY);
+            ctx.lineTo(w, baseY);
+            ctx.stroke();
+
+            ctx.fillStyle = 'rgba(255,255,255,0.5)';
+            ctx.font = '10px SF Mono, monospace';
+            ctx.textAlign = 'center';
+            ctx.fillText(`峰高: ${Math.round(peakHeight)}`, cx, baseY - peakHeight - 8);
+
+            if (strength > 0.5) {
+                ctx.fillStyle = 'rgba(255,255,255,0.8)';
+                ctx.beginPath();
+                ctx.moveTo(cx, baseY - peakHeight);
+                ctx.lineTo(cx - 8, baseY - peakHeight + 12);
+                ctx.lineTo(cx + 8, baseY - peakHeight + 12);
+                ctx.closePath();
+                ctx.fill();
+            }
+        }
+
+        function getEnvTag(strength) {
+            if (strength < 0.25) return { text: '平静', color: 'rgba(52,211,153,0.15)', border: 'rgba(52,211,153,0.3)', textColor: '#6ee7b7' };
+            if (strength < 0.5) return { text: '微风', color: 'rgba(52,211,153,0.15)', border: 'rgba(52,211,153,0.3)', textColor: '#6ee7b7' };
+            if (strength < 0.75) return { text: '强风', color: 'rgba(251,191,36,0.15)', border: 'rgba(251,191,36,0.3)', textColor: '#fbbf24' };
+            return { text: '风暴', color: 'rgba(239,68,68,0.15)', border: 'rgba(239,68,68,0.3)', textColor: '#fca5a5' };
+        }
+
+        function updateAltitudeSim() {
+            const s = currentState.envStrength;
+            const bottomArea = 150;
+            const boxHeight = 80;
+            const splitRatio = 0.5 + s * 0.5;
+            const eqAltitude = Math.min(1, (bottomArea * boxHeight * splitRatio) / (150 * 80));
+            const volDeviation = (eqAltitude - 0.5) * 0.5;
+
+            document.getElementById('envValue').textContent = s.toFixed(2);
+            const et = getEnvTag(s);
+            const envTagEl = document.getElementById('envTag');
+            envTagEl.textContent = et.text;
+            envTagEl.style.background = et.color;
+            envTagEl.style.borderColor = et.border;
+            envTagEl.style.color = et.textColor;
+
+            document.getElementById('splitRatio').textContent = `1:${(0.5 + s*2).toFixed(1)}`;
+            document.getElementById('eqAltitude').textContent = eqAltitude.toFixed(2);
+            document.getElementById('volDeviation').textContent = (volDeviation >= 0 ? '+' : '') + volDeviation.toFixed(2);
+            document.getElementById('altLabel').textContent = eqAltitude.toFixed(2);
+
+            let concurrency;
+            if (eqAltitude < 0.3) concurrency = 0.3 + Math.random() * 0.1;
+            else if (eqAltitude < 0.6) concurrency = 0.5 + Math.random() * 0.15;
+            else concurrency = 0.7 + Math.random() * 0.15;
+            concurrency = Math.min(0.85, concurrency);
+            document.getElementById('powerConc').textContent = Math.round(concurrency * 100) + '%';
+
+            let semP, vmP, cogP;
+            if (s < 0.4) { semP = 0.35; vmP = 0.35; cogP = 0.30; }
+            else if (s < 0.7) { semP = 0.40; vmP = 0.32; cogP = 0.28; }
+            else { semP = 0.45; vmP = 0.30; cogP = 0.25; }
+
+            const layerCount = 5;
+            const layersHtml = [];
+            const colors = ['#6366f1', '#8b5cf6', '#a78bfa', '#c4b5fd', '#e9d5ff'];
+            for (let i = 0; i < layerCount; i++) {
+                const layerVal = Math.max(0.1, Math.min(0.95, 0.3 + Math.sin(s * Math.PI + i * 0.5) * 0.3 + s * 0.2 - i * 0.05));
+                layersHtml.push(`
+                    <div class="layer-bar-row">
+                        <div class="layer-name">层${i+1}</div>
+                        <div class="layer-track"><div class="layer-fill" style="width:${layerVal*100}%;background:${colors[i]};"></div></div>
+                        <div class="layer-val">${layerVal.toFixed(2)}</div>
+                    </div>
+                `);
+            }
+            document.getElementById('layerBars').innerHTML = layersHtml;
+
+            const pColors = ['#a78bfa', '#22d3ee', '#f472b6'];
+            document.getElementById('powerBars').innerHTML = `
+                <div class="power-bar-row">
+                    <div class="power-label">语义解析</div>
+                    <div class="power-track"><div class="power-fill" style="width:${semP*100}%;background:${pColors[0]};"></div></div>
+                    <div class="power-val">${Math.round(semP*100)}%</div>
+                </div>
+                <div class="power-bar-row">
+                    <div class="power-label">向量映射</div>
+                    <div class="power-track"><div class="power-fill" style="width:${vmP*100}%;background:${pColors[1]};"></div></div>
+                    <div class="power-val">${Math.round(vmP*100)}%</div>
+                </div>
+                <div class="power-bar-row">
+                    <div class="power-label">认知输出</div>
+                    <div class="power-track"><div class="power-fill" style="width:${cogP*100}%;background:${pColors[2]};"></div></div>
+                    <div class="power-val">${Math.round(cogP*100)}%</div>
+                </div>
+            `;
+
+            drawMountain(s);
         }
 
         function init() {
-            bindSliders();
-            const emitC = document.getElementById('emitCognitiveBtn');
-            const emitP = document.getElementById('emitPowerBtn');
-            if (emitC) emitC.addEventListener('click', emitMindVector);
-            if (emitP) emitP.addEventListener('click', emitPowerSchedule);
-            document.querySelectorAll('.card').forEach(card => {
-                card.addEventListener('click', function(e) {
-                    if (e.target.tagName === 'INPUT') return;
-                    this.style.transition = 'transform 0.1s';
-                    this.style.transform = 'scale(0.96)';
-                    setTimeout(()=>{ this.style.transform='scale(1); },100);
+            initCharts();
+
+            document.querySelectorAll('.sample-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.getElementById('userInput').value = btn.dataset.text;
                 });
             });
-            log('EvolveMind V2.1 已激活，YBus通道已就绪');
-            log('三基准锁定：保本0.48 / 稳态0.50 / 熔断0.68');
-            setTimeout(()=>{ emitMindVector(); emitPowerSchedule(); log('初始认知向量与算力调度已自动发布'); }, 500);
-            setInterval(()=>{ if(Date.now()-state.lastEmit > 10000) { emitMindVector(); emitPowerSchedule(); } }, 10000);
+
+            document.getElementById('submitBtn').addEventListener('click', () => {
+                const text = document.getElementById('userInput').value.trim();
+                if (!text) {
+                    addLog('请输入文本内容', 'warn');
+                    return;
+                }
+                processInput(text);
+            });
+
+            const slider = document.getElementById('envSlider');
+            slider.addEventListener('input', () => {
+                currentState.envStrength = parseInt(slider.value) / 100;
+                updateAltitudeSim();
+            });
+
+            addLog('人机思维交互引擎已启动', 'success');
+            addLog('等待用户输入...', 'info');
+            updateAltitudeSim();
+            updateBinaryTable();
+
+            setTimeout(() => {
+                document.getElementById('mountainCanvas').getBoundingClientRect();
+                drawMountain(currentState.envStrength);
+            }, 100);
         }
 
         if (document.readyState === 'loading') {
@@ -613,6 +1488,5 @@
         } else { init(); }
     })();
     </script>
-
 </body>
 </html>
