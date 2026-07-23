@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>📡 低空+高空混合空域信息调度系统 · GPS信号中继与卫星链路验证</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:#0a0a0f;color:#fff;font-family:'SF Pro Display',-apple-system,BlinkMacSystemFont,'PingFang SC',sans-serif;overflow-x:hidden;}
+#particles{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;}
+.container{position:relative;z-index:1;max-width:1400px;margin:0 auto;padding:30px 20px;}
+.page-header{text-align:center;margin-bottom:40px;}
+.crumb{font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:12px;letter-spacing:1px;}
+.page-title{font-size:28px;font-weight:800;background:linear-gradient(135deg,#22d3ee,#a78bfa,#fb923c);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:10px;}
+.page-subtitle{font-size:13px;color:rgba(255,255,255,0.45);letter-spacing:0.5px;}
+
+.chain-flow{display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:40px;flex-wrap:wrap;padding:16px;background:rgba(255,255,255,0.02);border-radius:12px;border:1px solid rgba(255,255,255,0.05);}
+.chain-node{display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:8px;font-size:12px;font-weight:600;transition:all 0.4s;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.02);color:rgba(255,255,255,0.4);}
+.chain-node.active{background:rgba(34,211,238,0.15);border-color:rgba(34,211,238,0.5);color:#22d3ee;box-shadow:0 0 20px rgba(34,211,238,0.2);}
+.chain-node.done{background:rgba(74,222,128,0.1);border-color:rgba(74,222,128,0.3);color:#4ade80;}
+.chain-arrow{color:rgba(255,255,255,0.2);font-size:12px;}
+
+.card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:16px;padding:28px;margin-bottom:24px;backdrop-filter:blur(10px);transition:all 0.5s;}
+.card-title{font-size:18px;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:10px;}
+.card-desc{font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:20px;}
+
+.k-input-wrap{margin-bottom:16px;}
+.k-input{width:100%;background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:14px 16px;color:#fff;font-size:14px;outline:none;transition:border 0.3s;font-family:inherit;}
+.k-input:focus{border-color:#22d3ee;box-shadow:0 0 15px rgba(34,211,238,0.1);}
+.k-presets{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;}
+.k-preset-btn{padding:8px 14px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:rgba(255,255,255,0.7);font-size:12px;cursor:pointer;transition:all 0.2s;font-family:inherit;}
+.k-preset-btn:hover{background:rgba(34,211,238,0.1);border-color:rgba(34,211,238,0.3);color:#22d3ee;}
+.k-go-btn{padding:12px 32px;background:linear-gradient(135deg,#22d3ee,#0891b2);border:none;border-radius:10px;color:#000;font-weight:700;font-size:14px;cursor:pointer;transition:all 0.3s;font-family:inherit;}
+.k-go-btn:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(34,211,238,0.3);}
+.k-result{margin-top:20px;padding:16px;background:rgba(0,0,0,0.2);border-radius:10px;border:1px solid rgba(34,211,238,0.15);display:none;}
+.k-result.show{display:block;animation:fadeUp 0.5s ease;}
+.kw-tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;}
+.kw-tag{padding:4px 12px;background:rgba(34,211,238,0.1);border:1px solid rgba(34,211,238,0.25);border-radius:20px;font-size:12px;color:#22d3ee;}
+.intent-tag{padding:4px 12px;background:rgba(167,139,250,0.1);border:1px solid rgba(167,139,250,0.25);border-radius:20px;font-size:12px;color:#a78bfa;}
+.risk-tag{padding:4px 12px;background:rgba(251,146,60,0.1);border:1px solid rgba(251,146,60,0.25);border-radius:20px;font-size:12px;color:#fb923c;}
+
+table{width:100%;border-collapse:collapse;}
+th{font-size:11px;color:rgba(255,255,255,0.4);text-align:left;padding:10px 12px;border-bottom:1px solid rgba(255,255,255,0.06);font-weight:500;letter-spacing:0.5px;}
+td{padding:12px;border-bottom:1px solid rgba(255,255,255,0.03);font-size:13px;}
+.val-bar-wrap{width:100%;min-width:120px;}
+.val-bar{height:6px;background:rgba(255,255,255,0.06);border-radius:3px;overflow:hidden;}
+.val-bar-fill{height:100%;border-radius:3px;width:0;transition:width 0.8s ease;}
+.val-bar-fill.cyan{background:linear-gradient(90deg,#22d3ee,#06b6d4);}
+.val-bar-fill.purple{background:linear-gradient(90deg,#a78bfa,#8b5cf6);}
+.val-bar-fill.green{background:linear-gradient(90deg,#4ade80,#22c55e);}
+.val-bar-fill.orange{background:linear-gradient(90deg,#fb923c,#f97316);}
+.val-num{font-family:'SF Mono',monospace;font-weight:700;font-size:15px;}
+
+.drone-panel{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+.drone-overview{background:rgba(0,0,0,0.2);border-radius:12px;padding:20px;border:1px solid rgba(255,255,255,0.05);}
+.drone-title{font-size:14px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.drone-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:16px;}
+.drone-card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:10px 6px;text-align:center;font-size:10px;transition:all 0.3s;}
+.drone-card.active{border-color:rgba(74,222,128,0.4);background:rgba(74,222,128,0.05);}
+.drone-card.standby{border-color:rgba(250,204,21,0.3);background:rgba(250,204,21,0.03);}
+.drone-card.fault{border-color:rgba(248,113,113,0.3);background:rgba(248,113,113,0.05);}
+.drone-id{font-family:'SF Mono',monospace;font-weight:700;font-size:11px;margin-bottom:4px;}
+.drone-status{margin-bottom:4px;}
+.drone-signal{font-family:'SF Mono',monospace;font-size:10px;color:rgba(255,255,255,0.5);}
+.drone-range{font-size:9px;color:rgba(255,255,255,0.35);}
+.drone-health{font-weight:700;margin-top:2px;}
+
+.weather-switch{display:flex;gap:6px;margin-bottom:14px;}
+.weather-btn{flex:1;padding:8px 4px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.02);color:rgba(255,255,255,0.6);font-size:11px;cursor:pointer;transition:all 0.25s;text-align:center;font-family:inherit;}
+.weather-btn.on{border-color:rgba(251,191,36,0.5);background:rgba(251,191,36,0.1);color:#fbbf24;}
+.weather-metrics{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;}
+.wm-item{background:rgba(255,255,255,0.02);border-radius:8px;padding:10px;}
+.wm-label{font-size:10px;color:rgba(255,255,255,0.4);margin-bottom:4px;}
+.wm-val{font-family:'SF Mono',monospace;font-size:18px;font-weight:700;}
+
+.relay-chain{background:rgba(0,0,0,0.2);border-radius:12px;padding:20px;border:1px solid rgba(255,255,255,0.05);}
+.relay-flow{display:flex;align-items:center;justify-content:space-between;gap:4px;margin:16px 0;flex-wrap:wrap;}
+.relay-node{display:flex;flex-direction:column;align-items:center;gap:6px;min-width:80px;flex:1;}
+.relay-icon{font-size:24px;}
+.relay-name{font-size:11px;color:rgba(255,255,255,0.7);font-weight:600;text-align:center;}
+.relay-sig{font-family:'SF Mono',monospace;font-size:10px;color:rgba(255,255,255,0.5);}
+.relay-ok{font-size:14px;}
+.relay-arrow{color:rgba(255,255,255,0.2);font-size:16px;}
+.link-map{margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,0.05);}
+.link-map-title{font-size:11px;color:rgba(255,255,255,0.4);margin-bottom:8px;}
+.link-map-tags{display:flex;flex-wrap:wrap;gap:6px;}
+.lm-tag{padding:3px 10px;border-radius:6px;font-size:10px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.5);}
+
+.radar-wrap{position:relative;height:380px;background:rgba(0,0,0,0.2);border-radius:12px;overflow:hidden;}
+#radarCanvas{width:100%;height:100%;}
+.radar-legend{position:absolute;bottom:14px;left:14px;display:flex;gap:14px;font-size:11px;}
+.radar-legend-item{display:flex;align-items:center;gap:5px;color:rgba(255,255,255,0.5);}
+.radar-legend-dot{width:10px;height:10px;border-radius:50%;}
+
+.th-panel{background:rgba(0,0,0,0.2);border-radius:12px;padding:20px;border:1px solid rgba(255,255,255,0.05);}
+.th-item{display:flex;align-items:center;gap:12px;padding:12px;border-radius:8px;margin-bottom:8px;border:1px solid transparent;}
+.th-item.safe{background:rgba(74,222,128,0.04);border-color:rgba(74,222,128,0.15);}
+.th-item.warn{background:rgba(250,204,21,0.04);border-color:rgba(250,204,21,0.15);}
+.th-item.danger{background:rgba(248,113,113,0.04);border-color:rgba(248,113,113,0.15);}
+.th-icon{font-size:20px;}
+.th-content{flex:1;}
+.th-label{font-size:12px;font-weight:600;}
+.th-val{font-size:11px;color:rgba(255,255,255,0.45);font-family:'SF Mono',monospace;margin-top:2px;}
+.th-status{font-size:11px;font-weight:700;}
+.th-item.safe .th-status{color:#4ade80;}
+.th-item.warn .th-status{color:#facc15;}
+.th-item.danger .th-status{color:#f87171;}
+.th-conclusion{margin-top:14px;padding:12px;background:rgba(34,211,238,0.05);border-left:3px solid #22d3ee;border-radius:0 8px 8px 0;font-size:12px;line-height:1.7;color:rgba(255,255,255,0.7);}
+
+.bin-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin-bottom:20px;}
+.bin-item{background:rgba(0,0,0,0.2);border-radius:8px;padding:12px;border:1px solid rgba(255,255,255,0.05);}
+.bin-dim-name{display:flex;justify-content:space-between;font-size:11px;color:rgba(255,255,255,0.6);margin-bottom:8px;}
+.bin-dim-val{font-family:'SF Mono',monospace;color:#22d3ee;font-weight:700;}
+.bin-bits{display:flex;gap:2px;}
+.bin-bit{flex:1;text-align:center;padding:4px 0;background:rgba(255,255,255,0.04);border-radius:3px;font-family:'SF Mono',monospace;font-size:11px;color:rgba(255,255,255,0.3);}
+.bin-bit.b1{background:rgba(34,211,238,0.2);color:#22d3ee;}
+
+.cmd-output{background:rgba(0,0,0,0.3);border-radius:12px;padding:20px;border:1px solid rgba(255,255,255,0.06);}
+.cmd-text{font-size:13px;line-height:1.8;color:rgba(255,255,255,0.8);}
+.cmd-text .highlight{color:#22d3ee;font-weight:700;}
+.cmd-text .green{color:#4ade80;}
+.cmd-text .orange{color:#fb923c;}
+.cmd-text .red{color:#f87171;}
+.cmd-conf{display:flex;gap:20px;margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,0.05);font-size:11px;color:rgba(255,255,255,0.4);flex-wrap:wrap;}
+.cmd-conf strong{color:rgba(255,255,255,0.7);}
+
+.link-section{margin-top:20px;}
+.link-cat-title{font-size:14px;font-weight:700;margin:18px 0 10px;display:flex;align-items:center;gap:8px;}
+.link-items{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px;}
+.link-item{display:flex;align-items:flex-start;gap:10px;padding:12px;background:rgba(255,255,255,0.02);border-radius:8px;border:1px solid rgba(255,255,255,0.05);}
+.li-icon{font-size:20px;flex-shrink:0;}
+.li-name{font-size:12px;font-weight:600;margin-bottom:3px;}
+.li-desc{font-size:10px;color:rgba(255,255,255,0.4);line-height:1.5;}
+
+.disclaimer{margin-top:30px;padding:16px;text-align:center;font-size:11px;color:rgba(255,255,255,0.25);border-top:1px solid rgba(255,255,255,0.04);}
+
+.section-hidden{display:none;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(15px);}to{opacity:1;transform:translateY(0);}}
+</style>
+</head>
+<body>
+<canvas id="particles"></canvas>
+<div class="container">
+<div class="page-header">
+<div class="crumb">⬡ Game-OS / 工程验证 / 信息调度</div>
+<h1 class="page-title">📡 低空+高空混合空域信息调度系统</h1>
+<div class="page-subtitle">地面GPS → 无人机中继 → 卫星接收 · KMP→IPD→七维向量完整联动 · GPS信号中继与卫星链路验证</div>
+</div>
+
+<div class="chain-flow">
+<div class="chain-node" data-step="k">📝 K层·需求输入</div>
+<div class="chain-arrow">→</div>
+<div class="chain-node" data-step="m">📐 M层·数学映射</div>
+<div class="chain-arrow">→</div>
+<div class="chain-node" data-step="p">🏔️ P层·物理映射</div>
+<div class="chain-arrow">→</div>
+<div class="chain-node" data-step="u">🚁 信号中继矩阵</div>
+<div class="chain-arrow">→</div>
+<div class="chain-node" data-step="v">📊 七维雷达图</div>
+<div class="chain-arrow">→</div>
+<div class="chain-node" data-step="t">💥 THRESHOLDS</div>
+<div class="chain-arrow">→</div>
+<div class="chain-node" data-step="b">💾 01解码器</div>
+<div class="chain-arrow">→</div>
+<div class="chain-node" data-step="x">🔗 主线映射</div>
+</div>
+
+<div class="card" id="secK">
+<div class="card-title">📝 K层 · 需求输入（Knowledge）</div>
+<div class="card-desc">用户输入信息传输需求 → 系统提取关键词、意图、风险标签</div>
+<div class="k-input-wrap">
+<textarea class="k-input" id="kInput" rows="2" placeholder="输入信息传输需求，例如：地面GPS信号通过低空无人机中继传输到高空卫星..."></textarea>
+</div>
+<div class="k-presets">
+<button class="k-preset-btn" onclick="setPreset(0)">🗺️ 地面GPS信号通过低空无人机中继传输到高空卫星</button>
+<button class="k-preset-btn" onclick="setPreset(1)">🧭 低空无人机集群的导航信号覆盖与精度验证</button>
+<button class="k-preset-btn" onclick="setPreset(2)">📶 高空卫星信号在低空环境下的接收与中继</button>
+</div>
+<button class="k-go-btn" onclick="processK()">开始KMP解析 ▶</button>
+<div class="k-result" id="kResult">
+<div style="font-size:13px;color:rgba(255,255,255,0.7);margin-bottom:6px;">📌 K层解析结果：</div>
+<div style="font-size:12px;color:rgba(255,255,255,0.5);margin-bottom:8px;">意图：<span class="intent-tag" id="kIntent"></span></div>
+<div style="font-size:12px;color:rgba(255,255,255,0.5);margin-bottom:6px;">提取关键词：</div>
+<div class="kw-tags" id="kKeywords"></div>
+<div style="font-size:12px;color:rgba(255,255,255,0.5);margin:10px 0 6px;">风险标签：</div>
+<div class="kw-tags" id="kRisks"></div>
+</div>
+</div>
+
+<div class="card section-hidden" id="secM">
+<div class="card-title">📐 M层 · 数学化映射（Mathematization）</div>
+<div class="card-desc">关键词 → 归一化指标（0~1），可计算的数学表达</div>
+<table>
+<thead><tr><th>K层关键词</th><th>M层归一化指标</th><th>数值</th><th style="width:35%;">可视化</th></tr></thead>
+<tbody id="mTableBody"></tbody>
+</table>
+</div>
+
+<div class="card section-hidden" id="secP">
+<div class="card-title">🏔️ P层 · 物理映射（Physics）</div>
+<div class="card-desc">M层数值 → 物理量，构建七维向量 V = (I, P, D, S, Dev-I, Dev1, Dev2)</div>
+<table>
+<thead><tr><th>物理量</th><th>符号</th><th>对应M层来源</th><th>数值</th><th style="width:30%;">可视化</th></tr></thead>
+<tbody id="pTableBody"></tbody>
+</table>
+</div>
+
+<div class="card section-hidden" id="secU">
+<div class="card-title">🚁 低空无人机信号中继矩阵 · 信号质量与冗余调度</div>
+<div class="card-desc">展示 5 架无人机的中继状态、信号强度、链路健康度</div>
+<div class="drone-panel">
+<div class="drone-overview">
+<div class="drone-title">📡 无人机中继矩阵总览</div>
+<div class="weather-switch">
+<button class="weather-btn on" data-w="ideal" onclick="setWeather('ideal')">☀️ 理想环境</button>
+<button class="weather-btn" data-w="interfere" onclick="setWeather('interfere')">⛈️ 干扰环境</button>
+<button class="weather-btn" data-w="extreme" onclick="setWeather('extreme')">🌪️ 极端环境</button>
+</div>
+<div class="drone-grid" id="droneGrid"></div>
+<div class="weather-metrics">
+<div class="wm-item"><div class="wm-label">矩阵总信号覆盖率</div><div class="wm-val" id="wCoverage" style="color:#22d3ee;">—</div></div>
+<div class="wm-item"><div class="wm-label">矩阵健康度</div><div class="wm-val" id="wHealth" style="color:#4ade80;">🟢 —</div></div>
+<div class="wm-item"><div class="wm-label">平均信号强度</div><div class="wm-val" id="wSignal" style="color:#a78bfa;">—</div></div>
+<div class="wm-item"><div class="wm-label">活跃中继节点</div><div class="wm-val" id="wActive" style="color:#fb923c;">—</div></div>
+</div>
+<div class="link-map">
+<div class="link-map-title">🔗 主线模块映射</div>
+<div class="link-map-tags">
+<span class="lm-tag">🧠 AirMind引擎（低空调度）</span>
+<span class="lm-tag">📡 通信信道实验（信号传输）</span>
+<span class="lm-tag">🏗️ 结构力学实验（中继结构冗余）</span>
+</div>
+</div>
+</div>
+<div class="relay-chain">
+<div class="drone-title">🔗 信号中继链路状态</div>
+<div class="relay-flow" id="relayFlow"></div>
+<div style="margin-top:16px;padding:12px;background:rgba(0,0,0,0.15);border-radius:8px;">
+<div style="font-size:11px;color:rgba(255,255,255,0.4);margin-bottom:8px;">📡 当前场景说明</div>
+<div id="weatherDesc" style="font-size:12px;color:rgba(255,255,255,0.7);line-height:1.6;">☀️ 理想环境：全链路正常，信号质量优良，GPS信号无衰减传输</div>
+</div>
+<div style="margin-top:12px;padding:12px;background:rgba(0,0,0,0.15);border-radius:8px;">
+<div style="font-size:11px;color:rgba(255,255,255,0.4);margin-bottom:8px;">📐 信号质量指标</div>
+<div id="signalMetrics" style="font-size:12px;color:rgba(255,255,255,0.7);line-height:1.8;"></div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="card section-hidden" id="secV">
+<div class="card-title">📊 七维向量雷达图 + THRESHOLDS 三基准判定</div>
+<div class="card-desc">七维向量空间可视化，0.48保本线 / 0.50稳态线 / 0.68熔断线</div>
+<div style="display:grid;grid-template-columns:1fr 380px;gap:20px;">
+<div class="radar-wrap">
+<canvas id="radarCanvas"></canvas>
+<div class="radar-legend" id="radarLegend"></div>
+</div>
+<div class="th-panel" id="thresholdPanel"></div>
+</div>
+</div>
+
+<div class="card section-hidden" id="secB">
+<div class="card-title">💾 01解码器 → 工程指令输出</div>
+<div class="card-desc">七维向量 → 7×8bit 二进制编码 → 可读工程建议</div>
+<div class="bin-grid" id="binGrid"></div>
+<div class="cmd-output">
+<div style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:10px;">📋 工程指令输出：</div>
+<div class="cmd-text" id="cmdText">解析中...</div>
+<div class="cmd-conf" id="cmdConf"></div>
+</div>
+</div>
+
+<div class="card section-hidden" id="secLink">
+<div class="card-title">🔗 与主线模块映射</div>
+<div class="card-desc">本系统核心模块与Game-OS主线模块的对应关系</div>
+<div class="link-section">
+<div class="link-cat-title">🧠 核心方法论</div>
+<div class="link-items">
+<div class="link-item"><div class="li-icon">💥</div><div><div class="li-name">THRESHOLDS熔断体系</div><div class="li-desc">0.48保本/0.50稳态/0.68熔断三基准判定，信号传输安全边界验证</div></div></div>
+<div class="link-item"><div class="li-icon">🧬</div><div><div class="li-name">KMP→IPD方法论</div><div class="li-desc">知识→数学→物理三层映射，七维向量体系在信息链路场景完整落地</div></div></div>
+<div class="link-item"><div class="li-icon">💾</div><div><div class="li-name">01解码器</div><div class="li-desc">七维向量转二进制编码，信号中继调度方案工程化输出</div></div></div>
+</div>
+</div>
+<div class="link-section">
+<div class="link-cat-title">🚁 实验模块映射</div>
+<div class="link-items">
+<div class="link-item"><div class="li-icon">🚁</div><div><div class="li-name">AirMind引擎</div><div class="li-desc">低空无人机信号中继调度，对应 D（阻尼）和 Dev-I 维度验证</div></div></div>
+<div class="link-item"><div class="li-icon">📡</div><div><div class="li-name">通信信道实验</div><div class="li-desc">GPS信号传输链路稳定性与噪声容限，对应 S（博弈熵）维度</div></div></div>
+<div class="link-item"><div class="li-icon">🏗️</div><div><div class="li-name">结构力学实验组</div><div class="li-desc">无人机中继结构冗余与信号覆盖范围，对应 I（海拔）维度</div></div></div>
+</div>
+</div>
+<div class="link-section">
+<div class="link-cat-title">⚡ 孪生页面验证</div>
+<div class="link-items">
+<div class="link-item"><div class="li-icon">🔋</div><div><div class="li-name">能源调度系统</div><div class="li-desc">验证方法论在"能量传输"（微波/激光供能）场景中的有效性</div></div></div>
+<div class="link-item"><div class="li-icon">📡</div><div><div class="li-name">信息调度系统（本页）</div><div class="li-desc">验证方法论在"信号传输"（GPS/导航信号）场景中的有效性</div></div></div>
+<div class="link-item"><div class="li-icon">🔗</div><div><div class="li-name">方法论普适性证明</div><div class="li-desc">两者共用同一套框架，证明该方法论不依赖具体输入类型（能量/信号通用）</div></div></div>
+</div>
+</div>
+</div>
+
+<div class="disclaimer">
+⚠️ 本页面为信号传输链路模拟演示，数据为模拟数据，不构成实际工程决策依据。<br>
+KMP→IPD→七维向量→THRESHOLDS→01解码 · Game-OS 工程验证系统 v1.0
+</div>
+</div>
+
+<script>
+const canvas = document.getElementById('particles');
+const ctx = canvas.getContext('2d');
+let pts = [];
+function resize(){canvas.width=window.innerWidth;canvas.height=window.innerHeight;pts=[];for(let i=0;i<60;i++)pts.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,vx:(Math.random()-0.5)*0.3,vy:(Math.random()-0.5)*0.3,r:Math.random()*1.5+0.5});}
+resize();window.addEventListener('resize',resize);
+function draw(){ctx.clearRect(0,0,canvas.width,canvas.height);pts.forEach((p,i)=>{p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>canvas.width)p.vx*=-1;if(p.y<0||p.y>canvas.height)p.vy*=-1;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle='rgba(34,211,238,0.3)';ctx.fill();for(let j=i+1;j<pts.length;j++){const dx=p.x-pts[j].x,dy=p.y-pts[j].y,d=Math.sqrt(dx*dx+dy*dy);if(d<120){ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(pts[j].x,pts[j].y);ctx.strokeStyle=`rgba(34,211,238,${0.08*(1-d/120)})`;ctx.lineWidth=0.5;ctx.stroke();}}});requestAnimationFrame(draw);}
+draw();
+
+const presets = [
+    {text:'地面GPS信号通过低空无人机中继传输到高空卫星，要求信号延迟低、可靠性高、覆盖范围广', intent:'信号传输与可靠性评估', kws:['GPS信号','无人机中继','卫星接收','信号传输','延迟','可靠性','覆盖范围'], risks:['信号衰减','多径效应','干扰','延迟']},
+    {text:'低空无人机集群的导航信号覆盖与精度验证，需要保障多机协同的信号稳定性', intent:'导航信号覆盖验证', kws:['无人机集群','导航信号','信号覆盖','精度验证','信号稳定','多机协同'], risks:['信号盲区','多径效应','同步误差','干扰']},
+    {text:'高空卫星信号在低空环境下的接收与中继，需应对复杂低空环境对信号的影响', intent:'卫星信号低空中继', kws:['卫星信号','低空环境','信号接收','中继传输','环境影响'], risks:['信号衰减','遮挡','干扰','多普勒效应']},
+];
+
+const scenarioData = {
+    ideal: {
+        name: '☀️ 理想环境',
+        signalStrength: '100%',
+        linkStatus: '全链路正常，信号质量优良',
+        coverage: '21km / 24km (87%)',
+        health: '🟢 优秀 (92%)',
+        avgSignal: '-48dBm',
+        active: '3架',
+        drones: [
+            {id:'U-01',status:'active',statusText:'🟢 活跃中继',signal:'-45dBm',range:'半径8km',health:95,healthColor:'#4ade80'},
+            {id:'U-02',status:'active',statusText:'🟢 活跃中继',signal:'-48dBm',range:'半径7km',health:92,healthColor:'#4ade80'},
+            {id:'U-03',status:'standby',statusText:'🟡 待命中',signal:'—',range:'—',health:'—',healthColor:'rgba(255,255,255,0.3)'},
+            {id:'U-04',status:'fault',statusText:'🔴 故障',signal:'—',range:'—',health:'—',healthColor:'rgba(255,255,255,0.3)'},
+            {id:'U-05',status:'active',statusText:'🟢 活跃中继',signal:'-52dBm',range:'半径6km',health:88,healthColor:'#4ade80'},
+        ],
+        chain: [
+            {icon:'📡',name:'地面GPS基站',signal:'发射功率 50W',ok:'✅ 正常'},
+            {icon:'🚁',name:'无人机U-01',signal:'-45dBm',ok:'✅ 正常'},
+            {icon:'🚁',name:'无人机U-05',signal:'-52dBm',ok:'✅ 正常'},
+            {icon:'🛰️',name:'高空卫星接收端',signal:'-55dBm',ok:'✅ 正常'},
+        ],
+        desc: '☀️ 理想环境：全链路正常，信号质量优良，GPS信号无衰减传输',
+        metrics: '信噪比 SNR: 25dB · 延迟: 12ms · 丢包率: 0.1% · 误码率: 10⁻⁹',
+        warning: '',
+    },
+    interfere: {
+        name: '⛈️ 干扰环境',
+        signalStrength: '60%',
+        linkStatus: '部分链路降级，启用冗余中继',
+        coverage: '15km / 24km (62%)',
+        health: '🟡 降级 (65%)',
+        avgSignal: '-65dBm',
+        active: '2架',
+        drones: [
+            {id:'U-01',status:'active',statusText:'🟢 活跃中继',signal:'-58dBm',range:'半径6km',health:72,healthColor:'#facc15'},
+            {id:'U-02',status:'standby',statusText:'🟡 启用冗余',signal:'-62dBm',range:'半径5km',health:68,healthColor:'#facc15'},
+            {id:'U-03',status:'standby',statusText:'🟡 待命中',signal:'—',range:'—',health:'—',healthColor:'rgba(255,255,255,0.3)'},
+            {id:'U-04',status:'fault',statusText:'🔴 故障',signal:'—',range:'—',health:'—',healthColor:'rgba(255,255,255,0.3)'},
+            {id:'U-05',status:'active',statusText:'🟡 信号降级',signal:'-68dBm',range:'半径4km',health:55,healthColor:'#facc15'},
+        ],
+        chain: [
+            {icon:'📡',name:'地面GPS基站',signal:'发射功率 50W',ok:'✅ 正常'},
+            {icon:'🚁',name:'无人机U-01',signal:'-58dBm',ok:'🟡 降级'},
+            {icon:'🚁',name:'无人机U-02(冗余)',signal:'-62dBm',ok:'🟡 启用'},
+            {icon:'🛰️',name:'高空卫星接收端',signal:'-70dBm',ok:'🟡 弱信号'},
+        ],
+        desc: '⛈️ 干扰环境：存在电磁干扰和多径效应，部分链路信号降级，冗余中继U-02已启用保障链路连通',
+        metrics: '信噪比 SNR: 15dB · 延迟: 35ms · 丢包率: 2.5% · 误码率: 10⁻⁵ · 已启用: 冗余中继、信号滤波',
+        warning: '⚠️ 干扰环境下信号质量下降，建议启用抗干扰算法和冗余链路',
+    },
+    extreme: {
+        name: '🌪️ 极端环境',
+        signalStrength: '30%',
+        linkStatus: '多链路中断，启用紧急备份',
+        coverage: '7km / 24km (29%)',
+        health: '🔴 危急 (32%)',
+        avgSignal: '-82dBm',
+        active: '1架',
+        drones: [
+            {id:'U-01',status:'fault',statusText:'🔴 信号中断',signal:'-95dBm',range:'—',health:15,healthColor:'#f87171'},
+            {id:'U-02',status:'active',statusText:'🟡 紧急备份',signal:'-78dBm',range:'半径4km',health:45,healthColor:'#facc15'},
+            {id:'U-03',status:'fault',statusText:'🔴 失联',signal:'—',range:'—',health:'—',healthColor:'rgba(255,255,255,0.3)'},
+            {id:'U-04',status:'fault',statusText:'🔴 故障',signal:'—',range:'—',health:'—',healthColor:'rgba(255,255,255,0.3)'},
+            {id:'U-05',status:'fault',statusText:'🔴 信号中断',signal:'-92dBm',range:'—',health:12,healthColor:'#f87171'},
+        ],
+        chain: [
+            {icon:'📡',name:'地面GPS基站',signal:'发射功率 50W',ok:'✅ 正常'},
+            {icon:'🚁',name:'无人机U-02(备份)',signal:'-78dBm',ok:'🟡 紧急'},
+            {icon:'❌',name:'U-01/U-05中断',signal:'链路不可用',ok:'🔴 中断'},
+            {icon:'🛰️',name:'高空卫星接收端',signal:'-85dBm',ok:'🔴 极弱'},
+        ],
+        desc: '🌪️ 极端环境：强干扰/遮挡导致多链路中断，仅紧急备份节点U-02维持最低限度连通，信号质量极差',
+        metrics: '信噪比 SNR: 6dB · 延迟: 120ms · 丢包率: 18% · 误码率: 10⁻² · 已启用: 紧急功率增强、纠错编码、备份链路',
+        warning: '⚠️ 极端环境下链路可靠性严重不足，建议暂停非关键数据传输，启动应急通信预案',
+    },
+};
+
+const mMap = [
+    {kw:'信号强度', mi:'信号强度指标', val:0.70, color:'cyan'},
+    {kw:'延迟', mi:'延迟指标', val:0.40, color:'purple'},
+    {kw:'信噪比', mi:'信噪比指标', val:0.75, color:'green'},
+    {kw:'可用性/可靠性', mi:'可用性指标', val:0.85, color:'cyan'},
+    {kw:'覆盖范围', mi:'覆盖范围指标', val:0.80, color:'purple'},
+    {kw:'多径效应', mi:'多径干扰指标', val:0.50, color:'orange'},
+];
+
+let currentData = null;
+let currentStep = 0;
+let currentWeather = 'ideal';
+
+function setPreset(idx){document.getElementById('kInput').value=presets[idx].text;}
+
+function processK(){
+    const text = document.getElementById('kInput').value.trim();
+    if(!text){alert('请输入信息传输需求或选择预设示例');return;}
+    let matched = presets[0];
+    presets.forEach(p=>{if(text.includes(p.text.substring(0,10)))matched=p;});
+    if(text.includes('导航')||text.includes('集群'))matched=presets[1];
+    if(text.includes('卫星信号')&&text.includes('低空'))matched=presets[2];
+
+    document.getElementById('kIntent').textContent = matched.intent;
+    const kwEl = document.getElementById('kKeywords');
+    kwEl.innerHTML = matched.kws.map(k=>`<span class="kw-tag">${k}</span>`).join('');
+    const rkEl = document.getElementById('kRisks');
+    rkEl.innerHTML = matched.risks.map(r=>`<span class="risk-tag">⚠️ ${r}</span>`).join('');
+    document.getElementById('kResult').classList.add('show');
+
+    setTimeout(()=>{updateChain(1);showSection('secM');renderMLayer();},600);
+}
+
+function renderMLayer(){
+    const tbody = document.getElementById('mTableBody');
+    let html = '';
+    mMap.forEach((m,i)=>{
+        setTimeout(()=>{
+            const bar = document.querySelector(`tr[data-m-idx="${i}"] .val-bar-fill`);
+            if(bar)bar.style.width=(m.val*100)+'%';
+        },200+i*150);
+        html+=`<tr data-m-idx="${i}">
+            <td style="color:rgba(255,255,255,0.8);">${m.kw}</td>
+            <td style="color:rgba(255,255,255,0.6);font-size:12px;">${m.mi}</td>
+            <td><span class="val-num" style="color:${getColor(m.color)}">${m.val.toFixed(2)}</span></td>
+            <td><div class="val-bar-wrap"><div class="val-bar"><div class="val-bar-fill ${m.color}"></div></div></div></td>
+        </tr>`;
+    });
+    tbody.innerHTML=html;
+    setTimeout(()=>updateChain(2),mMap.length*150+400);
+    setTimeout(()=>showSection('secP'),mMap.length*150+700);
+    setTimeout(()=>renderPLayer(),mMap.length*150+1000);
+}
+
+function setWeather(w){
+    currentWeather = w;
+    document.querySelectorAll('.weather-btn').forEach(b=>{b.classList.toggle('on',b.dataset.w===w);});
+    if(currentData){
+        currentData.weather = w;
+        renderDroneFleet();
+        renderRelayChain();
+        updateWeatherDependentVector();
+        renderRadar();
+        renderThresholds();
+        renderBinAndCmd();
+    }
+}
+
+function updateWeatherDependentVector(){
+    const v = currentData.vector;
+    const s = scenarioData[currentWeather];
+    const sigFactor = currentWeather === 'ideal' ? 1 : (currentWeather === 'interfere' ? 0.75 : 0.5);
+    v.S = currentWeather === 'ideal' ? 0.75 : (currentWeather === 'interfere' ? 0.82 : 0.90);
+    v.D = currentWeather === 'ideal' ? 0.50 : (currentWeather === 'interfere' ? 0.62 : 0.75);
+    v.P = currentWeather === 'ideal' ? 0.40 : (currentWeather === 'interfere' ? 0.52 : 0.65);
+    v.DevI = currentWeather === 'ideal' ? 0.30 : (currentWeather === 'interfere' ? 0.42 : 0.60);
+    currentData.warning = s.warning;
+    currentData.confidence = currentWeather === 'ideal' ? 92 : (currentWeather === 'interfere' ? 73 : 48);
+}
+
+function renderDroneFleet(){
+    const s = scenarioData[currentWeather];
+    document.getElementById('wCoverage').textContent = s.coverage;
+    document.getElementById('wHealth').textContent = s.health;
+    document.getElementById('wHealth').style.color = currentWeather==='ideal'?'#4ade80':(currentWeather==='interfere'?'#facc15':'#f87171');
+    document.getElementById('wSignal').textContent = s.avgSignal;
+    document.getElementById('wActive').textContent = s.active;
+
+    const dg = document.getElementById('droneGrid');
+    dg.innerHTML = s.drones.map(d=>`<div class="drone-card ${d.status}">
+        <div class="drone-id">${d.id}</div>
+        <div class="drone-status">${d.statusText}</div>
+        <div class="drone-signal">${d.signal}</div>
+        <div class="drone-range">${d.range}</div>
+        <div class="drone-health" style="color:${d.healthColor}">${typeof d.health==='number'?d.health+'%':d.health}</div>
+    </div>`).join('');
+}
+
+function renderRelayChain(){
+    const s = scenarioData[currentWeather];
+    const rf = document.getElementById('relayFlow');
+    let html = '';
+    s.chain.forEach((node,i)=>{
+        html+=`<div class="relay-node">
+            <div class="relay-icon">${node.icon}</div>
+            <div class="relay-name">${node.name}</div>
+            <div class="relay-sig">${node.signal}</div>
+            <div class="relay-ok">${node.ok}</div>
+        </div>`;
+        if(i<s.chain.length-1)html+=`<div class="relay-arrow">→</div>`;
+    });
+    rf.innerHTML = html;
+    document.getElementById('weatherDesc').textContent = s.desc;
+    document.getElementById('signalMetrics').innerHTML = s.metrics;
+}
+
+function renderPLayer(){
+    currentData = {
+        vector: {I:0.80, P:0.40, D:0.50, S:0.75, DevI:0.30, Dev1:0.15, Dev2:0.25},
+        material: 'GPS信号中继调度方案',
+        confidence: 92,
+        weather: 'ideal',
+        warning: '',
+    };
+    const v = currentData.vector;
+    const pMap = [
+        {name:'海拔', sym:'I', src:'覆盖范围指标', val:v.I, color:'cyan', desc:'信号覆盖范围'},
+        {name:'坡度', sym:'P', src:'延迟指标', val:v.P, color:'purple', desc:'信号传输延迟'},
+        {name:'阻尼', sym:'D', src:'多径干扰指标', val:v.D, color:'green', desc:'信号衰减速率'},
+        {name:'博弈熵', sym:'S', src:'信噪比指标', val:v.S, color:'orange', desc:'信号传输不确定性'},
+        {name:'容积偏差', sym:'Dev-I', src:'信号强度偏差', val:v.DevI, color:'cyan', desc:'与理想信号状态的偏差'},
+        {name:'均值偏差', sym:'Dev1', src:'可用性偏差', val:v.Dev1, color:'purple', desc:'可用性偏离基准'},
+        {name:'历史偏差', sym:'Dev2', src:'历史信号质量偏差', val:v.Dev2, color:'orange', desc:'与历史最优信号的偏差'},
+    ];
+    const tbody = document.getElementById('pTableBody');
+    let html = '';
+    pMap.forEach((p,i)=>{
+        setTimeout(()=>{
+            const row=document.querySelector(`tr[data-p-idx="${i}"] .val-bar-fill`);
+            if(row)row.style.width=(p.val*100)+'%';
+        },200+i*120);
+        html+=`<tr data-p-idx="${i}">
+            <td style="color:rgba(255,255,255,0.8);">${p.name}</td>
+            <td style="font-family:'SF Mono',monospace;font-weight:700;color:${getColor(p.color)};">${p.sym}</td>
+            <td style="color:rgba(255,255,255,0.5);font-size:11px;">${p.src}（${p.desc}）</td>
+            <td><span class="val-num" style="color:${getColor(p.color)}">${p.val.toFixed(2)}</span></td>
+            <td><div class="val-bar-wrap"><div class="val-bar"><div class="val-bar-fill ${p.color}"></div></div></div></td>
+        </tr>`;
+    });
+    tbody.innerHTML=html;
+
+    setTimeout(()=>updateChain(3),pMap.length*120+400);
+    setTimeout(()=>showSection('secU'),pMap.length*120+700);
+    setTimeout(()=>{renderDroneFleet();renderRelayChain();},pMap.length*120+1000);
+    setTimeout(()=>updateChain(4),pMap.length*120+1400);
+    setTimeout(()=>showSection('secV'),pMap.length*120+1700);
+    setTimeout(()=>{renderRadar();renderThresholds();},pMap.length*120+2000);
+}
+
+function renderRadar(){
+    const canvas=document.getElementById('radarCanvas');
+    const ctx=canvas.getContext('2d');
+    const rect=canvas.getBoundingClientRect();
+    const dpr=window.devicePixelRatio||1;
+    canvas.width=rect.width*dpr;canvas.height=rect.height*dpr;ctx.scale(dpr,dpr);
+    const W=rect.width,H=rect.height,cx=W/2,cy=H/2,R=Math.min(W,H)*0.35;
+    const dims=['I','P','D','S','Dev-I','Dev1','Dev2'];
+    const dimNames=['I(覆盖)','P(延迟)','D(衰减)','S(不确定)','Dev-I','Dev1','Dev2'];
+    const v=currentData.vector;
+    const vals=[v.I,v.P,v.D,v.S,v.DevI,v.Dev1,v.Dev2];
+    const n=dims.length;
+    ctx.clearRect(0,0,W,H);
+    [0.25,0.48,0.50,0.68,1.0].forEach(level=>{
+        ctx.beginPath();
+        for(let i=0;i<=n;i++){const angle=(Math.PI*2*i/n)-Math.PI/2,r=R*level,x=cx+r*Math.cos(angle),y=cy+r*Math.sin(angle);if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);}
+        ctx.closePath();
+        if(level===0.48){ctx.strokeStyle='rgba(74,222,128,0.4)';ctx.setLineDash([5,4]);ctx.lineWidth=1.5;}
+        else if(level===0.50){ctx.strokeStyle='rgba(250,204,21,0.4)';ctx.setLineDash([5,4]);ctx.lineWidth=1.5;}
+        else if(level===0.68){ctx.strokeStyle='rgba(248,113,113,0.5)';ctx.setLineDash([7,3]);ctx.lineWidth=2;}
+        else{ctx.strokeStyle='rgba(255,255,255,0.06)';ctx.setLineDash([]);ctx.lineWidth=1;}
+        ctx.stroke();
+    });
+    ctx.setLineDash([]);
+    for(let i=0;i<n;i++){const angle=(Math.PI*2*i/n)-Math.PI/2;ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(cx+R*Math.cos(angle),cy+R*Math.sin(angle));ctx.strokeStyle='rgba(255,255,255,0.06)';ctx.lineWidth=1;ctx.stroke();}
+    for(let i=0;i<n;i++){const angle=(Math.PI*2*i/n)-Math.PI/2,lx=cx+(R+22)*Math.cos(angle),ly=cy+(R+22)*Math.sin(angle);ctx.font='11px SF Mono,monospace';ctx.fillStyle='rgba(255,255,255,0.5)';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(dimNames[i],lx,ly);}
+    ctx.beginPath();
+    for(let i=0;i<=n;i++){const idx=i%n,angle=(Math.PI*2*idx/n)-Math.PI/2,r=R*vals[idx],x=cx+r*Math.cos(angle),y=cy+r*Math.sin(angle);if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);}
+    ctx.closePath();
+    const fillColor = currentWeather==='ideal'?'rgba(34,211,238,0.15)':(currentWeather==='interfere'?'rgba(250,204,21,0.15)':'rgba(248,113,113,0.15)');
+    const strokeColor = currentWeather==='ideal'?'rgba(34,211,238,0.7)':(currentWeather==='interfere'?'rgba(250,204,21,0.7)':'rgba(248,113,113,0.7)');
+    ctx.fillStyle=fillColor;ctx.fill();ctx.strokeStyle=strokeColor;ctx.lineWidth=2.5;ctx.stroke();
+    for(let i=0;i<n;i++){const angle=(Math.PI*2*i/n)-Math.PI/2,r=R*vals[i],x=cx+r*Math.cos(angle),y=cy+r*Math.sin(angle);ctx.beginPath();ctx.arc(x,y,4.5,0,Math.PI*2);ctx.fillStyle=strokeColor;ctx.fill();ctx.strokeStyle='rgba(0,0,0,0.4)';ctx.lineWidth=1;ctx.stroke();}
+    const lg=document.getElementById('radarLegend');
+    lg.innerHTML=`
+        <span class="radar-legend-item"><span class="radar-legend-dot" style="background:#4ade80;"></span>0.48保本线</span>
+        <span class="radar-legend-item"><span class="radar-legend-dot" style="background:#facc15;"></span>0.50稳态线</span>
+        <span class="radar-legend-item"><span class="radar-legend-dot" style="background:#f87171;"></span>0.68熔断线</span>
+        <span class="radar-legend-item"><span class="radar-legend-dot" style="background:${strokeColor};"></span>当前向量(${scenarioData[currentWeather].name})</span>
+    `;
+}
+
+function renderThresholds(){
+    const v=currentData.vector;
+    const dimChecks = [
+        {sym:'I', name:'覆盖范围', val:v.I},
+        {sym:'P', name:'传输延迟', val:v.P},
+        {sym:'D', name:'信号衰减', val:v.D},
+        {sym:'S', name:'不确定性', val:v.S},
+        {sym:'Dev-I', name:'信号偏差', val:v.DevI},
+    ];
+    let dangerCount=0,warnCount=0,safeCount=0;
+    const checks = [];
+    dimChecks.forEach(d=>{
+        let status,cls,icon,statusText;
+        if(d.val>=0.68){cls='danger';icon='🔴';status='danger';statusText='⚠️ 熔断';dangerCount++;}
+        else if(d.val>=0.50){cls='warn';icon='🟡';status='warn';statusText='⚡ 超稳态';warnCount++;}
+        else if(d.val>=0.48){cls='warn';icon='🟡';status='warn';statusText='⚠️ 临界';warnCount++;}
+        else{cls='safe';icon='🟢';status='safe';statusText='✅ 安全';safeCount++;}
+        checks.push({name:`${d.sym}(${d.name})`, val:d.val, threshold:0.48, cls, icon, statusText, isMulti:true});
+    });
+
+    const panel=document.getElementById('thresholdPanel');
+    let html='';
+    checks.forEach(th=>{
+        let threshLabel = th.val>=0.68?'熔断线0.68':(th.val>=0.50?'稳态线0.50':'保本线0.48');
+        html+=`
+        <div class="th-item ${th.cls}">
+            <div class="th-icon">${th.icon}</div>
+            <div class="th-content">
+                <div class="th-label">${th.name}</div>
+                <div class="th-val">当前值 ${th.val.toFixed(2)} · 参考 ${threshLabel}</div>
+            </div>
+            <div class="th-status">${th.statusText}</div>
+        </div>`;
+    });
+
+    let conclusion = '';
+    if(currentWeather==='ideal'){
+        conclusion = '✅ <strong>信号强度和覆盖范围充沛</strong>（I=0.80），但延迟偏高（P=0.40，低于保本线）<br>📡 信噪比偏高（S=0.75），需关注信号质量<br>💡 建议：增强中继节点，优化信号传输路径';
+    }else if(currentWeather==='interfere'){
+        conclusion = '⚠️ <strong>干扰环境下信号质量下降</strong>：衰减D=0.62、不确定性S=0.82均接近/超过熔断线<br>🔴 延迟P=0.52超稳态线，信号偏差Dev-I=0.42接近保本线<br>💡 建议：已启用冗余中继和信号滤波，建议进一步增强抗干扰能力';
+    }else{
+        conclusion = '🔴 <strong>极端环境下链路危急</strong>：D=0.75、S=0.90、P=0.65均大幅超过熔断线<br>🔴 信号偏差Dev-I=0.60超过熔断线，信号质量极差<br>💡 建议：立即启动应急通信预案，暂停非关键数据传输';
+    }
+    html+=`<div class="th-conclusion">${conclusion}</div>`;
+    panel.innerHTML=html;
+
+    setTimeout(()=>updateChain(5),600);
+    setTimeout(()=>updateChain(6),800);
+    setTimeout(()=>showSection('secB'),1000);
+    setTimeout(()=>renderBinAndCmd(),1300);
+}
+
+function toBinary8(val){const byte=Math.round(val*255);return byte.toString(2).padStart(8,'0');}
+
+function renderBinAndCmd(){
+    const v=currentData.vector;
+    const dims=[
+        {name:'I（覆盖范围）',key:'I',val:v.I},
+        {name:'P（传输延迟）',key:'P',val:v.P},
+        {name:'D（信号衰减）',key:'D',val:v.D},
+        {name:'S（不确定性）',key:'S',val:v.S},
+        {name:'Dev-I（信号偏差）',key:'DevI',val:v.DevI},
+        {name:'Dev1（可用性偏差）',key:'Dev1',val:v.Dev1},
+        {name:'Dev2（历史偏差）',key:'Dev2',val:v.Dev2},
+    ];
+    const binGrid=document.getElementById('binGrid');
+    let html='';
+    dims.forEach((d,i)=>{
+        const bin=toBinary8(d.val);
+        setTimeout(()=>{
+            const bits=document.querySelectorAll(`[data-bin="${d.key}"] .bin-bit`);
+            bits.forEach((bit,j)=>{setTimeout(()=>{bit.style.opacity='1';bit.style.transform='scale(1)';},j*40);});
+        },200+i*150);
+        html+=`<div class="bin-item" data-bin="${d.key}">
+            <div class="bin-dim-name"><span>${d.name}</span><span class="bin-dim-val">${d.val.toFixed(2)}</span></div>
+            <div class="bin-bits">${bin.split('').map(b=>`<span class="bin-bit b${b}" style="opacity:0;transform:scale(0.5);transition:all 0.2s ease;">${b}</span>`).join('')}</div>
+        </div>`;
+    });
+    binGrid.innerHTML=html;
+
+    setTimeout(()=>{
+        const cmdText=document.getElementById('cmdText');
+        let warnHtml = currentData.warning ? `<br><span class="${currentData.warning.includes('🔴')?'red':'orange'}">${currentData.warning}</span>` : `<br><span class="green">✅ 各项指标在安全区间内</span>`;
+        let signalAdvice = '';
+        if(currentWeather==='ideal'){
+            signalAdvice = `GPS信号强度充沛（I=0.80），延迟偏高（P=0.40，低于0.48保本线），需优化无人机中继节点位置或增加中继密度。信噪比偏高（S=0.75，接近0.68熔断线），建议增强信号滤波或切换至冗余信道。整体可用性可接受（Dev1=0.15），信号传输方案整体可行。`;
+        }else if(currentWeather==='interfere'){
+            signalAdvice = `干扰环境下信号衰减（D=0.62）和不确定性（S=0.82）超过熔断线，延迟（P=0.52）超稳态线。冗余中继U-02已启用，建议进一步增强抗干扰算法、增大发射功率、启用纠错编码。当前链路可维持关键数据传输。`;
+        }else{
+            signalAdvice = `极端环境下多项指标严重超标：衰减D=0.75、不确定性S=0.90、延迟P=0.65均大幅超熔断线。仅备份中继U-02维持最低连通，信号质量极差。建议立即暂停非关键传输，启动应急卫星通信备份链路，待环境好转后恢复。`;
+        }
+        cmdText.innerHTML = `${signalAdvice}${warnHtml}`;
+        const cmdConf=document.getElementById('cmdConf');
+        cmdConf.innerHTML=`
+            <span>🎯 置信度：<strong>${currentData.confidence}%</strong></span>
+            <span>📐 方法：<strong>KMP→IPD→七维向量</strong></span>
+            <span>💾 编码：<strong>7×8bit = 56bit</strong></span>
+            <span>📡 当前场景：<strong>${scenarioData[currentWeather].name}</strong></span>
+        `;
+    },dims.length*150+400);
+
+    setTimeout(()=>updateChain(7),dims.length*150+800);
+    setTimeout(()=>showSection('secLink'),dims.length*150+1100);
+}
+
+function getColor(c){const map={cyan:'#22d3ee',purple:'#a78bfa',orange:'#fb923c',green:'#4ade80',red:'#f87171'};return map[c]||'#22d3ee';}
+function showSection(id){document.getElementById(id).classList.remove('section-hidden');}
+function updateChain(step){currentStep=step;const steps=['k','m','p','u','v','t','b','x'];document.querySelectorAll('.chain-node').forEach((node,i)=>{node.classList.remove('active','done');if(i<step)node.classList.add('done');else if(i===step)node.classList.add('active');});}
+window.addEventListener('resize',()=>{if(currentData)renderRadar();});
+</script>
+</body>
+</html>
