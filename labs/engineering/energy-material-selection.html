@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>📡 高空能源传输链路 · 材料选型与模拟验证系统</title>
+    <link rel="stylesheet" href="../../assets/css/base.css">
+    <style>
+        body{background:#05030a;min-height:100vh;}
+        body.layout-fixed{padding-left:0;}
+        .wrap{max-width:1320px;margin:0 auto;padding:40px 28px 60px;}
+        .container{
+            background:radial-gradient(ellipse at 30% 20%,#120b24,#0b0b1a 70%,#05030a);
+            border-radius:28px;padding:44px 44px 36px;border:1px solid rgba(255,255,255,0.06);
+            box-shadow:0 30px 80px rgba(40,10,80,0.4);position:relative;overflow:hidden;
+        }
+        .container::before{content:'';position:absolute;top:-100px;right:-100px;width:400px;height:400px;background:radial-gradient(circle,rgba(251,191,36,0.08),transparent 70%);pointer-events:none;}
+        .header{text-align:center;margin-bottom:24px;opacity:0;animation:fadeInUp 0.8s ease forwards;}
+        .badge-row{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-bottom:12px;}
+        .badge{display:inline-block;background:rgba(251,191,36,0.08);border:1px solid rgba(251,191,36,0.2);color:rgba(251,191,36,0.85);font-size:12px;padding:4px 16px;border-radius:20px;letter-spacing:0.5px;font-weight:600;}
+        .badge.kmp{background:rgba(34,211,238,0.08);border-color:rgba(34,211,238,0.2);color:#22d3ee;}
+        .badge.vec{background:rgba(167,139,250,0.08);border-color:rgba(167,139,250,0.3);color:#c4b5fd;}
+        .badge.bin{background:rgba(74,222,128,0.08);border-color:rgba(74,222,128,0.2);color:#4ade80;}
+        .header h1{font-size:28px;font-weight:700;color:#f1f5f9;letter-spacing:-0.3px;background:linear-gradient(135deg,#f1f5f9,#fbbf24,#fb923c,#f87171,#f1f5f9);background-size:300% 300%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:gradientFlow 6s ease-in-out infinite;margin:0;}
+        .header .sub{font-size:14px;color:rgba(255,255,255,0.4);font-weight:300;margin-top:8px;line-height:1.6;}
+        .breadcrumb{display:flex;align-items:center;gap:7px;font-size:11px;color:rgba(255,255,255,0.3);margin-bottom:24px;flex-wrap:wrap;}
+        .breadcrumb a{color:rgba(255,255,255,0.4);text-decoration:none;transition:color .2s;}
+        .breadcrumb a:hover{color:#fbbf24;}
+        .breadcrumb .sep{color:rgba(255,255,255,0.12);}
+        .breadcrumb .cur{color:#fbbf24;font-weight:600;}
+
+        .chain-flow{display:flex;align-items:center;justify-content:center;gap:6px;margin:16px 0 28px;flex-wrap:wrap;opacity:0;animation:fadeInUp 0.6s ease forwards 0.15s;}
+        .chain-node{padding:8px 16px;border-radius:10px;font-size:12px;font-weight:600;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.5);display:flex;align-items:center;gap:6px;}
+        .chain-node.active{background:rgba(251,191,36,0.1);border-color:rgba(251,191,36,0.3);color:#fbbf24;}
+        .chain-node.done{background:rgba(74,222,128,0.08);border-color:rgba(74,222,128,0.2);color:#4ade80;}
+        .chain-arrow{color:rgba(255,255,255,0.15);font-size:14px;}
+
+        .sec{margin-bottom:24px;opacity:0;animation:fadeInUp 0.6s ease forwards;}
+        .sec:nth-child(1){animation-delay:0.1s;}
+        .sec:nth-child(2){animation-delay:0.2s;}
+        .sec:nth-child(3){animation-delay:0.3s;}
+        .sec:nth-child(4){animation-delay:0.4s;}
+        .sec:nth-child(5){animation-delay:0.5s;}
+        .sec:nth-child(6){animation-delay:0.6s;}
+        .sec:nth-child(7){animation-delay:0.7s;}
+
+        .sec-title{font-size:17px;font-weight:700;color:#f1f5f9;margin:0 0 12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+        .sec-title .layer-tag{font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;letter-spacing:0.5px;}
+        .layer-tag.k{background:rgba(34,211,238,0.12);color:#22d3ee;border:1px solid rgba(34,211,238,0.25);}
+        .layer-tag.m{background:rgba(167,139,250,0.12);color:#c4b5fd;border:1px solid rgba(167,139,250,0.25);}
+        .layer-tag.p{background:rgba(251,146,60,0.12);color:#fb923c;border:1px solid rgba(251,146,60,0.25);}
+        .layer-tag.v{background:rgba(74,222,128,0.12);color:#4ade80;border:1px solid rgba(74,222,128,0.25);}
+        .layer-tag.t{background:rgba(250,204,21,0.12);color:#facc15;border:1px solid rgba(250,204,21,0.25);}
+        .layer-tag.b{background:rgba(248,113,113,0.12);color:#f87171;border:1px solid rgba(248,113,113,0.25);}
+        .layer-tag.x{background:rgba(251,191,36,0.12);color:#fbbf24;border:1px solid rgba(251,191,36,0.25);}
+
+        .panel{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:14px;padding:20px;}
+        .panel.gold{border-color:rgba(251,191,36,0.15);background:linear-gradient(135deg,rgba(251,191,36,0.04),rgba(251,191,36,0.01));}
+
+        .input-area{display:flex;flex-direction:column;gap:12px;}
+        .input-row{display:flex;gap:10px;flex-wrap:wrap;}
+        .req-input{flex:1;min-width:280px;padding:14px 18px;border-radius:12px;background:rgba(0,0,0,0.3);border:1.5px solid rgba(255,255,255,0.1);color:#e2e8f0;font-size:14px;font-family:inherit;outline:none;transition:border-color .25s;resize:vertical;min-height:60px;}
+        .req-input:focus{border-color:rgba(251,191,36,0.4);box-shadow:0 0 20px rgba(251,191,36,0.08);}
+        .req-input::placeholder{color:rgba(255,255,255,0.25);}
+        .btn{padding:12px 24px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;border:1px solid;transition:all .25s;display:inline-flex;align-items:center;gap:6px;font-family:inherit;}
+        .btn-primary{background:linear-gradient(135deg,rgba(251,191,36,0.15),rgba(251,146,60,0.1));border-color:rgba(251,191,36,0.4);color:#fbbf24;}
+        .btn-primary:hover{background:linear-gradient(135deg,rgba(251,191,36,0.25),rgba(251,146,60,0.15));border-color:rgba(251,191,36,0.6);box-shadow:0 0 24px rgba(251,191,36,0.15);}
+        .btn-secondary{background:rgba(255,255,255,0.03);border-color:rgba(255,255,255,0.1);color:rgba(255,255,255,0.5);}
+        .btn-secondary:hover{border-color:rgba(255,255,255,0.2);color:rgba(255,255,255,0.7);}
+        .preset-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px;}
+        .preset-btn{padding:6px 14px;border-radius:8px;font-size:11px;font-weight:500;cursor:pointer;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.4);transition:all .2s;}
+        .preset-btn:hover{border-color:rgba(251,191,36,0.3);color:#fbbf24;background:rgba(251,191,36,0.05);}
+
+        .k-result{margin-top:14px;display:none;}
+        .k-result.show{display:block;animation:fadeInUp 0.4s ease;}
+        .k-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;}
+        .k-item{padding:12px 14px;border-radius:10px;background:rgba(34,211,238,0.04);border:1px solid rgba(34,211,238,0.15);}
+        .k-item .k-label{font-size:10px;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:5px;}
+        .k-item .k-val{font-size:13px;color:#22d3ee;font-weight:600;}
+        .k-item .k-val.warn{color:#fb923c;}
+        .k-keywords{display:flex;gap:6px;flex-wrap:wrap;}
+        .k-kw{padding:4px 10px;border-radius:6px;font-size:11px;background:rgba(34,211,238,0.1);border:1px solid rgba(34,211,238,0.2);color:#67e8f9;}
+        .k-kw.warn{background:rgba(251,146,60,0.1);border-color:rgba(251,146,60,0.2);color:#fb923c;}
+
+        .mapping-table{width:100%;border-collapse:collapse;margin-top:8px;}
+        .mapping-table th,.mapping-table td{padding:10px 14px;text-align:left;font-size:12px;border-bottom:1px solid rgba(255,255,255,0.04);}
+        .mapping-table th{color:rgba(255,255,255,0.4);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:0.3px;}
+        .mapping-table td{color:rgba(255,255,255,0.65);}
+        .mapping-table tr:last-child td{border-bottom:none;}
+        .val-bar-wrap{display:flex;align-items:center;gap:8px;}
+        .val-bar{flex:1;height:6px;border-radius:3px;background:rgba(255,255,255,0.05);overflow:hidden;}
+        .val-bar-fill{height:100%;border-radius:3px;transition:width 0.8s ease;width:0;}
+        .val-bar-fill.cyan{background:linear-gradient(90deg,#22d3ee,#06b6d4);}
+        .val-bar-fill.purple{background:linear-gradient(90deg,#a78bfa,#8b5cf6);}
+        .val-bar-fill.orange{background:linear-gradient(90deg,#fb923c,#f97316);}
+        .val-bar-fill.green{background:linear-gradient(90deg,#4ade80,#22c55e);}
+        .val-num{font-family:'SF Mono',monospace;font-size:12px;font-weight:700;color:#f1f5f9;min-width:32px;text-align:right;}
+        .arrow-cell{color:rgba(255,255,255,0.15);text-align:center;width:30px;}
+
+        .split-panel{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+        @media(max-width:768px){.split-panel{grid-template-columns:1fr;}}
+
+        .radar-wrap{position:relative;width:100%;aspect-ratio:1;background:rgba(0,0,0,0.2);border-radius:14px;border:1px solid rgba(255,255,255,0.05);padding:16px;}
+        .radar-wrap canvas{width:100%;height:100%;}
+        .radar-legend{position:absolute;bottom:12px;left:12px;right:12px;display:flex;flex-wrap:wrap;gap:8px;font-size:10px;}
+        .radar-legend-item{display:flex;align-items:center;gap:4px;color:rgba(255,255,255,0.5);}
+        .radar-legend-dot{width:8px;height:8px;border-radius:50%;}
+
+        .threshold-panel{display:flex;flex-direction:column;gap:12px;}
+        .th-item{padding:14px;border-radius:12px;border:1px solid;display:flex;align-items:center;gap:12px;}
+        .th-item.safe{background:rgba(74,222,128,0.05);border-color:rgba(74,222,128,0.2);}
+        .th-item.warn{background:rgba(250,204,21,0.05);border-color:rgba(250,204,21,0.2);}
+        .th-item.danger{background:rgba(248,113,113,0.05);border-color:rgba(248,113,113,0.2);}
+        .th-icon{font-size:22px;flex-shrink:0;}
+        .th-content{flex:1;}
+        .th-label{font-size:11px;color:rgba(255,255,255,0.4);margin-bottom:3px;}
+        .th-val{font-size:14px;font-weight:700;}
+        .th-item.safe .th-val{color:#4ade80;}
+        .th-item.warn .th-val{color:#facc15;}
+        .th-item.danger .th-val{color:#f87171;}
+        .th-status{font-size:10px;font-weight:600;padding:3px 10px;border-radius:6px;}
+        .th-item.safe .th-status{background:rgba(74,222,128,0.12);color:#4ade80;}
+        .th-item.warn .th-status{background:rgba(250,204,21,0.12);color:#facc15;}
+        .th-item.danger .th-status{background:rgba(248,113,113,0.12);color:#f87171;}
+
+        .bin-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:16px;}
+        .bin-item{padding:12px;border-radius:10px;background:rgba(0,0,0,0.2);border:1px solid rgba(255,255,255,0.06);}
+        .bin-dim-name{font-size:11px;color:rgba(255,255,255,0.4);margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;}
+        .bin-dim-val{font-family:'SF Mono',monospace;font-size:11px;color:#fbbf24;font-weight:700;}
+        .bin-bits{display:flex;gap:2px;}
+        .bin-bit{width:14px;height:20px;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:9px;font-family:'SF Mono',monospace;font-weight:700;}
+        .bin-bit.b1{background:rgba(74,222,128,0.15);color:#4ade80;border:1px solid rgba(74,222,128,0.3);}
+        .bin-bit.b0{background:rgba(255,255,255,0.03);color:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.06);}
+
+        .cmd-output{padding:20px;border-radius:14px;background:linear-gradient(135deg,rgba(74,222,128,0.06),rgba(34,211,238,0.04));border:1.5px solid rgba(74,222,128,0.2);}
+        .cmd-title{font-size:12px;font-weight:700;color:#4ade80;margin-bottom:10px;display:flex;align-items:center;gap:6px;letter-spacing:0.3px;}
+        .cmd-text{font-size:15px;color:#f1f5f9;line-height:1.8;font-weight:500;}
+        .cmd-text .highlight{color:#fbbf24;font-weight:700;}
+        .cmd-text .green{color:#4ade80;}
+        .cmd-text .orange{color:#fb923c;}
+        .cmd-text .red{color:#f87171;}
+        .cmd-conf{margin-top:12px;display:flex;gap:16px;font-size:11px;color:rgba(255,255,255,0.4);}
+        .cmd-conf span{display:flex;align-items:center;gap:4px;}
+        .cmd-conf strong{color:rgba(255,255,255,0.7);font-weight:600;font-family:'SF Mono',monospace;}
+
+        .link-map{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;}
+        .link-item{padding:14px;border-radius:10px;background:rgba(167,139,250,0.04);border:1px solid rgba(167,139,250,0.12);}
+        .link-item .link-icon{font-size:18px;margin-bottom:6px;}
+        .link-item .link-name{font-size:12px;font-weight:600;color:#c4b5fd;margin-bottom:3px;}
+        .link-item .link-desc{font-size:10px;color:rgba(255,255,255,0.35);line-height:1.5;}
+
+        .disclaimer{margin-top:28px;padding:14px 18px;border-radius:10px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.05);font-size:10px;color:rgba(255,255,255,0.25);text-align:center;line-height:1.6;}
+
+        @keyframes fadeInUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+        @keyframes gradientFlow{0%,100%{background-position:0% 50%;}50%{background-position:100% 50%;}}
+        @keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.6;}}
+        .processing{display:inline-flex;align-items:center;gap:6px;color:#fbbf24;font-size:12px;}
+        .processing .dot{width:6px;height:6px;border-radius:50%;background:#fbbf24;animation:pulse 1s ease infinite;}
+        .processing .dot:nth-child(2){animation-delay:0.2s;}
+        .processing .dot:nth-child(3){animation-delay:0.4s;}
+
+        .section-hidden{display:none;}
+    </style>
+</head>
+<body>
+    <div class="wrap">
+        <div class="container">
+            <div class="breadcrumb">
+                <a href="../../index.html">🏠 总控台</a>
+                <span class="sep">/</span>
+                <span class="cur">📡 高空能源传输链路 · 材料选型验证</span>
+            </div>
+
+            <div class="header">
+                <div class="badge-row">
+                    <span class="badge kmp">KMP 方法论</span>
+                    <span class="badge vec">七维向量</span>
+                    <span class="badge bin">01 解码</span>
+                    <span class="badge">低空+高空混合空域</span>
+                </div>
+                <h1>📡 高空能源传输链路 · 材料选型与模拟验证系统</h1>
+                <div class="sub">地面→低空→高空 · KMP→IPD→七维向量→01解码 完整联动<br>Game-OS 工程应用验证平台</div>
+            </div>
+
+            <div class="chain-flow" id="chainFlow">
+                <div class="chain-node active" data-step="k">📝 K层·需求输入</div>
+                <span class="chain-arrow">→</span>
+                <div class="chain-node" data-step="m">📐 M层·数学映射</div>
+                <span class="chain-arrow">→</span>
+                <div class="chain-node" data-step="p">🏔️ P层·物理映射</div>
+                <span class="chain-arrow">→</span>
+                <div class="chain-node" data-step="v">📊 七维向量</div>
+                <span class="chain-arrow">→</span>
+                <div class="chain-node" data-step="t">⚡ 阈值判定</div>
+                <span class="chain-arrow">→</span>
+                <div class="chain-node" data-step="b">💾 01解码</div>
+                <span class="chain-arrow">→</span>
+                <div class="chain-node" data-step="x">🔧 工程指令</div>
+            </div>
+
+            <div class="sec" id="secK">
+                <h2 class="sec-title">
+                    📝 工程需求输入
+                    <span class="layer-tag k">K层 · 知识层</span>
+                </h2>
+                <div class="panel gold">
+                    <div class="input-area">
+                        <textarea class="req-input" id="reqInput" placeholder="描述工程需求，例如：高空太阳能电池板，要求轻质、耐氧化、耐辐射、高转化率，适用高度30km"></textarea>
+                        <div class="input-row">
+                            <button class="btn btn-primary" onclick="processKLayer()">▶ 开始KMP分析</button>
+                            <button class="btn btn-secondary" onclick="fillPreset()">📋 填充示例</button>
+                        </div>
+                        <div class="preset-row">
+                            <span style="font-size:11px;color:rgba(255,255,255,0.3);margin-right:4px;">快速预设：</span>
+                            <span class="preset-btn" onclick="usePreset('高空太阳能电池板，要求轻质、耐氧化、耐辐射、高转化率，适用高度30km')">☀️ 高空太阳能电池板</span>
+                            <span class="preset-btn" onclick="usePreset('微波传输天线罩，要求透波率高、耐高低温、抗紫外线，适用高度20km')">📡 微波天线罩</span>
+                            <span class="preset-btn" onclick="usePreset('无人机中继机翼材料，要求高强度、低密度、抗疲劳，适用高度0-15km')">✈️ 无人机中继机翼</span>
+                            <span class="preset-btn" onclick="usePreset('高空储能电池外壳，要求绝缘、耐压、轻量化，适用高度40km')">🔋 高空储能外壳</span>
+                        </div>
+                    </div>
+                    <div class="k-result" id="kResult">
+                        <div style="margin:16px 0 10px;font-size:12px;color:rgba(255,255,255,0.5);display:flex;align-items:center;gap:8px;">
+                            <span>📌 K层处理结果：</span>
+                        </div>
+                        <div class="k-grid" id="kGrid"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sec section-hidden" id="secM">
+                <h2 class="sec-title">
+                    📐 M层 · 数学化映射
+                    <span class="layer-tag m">M层 · 数学层</span>
+                </h2>
+                <div class="panel">
+                    <p style="font-size:12px;color:rgba(255,255,255,0.45);margin:0 0 14px;line-height:1.6;">将K层提取的关键词转化为可计算的归一化数值（0~1），作为七维向量的初始输入。</p>
+                    <table class="mapping-table" id="mTable">
+                        <thead>
+                            <tr>
+                                <th>K层关键词</th>
+                                <th></th>
+                                <th>M层归一化指标</th>
+                                <th>归一化数值</th>
+                                <th style="width:120px;">可视化</th>
+                            </tr>
+                        </thead>
+                        <tbody id="mTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="sec section-hidden" id="secP">
+                <h2 class="sec-title">
+                    🏔️ P层 · 物理映射
+                    <span class="layer-tag p">P层 · 物理层</span>
+                </h2>
+                <div class="panel">
+                    <p style="font-size:12px;color:rgba(255,255,255,0.45);margin:0 0 14px;line-height:1.6;">将M层数学值映射为物理量，构建七维向量体系。</p>
+                    <table class="mapping-table" id="pTable">
+                        <thead>
+                            <tr>
+                                <th>物理量</th>
+                                <th>符号</th>
+                                <th>对应M层来源</th>
+                                <th>数值</th>
+                                <th style="width:120px;">可视化</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="sec section-hidden" id="secV">
+                <h2 class="sec-title">
+                    📊 七维向量雷达图 + THRESHOLDS 三基准判定
+                    <span class="layer-tag v">向量层</span>
+                    <span class="layer-tag t">阈值层</span>
+                </h2>
+                <div class="split-panel">
+                    <div class="panel" style="padding:16px;">
+                        <div style="font-size:12px;font-weight:600;color:#4ade80;margin-bottom:8px;">🎯 七维向量雷达图</div>
+                        <div class="radar-wrap">
+                            <canvas id="radarCanvas"></canvas>
+                            <div class="radar-legend" id="radarLegend"></div>
+                        </div>
+                    </div>
+                    <div class="panel threshold-panel" id="thresholdPanel">
+                    </div>
+                </div>
+            </div>
+
+            <div class="sec section-hidden" id="secB">
+                <h2 class="sec-title">
+                    💾 01解码器 → 工程指令输出
+                    <span class="layer-tag b">二进制解码</span>
+                    <span class="layer-tag x">工程指令</span>
+                </h2>
+                <div class="panel">
+                    <p style="font-size:12px;color:rgba(255,255,255,0.45);margin:0 0 14px;line-height:1.6;">将七维向量的每个维度转化为8位二进制编码，解码后输出可执行工程指令。</p>
+                    <div class="bin-grid" id="binGrid"></div>
+                    <div class="cmd-output" id="cmdOutput">
+                        <div class="cmd-title">🔧 工程指令输出</div>
+                        <div class="cmd-text" id="cmdText"></div>
+                        <div class="cmd-conf" id="cmdConf"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sec section-hidden" id="secLink">
+                <h2 class="sec-title">
+                    🔗 与主线模块映射
+                </h2>
+                <div class="panel">
+                    <p style="font-size:12px;color:rgba(255,255,255,0.45);margin:0 0 14px;line-height:1.6;">本验证系统直接关联Game-OS以下主线模块：</p>
+                    <div class="link-map">
+                        <div class="link-item">
+                            <div class="link-icon">🚁</div>
+                            <div class="link-name">AirMind引擎</div>
+                            <div class="link-desc">低空飞行器力学稳定性与调度，对应D（阻尼）维度验证</div>
+                        </div>
+                        <div class="link-item">
+                            <div class="link-icon">📐</div>
+                            <div class="link-name">几何心智算力底座</div>
+                            <div class="link-desc">结构冗余、高空层级结构建模，对应Dev-I维度验证</div>
+                        </div>
+                        <div class="link-item">
+                            <div class="link-icon">📡</div>
+                            <div class="link-name">通信信道实验</div>
+                            <div class="link-desc">微波传输链路稳定性与噪声容限，对应S（博弈熵）维度</div>
+                        </div>
+                        <div class="link-item">
+                            <div class="link-icon">💥</div>
+                            <div class="link-name">THRESHOLDS熔断体系</div>
+                            <div class="link-desc">0.48保本/0.50稳态/0.68熔断三基准判定，安全边界验证</div>
+                        </div>
+                        <div class="link-item">
+                            <div class="link-icon">🍎</div>
+                            <div class="link-name">结构力学实验组</div>
+                            <div class="link-desc">7项实验完整链路：低空基准→高空层级→跨空域耦合→冗余→承重→爆破→堆积</div>
+                        </div>
+                        <div class="link-item">
+                            <div class="link-icon">🧠</div>
+                            <div class="link-name">KMP→IPD方法论</div>
+                            <div class="link-desc">知识→数学→物理三层映射，七维向量体系完整落地</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="disclaimer">
+                ⚠️ 本页面为工程模拟演示，数据为模拟数据，不构成实际工程决策依据。<br>
+                核心价值：展示KMP→IPD→七维向量→01解码方法论在真实工程场景中的完整可运行链路。
+            </div>
+        </div>
+    </div>
+
+<script>
+const materialPresets = {
+    '高空太阳能电池板，要求轻质、耐氧化、耐辐射、高转化率，适用高度30km': {
+        keywords: ['轻质', '耐氧化', '耐辐射', '高转化率', '30km'],
+        intent: '材料选型',
+        riskTags: ['高可靠性', '长寿命'],
+        mMapping: [
+            {kw:'轻质', metric:'密度指标（越低越好）', val:0.6, color:'cyan'},
+            {kw:'耐氧化', metric:'氧化抗性指标（越高越好）', val:0.8, color:'green'},
+            {kw:'耐辐射', metric:'辐射耐受指标（越高越好）', val:0.7, color:'purple'},
+            {kw:'高转化率', metric:'光电转化率指标（越高越好）', val:0.9, color:'orange'},
+            {kw:'30km', metric:'适用高度指标（越高越好）', val:0.75, color:'cyan'},
+        ],
+        vector: {I:0.75, P:0.60, D:0.30, S:0.45, DevI:0.20, Dev1:0.35, Dev2:0.40},
+        material: '钙钛矿+硅叠层',
+        altitude: '30km',
+        lifespan: '5年',
+        confidence: 82,
+        warning: '需复检高温极限工况（I≈0.68阈值）'
+    },
+    '微波传输天线罩，要求透波率高、耐高低温、抗紫外线，适用高度20km': {
+        keywords: ['透波率高', '耐高低温', '抗紫外线', '20km'],
+        intent: '材料选型',
+        riskTags: ['透波稳定性', '环境耐受'],
+        mMapping: [
+            {kw:'透波率高', metric:'介电常数指标', val:0.85, color:'cyan'},
+            {kw:'耐高低温', metric:'热稳定性指标', val:0.70, color:'orange'},
+            {kw:'抗紫外线', metric:'UV耐受指标', val:0.65, color:'purple'},
+            {kw:'20km', metric:'适用高度指标', val:0.55, color:'green'},
+        ],
+        vector: {I:0.55, P:0.50, D:0.35, S:0.30, DevI:0.18, Dev1:0.28, Dev2:0.32},
+        material: '石英陶瓷复合',
+        altitude: '20km',
+        lifespan: '8年',
+        confidence: 88,
+        warning: ''
+    },
+    '无人机中继机翼材料，要求高强度、低密度、抗疲劳，适用高度0-15km': {
+        keywords: ['高强度', '低密度', '抗疲劳', '0-15km'],
+        intent: '材料选型',
+        riskTags: ['结构安全', '疲劳寿命'],
+        mMapping: [
+            {kw:'高强度', metric:'比强度指标', val:0.80, color:'orange'},
+            {kw:'低密度', metric:'密度指标（越低越好）', val:0.75, color:'cyan'},
+            {kw:'抗疲劳', metric:'疲劳寿命指标', val:0.70, color:'purple'},
+            {kw:'0-15km', metric:'适用高度范围', val:0.45, color:'green'},
+        ],
+        vector: {I:0.45, P:0.55, D:0.25, S:0.25, DevI:0.15, Dev1:0.22, Dev2:0.28},
+        material: '碳纤维T1000复合材料',
+        altitude: '0-15km',
+        lifespan: '10年/15000飞行小时',
+        confidence: 91,
+        warning: ''
+    },
+    '高空储能电池外壳，要求绝缘、耐压、轻量化，适用高度40km': {
+        keywords: ['绝缘', '耐压', '轻量化', '40km'],
+        intent: '材料选型',
+        riskTags: ['电气安全', '承压密封'],
+        mMapping: [
+            {kw:'绝缘', metric:'介电强度指标', val:0.85, color:'purple'},
+            {kw:'耐压', metric:'承压强度指标', val:0.75, color:'orange'},
+            {kw:'轻量化', metric:'比强度指标', val:0.65, color:'cyan'},
+            {kw:'40km', metric:'适用高度指标', val:0.88, color:'red'},
+        ],
+        vector: {I:0.88, P:0.45, D:0.40, S:0.50, DevI:0.25, Dev1:0.40, Dev2:0.45},
+        material: '凯夫拉增强聚酰亚胺',
+        altitude: '40km',
+        lifespan: '3年',
+        confidence: 74,
+        warning: '⚠️ I=0.88超过0.68熔断线，需极端工况压力测试'
+    }
+};
+
+let currentData = null;
+let currentStep = 0;
+
+function fillPreset() {
+    document.getElementById('reqInput').value = '高空太阳能电池板，要求轻质、耐氧化、耐辐射、高转化率，适用高度30km';
+}
+
+function usePreset(text) {
+    document.getElementById('reqInput').value = text;
+}
+
+function processKLayer() {
+    const input = document.getElementById('reqInput').value.trim();
+    if (!input) {
+        alert('请输入工程需求描述');
+        return;
+    }
+
+    currentData = materialPresets[input] || generateGenericResult(input);
+
+    const kGrid = document.getElementById('kGrid');
+    kGrid.innerHTML = `
+        <div class="k-item">
+            <div class="k-label">🎯 意图识别</div>
+            <div class="k-val">${currentData.intent}</div>
+        </div>
+        <div class="k-item">
+            <div class="k-label">🔑 提取关键词</div>
+            <div class="k-val"><div class="k-keywords">${currentData.keywords.map(kw=>`<span class="k-kw">${kw}</span>`).join('')}</div></div>
+        </div>
+        <div class="k-item">
+            <div class="k-label">⚠️ 风险标签</div>
+            <div class="k-val"><div class="k-keywords">${currentData.riskTags.map(t=>`<span class="k-kw warn">${t}</span>`).join('')}</div></div>
+        </div>
+    `;
+    document.getElementById('kResult').classList.add('show');
+
+    updateChain(1);
+    setTimeout(() => showSection('secM'), 600);
+    setTimeout(() => renderMLayer(), 900);
+}
+
+function generateGenericResult(input) {
+    const baseVec = {I:0.60, P:0.50, D:0.35, S:0.40, DevI:0.25, Dev1:0.30, Dev2:0.35};
+    return {
+        keywords: ['自定义需求'],
+        intent: '材料选型',
+        riskTags: ['综合评估'],
+        mMapping: [
+            {kw:'综合需求', metric:'性能指标综合评估', val:0.6, color:'cyan'},
+        ],
+        vector: baseVec,
+        material: '待评估复合材料',
+        altitude: '待定',
+        lifespan: '待评估',
+        confidence: 65,
+        warning: '建议提供更具体的参数需求以提高置信度'
+    };
+}
+
+function renderMLayer() {
+    const tbody = document.getElementById('mTableBody');
+    let html = '';
+    currentData.mMapping.forEach((m, i) => {
+        setTimeout(() => {
+            const row = document.querySelector(`tr[data-m-idx="${i}"] .val-bar-fill`);
+            if (row) row.style.width = (m.val * 100) + '%';
+        }, 200 + i * 150);
+        html += `<tr data-m-idx="${i}">
+            <td style="color:#67e8f9;font-weight:600;">${m.kw}</td>
+            <td class="arrow-cell">→</td>
+            <td style="color:rgba(255,255,255,0.7);">${m.metric}</td>
+            <td><span class="val-num" style="color:${getColor(m.color)}">${m.val.toFixed(2)}</span></td>
+            <td><div class="val-bar-wrap"><div class="val-bar"><div class="val-bar-fill ${m.color}"></div></div></div></td>
+        </tr>`;
+    });
+    tbody.innerHTML = html;
+
+    setTimeout(() => updateChain(2), currentData.mMapping.length * 150 + 400);
+    setTimeout(() => showSection('secP'), currentData.mMapping.length * 150 + 700);
+    setTimeout(() => renderPLayer(), currentData.mMapping.length * 150 + 1000);
+}
+
+function renderPLayer() {
+    const v = currentData.vector;
+    const pMap = [
+        {name:'海拔', sym:'I', src:'适用高度指标', val:v.I, color:'cyan'},
+        {name:'坡度', sym:'P', src:'生产效率/产能爬坡', val:v.P, color:'purple'},
+        {name:'阻尼', sym:'D', src:'材料衰减速率/耐候性', val:v.D, color:'green'},
+        {name:'博弈熵', sym:'S', src:'不确定性/环境波动', val:v.S, color:'orange'},
+        {name:'容积偏差', sym:'Dev-I', src:'几何形态偏差', val:v.DevI, color:'cyan'},
+        {name:'偏差1', sym:'Dev1', src:'均值回归偏差', val:v.Dev1, color:'purple'},
+        {name:'偏差2', sym:'Dev2', src:'历史相似度偏差', val:v.Dev2, color:'orange'},
+    ];
+    const tbody = document.getElementById('pTableBody');
+    let html = '';
+    pMap.forEach((p, i) => {
+        setTimeout(() => {
+            const row = document.querySelector(`tr[data-p-idx="${i}"] .val-bar-fill`);
+            if (row) row.style.width = (p.val * 100) + '%';
+        }, 200 + i * 120);
+        html += `<tr data-p-idx="${i}">
+            <td style="color:rgba(255,255,255,0.8);">${p.name}</td>
+            <td style="font-family:'SF Mono',monospace;font-weight:700;color:${getColor(p.color)};">${p.sym}</td>
+            <td style="color:rgba(255,255,255,0.5);font-size:11px;">${p.src}</td>
+            <td><span class="val-num" style="color:${getColor(p.color)}">${p.val.toFixed(2)}</span></td>
+            <td><div class="val-bar-wrap"><div class="val-bar"><div class="val-bar-fill ${p.color}"></div></div></div></td>
+        </tr>`;
+    });
+    tbody.innerHTML = html;
+
+    setTimeout(() => updateChain(3), pMap.length * 120 + 400);
+    setTimeout(() => showSection('secV'), pMap.length * 120 + 700);
+    setTimeout(() => { renderRadar(); renderThresholds(); }, pMap.length * 120 + 1000);
+}
+
+function renderRadar() {
+    const canvas = document.getElementById('radarCanvas');
+    const ctx = canvas.getContext('2d');
+    const rect = canvas.getBoundingClientRect();
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    ctx.scale(dpr, dpr);
+    const W = rect.width;
+    const H = rect.height;
+    const cx = W / 2;
+    const cy = H / 2;
+    const R = Math.min(W, H) * 0.35;
+
+    const dims = ['I','P','D','S','Dev-I','Dev1','Dev2'];
+    const dimNames = ['I(海拔)','P(坡度)','D(阻尼)','S(熵)','Dev-I','Dev1','Dev2'];
+    const v = currentData.vector;
+    const vals = [v.I, v.P, v.D, v.S, v.DevI, v.Dev1, v.Dev2];
+    const n = dims.length;
+
+    ctx.clearRect(0, 0, W, H);
+
+    [0.25, 0.5, 0.68, 1.0].forEach(level => {
+        ctx.beginPath();
+        for (let i = 0; i <= n; i++) {
+            const angle = (Math.PI * 2 * i / n) - Math.PI / 2;
+            const r = R * level;
+            const x = cx + r * Math.cos(angle);
+            const y = cy + r * Math.sin(angle);
+            if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+        }
+        ctx.closePath();
+        if (level === 0.48) { ctx.strokeStyle = 'rgba(74,222,128,0.3)'; ctx.setLineDash([4,4]); }
+        else if (level === 0.5) { ctx.strokeStyle = 'rgba(250,204,21,0.3)'; ctx.setLineDash([4,4]); }
+        else if (level === 0.68) { ctx.strokeStyle = 'rgba(248,113,113,0.4)'; ctx.setLineDash([6,3]); ctx.lineWidth = 2; }
+        else { ctx.strokeStyle = 'rgba(255,255,255,0.08)'; ctx.setLineDash([]); ctx.lineWidth = 1; }
+        ctx.stroke();
+    });
+    ctx.setLineDash([]);
+
+    for (let i = 0; i < n; i++) {
+        const angle = (Math.PI * 2 * i / n) - Math.PI / 2;
+        ctx.beginPath();
+        ctx.moveTo(cx, cy);
+        ctx.lineTo(cx + R * Math.cos(angle), cy + R * Math.sin(angle));
+        ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+    }
+
+    for (let i = 0; i < n; i++) {
+        const angle = (Math.PI * 2 * i / n) - Math.PI / 2;
+        const lx = cx + (R + 18) * Math.cos(angle);
+        const ly = cy + (R + 18) * Math.sin(angle);
+        ctx.font = '11px SF Mono, monospace';
+        ctx.fillStyle = 'rgba(255,255,255,0.5)';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(dimNames[i], lx, ly);
+    }
+
+    ctx.beginPath();
+    for (let i = 0; i <= n; i++) {
+        const idx = i % n;
+        const angle = (Math.PI * 2 * idx / n) - Math.PI / 2;
+        const r = R * vals[idx];
+        const x = cx + r * Math.cos(angle);
+        const y = cy + r * Math.sin(angle);
+        if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    }
+    ctx.closePath();
+    ctx.fillStyle = 'rgba(251,191,36,0.15)';
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(251,191,36,0.7)';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    for (let i = 0; i < n; i++) {
+        const angle = (Math.PI * 2 * i / n) - Math.PI / 2;
+        const r = R * vals[i];
+        const x = cx + r * Math.cos(angle);
+        const y = cy + r * Math.sin(angle);
+        ctx.beginPath();
+        ctx.arc(x, y, 4, 0, Math.PI * 2);
+        ctx.fillStyle = '#fbbf24';
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(0,0,0,0.3)';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+    }
+
+    const legend = document.getElementById('radarLegend');
+    legend.innerHTML = `
+        <span class="radar-legend-item"><span class="radar-legend-dot" style="background:#4ade80;"></span>0.48保本线</span>
+        <span class="radar-legend-item"><span class="radar-legend-dot" style="background:#facc15;"></span>0.50稳态线</span>
+        <span class="radar-legend-item"><span class="radar-legend-dot" style="background:#f87171;"></span>0.68熔断线</span>
+        <span class="radar-legend-item"><span class="radar-legend-dot" style="background:#fbbf24;"></span>当前向量</span>
+    `;
+}
+
+function renderThresholds() {
+    const v = currentData.vector;
+    const maxDim = Math.max(v.I, v.P, v.D, v.S, v.DevI, v.Dev1, v.Dev2);
+    const checks = [
+        {name:'0.48 保本线', val:v.I, threshold:0.48, desc:'I(海拔)维度' },
+        {name:'0.50 稳态线', val:v.I, threshold:0.50, desc:'I(海拔)维度' },
+        {name:'0.68 熔断线', val:v.I, threshold:0.68, desc:'I(海拔)维度' },
+    ];
+
+    const panel = document.getElementById('thresholdPanel');
+    let html = '';
+    checks.forEach(th => {
+        let status, cls, icon, statusText;
+        if (th.val >= th.threshold + 0.15) {
+            cls = 'danger'; icon = '🔴'; status = 'danger'; statusText = '⚠️ 超阈';
+        } else if (th.val >= th.threshold) {
+            cls = th.threshold === 0.68 ? 'danger' : 'warn';
+            icon = th.threshold === 0.68 ? '🔴' : '🟡';
+            statusText = th.threshold === 0.68 ? '⚠️ 达熔断' : '⚡ 超稳态';
+        } else {
+            cls = 'safe'; icon = '🟢'; status = 'safe'; statusText = '✅ 安全';
+        }
+        html += `
+        <div class="th-item ${cls}">
+            <div class="th-icon">${icon}</div>
+            <div class="th-content">
+                <div class="th-label">${th.name} · ${th.desc}</div>
+                <div class="th-val">当前值 ${th.val.toFixed(2)} ${th.val >= th.threshold ? '≥' : '<'} ${th.threshold.toFixed(2)}</div>
+            </div>
+            <div class="th-status">${statusText}</div>
+        </div>`;
+    });
+    panel.innerHTML = html;
+
+    setTimeout(() => updateChain(4), 600);
+    setTimeout(() => updateChain(5), 800);
+    setTimeout(() => showSection('secB'), 1000);
+    setTimeout(() => renderBinAndCmd(), 1300);
+}
+
+function toBinary8(val) {
+    const byte = Math.round(val * 255);
+    return byte.toString(2).padStart(8, '0');
+}
+
+function renderBinAndCmd() {
+    const v = currentData.vector;
+    const dims = [
+        {name:'I（海拔）', key:'I', val:v.I},
+        {name:'P（坡度）', key:'P', val:v.P},
+        {name:'D（阻尼）', key:'D', val:v.D},
+        {name:'S（博弈熵）', key:'S', val:v.S},
+        {name:'Dev-I', key:'DevI', val:v.DevI},
+        {name:'Dev1', key:'Dev1', val:v.Dev1},
+        {name:'Dev2', key:'Dev2', val:v.Dev2},
+    ];
+
+    const binGrid = document.getElementById('binGrid');
+    let html = '';
+    dims.forEach((d, i) => {
+        const bin = toBinary8(d.val);
+        setTimeout(() => {
+            const bits = document.querySelectorAll(`[data-bin="${d.key}"] .bin-bit`);
+            bits.forEach((bit, j) => {
+                setTimeout(() => {
+                    bit.style.opacity = '1';
+                    bit.style.transform = 'scale(1)';
+                }, j * 40);
+            });
+        }, 200 + i * 150);
+        html += `<div class="bin-item" data-bin="${d.key}">
+            <div class="bin-dim-name">
+                <span>${d.name}</span>
+                <span class="bin-dim-val">${d.val.toFixed(2)}</span>
+            </div>
+            <div class="bin-bits">${bin.split('').map(b=>`<span class="bin-bit b${b}" style="opacity:0;transform:scale(0.5);transition:all 0.2s ease;">${b}</span>`).join('')}</div>
+        </div>`;
+    });
+    binGrid.innerHTML = html;
+
+    setTimeout(() => {
+        const cmdText = document.getElementById('cmdText');
+        let warnHtml = currentData.warning ? `<br><span class="${currentData.warning.includes('⚠️') ? 'red' : 'orange'}">${currentData.warning}</span>` : `<br><span class="green">✅ 各项指标在安全区间内</span>`;
+        cmdText.innerHTML = `建议材料：<span class="highlight">${currentData.material}</span> | 适用高度：<span class="highlight">${currentData.altitude}</span> | 预估寿命：<span class="highlight">${currentData.lifespan}</span>${warnHtml}`;
+
+        const cmdConf = document.getElementById('cmdConf');
+        cmdConf.innerHTML = `
+            <span>🎯 置信度：<strong>${currentData.confidence}%</strong></span>
+            <span>📐 方法：<strong>KMP→IPD→七维向量</strong></span>
+            <span>💾 编码：<strong>7×8bit = 56bit</strong></span>
+        `;
+    }, dims.length * 150 + 400);
+
+    setTimeout(() => updateChain(6), dims.length * 150 + 800);
+    setTimeout(() => showSection('secLink'), dims.length * 150 + 1100);
+}
+
+function getColor(c) {
+    const map = {cyan:'#22d3ee', purple:'#a78bfa', orange:'#fb923c', green:'#4ade80', red:'#f87171'};
+    return map[c] || '#fbbf24';
+}
+
+function showSection(id) {
+    document.getElementById(id).classList.remove('section-hidden');
+}
+
+function updateChain(step) {
+    currentStep = step;
+    const steps = ['k','m','p','v','t','b','x'];
+    document.querySelectorAll('.chain-node').forEach((node, i) => {
+        node.classList.remove('active', 'done');
+        if (i < step) node.classList.add('done');
+        else if (i === step) node.classList.add('active');
+    });
+}
+
+window.addEventListener('resize', () => {
+    if (currentData) renderRadar();
+});
+</script>
+</body>
+</html>
