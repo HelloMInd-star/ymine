@@ -628,10 +628,302 @@
         .log-entry.warn { color: #fbbf24; }
         .log-entry.process { color: #67e8f9; }
 
+        /* ========== 引导区样式 ========== */
+        .guide-section {
+            background: linear-gradient(135deg, rgba(167,139,250,0.06), rgba(34,211,238,0.04), rgba(52,211,153,0.04));
+            border: 1px solid rgba(167,139,250,0.12);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+            position: relative;
+            overflow: hidden;
+        }
+        .guide-section::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #60a5fa, #a78bfa, #22d3ee, #34d399);
+        }
+        .guide-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: rgba(255,255,255,0.8);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .guide-title .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 10px;
+            background: rgba(251,191,36,0.12);
+            border: 1px solid rgba(251,191,36,0.25);
+            border-radius: 6px;
+            font-size: 11px;
+            color: #fbbf24;
+            font-weight: 500;
+        }
+        .guide-cards {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr auto 1fr;
+            gap: 0;
+            align-items: stretch;
+            margin-bottom: 16px;
+        }
+        .guide-card {
+            background: rgba(0,0,0,0.25);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 12px;
+            padding: 16px;
+            position: relative;
+            transition: all .3s;
+        }
+        .guide-card:hover {
+            border-color: rgba(255,255,255,0.12);
+            transform: translateY(-2px);
+        }
+        .guide-card.layer-app { border-top: 2px solid #60a5fa; }
+        .guide-card.layer-map { border-top: 2px solid #a78bfa; }
+        .guide-card.layer-store { border-top: 2px solid #34d399; }
+
+        .guide-card-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+        .guide-card-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+        .layer-app .guide-card-icon { background: rgba(96,165,250,0.15); }
+        .layer-map .guide-card-icon { background: rgba(167,139,250,0.15); }
+        .layer-store .guide-card-icon { background: rgba(52,211,153,0.15); }
+
+        .guide-card-layer {
+            font-size: 10px;
+            color: rgba(255,255,255,0.35);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+        .guide-card-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: rgba(255,255,255,0.85);
+        }
+        .guide-card-desc {
+            font-size: 11px;
+            color: rgba(255,255,255,0.5);
+            line-height: 1.6;
+            margin-bottom: 12px;
+        }
+        .guide-card-example {
+            background: rgba(255,255,255,0.03);
+            border-radius: 8px;
+            padding: 8px 10px;
+            font-size: 11px;
+            color: rgba(255,255,255,0.45);
+            font-family: 'SF Mono', monospace;
+            line-height: 1.5;
+            border-left: 2px solid rgba(255,255,255,0.1);
+        }
+        .layer-app .guide-card-example { border-left-color: rgba(96,165,250,0.4); }
+        .layer-map .guide-card-example { border-left-color: rgba(167,139,250,0.4); }
+        .layer-store .guide-card-example { border-left-color: rgba(52,211,153,0.4); }
+
+        .guide-arrow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 6px;
+        }
+        .guide-arrow svg {
+            width: 24px;
+            height: 24px;
+            opacity: 0.3;
+        }
+
+        /* KMP→IPD 映射表格 */
+        .kmp-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 8px;
+            font-size: 10px;
+        }
+        .kmp-table th {
+            text-align: left;
+            padding: 4px 6px;
+            color: rgba(255,255,255,0.4);
+            font-weight: 500;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            font-size: 9px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .kmp-table td {
+            padding: 4px 6px;
+            color: rgba(255,255,255,0.6);
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+        }
+        .kmp-table .k-letter { color: #60a5fa; font-weight: 600; font-family: 'SF Mono', monospace; }
+        .kmp-table .m-letter { color: #a78bfa; font-weight: 600; font-family: 'SF Mono', monospace; }
+        .kmp-table .p-letter { color: #f472b6; font-weight: 600; font-family: 'SF Mono', monospace; }
+        .kmp-table .arrow-cell { color: rgba(255,255,255,0.2); text-align: center; }
+        .kmp-table .ipd-val { color: #22d3ee; font-family: 'SF Mono', monospace; }
+
+        .binary-mini {
+            font-family: 'SF Mono', monospace;
+            font-size: 10px;
+            color: #4ade80;
+            letter-spacing: 0.5px;
+            line-height: 1.7;
+        }
+        .binary-mini .dim-tag {
+            color: #a78bfa;
+            display: inline-block;
+            width: 36px;
+        }
+
+        .guide-flow {
+            text-align: center;
+            font-size: 11px;
+            color: rgba(255,255,255,0.4);
+            padding: 10px 16px;
+            background: rgba(0,0,0,0.15);
+            border-radius: 8px;
+            line-height: 1.6;
+        }
+        .guide-flow .flow-arrow { color: rgba(167,139,250,0.6); margin: 0 4px; }
+        .guide-flow .hl-app { color: #60a5fa; }
+        .guide-flow .hl-map { color: #c4b5fd; }
+        .guide-flow .hl-power { color: #fbbf24; }
+        .guide-flow .hl-store { color: #6ee7b7; }
+
+        /* ========== 底部双栏：日志 + 记忆库 ========== */
+        .bottom-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+        .memory-panel {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 16px;
+            padding: 20px;
+            backdrop-filter: blur(8px);
+            display: flex;
+            flex-direction: column;
+        }
+        .memory-panel .section-title { margin-bottom: 14px; }
+        .memory-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .memory-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 12px;
+            background: rgba(52,211,153,0.06);
+            border: 1px solid rgba(52,211,153,0.15);
+            border-radius: 8px;
+            font-size: 11px;
+        }
+        .memory-dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: #34d399;
+            animation: pulse-dot 2s ease-in-out infinite;
+            flex-shrink: 0;
+        }
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(52,211,153,0.4); }
+            50% { opacity: 0.7; box-shadow: 0 0 0 6px rgba(52,211,153,0); }
+        }
+        .memory-status-text { color: rgba(255,255,255,0.6); }
+        .memory-status-text .status-label { color: #6ee7b7; font-weight: 600; }
+
+        .memory-current {
+            padding: 12px;
+            background: rgba(0,0,0,0.25);
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.04);
+        }
+        .memory-current-label {
+            font-size: 10px;
+            color: rgba(255,255,255,0.35);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+        .memory-current-text {
+            font-size: 12px;
+            color: rgba(255,255,255,0.7);
+            line-height: 1.5;
+            font-family: 'SF Mono', monospace;
+            word-break: break-all;
+        }
+        .memory-current-time {
+            font-size: 10px;
+            color: rgba(167,139,250,0.6);
+            margin-top: 4px;
+            font-family: 'SF Mono', monospace;
+        }
+
+        .memory-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .memory-stat {
+            padding: 10px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+            text-align: center;
+        }
+        .memory-stat .ms-val {
+            font-size: 20px;
+            font-weight: 700;
+            font-family: 'SF Mono', monospace;
+        }
+        .memory-stat .ms-label {
+            font-size: 10px;
+            color: rgba(255,255,255,0.4);
+            margin-top: 2px;
+        }
+        .ms-dim { color: #22d3ee; }
+        .ms-count { color: #fbbf24; }
+
+        .memory-binary-preview {
+            padding: 10px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+            font-family: 'SF Mono', monospace;
+            font-size: 10px;
+            color: #4ade80;
+            letter-spacing: 0.5px;
+            line-height: 1.7;
+            max-height: 80px;
+            overflow: hidden;
+        }
+
         .footer-note {
             text-align: center;
             padding-top: 20px;
-            margin-top: 20px;
+            margin-top: 0;
             border-top: 1px solid rgba(255,255,255,0.04);
             font-size: 12px;
             color: rgba(255,255,255,0.25);
@@ -642,6 +934,11 @@
             .charts-row { grid-template-columns: 1fr; }
             .charts-triple { grid-template-columns: 1fr; }
             .sim-visual { grid-template-columns: 1fr; }
+            .bottom-row { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 900px) {
+            .guide-cards { grid-template-columns: 1fr; gap: 10px; }
+            .guide-arrow { transform: rotate(90deg); padding: 4px 0; }
         }
         @media (max-width: 680px) {
             .page-container { padding: 16px 12px; }
@@ -671,6 +968,92 @@
         <div class="page-header">
             <h1>🧠 人机思维交互引擎</h1>
             <div class="subtitle">语言拆解 · 语义映射 · 算力联动 · 01 解码 · 海拔模拟</div>
+        </div>
+
+        <!-- 📐 系统运行链路引导区（新增） -->
+        <div class="guide-section">
+            <div class="guide-title">
+                📐 系统运行链路引导
+                <span class="badge">🔍 先看全局框架</span>
+            </div>
+            <div class="guide-cards">
+                <!-- 卡片1：应用层 -->
+                <div class="guide-card layer-app" id="guideCard1">
+                    <div class="guide-card-header">
+                        <div class="guide-card-icon">💬</div>
+                        <div>
+                            <div class="guide-card-layer">① 应用层</div>
+                            <div class="guide-card-name">用户输入与语义解析</div>
+                        </div>
+                    </div>
+                    <div class="guide-card-desc">接收用户输入，通过语言拆解提取关键词与意图，识别情感标签和主题分类。</div>
+                    <div class="guide-card-example" id="guideExample1">
+                        💡 示例："今天市场波动有点大，我想看看风险情况。"
+                    </div>
+                </div>
+                <!-- 箭头1 -->
+                <div class="guide-arrow">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M5 12h14M12 5l7 7-7 7" stroke="rgba(167,139,250,0.4)"/>
+                    </svg>
+                </div>
+                <!-- 卡片2：映射层 -->
+                <div class="guide-card layer-map" id="guideCard2">
+                    <div class="guide-card-header">
+                        <div class="guide-card-icon">🔄</div>
+                        <div>
+                            <div class="guide-card-layer">② 映射层</div>
+                            <div class="guide-card-name">KMP → IPD 转换</div>
+                        </div>
+                    </div>
+                    <div class="guide-card-desc">将语义信息通过 K(知识层)→M(数学层)→P(物理层) 三级映射，转化为 IPD 七维向量。</div>
+                    <table class="kmp-table">
+                        <thead><tr><th>KMP</th><th>作用</th><th class="arrow-cell">→</th><th>IPD</th></tr></thead>
+                        <tbody>
+                            <tr><td class="k-letter">K</td><td>识别实体与意图</td><td class="arrow-cell">→</td><td class="ipd-val">决定 I(海拔)</td></tr>
+                            <tr><td class="m-letter">M</td><td>语义转可计算维度</td><td class="arrow-cell">→</td><td class="ipd-val">决定 P(坡度)</td></tr>
+                            <tr><td class="p-letter">P</td><td>物理状态描述行为</td><td class="arrow-cell">→</td><td class="ipd-val">决定 D(阻尼)</td></tr>
+                        </tbody>
+                    </table>
+                    <div class="guide-card-example" id="guideExample2">
+                        K(市场/风险) → M(向量) → P(海拔) → IPD(I=0.35, P=0.60, D=0.45)
+                    </div>
+                </div>
+                <!-- 箭头2 -->
+                <div class="guide-arrow">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M5 12h14M12 5l7 7-7 7" stroke="rgba(167,139,250,0.4)"/>
+                    </svg>
+                </div>
+                <!-- 卡片3：存储层 -->
+                <div class="guide-card layer-store" id="guideCard3">
+                    <div class="guide-card-header">
+                        <div class="guide-card-icon">💾</div>
+                        <div>
+                            <div class="guide-card-layer">③ 存储层</div>
+                            <div class="guide-card-name">01 进制与长期记忆</div>
+                        </div>
+                    </div>
+                    <div class="guide-card-desc">七维向量以 01 二进制形式编码，存入长期记忆库（GitHub 仓库 / 本地存储）。</div>
+                    <div class="binary-mini" id="guideExample3">
+                        <span class="dim-tag">I</span> 01011001<br>
+                        <span class="dim-tag">P</span> 10011010<br>
+                        <span class="dim-tag">D</span> 01110011<br>
+                        <span class="dim-tag">...</span> 共7维
+                    </div>
+                </div>
+            </div>
+            <div class="guide-flow">
+                <span class="hl-app">用户输入</span>
+                <span class="flow-arrow">→</span>
+                <span class="hl-app">应用层解析</span>
+                <span class="flow-arrow">→</span>
+                <span class="hl-map">映射层转换为 IPD</span>
+                <span class="flow-arrow">→</span>
+                <span class="hl-power">算力调度</span>
+                <span class="flow-arrow">→</span>
+                <span class="hl-store">存储层以 01 形式沉淀为长期记忆</span>
+            </div>
         </div>
 
         <div class="section">
@@ -839,9 +1222,38 @@
             </div>
         </div>
 
-        <div class="section">
-            <div class="section-title"><span class="num">7</span> 认知日志</div>
-            <div class="log-container" id="logContainer"></div>
+        <div class="bottom-row">
+            <div class="section" style="margin-bottom:0;">
+                <div class="section-title"><span class="num">7</span> 认知日志</div>
+                <div class="log-container" id="logContainer"></div>
+            </div>
+            <div class="memory-panel">
+                <div class="section-title">📁 长期记忆库状态</div>
+                <div class="memory-content">
+                    <div class="memory-status">
+                        <div class="memory-dot"></div>
+                        <div class="memory-status-text"><span class="status-label" id="memStatusLabel">待写入</span></div>
+                    </div>
+                    <div class="memory-current">
+                        <div class="memory-current-label">当前写入</div>
+                        <div class="memory-current-text" id="memCurrentText">暂无输入，等待处理...</div>
+                        <div class="memory-current-time" id="memCurrentTime">--</div>
+                    </div>
+                    <div class="memory-stats">
+                        <div class="memory-stat">
+                            <div class="ms-val ms-dim" id="memDimCount">0/7</div>
+                            <div class="ms-label">已存储维度</div>
+                        </div>
+                        <div class="memory-stat">
+                            <div class="ms-val ms-count" id="memTotalCount">0</div>
+                            <div class="ms-label">库中条目总数</div>
+                        </div>
+                    </div>
+                    <div class="memory-binary-preview" id="memBinaryPreview">
+                        等待数据写入...
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div class="footer-note">
@@ -883,17 +1295,26 @@
             '今天市场波动有点大，我想看看风险情况': {
                 keywords: ['市场', '波动', '风险', '看看'],
                 emotions: ['焦虑', '关注'],
-                topics: ['金融', '风险']
+                topics: ['金融', '风险'],
+                kmpSummary: 'K(市场/风险) → M(向量) → P(海拔)',
+                ipd: { I: 0.35, P: 0.60, D: 0.45, S: 0.72, 'Dev-I': 0.78, Dev1: 0.32, Dev2: 0.41 },
+                kmpMap: 'K(市场/风险)'
             },
             '帮我优化一下这个投资策略': {
                 keywords: ['优化', '投资', '策略'],
                 emotions: ['中性', '积极'],
-                topics: ['决策', '优化']
+                topics: ['决策', '优化'],
+                kmpSummary: 'K(策略/优化) → M(向量) → P(海拔)',
+                ipd: { I: 0.55, P: 0.70, D: 0.30, S: 0.42, 'Dev-I': 0.35, Dev1: 0.50, Dev2: 0.55 },
+                kmpMap: 'K(策略/优化)'
             },
             '我感觉有点累，需要休息一下': {
                 keywords: ['累', '休息'],
                 emotions: ['疲惫', '消极'],
-                topics: ['状态', '健康']
+                topics: ['状态', '健康'],
+                kmpSummary: 'K(状态/休息) → M(向量) → P(海拔)',
+                ipd: { I: 0.20, P: 0.10, D: 0.80, S: 0.35, 'Dev-I': 0.25, Dev1: 0.60, Dev2: 0.30 },
+                kmpMap: 'K(状态/休息)'
             }
         };
 
@@ -903,7 +1324,8 @@
             powerAlloc: { semantic: 0.35, vector: 0.30, cognitive: 0.25, other: 0.10 },
             powerHistory: [0.4, 0.45, 0.5, 0.52, 0.48, 0.55, 0.5, 0.53, 0.49, 0.5],
             envStrength: 0.5,
-            processing: false
+            processing: false,
+            memoryCount: 23
         };
 
         let charts = {};
@@ -1188,6 +1610,72 @@
 
         function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
+        function toKMPMap(text) {
+            if (SAMPLES[text]) {
+                return SAMPLES[text].kmpMap;
+            }
+            const topics = [];
+            if (/[市场风险波动涨跌金融]/.test(text)) topics.push('市场/风险');
+            if (/[优化策略分析计划]/.test(text)) topics.push('策略/优化');
+            if (/[累休息疲惫困健康]/.test(text)) topics.push('状态/休息');
+            if (/[开心高兴喜欢快乐]/.test(text)) topics.push('情感/积极');
+            if (topics.length === 0) topics.push('通用');
+            return 'K(' + topics.join('/') + ')';
+        }
+
+        function updateGuideCards(text) {
+            const kmp = toKMPMap(text);
+            const ex1 = document.getElementById('guideExample1');
+            const ex2 = document.getElementById('guideExample2');
+            const ex3 = document.getElementById('guideExample3');
+            if (ex1) ex1.innerHTML = '💡 示例："' + text.substring(0, 40) + (text.length > 40 ? '...' : '') + '"';
+        }
+
+        function writeToMemory(text, vector) {
+            currentState.memoryCount++;
+            const now = new Date();
+            const timeStr = `${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+
+            const kmp = toKMPMap(text);
+            const ex2 = document.getElementById('guideExample2');
+            if (ex2) {
+                ex2.textContent = `${kmp} → M(向量值) → P(海拔${vector.I.toFixed(2)}/坡度${vector.P.toFixed(2)}) → IPD(I=${vector.I.toFixed(2)}, P=${vector.P.toFixed(2)}, D=${vector.D.toFixed(2)})`;
+            }
+            const ex3 = document.getElementById('guideExample3');
+            if (ex3) {
+                ex3.innerHTML = DIMENSIONS.slice(0, 4).map(d =>
+                    `<span class="dim-tag">${d}</span> ${toBinary(vector[d])}`
+                ).join('<br>') + `<br><span class="dim-tag">...</span> 共7维`;
+            }
+
+            const dot = document.querySelector('.memory-dot');
+            const statusLabel = document.getElementById('memStatusLabel');
+            if (dot) dot.classList.add('writing');
+            if (statusLabel) statusLabel.textContent = '写入中...';
+
+            setTimeout(() => {
+                const memText = document.getElementById('memCurrentText');
+                const memTime = document.getElementById('memCurrentTime');
+                const memDim = document.getElementById('memDimCount');
+                const memTotal = document.getElementById('memTotalCount');
+                const memBin = document.getElementById('memBinaryPreview');
+
+                if (memText) memText.textContent = `"${text.substring(0, 50)}${text.length > 50 ? '...' : ''}"`;
+                if (memTime) memTime.textContent = timeStr;
+                if (memDim) memDim.textContent = '7/7';
+                if (memTotal) memTotal.textContent = currentState.memoryCount;
+                if (memBin) {
+                    memBin.innerHTML = DIMENSIONS.map(d =>
+                        `<div class="mem-bin-row"><span class="dim-tag">${d}</span> ${toBinary(vector[d])} <span style="opacity:0.5;margin-left:4px;">${vector[d].toFixed(2)}</span></div>`
+                    ).join('');
+                }
+
+                if (dot) dot.classList.remove('writing');
+                if (dot) dot.classList.add('done');
+                if (statusLabel) statusLabel.textContent = '✓ 已写入长期记忆库';
+            }, 600);
+        }
+
         async function processInput(text) {
             if (currentState.processing) return;
             currentState.processing = true;
@@ -1290,6 +1778,7 @@
 
             addLog(`处理链路完成 ✓`, 'success');
             currentState.processing = false;
+            writeToMemory(text, currentState.vector);
         }
 
         function toggleStepDetail(step) {
@@ -1453,7 +1942,9 @@
 
             document.querySelectorAll('.sample-btn').forEach(btn => {
                 btn.addEventListener('click', () => {
-                    document.getElementById('userInput').value = btn.dataset.text;
+                    const text = btn.dataset.text;
+                    document.getElementById('userInput').value = text;
+                    updateGuideCards(text);
                 });
             });
 
@@ -1463,6 +1954,7 @@
                     addLog('请输入文本内容', 'warn');
                     return;
                 }
+                updateGuideCards(text);
                 processInput(text);
             });
 
@@ -1471,6 +1963,9 @@
                 currentState.envStrength = parseInt(slider.value) / 100;
                 updateAltitudeSim();
             });
+
+            const memTotal = document.getElementById('memTotalCount');
+            if (memTotal) memTotal.textContent = currentState.memoryCount;
 
             addLog('人机思维交互引擎已启动', 'success');
             addLog('等待用户输入...', 'info');
