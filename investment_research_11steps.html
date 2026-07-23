@@ -57,6 +57,26 @@
         .model-desc { font-size: 12px; color: rgba(255,255,255,0.55); line-height: 1.7; margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.05); }
         .star-rating { color: #fbbf24; letter-spacing: 2px; }
 
+        /* === KMP→IPD 多维展开图 === */
+        .kmp-expand { display: none; margin-top: 14px; padding: 14px; background: linear-gradient(135deg, rgba(46,204,113,0.05), rgba(34,211,238,0.03)); border: 1px solid rgba(46,204,113,0.2); border-radius: 12px; }
+        .kmp-expand.show { display: block; }
+        .kmp-flow { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; gap: 8px; align-items: stretch; margin-bottom: 12px; }
+        .kmp-layer { background: rgba(0,0,0,0.25); border-radius: 10px; padding: 12px; text-align: center; border: 1px solid rgba(255,255,255,0.06); }
+        .kmp-layer.k { border-color: rgba(59,130,246,0.3); }
+        .kmp-layer.m { border-color: rgba(167,139,250,0.3); }
+        .kmp-layer.p { border-color: rgba(251,146,60,0.3); }
+        .kmp-layer .kl-title { font-size: 12px; font-weight: 600; margin-bottom: 6px; }
+        .kmp-layer.k .kl-title { color: #93c5fd; }
+        .kmp-layer.m .kl-title { color: #c4b5fd; }
+        .kmp-layer.p .kl-title { color: #fdba74; }
+        .kmp-layer .kl-content { font-size: 11px; color: rgba(255,255,255,0.6); line-height: 1.6; }
+        .kmp-arrow { display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,0.25); font-size: 18px; }
+        .kmp-vector { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-top: 10px; }
+        .kmp-dim { background: rgba(0,0,0,0.2); border-radius: 6px; padding: 6px 4px; text-align: center; }
+        .kmp-dim .kd-name { font-size: 10px; color: rgba(255,255,255,0.4); margin-bottom: 2px; }
+        .kmp-dim .kd-val { font-size: 13px; font-weight: 700; font-family: monospace; }
+        .kmp-status { font-size: 11px; color: rgba(134,239,172,0.8); text-align: center; margin-top: 8px; padding: 6px; background: rgba(34,197,94,0.06); border-radius: 6px; }
+
         /* === 投研输入区 === */
         .input-textarea { width: 100%; min-height: 90px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 14px; color: rgba(255,255,255,0.85); font-size: 14px; resize: vertical; font-family: inherit; line-height: 1.6; box-sizing: border-box; }
         .input-textarea:focus { outline: none; border-color: rgba(251,191,36,0.4); box-shadow: 0 0 0 3px rgba(251,191,36,0.1); }
@@ -64,6 +84,7 @@
         .preset-row { display: flex; gap: 10px; margin: 14px 0; flex-wrap: wrap; }
         .preset-btn { padding: 8px 16px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.03); color: rgba(255,255,255,0.7); cursor: pointer; font-size: 12px; transition: all .2s; font-family: inherit; }
         .preset-btn:hover { background: rgba(251,191,36,0.1); border-color: rgba(251,191,36,0.3); color: #fde68a; }
+        .preset-btn.active { background: rgba(251,191,36,0.15); border-color: rgba(251,191,36,0.5); color: #fde68a; box-shadow: 0 0 12px rgba(251,191,36,0.15); }
         .btn-row { display: flex; gap: 10px; }
         .btn-primary { padding: 10px 24px; border-radius: 10px; border: 1.5px solid rgba(251,191,36,0.5); background: linear-gradient(135deg, rgba(251,191,36,0.2), rgba(239,68,68,0.1)); color: #fde68a; font-size: 14px; font-weight: 600; cursor: pointer; transition: all .3s; font-family: inherit; }
         .btn-primary:hover { background: linear-gradient(135deg, rgba(251,191,36,0.3), rgba(239,68,68,0.15)); box-shadow: 0 0 20px rgba(251,191,36,0.2); transform: translateY(-1px); }
@@ -263,9 +284,9 @@
                     <div class="mt-name" style="color:#7B2FBE;">📚 Mnemis</div>
                     <div class="mt-source">微软/ACL 2026</div>
                 </div>
-                <div class="model-tab" data-model="custom">
-                    <div class="mt-name" style="color:#2ECC71;">⚙️ 自定义</div>
-                    <div class="mt-source">自研</div>
+                <div class="model-tab" data-model="custom" style="border-color:rgba(46,204,113,0.3);">
+                    <div class="mt-name" style="color:#2ECC71;">🔬 KMP→IPD</div>
+                    <div class="mt-source">跨域映射（自研）</div>
                 </div>
             </div>
             <div class="model-info-panel" id="modelInfoPanel">
@@ -274,6 +295,35 @@
                     <div class="model-info-item"><span class="mi-label">投研适配度：</span><span class="mi-value star-rating" id="miStars">★★★★☆</span></div>
                 </div>
                 <div class="model-desc" id="miDesc">多模态长期记忆Agent，支持实时视觉/听觉输入，以实体为中心组织记忆。适合投研场景中多源信息（财报图表、新闻、公告）的交叉参照分析。</div>
+                <div class="kmp-expand" id="kmpExpand">
+                    <div style="font-size:12px;font-weight:600;color:#86efac;margin-bottom:10px;">🔬 KMP→IPD 多维展开图 · 当前映射结果</div>
+                    <div class="kmp-flow">
+                        <div class="kmp-layer k">
+                            <div class="kl-title">K 知识层</div>
+                            <div class="kl-content" id="kmpK">等待投研输入<br>语义拆解中...</div>
+                        </div>
+                        <div class="kmp-arrow">→</div>
+                        <div class="kmp-layer m">
+                            <div class="kl-title">M 数学层</div>
+                            <div class="kl-content" id="kmpM">七维向量<br>待计算</div>
+                        </div>
+                        <div class="kmp-arrow">→</div>
+                        <div class="kmp-layer p">
+                            <div class="kl-title">P 物理层（IPD）</div>
+                            <div class="kl-content" id="kmpP">山体模型<br>待映射</div>
+                        </div>
+                    </div>
+                    <div class="kmp-vector" id="kmpVector">
+                        <div class="kmp-dim"><div class="kd-name">I(海拔)</div><div class="kd-val" style="color:#60a5fa;" id="kmpI">—</div></div>
+                        <div class="kmp-dim"><div class="kd-name">P(坡度)</div><div class="kd-val" style="color:#a78bfa;" id="kmpPval">—</div></div>
+                        <div class="kmp-dim"><div class="kd-name">D(阻尼)</div><div class="kd-val" style="color:#fb923c;" id="kmpD">—</div></div>
+                        <div class="kmp-dim"><div class="kd-name">S(熵)</div><div class="kd-val" style="color:#facc15;" id="kmpS">—</div></div>
+                        <div class="kmp-dim"><div class="kd-name">Dev-I</div><div class="kd-val" style="color:#f472b6;" id="kmpDevI">—</div></div>
+                        <div class="kmp-dim"><div class="kd-name">Dev1</div><div class="kd-val" style="color:#34d399;" id="kmpDev1">—</div></div>
+                        <div class="kmp-dim"><div class="kd-name">Dev2</div><div class="kd-val" style="color:#22d3ee;" id="kmpDev2">—</div></div>
+                    </div>
+                    <div class="kmp-status" id="kmpStatus">等待推理启动 · KMP映射通路已就绪</div>
+                </div>
             </div>
         </div>
 
@@ -478,8 +528,8 @@
             desc: '8×8在线状态矩阵模型，不扩充上下文窗口，参数开销仅0.12%。在长序列投研推理中保持极低的内存占用，适合高频数据流的实时状态追踪。' },
         mnemis: { name: '📚 Mnemis', source: '微软/ACL 2026', stars: '★★★★★', color: '#7B2FBE',
             desc: '层级图索引+双路径检索（快思考+慢思考），LoCoMo基准93.9%。具备强大的长期记忆检索能力，适合跨周期、跨行业的投研知识关联与复盘。' },
-        custom: { name: '⚙️ 自定义', source: '自研', stars: '★★★★★', color: '#2ECC71',
-            desc: '基于KMP→IPD方法论的推理框架，跨学科物理映射。将投研问题转化为山体物理模型（海拔/坡度/阻尼/熵），通过PID负反馈调节实现稳态决策。' }
+        custom: { name: '🔬 KMP→IPD跨域映射', source: '自研', stars: '★★★★★', color: '#2ECC71',
+            desc: '基于KMP→IPD方法论的自研推理框架，跨学科物理映射引擎。将投研问题经K(知识层)→M(数学层)→P(物理层)三级映射转化为山体物理模型（海拔/坡度/阻尼/熵），通过PID负反馈调节实现稳态决策，并在多维展开图中实时展示映射过程。' }
     };
 
     const PRESETS = {
@@ -559,6 +609,7 @@
         initRadarChart();
         initPidChart();
         bindEvents();
+        addLog('🚀 11步投研推理系统已启动，所有模块加载完成', 'ok');
     }
 
     function renderChainFlow() {
@@ -630,7 +681,12 @@
             btn.addEventListener('click', () => {
                 const p = PRESETS[btn.dataset.preset];
                 document.getElementById('inputText').value = p.text;
-                addLog(`载入预设示例：${p.target}`, 'ok');
+                document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                if (p.refModel && p.refModel !== currentModel) {
+                    selectModel(p.refModel);
+                }
+                addLog(`载入预设示例：${p.target}（推荐参照模型：${MODELS[p.refModel]?.name || '自动'}）`, 'ok');
             });
         });
     }
@@ -646,11 +702,17 @@
         const active = document.querySelector(`.model-tab[data-model="${mid}"]`);
         active.classList.add('active');
         active.style.borderColor = m.color + '66';
-        active.style.boxShadow = `0 0 16px ${m.color}33`;
+        active.style.boxShadow = `0 0 20px ${m.color}44`;
         document.getElementById('miName').textContent = m.name;
         document.getElementById('miName').style.color = m.color;
         document.getElementById('miStars').textContent = m.stars;
         document.getElementById('miDesc').textContent = m.desc;
+        const kmpPanel = document.getElementById('kmpExpand');
+        if (mid === 'custom') {
+            kmpPanel.classList.add('show');
+        } else {
+            kmpPanel.classList.remove('show');
+        }
         addLog(`参照模型切换为：${m.name}`, 'ok');
     }
 
@@ -678,15 +740,12 @@
             if (PRESETS[k].text === text) { data = JSON.parse(JSON.stringify(PRESETS[k])); break; }
         }
         if (!data) {
-            // 非预设文本，生成模拟数据
             data = {
                 text, target: '分析标的', price: (50 + Math.random()*100).toFixed(2),
                 K: { keywords: text.split(/[，。！？\s]+/).filter(w=>w.length>=2).slice(0,5), intent: '综合分析', emotion: '中性', topic: '通用' },
-                M: { I: 0.50+Math.random()*0.2, P: 0.20+Math.random()*0.5, D: 0.30+Math.random()*0.3, S: 0.30+Math.random()*0.4, 'Dev-I': (Math.random()-0.5)*0.6, Dev1: Math.random()*0.3, Dev2: Math.random()*0.5 },
+                M: { I: +(0.50+Math.random()*0.2).toFixed(2), P: +(0.20+Math.random()*0.5).toFixed(2), D: +(0.30+Math.random()*0.3).toFixed(2), S: +(0.30+Math.random()*0.4).toFixed(2), 'Dev-I': +((Math.random()-0.5)*0.6).toFixed(2), Dev1: +(Math.random()*0.3).toFixed(2), Dev2: +(Math.random()*0.5).toFixed(2) },
                 P: '系统状态计算中...', refModel: currentModel, refConsistency: Math.floor(65+Math.random()*20),
-                power: { usage: Math.floor(50+Math.random()*20), parse: Math.floor(30+Math.random()*15), map: Math.floor(25+Math.random()*15), output: Math.floor(25+Math.random()*15) },
-                conclusion: '基于当前输入的综合分析结果，系统正在生成定制化投研建议...',
-                binary: { I:'01001101', P:'01101010', D:'01010110', S:'01100101', 'Dev-I':'00110110', Dev1:'00100100', Dev2:'01011010' }
+                power: { usage: Math.floor(50+Math.random()*20), parse: Math.floor(30+Math.random()*15), map: Math.floor(25+Math.random()*15), output: Math.floor(25+Math.random()*15) }
             };
             const v = data.M;
             let sig;
@@ -697,40 +756,57 @@
             data.signal = sig;
             data.P = describePhysics(v);
             data.conclusion = generateConclusion(data);
+            data.binary = generateBinary(v);
         }
         currentData = data;
+        data.refModel = currentModel;
+        if (data.refModel) {
+            const baseCons = data.refConsistency || 75;
+            if (currentModel !== (data._origRefModel || data.refModel)) {
+                data.refConsistency = Math.max(55, Math.min(90, baseCons - 8 + Math.floor(Math.random()*8)));
+            }
+        }
+        data._origRefModel = data._origRefModel || data.refModel;
 
         clearLog();
         addLog('🚀 11步投研推理系统启动', 'ok');
         addLog(`用户输入："${text.substring(0,40)}${text.length>40?'...':''}"`);
-        addLog(`参照模型：${MODELS[data.refModel]?.name || MODELS[currentModel].name}`);
+        addLog(`参照模型：${MODELS[currentModel].name}`);
+        addLog(`算力基线：${data.power.usage}%`);
 
-        // 重置步骤状态
+        resetKMPExpand();
+
         document.querySelectorAll('.chain-step').forEach(s => { s.classList.remove('active','done'); });
 
-        // 按步骤执行
         for (let i = 0; i < STEPS.length; i++) {
             currentStep = STEPS[i].num;
             await sleep(600);
             highlightStep(currentStep);
             showStepDetail(currentStep, data);
+            updateKMPExpand(currentStep, data);
             await sleep(800);
             markStepDone(currentStep);
-            // 步骤7后显示PID模块
+            if (currentStep === 4) {
+                updateRadar(data.M, 0.4);
+                await sleep(300);
+            }
+            if (currentStep === 6) {
+                updateRadar(data.M, 0.7);
+                await sleep(300);
+            }
             if (currentStep === 7) {
                 showPIDModule(data);
                 await sleep(1200);
             }
-            // 步骤8后更新雷达图
             if (currentStep === 8) {
-                updateRadar(data.M);
+                updateRadar(data.M, 1.0);
                 await sleep(500);
             }
         }
 
-        // 完成后输出结论
         showConclusion(data);
         updateMemory(data);
+        updateKMPExpand(11, data);
         addLog('✅ 11步推理全部完成，投研结论已输出', 'ok');
         isRunning = false;
         document.getElementById('btnStart').disabled = false;
@@ -739,11 +815,59 @@
     function describePhysics(v) {
         const parts = [];
         parts.push(v.I < 0.4 ? '海拔偏低' : v.I > 0.6 ? '海拔偏高' : '海拔中等');
-        parts.push(v.P < 0.2 ? '坡度平缓' : v.P > 0.5 ? '坡度较陡' : '坡度中等');
+        if (v.P < -0.1) parts.push('坡度微降（下行趋势）');
+        else if (v.P < 0.2) parts.push('坡度平缓');
+        else if (v.P > 0.5) parts.push('坡度较陡');
+        else parts.push('坡度中等');
         parts.push(v.D < 0.3 ? '阻尼较小' : v.D > 0.5 ? '阻尼较大' : '阻尼中等');
         parts.push(v.S < 0.4 ? '熵值偏低' : v.S > 0.6 ? '熵值偏高' : '熵值中等');
         parts.push(v['Dev-I'] < -0.1 ? '山体偏下' : v['Dev-I'] > 0.1 ? '山体偏上' : '山体居中');
         return parts.join('、');
+    }
+
+    function generateBinary(v) {
+        const result = {};
+        for (const d of ['I','P','D','S','Dev-I','Dev1','Dev2']) {
+            let val = v[d];
+            val = Math.max(-1, Math.min(1, val));
+            const byteVal = Math.round(((val + 1) / 2) * 255);
+            result[d] = byteVal.toString(2).padStart(8, '0');
+        }
+        return result;
+    }
+
+    function resetKMPExpand() {
+        document.getElementById('kmpK').innerHTML = '等待投研输入<br>语义拆解中...';
+        document.getElementById('kmpM').innerHTML = '七维向量<br>待计算';
+        document.getElementById('kmpP').innerHTML = '山体模型<br>待映射';
+        ['kmpI','kmpPval','kmpD','kmpS','kmpDevI','kmpDev1','kmpDev2'].forEach(id => {
+            document.getElementById(id).textContent = '—';
+        });
+        document.getElementById('kmpStatus').textContent = '等待推理启动 · KMP映射通路已就绪';
+    }
+
+    function updateKMPExpand(step, data) {
+        if (currentModel !== 'custom') return;
+        if (step >= 3) {
+            const kws = data.K.keywords.slice(0,4).join('、');
+            document.getElementById('kmpK').innerHTML = `意图：${data.K.intent}<br>情感：${data.K.emotion}<br><span style="font-size:10px;opacity:0.7;">关键词：${kws}</span>`;
+        }
+        if (step >= 4) {
+            const v = data.M;
+            document.getElementById('kmpM').innerHTML = `七维向量已生成<br><span style="font-size:10px;opacity:0.7;">I=${v.I} P=${v.P} D=${v.D}</span>`;
+            const dimMap = { I:'kmpI', P:'kmpPval', D:'kmpD', S:'kmpS', 'Dev-I':'kmpDevI', Dev1:'kmpDev1', Dev2:'kmpDev2' };
+            for (const [d, id] of Object.entries(dimMap)) {
+                document.getElementById(id).textContent = v[d].toFixed(2);
+            }
+        }
+        if (step >= 5) {
+            document.getElementById('kmpP').innerHTML = `<span style="font-size:10px;">${data.P}</span>`;
+        }
+        if (step >= 9) {
+            document.getElementById('kmpStatus').innerHTML = `✅ KMP映射完成 · 信号：${data.signal.icon} ${data.signal.label}（置信度${data.signal.conf}%）`;
+        } else if (step >= 5) {
+            document.getElementById('kmpStatus').textContent = `🔄 映射进行中 · 步骤${step}/11 · PID${step>=7?'已介入':'待介入'}`;
+        }
     }
 
     function generateConclusion(data) {
@@ -786,11 +910,13 @@
                 dataHtml = `<div class="sd-data"><span class="sd-key">原始输入：</span>${data.text}</div>`;
                 break;
             case 2:
-                const m = MODELS[data.refModel] || MODELS[currentModel];
+                const m = MODELS[currentModel];
+                const recCons = data.refConsistency;
                 dataHtml = `<div class="sd-data">
                     <div><span class="sd-key">参照模型：</span><span style="color:${m.color};font-weight:600;">${m.name}</span></div>
                     <div><span class="sd-key">模型来源：</span>${m.source}</div>
                     <div><span class="sd-key">投研适配度：</span><span class="star-rating">${m.stars}</span></div>
+                    <div style="margin-top:8px;padding:8px 10px;background:rgba(0,0,0,0.2);border-radius:6px;font-size:11px;color:rgba(255,255,255,0.55);">${m.desc.substring(0,80)}...</div>
                 </div>`;
                 addLog(`参照模型加载完成：${m.name}`, 'ok');
                 break;
@@ -824,7 +950,7 @@
                 addLog(`P层映射完成：${data.P}`, 'ok');
                 break;
             case 6:
-                const rm = MODELS[data.refModel] || MODELS[currentModel];
+                const rm = MODELS[currentModel];
                 dataHtml = `<div class="sd-data">
                     <div><span class="sd-key">参照模型：</span><span style="color:${rm.color};font-weight:600;">${rm.name}</span></div>
                     <div style="margin-top:8px;"><span class="sd-key">一致性：</span>
@@ -858,16 +984,24 @@
                 addLog(`算力调度完成：使用率 ${power.usage}%`, 'ok');
                 break;
             case 8:
+                const v = data.M;
+                const composite = ((v.I + v.P + v.D + v.S)/4).toFixed(3);
                 dataHtml = `<div class="sd-data">
-                    <div style="padding:12px;background:rgba(0,0,0,0.2);border-radius:8px;border-left:3px solid #22d3ee;line-height:1.8;">
+                    <div style="padding:12px;background:rgba(0,0,0,0.2);border-radius:8px;border-left:3px solid #22d3ee;line-height:2;">
                         🧠 精算推理计算中...<br>
-                        • 基于七维向量综合评分：${((data.M.I+data.M.P+data.M.D+data.M.S)/4).toFixed(3)}<br>
-                        • Dev-I偏差修正：${data.M['Dev-I'].toFixed(3)}<br>
-                        • PID稳态调节已介入（详见下方模块）<br>
-                        • 信号方向初步判定：${data.signal.icon} ${data.signal.label}
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 12px;font-size:11px;margin-top:4px;">
+                            <div>• 综合评分：<span style="color:#fde68a;font-family:monospace;">${composite}</span></div>
+                            <div>• Dev-I偏差：<span style="color:#f472b6;font-family:monospace;">${v['Dev-I'].toFixed(3)}</span></div>
+                            <div>• I海拔估值：<span style="color:#60a5fa;font-family:monospace;">${v.I.toFixed(2)}</span></div>
+                            <div>• P坡度动能：<span style="color:#a78bfa;font-family:monospace;">${v.P.toFixed(2)}</span></div>
+                            <div>• D阻尼阻力：<span style="color:#fb923c;font-family:monospace;">${v.D.toFixed(2)}</span></div>
+                            <div>• S熵值分歧：<span style="color:#facc15;font-family:monospace;">${v.S.toFixed(2)}</span></div>
+                        </div>
+                        <div style="margin-top:6px;">• PID稳态调节已介入（详见下方模块）</div>
+                        <div>• 信号方向判定：<span style="color:${data.signal.type==='buy'?'#4ade80':data.signal.type==='sell'?'#fca5a5':'#fde68a'};font-weight:600;">${data.signal.icon} ${data.signal.label}</span></div>
                     </div>
                 </div>`;
-                addLog(`精算推理完成：投研结论已生成`, 'ok');
+                addLog(`精算推理完成：${data.signal.label}（综合评分${composite}）`, 'ok');
                 break;
             case 9:
                 const sigColor = data.signal.type==='buy'?'#4ade80':data.signal.type==='sell'?'#fca5a5':'#fde68a';
@@ -888,14 +1022,20 @@
                 addLog(`01解码完成：7维二进制编码已输出`, 'ok');
                 break;
             case 11:
+                const newCount = parseInt(document.getElementById('memCount').textContent) + 1;
+                const newVectors = parseInt(document.getElementById('memVectors').textContent) + 7;
                 dataHtml = `<div class="sd-data">
                     <div style="padding:12px;background:rgba(34,197,94,0.06);border-radius:8px;border:1px solid rgba(34,197,94,0.2);text-align:center;">
                         <div style="font-size:24px;margin-bottom:6px;">✅</div>
                         <div style="color:#86efac;font-weight:600;">写入成功</div>
-                        <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:4px;">投研记录已存入长期记忆库</div>
+                        <div style="font-size:11px;color:rgba(255,255,255,0.5);margin-top:8px;display:grid;grid-template-columns:1fr 1fr;gap:4px;">
+                            <div>投研条目：<span style="color:#86efac;font-family:monospace;">${newCount}</span></div>
+                            <div>向量总数：<span style="color:#67e8f9;font-family:monospace;">${newVectors}</span></div>
+                        </div>
+                        <div style="font-size:10px;color:rgba(255,255,255,0.4);margin-top:6px;">投研记录已存入长期记忆库，可用于后续参照对比</div>
                     </div>
                 </div>`;
-                addLog(`长期记忆沉淀完成：已写入投研记忆库`, 'ok');
+                addLog(`长期记忆沉淀完成：条目#${newCount}已写入，7维向量已归档`, 'ok');
                 break;
         }
 
@@ -966,15 +1106,17 @@
         addLog(`PID调节完成：当前浓度 ${I.toFixed(2)}，${status}`, 'ok');
     }
 
-    function updateRadar(M) {
+    function updateRadar(M, progress) {
         const dims = ['I','P','D','S','Dev-I','Dev1','Dev2'];
-        const vals = dims.map(d => +M[d].toFixed(2));
+        const p = progress !== undefined ? progress : 1.0;
+        const vals = dims.map(d => +(M[d] * p).toFixed(2));
+        const alpha = 0.1 + 0.15 * p;
         radarChart.setOption({
             series: [{
                 type: 'radar',
                 data: [{ value: vals, name: '七维向量',
-                    areaStyle: { color: 'rgba(251,191,36,0.2)' },
-                    lineStyle: { color: '#fbbf24', width: 2.5 },
+                    areaStyle: { color: `rgba(251,191,36,${alpha})` },
+                    lineStyle: { color: '#fbbf24', width: 2 + p },
                     itemStyle: { color: '#fbbf24', borderWidth: 2 } }]
             }]
         });
@@ -999,8 +1141,10 @@
         `;
     }
 
+    let memoryStartTime = null;
     function updateMemory(data) {
         const now = new Date();
+        memoryStartTime = now;
         const ts = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
         document.getElementById('memCurrent').textContent = `${ts} ${data.target}`;
         const count = parseInt(document.getElementById('memCount').textContent) + 1;
@@ -1009,6 +1153,9 @@
         document.getElementById('memVectors').textContent = vectors;
         document.getElementById('memRecent').textContent = '刚刚';
         document.getElementById('memStatus').innerHTML = '🟢 写入成功 · 记忆库已更新';
+        setTimeout(() => {
+            if (memoryStartTime) document.getElementById('memRecent').textContent = '1秒前';
+        }, 1000);
     }
 
     function addLog(msg, type) {
@@ -1030,15 +1177,17 @@
     function resetAll() {
         if (isRunning) return;
         document.getElementById('inputText').value = '';
+        document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
         document.querySelectorAll('.chain-step').forEach(s => s.classList.remove('active','done'));
         document.getElementById('stepDetail').innerHTML = '<div class="sd-title">⏸ 等待启动</div><div class="sd-desc">请输入投研问题并点击"启动推理"，系统将按11步依次执行，每一步的详细数据将在此处展示。</div>';
         document.getElementById('pidSection').style.display = 'none';
         document.getElementById('conclusionPanel').innerHTML = '<div style="text-align:center;color:rgba(255,255,255,0.25);font-size:13px;padding:40px 0;">⏳ 等待推理完成后输出投研结论</div>';
-        radarChart.setOption({ series:[{type:'radar',data:[{value:[0,0,0,0,0,0,0],name:'七维向量',areaStyle:{color:'rgba(251,191,36,0.15)'},lineStyle:{color:'#fbbf24',width:2},itemStyle:{color:'#fbbf24'}}]}] });
+        radarChart.setOption({ series:[{type:'radar',data:[{value:[0,0,0,0,0,0,0],name:'七维向量',areaStyle:{color:'rgba(251,191,36,0.1)'},lineStyle:{color:'#fbbf24',width:2},itemStyle:{color:'#fbbf24'}}]}] });
         document.getElementById('memCurrent').textContent = '—';
         document.getElementById('memRecent').textContent = '—';
         document.getElementById('memStatus').innerHTML = '🟢 记忆库正常 · 等待写入';
         document.getElementById('logPanel').innerHTML = '<div class="log-entry"><span class="log-time">[系统]</span> 11步投研推理系统已就绪，等待投研输入...</div>';
+        resetKMPExpand();
         addLog('🔄 系统已重置', 'ok');
     }
 
