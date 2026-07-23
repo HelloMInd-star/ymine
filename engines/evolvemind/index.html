@@ -929,16 +929,342 @@
             color: rgba(255,255,255,0.25);
         }
 
+        /* ===== 人脑思考过程 & 人机交互过程 新增模块 ===== */
+        .transition-hint {
+            text-align: center;
+            padding: 12px 0 4px;
+            font-size: 13px;
+            color: rgba(255,255,255,0.45);
+            letter-spacing: 0.5px;
+        }
+        .transition-hint .sep { color: rgba(167,139,250,0.5); margin: 0 6px; }
+
+        .brain-section, .interaction-section {
+            margin-bottom: 20px;
+        }
+        .brain-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #f0e6ff;
+        }
+        .brain-title .emoji { font-size: 22px; }
+        .brain-title .sub {
+            font-size: 12px;
+            font-weight: 400;
+            color: rgba(255,255,255,0.4);
+            margin-left: auto;
+            padding: 3px 10px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .curves-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+        .curve-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 12px;
+            padding: 16px;
+        }
+        .curve-card.forget { border-top: 2px solid rgba(156,163,175,0.4); }
+        .curve-card.pdca { border-top: 2px solid rgba(52,211,153,0.5); }
+        .curve-card-title {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .curve-card.forget .curve-card-title { color: #9ca3af; }
+        .curve-card.pdca .curve-card-title { color: #6ee7b7; }
+        .curve-card-subtitle {
+            font-size: 11px;
+            color: rgba(255,255,255,0.35);
+            margin-bottom: 10px;
+        }
+        .curve-chart { width: 100%; height: 180px; }
+        .curve-stats {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 8px;
+            gap: 4px;
+        }
+        .curve-stat {
+            text-align: center;
+            flex: 1;
+        }
+        .curve-stat-time {
+            font-size: 10px;
+            color: rgba(255,255,255,0.35);
+            margin-bottom: 2px;
+        }
+        .curve-stat-val {
+            font-size: 14px;
+            font-weight: 700;
+            font-family: 'SF Mono', 'Fira Code', monospace;
+        }
+        .curve-card.forget .curve-stat-val { color: #fca5a5; }
+        .curve-card.pdca .curve-stat-val { color: #6ee7b7; }
+
+        .pdca-cycle {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 12px;
+            padding: 16px;
+        }
+        .pdca-cycle-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #c4b5fd;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .pdca-flow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+        }
+        .pdca-step {
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            text-align: center;
+            min-width: 68px;
+        }
+        .pdca-step.p { background: rgba(96,165,250,0.12); border: 1px solid rgba(96,165,250,0.25); color: #93c5fd; }
+        .pdca-step.d { background: rgba(251,191,36,0.12); border: 1px solid rgba(251,191,36,0.25); color: #fcd34d; }
+        .pdca-step.c { background: rgba(167,139,250,0.12); border: 1px solid rgba(167,139,250,0.25); color: #c4b5fd; }
+        .pdca-step.a { background: rgba(52,211,153,0.12); border: 1px solid rgba(52,211,153,0.25); color: #6ee7b7; }
+        .pdca-arrow { color: rgba(255,255,255,0.2); font-size: 14px; }
+        .pdca-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11px;
+        }
+        .pdca-table th {
+            text-align: left;
+            padding: 6px 8px;
+            color: rgba(255,255,255,0.4);
+            font-weight: 500;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            font-size: 10px;
+        }
+        .pdca-table td {
+            padding: 6px 8px;
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+            color: rgba(255,255,255,0.7);
+            vertical-align: top;
+        }
+        .pdca-table td:first-child { font-weight: 600; width: 90px; }
+        .pdca-table .p-tag { color: #93c5fd; }
+        .pdca-table .d-tag { color: #fcd34d; }
+        .pdca-table .c-tag { color: #c4b5fd; }
+        .pdca-table .a-tag { color: #6ee7b7; }
+        .pdca-table td:last-child { color: rgba(255,255,255,0.5); font-size: 10px; }
+        .pdca-note {
+            margin-top: 12px;
+            padding: 10px 14px;
+            background: rgba(167,139,250,0.06);
+            border-left: 3px solid rgba(167,139,250,0.3);
+            border-radius: 0 8px 8px 0;
+            font-size: 11px;
+            color: rgba(255,255,255,0.55);
+            line-height: 1.6;
+        }
+
+        /* 人机交互过程 */
+        .mapping-tables {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+        .map-table-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 12px;
+            padding: 16px;
+        }
+        .map-table-card.kmp { border-top: 2px solid rgba(96,165,250,0.4); }
+        .map-table-card.ipd { border-top: 2px solid rgba(251,191,36,0.4); }
+        .map-table-title {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .map-table-card.kmp .map-table-title { color: #93c5fd; }
+        .map-table-card.ipd .map-table-title { color: #fcd34d; }
+        .map-table-subtitle {
+            font-size: 11px;
+            color: rgba(255,255,255,0.35);
+            margin-bottom: 10px;
+        }
+        .kmp-detail-table, .ipd-detail-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11px;
+        }
+        .kmp-detail-table th, .ipd-detail-table th {
+            text-align: left;
+            padding: 5px 6px;
+            color: rgba(255,255,255,0.4);
+            font-weight: 500;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            font-size: 10px;
+        }
+        .kmp-detail-table td, .ipd-detail-table td {
+            padding: 6px 6px;
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+            color: rgba(255,255,255,0.7);
+            vertical-align: top;
+        }
+        .kmp-detail-table .layer-tag {
+            display: inline-block;
+            width: 22px;
+            height: 22px;
+            line-height: 22px;
+            text-align: center;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 11px;
+            margin-right: 4px;
+        }
+        .layer-tag.k { background: rgba(96,165,250,0.15); color: #93c5fd; }
+        .layer-tag.m { background: rgba(167,139,250,0.15); color: #c4b5fd; }
+        .layer-tag.p { background: rgba(52,211,153,0.15); color: #6ee7b7; }
+        .kmp-detail-table .output-cell {
+            font-family: 'SF Mono', 'Fira Code', monospace;
+            font-size: 10px;
+            color: rgba(255,255,255,0.6);
+        }
+        .kmp-detail-table .example-cell {
+            font-size: 10px;
+            color: rgba(255,255,255,0.45);
+        }
+        .ipd-tag {
+            display: inline-block;
+            width: 22px;
+            height: 22px;
+            line-height: 22px;
+            text-align: center;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 11px;
+            margin-right: 4px;
+        }
+        .ipd-tag.i { background: rgba(96,165,250,0.15); color: #93c5fd; }
+        .ipd-tag.p2 { background: rgba(251,191,36,0.15); color: #fcd34d; }
+        .ipd-tag.d2 { background: rgba(239,68,68,0.15); color: #fca5a5; }
+        .ipd-detail-table .val-cell {
+            font-family: 'SF Mono', 'Fira Code', monospace;
+            font-weight: 600;
+        }
+        .val-low { color: #6ee7b7; }
+        .val-mid { color: #fcd34d; }
+        .val-high { color: #fca5a5; }
+        .ipd-detail-table .behavior-cell { font-size: 10px; color: rgba(255,255,255,0.55); }
+        .ipd-detail-table .impact-cell { font-size: 10px; color: rgba(255,255,255,0.4); }
+        .map-note {
+            margin-top: 10px;
+            padding: 8px 12px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 6px;
+            font-size: 10px;
+            color: rgba(255,255,255,0.4);
+            line-height: 1.5;
+        }
+
+        .hm-flow {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 12px;
+            padding: 20px 16px;
+        }
+        .hm-flow-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #f0e6ff;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .hm-flow-grid {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 8px 16px;
+            align-items: center;
+        }
+        .hm-row-label {
+            font-size: 11px;
+            font-weight: 600;
+            text-align: right;
+            padding-right: 8px;
+            border-right: 2px solid rgba(255,255,255,0.1);
+            min-width: 50px;
+        }
+        .hm-row-label.human { color: #c4b5fd; border-color: rgba(167,139,250,0.3); }
+        .hm-row-label.arrow { color: rgba(255,255,255,0.25); border: none; text-align: center; font-size: 14px; }
+        .hm-row-label.machine { color: #6ee7b7; border-color: rgba(52,211,153,0.3); }
+        .hm-row-label.module { color: rgba(255,255,255,0.35); border: none; font-size: 10px; font-weight: 400; }
+        .hm-steps {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            flex-wrap: wrap;
+        }
+        .hm-step {
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 500;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            color: rgba(255,255,255,0.7);
+            white-space: nowrap;
+        }
+        .hm-step.h { background: rgba(167,139,250,0.08); border-color: rgba(167,139,250,0.2); color: #c4b5fd; }
+        .hm-step.m { background: rgba(52,211,153,0.08); border-color: rgba(52,211,153,0.2); color: #6ee7b7; }
+        .hm-step.mod { background: transparent; border: 1px dashed rgba(255,255,255,0.1); color: rgba(255,255,255,0.35); font-size: 10px; }
+        .hm-step-arrow { color: rgba(255,255,255,0.2); font-size: 12px; }
+        .hm-flow-note {
+            margin-top: 14px;
+            text-align: center;
+            font-size: 11px;
+            color: rgba(255,255,255,0.35);
+        }
+
         @media (max-width: 1100px) {
             .pipeline-steps { grid-template-columns: repeat(3, 1fr); }
             .charts-row { grid-template-columns: 1fr; }
             .charts-triple { grid-template-columns: 1fr; }
             .sim-visual { grid-template-columns: 1fr; }
             .bottom-row { grid-template-columns: 1fr; }
+            .mapping-tables { grid-template-columns: 1fr; }
         }
         @media (max-width: 900px) {
             .guide-cards { grid-template-columns: 1fr; gap: 10px; }
             .guide-arrow { transform: rotate(90deg); padding: 4px 0; }
+            .curves-row { grid-template-columns: 1fr; }
         }
         @media (max-width: 680px) {
             .page-container { padding: 16px 12px; }
@@ -1053,6 +1379,138 @@
                 <span class="hl-power">算力调度</span>
                 <span class="flow-arrow">→</span>
                 <span class="hl-store">存储层以 01 形式沉淀为长期记忆</span>
+            </div>
+        </div>
+
+        <!-- 过渡提示 -->
+        <div class="transition-hint">
+            💡 以下将展示：<span class="sep">|</span> 人脑如何思考 <span class="sep">→</span> 机器如何模拟人脑 <span class="sep">→</span> 系统如何执行
+        </div>
+
+        <!-- ② 人脑思考过程 -->
+        <div class="section brain-section">
+            <div class="brain-title">
+                <span class="emoji">🧠</span> 人脑思考过程
+                <span class="sub">艾宾浩斯遗忘曲线 × PDCA 工程循环</span>
+            </div>
+            <div style="text-align:center;font-size:12px;color:rgba(255,255,255,0.35);margin-bottom:14px;">
+                无闭环 → 遗忘 <span style="color:rgba(255,255,255,0.15);margin:0 12px;">｜</span> 有闭环 → 记忆保持
+            </div>
+            <div class="curves-row">
+                <div class="curve-card forget">
+                    <div class="curve-card-title">📉 常规学习（无闭环）</div>
+                    <div class="curve-card-subtitle">记忆保持率随时间自然衰减</div>
+                    <div class="curve-chart" id="forgetCurveChart"></div>
+                    <div class="curve-stats">
+                        <div class="curve-stat"><div class="curve-stat-time">1h</div><div class="curve-stat-val">44%</div></div>
+                        <div class="curve-stat"><div class="curve-stat-time">24h</div><div class="curve-stat-val">33%</div></div>
+                        <div class="curve-stat"><div class="curve-stat-time">48h</div><div class="curve-stat-val">27%</div></div>
+                        <div class="curve-stat"><div class="curve-stat-time">7天</div><div class="curve-stat-val">21%</div></div>
+                    </div>
+                </div>
+                <div class="curve-card pdca">
+                    <div class="curve-card-title">📈 PDCA闭环学习（有闭环）</div>
+                    <div class="curve-card-subtitle">反复迭代阻断遗忘，记忆稳定保持</div>
+                    <div class="curve-chart" id="pdcaCurveChart"></div>
+                    <div class="curve-stats">
+                        <div class="curve-stat"><div class="curve-stat-time">1h</div><div class="curve-stat-val">85%</div></div>
+                        <div class="curve-stat"><div class="curve-stat-time">24h</div><div class="curve-stat-val">78%</div></div>
+                        <div class="curve-stat"><div class="curve-stat-time">48h</div><div class="curve-stat-val">72%</div></div>
+                        <div class="curve-stat"><div class="curve-stat-time">7天</div><div class="curve-stat-val">60%</div></div>
+                    </div>
+                </div>
+            </div>
+            <div class="pdca-cycle">
+                <div class="pdca-cycle-title">🔄 PDCA 工程循环如何阻断遗忘</div>
+                <div class="pdca-flow">
+                    <div class="pdca-step p">Plan<br><span style="font-size:10px;font-weight:400;opacity:0.7;">计划</span></div>
+                    <span class="pdca-arrow">→</span>
+                    <div class="pdca-step d">Do<br><span style="font-size:10px;font-weight:400;opacity:0.7;">执行</span></div>
+                    <span class="pdca-arrow">→</span>
+                    <div class="pdca-step c">Check<br><span style="font-size:10px;font-weight:400;opacity:0.7;">检查</span></div>
+                    <span class="pdca-arrow">→</span>
+                    <div class="pdca-step a">Act<br><span style="font-size:10px;font-weight:400;opacity:0.7;">处理</span></div>
+                    <span class="pdca-arrow">🔄</span>
+                </div>
+                <table class="pdca-table">
+                    <thead><tr><th>PDCA 阶段</th><th>认知动作</th><th>对记忆的作用</th></tr></thead>
+                    <tbody>
+                        <tr><td><span class="p-tag">Plan（计划）</span></td><td>明确要学什么、要达到什么目标</td><td>建立学习意图，激活前额叶</td></tr>
+                        <tr><td><span class="d-tag">Do（执行）</span></td><td>输入新信息、加工处理</td><td>海马体编码，形成短期记忆</td></tr>
+                        <tr><td><span class="c-tag">Check（检查）</span></td><td>自我测试、验证是否理解</td><td>提取练习，巩固记忆痕迹</td></tr>
+                        <tr><td><span class="a-tag">Act（处理）</span></td><td>纠正错误、强化正确认知</td><td>错误修正 + 重复强化 → 长期记忆</td></tr>
+                    </tbody>
+                </table>
+                <div class="pdca-note">
+                    💡 无闭环的学习 → 艾宾浩斯遗忘曲线自然衰减；PDCA 工程循环通过"计划→执行→检查→处理"的反复迭代，阻断遗忘，将短期认知固化为长期记忆。
+                </div>
+            </div>
+        </div>
+
+        <!-- ③ 人机交互过程 -->
+        <div class="section interaction-section">
+            <div class="brain-title">
+                <span class="emoji">🤖</span> 人机交互过程
+                <span class="sub">KMP → IPD 映射 · 人脑步骤 → 机器步骤</span>
+            </div>
+            <div class="mapping-tables">
+                <div class="map-table-card kmp">
+                    <div class="map-table-title">📋 映射表1：KMP 三层映射框架</div>
+                    <div class="map-table-subtitle">当前输入经过 K→M→P 三层转换的过程</div>
+                    <table class="kmp-detail-table" id="kmpDetailTable">
+                        <thead><tr><th>层级</th><th>输入</th><th>输出</th><th>示例</th></tr></thead>
+                        <tbody id="kmpTableBody">
+                            <tr><td><span class="layer-tag k">K</span>知识层</td><td class="output-cell">用户输入文本</td><td class="output-cell">关键词+意图+情感</td><td class="example-cell" id="kmpKExample">等待输入...</td></tr>
+                            <tr><td><span class="layer-tag m">M</span>数学层</td><td class="output-cell">关键词+意图</td><td class="output-cell">七维向量初始值</td><td class="example-cell" id="kmpMExample">等待输入...</td></tr>
+                            <tr><td><span class="layer-tag p">P</span>物理层</td><td class="output-cell">七维向量</td><td class="output-cell">物理状态描述</td><td class="example-cell" id="kmpPExample">等待输入...</td></tr>
+                        </tbody>
+                    </table>
+                    <div class="map-note">KMP 映射将自然语言转化为可计算的物理量，完成"知识 → 数学 → 物理"的转换。</div>
+                </div>
+                <div class="map-table-card ipd">
+                    <div class="map-table-title">📋 映射表2：IPD 物理层映射</div>
+                    <div class="map-table-subtitle">P 层中三个核心物理量如何驱动系统行为</div>
+                    <table class="ipd-detail-table" id="ipdDetailTable">
+                        <thead><tr><th>物理量</th><th>当前值</th><th>系统行为</th><th>影响</th></tr></thead>
+                        <tbody id="ipdTableBody">
+                            <tr><td><span class="ipd-tag i">I</span>箱体海拔</td><td class="val-cell" id="ipdIVal">--</td><td class="behavior-cell" id="ipdIBehavior">等待输入</td><td class="impact-cell" id="ipdIImpact">--</td></tr>
+                            <tr><td><span class="ipd-tag p2">P</span>坡度动量</td><td class="val-cell" id="ipdPVal">--</td><td class="behavior-cell" id="ipdPBehavior">等待输入</td><td class="impact-cell" id="ipdPImpact">--</td></tr>
+                            <tr><td><span class="ipd-tag d2">D</span>阻尼衰减</td><td class="val-cell" id="ipdDVal">--</td><td class="behavior-cell" id="ipdDBehavior">等待输入</td><td class="impact-cell" id="ipdDImpact">--</td></tr>
+                        </tbody>
+                    </table>
+                    <div class="map-note">IPD 映射将物理量转化为系统响应，驱动海拔模拟器和算力调度模块。</div>
+                </div>
+            </div>
+            <div class="hm-flow">
+                <div class="hm-flow-title">🔗 人脑 → 机器的完整对应链路</div>
+                <div class="hm-flow-grid">
+                    <div class="hm-row-label human">人脑</div>
+                    <div class="hm-steps">
+                        <div class="hm-step h">理解输入</div><span class="hm-step-arrow">→</span>
+                        <div class="hm-step h">分析推理</div><span class="hm-step-arrow">→</span>
+                        <div class="hm-step h">验证方案</div><span class="hm-step-arrow">→</span>
+                        <div class="hm-step h">形成记忆</div>
+                    </div>
+                    <div class="hm-row-label arrow">↓</div>
+                    <div class="hm-steps"><div style="width:100%;height:1px;background:rgba(255,255,255,0.06);"></div></div>
+                    <div class="hm-row-label machine">机器</div>
+                    <div class="hm-steps">
+                        <div class="hm-step m">语言拆解</div><span class="hm-step-arrow">→</span>
+                        <div class="hm-step m">语义映射</div><span class="hm-step-arrow">→</span>
+                        <div class="hm-step m">01解码</div><span class="hm-step-arrow">→</span>
+                        <div class="hm-step m">长期存储</div>
+                    </div>
+                    <div class="hm-row-label arrow">↓</div>
+                    <div class="hm-steps"><div style="width:100%;height:1px;background:rgba(255,255,255,0.06);"></div></div>
+                    <div class="hm-row-label module">模块</div>
+                    <div class="hm-steps">
+                        <div class="hm-step mod">用户输入区<br>(STEP1-2)</div><span class="hm-step-arrow">→</span>
+                        <div class="hm-step mod">语义映射<br>(STEP3)</div><span class="hm-step-arrow">→</span>
+                        <div class="hm-step mod">01解码器<br>(STEP6)</div><span class="hm-step-arrow">→</span>
+                        <div class="hm-step mod">长期记忆库</div>
+                    </div>
+                </div>
+                <div class="hm-flow-note">机器链路中各步骤与下方处理链路模块一一对应，可点击下方步骤展开查看详情。</div>
             </div>
         </div>
 
@@ -1338,16 +1796,177 @@
             charts.pie = echarts.init(document.getElementById('pieChart'), 'dark');
             charts.bar = echarts.init(document.getElementById('barChart'), 'dark');
             charts.line = echarts.init(document.getElementById('lineChart'), 'dark');
+            charts.forget = echarts.init(document.getElementById('forgetCurveChart'), 'dark');
+            charts.pdca = echarts.init(document.getElementById('pdcaCurveChart'), 'dark');
 
             updateRadarChart();
             updateGaugeChart();
             updatePieChart();
             updateBarChart();
             updateLineChart();
+            initForgetCurves();
 
             window.addEventListener('resize', () => {
                 Object.values(charts).forEach(c => c && c.resize());
             });
+        }
+
+        function initForgetCurves() {
+            const timePoints = ['0h', '1h', '24h', '48h', '72h', '168h'];
+            const timeLabels = ['刚学完', '1小时', '1天', '2天', '3天', '7天'];
+            const forgetData = [100, 44, 33, 27, 25, 21];
+            const pdcaData = [100, 85, 78, 72, 68, 60];
+
+            const baseOption = {
+                backgroundColor: 'transparent',
+                grid: { top: 20, right: 15, bottom: 28, left: 38 },
+                tooltip: {
+                    trigger: 'axis',
+                    backgroundColor: 'rgba(15,23,42,0.9)',
+                    borderColor: 'rgba(255,255,255,0.1)',
+                    textStyle: { color: '#e2e8f0', fontSize: 11 },
+                    formatter: p => `${p[0].name}<br/>${p[0].marker} 保持率: ${p[0].value}%`
+                },
+                xAxis: {
+                    type: 'category',
+                    data: timeLabels,
+                    axisLabel: { color: 'rgba(255,255,255,0.4)', fontSize: 9 },
+                    axisLine: { lineStyle: { color: 'rgba(255,255,255,0.08)' } },
+                    axisTick: { show: false }
+                },
+                yAxis: {
+                    type: 'value',
+                    min: 0, max: 100,
+                    axisLabel: { color: 'rgba(255,255,255,0.3)', fontSize: 9, formatter: '{value}%' },
+                    splitLine: { lineStyle: { color: 'rgba(255,255,255,0.05)' } },
+                    axisLine: { show: false },
+                    axisTick: { show: false }
+                }
+            };
+
+            charts.forget.setOption({
+                ...baseOption,
+                series: [{
+                    type: 'line',
+                    data: forgetData,
+                    smooth: true,
+                    symbol: 'circle',
+                    symbolSize: 6,
+                    lineStyle: { color: '#9ca3af', width: 2, type: 'dashed' },
+                    itemStyle: { color: '#fca5a5', borderWidth: 0 },
+                    areaStyle: {
+                        color: {
+                            type: 'linear', x: 0, y: 0, x2: 0, y2: 1,
+                            colorStops: [
+                                { offset: 0, color: 'rgba(156,163,175,0.25)' },
+                                { offset: 1, color: 'rgba(156,163,175,0.02)' }
+                            ]
+                        }
+                    },
+                    label: { show: true, position: 'top', color: '#fca5a5', fontSize: 9, formatter: '{c}%' }
+                }]
+            });
+
+            charts.pdca.setOption({
+                ...baseOption,
+                series: [{
+                    type: 'line',
+                    data: pdcaData,
+                    smooth: true,
+                    symbol: 'circle',
+                    symbolSize: 6,
+                    lineStyle: { color: '#34d399', width: 2 },
+                    itemStyle: { color: '#6ee7b7', borderWidth: 0 },
+                    areaStyle: {
+                        color: {
+                            type: 'linear', x: 0, y: 0, x2: 0, y2: 1,
+                            colorStops: [
+                                { offset: 0, color: 'rgba(52,211,153,0.25)' },
+                                { offset: 1, color: 'rgba(52,211,153,0.02)' }
+                            ]
+                        }
+                    },
+                    label: { show: true, position: 'top', color: '#6ee7b7', fontSize: 9, formatter: '{c}%' },
+                    markPoint: {
+                        symbol: 'pin', symbolSize: 36,
+                        itemStyle: { color: 'rgba(52,211,153,0.2)', borderColor: 'rgba(52,211,153,0.4)' },
+                        label: { color: '#6ee7b7', fontSize: 8, formatter: 'PDCA\n阻断' },
+                        data: [{ coord: [4, 68] }]
+                    }
+                }]
+            });
+        }
+
+        function getPhysicalDesc(v) {
+            const I = v.I, P = v.P, D = v.D, S = v.S, devI = v['Dev-I'];
+            const parts = [];
+            if (I < 0.4) parts.push('海拔较低');
+            else if (I > 0.6) parts.push('海拔较高');
+            else parts.push('海拔中等');
+            if (P < 0.4) parts.push('坡度平缓');
+            else if (P >= 0.55) parts.push('坡度较陡');
+            else parts.push('坡度适中');
+            if (D < 0.4) parts.push('阻尼偏弱');
+            else if (D > 0.6) parts.push('阻尼较强');
+            else parts.push('阻尼中等');
+            if (S > 0.65) parts.push('熵值偏高');
+            else if (S < 0.35) parts.push('熵值偏低');
+            if (devI > 0.6) parts.push('山体明显偏上');
+            else if (devI < 0.4) parts.push('山体轻度偏下');
+            return parts.join('、');
+        }
+
+        function getLevelText(val, low, mid, high, lowText, midText, highText) {
+            if (val < low) return { cls: 'val-low', text: lowText };
+            if (val > high) return { cls: 'val-high', text: highText };
+            return { cls: 'val-mid', text: midText };
+        }
+
+        function updateMappingTables(text, analysis, vector) {
+            const kws = analysis.keywords || [];
+            const emos = analysis.emotions || [];
+
+            const intent = (/[风险危险波动跌]/.test(text)) ? '分析风险' :
+                          (/[优化策略计划]/.test(text)) ? '优化策略' :
+                          (/[累休息疲惫困]/.test(text)) ? '寻求休息' :
+                          '理解内容';
+
+            const kExample = `关键词：[${kws.slice(0,3).join(', ')}]；意图：${intent}；情感：${emos.join('/')}`;
+            const mExample = DIMENSIONS.slice(0,4).map(d => `${d}=${vector[d].toFixed(2)}`).join(', ');
+            const pExample = `"${getPhysicalDesc(vector)}"`;
+
+            const kEl = document.getElementById('kmpKExample');
+            const mEl = document.getElementById('kmpMExample');
+            const pEl = document.getElementById('kmpPExample');
+            if (kEl) kEl.textContent = kExample;
+            if (mEl) mEl.textContent = mExample;
+            if (pEl) pEl.textContent = pExample;
+
+            function setIPDVal(valId, behId, impId, val, behavior, impact, levelInfo) {
+                const v = document.getElementById(valId);
+                const b = document.getElementById(behId);
+                const i = document.getElementById(impId);
+                if (v) { v.textContent = val.toFixed(2) + '（' + levelInfo.text + '）'; v.className = 'val-cell ' + levelInfo.cls; }
+                if (b) b.textContent = behavior;
+                if (i) i.textContent = impact;
+            }
+
+            const iVal = vector.I, pVal = vector.P, dVal = vector.D;
+            const iLevel = iVal < 0.4 ? {cls:'val-low',text:'较低'} : iVal > 0.6 ? {cls:'val-high',text:'较高'} : {cls:'val-mid',text:'中等'};
+            const pLevel = pVal < 0.4 ? {cls:'val-low',text:'较弱'} : pVal >= 0.55 ? {cls:'val-high',text:'较强'} : {cls:'val-mid',text:'中等'};
+            const dLevel = dVal < 0.4 ? {cls:'val-low',text:'偏弱'} : dVal > 0.6 ? {cls:'val-high',text:'较强'} : {cls:'val-mid',text:'中等'};
+
+            const iBehavior = iVal < 0.4 ? '山体扁平，重心偏低' : iVal > 0.6 ? '山体高耸，重心偏高' : '山体均衡，重心居中';
+            const pBehavior = pVal < 0.4 ? '山体平缓，无明显隆起' : pVal >= 0.55 ? '山体隆起，形成"尖峰"' : '山体平滑，起伏适中';
+            const dBehavior = dVal < 0.4 ? '山体有明显波动' : dVal > 0.6 ? '山体过度平滑，响应迟滞' : '山体平滑，无明显突变';
+
+            const iImpact = iVal < 0.4 ? '系统倾向于"保守响应"' : iVal > 0.6 ? '系统倾向于"激进响应"' : '系统响应"中立均衡"';
+            const pImpact = pVal < 0.4 ? '系统倾向于"缓慢处理"' : pVal >= 0.55 ? '系统倾向于"加速处理"' : '系统响应"速度适中"';
+            const dImpact = dVal < 0.4 ? '系统"灵敏但易震荡"' : dVal > 0.6 ? '系统"稳定但响应慢"' : '系统响应"均衡，无偏向"';
+
+            setIPDVal('ipdIVal', 'ipdIBehavior', 'ipdIImpact', iVal, iBehavior, iImpact, iLevel);
+            setIPDVal('ipdPVal', 'ipdPBehavior', 'ipdPImpact', pVal, pBehavior, pImpact, pLevel);
+            setIPDVal('ipdDVal', 'ipdDBehavior', 'ipdDImpact', dVal, dBehavior, dImpact, dLevel);
         }
 
         function getRadarOption() {
@@ -1725,6 +2344,7 @@
             `).join('');
             addLog(`语义映射完成，7维度初始值已生成`, 'process');
             updateRadarChart();
+            updateMappingTables(text, analysis, currentState.vector);
             await sleep(500);
             setStepCompleted(3);
 
@@ -1939,6 +2559,14 @@
 
         function init() {
             initCharts();
+
+            const defaultAnalysis = {
+                keywords: ['市场', '波动', '风险'],
+                emotions: ['焦虑'],
+                topics: ['金融']
+            };
+            const defaultVector = { I: 0.35, P: 0.60, D: 0.45, S: 0.72, 'Dev-I': 0.35, Dev1: 0.28, Dev2: 0.65 };
+            updateMappingTables('市场波动风险分析', defaultAnalysis, defaultVector);
 
             document.querySelectorAll('.sample-btn').forEach(btn => {
                 btn.addEventListener('click', () => {
