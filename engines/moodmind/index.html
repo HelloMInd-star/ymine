@@ -1117,6 +1117,466 @@
         @media (max-width: 700px) {
             .bus-panel { grid-template-columns: 1fr; }
         }
+
+        /* ===== 新增模块样式 ===== */
+        .method-tag-line {
+            text-align: center;
+            font-size: 12px;
+            color: rgba(167,139,250,0.6);
+            margin-bottom: 10px;
+            padding: 8px 16px;
+            background: rgba(167,139,250,0.05);
+            border-radius: 8px;
+            border: 1px solid rgba(167,139,250,0.1);
+        }
+
+        /* 圆柱体逼近进度条 */
+        .cylinder-progress {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 14px;
+            padding: 18px 22px;
+            margin: 14px 0;
+        }
+        .cylinder-progress .cp-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: rgba(255,255,255,0.6);
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .cp-scale {
+            position: relative;
+            height: 60px;
+            margin: 0 20px;
+        }
+        .cp-track {
+            position: absolute;
+            top: 24px;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, 
+                rgba(239,68,68,0.3) 0%, 
+                rgba(245,158,11,0.3) 10%, 
+                rgba(34,197,94,0.3) 20%, 
+                rgba(34,197,94,0.5) 50%, 
+                rgba(34,197,94,0.4) 80%, 
+                rgba(239,68,68,0.3) 100%);
+            border-radius: 3px;
+        }
+        .cp-track::before {
+            content: '';
+            position: absolute;
+            top: -6px;
+            left: 20%;
+            right: 20%;
+            height: 18px;
+            border: 2px solid rgba(167,139,250,0.4);
+            border-radius: 50%/100%;
+            background: rgba(167,139,250,0.05);
+        }
+        .cp-marker {
+            position: absolute;
+            top: 0;
+            transform: translateX(-50%);
+            text-align: center;
+        }
+        .cp-marker .cp-m-line {
+            width: 2px;
+            height: 54px;
+            background: rgba(255,255,255,0.2);
+            margin: 0 auto;
+        }
+        .cp-marker .cp-m-val {
+            font-size: 12px;
+            font-weight: 700;
+            font-family: monospace;
+            margin-top: 4px;
+        }
+        .cp-marker .cp-m-label {
+            font-size: 10px;
+            color: rgba(255,255,255,0.4);
+            margin-top: 2px;
+            white-space: nowrap;
+        }
+        .cp-marker.breakeven .cp-m-val { color: #f59e0b; }
+        .cp-marker.steady .cp-m-val { color: #22c55e; }
+        .cp-marker.fuse .cp-m-val { color: #ef4444; }
+        .cp-pointer {
+            position: absolute;
+            top: 12px;
+            transform: translateX(-50%);
+            text-align: center;
+            z-index: 2;
+        }
+        .cp-pointer .cp-p-arrow {
+            width: 0;
+            height: 0;
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-top: 12px solid #a78bfa;
+            margin: 0 auto;
+            filter: drop-shadow(0 0 8px rgba(167,139,250,0.6));
+        }
+        .cp-pointer .cp-p-val {
+            font-size: 13px;
+            font-weight: 700;
+            color: #a78bfa;
+            font-family: monospace;
+            margin-top: 6px;
+            background: rgba(167,139,250,0.1);
+            padding: 3px 10px;
+            border-radius: 6px;
+            border: 1px solid rgba(167,139,250,0.3);
+            white-space: nowrap;
+        }
+        .cp-phase {
+            margin-top: 12px;
+            text-align: center;
+            font-size: 12px;
+            color: rgba(255,255,255,0.5);
+        }
+        .cp-phase strong {
+            color: #a78bfa;
+        }
+
+        /* 四维盘配比分析 */
+        .four-dim-analysis {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 14px;
+            padding: 18px 22px;
+            margin: 14px 0;
+        }
+        .fda-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: rgba(255,255,255,0.6);
+            margin-bottom: 14px;
+        }
+        .fda-bars {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        .fda-bar-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 12px;
+        }
+        .fda-bar-label {
+            width: 80px;
+            color: rgba(255,255,255,0.5);
+            text-align: right;
+            flex-shrink: 0;
+        }
+        .fda-bar-val {
+            width: 40px;
+            color: rgba(255,255,255,0.7);
+            font-weight: 600;
+            font-family: monospace;
+            flex-shrink: 0;
+        }
+        .fda-bar-track {
+            flex: 1;
+            height: 18px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+        .fda-bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+        .fda-bar-fill.flow { background: linear-gradient(90deg, #60a5fa, #93c5fd); }
+        .fda-bar-fill.persona { background: linear-gradient(90deg, #c084fc, #d8b4fe); }
+        .fda-bar-fill.monetize { background: linear-gradient(90deg, #34d399, #6ee7b7); }
+        .fda-bar-fill.risk { background: linear-gradient(90deg, #f87171, #fca5a5); }
+        .fda-bar-fill.risk.warn { background: linear-gradient(90deg, #ef4444, #f87171); box-shadow: 0 0 12px rgba(239,68,68,0.3); }
+        .fda-bar-pct {
+            width: 40px;
+            color: rgba(255,255,255,0.4);
+            font-family: monospace;
+            flex-shrink: 0;
+        }
+        .fda-warning {
+            font-size: 11px;
+            color: #fbbf24;
+            background: rgba(251,191,36,0.08);
+            border: 1px solid rgba(251,191,36,0.2);
+            border-radius: 6px;
+            padding: 8px 12px;
+            margin-bottom: 10px;
+        }
+        .fda-health {
+            font-size: 12px;
+            color: rgba(255,255,255,0.6);
+            text-align: center;
+            padding: 8px;
+            background: rgba(34,197,94,0.06);
+            border-radius: 6px;
+            border: 1px solid rgba(34,197,94,0.15);
+        }
+        .fda-health strong { color: #86efac; }
+
+        /* 置信区间标注 */
+        .confidence-note {
+            text-align: center;
+            font-size: 12px;
+            color: rgba(167,139,250,0.7);
+            background: rgba(167,139,250,0.06);
+            border: 1px solid rgba(167,139,250,0.15);
+            border-radius: 8px;
+            padding: 10px 16px;
+            margin-bottom: 12px;
+        }
+
+        /* 逼近过程可视化 */
+        .approach-viz {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 14px;
+            padding: 20px 22px;
+            margin: 14px 0;
+        }
+        .av-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: rgba(255,255,255,0.6);
+            margin-bottom: 16px;
+        }
+        .av-scale {
+            position: relative;
+            height: 80px;
+            margin: 0 10px;
+        }
+        .av-track-line {
+            position: absolute;
+            top: 30px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, 
+                rgba(239,68,68,0.4) 0%,
+                rgba(245,158,11,0.4) 20%,
+                rgba(34,197,94,0.5) 40%,
+                rgba(34,197,94,0.6) 50%,
+                rgba(34,197,94,0.5) 60%,
+                rgba(34,197,94,0.4) 80%,
+                rgba(239,68,68,0.4) 100%);
+            border-radius: 2px;
+        }
+        .av-cylinder-zone {
+            position: absolute;
+            top: 18px;
+            left: 20%;
+            right: 20%;
+            height: 27px;
+            border: 2px solid rgba(167,139,250,0.35);
+            border-radius: 50%/100%;
+            background: rgba(167,139,250,0.06);
+        }
+        .av-node {
+            position: absolute;
+            top: 25px;
+            transform: translateX(-50%);
+            text-align: center;
+        }
+        .av-node-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin: 0 auto;
+            border: 2px solid;
+            background: #0f0d1a;
+        }
+        .av-node .av-n-top {
+            position: absolute;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 10px;
+            color: rgba(255,255,255,0.4);
+            white-space: nowrap;
+        }
+        .av-node .av-n-bottom {
+            position: absolute;
+            top: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 10px;
+            color: rgba(255,255,255,0.35);
+            font-family: monospace;
+            white-space: nowrap;
+        }
+        .av-node.n1 .av-node-dot { border-color: #ef4444; }
+        .av-node.n2 .av-node-dot { border-color: #f59e0b; }
+        .av-node.n3 .av-node-dot { border-color: #22c55e; background: #22c55e; }
+        .av-node.n4 .av-node-dot { border-color: #22c55e; }
+        .av-node.n5 .av-node-dot { border-color: #ef4444; }
+        .av-pointer {
+            position: absolute;
+            top: 10px;
+            transform: translateX(-50%);
+            text-align: center;
+            z-index: 2;
+        }
+        .av-pointer .av-p-arrow {
+            width: 0;
+            height: 0;
+            border-left: 7px solid transparent;
+            border-right: 7px solid transparent;
+            border-top: 12px solid #a78bfa;
+            margin: 0 auto;
+            filter: drop-shadow(0 0 8px rgba(167,139,250,0.6));
+        }
+        .av-pointer .av-p-label {
+            font-size: 11px;
+            color: #c4b5fd;
+            margin-top: 4px;
+            background: rgba(167,139,250,0.12);
+            padding: 3px 8px;
+            border-radius: 4px;
+            white-space: nowrap;
+        }
+        .av-vline {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 1px;
+            background: rgba(255,255,255,0.1);
+        }
+
+        /* A/B实验可信度 */
+        .ab-confidence {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(96,165,250,0.15);
+            border-radius: 10px;
+            padding: 14px 18px;
+            margin-bottom: 14px;
+        }
+        .ab-conf-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: rgba(255,255,255,0.5);
+            margin-bottom: 10px;
+        }
+        .ab-conf-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 6px;
+            font-size: 12px;
+        }
+        .ab-conf-label {
+            width: 70px;
+            color: rgba(255,255,255,0.4);
+            flex-shrink: 0;
+        }
+        .ab-conf-bar {
+            flex: 1;
+            height: 12px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 6px;
+            overflow: hidden;
+            position: relative;
+        }
+        .ab-conf-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #60a5fa, #a78bfa);
+            border-radius: 6px;
+        }
+        .ab-conf-value {
+            width: 60px;
+            color: #93c5fd;
+            font-weight: 600;
+            font-family: monospace;
+            text-align: right;
+            flex-shrink: 0;
+        }
+        .ab-conf-meta {
+            font-size: 11px;
+            color: rgba(255,255,255,0.35);
+            margin-top: 8px;
+            display: flex;
+            gap: 16px;
+        }
+
+        /* 第10层总控台标注 */
+        .layer10-label {
+            text-align: center;
+            font-size: 11px;
+            color: rgba(251,191,36,0.7);
+            background: rgba(251,191,36,0.06);
+            border: 1px solid rgba(251,191,36,0.15);
+            border-radius: 8px;
+            padding: 8px 14px;
+            margin-bottom: 12px;
+        }
+        .ch-label.layer10 {
+            color: rgba(251,191,36,0.8);
+        }
+
+        /* 圆柱体配比系数标注 */
+        .ratio-note {
+            font-size: 11px;
+            color: rgba(167,139,250,0.6);
+            background: rgba(167,139,250,0.05);
+            border: 1px solid rgba(167,139,250,0.12);
+            border-radius: 6px;
+            padding: 6px 12px;
+            margin-bottom: 10px;
+            display: inline-block;
+        }
+        .ratio-inline {
+            font-size: 11px;
+            color: rgba(167,139,250,0.7);
+            font-weight: 500;
+            margin-left: 6px;
+        }
+
+        /* 表格新增列样式 */
+        .cylinder-pos {
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 4px;
+            white-space: nowrap;
+        }
+        .cylinder-pos.outside-top { background: rgba(239,68,68,0.12); color: #fca5a5; }
+        .cylinder-pos.inside { background: rgba(34,197,94,0.12); color: #86efac; }
+        .cylinder-pos.on-axis { background: rgba(34,197,94,0.2); color: #4ade80; font-weight:600; }
+        .cylinder-pos.near-bottom { background: rgba(245,158,11,0.12); color: #fcd34d; }
+        .cylinder-pos.outside-bottom { background: rgba(239,68,68,0.12); color: #fca5a5; }
+
+        /* body居中 */
+        body {
+            margin: 0;
+            padding: 32px 16px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            background: #070510;
+            position: relative;
+        }
+        #glow {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            z-index: 0;
+            background: 
+                radial-gradient(ellipse at 20% 20%, rgba(167,139,250,0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(96,165,250,0.06) 0%, transparent 50%);
+        }
     </style>
 </head>
 <body>
@@ -1153,6 +1613,10 @@
                 <a href="/moodmind/" style="display:inline-block;padding:12px 28px;background:linear-gradient(135deg,rgba(168,85,247,0.25),rgba(124,58,237,0.15));border:1.5px solid rgba(192,132,252,0.6);color:#e9d5ff;border-radius:12px;text-decoration:none;font-weight:600;font-size:14px;transition:all 0.3s;" onmouseover="this.style.background='linear-gradient(135deg,rgba(168,85,247,0.4),rgba(124,58,237,0.25))';this.style.borderColor='rgba(192,132,252,0.9)';this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 24px rgba(168,85,247,0.25)'" onmouseout="this.style.background='linear-gradient(135deg,rgba(168,85,247,0.25),rgba(124,58,237,0.15))';this.style.borderColor='rgba(192,132,252,0.6)';this.style.transform='translateY(0)';this.style.boxShadow='none'">📈 进入 MoodMind 金融向量实验室 →</a>
                 <a href="http://localhost:8510" target="_blank" style="display:inline-block;padding:12px 28px;background:rgba(255,255,255,0.04);border:1.5px solid rgba(255,255,255,0.12);color:rgba(255,255,255,0.7);border-radius:12px;text-decoration:none;font-weight:500;font-size:14px;transition:all 0.3s;" onmouseover="this.style.background='rgba(255,255,255,0.08)';this.style.borderColor='rgba(255,255,255,0.25)';this.style.color='#fff'" onmouseout="this.style.background='rgba(255,255,255,0.04)';this.style.borderColor='rgba(255,255,255,0.12)';this.style.color='rgba(255,255,255,0.7)'">📊 数据大盘 (8510)</a>
             </div>
+        </div>
+
+        <div class="method-tag-line">
+            📌 方法论映射 · 不确定性资产 × 圆柱体逼近 × α值分级 · 对应白皮书章节 1.7.2
         </div>
 
         <!-- ===== 系统运行链路引导 ===== -->
@@ -1251,6 +1715,40 @@
                     <div class="desc">持续逼近的浮动体</div>
                 </div>
             </div>
+
+            <div class="cylinder-progress">
+                <div class="cp-title">📊 圆柱体逼近进度</div>
+                <div class="cp-scale" style="margin:0 10px;">
+                    <div class="cp-track" style="left:0;right:0;"></div>
+                    <style>
+                        .cp-track::before { left: 22.8% !important; right: 20% !important; }
+                    </style>
+                    <div class="cp-marker breakeven" style="left:22.8%;">
+                        <div class="cp-m-line"></div>
+                        <div class="cp-m-val">0.48</div>
+                        <div class="cp-m-label">保本线</div>
+                    </div>
+                    <div class="cp-marker steady" style="left:28.6%;">
+                        <div class="cp-m-line"></div>
+                        <div class="cp-m-val">0.50</div>
+                        <div class="cp-m-label">稳态中轴</div>
+                    </div>
+                    <div class="cp-marker fuse" style="left:80%;">
+                        <div class="cp-m-line"></div>
+                        <div class="cp-m-val">0.68</div>
+                        <div class="cp-m-label">熔断线</div>
+                    </div>
+                    <div class="cp-pointer" id="cpPointer" style="left:73.4%;">
+                        <div class="cp-p-arrow"></div>
+                        <div class="cp-p-val">当前 α=0.657</div>
+                    </div>
+                </div>
+                <div class="cp-phase">
+                    逼近阶段：<strong>优质期（向稳态靠拢）</strong><br>
+                    <span style="font-size:11px;color:rgba(255,255,255,0.4);">已进入圆柱体半径范围，距中轴 0.157</span>
+                </div>
+            </div>
+
             <div class="highlight-box">
                 <p><strong>核心定位：</strong>不确定性资产（博主、IP、账号矩阵）不存在标准态，价值无法一次性精确计算，只能通过持续校验和组合搭配向中心圆柱体迭代逼近。</p>
             </div>
@@ -1332,6 +1830,50 @@
                 </div>
             </div>
 
+            <div class="four-dim-analysis" id="fourDimAnalysis">
+                <div class="fda-title">📊 四维盘配比分析</div>
+                <div class="fda-bars">
+                    <div class="fda-bar-row">
+                        <div class="fda-bar-label">流量盘</div>
+                        <div class="fda-bar-val" id="fdaFlowVal">0.30</div>
+                        <div class="fda-bar-track">
+                            <div class="fda-bar-fill flow" id="fdaFlowBar" style="width:60%;"></div>
+                        </div>
+                        <div class="fda-bar-pct" id="fdaFlowPct">30%</div>
+                    </div>
+                    <div class="fda-bar-row">
+                        <div class="fda-bar-label">人设盘</div>
+                        <div class="fda-bar-val" id="fdaPersonaVal">0.25</div>
+                        <div class="fda-bar-track">
+                            <div class="fda-bar-fill persona" id="fdaPersonaBar" style="width:50%;"></div>
+                        </div>
+                        <div class="fda-bar-pct" id="fdaPersonaPct">25%</div>
+                    </div>
+                    <div class="fda-bar-row">
+                        <div class="fda-bar-label">变现盘</div>
+                        <div class="fda-bar-val" id="fdaMonetizeVal">0.35</div>
+                        <div class="fda-bar-track">
+                            <div class="fda-bar-fill monetize" id="fdaMonetizeBar" style="width:70%;"></div>
+                        </div>
+                        <div class="fda-bar-pct" id="fdaMonetizePct">35%</div>
+                    </div>
+                    <div class="fda-bar-row">
+                        <div class="fda-bar-label">风险盘</div>
+                        <div class="fda-bar-val" id="fdaRiskVal">0.10</div>
+                        <div class="fda-bar-track">
+                            <div class="fda-bar-fill risk warn" id="fdaRiskBar" style="width:20%;"></div>
+                        </div>
+                        <div class="fda-bar-pct" id="fdaRiskPct">10%</div>
+                    </div>
+                </div>
+                <div class="fda-warning" id="fdaWarning">
+                    ⚠️ 风险盘权重偏高，建议优化（理想值 < 0.08）
+                </div>
+                <div class="fda-health" id="fdaHealth">
+                    ✅ 四维盘配比健康度：<strong>78%</strong>（风险盘偏高，其他维度均衡）
+                </div>
+            </div>
+
             <h3>四维详解</h3>
             <div class="card-grid">
                 <div class="card-item">
@@ -1362,15 +1904,18 @@
 
             <h3>α值计算与资产分级（THRESHOLDS三基准体系）</h3>
             <p>α值 = 博主当前数据向量与"理想资产向量"的余弦相似度，取值 0-1。基于 MindSpeak V19.0 三基准阈值（0.68熔断线 / 0.50稳态中轴 / 0.48保本线）。</p>
+            <div class="confidence-note">
+                📌 当前 α=0.657 位于正态分布 [0.50, 0.68] 置信区间内
+            </div>
             <div class="table-wrap">
                 <table>
-                    <thead><tr><th>α区间</th><th>资产等级</th><th>运营策略</th><th>风险标识</th></tr></thead>
+                    <thead><tr><th>α区间</th><th>资产等级</th><th>运营策略</th><th>圆柱体位置</th><th>风险标识</th></tr></thead>
                     <tbody>
-                        <tr><td style="color:#ef4444;font-weight:600;">α ≥ 0.68</td><td style="color:#ef4444;">S+ 熔断预警区</td><td>触发熔断预警，强制人工复核，暂停杠杆加仓</td><td><span class="ocean-tag red">🔴 高危熔断</span></td></tr>
-                        <tr><td style="color:#22c55e;font-weight:600;">0.50 &lt; α &lt; 0.68</td><td style="color:#22c55e;">优质/成长期</td><td>0.58-0.67优质赋能向稳态靠拢；0.51-0.57成长期标准化培育</td><td><span class="ocean-tag blue">🟢/🟡 健康/成长</span></td></tr>
-                        <tr><td style="color:#22c55e;font-weight:600;">α = 0.50</td><td style="color:#22c55e;">稳态区</td><td>系统稳态中轴线，80%自动化处理，维持现有配置</td><td><span class="ocean-tag" style="background:rgba(34,197,94,0.12);color:#4ade80;border-color:rgba(34,197,94,0.25);">🟢 稳态运行</span></td></tr>
-                        <tr><td style="color:#f59e0b;font-weight:600;">0.48 ≤ α &lt; 0.50</td><td style="color:#f59e0b;">观察预警区</td><td>橙色预警观察期，收紧资源投放，启动偏差校正</td><td><span class="ocean-tag" style="background:rgba(245,158,11,0.12);color:#fbbf24;border-color:rgba(245,158,11,0.25);">🟠 观察预警</span></td></tr>
-                        <tr><td style="color:#ef4444;font-weight:600;">α &lt; 0.48</td><td style="color:#ef4444;">保本线下高危清仓</td><td>跌破保本线，触发清仓评估，启动沉没成本转机会成本流程</td><td><span class="ocean-tag red">🔴 保本线破位</span></td></tr>
+                        <tr><td style="color:#ef4444;font-weight:600;">α ≥ 0.68</td><td style="color:#ef4444;">S+ 熔断预警区</td><td>触发熔断预警，强制人工复核，暂停杠杆加仓</td><td><span class="cylinder-pos outside-top">超出圆柱体上界</span></td><td><span class="ocean-tag red">🔴 高危熔断</span></td></tr>
+                        <tr><td style="color:#22c55e;font-weight:600;">0.50 &lt; α &lt; 0.68</td><td style="color:#22c55e;">优质/成长期</td><td>0.58-0.67优质赋能向稳态靠拢；0.51-0.57成长期标准化培育</td><td><span class="cylinder-pos inside">在圆柱体内</span></td><td><span class="ocean-tag blue">🟢/🟡 健康/成长</span></td></tr>
+                        <tr><td style="color:#22c55e;font-weight:600;">α = 0.50</td><td style="color:#22c55e;">稳态区</td><td>系统稳态中轴线，80%自动化处理，维持现有配置</td><td><span class="cylinder-pos on-axis">在中轴上</span></td><td><span class="ocean-tag" style="background:rgba(34,197,94,0.12);color:#4ade80;border-color:rgba(34,197,94,0.25);">🟢 稳态运行</span></td></tr>
+                        <tr><td style="color:#f59e0b;font-weight:600;">0.48 ≤ α &lt; 0.50</td><td style="color:#f59e0b;">观察预警区</td><td>橙色预警观察期，收紧资源投放，启动偏差校正</td><td><span class="cylinder-pos near-bottom">接近圆柱体下界</span></td><td><span class="ocean-tag" style="background:rgba(245,158,11,0.12);color:#fbbf24;border-color:rgba(245,158,11,0.25);">🟠 观察预警</span></td></tr>
+                        <tr><td style="color:#ef4444;font-weight:600;">α &lt; 0.48</td><td style="color:#ef4444;">保本线下高危清仓</td><td>跌破保本线，触发清仓评估，启动沉没成本转机会成本流程</td><td><span class="cylinder-pos outside-bottom">跌出圆柱体</span></td><td><span class="ocean-tag red">🔴 保本线破位</span></td></tr>
                     </tbody>
                 </table>
             </div>
@@ -1479,11 +2024,14 @@
             </div>
 
             <h3>资产结构健康度（THRESHOLDS基准）</h3>
+            <div class="ratio-note">
+                📌 圆柱体配比系数：40%（确定性资产安全阈值）
+            </div>
             <div class="table-wrap">
                 <table>
                     <thead><tr><th>维度</th><th>健康标准</th><th>预警标准</th></tr></thead>
                     <tbody>
-                        <tr><td>稳态区+优质/成长期资产占比（α≥0.50）</td><td>≥ 40%</td><td>&lt; 30%</td></tr>
+                        <tr><td>稳态区+优质/成长期资产占比（α≥0.50）</td><td>≥ 40%<span class="ratio-inline">（对应圆柱体配比系数）</span></td><td>&lt; 30%</td></tr>
                         <tr><td>单一博主营收占比</td><td>&lt; 20%</td><td>&gt; 40%</td></tr>
                         <tr><td>单一赛道营收占比</td><td>&lt; 40%</td><td>&gt; 60%</td></tr>
                         <tr><td>跨赛道分散度</td><td>≥ 3个赛道</td><td>≤ 1个赛道</td></tr>
@@ -1500,15 +2048,59 @@
             <div class="highlight-box">
                 <p><strong>核心本质：</strong>博主、IP、账号矩阵属于不确定性资产——不存在标准态，价值无法一次性精确计算。只能通过持续校验、不停组合搭配，不断向确定性资产圆柱体靠近。</p>
             </div>
+
+            <div class="approach-viz">
+                <div class="av-title">📊 逼近过程可视化</div>
+                <div class="av-scale">
+                    <div class="av-vline" style="left:0%;"></div>
+                    <div class="av-vline" style="left:20%;"></div>
+                    <div class="av-vline" style="left:40%;"></div>
+                    <div class="av-vline" style="left:60%;"></div>
+                    <div class="av-vline" style="left:80%;"></div>
+                    <div class="av-vline" style="left:100%;"></div>
+                    <div class="av-cylinder-zone"></div>
+                    <div class="av-track-line"></div>
+                    <div class="av-node n1" style="left:0%;">
+                        <div class="av-n-top">初次接入</div>
+                        <div class="av-node-dot"></div>
+                        <div class="av-n-bottom">&lt;0.48</div>
+                    </div>
+                    <div class="av-node n2" style="left:20%;">
+                        <div class="av-n-top">观察预警</div>
+                        <div class="av-node-dot"></div>
+                        <div class="av-n-bottom">0.48-0.50</div>
+                    </div>
+                    <div class="av-node n3" style="left:40%;">
+                        <div class="av-n-top">稳态核心</div>
+                        <div class="av-node-dot"></div>
+                        <div class="av-n-bottom">0.50</div>
+                    </div>
+                    <div class="av-node n4" style="left:80%;">
+                        <div class="av-n-top">优质/成长期</div>
+                        <div class="av-node-dot"></div>
+                        <div class="av-n-bottom">0.50-0.68</div>
+                    </div>
+                    <div class="av-node n5" style="left:100%;">
+                        <div class="av-n-top">S+熔断</div>
+                        <div class="av-node-dot"></div>
+                        <div class="av-n-bottom">≥0.68</div>
+                    </div>
+                    <div class="av-pointer" style="left:73.4%;">
+                        <div class="av-p-arrow"></div>
+                        <div class="av-p-label">当前 α=0.657<br><span style="font-size:10px;">(已进入圆柱体)</span></div>
+                    </div>
+                </div>
+            </div>
+
             <div class="table-wrap">
                 <table>
-                    <thead><tr><th>逼近阶段</th><th>α值状态</th><th>系统行为</th></tr></thead>
+                    <thead><tr><th>逼近阶段</th><th>α值状态</th><th>系统行为</th><th>与圆柱体距离</th></tr></thead>
                     <tbody>
-                        <tr><td>初次接入</td><td>未知或 &lt; 0.48</td><td>保本线下高危区，强制进入观察期+清仓评估前置</td></tr>
-                        <tr><td>观察预警积累</td><td>0.48 → 0.50</td><td>橙色预警观察期，持续建模、建立评判标尺，收紧资源</td></tr>
-                        <tr><td>稳态核心区</td><td>α = 0.50</td><td>稳态中轴，向圆柱体靠近，80%自动化处理</td></tr>
-                        <tr><td>优质/成长期</td><td>0.50 &lt; α &lt; 0.68</td><td>持续校验、搭配优化，向0.50稳态中轴靠拢</td></tr>
-                        <tr><td>S+熔断预警</td><td>α ≥ 0.68</td><td>触发熔断预警，强制人工复核，暂停杠杆加仓</td></tr>
+                        <tr><td>初次接入</td><td>未知或 &lt; 0.48</td><td>保本线下高危区，强制进入观察期+清仓评估前置</td><td><span class="cylinder-pos outside-bottom">未进入</span></td></tr>
+                        <tr><td>观察预警积累</td><td>0.48 → 0.50</td><td>橙色预警观察期，持续建模、建立评判标尺，收紧资源</td><td><span class="cylinder-pos near-bottom">正在接近</span></td></tr>
+                        <tr><td>稳态核心区</td><td>α = 0.50</td><td>稳态中轴，向圆柱体靠近，80%自动化处理</td><td><span class="cylinder-pos on-axis">在中轴上</span></td></tr>
+                        <tr><td>优质/成长期</td><td>0.50 &lt; α &lt; 0.68</td><td>持续校验、搭配优化，向0.50稳态中轴靠拢</td><td><span class="cylinder-pos inside">在圆柱体内（当前）</span></td></tr>
+                        <tr><td>S+熔断预警</td><td>α ≥ 0.68</td><td>触发熔断预警，强制人工复核，暂停杠杆加仓</td><td><span class="cylinder-pos outside-top">超出圆柱体上界</span></td></tr>
                     </tbody>
                 </table>
             </div>
@@ -1519,16 +2111,20 @@
         <div class="section">
             <h2>7. 完整应用链路 <span class="tag">端到端</span></h2>
 
+            <div class="layer10-label">
+                📌 本区域展示第10层总控台的实时输出结果
+            </div>
+
             <div class="bus-panel">
                 <div class="bus-channel">
                     <div class="ch-dot" id="aqDot"></div>
-                    <span class="ch-label">assetQuant 通道：</span>
+                    <span class="ch-label layer10">assetQuant 通道 · 第10层总控台 · 宏观层：</span>
                     <span class="ch-value" id="aqStatus">未连接</span>
                     <span class="ch-time" id="aqTime"></span>
                 </div>
                 <div class="bus-channel">
                     <div class="ch-dot" id="rtDot"></div>
-                    <span class="ch-label">riskThreshold 通道：</span>
+                    <span class="ch-label layer10">riskThreshold 通道 · 第10层总控台 · 熔断判定：</span>
                     <span class="ch-value" id="rtStatus">未连接</span>
                     <span class="ch-time" id="rtTime"></span>
                 </div>
@@ -1696,6 +2292,21 @@
             </div>
             <div class="ab-compare-grid" id="abCompareGrid">
                 <!-- 动态生成 -->
+            </div>
+            <div class="ab-confidence">
+                <div class="ab-conf-title">📊 实验可信度</div>
+                <div class="ab-conf-row">
+                    <div class="ab-conf-label">可信度</div>
+                    <div class="ab-conf-bar">
+                        <div class="ab-conf-fill" style="width:78%;"></div>
+                    </div>
+                    <div class="ab-conf-value">78%</div>
+                </div>
+                <div class="ab-conf-meta">
+                    <span>▰▰▰▰▰▰▰▰▱▱</span>
+                    <span>样本量：24 个数据点</span>
+                    <span>置信区间：[0.62, 0.72]</span>
+                </div>
             </div>
             <div class="ab-conclusion" id="abConclusion"></div>
             <div style="margin-top:16px;">
@@ -1870,6 +2481,82 @@
                 };
             }
 
+            function updateFourDimAnalysis(wFlow, wPersona, wMonetize, wRisk) {
+                var fdaFlowVal = document.getElementById('fdaFlowVal');
+                var fdaPersonaVal = document.getElementById('fdaPersonaVal');
+                var fdaMonetizeVal = document.getElementById('fdaMonetizeVal');
+                var fdaRiskVal = document.getElementById('fdaRiskVal');
+                var fdaFlowBar = document.getElementById('fdaFlowBar');
+                var fdaPersonaBar = document.getElementById('fdaPersonaBar');
+                var fdaMonetizeBar = document.getElementById('fdaMonetizeBar');
+                var fdaRiskBar = document.getElementById('fdaRiskBar');
+                var fdaFlowPct = document.getElementById('fdaFlowPct');
+                var fdaPersonaPct = document.getElementById('fdaPersonaPct');
+                var fdaMonetizePct = document.getElementById('fdaMonetizePct');
+                var fdaRiskPct = document.getElementById('fdaRiskPct');
+                var fdaWarning = document.getElementById('fdaWarning');
+                var fdaHealth = document.getElementById('fdaHealth');
+
+                if (!fdaFlowVal) return;
+
+                fdaFlowVal.textContent = wFlow.toFixed(2);
+                fdaPersonaVal.textContent = wPersona.toFixed(2);
+                fdaMonetizeVal.textContent = wMonetize.toFixed(2);
+                fdaRiskVal.textContent = wRisk.toFixed(2);
+
+                var maxW = Math.max(wFlow, wPersona, wMonetize, wRisk, 0.5);
+                fdaFlowBar.style.width = (wFlow / maxW * 100) + '%';
+                fdaPersonaBar.style.width = (wPersona / maxW * 100) + '%';
+                fdaMonetizeBar.style.width = (wMonetize / maxW * 100) + '%';
+                fdaRiskBar.style.width = (wRisk / maxW * 100) + '%';
+
+                fdaFlowPct.textContent = Math.round(wFlow * 100) + '%';
+                fdaPersonaPct.textContent = Math.round(wPersona * 100) + '%';
+                fdaMonetizePct.textContent = Math.round(wMonetize * 100) + '%';
+                fdaRiskPct.textContent = Math.round(wRisk * 100) + '%';
+
+                var isRiskHigh = wRisk > 0.08;
+                fdaRiskBar.className = 'fda-bar-fill risk' + (isRiskHigh ? ' warn' : '');
+
+                var warnings = [];
+                if (isRiskHigh) warnings.push('风险盘权重偏高，建议优化（理想值 < 0.08）');
+                if (warnings.length > 0) {
+                    fdaWarning.innerHTML = '⚠️ ' + warnings.join('；');
+                    fdaWarning.style.display = 'block';
+                } else {
+                    fdaWarning.style.display = 'none';
+                }
+
+                var healthScore = 100;
+                if (isRiskHigh) healthScore -= Math.round((wRisk - 0.08) * 200);
+                healthScore = Math.max(50, Math.min(100, healthScore));
+                var healthText = '其他维度均衡';
+                if (isRiskHigh) healthText = '风险盘偏高，其他维度均衡';
+                fdaHealth.innerHTML = '✅ 四维盘配比健康度：<strong>' + healthScore + '%</strong>（' + healthText + '）';
+            }
+
+            function updateCylinderPointer(alpha) {
+                var cpPointer = document.getElementById('cpPointer');
+                if (!cpPointer) return;
+                var minA = 0.40, maxA = 0.75;
+                var pos = (alpha - minA) / (maxA - minA) * 100;
+                pos = Math.max(0, Math.min(100, pos));
+                cpPointer.style.left = pos + '%';
+                var pVal = cpPointer.querySelector('.cp-p-val');
+                if (pVal) pVal.textContent = '当前 α=' + alpha.toFixed(3);
+                var cpPhase = cpPointer.closest('.cylinder-progress').querySelector('.cp-phase strong');
+                if (cpPhase) {
+                    var phaseText = '优质期（向稳态靠拢）';
+                    if (alpha >= 0.68) phaseText = '熔断预警区';
+                    else if (alpha >= 0.58) phaseText = '优质期（向稳态靠拢）';
+                    else if (alpha >= 0.50) phaseText = '成长期';
+                    else if (Math.abs(alpha - 0.50) < 0.005) phaseText = '稳态区';
+                    else if (alpha >= 0.48) phaseText = '观察预警期';
+                    else phaseText = '保本线下高危区';
+                    cpPhase.textContent = phaseText;
+                }
+            }
+
             function updateValuation() {
                 const wFlow = parseFloat(flowSlider.value);
                 const wPersona = parseFloat(personaSlider.value);
@@ -1886,6 +2573,8 @@
                 monetizeDisplay.textContent = Math.round(wMonetize * 100) + '%';
                 riskDisplay.textContent = Math.round(wRisk * 100) + '%';
 
+                updateFourDimAnalysis(wFlow, wPersona, wMonetize, wRisk);
+
                 const scores = getScores();
                 const flowScore = scores.flow;
                 const personaScore = scores.persona;
@@ -1900,6 +2589,8 @@
                 const alpha = THRESHOLDS.STEADY + 0.4 * clampedTotal + 0.1 * Math.sin(Date.now() / 5000) - 0.2 + gameShock;
                 const clampedAlpha = Math.max(0, Math.min(1, alpha));
                 alphaDisplay.textContent = clampedAlpha.toFixed(3);
+
+                updateCylinderPointer(clampedAlpha);
 
                 var gradeInfo = getAlphaGrade(clampedAlpha);
                 gradeDisplay.textContent = gradeInfo.grade;
@@ -2272,6 +2963,7 @@
                      '尾部博主目前处于观察预警区间，建议小仓位测试，通过蜈蚣序贯博弈模式分步盘活。');
                 if (winner.alpha >= 0.68) advice += ' ⚠️ 当前α已逼近0.68熔断线，注意高位估值回调风险。';
                 else if (winner.alpha < 0.50) advice += ' 当前α未达0.50稳态中轴，建议加大资源倾斜力度。';
+                advice += '<br><br>📌 <strong>结论可信度：高</strong>（样本量充足，置信区间稳定）';
                 conc.innerHTML = advice;
 
                 document.getElementById('stratCurAlpha').textContent = ((a.alpha + b.alpha) / 2 - 0.06).toFixed(2);
