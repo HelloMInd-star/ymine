@@ -1253,6 +1253,274 @@
             color: rgba(255,255,255,0.35);
         }
 
+        /* === 模块三：大模型工作流链路 === */
+        .workflow-section { margin-bottom: 16px; }
+        .workflow-title {
+            font-size: 15px; font-weight: 700; color: #f1f5f9;
+            margin-bottom: 4px; display: flex; align-items: center; gap: 8px;
+        }
+        .workflow-sub {
+            font-size: 11px; color: rgba(255,255,255,0.4);
+            margin-bottom: 16px; letter-spacing: 0.5px;
+        }
+        .workflow-chain {
+            display: flex; align-items: stretch; gap: 0;
+            overflow-x: auto; padding-bottom: 8px;
+        }
+        .wf-stage {
+            flex: 1; min-width: 130px;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 12px;
+            padding: 14px 10px;
+            text-align: center;
+            position: relative;
+            transition: all .35s;
+        }
+        .wf-stage:not(:last-child)::after {
+            content: '→';
+            position: absolute; right: -14px; top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255,255,255,0.15);
+            font-size: 18px; z-index: 2;
+        }
+        .wf-stage-num {
+            font-size: 10px; color: rgba(255,255,255,0.3);
+            letter-spacing: 1px; margin-bottom: 6px;
+        }
+        .wf-stage-name {
+            font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.75);
+            margin-bottom: 4px;
+        }
+        .wf-stage-loc {
+            font-size: 10px; color: rgba(255,255,255,0.3);
+            margin-bottom: 4px;
+        }
+        .wf-stage-module {
+            font-size: 10px; color: rgba(34,211,238,0.6);
+            padding: 2px 6px;
+            background: rgba(34,211,238,0.06);
+            border-radius: 4px;
+            display: inline-block;
+        }
+        .wf-stage.active {
+            background: linear-gradient(135deg, rgba(167,139,250,0.12), rgba(34,211,238,0.08));
+            border-color: rgba(167,139,250,0.35);
+            box-shadow: 0 0 20px rgba(167,139,250,0.15);
+            transform: translateY(-2px);
+        }
+        .wf-stage.active .wf-stage-name { color: #c4b5fd; }
+        .wf-stage.active .wf-stage-num { color: #a78bfa; }
+        .wf-stage.done {
+            background: rgba(52,211,153,0.05);
+            border-color: rgba(52,211,153,0.15);
+        }
+        .wf-stage.done .wf-stage-name { color: #6ee7b7; }
+        .wf-stage.done::after { color: rgba(52,211,153,0.3); }
+        .wf-current-bar {
+            margin-top: 16px;
+            padding: 12px 16px;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 10px;
+            display: flex; align-items: center; gap: 12px;
+        }
+        .wf-cur-label {
+            font-size: 11px; color: rgba(255,255,255,0.4);
+            white-space: nowrap;
+        }
+        .wf-cur-tag {
+            font-size: 12px; font-weight: 600;
+            padding: 3px 10px; border-radius: 6px;
+            background: rgba(167,139,250,0.12); color: #c4b5fd;
+            border: 1px solid rgba(167,139,250,0.2);
+        }
+        .wf-cur-desc {
+            font-size: 11px; color: rgba(255,255,255,0.5);
+        }
+
+        /* === 模块四：向量空间展开 === */
+        .vector-unfold-section { margin-bottom: 16px; }
+        .unfold-title {
+            font-size: 15px; font-weight: 700; color: #f1f5f9;
+            margin-bottom: 4px; display: flex; align-items: center; gap: 8px;
+        }
+        .unfold-sub {
+            font-size: 11px; color: rgba(255,255,255,0.4);
+            margin-bottom: 14px; letter-spacing: 0.5px;
+        }
+        .unfold-canvas-wrap {
+            background: rgba(0,0,0,0.2);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+            height: 260px;
+        }
+        #unfoldCanvas { display: block; width: 100%; height: 100%; }
+        .unfold-phase-label {
+            position: absolute; top: 10px; left: 14px;
+            font-size: 11px; color: rgba(255,255,255,0.45);
+            background: rgba(0,0,0,0.4);
+            padding: 4px 10px; border-radius: 6px;
+            backdrop-filter: blur(4px);
+        }
+        .unfold-desc {
+            position: absolute; bottom: 10px; left: 14px; right: 14px;
+            font-size: 11px; color: rgba(255,255,255,0.4);
+            text-align: center;
+        }
+
+        /* === 模块五：系统状态偏离模拟器 === */
+        .deviation-section { margin-bottom: 16px; }
+        .dev-title {
+            font-size: 15px; font-weight: 700; color: #f1f5f9;
+            margin-bottom: 4px; display: flex; align-items: center; gap: 8px;
+        }
+        .dev-sub {
+            font-size: 11px; color: rgba(255,255,255,0.4);
+            margin-bottom: 14px; letter-spacing: 0.5px;
+        }
+        .dev-visual-row {
+            display: grid;
+            grid-template-columns: 240px 1fr;
+            gap: 16px;
+            margin-bottom: 14px;
+        }
+        .dev-mountain-wrap {
+            background: rgba(0,0,0,0.2);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 12px;
+            height: 180px;
+            position: relative;
+            overflow: hidden;
+        }
+        #devMountainCanvas { display: block; width: 100%; height: 100%; }
+        .dev-mountain-label {
+            position: absolute; top: 8px; left: 10px;
+            font-size: 10px; color: rgba(255,255,255,0.4);
+        }
+        .dev-steady-panel {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 12px;
+            padding: 16px;
+            display: flex; flex-direction: column; gap: 10px;
+        }
+        .steady-range-title {
+            font-size: 12px; color: rgba(255,255,255,0.5);
+            margin-bottom: 4px;
+        }
+        .steady-bar-wrap {
+            position: relative;
+            height: 32px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.06);
+            overflow: hidden;
+        }
+        .steady-zone {
+            position: absolute; top: 0; bottom: 0;
+            background: linear-gradient(90deg, rgba(52,211,153,0.12), rgba(34,211,238,0.12), rgba(52,211,153,0.12));
+            border-left: 1px dashed rgba(52,211,153,0.4);
+            border-right: 1px dashed rgba(52,211,153,0.4);
+        }
+        .steady-danger-l {
+            position: absolute; left:0; top:0; bottom:0;
+            background: linear-gradient(90deg, rgba(248,113,113,0.15), transparent);
+        }
+        .steady-danger-r {
+            position: absolute; right:0; top:0; bottom:0;
+            background: linear-gradient(270deg, rgba(251,191,36,0.15), transparent);
+        }
+        .steady-marker {
+            position: absolute; top: -4px;
+            width: 14px; height: 14px;
+            background: #e2e8f0;
+            border-radius: 50%;
+            border: 2px solid #0b0b1a;
+            box-shadow: 0 0 8px rgba(255,255,255,0.3);
+            transform: translateX(-50%);
+            transition: left .6s cubic-bezier(0.34,1.56,0.64,1);
+            z-index: 2;
+        }
+        .steady-marker::after {
+            content: '';
+            position: absolute; bottom: -8px; left: 50%;
+            transform: translateX(-50%);
+            width: 2px; height: 40px;
+            background: rgba(255,255,255,0.3);
+        }
+        .steady-labels {
+            display: flex; justify-content: space-between;
+            font-size: 9px; color: rgba(255,255,255,0.3);
+            margin-top: 2px;
+        }
+        .steady-pos-label {
+            font-size: 11px; color: rgba(255,255,255,0.6);
+            text-align: center;
+        }
+        .steady-pos-val {
+            font-size: 18px; font-weight: 700;
+            font-family: 'Courier New', monospace;
+            color: #6ee7b7;
+        }
+        .dev-status-tag {
+            display: inline-block;
+            padding: 3px 10px; border-radius: 6px;
+            font-size: 11px; font-weight: 600;
+        }
+        .dev-status-tag.steady { background: rgba(52,211,153,0.12); color: #6ee7b7; border: 1px solid rgba(52,211,153,0.25); }
+        .dev-status-tag.left { background: rgba(96,165,250,0.12); color: #93c5fd; border: 1px solid rgba(96,165,250,0.25); }
+        .dev-status-tag.right { background: rgba(251,191,36,0.12); color: #fbbf24; border: 1px solid rgba(251,191,36,0.25); }
+        .dev-status-tag.danger { background: rgba(248,113,113,0.12); color: #fca5a5; border: 1px solid rgba(248,113,113,0.25); }
+
+        .dev-info-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+        .dev-info-card {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 10px;
+            padding: 10px 12px;
+        }
+        .dev-info-label {
+            font-size: 10px; color: rgba(255,255,255,0.35);
+            margin-bottom: 4px;
+        }
+        .dev-info-val {
+            font-size: 13px; font-weight: 600;
+        }
+        .dev-info-val.heat-low { color: #93c5fd; }
+        .dev-info-val.heat-mid { color: #fbbf24; }
+        .dev-info-val.heat-high { color: #f87171; }
+
+        .dev-strategy-box {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 10px;
+            padding: 12px 14px;
+        }
+        .dev-strategy-title {
+            font-size: 11px; color: rgba(255,255,255,0.4);
+            margin-bottom: 6px;
+        }
+        .dev-strategy-name {
+            font-size: 13px; font-weight: 600;
+            margin-bottom: 4px;
+        }
+        .dev-strategy-name.s-standard { color: #6ee7b7; }
+        .dev-strategy-name.s-deep { color: #fbbf24; }
+        .dev-strategy-name.s-conservative { color: #93c5fd; }
+        .dev-strategy-name.s-context { color: #c4b5fd; }
+        .dev-strategy-name.s-alert { color: #f87171; }
+        .dev-strategy-desc {
+            font-size: 11px; color: rgba(255,255,255,0.45); line-height: 1.6;
+        }
+
         @media (max-width: 1100px) {
             .pipeline-steps { grid-template-columns: repeat(3, 1fr); }
             .charts-row { grid-template-columns: 1fr; }
@@ -1260,11 +1528,18 @@
             .sim-visual { grid-template-columns: 1fr; }
             .bottom-row { grid-template-columns: 1fr; }
             .mapping-tables { grid-template-columns: 1fr; }
+            .dev-visual-row { grid-template-columns: 1fr; }
+            .dev-info-row { grid-template-columns: 1fr; }
         }
         @media (max-width: 900px) {
             .guide-cards { grid-template-columns: 1fr; gap: 10px; }
             .guide-arrow { transform: rotate(90deg); padding: 4px 0; }
             .curves-row { grid-template-columns: 1fr; }
+            .workflow-chain { flex-direction: column; gap: 8px; }
+            .wf-stage:not(:last-child)::after {
+                content: '↓'; right: auto; top: auto; bottom: -16px; left: 50%;
+                transform: translateX(-50%);
+            }
         }
         @media (max-width: 680px) {
             .page-container { padding: 16px 12px; }
@@ -1514,6 +1789,71 @@
             </div>
         </div>
 
+        <!-- ④ 大模型完整工作流链路 -->
+        <div class="section workflow-section">
+            <div class="workflow-title">
+                <span>🚀</span> 大模型完整工作流链路
+            </div>
+            <div class="workflow-sub">从后端到前端 · 从输入到输出 · 数据流向全景</div>
+            <div class="workflow-chain" id="workflowChain">
+                <div class="wf-stage" data-wf="1" id="wfStage1">
+                    <div class="wf-stage-num">阶段 1</div>
+                    <div class="wf-stage-name">输入接收</div>
+                    <div class="wf-stage-loc">🖥️ 前端</div>
+                    <div class="wf-stage-module">用户输入区</div>
+                </div>
+                <div class="wf-stage" data-wf="2" id="wfStage2">
+                    <div class="wf-stage-num">阶段 2</div>
+                    <div class="wf-stage-name">语义解析</div>
+                    <div class="wf-stage-loc">⚙️ 后端</div>
+                    <div class="wf-stage-module">语言拆解 (STEP 2)</div>
+                </div>
+                <div class="wf-stage" data-wf="3" id="wfStage3">
+                    <div class="wf-stage-num">阶段 3</div>
+                    <div class="wf-stage-name">向量映射</div>
+                    <div class="wf-stage-loc">⚙️ 后端</div>
+                    <div class="wf-stage-module">语义映射+算力调度 (STEP 3-4)</div>
+                </div>
+                <div class="wf-stage" data-wf="4" id="wfStage4">
+                    <div class="wf-stage-num">阶段 4</div>
+                    <div class="wf-stage-name">状态输出</div>
+                    <div class="wf-stage-loc">⚙️ 后端</div>
+                    <div class="wf-stage-module">向量输出+01解码 (STEP 5-6)</div>
+                </div>
+                <div class="wf-stage" data-wf="5" id="wfStage5">
+                    <div class="wf-stage-num">阶段 5</div>
+                    <div class="wf-stage-name">存储沉淀</div>
+                    <div class="wf-stage-loc">💾 后端</div>
+                    <div class="wf-stage-module">长期记忆库</div>
+                </div>
+                <div class="wf-stage" data-wf="6" id="wfStage6">
+                    <div class="wf-stage-num">阶段 6</div>
+                    <div class="wf-stage-name">前端展示</div>
+                    <div class="wf-stage-loc">🖥️ 前端</div>
+                    <div class="wf-stage-module">雷达图·模拟器·解读</div>
+                </div>
+            </div>
+            <div class="wf-current-bar">
+                <span class="wf-cur-label">当前阶段：</span>
+                <span class="wf-cur-tag" id="wfCurTag">等待输入</span>
+                <span class="wf-cur-desc" id="wfCurDesc">提交文本后，系统将按阶段依次执行，高亮显示正在处理的环节。</span>
+            </div>
+        </div>
+
+        <!-- ⑤ 向量空间展开 -->
+        <div class="section vector-unfold-section">
+            <div class="unfold-title">
+                <span>🌌</span> 向量空间展开
+            </div>
+            <div class="unfold-sub">山体立体形态 → 语义支点 → 七维坐标轴 → 多维坐标点</div>
+            <div class="unfold-canvas-wrap">
+                <canvas id="unfoldCanvas"></canvas>
+                <div class="unfold-phase-label" id="unfoldPhaseLabel">⏸ 等待输入触发展开动画</div>
+                <div class="unfold-desc" id="unfoldDesc">提交文本后自动播放：山体形态 → 提取支点 → 展开坐标轴 → 坐标点定位</div>
+            </div>
+        </div>
+
+        <!-- ⑥ 用户输入区 -->
         <div class="section">
             <div class="section-title"><span class="num">1</span> 用户输入区</div>
             <div class="input-area">
@@ -1522,6 +1862,10 @@
                     <button class="submit-btn" id="submitBtn">🚀 提交处理</button>
                 </div>
                 <div class="sample-buttons">
+                    <button class="sample-btn" data-text="今天天气不错。">☀️ 示例4：日常闲聊</button>
+                    <button class="sample-btn" data-text="市场崩盘了！我该怎么办！">😱 示例5：紧急风险</button>
+                    <button class="sample-btn" data-text="嗯…我其实不太确定这是什么意思……">🤔 示例6：模糊疑问</button>
+                    <button class="sample-btn" data-text="你之前说的那个，现在还成立吗？">💭 示例7：上下文追问</button>
                     <button class="sample-btn" data-text="今天市场波动有点大，我想看看风险情况">📊 示例1：市场风险</button>
                     <button class="sample-btn" data-text="帮我优化一下这个投资策略">💡 示例2：策略优化</button>
                     <button class="sample-btn" data-text="我感觉有点累，需要休息一下">😌 示例3：休息状态</button>
@@ -1680,6 +2024,66 @@
             </div>
         </div>
 
+        <!-- ⑨ 系统状态偏离模拟器 -->
+        <div class="section deviation-section">
+            <div class="dev-title">
+                <span>🌋</span> 系统状态偏离模拟器
+            </div>
+            <div class="dev-sub">地热势能 → 山体形态 → 稳态区间 0.5~0.68 → 响应策略</div>
+
+            <div class="dev-visual-row">
+                <div class="dev-mountain-wrap">
+                    <canvas id="devMountainCanvas"></canvas>
+                    <div class="dev-mountain-label" id="devMountainLabel">🌋 地热势能：待输入</div>
+                </div>
+                <div class="dev-steady-panel">
+                    <div>
+                        <div class="steady-range-title">📏 稳态区间 0.50 ~ 0.68（最佳处理区间）</div>
+                        <div class="steady-bar-wrap">
+                            <div class="steady-danger-l" style="width:50%;"></div>
+                            <div class="steady-zone" id="steadyZone" style="left:50%;width:18%;"></div>
+                            <div class="steady-danger-r" style="width:32%;"></div>
+                            <div class="steady-marker" id="steadyMarker" style="left:55%;"></div>
+                        </div>
+                        <div class="steady-labels">
+                            <span>0.0</span><span>0.5</span><span>0.68</span><span>1.0</span>
+                        </div>
+                    </div>
+                    <div class="steady-pos-label">
+                        当前状态位置：<span class="steady-pos-val" id="devPosVal">0.55</span>
+                        <span class="dev-status-tag steady" id="devStatusTag">稳态</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dev-info-row">
+                <div class="dev-info-card">
+                    <div class="dev-info-label">🔥 地热势能</div>
+                    <div class="dev-info-val heat-mid" id="devHeatVal">中等</div>
+                </div>
+                <div class="dev-info-card">
+                    <div class="dev-info-label">📋 响应策略</div>
+                    <div class="dev-info-val" id="devStrategyVal" style="color:#6ee7b7;">标准处理</div>
+                </div>
+                <div class="dev-info-card">
+                    <div class="dev-info-label">⚖️ 负反馈调节</div>
+                    <div class="dev-info-val" id="devFeedbackVal" style="color:rgba(255,255,255,0.5);">维持当前</div>
+                </div>
+            </div>
+
+            <div class="dev-strategy-box">
+                <div class="dev-strategy-title">📝 策略说明</div>
+                <div class="dev-strategy-name s-standard" id="devStrategyName">标准处理</div>
+                <div class="dev-strategy-desc" id="devStrategyDesc">
+                    系统处于稳态区间 (0.5~0.68)，以标准流程处理输入。算力均衡分配，响应速度适中，输出置信度正常。
+                </div>
+            </div>
+
+            <div style="margin-top:12px;font-size:10px;color:rgba(255,255,255,0.3);text-align:center;line-height:1.6;">
+                💡 0.5~0.68 是系统"最佳处理区间"——机器回答问题的理想状态。随着输入发散，系统状态从稳态左右偏离，触发不同响应策略，通过负反馈调节将状态拉回稳态。
+            </div>
+        </div>
+
         <div class="bottom-row">
             <div class="section" style="margin-bottom:0;">
                 <div class="section-title"><span class="num">7</span> 认知日志</div>
@@ -1739,6 +2143,7 @@
             '波动': { dim: 'S', delta: 0.2 },
             '风险': { dim: 'Dev-I', delta: 0.3 },
             '危险': { dim: 'Dev-I', delta: 0.3 },
+            '崩盘': { dim: 'I', delta: 0.35, dim2: 'S', delta2: 0.3 },
             '优化': { dim: 'P', delta: 0.2 },
             '策略': { dim: 'P', delta: 0.2 },
             '分析': { dim: 'P', delta: 0.15 },
@@ -1746,7 +2151,15 @@
             '休息': { dim: 'I', delta: -0.2, dim2: 'D', delta2: 0.3 },
             '疲惫': { dim: 'I', delta: -0.25, dim2: 'D', delta2: 0.25 },
             '高位': { dim: 'I', delta: 0.3 },
-            '顶部': { dim: 'I', delta: 0.3 }
+            '顶部': { dim: 'I', delta: 0.3 },
+            '天气': { dim: 'S', delta: -0.15 },
+            '不错': { dim: 'I', delta: 0.05 },
+            '不确定': { dim: 'S', delta: 0.15, dim2: 'D', delta2: 0.15 },
+            '意思': { dim: 'Dev1', delta: 0.2 },
+            '之前': { dim: 'Dev2', delta: 0.3 },
+            '那个': { dim: 'Dev2', delta: 0.2 },
+            '成立': { dim: 'P', delta: 0.1 },
+            '怎么办': { dim: 'S', delta: 0.25, dim2: 'Dev-I', delta2: 0.2 }
         };
 
         const SAMPLES = {
@@ -1756,7 +2169,8 @@
                 topics: ['金融', '风险'],
                 kmpSummary: 'K(市场/风险) → M(向量) → P(海拔)',
                 ipd: { I: 0.35, P: 0.60, D: 0.45, S: 0.72, 'Dev-I': 0.78, Dev1: 0.32, Dev2: 0.41 },
-                kmpMap: 'K(市场/风险)'
+                kmpMap: 'K(市场/风险)',
+                devState: { pos: 0.42, heat: 'mid', strategy: 'conservative' }
             },
             '帮我优化一下这个投资策略': {
                 keywords: ['优化', '投资', '策略'],
@@ -1764,7 +2178,8 @@
                 topics: ['决策', '优化'],
                 kmpSummary: 'K(策略/优化) → M(向量) → P(海拔)',
                 ipd: { I: 0.55, P: 0.70, D: 0.30, S: 0.42, 'Dev-I': 0.35, Dev1: 0.50, Dev2: 0.55 },
-                kmpMap: 'K(策略/优化)'
+                kmpMap: 'K(策略/优化)',
+                devState: { pos: 0.62, heat: 'mid', strategy: 'context' }
             },
             '我感觉有点累，需要休息一下': {
                 keywords: ['累', '休息'],
@@ -1772,7 +2187,44 @@
                 topics: ['状态', '健康'],
                 kmpSummary: 'K(状态/休息) → M(向量) → P(海拔)',
                 ipd: { I: 0.20, P: 0.10, D: 0.80, S: 0.35, 'Dev-I': 0.25, Dev1: 0.60, Dev2: 0.30 },
-                kmpMap: 'K(状态/休息)'
+                kmpMap: 'K(状态/休息)',
+                devState: { pos: 0.30, heat: 'low', strategy: 'conservative' }
+            },
+            '今天天气不错。': {
+                keywords: ['天气', '不错'],
+                emotions: ['愉悦', '积极'],
+                topics: ['日常', '闲聊'],
+                kmpSummary: 'K(日常/闲聊) → M(向量) → P(海拔)',
+                ipd: { I: 0.55, P: 0.40, D: 0.40, S: 0.30, 'Dev-I': 0.48, Dev1: 0.45, Dev2: 0.40 },
+                kmpMap: 'K(日常/闲聊)',
+                devState: { pos: 0.55, heat: 'low', strategy: 'standard' }
+            },
+            '市场崩盘了！我该怎么办！': {
+                keywords: ['市场', '崩盘', '怎么办'],
+                emotions: ['恐慌', '焦虑'],
+                topics: ['金融', '紧急风险'],
+                kmpSummary: 'K(崩盘/紧急) → M(向量) → P(海拔)',
+                ipd: { I: 0.82, P: 0.85, D: 0.20, S: 0.90, 'Dev-I': 0.88, Dev1: 0.25, Dev2: 0.72 },
+                kmpMap: 'K(崩盘/紧急)',
+                devState: { pos: 0.82, heat: 'high', strategy: 'deep' }
+            },
+            '嗯…我其实不太确定这是什么意思……': {
+                keywords: ['不确定', '意思'],
+                emotions: ['困惑', '犹豫'],
+                topics: ['模糊', '疑问'],
+                kmpSummary: 'K(模糊/疑问) → M(向量) → P(海拔)',
+                ipd: { I: 0.35, P: 0.25, D: 0.65, S: 0.65, 'Dev-I': 0.40, Dev1: 0.70, Dev2: 0.45 },
+                kmpMap: 'K(模糊/疑问)',
+                devState: { pos: 0.35, heat: 'mid', strategy: 'conservative' }
+            },
+            '你之前说的那个，现在还成立吗？': {
+                keywords: ['之前', '那个', '成立'],
+                emotions: ['追问', '中性'],
+                topics: ['上下文', '历史'],
+                kmpSummary: 'K(上下文/历史) → M(向量) → P(海拔)',
+                ipd: { I: 0.62, P: 0.50, D: 0.45, S: 0.40, 'Dev-I': 0.50, Dev1: 0.45, Dev2: 0.80 },
+                kmpMap: 'K(上下文/历史)',
+                devState: { pos: 0.62, heat: 'mid', strategy: 'context' }
             }
         };
 
@@ -1805,9 +2257,15 @@
             updateBarChart();
             updateLineChart();
             initForgetCurves();
+            drawUnfoldIdle();
+            updateDeviationSimulator('', currentState.vector);
+            resetWorkflow();
 
             window.addEventListener('resize', () => {
                 Object.values(charts).forEach(c => c && c.resize());
+                drawUnfoldIdle();
+                if (currentState.processing) return;
+                drawDevMountain('mid');
             });
         }
 
@@ -1895,6 +2353,496 @@
                     }
                 }]
             });
+        }
+
+        /* ========== 工作流链路阶段管理 ========== */
+        const WF_STAGES = {
+            1: { name: '输入接收', desc: '前端接收用户原始文本输入，准备送入后端处理管线。' },
+            2: { name: '语义解析', desc: '后端语言拆解模块运行，提取关键词、意图、情感标签和主题分类。' },
+            3: { name: '向量映射', desc: '将语义信息映射为七维认知向量，调度算力资源完成 K→M→P 三级转换。' },
+            4: { name: '状态输出', desc: '七维向量生成完毕，01 解码器将物理量编码为二进制形式。' },
+            5: { name: '存储沉淀', desc: '二进制向量写入长期记忆库，完成认知沉淀，可被后续上下文检索。' },
+            6: { name: '前端展示', desc: '雷达图、海拔模拟器、解读文本同步更新，呈现完整思维交互过程。' }
+        };
+
+        function setWorkflowStage(stage) {
+            for (let i = 1; i <= 6; i++) {
+                const el = document.getElementById('wfStage' + i);
+                if (!el) continue;
+                el.classList.remove('active', 'done');
+                if (i < stage) el.classList.add('done');
+                if (i === stage) el.classList.add('active');
+            }
+            const tag = document.getElementById('wfCurTag');
+            const desc = document.getElementById('wfCurDesc');
+            const info = WF_STAGES[stage];
+            if (tag && info) tag.textContent = '阶段' + stage + ' · ' + info.name;
+            if (desc && info) desc.textContent = info.desc;
+        }
+
+        function resetWorkflow() {
+            for (let i = 1; i <= 6; i++) {
+                const el = document.getElementById('wfStage' + i);
+                if (el) el.classList.remove('active', 'done');
+            }
+            const tag = document.getElementById('wfCurTag');
+            const desc = document.getElementById('wfCurDesc');
+            if (tag) tag.textContent = '等待输入';
+            if (desc) desc.textContent = '提交文本后，系统将按阶段依次执行，高亮显示正在处理的环节。';
+        }
+
+        function completeWorkflow() {
+            for (let i = 1; i <= 6; i++) {
+                const el = document.getElementById('wfStage' + i);
+                if (el) { el.classList.remove('active'); el.classList.add('done'); }
+            }
+            const tag = document.getElementById('wfCurTag');
+            const desc = document.getElementById('wfCurDesc');
+            if (tag) tag.textContent = '✓ 全部完成';
+            if (desc) desc.textContent = '所有阶段执行完毕，认知向量已存储，前端已更新展示。';
+        }
+
+        /* ========== 向量空间展开动画 (Canvas) ========== */
+        let unfoldAnim = null;
+        let unfoldPhase = 0;
+        let unfoldProgress = 0;
+
+        function getUnfoldCanvas() {
+            const canvas = document.getElementById('unfoldCanvas');
+            if (!canvas) return null;
+            const ctx = canvas.getContext('2d');
+            const rect = canvas.getBoundingClientRect();
+            const dpr = window.devicePixelRatio || 1;
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+            ctx.scale(dpr, dpr);
+            return { canvas, ctx, w: rect.width, h: rect.height };
+        }
+
+        function drawUnfoldIdle() {
+            const u = getUnfoldCanvas();
+            if (!u) return;
+            const { ctx, w, h } = u;
+            ctx.clearRect(0, 0, w, h);
+
+            ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+            ctx.lineWidth = 1;
+            const cx = w / 2, cy = h / 2 + 20;
+            for (let r = 40; r <= 120; r += 40) {
+                ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.stroke();
+            }
+            ctx.fillStyle = 'rgba(255,255,255,0.15)';
+            ctx.font = '12px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('提交文本后自动播放展开动画', cx, 40);
+            ctx.fillStyle = 'rgba(255,255,255,0.3)';
+            ctx.font = '10px sans-serif';
+            ctx.fillText('山体形态 → 提取支点 → 展开坐标轴 → 坐标点定位', cx, h - 20);
+        }
+
+        function lerp(a, b, t) { return a + (b - a) * t; }
+        function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
+        function easeInOutCubic(t) { return t < 0.5 ? 4*t*t*t : 1 - Math.pow(-2*t+2,3)/2; }
+
+        function drawUnfoldFrame(phase, prog, vector) {
+            const u = getUnfoldCanvas();
+            if (!u) return;
+            const { ctx, w, h } = u;
+            ctx.clearRect(0, 0, w, h);
+
+            const cx = w / 2, cy = h / 2 + 10;
+            const phaseLabels = [
+                '① 山体形态：当前系统状态的立体形态',
+                '② 提取支点：语义中心（认知锚点）',
+                '③ 展开到坐标轴：7个维度依次展开',
+                '④ 坐标点定位：多维空间坐标点合成完成'
+            ];
+            const phaseLabel = document.getElementById('unfoldPhaseLabel');
+            const descEl = document.getElementById('unfoldDesc');
+            const descs = [
+                '展示七维向量构成的立体"山体"形态，浓度分布代表各维度综合状态',
+                '在山体中心提取"语义支点"，这是当前输入的认知核心',
+                '山体从支点向外展开，7个维度延伸到7个坐标轴方向',
+                '每个维度值在坐标轴上精确定位，最终合成多维空间中的一个坐标点'
+            ];
+
+            const p = Math.min(1, Math.max(0, prog));
+            const et = easeInOutCubic(p);
+
+            // Draw mountain (cone shape) with varying intensity
+            const mountainAlpha = phase === 0 ? 1 : (phase < 3 ? Math.max(0, 1 - et * 0.8) : 0.1);
+            if (mountainAlpha > 0.05) {
+                const baseR = 80 + vector.S * 30;
+                const height = 120 * (0.3 + vector.I * 0.7);
+                const peakOffset = (vector['Dev-I'] - 0.5) * 40;
+
+                ctx.save();
+                // Gradient for mountain
+                const grad = ctx.createLinearGradient(cx + peakOffset, cy - height, cx, cy + 10);
+                const baseHue = vector.S > 0.6 ? 20 : vector.I < 0.4 ? 220 : 260;
+                grad.addColorStop(0, `hsla(${baseHue}, 70%, 70%, ${mountainAlpha * 0.9})`);
+                grad.addColorStop(1, `hsla(${baseHue}, 60%, 30%, ${mountainAlpha * 0.4})`);
+                ctx.fillStyle = grad;
+                ctx.beginPath();
+                ctx.moveTo(cx - baseR, cy + 10);
+                ctx.lineTo(cx + baseR, cy + 10);
+                ctx.lineTo(cx + peakOffset, cy - height);
+                ctx.closePath();
+                ctx.fill();
+
+                // Contour lines
+                ctx.strokeStyle = `rgba(167,139,250,${mountainAlpha * 0.3})`;
+                ctx.lineWidth = 1;
+                for (let i = 1; i <= 5; i++) {
+                    const t = i / 6;
+                    const y = cy + 10 - t * height;
+                    const r = baseR * (1 - t) * (0.8 + 0.2 * Math.sin(t * Math.PI));
+                    ctx.beginPath();
+                    ctx.ellipse(cx + peakOffset * t, y + 5, r, r * 0.2, 0, 0, Math.PI * 2);
+                    ctx.stroke();
+                }
+                ctx.restore();
+            }
+
+            // Phase 1+: semantic center point
+            if (phase >= 1) {
+                const pt = phase === 1 ? et : 1;
+                const ptR = 4 + pt * 6;
+                ctx.save();
+                ctx.shadowColor = 'rgba(34,211,238,0.8)';
+                ctx.shadowBlur = 15 * pt;
+                ctx.fillStyle = `rgba(34,211,238,${pt})`;
+                ctx.beginPath(); ctx.arc(cx, cy, ptR, 0, Math.PI * 2); ctx.fill();
+                ctx.restore();
+
+                ctx.fillStyle = `rgba(34,211,238,${pt * 0.8})`;
+                ctx.font = '10px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('语义支点', cx, cy - 15);
+            }
+
+            // Phase 2+: axes expanding
+            const axesStart = phase >= 2 ? (phase === 2 ? et : 1) : 0;
+            const dims = DIMENSIONS;
+            const n = dims.length;
+            const axisLen = 110;
+            const dimColors = ['#f87171','#fbbf24','#34d399','#22d3ee','#a78bfa','#f472b6','#94a3b8'];
+
+            if (axesStart > 0.05) {
+                for (let i = 0; i < n; i++) {
+                    const angle = -Math.PI/2 + (i / n) * Math.PI * 2;
+                    const endX = cx + Math.cos(angle) * axisLen * axesStart;
+                    const endY = cy + Math.sin(angle) * axisLen * axesStart;
+
+                    ctx.strokeStyle = `rgba(255,255,255,${0.15 + axesStart * 0.2})`;
+                    ctx.lineWidth = 1;
+                    ctx.beginPath();
+                    ctx.moveTo(cx, cy);
+                    ctx.lineTo(endX, endY);
+                    ctx.stroke();
+
+                    // axis endpoint
+                    ctx.fillStyle = dimColors[i];
+                    ctx.globalAlpha = axesStart;
+                    ctx.beginPath(); ctx.arc(endX, endY, 3, 0, Math.PI*2); ctx.fill();
+                    ctx.globalAlpha = 1;
+
+                    // label
+                    if (axesStart > 0.6) {
+                        const lx = cx + Math.cos(angle) * (axisLen + 14);
+                        const ly = cy + Math.sin(angle) * (axisLen + 14);
+                        ctx.fillStyle = dimColors[i];
+                        ctx.font = '10px sans-serif';
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillText(dims[i], lx, ly);
+                    }
+                }
+            }
+
+            // Phase 3: coordinate points on axes
+            if (phase >= 3) {
+                const vt = phase === 3 ? et : 1;
+                for (let i = 0; i < n; i++) {
+                    const angle = -Math.PI/2 + (i / n) * Math.PI * 2;
+                    const val = vector[dims[i]] || 0.5;
+                    const dist = axisLen * val * vt;
+                    const px = cx + Math.cos(angle) * dist;
+                    const py = cy + Math.sin(angle) * dist;
+
+                    ctx.save();
+                    ctx.shadowColor = dimColors[i];
+                    ctx.shadowBlur = 8;
+                    ctx.fillStyle = dimColors[i];
+                    ctx.beginPath(); ctx.arc(px, py, 5, 0, Math.PI*2); ctx.fill();
+                    ctx.restore();
+
+                    // Value label
+                    if (vt > 0.7) {
+                        ctx.fillStyle = dimColors[i];
+                        ctx.font = '9px monospace';
+                        ctx.textAlign = 'center';
+                        ctx.fillText(val.toFixed(2), px, py - 10);
+                    }
+                }
+
+                // Connect points to form polygon
+                if (vt > 0.3) {
+                    ctx.strokeStyle = `rgba(167,139,250,${0.3 + vt * 0.3})`;
+                    ctx.lineWidth = 1.5;
+                    ctx.beginPath();
+                    for (let i = 0; i < n; i++) {
+                        const angle = -Math.PI/2 + (i / n) * Math.PI * 2;
+                        const val = vector[dims[i]] || 0.5;
+                        const dist = axisLen * val * vt;
+                        const px = cx + Math.cos(angle) * dist;
+                        const py = cy + Math.sin(angle) * dist;
+                        if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+                    }
+                    ctx.closePath();
+                    ctx.stroke();
+                    ctx.fillStyle = `rgba(167,139,250,${0.08 * vt})`;
+                    ctx.fill();
+                }
+
+                // Final center coordinate point glow
+                if (phase === 3 && vt > 0.9) {
+                    ctx.save();
+                    ctx.shadowColor = 'rgba(244,114,182,0.9)';
+                    ctx.shadowBlur = 20;
+                    ctx.fillStyle = '#f472b6';
+                    ctx.beginPath(); ctx.arc(cx, cy, 8, 0, Math.PI*2); ctx.fill();
+                    ctx.restore();
+                    ctx.fillStyle = 'rgba(244,114,182,0.9)';
+                    ctx.font = '11px sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('多维坐标点', cx, cy + 35);
+                }
+            }
+
+            if (phaseLabel) phaseLabel.textContent = phaseLabels[Math.min(phase, 3)];
+            if (descEl) descEl.textContent = phase >= 0 && phase <= 3 ? descs[phase] : descs[3];
+        }
+
+        function playUnfoldAnimation(vector) {
+            if (unfoldAnim) cancelAnimationFrame(unfoldAnim);
+            unfoldPhase = 0;
+            unfoldProgress = 0;
+
+            const v = vector || currentState.vector;
+            const phaseDurations = [600, 500, 800, 600];
+            let startTime = null;
+
+            function frame(ts) {
+                if (!startTime) startTime = ts;
+                const elapsed = ts - startTime;
+
+                let acc = 0;
+                let curPhase = 0, curProg = 0;
+                for (let i = 0; i < 4; i++) {
+                    if (elapsed < acc + phaseDurations[i]) {
+                        curPhase = i;
+                        curProg = (elapsed - acc) / phaseDurations[i];
+                        break;
+                    }
+                    acc += phaseDurations[i];
+                    if (i === 3) { curPhase = 3; curProg = 1; }
+                }
+
+                unfoldPhase = curPhase;
+                unfoldProgress = curProg;
+                drawUnfoldFrame(curPhase, curProg, v);
+
+                if (elapsed < phaseDurations.reduce((a,b)=>a+b, 0) + 200) {
+                    unfoldAnim = requestAnimationFrame(frame);
+                }
+            }
+            unfoldAnim = requestAnimationFrame(frame);
+        }
+
+        /* ========== 系统状态偏离模拟器 ========== */
+        const STRATEGY_CONFIG = {
+            standard: {
+                name: '标准处理', cls: 's-standard',
+                heatText: '低', heatCls: 'heat-low',
+                statusCls: 'steady', statusText: '稳态',
+                feedback: '维持当前',
+                desc: '系统处于稳态区间 (0.5~0.68)，以标准流程处理输入。算力均衡分配，响应速度适中，输出置信度正常。'
+            },
+            deep: {
+                name: '深度处理', cls: 's-deep',
+                heatText: '高', heatCls: 'heat-high',
+                statusCls: 'danger', statusText: '紧急偏离',
+                feedback: '算力集中+风险分析',
+                desc: '系统状态严重向右偏离 (>0.75)，检测到高紧急度/高风险信号。集中算力进行深度分析，启动风险预警机制，提高响应优先级。'
+            },
+            conservative: {
+                name: '保守处理', cls: 's-conservative',
+                heatText: '中', heatCls: 'heat-mid',
+                statusCls: 'left', statusText: '左侧偏离',
+                feedback: '降低置信度+请求澄清',
+                desc: '系统状态向左偏离 (<0.5)，输入置信度不足或语义模糊。降低输出置信度，请求用户澄清，以保守策略输出避免误判。'
+            },
+            context: {
+                name: '上下文联动', cls: 's-context',
+                heatText: '中', heatCls: 'heat-mid',
+                statusCls: 'steady', statusText: '稳态波动',
+                feedback: '参考长期记忆',
+                desc: '系统状态在稳态区间附近波动，检测到历史上下文关联（Dev2 较高）。自动检索长期记忆库，结合历史交互给出连贯回复。'
+            },
+            alert: {
+                name: '紧急报警', cls: 's-alert',
+                heatText: '高', heatCls: 'heat-high',
+                statusCls: 'danger', statusText: '极度偏离',
+                feedback: '触发警报+人工介入',
+                desc: '系统状态极度偏离稳态（接近0或1），已超出自动调节范围，触发报警机制请求人工介入。'
+            }
+        };
+
+        function computeDevState(text, vector) {
+            if (SAMPLES[text] && SAMPLES[text].devState) {
+                return SAMPLES[text].devState;
+            }
+            // compute from vector for custom text
+            const I = vector.I, P = vector.P, D = vector.D, S = vector.S, dev2 = vector.Dev2;
+            let pos = 0.55;
+            let heat = 'mid';
+            let strategy = 'standard';
+
+            pos = I * 0.5 + P * 0.3 + (1 - S) * 0.2;
+            pos = Math.max(0.05, Math.min(0.95, pos));
+
+            if (S > 0.7 && I > 0.6) { heat = 'high'; strategy = 'deep'; }
+            else if (I < 0.35 || D > 0.65) { heat = 'low'; strategy = 'conservative'; }
+            else if (dev2 > 0.65) { heat = 'mid'; strategy = 'context'; }
+            else if (pos >= 0.5 && pos <= 0.68) { heat = 'low'; strategy = 'standard'; }
+            else if (pos > 0.75) { heat = 'high'; strategy = 'deep'; }
+            else if (pos < 0.35) { heat = 'mid'; strategy = 'conservative'; }
+            else { heat = 'mid'; strategy = 'context'; }
+
+            return { pos, heat, strategy };
+        }
+
+        function drawDevMountain(heat) {
+            const canvas = document.getElementById('devMountainCanvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const rect = canvas.getBoundingClientRect();
+            const dpr = window.devicePixelRatio || 1;
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+            ctx.scale(dpr, dpr);
+            const w = rect.width, h = rect.height;
+            ctx.clearRect(0, 0, w, h);
+
+            let c1, c2, glowC;
+            if (heat === 'high') {
+                c1 = 'rgba(248,113,113,0.8)'; c2 = 'rgba(251,146,60,0.3)'; glowC = 'rgba(239,68,68,0.4)';
+            } else if (heat === 'low') {
+                c1 = 'rgba(96,165,250,0.7)'; c2 = 'rgba(148,163,184,0.25)'; glowC = 'rgba(59,130,246,0.25)';
+            } else {
+                c1 = 'rgba(251,191,36,0.7)'; c2 = 'rgba(180,120,60,0.3)'; glowC = 'rgba(245,158,11,0.3)';
+            }
+
+            // ground/base heat glow
+            const baseY = h - 20;
+            const glowGrad = ctx.createRadialGradient(w/2, baseY + 10, 5, w/2, baseY, 100);
+            glowGrad.addColorStop(0, glowC);
+            glowGrad.addColorStop(1, 'transparent');
+            ctx.fillStyle = glowGrad;
+            ctx.fillRect(0, 0, w, h);
+
+            // mountain body
+            const peakX = w/2 + (Math.sin(Date.now()/800) * (heat === 'high' ? 3 : 1));
+            const peakY = heat === 'high' ? 25 : heat === 'low' ? 65 : 40;
+            const baseW = w * 0.7;
+
+            ctx.beginPath();
+            ctx.moveTo(w/2 - baseW/2, baseY);
+            ctx.quadraticCurveTo(w/2 - baseW/4, peakY + 30, peakX, peakY);
+            ctx.quadraticCurveTo(w/2 + baseW/4, peakY + 30, w/2 + baseW/2, baseY);
+            ctx.closePath();
+            const mg = ctx.createLinearGradient(peakX, peakY, w/2, baseY);
+            mg.addColorStop(0, c1); mg.addColorStop(1, c2);
+            ctx.fillStyle = mg;
+            ctx.fill();
+
+            // snow cap for low heat (iceberg)
+            if (heat === 'low') {
+                ctx.beginPath();
+                ctx.moveTo(peakX - 18, peakY + 20);
+                ctx.lineTo(peakX, peakY);
+                ctx.lineTo(peakX + 18, peakY + 20);
+                ctx.closePath();
+                ctx.fillStyle = 'rgba(226,232,240,0.6)';
+                ctx.fill();
+            }
+            // lava glow for high heat
+            if (heat === 'high') {
+                ctx.fillStyle = 'rgba(254,240,138,0.5)';
+                for (let i = 0; i < 3; i++) {
+                    const bx = w/2 + (Math.random()-0.5)*20;
+                    const by = baseY - Math.random()*20;
+                    ctx.beginPath();
+                    ctx.arc(bx, by, 2+Math.random()*3, 0, Math.PI*2);
+                    ctx.fill();
+                }
+            }
+
+            // base line
+            ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+            ctx.lineWidth = 1;
+            ctx.beginPath(); ctx.moveTo(10, baseY); ctx.lineTo(w-10, baseY); ctx.stroke();
+        }
+
+        function updateDeviationSimulator(text, vector) {
+            const dev = computeDevState(text, vector);
+            const pos = dev.pos;
+
+            // update marker position
+            const marker = document.getElementById('steadyMarker');
+            if (marker) marker.style.left = (pos * 100) + '%';
+
+            // update position value
+            const posVal = document.getElementById('devPosVal');
+            if (posVal) {
+                posVal.textContent = pos.toFixed(2);
+                posVal.style.color = pos >= 0.5 && pos <= 0.68 ? '#6ee7b7' :
+                    pos < 0.4 ? '#93c5fd' : pos > 0.75 ? '#f87171' : '#fbbf24';
+            }
+
+            // update status tag
+            const cfg = STRATEGY_CONFIG[dev.strategy] || STRATEGY_CONFIG.standard;
+            const tag = document.getElementById('devStatusTag');
+            if (tag) {
+                tag.className = 'dev-status-tag ' + cfg.statusCls;
+                tag.textContent = cfg.statusText;
+            }
+
+            // update heat
+            const heatEl = document.getElementById('devHeatVal');
+            const heatLabel = document.getElementById('devMountainLabel');
+            if (heatEl) {
+                heatEl.textContent = cfg.heatText;
+                heatEl.className = 'dev-info-val ' + cfg.heatCls;
+            }
+            if (heatLabel) {
+                const icon = dev.heat === 'high' ? '🌋' : dev.heat === 'low' ? '🧊' : '⛰️';
+                heatLabel.textContent = icon + ' 地热势能：' + cfg.heatText;
+            }
+
+            // update strategy
+            const strVal = document.getElementById('devStrategyVal');
+            const strName = document.getElementById('devStrategyName');
+            const strDesc = document.getElementById('devStrategyDesc');
+            const fbVal = document.getElementById('devFeedbackVal');
+            if (strVal) { strVal.textContent = cfg.name; strVal.style.color = getComputedStyle(document.querySelector('.' + cfg.cls) || document.body).color || ''; }
+            if (strName) { strName.className = 'dev-strategy-name ' + cfg.cls; strName.textContent = cfg.name; }
+            if (strDesc) strDesc.textContent = cfg.desc;
+            if (fbVal) fbVal.textContent = cfg.feedback;
+
+            // draw mountain
+            drawDevMountain(dev.heat);
         }
 
         function getPhysicalDesc(v) {
@@ -2303,6 +3251,10 @@
             document.querySelectorAll('.step-card').forEach(c => c.classList.remove('active', 'completed'));
             document.querySelectorAll('.step-detail').forEach(d => d.classList.remove('show'));
 
+            // Workflow stage 1: 输入接收
+            resetWorkflow();
+            setWorkflowStage(1);
+
             addLog(`用户输入："${text}"`, 'info');
             document.getElementById('step1Preview').textContent = text.length > 10 ? text.substring(0, 10) + '...' : text;
             document.getElementById('detail1Content').textContent = text;
@@ -2310,6 +3262,8 @@
             await sleep(400);
             setStepCompleted(1);
 
+            // Workflow stage 2: 语义解析
+            setWorkflowStage(2);
             setStepActive(2);
             const analysis = analyzeText(text);
             document.getElementById('step2Preview').textContent = analysis.keywords.slice(0, 3).join(' / ');
@@ -2331,6 +3285,8 @@
             await sleep(500);
             setStepCompleted(2);
 
+            // Workflow stage 3: 向量映射
+            setWorkflowStage(3);
             setStepActive(3);
             currentState.vector = { ...analysis.vector };
             const initPreview = DIMENSIONS.slice(0, 3).map(d => `${d}:${currentState.vector[d].toFixed(2)}`).join(' ');
@@ -2345,6 +3301,8 @@
             addLog(`语义映射完成，7维度初始值已生成`, 'process');
             updateRadarChart();
             updateMappingTables(text, analysis, currentState.vector);
+            // Trigger vector unfold animation now that vector is available
+            playUnfoldAnimation(currentState.vector);
             await sleep(500);
             setStepCompleted(3);
 
@@ -2371,6 +3329,8 @@
             await sleep(500);
             setStepCompleted(4);
 
+            // Workflow stage 4: 状态输出
+            setWorkflowStage(4);
             setStepActive(5);
             const vecPreview = DIMENSIONS.slice(0, 3).map(d => currentState.vector[d].toFixed(2)).join(' ');
             document.getElementById('step5Preview').textContent = vecPreview;
@@ -2397,8 +3357,20 @@
             setStepCompleted(6);
 
             addLog(`处理链路完成 ✓`, 'success');
-            currentState.processing = false;
+
+            // Workflow stage 5: 存储沉淀
+            setWorkflowStage(5);
             writeToMemory(text, currentState.vector);
+            await sleep(400);
+
+            // Workflow stage 6: 前端展示
+            setWorkflowStage(6);
+            updateGuideCards(text);
+            updateDeviationSimulator(text, currentState.vector);
+            await sleep(300);
+            completeWorkflow();
+
+            currentState.processing = false;
         }
 
         function toggleStepDetail(step) {
