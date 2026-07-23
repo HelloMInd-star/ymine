@@ -438,6 +438,25 @@ html,body{
   border-bottom:1px solid rgba(255,255,255,0.05);
   display:flex;align-items:center;gap:6px;
 }
+.exp-link-tag{
+  display:inline-block;font-size:10px;font-weight:600;
+  padding:2px 8px;border-radius:4px;margin-bottom:8px;
+  background:rgba(251,191,36,0.12);color:#fbbf24;
+  border:1px solid rgba(251,191,36,0.25);
+}
+.exp-meta-block{
+  display:flex;flex-direction:column;gap:3px;
+  margin-bottom:10px;padding:8px 10px;
+  background:rgba(251,191,36,0.04);border-radius:6px;
+  border-left:2px solid rgba(251,191,36,0.3);
+}
+.exp-meta-item{
+  font-size:9px;color:rgba(255,255,255,0.5);line-height:1.4;
+  display:flex;align-items:flex-start;gap:4px;
+}
+.exp-meta-item .meta-check{color:#4ade80;flex-shrink:0;font-size:9px;}
+.exp-meta-item .meta-key{color:rgba(255,255,255,0.35);}
+.exp-meta-item .meta-val{color:rgba(255,255,255,0.65);}
 .card-vars{
   display:flex;gap:12px;margin-bottom:12px;
 }
@@ -718,7 +737,7 @@ html,body{
 <div class="container">
   <div class="header">
     <h1>🧪 全域仿真实验向量总管理台</h1>
-    <div class="subtitle">31组实验 · 三元向量库 · KMP骨架检索 · 公私分层隔离 · MindSpeak一键同构</div>
+    <div class="subtitle">32组实验 · 三元向量库 · KMP骨架检索 · 公私分层隔离 · MindSpeak一键同构</div>
     <span class="version-pill">V1.0 · MemoryBase子模块</span>
   </div>
 
@@ -760,9 +779,9 @@ html,body{
         <div class="filter-group">
           <span class="filter-label">分类:</span>
           <select class="styled-select" id="catSelect" onchange="onCatChange()">
-            <option value="all">全部 (31)</option>
+            <option value="all">全部 (32)</option>
             <option value="cybernetics_control">控制论 (12)</option>
-            <option value="structural_safety">结构力学 (6)</option>
+            <option value="structural_safety">结构力学 (7)</option>
             <option value="cognitive_neuroscience">认知神经 (7)</option>
             <option value="game_evolution">博弈演化 (5)</option>
             <option value="info_channel">信息信道 (1)</option>
@@ -814,7 +833,7 @@ html,body{
         <input type="checkbox" id="selectAll" onchange="toggleSelectAll()">
         <span>全选</span>
       </label>
-      <span class="selected-text">(<span class="sel-num" id="selectedCount">0</span>/<span id="totalCount">31</span> 已选)</span>
+      <span class="selected-text">(<span class="sel-num" id="selectedCount">0</span>/<span id="totalCount">32</span> 已选)</span>
     </div>
   </div>
 
@@ -903,42 +922,55 @@ const experiments = [
     func_expr:'型别v=系统含积分器个数:\nv=0: e_ss(阶跃)=1/(1+Kp)\nv=1: e_ss(斜坡)=1/Kv\nv=2: e_ss(抛物线)=1/Ka\n内模原理: 含参考信号模型可实现无静差',
     currentValue:0.49,storageTier:'hot',status:'normal',runCount:1567,lastRun:'2026-07-21 08:50:22',frequency:9,
     auditLogs:[{time:'2026-07-21 08:50:22',model:'三角审计V1',result:'I型系统,斜坡误差1/Kv',deviation:'0.7%'},{time:'2026-07-20 17:30:11',model:'三角审计V2',result:'带宽满足快速性要求',deviation:'1.2%'},{time:'2026-07-19 22:05:47',model:'三角审计V3',result:'跟踪滞后<0.1s',deviation:'0.5%'}]},
-  {id:'EXP-13',name:'万有引力双层阻尼',icon:'🌍',category:'structural_safety',
-    vars_in:[{name:'M,m',type:'float',desc:'中心/环绕天体质量(kg)',defaultVal:'5.97e24,1000'},{name:'G',type:'float',desc:'引力常数',defaultVal:'6.67e-11'},{name:'r0',type:'float',desc:'初始轨道半径(m)',defaultVal:'7e6'},{name:'c_damp',type:'float',desc:'双层阻尼系数',defaultVal:'1e-6'}],
+  {id:'EXP-13',name:'万有引力·苹果-无人机双层阻尼终极版',icon:'🍎',category:'structural_safety',
+    linkTag:'① 低空力学基准',dimension:'D（阻尼）',module:'AirMind引擎 — 低空飞行器力学稳定性',airspace:'低空',
+    vars_in:[{name:'M,m',type:'float',desc:'中心/环绕天体质量(kg)',defaultVal:'5.97e24,1000'},{name:'G',type:'float',desc:'引力常数',defaultVal:'6.67e-11'},{name:'r0',type:'float',desc:'初始轨道半径(m)',defaultVal:'7e6'},{name:'c_damp',type:'float',desc:'双层阻尼系数C₁/C₂',defaultVal:'1e-6'}],
     vars_out:[{name:'F_grav',type:'float',desc:'万有引力(N)'},{name:'r(t)',type:'float',desc:'轨道半径衰减'},{name:'orbit_decay',type:'float',desc:'轨道衰减率'}],
-    func_expr:'F = G·Mm/r² (牛顿万有引力)\n双层阻尼: F_damp = -c₁v -c₂v|v|\nd²r/dt² = -GM/r² + F_damp/m (径向运动方程)',
+    func_expr:'F = G·Mm/r² (牛顿万有引力)\n双层阻尼: F_damp = -c₁v -c₂v|v|\nd²r/dt² = -GM/r² + F_damp/m (径向运动方程)\nAirMind串级PID: u(t)=Kp·e(t)+Ki·∫e+Kd·de/dt',
     currentValue:0.43,storageTier:'hot',status:'normal',runCount:982,lastRun:'2026-07-20 22:10:05',frequency:8,
     auditLogs:[{time:'2026-07-20 22:10:05',model:'三角审计V1',result:'轨道衰减率0.01%/圈',deviation:'0.6%'},{time:'2026-07-19 18:25:33',model:'三角审计V2',result:'双阻尼层耗能验证',deviation:'0.8%'},{time:'2026-07-18 12:40:19',model:'三角审计V3',result:'角动量守恒近似成立',deviation:'0.4%'}]},
-  {id:'EXP-14',name:'原子电子圈层',icon:'⚛️',category:'structural_safety',
+  {id:'EXP-14',name:'原子电子圈层排布',icon:'⚛️',category:'structural_safety',
+    linkTag:'② 高空层级结构',dimension:'Dev-I',module:'几何心智算力底座 — 高空层级结构',airspace:'高空',
     vars_in:[{name:'Z',type:'int',desc:'原子序数',defaultVal:'1'},{name:'n',type:'int',desc:'主量子数',defaultVal:'1'},{name:'eV_level',type:'float',desc:'能级能量(eV)',defaultVal:'-13.6'}],
     vars_out:[{name:'r_n',type:'float',desc:'玻尔半径'},{name:'E_n',type:'float',desc:'能级能量'},{name:'λ_emission',type:'float',desc:'发射光谱波长'}],
-    func_expr:'玻尔模型:\nr_n = 4πε₀ħ²n²/(mZe²) = a₀·n²/Z\nE_n = -13.6Z²/n² eV\n跃迁: hc/λ = E_m - E_n (m>n,发射光子)',
+    func_expr:'玻尔模型:\nr_n = 4πε₀ħ²n²/(mZe²) = a₀·n²/Z\nE_n = -13.6Z²/n² eV\n跃迁: hc/λ = E_m - E_n (m>n,发射光子)\n圈层约束→飞行器层级结构映射',
     currentValue:0.36,storageTier:'warm',status:'normal',runCount:423,lastRun:'2026-07-19 16:55:40',frequency:5,
     auditLogs:[{time:'2026-07-19 16:55:40',model:'三角审计V1',result:'能级跃迁概率分布合规',deviation:'0.5%'},{time:'2026-07-16 10:20:18',model:'三角审计V2',result:'光谱波长与实验吻合',deviation:'0.3%'},{time:'2026-07-13 14:35:22',model:'三角审计V3',result:'量子数选择定则验证',deviation:'0.2%'}]},
-  {id:'EXP-15',name:'分子化学键构型',icon:'🔬',category:'structural_safety',
+  {id:'EXP-15',name:'分子化学键多构型',icon:'🔗',category:'structural_safety',
+    linkTag:'③ 跨空域耦合',dimension:'Dev-I',module:'AirMind引擎 — 低空↔高空跨域耦合',airspace:'跨空域',
     vars_in:[{name:'bond_type',type:'enum',desc:'键型:s/sp/sp2/sp3',defaultVal:'sp3'},{name:'angle_natural',type:'float',desc:'自然键角(°)',defaultVal:'109.5'},{name:'k_angle',type:'float',desc:'键角力常数',defaultVal:'0.5'}],
     vars_out:[{name:'V_angle',type:'float',desc:'键角势能'},{name:'geometry',type:'enum',desc:'分子构型'},{name:'strain_energy',type:'float',desc:'环张力能'}],
-    func_expr:'键角势(Harmonic): V(θ) = (k_θ/2)(θ-θ₀)²\n二面角: V(φ) = Σ[V_n/2(1+cos(nφ-γ_n))]\n分子力场: MM2/MM3键伸缩+键角弯曲+二面角扭转+范德华+静电',
+    func_expr:'键角势(Harmonic): V(θ) = (k_θ/2)(θ-θ₀)²\n二面角: V(φ) = Σ[V_n/2(1+cos(nφ-γ_n))]\n分子力场: MM2/MM3键伸缩+键角弯曲+二面角扭转+范德华+静电\n化学键→低空↔高空动态连接/分离逻辑',
     currentValue:0.40,storageTier:'warm',status:'normal',runCount:389,lastRun:'2026-07-18 19:30:12',frequency:5,
     auditLogs:[{time:'2026-07-18 19:30:12',model:'三角审计V1',result:'sp3杂化四面体构型',deviation:'0.7%'},{time:'2026-07-15 11:45:36',model:'三角审计V2',result:'环丙烷张力能符合计算',deviation:'1.0%'},{time:'2026-07-11 08:20:44',model:'三角审计V3',result:'构象能量极小值收敛',deviation:'0.5%'}]},
-  {id:'EXP-16',name:'悬臂多点锁止',icon:'🏗️',category:'structural_safety',
+  {id:'EXP-16',name:'悬臂单点vs多点锁止',icon:'📐',category:'structural_safety',
+    linkTag:'④ 结构冗余',dimension:'D（阻尼）',module:'几何心智算力底座 — 结构冗余验证',airspace:'双空域',
     vars_in:[{name:'L',type:'float',desc:'梁长(m)',defaultVal:'5.0'},{name:'E',type:'float',desc:'弹性模量(GPa)',defaultVal:'200'},{name:'I',type:'float',desc:'截面惯性矩(m⁴)',defaultVal:'1e-4'},{name:'P_loads',type:'array',desc:'各点荷载(N)'}],
     vars_out:[{name:'δ_max',type:'float',desc:'最大挠度'},{name:'σ_max',type:'float',desc:'最大应力'},{name:'lock_status',type:'array',desc:'各锁止点状态'}],
-    func_expr:'悬臂梁挠曲线方程: EI·d⁴δ/dx⁴ = q(x)\n单点荷载P于a处:\nδ(x) = Px²(3a-x)/(6EI) for x≤a\nδ(x) = Pa²(3x-a)/(6EI) for x>a\n锁止条件: δ_i ≤ δ_lock',
+    func_expr:'悬臂梁挠曲线方程: EI·d⁴δ/dx⁴ = q(x)\n单点荷载P于a处:\nδ(x) = Px²(3a-x)/(6EI) for x≤a\nδ(x) = Pa²(3x-a)/(6EI) for x>a\n锁止条件: δ_i ≤ δ_lock · 冗余度对比',
     currentValue:0.56,storageTier:'warm',status:'warning',runCount:634,lastRun:'2026-07-20 14:05:28',frequency:7,
     auditLogs:[{time:'2026-07-20 14:05:28',model:'三角审计V1',result:'3号锁止点挠度接近阈值',deviation:'4.2%'},{time:'2026-07-19 20:10:35',model:'三角审计V2',result:'应力集中系数偏高',deviation:'3.6%'},{time:'2026-07-17 09:55:18',model:'三角审计V3',result:'建议加固第2跨',deviation:'3.1%'}]},
-  {id:'EXP-17',name:'简支梁分散承重',icon:'🏛️',category:'structural_safety',
+  {id:'EXP-17',name:'简支梁多点分散承重',icon:'🏛️',category:'structural_safety',
+    linkTag:'⑤ 承重分布',dimension:'D（阻尼）',module:'几何心智算力底座 — 荷载分散验证',airspace:'双空域',
     vars_in:[{name:'L',type:'float',desc:'跨度(m)',defaultVal:'10.0'},{name:'n_supports',type:'int',desc:'支座数量',defaultVal:'5'},{name:'q_distributed',type:'float',desc:'均布荷载(kN/m)',defaultVal:'20'},{name:'P_concentrated',type:'array',desc:'集中荷载'}],
     vars_out:[{name:'R_i',type:'array',desc:'各支座反力'},{name:'M_max',type:'float',desc:'最大弯矩'},{name:'δ_mid',type:'float',desc:'跨中挠度'}],
-    func_expr:'三弯矩方程(连续梁):\nM_{n-1}L_n + 2M_n(L_n+L_{n+1}) + M_{n+1}L_{n+1} = -6A_n̄x_n/L_n -6A_{n+1}̄x\'_{n+1}/L_{n+1}\n简支均布: M_max = qL²/8, δ_max = 5qL⁴/(384EI)',
+    func_expr:'三弯矩方程(连续梁):\nM_{n-1}L_n + 2M_n(L_n+L_{n+1}) + M_{n+1}L_{n+1} = -6A_n̄x_n/L_n -6A_{n+1}̄x\'_{n+1}/L_{n+1}\n简支均布: M_max = qL²/8, δ_max = 5qL⁴/(384EI)\n荷载分散→承重冗余验证',
     currentValue:0.46,storageTier:'warm',status:'normal',runCount:512,lastRun:'2026-07-19 17:25:40',frequency:6,
     auditLogs:[{time:'2026-07-19 17:25:40',model:'三角审计V1',result:'支座反力分配均匀',deviation:'1.2%'},{time:'2026-07-17 12:40:22',model:'三角审计V2',result:'弯矩包络图合规',deviation:'1.5%'},{time:'2026-07-14 15:50:36',model:'三角审计V3',result:'挠度<L/500,满足规范',deviation:'0.8%'}]},
-  {id:'EXP-18',name:'压力容器爆破临界',icon:'💣',category:'structural_safety',
+  {id:'EXP-18',name:'压力容器耐压临界爆破',icon:'💥',category:'structural_safety',
+    linkTag:'⑥ 安全边界（0.68临界）',dimension:'Dev-I',module:'THRESHOLDS — 0.68熔断安全边界',airspace:'双空域',
     vars_in:[{name:'P_internal',type:'float',desc:'内部压力(MPa)',defaultVal:'15'},{name:'σ_yield',type:'float',desc:'材料屈服强度(MPa)',defaultVal:'350'},{name:'t_wall',type:'float',desc:'壁厚(mm)',defaultVal:'20'},{name:'D',type:'float',desc:'容器内径(mm)',defaultVal:'1000'},{name:'defect_size',type:'float',desc:'缺陷尺寸(mm)',defaultVal:'8'}],
     vars_out:[{name:'σ_hoop',type:'float',desc:'环向应力'},{name:'P_burst',type:'float',desc:'爆破压力'},{name:'safety_factor',type:'float',desc:'安全系数'},{name:'fuse_state',type:'enum',desc:'熔断状态'}],
     func_expr:'薄膜理论: σ_θ = PD/(2t) (环向), σ_φ=PD/(4t)(纵向)\nBarlow公式: P_burst = 2σ_uts·t/D\n断裂力学: K_I = σ√(πa)·f(a/t)\n熔断触发: K_I ≥ K_IC 或 P ≥ 0.68·P_burst',
     currentValue:0.73,storageTier:'hot',status:'fused',runCount:2756,lastRun:'2026-07-21 10:50:33',frequency:10,
     auditLogs:[{time:'2026-07-21 10:50:33',model:'三角审计V1',result:'⚠️应力强度因子K_I达0.73K_IC,已熔断',deviation:'9.1%'},{time:'2026-07-21 09:20:15',model:'三角审计V2',result:'裂纹扩展速率超标',deviation:'7.6%'},{time:'2026-07-21 06:45:28',model:'三角审计V3',result:'⚠️紧急泄压已触发',deviation:'8.3%'}]},
+  {id:'EXP-32',name:'堆积形态与系统偏差实验',icon:'📊',category:'structural_safety',
+    linkTag:'⑦ 堆积偏差（Dev-I强化）',dimension:'Dev-I',module:'IPD框架 — 堆积形态与系统偏差',airspace:'双空域',
+    vars_in:[{name:'packing_type',type:'enum',desc:'堆积类型:随机/立方/六方',defaultVal:'随机'},{name:'particle_count',type:'int',desc:'粒子数量',defaultVal:'1000'},{name:'friction_coef',type:'float',desc:'摩擦系数',defaultVal:'0.3'},{name:'container_shape',type:'enum',desc:'容器形状:圆柱/方盒/锥',defaultVal:'圆柱'}],
+    vars_out:[{name:'packing_density',type:'float',desc:'堆积密度'},{name:'porosity',type:'float',desc:'孔隙率'},{name:'deviation',type:'float',desc:'系统偏差Dev-I'},{name:'angle_repose',type:'float',desc:'休止角(°)'}],
+    func_expr:'随机堆积密度: φ ≈ 0.60~0.64 (临界)\n立方最密堆积: φ = π/(3√2) ≈ 0.74\nDev-I偏差: ΔV/V₀ = ∫|ρ(x)-ρ̄|/ρ̄ dV\n休止角: tan(θ_r) = μ_s (静摩擦系数)\nIPD框架: 形态→偏差映射关系',
+    currentValue:0.58,storageTier:'warm',status:'warning',runCount:356,lastRun:'2026-07-20 16:30:00',frequency:5,
+    auditLogs:[{time:'2026-07-20 16:30:00',model:'三角审计V1',result:'随机堆积密度0.62,偏差4.8%',deviation:'4.8%'},{time:'2026-07-19 11:20:00',model:'三角审计V2',result:'Dev-I偏差在安全区间',deviation:'3.2%'},{time:'2026-07-18 14:45:00',model:'三角审计V3',result:'堆积形态与IPD映射验证通过',deviation:'2.5%'}]},
   {id:'EXP-19',name:'水迷宫空间寻优',icon:'🐭',category:'cognitive_neuroscience',
     vars_in:[{name:'pool_diameter',type:'float',desc:'迷宫直径(m)',defaultVal:'1.8'},{name:'platform_pos',type:'coords',desc:'平台位置'},{name:'n_trials',type:'int',desc:'训练试次',defaultVal:'20'},{name:'learning_rate',type:'float',desc:'学习速率',defaultVal:'0.15'}],
     vars_out:[{name:'escape_latency',type:'float',desc:'逃逸潜伏期(s)'},{name:'path_efficiency',type:'float',desc:'路径效率'},{name:'spatial_memory',type:'float',desc:'空间记忆得分'}],
@@ -1119,7 +1151,7 @@ function buildStats(){
   ];
   document.getElementById('statsRow').innerHTML=`
     <div class="stat-card card-cats">
-      <div class="stat-title">📊 实验分类 · 31组</div>
+      <div class="stat-title">📊 实验分类 · 32组</div>
       <div class="cat-list">
         ${catMap.map(c=>`
           <div class="cat-item">
@@ -1182,7 +1214,7 @@ function buildStats(){
     document.getElementById('barWarm').style.width='48%';
     document.getElementById('barCold').style.width='23%';
   },100);
-  document.getElementById('totalCount').textContent=31;
+  document.getElementById('totalCount').textContent=32;
 }
 
 function catClass(cat){
@@ -1253,6 +1285,13 @@ function renderGrid(){
     const inStr=e.vars_in.map(v=>v.name).join(', ');
     const outStr=e.vars_out.map(v=>v.name).join(', ');
     const runDate=e.lastRun.substring(5,16).replace(' ',' ');
+    const linkTagHtml = e.linkTag ? `<div class="exp-link-tag">${e.linkTag}</div>` : '';
+    const metaHtml = (e.dimension || e.module || e.airspace) ? `
+      <div class="exp-meta-block">
+        ${e.dimension ? `<div class="exp-meta-item"><span class="meta-check">✅</span><span><span class="meta-key">验证维度：</span><span class="meta-val">${e.dimension}</span></span></div>` : ''}
+        ${e.module ? `<div class="exp-meta-item"><span class="meta-check">✅</span><span><span class="meta-key">主线模块：</span><span class="meta-val">${e.module}</span></span></div>` : ''}
+        ${e.airspace ? `<div class="exp-meta-item"><span class="meta-check">✅</span><span><span class="meta-key">空域场景：</span><span class="meta-val">${e.airspace}</span></span></div>` : ''}
+      </div>` : '';
     return `
     <div class="exp-card ${catClass(e.category)} tier-${e.storageTier} status-${e.status} ${selClass}" onclick="openModal('${e.id}')" data-id="${e.id}">
       <div class="card-header">
@@ -1270,7 +1309,9 @@ function renderGrid(){
         </div>
         <div class="tier-block ${e.storageTier}" title="${tierEmoji(e.storageTier)}${e.storageTier==='hot'?'热内存':e.storageTier==='warm'?'温缓冲':'冷休眠'}">${tierEmoji(e.storageTier)}</div>
       </div>
+      ${linkTagHtml}
       <div class="card-runline">🏃 累计运行 <strong style="color:var(--text-primary);font-family:var(--mono)">${e.runCount}</strong> 次</div>
+      ${metaHtml}
       <div class="card-vars">
         <div class="var-half">
           <div class="var-label in"><span class="var-dot in"></span>📥 IN</div>
@@ -1536,7 +1577,7 @@ function batchValidate(){
   alert(`🔺 三角审计批量校验完成\n\n校验范围: ${checked}个实验\n三模交叉验证已完成\n⚠️ 发现 ${warnings} 处参数引用警告\n\n三角审计链路已记录本次校验结果,偏差可追溯。`);
 }
 function batchMindSpeak(){
-  const count=selectedIds.size>0?selectedIds.size:31;
+  const count=selectedIds.size>0?selectedIds.size:32;
   alert(`🔗 一键同步至MindSpeak完成\n\n同步实验数: ${count}个\n- 三元向量结构映射完成\n- func_expr数学→自然语言同构转换完成\n- vars_in/vars_out契约语言化完成\n\n🔒 公私分层已保障: private_engine求解内核未同步,仅同步公开参数层与表达式结构。\n\n可前往 mindspeak 模块查看生成的认知语言块。`);
 }
 function batchExport(){

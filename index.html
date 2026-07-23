@@ -1515,6 +1515,16 @@
             .lab-cat-cognitive .lab-card:hover .lab-card-btn { background:rgba(167,139,250,0.15); border-color:rgba(167,139,250,0.3); color:#a78bfa; }
             .lab-cat-game .lab-card:hover .lab-card-btn { background:rgba(248,113,113,0.15); border-color:rgba(248,113,113,0.3); color:#f87171; }
             .lab-cat-info .lab-card:hover .lab-card-btn { background:rgba(74,222,128,0.15); border-color:rgba(74,222,128,0.3); color:#4ade80; }
+            .lab-card-meta { display:flex; flex-direction:column; gap:3px; margin-bottom:8px; }
+            .lab-meta-item { font-size:9px; color:rgba(255,255,255,0.45); line-height:1.4; display:flex; align-items:flex-start; gap:4px; }
+            .lab-meta-item .check { color:#4ade80; flex-shrink:0; font-size:9px; }
+            .lab-meta-item .meta-label { color:rgba(255,255,255,0.35); }
+            .lab-meta-item .meta-val { color:rgba(255,255,255,0.6); }
+            .lab-card-status { font-size:9px; margin-bottom:6px; color:rgba(251,191,36,0.7); }
+            .lab-cat-structural .lab-cat-guide { color:rgba(251,191,36,0.65); background:rgba(251,191,36,0.05); border-left-color:rgba(251,191,36,0.4); }
+            .lab-cat-cognitive .lab-cat-guide { color:rgba(167,139,250,0.65); background:rgba(167,139,250,0.05); border-left-color:rgba(167,139,250,0.4); }
+            .lab-cat-game .lab-cat-guide { color:rgba(248,113,113,0.65); background:rgba(248,113,113,0.05); border-left-color:rgba(248,113,113,0.4); }
+            .lab-cat-info .lab-cat-guide { color:rgba(74,222,128,0.65); background:rgba(74,222,128,0.05); border-left-color:rgba(74,222,128,0.4); }
             .lab-modal-mask { position:fixed; inset:0; background:rgba(5,5,15,0.85); backdrop-filter:blur(8px); z-index:10000; display:none; align-items:center; justify-content:center; padding:20px; }
             .lab-modal-mask.active { display:flex; animation:labFadeIn 0.25s ease; }
             @keyframes labFadeIn { from{opacity:0} to{opacity:1} }
@@ -1815,6 +1825,7 @@
                                 <span class="eo-cat-name">结构力学与冗余安全</span>
                                 <span class="eo-cat-count">7项</span>
                             </div>
+                            <div class="eo-cat-desc" style="font-size:9px;color:rgba(251,191,36,0.6);margin-top:3px;">低空+高空混合空域验证</div>
                             <div class="eo-cat-dims">D（阻尼）、Dev-I</div>
                         </div>
                         <div class="eo-cat-card cog">
@@ -1930,35 +1941,113 @@
                         <span class="lab-cat-icon">🏗️</span>
                         <span class="lab-cat-name">结构力学与冗余安全类</span>
                         <span class="lab-cat-count">7项</span>
-                        <span class="lab-cat-desc">宏观落体 · 介观原子 · 微观分子 · 承重 · 冗余 · 堆积形态 · 爆破临界</span>
+                        <span class="lab-cat-desc">低空+高空混合空域验证 · D（阻尼）· Dev-I</span>
+                    </div>
+                    <div class="lab-cat-desc-block" style="margin:10px 0 8px;padding:12px 14px;background:linear-gradient(135deg,rgba(251,191,36,0.06),rgba(251,191,36,0.02));border:1px solid rgba(251,191,36,0.15);border-radius:10px;font-size:11px;line-height:1.7;color:rgba(251,191,36,0.75);">
+                        <div style="font-weight:600;color:#fcd34d;margin-bottom:6px;">🏗️ 结构力学与冗余安全类 · 低空+高空混合空域验证</div>
+                        <div style="margin-bottom:6px;">7项 · 宏观落体 · 介观原子 · 微观分子 · 承重 · 冗余 · 堆积形态 · 爆破临界</div>
+                        <div style="color:rgba(255,255,255,0.5);margin-bottom:6px;">本类别实验聚焦飞行器在低空+高空混合空域中的力学行为、结构冗余与安全边界验证：</div>
+                        <div style="color:rgba(255,255,255,0.4);padding-left:10px;">
+                            <div>• 低空基准：无人机双层阻尼与串级PID控制</div>
+                            <div>• 高空层级：飞行器层级结构与约束边界（原子圈层映射）</div>
+                            <div>• 跨空域耦合：低空↔高空的动态连接与分离逻辑</div>
+                            <div>• 双空域通用：结构冗余、荷载分散、安全边界、堆积形态</div>
+                        </div>
+                        <div style="margin-top:6px;color:rgba(251,191,36,0.6);">直接映射七维向量体系中的 <b style="color:#fcd34d;">D（阻尼）</b> 和 <b style="color:#fcd34d;">Dev-I（山体容积偏差）</b> 维度。对应主线模块：AirMind引擎（低空调度）、几何心智算力底座（结构冗余）。</div>
+                    </div>
+                    <div class="lab-cat-guide">
+                        推荐观看顺序：万有引力·苹果-无人机双层阻尼终极版 → 原子电子圈层排布 → 分子化学键多构型 → 悬臂单点vs多点锁止 → 简支梁多点分散承重 → 压力容器耐压临界爆破 → 堆积形态与系统偏差实验。这七组实验构成从「低空力学基准 → 高空层级结构 → 跨空域耦合 → 结构冗余 → 承重分布 → 安全边界 → 堆积偏差」的完整验证链路，与 KMP→IPD→七维向量体系中的 D（阻尼）、Dev-I（山体容积偏差）和 0.68 熔断阈值直接对应。
                     </div>
                     <div class="lab-grid">
                         <a href="labs/structural-mechanics/exp30-gravity.html" class="lab-card" style="text-decoration:none;color:inherit;border-color:rgba(34,211,238,0.3);background:rgba(34,211,238,0.04);">
+                            <div class="lab-card-tag" style="background:rgba(34,211,238,0.12);color:#22d3ee;border-color:rgba(34,211,238,0.25);">① 低空力学基准</div>
                             <div class="lab-card-icon" style="font-size:26px;">🍎</div>
-                            <div class="lab-card-name" style="color:#67e8f9;">#30 万有引力·苹果-无人机双层阻尼终极版</div>
+                            <div class="lab-card-name" style="color:#67e8f9;">万有引力·苹果-无人机双层阻尼终极版</div>
                             <div class="lab-card-desc">微观苹果基准·双层C₁/C₂阻尼·三维空地对照·AirMind力学基准·串级PID</div>
-                            <span class="lab-card-btn" style="background:rgba(34,211,238,0.15);border-color:rgba(34,211,238,0.4);color:#67e8f9;">★ AirMind V2.0 完整版</span>
+                            <div class="lab-card-meta">
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">验证维度：</span><span class="meta-val" style="color:#67e8f9;">D（阻尼）</span></span></div>
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">主线模块：</span><span class="meta-val">AirMind引擎 — 低空飞行器力学稳定性</span></span></div>
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">空域场景：</span><span class="meta-val" style="color:#22d3ee;">低空</span></span></div>
+                            </div>
+                            <div class="lab-card-status">📍 状态：★ AirMind V2.0 完整版</div>
+                            <span class="lab-card-btn" style="background:rgba(34,211,238,0.15);border-color:rgba(34,211,238,0.4);color:#67e8f9;">▶ 进入演示</span>
                         </a>
                         <a href="labs/structural-mechanics/exp31-atom.html" class="lab-card" style="text-decoration:none;color:inherit;border-color:rgba(167,139,250,0.3);background:rgba(167,139,250,0.04);">
+                            <div class="lab-card-tag" style="background:rgba(167,139,250,0.12);color:#a78bfa;border-color:rgba(167,139,250,0.25);">② 高空层级结构</div>
                             <div class="lab-card-icon" style="font-size:26px;">⚛️</div>
-                            <div class="lab-card-name" style="color:#c4b5fd;">#31 原子电子圈层排布</div>
+                            <div class="lab-card-name" style="color:#c4b5fd;">原子电子圈层排布</div>
                             <div class="lab-card-desc">库仑约束·稀有气体饱和/不饱和蓝海/碱金属单电子高危</div>
-                            <span class="lab-card-btn" style="background:rgba(167,139,250,0.15);border-color:rgba(167,139,250,0.4);color:#c4b5fd;">★ 完整版</span>
+                            <div class="lab-card-meta">
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">验证维度：</span><span class="meta-val" style="color:#c4b5fd;">Dev-I</span></span></div>
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">主线模块：</span><span class="meta-val">几何心智算力底座 — 高空层级结构</span></span></div>
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">空域场景：</span><span class="meta-val" style="color:#a78bfa;">高空</span></span></div>
+                            </div>
+                            <div class="lab-card-status">📍 状态：★ 完整版</div>
+                            <span class="lab-card-btn" style="background:rgba(167,139,250,0.15);border-color:rgba(167,139,250,0.4);color:#c4b5fd;">▶ 进入演示</span>
                         </a>
                         <a href="labs/structural-mechanics/exp32-molecule.html" class="lab-card" style="text-decoration:none;color:inherit;border-color:rgba(52,211,153,0.3);background:rgba(52,211,153,0.04);">
+                            <div class="lab-card-tag" style="background:rgba(52,211,153,0.12);color:#34d399;border-color:rgba(52,211,153,0.25);">③ 跨空域耦合</div>
                             <div class="lab-card-icon" style="font-size:26px;">🔗</div>
-                            <div class="lab-card-name" style="color:#6ee7b7;">#32 分子化学键多构型</div>
+                            <div class="lab-card-name" style="color:#6ee7b7;">分子化学键多构型</div>
                             <div class="lab-card-desc">惰性单原子/共价三角/离子单点/高分子网状·拖拽施力断裂</div>
-                            <span class="lab-card-btn" style="background:rgba(52,211,153,0.15);border-color:rgba(52,211,153,0.4);color:#6ee7b7;">★ 完整版</span>
+                            <div class="lab-card-meta">
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">验证维度：</span><span class="meta-val" style="color:#6ee7b7;">Dev-I</span></span></div>
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">主线模块：</span><span class="meta-val">AirMind引擎 — 低空↔高空跨域耦合</span></span></div>
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">空域场景：</span><span class="meta-val" style="color:#34d399;">跨空域</span></span></div>
+                            </div>
+                            <div class="lab-card-status">📍 状态：★ 完整版</div>
+                            <span class="lab-card-btn" style="background:rgba(52,211,153,0.15);border-color:rgba(52,211,153,0.4);color:#6ee7b7;">▶ 进入演示</span>
                         </a>
-                        <div class="lab-card" data-exp="exp-13"><div class="lab-card-icon">📐</div><div class="lab-card-name">悬臂单点vs多点锁止</div><div class="lab-card-desc">悬臂梁在不同支撑下的挠度对比</div><span class="lab-card-btn">▶ 进入演示</span></div>
-                        <div class="lab-card" data-exp="exp-14"><div class="lab-card-icon">🏛️</div><div class="lab-card-name">简支梁多点分散承重</div><div class="lab-card-desc">荷载分散至多个支点的冗余设计</div><span class="lab-card-btn">▶ 进入演示</span></div>
-                        <div class="lab-card" data-exp="exp-15"><div class="lab-card-icon">💥</div><div class="lab-card-name">压力容器耐压临界爆破</div><div class="lab-card-desc">压力升至0.68临界点时的爆破模拟</div><span class="lab-card-btn">▶ 进入演示</span></div>
+                        <div class="lab-card" data-exp="exp-13" style="border-color:rgba(251,191,36,0.3);background:rgba(251,191,36,0.04);">
+                            <div class="lab-card-tag" style="background:rgba(251,191,36,0.12);color:#fbbf24;border-color:rgba(251,191,36,0.25);">④ 结构冗余</div>
+                            <div class="lab-card-icon" style="font-size:26px;">📐</div>
+                            <div class="lab-card-name" style="color:#fcd34d;">悬臂单点vs多点锁止</div>
+                            <div class="lab-card-desc">悬臂梁在不同支撑下的挠度对比·冗余锁止验证</div>
+                            <div class="lab-card-meta">
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">验证维度：</span><span class="meta-val" style="color:#fcd34d;">D（阻尼）</span></span></div>
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">主线模块：</span><span class="meta-val">几何心智算力底座 — 结构冗余验证</span></span></div>
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">空域场景：</span><span class="meta-val" style="color:#fbbf24;">双空域</span></span></div>
+                            </div>
+                            <div class="lab-card-status">📍 状态：★ 完整版</div>
+                            <span class="lab-card-btn" style="background:rgba(251,191,36,0.1);border-color:rgba(251,191,36,0.25);color:#fbbf24;">▶ 进入演示</span>
+                        </div>
+                        <div class="lab-card" data-exp="exp-14" style="border-color:rgba(251,191,36,0.3);background:rgba(251,191,36,0.04);">
+                            <div class="lab-card-tag" style="background:rgba(251,191,36,0.12);color:#fbbf24;border-color:rgba(251,191,36,0.25);">⑤ 承重分布</div>
+                            <div class="lab-card-icon" style="font-size:26px;">🏛️</div>
+                            <div class="lab-card-name" style="color:#fcd34d;">简支梁多点分散承重</div>
+                            <div class="lab-card-desc">荷载分散至多个支点的冗余设计·承重分布验证</div>
+                            <div class="lab-card-meta">
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">验证维度：</span><span class="meta-val" style="color:#fcd34d;">D（阻尼）</span></span></div>
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">主线模块：</span><span class="meta-val">几何心智算力底座 — 荷载分散验证</span></span></div>
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">空域场景：</span><span class="meta-val" style="color:#fbbf24;">双空域</span></span></div>
+                            </div>
+                            <div class="lab-card-status">📍 状态：★ 完整版</div>
+                            <span class="lab-card-btn" style="background:rgba(251,191,36,0.1);border-color:rgba(251,191,36,0.25);color:#fbbf24;">▶ 进入演示</span>
+                        </div>
+                        <div class="lab-card" data-exp="exp-15" style="border-color:rgba(248,113,113,0.3);background:rgba(248,113,113,0.04);">
+                            <div class="lab-card-tag" style="background:rgba(248,113,113,0.12);color:#f87171;border-color:rgba(248,113,113,0.25);">⑥ 安全边界（0.68临界）</div>
+                            <div class="lab-card-icon" style="font-size:26px;">💥</div>
+                            <div class="lab-card-name" style="color:#fca5a5;">压力容器耐压临界爆破</div>
+                            <div class="lab-card-desc">压力升至0.68临界点时的爆破模拟·THRESHOLDS熔断边界</div>
+                            <div class="lab-card-meta">
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">验证维度：</span><span class="meta-val" style="color:#fca5a5;">Dev-I</span></span></div>
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">主线模块：</span><span class="meta-val">THRESHOLDS — 0.68熔断安全边界</span></span></div>
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">空域场景：</span><span class="meta-val" style="color:#f87171;">双空域</span></span></div>
+                            </div>
+                            <div class="lab-card-status">📍 状态：★ 完整版 · 0.68熔断阈值</div>
+                            <span class="lab-card-btn" style="background:rgba(248,113,113,0.1);border-color:rgba(248,113,113,0.25);color:#f87171;">▶ 进入演示</span>
+                        </div>
                         <div class="lab-card" data-exp="exp-29" style="border-color:rgba(251,191,36,0.3);background:rgba(251,191,36,0.04);">
-                            <div class="lab-card-tag new-badge dev" style="background:rgba(251,191,36,0.15);color:#fbbf24;border-color:rgba(251,191,36,0.3);">Dev-I强化</div>
-                            <div class="lab-card-icon">📊</div>
+                            <div class="lab-card-tag" style="background:rgba(251,191,36,0.15);color:#fbbf24;border-color:rgba(251,191,36,0.3);">⑦ 堆积偏差（Dev-I强化）</div>
+                            <div class="lab-card-icon" style="font-size:26px;">📊</div>
                             <div class="lab-card-name" style="color:#fcd34d;">堆积形态与系统偏差实验</div>
-                            <div class="lab-card-desc">不同堆积形态下的系统输出偏差测量 · Dev-I维度强化</div>
+                            <div class="lab-card-desc">不同堆积形态下的系统输出偏差测量 · Dev-I维度强化 · IPD框架</div>
+                            <div class="lab-card-meta">
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">验证维度：</span><span class="meta-val" style="color:#fcd34d;">Dev-I</span></span></div>
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">主线模块：</span><span class="meta-val">IPD框架 — 堆积形态与系统偏差</span></span></div>
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">空域场景：</span><span class="meta-val" style="color:#fbbf24;">双空域</span></span></div>
+                            </div>
+                            <div class="lab-card-status">📍 状态：★ Dev-I强化验证版</div>
                             <span class="lab-card-btn" style="background:rgba(251,191,36,0.1);border-color:rgba(251,191,36,0.25);color:#fbbf24;">▶ 进入演示</span>
                         </div>
                     </div>
