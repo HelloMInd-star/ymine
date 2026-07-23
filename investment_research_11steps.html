@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚀 11步投研推理系统</title>
+    <link rel="stylesheet" href="assets/css/base.css">
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <style>
+        body { background: #080810; }
+        .page-container { max-width: 1440px; width: 100%; margin: 0 auto; padding: 24px 28px 40px; }
+        .breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 13px; margin-bottom: 16px; flex-wrap: wrap; }
+        .breadcrumb a { color: rgba(255,255,255,0.5); text-decoration: none; transition: color .2s; }
+        .breadcrumb a:hover { color: rgba(255,255,255,0.8); }
+        .breadcrumb .sep { color: rgba(255,255,255,0.2); }
+        .breadcrumb .current { color: rgba(255,255,255,0.7); }
+        .nav-actions { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+        .nav-actions a { padding: 6px 14px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; color: rgba(255,255,255,0.7); text-decoration: none; font-size: 12px; transition: all .2s; }
+        .nav-actions a:hover { background: rgba(255,255,255,0.1); }
+
+        .page-header { text-align: center; margin-bottom: 24px; padding: 28px 24px; background: linear-gradient(135deg, rgba(251,191,36,0.08), rgba(34,211,238,0.06), rgba(167,139,250,0.06)); border: 1px solid rgba(251,191,36,0.18); border-radius: 20px; position: relative; overflow: hidden; }
+        .page-header::before { content:''; position:absolute; inset:0; background:linear-gradient(90deg,transparent,rgba(255,255,255,0.03),transparent); animation: scanLine 5s linear infinite; }
+        @keyframes scanLine { 0%{transform:translateX(-100%)} 100%{transform:translateX(100%)} }
+        .page-header h1 { font-size: 30px; font-weight: 700; background: linear-gradient(135deg, #fef3c7, #fbbf24, #22d3ee, #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 6px; position: relative; }
+        .page-header .subtitle { font-size: 14px; color: rgba(255,255,255,0.5); letter-spacing: 1px; position: relative; }
+        .page-header .sub-desc { font-size: 12px; color: rgba(255,255,255,0.35); margin-top: 10px; position: relative; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.06); }
+
+        .section { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; padding: 20px; margin-bottom: 16px; }
+        .section-title { font-size: 16px; font-weight: 600; color: rgba(255,255,255,0.85); margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+        .section-subtitle { font-size: 12px; color: rgba(255,255,255,0.4); margin-bottom: 14px; }
+
+        /* === 引导区 6阶段 === */
+        .guide-flow { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; margin-bottom: 0; }
+        .guide-stage { border-radius: 12px; padding: 14px 10px; text-align: center; position: relative; transition: all .3s; border: 1.5px solid; }
+        .guide-stage .gs-layer { font-size: 11px; font-weight: 600; margin-bottom: 4px; letter-spacing: 0.5px; }
+        .guide-stage .gs-steps { font-size: 10px; color: rgba(255,255,255,0.45); }
+        .guide-stage.input { background: linear-gradient(135deg, rgba(59,130,246,0.12), rgba(59,130,246,0.04)); border-color: rgba(59,130,246,0.3); color: #93c5fd; }
+        .guide-stage.mapping { background: linear-gradient(135deg, rgba(167,139,250,0.12), rgba(167,139,250,0.04)); border-color: rgba(167,139,250,0.3); color: #c4b5fd; }
+        .guide-stage.reference { background: linear-gradient(135deg, rgba(251,146,60,0.12), rgba(251,146,60,0.04)); border-color: rgba(251,146,60,0.3); color: #fdba74; }
+        .guide-stage.reasoning { background: linear-gradient(135deg, rgba(34,211,238,0.12), rgba(34,211,238,0.04)); border-color: rgba(34,211,238,0.3); color: #67e8f9; }
+        .guide-stage.decision { background: linear-gradient(135deg, rgba(34,197,94,0.12), rgba(34,197,94,0.04)); border-color: rgba(34,197,94,0.3); color: #86efac; }
+        .guide-stage.storage { background: linear-gradient(135deg, rgba(148,163,184,0.12), rgba(148,163,184,0.04)); border-color: rgba(148,163,184,0.3); color: #cbd5e1; }
+        .guide-stage:not(:last-child)::after { content:'→'; position:absolute; right:-14px; top:50%; transform:translateY(-50%); color:rgba(255,255,255,0.2); font-size:14px; z-index:1; }
+
+        /* === 参照模型选择 === */
+        .model-tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 16px; }
+        .model-tab { padding: 14px 12px; border-radius: 12px; border: 1.5px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.02); cursor: pointer; transition: all .3s; text-align: center; }
+        .model-tab:hover { background: rgba(255,255,255,0.05); transform: translateY(-2px); }
+        .model-tab.active { transform: translateY(-2px); box-shadow: 0 0 24px rgba(255,107,53,0.2); }
+        .model-tab .mt-name { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+        .model-tab .mt-source { font-size: 10px; color: rgba(255,255,255,0.4); }
+        .model-info-panel { background: rgba(0,0,0,0.2); border-radius: 12px; padding: 16px; border: 1px solid rgba(255,255,255,0.06); }
+        .model-info-row { display: flex; gap: 20px; flex-wrap: wrap; align-items: center; }
+        .model-info-item { font-size: 13px; }
+        .model-info-item .mi-label { color: rgba(255,255,255,0.4); margin-right: 6px; }
+        .model-info-item .mi-value { color: rgba(255,255,255,0.85); font-weight: 500; }
+        .model-desc { font-size: 12px; color: rgba(255,255,255,0.55); line-height: 1.7; margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.05); }
+        .star-rating { color: #fbbf24; letter-spacing: 2px; }
+
+        /* === 投研输入区 === */
+        .input-textarea { width: 100%; min-height: 90px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 14px; color: rgba(255,255,255,0.85); font-size: 14px; resize: vertical; font-family: inherit; line-height: 1.6; box-sizing: border-box; }
+        .input-textarea:focus { outline: none; border-color: rgba(251,191,36,0.4); box-shadow: 0 0 0 3px rgba(251,191,36,0.1); }
+        .input-textarea::placeholder { color: rgba(255,255,255,0.25); }
+        .preset-row { display: flex; gap: 10px; margin: 14px 0; flex-wrap: wrap; }
+        .preset-btn { padding: 8px 16px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.03); color: rgba(255,255,255,0.7); cursor: pointer; font-size: 12px; transition: all .2s; font-family: inherit; }
+        .preset-btn:hover { background: rgba(251,191,36,0.1); border-color: rgba(251,191,36,0.3); color: #fde68a; }
+        .btn-row { display: flex; gap: 10px; }
+        .btn-primary { padding: 10px 24px; border-radius: 10px; border: 1.5px solid rgba(251,191,36,0.5); background: linear-gradient(135deg, rgba(251,191,36,0.2), rgba(239,68,68,0.1)); color: #fde68a; font-size: 14px; font-weight: 600; cursor: pointer; transition: all .3s; font-family: inherit; }
+        .btn-primary:hover { background: linear-gradient(135deg, rgba(251,191,36,0.3), rgba(239,68,68,0.15)); box-shadow: 0 0 20px rgba(251,191,36,0.2); transform: translateY(-1px); }
+        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        .btn-secondary { padding: 10px 20px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.6); font-size: 14px; cursor: pointer; transition: all .2s; font-family: inherit; }
+        .btn-secondary:hover { background: rgba(255,255,255,0.08); }
+
+        /* === 11步推理链路 === */
+        .chain-flow { display: flex; gap: 0; overflow-x: auto; padding: 8px 0 4px; margin-bottom: 16px; }
+        .chain-step { flex: 1; min-width: 80px; padding: 10px 6px; border-radius: 10px; text-align: center; border: 1.5px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.01); position: relative; transition: all .4s; cursor: pointer; }
+        .chain-step:not(:last-child) { margin-right: 2px; }
+        .chain-step .cs-num { font-size: 10px; color: rgba(255,255,255,0.3); margin-bottom: 3px; font-weight: 600; }
+        .chain-step .cs-icon { font-size: 18px; margin-bottom: 2px; }
+        .chain-step .cs-label { font-size: 10px; color: rgba(255,255,255,0.5); white-space: nowrap; }
+        .chain-step.active { border-color: rgba(251,191,36,0.6); background: linear-gradient(135deg, rgba(251,191,36,0.15), rgba(239,68,68,0.08)); box-shadow: 0 0 16px rgba(251,191,36,0.2); transform: translateY(-2px); }
+        .chain-step.active .cs-num, .chain-step.active .cs-label { color: #fde68a; }
+        .chain-step.done { border-color: rgba(34,197,94,0.4); background: rgba(34,197,94,0.06); }
+        .chain-step.done .cs-num, .chain-step.done .cs-label { color: rgba(134,239,172,0.7); }
+        .chain-arrow { display: flex; align-items: center; color: rgba(255,255,255,0.15); font-size: 12px; padding: 0 1px; }
+        .step-detail-panel { background: rgba(0,0,0,0.25); border-radius: 12px; padding: 16px; border: 1px solid rgba(255,255,255,0.06); min-height: 120px; }
+        .sd-title { font-size: 14px; font-weight: 600; color: #fde68a; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        .sd-desc { font-size: 12px; color: rgba(255,255,255,0.5); line-height: 1.7; margin-bottom: 10px; }
+        .sd-data { font-size: 12px; color: rgba(255,255,255,0.75); line-height: 1.8; }
+        .sd-data .sd-key { color: rgba(255,255,255,0.4); }
+        .sd-tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 10px; margin: 2px 3px 2px 0; }
+        .sd-tag.kw { background: rgba(59,130,246,0.15); color: #93c5fd; border: 1px solid rgba(59,130,246,0.25); }
+        .sd-tag.intent { background: rgba(167,139,250,0.15); color: #c4b5fd; border: 1px solid rgba(167,139,250,0.25); }
+        .dim-bar-item { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+        .dim-bar-label { width: 50px; font-size: 11px; color: rgba(255,255,255,0.5); text-align: right; }
+        .dim-bar-track { flex: 1; height: 8px; background: rgba(255,255,255,0.05); border-radius: 4px; overflow: hidden; }
+        .dim-bar-fill { height: 100%; border-radius: 4px; transition: width .6s ease; }
+        .dim-bar-val { width: 50px; font-size: 11px; color: rgba(255,255,255,0.6); font-family: monospace; }
+        .binary-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 6px; margin-top: 8px; }
+        .binary-item { display: flex; align-items: center; gap: 8px; padding: 6px 10px; background: rgba(0,0,0,0.2); border-radius: 6px; font-family: monospace; font-size: 12px; }
+        .binary-item .bi-dim { color: #67e8f9; font-weight: 600; width: 36px; }
+        .binary-item .bi-val { color: #4ade80; letter-spacing: 1px; }
+
+        /* === 雷达图 + 结论区 === */
+        .main-grid { display: grid; grid-template-columns: 3fr 2fr; gap: 16px; }
+        .radar-wrap { height: 380px; width: 100%; }
+        .conclusion-panel { background: rgba(0,0,0,0.2); border-radius: 12px; padding: 18px; border: 1px solid rgba(255,255,255,0.06); display: flex; flex-direction: column; }
+        .conclusion-title { font-size: 15px; font-weight: 600; color: rgba(255,255,255,0.85); margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
+        .conclusion-row { font-size: 12px; margin-bottom: 6px; display: flex; gap: 6px; }
+        .conclusion-row .cr-label { color: rgba(255,255,255,0.4); min-width: 70px; }
+        .conclusion-row .cr-value { color: rgba(255,255,255,0.8); }
+        .conclusion-divider { height: 1px; background: rgba(255,255,255,0.06); margin: 12px 0; }
+        .conclusion-text { font-size: 13px; color: rgba(255,255,255,0.75); line-height: 1.8; flex: 1; padding: 12px; background: rgba(0,0,0,0.2); border-radius: 8px; border-left: 3px solid rgba(251,191,36,0.5); margin-bottom: 12px; }
+        .signal-box { display: flex; gap: 12px; flex-wrap: wrap; }
+        .signal-item { flex: 1; min-width: 80px; text-align: center; padding: 10px 8px; background: rgba(0,0,0,0.2); border-radius: 8px; }
+        .signal-item .si-label { font-size: 10px; color: rgba(255,255,255,0.4); margin-bottom: 4px; }
+        .signal-item .si-value { font-size: 14px; font-weight: 700; }
+
+        /* === PID 负反馈调节 === */
+        .pid-section { border-color: rgba(34,211,238,0.2); background: linear-gradient(135deg, rgba(34,211,238,0.04), rgba(167,139,250,0.02)); }
+        .pid-title { color: #67e8f9; }
+        .pid-steady-bar { position: relative; height: 36px; background: rgba(0,0,0,0.3); border-radius: 8px; margin: 10px 0 6px; overflow: hidden; }
+        .pid-steady-zone { position: absolute; top: 0; bottom: 0; left: 50%; width: 18%; background: linear-gradient(90deg, rgba(34,197,94,0.12), rgba(34,211,238,0.12), rgba(34,197,94,0.12)); border-left: 1px dashed rgba(34,197,94,0.4); border-right: 1px dashed rgba(239,68,68,0.4); }
+        .pid-danger-l { position: absolute; top:0; bottom:0; left:0; width:50%; background: linear-gradient(90deg, rgba(239,68,68,0.08), transparent); }
+        .pid-danger-r { position: absolute; top:0; bottom:0; right:0; width:32%; background: linear-gradient(270deg, rgba(239,68,68,0.12), transparent); }
+        .pid-marker { position: absolute; top: -2px; width: 12px; height: 40px; border-radius: 3px; transform: translateX(-50%); transition: left .8s cubic-bezier(0.34,1.56,0.64,1); z-index: 2; }
+        .pid-marker.current { background: linear-gradient(180deg, #22d3ee, #0891b2); box-shadow: 0 0 12px rgba(34,211,238,0.5); }
+        .pid-marker.target { background: rgba(167,139,250,0.8); width: 3px; }
+        .pid-target-line { position: absolute; top: 0; bottom: 0; width: 2px; background: rgba(167,139,250,0.5); }
+        .pid-bar-labels { display: flex; justify-content: space-between; font-size: 10px; color: rgba(255,255,255,0.35); margin-bottom: 10px; }
+        .pid-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin: 12px 0; }
+        .pid-stat { background: rgba(0,0,0,0.2); border-radius: 8px; padding: 10px 12px; }
+        .pid-stat .ps-label { font-size: 10px; color: rgba(255,255,255,0.4); margin-bottom: 3px; }
+        .pid-stat .ps-value { font-size: 15px; font-weight: 700; font-family: monospace; }
+        .pid-stat .ps-value.green { color: #4ade80; }
+        .pid-stat .ps-value.cyan { color: #67e8f9; }
+        .pid-stat .ps-value.purple { color: #c4b5fd; }
+        .pid-stat .ps-value.yellow { color: #fde68a; }
+        .pid-stat .ps-value.red { color: #fca5a5; }
+        .pid-params-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 12px 0; }
+        .pid-param-card { background: rgba(0,0,0,0.25); border-radius: 10px; padding: 12px; text-align: center; border: 1px solid rgba(255,255,255,0.05); }
+        .pid-param-card .pp-label { font-size: 11px; color: rgba(255,255,255,0.4); margin-bottom: 4px; }
+        .pid-param-card .pp-value { font-size: 22px; font-weight: 700; font-family: monospace; }
+        .pid-output { background: rgba(251,191,36,0.06); border: 1px solid rgba(251,191,36,0.15); border-radius: 8px; padding: 10px 14px; font-size: 12px; color: rgba(253,230,138,0.85); margin: 8px 0; }
+        .pid-fuse { background: rgba(0,0,0,0.2); border-radius: 8px; padding: 10px 14px; font-size: 12px; color: rgba(255,255,255,0.6); margin: 8px 0; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+        .pid-fuse .fuse-status { font-weight: 600; }
+        .pid-chart-wrap { height: 180px; margin-top: 12px; }
+        .pid-mapping-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 11px; }
+        .pid-mapping-table th, .pid-mapping-table td { padding: 6px 8px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .pid-mapping-table th { color: rgba(255,255,255,0.4); font-weight: 500; }
+        .pid-mapping-table td { color: rgba(255,255,255,0.7); }
+
+        /* === 折叠面板 === */
+        .collapse-toggle { cursor: pointer; display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: rgba(255,255,255,0.5); padding: 4px 10px; border-radius: 6px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); transition: all .2s; user-select: none; }
+        .collapse-toggle:hover { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.8); }
+        .collapse-body { display: none; margin-top: 12px; }
+        .collapse-body.open { display: block; }
+        .corr-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        .corr-table th, .corr-table td { padding: 8px 10px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .corr-table th { color: rgba(255,255,255,0.4); font-weight: 500; font-size: 11px; }
+        .corr-table td { color: rgba(255,255,255,0.7); }
+        .corr-table .arrow { color: rgba(34,211,238,0.6); padding: 0 6px; }
+        .corr-table .new-badge { display: inline-block; padding: 1px 6px; background: rgba(251,191,36,0.15); color: #fde68a; border-radius: 4px; font-size: 10px; margin-left: 4px; }
+        .corr-note { background: rgba(0,0,0,0.2); border-radius: 8px; padding: 12px 14px; font-size: 11px; color: rgba(255,255,255,0.5); line-height: 1.8; margin-top: 10px; border-left: 3px solid rgba(251,191,36,0.3); }
+
+        /* === 认知日志 + 记忆库 === */
+        .bottom-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .log-panel { background: rgba(0,0,0,0.3); border-radius: 10px; padding: 12px; max-height: 260px; overflow-y: auto; font-family: 'Consolas', 'Monaco', monospace; font-size: 11px; line-height: 1.8; }
+        .log-panel::-webkit-scrollbar { width: 4px; }
+        .log-panel::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+        .log-entry { color: rgba(255,255,255,0.55); }
+        .log-entry .log-time { color: #67e8f9; margin-right: 6px; }
+        .log-entry.log-ok { color: rgba(134,239,172,0.8); }
+        .log-entry.log-warn { color: rgba(253,230,138,0.8); }
+        .memory-panel { display: flex; flex-direction: column; gap: 10px; }
+        .memory-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: rgba(0,0,0,0.2); border-radius: 8px; font-size: 12px; }
+        .memory-item .mi-label { color: rgba(255,255,255,0.4); }
+        .memory-item .mi-value { color: rgba(255,255,255,0.85); font-weight: 600; font-family: monospace; }
+        .memory-status { text-align: center; padding: 12px; background: rgba(34,197,94,0.06); border: 1px solid rgba(34,197,94,0.2); border-radius: 8px; font-size: 13px; color: #86efac; }
+
+        .footer-note { text-align: center; font-size: 11px; color: rgba(255,255,255,0.25); margin-top: 24px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.04); }
+
+        .flex-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+
+        @media (max-width: 900px) {
+            .guide-flow { grid-template-columns: repeat(3, 1fr); }
+            .guide-stage:nth-child(3n)::after { display: none; }
+            .model-tabs { grid-template-columns: repeat(2, 1fr); }
+            .main-grid { grid-template-columns: 1fr; }
+            .pid-params-row { grid-template-columns: 1fr; }
+            .bottom-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-container">
+        <!-- 面包屑导航 -->
+        <div class="breadcrumb">
+            <a href="index.html">🏠 Y.Mine总控台</a>
+            <span class="sep">›</span>
+            <a href="ymine-studio.html">⚡ 三大心智引擎</a>
+            <span class="sep">›</span>
+            <span class="current">🚀 11步投研推理系统</span>
+        </div>
+
+        <div class="nav-actions">
+            <a href="index.html">← 返回总控台</a>
+            <a href="ymine-studio.html">🏠 返回十步闭环</a>
+        </div>
+
+        <!-- 标题区 -->
+        <div class="page-header">
+            <h1>🚀 11步投研推理系统 · 多模态参照与精算决策</h1>
+            <div class="subtitle">面向大模型的投研推理 · 人机协同精算与多模态参照决策框架</div>
+            <div class="sub-desc">基于十步闭环量化引擎升级 · 引入多模态参照模型与机器执行层</div>
+        </div>
+
+        <!-- 二、系统运行链路引导区 -->
+        <div class="section">
+            <div class="section-title"><span>📐</span> 系统运行链路引导</div>
+            <div class="section-subtitle">6层11步全景推理链路</div>
+            <div class="guide-flow">
+                <div class="guide-stage input">
+                    <div class="gs-layer">🔵 输入层</div>
+                    <div class="gs-steps">步骤 1-2</div>
+                </div>
+                <div class="guide-stage mapping">
+                    <div class="gs-layer">🟣 映射层</div>
+                    <div class="gs-steps">步骤 3-5</div>
+                </div>
+                <div class="guide-stage reference">
+                    <div class="gs-layer">🟠 参照层</div>
+                    <div class="gs-steps">步骤 6</div>
+                </div>
+                <div class="guide-stage reasoning">
+                    <div class="gs-layer">🔷 推理层</div>
+                    <div class="gs-steps">步骤 7-8</div>
+                </div>
+                <div class="guide-stage decision">
+                    <div class="gs-layer">🟢 决策层</div>
+                    <div class="gs-steps">步骤 9-10</div>
+                </div>
+                <div class="guide-stage storage">
+                    <div class="gs-layer">⚪ 存储层</div>
+                    <div class="gs-steps">步骤 11</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 三、参照模型选择区 -->
+        <div class="section">
+            <div class="section-title"><span>📚</span> 参照模型选择</div>
+            <div class="model-tabs" id="modelTabs">
+                <div class="model-tab active" data-model="m3" style="border-color:rgba(255,107,53,0.4);box-shadow:0 0 16px rgba(255,107,53,0.12);">
+                    <div class="mt-name" style="color:#FF6B35;">🤖 M3-Agent</div>
+                    <div class="mt-source">字节Seed/ICLR 2026</div>
+                </div>
+                <div class="model-tab" data-model="dmem">
+                    <div class="mt-name" style="color:#00B4D8;">🧠 δ-mem</div>
+                    <div class="mt-source">Mind Lab/ICLR 2026</div>
+                </div>
+                <div class="model-tab" data-model="mnemis">
+                    <div class="mt-name" style="color:#7B2FBE;">📚 Mnemis</div>
+                    <div class="mt-source">微软/ACL 2026</div>
+                </div>
+                <div class="model-tab" data-model="custom">
+                    <div class="mt-name" style="color:#2ECC71;">⚙️ 自定义</div>
+                    <div class="mt-source">自研</div>
+                </div>
+            </div>
+            <div class="model-info-panel" id="modelInfoPanel">
+                <div class="model-info-row">
+                    <div class="model-info-item"><span class="mi-label">当前选择：</span><span class="mi-value" id="miName" style="color:#FF6B35;">🤖 M3-Agent</span></div>
+                    <div class="model-info-item"><span class="mi-label">投研适配度：</span><span class="mi-value star-rating" id="miStars">★★★★☆</span></div>
+                </div>
+                <div class="model-desc" id="miDesc">多模态长期记忆Agent，支持实时视觉/听觉输入，以实体为中心组织记忆。适合投研场景中多源信息（财报图表、新闻、公告）的交叉参照分析。</div>
+            </div>
+        </div>
+
+        <!-- 四、投研输入区 -->
+        <div class="section">
+            <div class="section-title"><span>📝</span> 投研输入</div>
+            <textarea class="input-textarea" id="inputText" placeholder="请输入投研主题或问题，例如：分析某新能源储能公司的投资价值，重点关注其估值水平和技术优势。"></textarea>
+            <div class="preset-row">
+                <button class="preset-btn" data-preset="energy">🏭 新能源储能估值分析</button>
+                <button class="preset-btn" data-preset="ai">🤖 大模型公司分析</button>
+                <button class="preset-btn" data-preset="mcn">📱 MCN估值分析</button>
+            </div>
+            <div class="btn-row">
+                <button class="btn-primary" id="btnStart" onclick="startReasoning()">🚀 启动推理</button>
+                <button class="btn-secondary" onclick="resetAll()">🔄 重置</button>
+            </div>
+        </div>
+
+        <!-- 五、11步推理链路 -->
+        <div class="section">
+            <div class="section-title"><span>🔗</span> 11步推理链路</div>
+            <div class="chain-flow" id="chainFlow">
+                <!-- 动态生成 -->
+            </div>
+            <div class="step-detail-panel" id="stepDetail">
+                <div class="sd-title">⏸ 等待启动</div>
+                <div class="sd-desc">请输入投研问题并点击"启动推理"，系统将按11步依次执行，每一步的详细数据将在此处展示。</div>
+            </div>
+        </div>
+
+        <!-- 八、PID 负反馈调节模块 (在步骤7和8之间展示，作为独立模块) -->
+        <div class="section pid-section" id="pidSection" style="display:none;">
+            <div class="flex-header">
+                <div class="section-title pid-title"><span>🌊</span> PID水温负反馈调节 · 系统稳态偏差监控</div>
+                <div style="font-size:11px;color:rgba(255,255,255,0.35);">当前状态 → 目标稳态 → 偏差计算 → 调节执行</div>
+            </div>
+
+            <div style="margin-bottom:8px;font-size:12px;color:rgba(255,255,255,0.5);">📏 稳态区间监控条</div>
+            <div class="pid-steady-bar" id="pidSteadyBar">
+                <div class="pid-danger-l"></div>
+                <div class="pid-steady-zone"></div>
+                <div class="pid-danger-r"></div>
+                <div class="pid-marker target" id="pidTargetMarker" style="left:59%;"></div>
+                <div class="pid-marker current" id="pidCurrentMarker" style="left:55%;"></div>
+            </div>
+            <div class="pid-bar-labels">
+                <span>0.0</span><span>0.50</span><span style="color:rgba(34,197,94,0.6);">稳态区间</span><span>0.68</span><span>1.0</span>
+            </div>
+
+            <div class="pid-stats">
+                <div class="pid-stat">
+                    <div class="ps-label">当前浓度（I值归一化）</div>
+                    <div class="ps-value cyan" id="pidCurrent">0.55</div>
+                </div>
+                <div class="pid-stat">
+                    <div class="ps-label">目标值</div>
+                    <div class="ps-value purple" id="pidTarget">0.59</div>
+                </div>
+                <div class="pid-stat">
+                    <div class="ps-label">偏差（当前-目标）</div>
+                    <div class="ps-value yellow" id="pidError">-0.04</div>
+                </div>
+                <div class="pid-stat">
+                    <div class="ps-label">积分累计偏差</div>
+                    <div class="ps-value green" id="pidIntegral">0.02</div>
+                </div>
+                <div class="pid-stat">
+                    <div class="ps-label">微分变化率</div>
+                    <div class="ps-value cyan" id="pidDeriv">+0.01</div>
+                </div>
+                <div class="pid-stat">
+                    <div class="ps-label">调节状态</div>
+                    <div class="ps-value green" id="pidStatus">轻度调节 · 系统稳定</div>
+                </div>
+            </div>
+
+            <div style="font-size:12px;color:rgba(255,255,255,0.55);margin:12px 0 6px;">【PID 参数实时值】</div>
+            <div class="pid-params-row">
+                <div class="pid-param-card">
+                    <div class="pp-label">P（比例系数）</div>
+                    <div class="pp-value" style="color:#fbbf24;" id="pidP">0.45</div>
+                </div>
+                <div class="pid-param-card">
+                    <div class="pp-label">I（积分系数）</div>
+                    <div class="pp-value" style="color:#a78bfa;" id="pidI">0.12</div>
+                </div>
+                <div class="pid-param-card">
+                    <div class="pp-label">D（微分系数）</div>
+                    <div class="pp-value" style="color:#22d3ee;" id="pidD">0.08</div>
+                </div>
+            </div>
+
+            <div class="pid-output" id="pidOutput">💡 当前输出：调整算力分配 —— 语义解析 +5%，认知输出 -3%</div>
+
+            <div class="pid-fuse">
+                <span>🔒【熔断判定】</span>
+                <span>熔断阈值：<b style="color:#fca5a5;">0.68</b></span>
+                <span>当前浓度：<b id="pidFuseCur" style="color:#67e8f9;">0.55</b></span>
+                <span>距熔断线：<b id="pidFuseDist" style="color:#4ade80;">0.13</b></span>
+                <span class="fuse-status" id="pidFuseStatus" style="color:#4ade80;">🟢 未触发</span>
+            </div>
+
+            <div style="font-size:12px;color:rgba(255,255,255,0.55);margin:12px 0 4px;">📊 偏差趋势图（最近10次调节）</div>
+            <div class="pid-chart-wrap" id="pidChart"></div>
+
+            <div style="margin-top:12px;">
+                <span class="collapse-toggle" onclick="toggleCollapse('pidMappingCollapse', this)">📋 KMP/IPD 对应关系 [展开]</span>
+                <div class="collapse-body" id="pidMappingCollapse">
+                    <table class="pid-mapping-table">
+                        <thead><tr><th>层级</th><th>在投研推理中的含义</th><th>对应PID参数</th><th>对应11步</th></tr></thead>
+                        <tbody>
+                            <tr><td style="color:#93c5fd;">K（知识层）</td><td>用户输入语义理解</td><td>触发PID调节的"输入信号"</td><td>步骤3</td></tr>
+                            <tr><td style="color:#c4b5fd;">M（数学层）</td><td>七维向量计算 → 偏差值</td><td>P（比例增益）</td><td>步骤4</td></tr>
+                            <tr><td style="color:#fdba74;">P（物理层）</td><td>IPD状态描述：I海拔/P坡度/D阻尼</td><td>目标值设定、偏差计算、调节方向</td><td>步骤5</td></tr>
+                            <tr><td style="color:#67e8f9;">PID调节</td><td>执行调节回到稳态</td><td>P/I/D系数的实时计算</td><td>步骤8</td></tr>
+                            <tr><td style="color:#86efac;">稳态区间</td><td>系统"健康状态"范围 0.5~0.68</td><td>目标值区间</td><td>步骤9</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 六、七维向量雷达图 + 七、投研结论输出区 -->
+        <div class="main-grid">
+            <div class="section" style="padding:16px;">
+                <div class="section-title"><span>🎯</span> 七维向量雷达图</div>
+                <div class="radar-wrap" id="radarChart"></div>
+            </div>
+            <div class="section" style="padding:16px;display:flex;flex-direction:column;">
+                <div class="conclusion-title"><span>📋</span> 投研结论输出</div>
+                <div class="conclusion-panel" id="conclusionPanel" style="flex:1;border:none;background:transparent;padding:0;">
+                    <div style="text-align:center;color:rgba(255,255,255,0.25);font-size:13px;padding:40px 0;">⏳ 等待推理完成后输出投研结论</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 九、11步 vs 十步闭环对应关系 -->
+        <div class="section">
+            <div class="flex-header">
+                <div class="section-title"><span>📎</span> 11步 vs 十步闭环量化引擎 对应关系</div>
+                <span class="collapse-toggle" onclick="toggleCollapse('corrCollapse', this)" id="corrToggle">📎 [展开]</span>
+            </div>
+            <div class="collapse-body" id="corrCollapse">
+                <table class="corr-table">
+                    <thead><tr><th>11步推理系统</th><th></th><th>十步闭环量化引擎</th></tr></thead>
+                    <tbody>
+                        <tr><td>1. 投研需求输入</td><td class="arrow">→</td><td>Step 0 宏观海选</td></tr>
+                        <tr><td>2. 参照模型加载<span class="new-badge">新增</span></td><td class="arrow">→</td><td>—（多模态参照基准）</td></tr>
+                        <tr><td>3. 语言拆解（K层）</td><td class="arrow">→</td><td>Step 1 信息清洗ETL</td></tr>
+                        <tr><td>4. 语义映射（M层）</td><td class="arrow">→</td><td>Step 2 核心定价估值</td></tr>
+                        <tr><td>5. 物理映射（P层）</td><td class="arrow">→</td><td>Step 2 核心定价估值 + Step 4 动态周期观测</td></tr>
+                        <tr><td>6. 多模态参照对比</td><td class="arrow">→</td><td>Step 3 沙盘决策推演</td></tr>
+                        <tr><td>7. 算力调度<span class="new-badge">新增</span></td><td class="arrow">→</td><td>—（动态资源分配）</td></tr>
+                        <tr><td>8. 精算推理 + PID调节</td><td class="arrow">→</td><td>Step 5 人性偏差校验 + Step 6 熔断风控对冲</td></tr>
+                        <tr><td>9. 投研决策输出</td><td class="arrow">→</td><td>Step 7 全局闭环同步</td></tr>
+                        <tr><td>10. 01解码<span class="new-badge">新增</span></td><td class="arrow">→</td><td>—（机器底层语言表达）</td></tr>
+                        <tr><td>11. 长期记忆沉淀</td><td class="arrow">→</td><td>Step 7 全局闭环同步</td></tr>
+                    </tbody>
+                </table>
+                <div class="corr-note">
+                    <b>【新增的三个环节】</b><br>
+                    • 步骤2（参照模型加载）：相当于在宏观海选阶段增加参照系选择，引入 M3-Agent/δ-mem/Mnemis 等前沿模型作为对标基准<br>
+                    • 步骤7（算力调度）：贯穿沙盘决策推演和动态周期观测的资源分配，根据输入复杂度动态调配算力<br>
+                    • 步骤10（01解码）：位于全局闭环同步末端，将认知向量转化为二进制机器语言，实现物理层落地<br><br>
+                    <b>【PID水温负反馈调节在十步闭环中的对应】</b><br>
+                    • PID调节贯穿 Step 4（动态周期观测）和 Step 6（熔断风控对冲）<br>
+                    • → 稳态区间 0.5~0.68 对应十步闭环的"0.68熔断警戒线"<br>
+                    • → PID的D（微分）参数对应十步闭环的"动态周期观测"趋势预判
+                </div>
+            </div>
+        </div>
+
+        <!-- 十、认知日志 + 长期记忆库状态 -->
+        <div class="bottom-grid">
+            <div class="section" style="padding:16px;">
+                <div class="section-title"><span>📋</span> 认知日志</div>
+                <div class="log-panel" id="logPanel">
+                    <div class="log-entry"><span class="log-time">[系统]</span> 11步投研推理系统已就绪，等待投研输入...</div>
+                </div>
+            </div>
+            <div class="section" style="padding:16px;">
+                <div class="section-title"><span>📁</span> 长期记忆库状态</div>
+                <div class="memory-panel" id="memoryPanel">
+                    <div class="memory-item"><span class="mi-label">当前写入</span><span class="mi-value" id="memCurrent">—</span></div>
+                    <div class="memory-item"><span class="mi-label">已存储投研条目</span><span class="mi-value" id="memCount">23</span></div>
+                    <div class="memory-item"><span class="mi-label">库中总向量数</span><span class="mi-value" id="memVectors">161</span></div>
+                    <div class="memory-item"><span class="mi-label">最近更新</span><span class="mi-value" id="memRecent">—</span></div>
+                    <div class="memory-status" id="memStatus">🟢 记忆库正常 · 等待写入</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-note">本页面为交互演示，所有数据为模拟数据，不构成投资建议。</div>
+    </div>
+
+    <script>
+    // ========== 数据配置 ==========
+    const MODELS = {
+        m3: { name: '🤖 M3-Agent', source: '字节Seed/ICLR 2026', stars: '★★★★☆', color: '#FF6B35',
+            desc: '多模态长期记忆Agent，支持实时视觉/听觉输入，以实体为中心组织记忆。适合投研场景中多源信息（财报图表、新闻、公告）的交叉参照分析。' },
+        dmem: { name: '🧠 δ-mem', source: 'Mind Lab/ICLR 2026', stars: '★★★★☆', color: '#00B4D8',
+            desc: '8×8在线状态矩阵模型，不扩充上下文窗口，参数开销仅0.12%。在长序列投研推理中保持极低的内存占用，适合高频数据流的实时状态追踪。' },
+        mnemis: { name: '📚 Mnemis', source: '微软/ACL 2026', stars: '★★★★★', color: '#7B2FBE',
+            desc: '层级图索引+双路径检索（快思考+慢思考），LoCoMo基准93.9%。具备强大的长期记忆检索能力，适合跨周期、跨行业的投研知识关联与复盘。' },
+        custom: { name: '⚙️ 自定义', source: '自研', stars: '★★★★★', color: '#2ECC71',
+            desc: '基于KMP→IPD方法论的推理框架，跨学科物理映射。将投研问题转化为山体物理模型（海拔/坡度/阻尼/熵），通过PID负反馈调节实现稳态决策。' }
+    };
+
+    const PRESETS = {
+        energy: {
+            text: '分析某新能源储能公司的投资价值，重点关注其估值水平和技术优势。',
+            target: '新能源储能公司', price: '89.71',
+            K: { keywords: ['新能源','储能','估值','技术优势','投资'], intent: '估值分析', emotion: '中性', topic: '新能源' },
+            M: { I: 0.45, P: 0.60, D: 0.30, S: 0.35, 'Dev-I': -0.35, Dev1: 0.12, Dev2: 0.28 },
+            P: '海拔中等偏低、坡度较陡、阻尼较小、熵值偏低、山体轻度偏下',
+            refModel: 'm3', refConsistency: 78,
+            power: { usage: 65, parse: 40, map: 30, output: 30 },
+            conclusion: '该公司处于新能源储能赛道，当前估值处于行业中低位（I=0.45）。技术壁垒较高，市场尚未充分定价（Dev-I=-0.35）。建议关注，目标价上浮 15-20%。',
+            binary: { I:'01110011', P:'10011010', D:'01001100', S:'01011001', 'Dev-I':'10100110', Dev1:'00011110', Dev2:'01000111' },
+            signal: { type: 'buy', icon: '📈', label: '买入信号', conf: 78, risk: '中低' }
+        },
+        ai: {
+            text: '分析某大模型公司的投资价值，重点关注其商业模式和竞争格局。',
+            target: '大模型公司', price: '42.35',
+            K: { keywords: ['大模型','商业模式','竞争格局','估值','投资'], intent: '竞争分析', emotion: '中性', topic: 'AI' },
+            M: { I: 0.52, P: 0.30, D: 0.42, S: 0.58, 'Dev-I': -0.28, Dev1: 0.08, Dev2: 0.48 },
+            P: '海拔中等、坡度平缓、阻尼中等、熵值偏高、山体轻度偏下',
+            refModel: 'dmem', refConsistency: 82,
+            power: { usage: 58, parse: 35, map: 35, output: 30 },
+            conclusion: '大模型公司处于技术探索和商业模式验证期。I=0.52位于箱体中部，P=0.30缓慢上升但D=0.42阻力较大。S=0.58反映市场定价存在较大分歧。Dev-I=-0.28表明主力资金正在布局。综合判断：适合关注技术突破节点。',
+            binary: { I:'10000100', P:'01001100', D:'01101011', S:'10010100', 'Dev-I':'10111000', Dev1:'00010100', Dev2:'01111010' },
+            signal: { type: 'hold', icon: '➡️', label: '持有信号', conf: 62, risk: '中等' }
+        },
+        mcn: {
+            text: '分析某MCN内容平台的投资价值，重点关注其流量变现能力。',
+            target: 'MCN内容平台', price: '156.20',
+            K: { keywords: ['MCN','内容平台','流量变现','估值','投资'], intent: '商业模式分析', emotion: '中性', topic: '内容生态' },
+            M: { I: 0.72, P: -0.05, D: 0.38, S: 0.46, 'Dev-I': 0.32, Dev1: 0.18, Dev2: 0.35 },
+            P: '海拔偏高、坡度微降、阻尼中等、熵值中等、山体偏上',
+            refModel: 'mnemis', refConsistency: 75,
+            power: { usage: 52, parse: 30, map: 30, output: 40 },
+            conclusion: 'MCN/内容平台行业处于成熟期，流量红利逐渐收窄。I=0.72处于箱体高位，Dev-I=0.32表明高位筹码堆积较多，上行面临较大抛压。当前估值偏高，存在均值回归压力。综合判断：短期以防守为主。',
+            binary: { I:'10111000', P:'11111011', D:'01100001', S:'01110101', 'Dev-I':'01010010', Dev1:'00101110', Dev2:'01011001' },
+            signal: { type: 'sell', icon: '📉', label: '卖出信号', conf: 72, risk: '中高' }
+        }
+    };
+
+    const STEPS = [
+        { num: 1, icon: '📝', label: '输入', layer: '输入层', title: '投研需求输入',
+          desc: '用户输入投研主题或问题，作为整条链路的起点。系统接收原始文本，触发后续11步推理流程。' },
+        { num: 2, icon: '📚', label: '参照', layer: '输入层', title: '参照模型加载',
+          desc: '选择参照模型作为推理对标基准。系统加载模型权重和特征库，为后续对比分析准备参照系。' },
+        { num: 3, icon: '🔍', label: 'K层', layer: '映射层', title: '语言拆解（K层）',
+          desc: '将用户输入拆解为最小语义单元，通过NLP分词与意图识别，提取关键词、判定意图分类、识别情感标签与主题分类。' },
+        { num: 4, icon: '📐', label: 'M层', layer: '映射层', title: '语义映射（M层）',
+          desc: '将语言拆解结果（K层输出）映射为7个可计算的维度初始值：I(海拔)、P(坡度)、D(阻尼)、S(熵)、Dev-I、Dev1、Dev2，形成七维认知向量。' },
+        { num: 5, icon: '🏔️', label: 'P层', layer: '映射层', title: '物理映射（P层）',
+          desc: '将七维向量数值解释为物理状态描述，使用山体模型表征：海拔高低→估值水平，坡度陡缓→动能强弱，阻尼大小→阻力程度，熵值高低→市场分歧。' },
+        { num: 6, icon: '🔬', label: '对比', layer: '参照层', title: '多模态参照对比',
+          desc: '与选中的参照模型进行对比分析，计算当前分析结果与基准模型的一致性得分，输出参照结论。' },
+        { num: 7, icon: '⚡', label: '算力', layer: '推理层', title: '算力调度',
+          desc: '根据输入复杂度和参照对比结果，动态分配语义解析、向量映射、认知输出各环节的算力资源，确保推理效率。' },
+        { num: 8, icon: '🧠', label: '推理', layer: '推理层', title: '精算推理',
+          desc: '结合七维向量、参照对比结果、PID负反馈调节参数进行精算推理，计算信号方向、置信度和风险等级。' },
+        { num: 9, icon: '📊', label: '决策', layer: '决策层', title: '投研决策输出',
+          desc: '基于推理结果生成投研结论，包括标的判断、信号方向、置信度、风险等级和操作建议。' },
+        { num: 10, icon: '💾', label: '01', layer: '决策层', title: '01解码',
+          desc: '将七维向量结论转化为8位二进制机器语言，完成从认知向量到机器可执行编码的转换，实现物理层落地。' },
+        { num: 11, icon: '📁', label: '存储', layer: '存储层', title: '长期记忆沉淀',
+          desc: '将推理结果写入长期投研记忆库，包括关键词索引、七维向量、投研结论和01编码，形成可复用的投研知识资产。' }
+    ];
+
+    let currentModel = 'm3';
+    let currentData = null;
+    let radarChart = null;
+    let pidChart = null;
+    let currentStep = 0;
+    let isRunning = false;
+
+    // ========== 初始化 ==========
+    function init() {
+        renderChainFlow();
+        initRadarChart();
+        initPidChart();
+        bindEvents();
+    }
+
+    function renderChainFlow() {
+        const flow = document.getElementById('chainFlow');
+        let html = '';
+        STEPS.forEach((s, i) => {
+            html += `<div class="chain-step" data-step="${s.num}" onclick="jumpToStep(${s.num})">
+                <div class="cs-num">${s.num}</div>
+                <div class="cs-icon">${s.icon}</div>
+                <div class="cs-label">${s.label}</div>
+            </div>`;
+            if (i < STEPS.length - 1) {
+                html += `<div class="chain-arrow">→</div>`;
+            }
+        });
+        flow.innerHTML = html;
+    }
+
+    function initRadarChart() {
+        radarChart = echarts.init(document.getElementById('radarChart'));
+        const dims = ['I','P','D','S','Dev-I','Dev1','Dev2'];
+        radarChart.setOption({
+            backgroundColor: 'transparent',
+            tooltip: { backgroundColor: 'rgba(0,0,0,0.8)', borderColor: 'rgba(255,255,255,0.1)', textStyle: { color: '#fff', fontSize: 11 } },
+            radar: {
+                indicator: dims.map(d => ({ name: d, max: 1, min: -1 })),
+                radius: '65%',
+                center: ['50%','55%'],
+                splitNumber: 4,
+                axisName: { color: 'rgba(255,255,255,0.6)', fontSize: 12, fontWeight: 600 },
+                splitArea: { areaStyle: { color: ['rgba(167,139,250,0.02)','rgba(167,139,250,0.04)','rgba(34,211,238,0.03)','rgba(34,211,238,0.05)'] } },
+                splitLine: { lineStyle: { color: 'rgba(255,255,255,0.08)' } },
+                axisLine: { lineStyle: { color: 'rgba(255,255,255,0.08)' } }
+            },
+            series: [{
+                type: 'radar',
+                data: [{ value: [0,0,0,0,0,0,0], name: '七维向量',
+                    areaStyle: { color: 'rgba(251,191,36,0.15)' },
+                    lineStyle: { color: '#fbbf24', width: 2 },
+                    itemStyle: { color: '#fbbf24' } }]
+            }]
+        });
+        window.addEventListener('resize', () => { radarChart && radarChart.resize(); pidChart && pidChart.resize(); });
+    }
+
+    function initPidChart() {
+        pidChart = echarts.init(document.getElementById('pidChart'));
+        pidChart.setOption({
+            backgroundColor: 'transparent',
+            grid: { top: 20, right: 15, bottom: 25, left: 40 },
+            tooltip: { backgroundColor: 'rgba(0,0,0,0.8)', borderColor: 'rgba(255,255,255,0.1)', textStyle: { color: '#fff', fontSize: 11 } },
+            xAxis: { type: 'category', data: Array.from({length:10},(_,i)=>`t-${9-i}`), axisLine:{lineStyle:{color:'rgba(255,255,255,0.1)'}}, axisLabel:{color:'rgba(255,255,255,0.3)',fontSize:10} },
+            yAxis: { type: 'value', min: 0.3, max: 0.8, axisLine:{lineStyle:{color:'rgba(255,255,255,0.1)'}}, axisLabel:{color:'rgba(255,255,255,0.3)',fontSize:10,formatter:v=>v.toFixed(2)}, splitLine:{lineStyle:{color:'rgba(255,255,255,0.04)'}} },
+            series: [
+                { name:'稳态下限', type:'line', data:Array(10).fill(0.5), lineStyle:{color:'rgba(34,197,94,0.4)',type:'dashed'}, symbol:'none', tooltip:{show:false} },
+                { name:'稳态上限(熔断)', type:'line', data:Array(10).fill(0.68), lineStyle:{color:'rgba(239,68,68,0.5)',type:'dashed'}, symbol:'none', tooltip:{show:false} },
+                { name:'浓度', type:'line', data:[0.50,0.52,0.48,0.55,0.60,0.57,0.54,0.58,0.56,0.55],
+                  lineStyle:{color:'#22d3ee',width:2}, itemStyle:{color:'#22d3ee'},
+                  areaStyle:{color:new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'rgba(34,211,238,0.2)'},{offset:1,color:'rgba(34,211,238,0)'}])} }
+            ]
+        });
+    }
+
+    function bindEvents() {
+        document.querySelectorAll('.model-tab').forEach(tab => {
+            tab.addEventListener('click', () => selectModel(tab.dataset.model));
+        });
+        document.querySelectorAll('.preset-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const p = PRESETS[btn.dataset.preset];
+                document.getElementById('inputText').value = p.text;
+                addLog(`载入预设示例：${p.target}`, 'ok');
+            });
+        });
+    }
+
+    function selectModel(mid) {
+        currentModel = mid;
+        const m = MODELS[mid];
+        document.querySelectorAll('.model-tab').forEach(t => {
+            t.classList.remove('active');
+            t.style.borderColor = 'rgba(255,255,255,0.08)';
+            t.style.boxShadow = 'none';
+        });
+        const active = document.querySelector(`.model-tab[data-model="${mid}"]`);
+        active.classList.add('active');
+        active.style.borderColor = m.color + '66';
+        active.style.boxShadow = `0 0 16px ${m.color}33`;
+        document.getElementById('miName').textContent = m.name;
+        document.getElementById('miName').style.color = m.color;
+        document.getElementById('miStars').textContent = m.stars;
+        document.getElementById('miDesc').textContent = m.desc;
+        addLog(`参照模型切换为：${m.name}`, 'ok');
+    }
+
+    // ========== 折叠面板 ==========
+    function toggleCollapse(id, btn) {
+        const body = document.getElementById(id);
+        body.classList.toggle('open');
+        const isOpen = body.classList.contains('open');
+        btn.textContent = btn.textContent.replace(isOpen ? '[展开]' : '[收起]', isOpen ? '[收起]' : '[展开]');
+    }
+
+    // ========== 启动推理 ==========
+    async function startReasoning() {
+        if (isRunning) return;
+        const text = document.getElementById('inputText').value.trim();
+        if (!text) { addLog('⚠️ 请输入投研问题或选择预设示例', 'warn'); return; }
+
+        isRunning = true;
+        currentStep = 0;
+        document.getElementById('btnStart').disabled = true;
+
+        // 匹配预设
+        let data = null;
+        for (const k of Object.keys(PRESETS)) {
+            if (PRESETS[k].text === text) { data = JSON.parse(JSON.stringify(PRESETS[k])); break; }
+        }
+        if (!data) {
+            // 非预设文本，生成模拟数据
+            data = {
+                text, target: '分析标的', price: (50 + Math.random()*100).toFixed(2),
+                K: { keywords: text.split(/[，。！？\s]+/).filter(w=>w.length>=2).slice(0,5), intent: '综合分析', emotion: '中性', topic: '通用' },
+                M: { I: 0.50+Math.random()*0.2, P: 0.20+Math.random()*0.5, D: 0.30+Math.random()*0.3, S: 0.30+Math.random()*0.4, 'Dev-I': (Math.random()-0.5)*0.6, Dev1: Math.random()*0.3, Dev2: Math.random()*0.5 },
+                P: '系统状态计算中...', refModel: currentModel, refConsistency: Math.floor(65+Math.random()*20),
+                power: { usage: Math.floor(50+Math.random()*20), parse: Math.floor(30+Math.random()*15), map: Math.floor(25+Math.random()*15), output: Math.floor(25+Math.random()*15) },
+                conclusion: '基于当前输入的综合分析结果，系统正在生成定制化投研建议...',
+                binary: { I:'01001101', P:'01101010', D:'01010110', S:'01100101', 'Dev-I':'00110110', Dev1:'00100100', Dev2:'01011010' }
+            };
+            const v = data.M;
+            let sig;
+            if (v.I < 0.4 && v['Dev-I'] < -0.1) sig = { type:'buy', icon:'📈', label:'买入信号', conf: Math.floor(70+Math.random()*15), risk:'中低' };
+            else if (v.I > 0.6 && v['Dev-I'] > 0.1) sig = { type:'sell', icon:'📉', label:'卖出信号', conf: Math.floor(65+Math.random()*15), risk:'中高' };
+            else if (v.S > 0.6) sig = { type:'wait', icon:'⚠️', label:'观望信号', conf: Math.floor(40+Math.random()*15), risk:'中等' };
+            else sig = { type:'hold', icon:'➡️', label:'持有信号', conf: Math.floor(50+Math.random()*15), risk:'中等' };
+            data.signal = sig;
+            data.P = describePhysics(v);
+            data.conclusion = generateConclusion(data);
+        }
+        currentData = data;
+
+        clearLog();
+        addLog('🚀 11步投研推理系统启动', 'ok');
+        addLog(`用户输入："${text.substring(0,40)}${text.length>40?'...':''}"`);
+        addLog(`参照模型：${MODELS[data.refModel]?.name || MODELS[currentModel].name}`);
+
+        // 重置步骤状态
+        document.querySelectorAll('.chain-step').forEach(s => { s.classList.remove('active','done'); });
+
+        // 按步骤执行
+        for (let i = 0; i < STEPS.length; i++) {
+            currentStep = STEPS[i].num;
+            await sleep(600);
+            highlightStep(currentStep);
+            showStepDetail(currentStep, data);
+            await sleep(800);
+            markStepDone(currentStep);
+            // 步骤7后显示PID模块
+            if (currentStep === 7) {
+                showPIDModule(data);
+                await sleep(1200);
+            }
+            // 步骤8后更新雷达图
+            if (currentStep === 8) {
+                updateRadar(data.M);
+                await sleep(500);
+            }
+        }
+
+        // 完成后输出结论
+        showConclusion(data);
+        updateMemory(data);
+        addLog('✅ 11步推理全部完成，投研结论已输出', 'ok');
+        isRunning = false;
+        document.getElementById('btnStart').disabled = false;
+    }
+
+    function describePhysics(v) {
+        const parts = [];
+        parts.push(v.I < 0.4 ? '海拔偏低' : v.I > 0.6 ? '海拔偏高' : '海拔中等');
+        parts.push(v.P < 0.2 ? '坡度平缓' : v.P > 0.5 ? '坡度较陡' : '坡度中等');
+        parts.push(v.D < 0.3 ? '阻尼较小' : v.D > 0.5 ? '阻尼较大' : '阻尼中等');
+        parts.push(v.S < 0.4 ? '熵值偏低' : v.S > 0.6 ? '熵值偏高' : '熵值中等');
+        parts.push(v['Dev-I'] < -0.1 ? '山体偏下' : v['Dev-I'] > 0.1 ? '山体偏上' : '山体居中');
+        return parts.join('、');
+    }
+
+    function generateConclusion(data) {
+        const v = data.M;
+        const parts = [];
+        parts.push(`综合分析结果显示，当前标的${v.I<0.4?'估值偏低，存在价值洼地':v.I>0.6?'估值偏高，注意风险':'估值处于合理区间'}（I=${v.I.toFixed(2)}）。`);
+        parts.push(`市场动能${v.P<0.2?'偏弱，趋势尚未确立':v.P>0.5?'较强，趋势明确':'适中，需进一步观察'}（P=${v.P.toFixed(2)}）。`);
+        if (v['Dev-I'] < -0.1) parts.push(`Dev-I=${v['Dev-I'].toFixed(2)}表明资金正在低位布局，可适度关注。`);
+        else if (v['Dev-I'] > 0.1) parts.push(`Dev-I=${v['Dev-I'].toFixed(2)}表明高位筹码集中，注意回调风险。`);
+        if (v.S > 0.6) parts.push(`S=${v.S.toFixed(2)}熵值偏高，市场分歧较大，建议观望。`);
+        return parts.join('');
+    }
+
+    function highlightStep(num) {
+        document.querySelectorAll('.chain-step').forEach(s => s.classList.remove('active'));
+        const el = document.querySelector(`.chain-step[data-step="${num}"]`);
+        if (el) el.classList.add('active');
+        const step = STEPS[num-1];
+        addLog(`▶ 步骤${num}：${step.title}`);
+    }
+
+    function markStepDone(num) {
+        const el = document.querySelector(`.chain-step[data-step="${num}"]`);
+        if (el) { el.classList.remove('active'); el.classList.add('done'); }
+    }
+
+    function jumpToStep(num) {
+        if (!currentData || !isRunning) return;
+    }
+
+    function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+    function showStepDetail(num, data) {
+        const panel = document.getElementById('stepDetail');
+        const step = STEPS[num-1];
+        let dataHtml = '';
+
+        switch(num) {
+            case 1:
+                dataHtml = `<div class="sd-data"><span class="sd-key">原始输入：</span>${data.text}</div>`;
+                break;
+            case 2:
+                const m = MODELS[data.refModel] || MODELS[currentModel];
+                dataHtml = `<div class="sd-data">
+                    <div><span class="sd-key">参照模型：</span><span style="color:${m.color};font-weight:600;">${m.name}</span></div>
+                    <div><span class="sd-key">模型来源：</span>${m.source}</div>
+                    <div><span class="sd-key">投研适配度：</span><span class="star-rating">${m.stars}</span></div>
+                </div>`;
+                addLog(`参照模型加载完成：${m.name}`, 'ok');
+                break;
+            case 3:
+                const kws = data.K.keywords.map(k => `<span class="sd-tag kw">${k}</span>`).join('');
+                dataHtml = `<div class="sd-data">
+                    <div><span class="sd-key">关键词：</span>${kws}</div>
+                    <div style="margin-top:6px;"><span class="sd-key">意图：</span><span class="sd-tag intent">${data.K.intent}</span><span class="sd-key" style="margin-left:12px;">情感：</span><span class="sd-tag intent">${data.K.emotion}</span><span class="sd-key" style="margin-left:12px;">主题：</span><span class="sd-tag intent">${data.K.topic}</span></div>
+                </div>`;
+                addLog(`K层拆解完成：关键词[${data.K.keywords.join(',')}]，意图：${data.K.intent}`, 'ok');
+                break;
+            case 4:
+                const dimColors = { I:'#60a5fa', P:'#a78bfa', D:'#fb923c', S:'#facc15', 'Dev-I':'#f472b6', Dev1:'#34d399', Dev2:'#22d3ee' };
+                let bars = '';
+                for (const d of ['I','P','D','S','Dev-I','Dev1','Dev2']) {
+                    const val = data.M[d];
+                    const pct = Math.max(0, Math.min(100, ((val + 1) / 2) * 100));
+                    bars += `<div class="dim-bar-item">
+                        <span class="dim-bar-label" style="color:${dimColors[d]}">${d}</span>
+                        <span class="dim-bar-track"><span class="dim-bar-fill" style="width:${pct}%;background:linear-gradient(90deg,${dimColors[d]}66,${dimColors[d]});"></span></span>
+                        <span class="dim-bar-val">${val.toFixed(2)}</span>
+                    </div>`;
+                }
+                dataHtml = `<div class="sd-data">${bars}</div>`;
+                addLog(`M层映射完成：七维向量已生成`, 'ok');
+                break;
+            case 5:
+                dataHtml = `<div class="sd-data">
+                    <div style="padding:12px;background:rgba(0,0,0,0.2);border-radius:8px;border-left:3px solid #fdba74;line-height:1.8;">🏔️ ${data.P}</div>
+                </div>`;
+                addLog(`P层映射完成：${data.P}`, 'ok');
+                break;
+            case 6:
+                const rm = MODELS[data.refModel] || MODELS[currentModel];
+                dataHtml = `<div class="sd-data">
+                    <div><span class="sd-key">参照模型：</span><span style="color:${rm.color};font-weight:600;">${rm.name}</span></div>
+                    <div style="margin-top:8px;"><span class="sd-key">一致性：</span>
+                        <span style="font-size:20px;font-weight:700;color:#fbbf24;font-family:monospace;">${data.refConsistency}%</span>
+                    </div>
+                    <div style="margin-top:8px;padding:10px;background:rgba(0,0,0,0.2);border-radius:6px;font-size:12px;">
+                        当前分析与${rm.name}基准结论一致性达${data.refConsistency}%，结论方向${data.refConsistency>75?'高度一致':'基本一致，存在分歧点'}。
+                    </div>
+                </div>`;
+                addLog(`参照对比完成：${rm.name} 一致性 ${data.refConsistency}%`, 'ok');
+                break;
+            case 7:
+                const power = data.power;
+                dataHtml = `<div class="sd-data">
+                    <div><span class="sd-key">算力使用率：</span><span style="color:#fbbf24;font-size:18px;font-weight:700;font-family:monospace;">${power.usage}%</span></div>
+                    <div style="margin-top:8px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">
+                        <div style="background:rgba(167,139,250,0.08);padding:8px;border-radius:6px;text-align:center;">
+                            <div style="font-size:10px;color:rgba(255,255,255,0.4);">语义解析</div>
+                            <div style="font-size:16px;color:#c4b5fd;font-weight:700;font-family:monospace;">${power.parse}%</div>
+                        </div>
+                        <div style="background:rgba(34,211,238,0.08);padding:8px;border-radius:6px;text-align:center;">
+                            <div style="font-size:10px;color:rgba(255,255,255,0.4);">向量映射</div>
+                            <div style="font-size:16px;color:#67e8f9;font-weight:700;font-family:monospace;">${power.map}%</div>
+                        </div>
+                        <div style="background:rgba(251,191,36,0.08);padding:8px;border-radius:6px;text-align:center;">
+                            <div style="font-size:10px;color:rgba(255,255,255,0.4);">认知输出</div>
+                            <div style="font-size:16px;color:#fde68a;font-weight:700;font-family:monospace;">${power.output}%</div>
+                        </div>
+                    </div>
+                </div>`;
+                addLog(`算力调度完成：使用率 ${power.usage}%`, 'ok');
+                break;
+            case 8:
+                dataHtml = `<div class="sd-data">
+                    <div style="padding:12px;background:rgba(0,0,0,0.2);border-radius:8px;border-left:3px solid #22d3ee;line-height:1.8;">
+                        🧠 精算推理计算中...<br>
+                        • 基于七维向量综合评分：${((data.M.I+data.M.P+data.M.D+data.M.S)/4).toFixed(3)}<br>
+                        • Dev-I偏差修正：${data.M['Dev-I'].toFixed(3)}<br>
+                        • PID稳态调节已介入（详见下方模块）<br>
+                        • 信号方向初步判定：${data.signal.icon} ${data.signal.label}
+                    </div>
+                </div>`;
+                addLog(`精算推理完成：投研结论已生成`, 'ok');
+                break;
+            case 9:
+                const sigColor = data.signal.type==='buy'?'#4ade80':data.signal.type==='sell'?'#fca5a5':'#fde68a';
+                dataHtml = `<div class="sd-data">
+                    <div style="padding:14px;background:linear-gradient(135deg,rgba(251,191,36,0.06),rgba(0,0,0,0.2));border-radius:10px;border:1px solid rgba(251,191,36,0.15);line-height:1.8;">
+                        <div style="font-size:15px;font-weight:600;color:${sigColor};margin-bottom:8px;">${data.signal.icon} ${data.signal.label}</div>
+                        <div style="font-size:13px;color:rgba(255,255,255,0.8);">${data.conclusion}</div>
+                    </div>
+                </div>`;
+                addLog(`投研决策输出：${data.signal.label}（置信度${data.signal.conf}%）`, 'ok');
+                break;
+            case 10:
+                let binHtml = '';
+                for (const d of ['I','P','D','S','Dev-I','Dev1','Dev2']) {
+                    binHtml += `<div class="binary-item"><span class="bi-dim">${d}</span><span class="bi-val">${data.binary[d]}</span></div>`;
+                }
+                dataHtml = `<div class="sd-data"><div class="binary-grid">${binHtml}</div></div>`;
+                addLog(`01解码完成：7维二进制编码已输出`, 'ok');
+                break;
+            case 11:
+                dataHtml = `<div class="sd-data">
+                    <div style="padding:12px;background:rgba(34,197,94,0.06);border-radius:8px;border:1px solid rgba(34,197,94,0.2);text-align:center;">
+                        <div style="font-size:24px;margin-bottom:6px;">✅</div>
+                        <div style="color:#86efac;font-weight:600;">写入成功</div>
+                        <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:4px;">投研记录已存入长期记忆库</div>
+                    </div>
+                </div>`;
+                addLog(`长期记忆沉淀完成：已写入投研记忆库`, 'ok');
+                break;
+        }
+
+        panel.innerHTML = `<div class="sd-title">${step.icon} 步骤${step.num} · ${step.title} <span style="font-size:11px;color:rgba(255,255,255,0.3);font-weight:400;margin-left:8px;">[${step.layer}]</span></div>
+            <div class="sd-desc">${step.desc}</div>${dataHtml}`;
+    }
+
+    function showPIDModule(data) {
+        document.getElementById('pidSection').style.display = 'block';
+        const v = data.M;
+        const I = Math.max(0, Math.min(1, v.I));
+        const target = 0.59;
+        const error = I - target;
+        const pos = I * 100;
+
+        document.getElementById('pidCurrent').textContent = I.toFixed(2);
+        document.getElementById('pidTarget').textContent = target.toFixed(2);
+        document.getElementById('pidError').textContent = (error >= 0 ? '+' : '') + error.toFixed(2);
+        document.getElementById('pidIntegral').textContent = (error * 0.3).toFixed(2);
+        document.getElementById('pidDeriv').textContent = (v.P > 0 ? '+' : '') + (v.P * 0.05).toFixed(2);
+
+        let status, statusCls;
+        if (I >= 0.5 && I <= 0.68) { status = '轻度调节 · 系统稳定'; statusCls = 'green'; }
+        else if (I >= 0.45 && I < 0.5) { status = '中度调节（I积分增益增大）'; statusCls = 'yellow'; }
+        else if (I < 0.45) { status = '强烈调节（P增益增大，D预测转向）'; statusCls = 'red'; }
+        else if (I > 0.68 && I <= 0.75) { status = '中度调节（警惕偏高）'; statusCls = 'yellow'; }
+        else { status = '⚠️ 熔断触发！'; statusCls = 'red'; }
+        document.getElementById('pidStatus').textContent = status;
+        document.getElementById('pidStatus').className = 'ps-value ' + statusCls;
+
+        const P_coef = (0.3 + Math.abs(error) * 2).toFixed(2);
+        const I_coef = (0.08 + Math.abs(error) * 0.5).toFixed(2);
+        const D_coef = (0.05 + Math.abs(v.P) * 0.1).toFixed(2);
+        document.getElementById('pidP').textContent = P_coef;
+        document.getElementById('pidI').textContent = I_coef;
+        document.getElementById('pidD').textContent = D_coef;
+
+        const parseAdj = Math.round(error * -20);
+        const outputAdj = Math.round(error * 15);
+        document.getElementById('pidOutput').textContent = `💡 当前输出：调整算力分配 —— 语义解析 ${parseAdj>=0?'+':''}${parseAdj}%，认知输出 ${outputAdj>=0?'+':''}${outputAdj}%`;
+
+        document.getElementById('pidCurrentMarker').style.left = pos + '%';
+        document.getElementById('pidFuseCur').textContent = I.toFixed(2);
+        const dist = (0.68 - I).toFixed(2);
+        document.getElementById('pidFuseDist').textContent = dist;
+        const fuseEl = document.getElementById('pidFuseStatus');
+        if (I > 0.68) { fuseEl.textContent = '🔴 已触发熔断！'; fuseEl.style.color = '#fca5a5'; }
+        else if (I > 0.62) { fuseEl.textContent = '🟡 接近熔断线'; fuseEl.style.color = '#fde68a'; }
+        else { fuseEl.textContent = '🟢 未触发'; fuseEl.style.color = '#4ade80'; }
+
+        // 更新趋势图
+        const ts = [];
+        let base = 0.50;
+        for (let i = 0; i < 10; i++) {
+            base += (Math.random() - 0.4) * 0.05;
+            base = Math.max(0.35, Math.min(0.75, base));
+            ts.push(+base.toFixed(3));
+        }
+        ts[9] = +I.toFixed(3);
+        pidChart.setOption({
+            series: [
+                { name:'稳态下限', type:'line', data:Array(10).fill(0.5), lineStyle:{color:'rgba(34,197,94,0.4)',type:'dashed'}, symbol:'none', tooltip:{show:false} },
+                { name:'熔断线', type:'line', data:Array(10).fill(0.68), lineStyle:{color:'rgba(239,68,68,0.5)',type:'dashed'}, symbol:'none', tooltip:{show:false} },
+                { name:'浓度', type:'line', data:ts, lineStyle:{color:'#22d3ee',width:2}, itemStyle:{color:'#22d3ee'},
+                  areaStyle:{color:new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'rgba(34,211,238,0.2)'},{offset:1,color:'rgba(34,211,238,0)'}])} }
+            ]
+        });
+        addLog(`PID调节完成：当前浓度 ${I.toFixed(2)}，${status}`, 'ok');
+    }
+
+    function updateRadar(M) {
+        const dims = ['I','P','D','S','Dev-I','Dev1','Dev2'];
+        const vals = dims.map(d => +M[d].toFixed(2));
+        radarChart.setOption({
+            series: [{
+                type: 'radar',
+                data: [{ value: vals, name: '七维向量',
+                    areaStyle: { color: 'rgba(251,191,36,0.2)' },
+                    lineStyle: { color: '#fbbf24', width: 2.5 },
+                    itemStyle: { color: '#fbbf24', borderWidth: 2 } }]
+            }]
+        });
+    }
+
+    function showConclusion(data) {
+        const sig = data.signal;
+        const sigColor = sig.type==='buy'?'#4ade80':sig.type==='sell'?'#fca5a5':sig.type==='wait'?'#fbbf24':'#67e8f9';
+        const riskColor = sig.risk==='中低'?'#4ade80':sig.risk==='中高'?'#fca5a5':'#fde68a';
+        const vecStr = `[${(data.M.I).toFixed(2)}, ${(data.M.P).toFixed(2)}, ${(data.M.D).toFixed(2)}, ${(data.M.S).toFixed(2)}, ${(data.M['Dev-I']).toFixed(2)}, ${(data.M.Dev1).toFixed(2)}, ${(data.M.Dev2).toFixed(2)}]`;
+        document.getElementById('conclusionPanel').innerHTML = `
+            <div class="conclusion-row"><span class="cr-label">标的</span><span class="cr-value">${data.target}</span></div>
+            <div class="conclusion-row"><span class="cr-label">当前价格</span><span class="cr-value" style="color:#67e8f9;font-family:monospace;font-weight:600;">¥${data.price}</span></div>
+            <div class="conclusion-row"><span class="cr-label">七维向量</span><span class="cr-value" style="font-family:monospace;font-size:11px;color:rgba(255,255,255,0.6);">${vecStr}</span></div>
+            <div class="conclusion-divider"></div>
+            <div class="conclusion-text">${data.conclusion}</div>
+            <div class="signal-box">
+                <div class="signal-item"><div class="si-label">信号</div><div class="si-value" style="color:${sigColor};">${sig.icon} ${sig.label}</div></div>
+                <div class="signal-item"><div class="si-label">置信度</div><div class="si-value" style="color:#fbbf24;">${sig.conf}%</div></div>
+                <div class="signal-item"><div class="si-label">风险等级</div><div class="si-value" style="color:${riskColor};">${sig.risk}</div></div>
+            </div>
+        `;
+    }
+
+    function updateMemory(data) {
+        const now = new Date();
+        const ts = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+        document.getElementById('memCurrent').textContent = `${ts} ${data.target}`;
+        const count = parseInt(document.getElementById('memCount').textContent) + 1;
+        document.getElementById('memCount').textContent = count;
+        const vectors = parseInt(document.getElementById('memVectors').textContent) + 7;
+        document.getElementById('memVectors').textContent = vectors;
+        document.getElementById('memRecent').textContent = '刚刚';
+        document.getElementById('memStatus').innerHTML = '🟢 写入成功 · 记忆库已更新';
+    }
+
+    function addLog(msg, type) {
+        const panel = document.getElementById('logPanel');
+        const now = new Date();
+        const ts = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}`;
+        const cls = type === 'ok' ? 'log-ok' : type === 'warn' ? 'log-warn' : '';
+        const entry = document.createElement('div');
+        entry.className = `log-entry ${cls}`;
+        entry.innerHTML = `<span class="log-time">[${ts}]</span> ${msg}`;
+        panel.appendChild(entry);
+        panel.scrollTop = panel.scrollHeight;
+    }
+
+    function clearLog() {
+        document.getElementById('logPanel').innerHTML = '<div class="log-entry log-ok"><span class="log-time">[系统]</span> 🚀 11步投研推理系统启动</div>';
+    }
+
+    function resetAll() {
+        if (isRunning) return;
+        document.getElementById('inputText').value = '';
+        document.querySelectorAll('.chain-step').forEach(s => s.classList.remove('active','done'));
+        document.getElementById('stepDetail').innerHTML = '<div class="sd-title">⏸ 等待启动</div><div class="sd-desc">请输入投研问题并点击"启动推理"，系统将按11步依次执行，每一步的详细数据将在此处展示。</div>';
+        document.getElementById('pidSection').style.display = 'none';
+        document.getElementById('conclusionPanel').innerHTML = '<div style="text-align:center;color:rgba(255,255,255,0.25);font-size:13px;padding:40px 0;">⏳ 等待推理完成后输出投研结论</div>';
+        radarChart.setOption({ series:[{type:'radar',data:[{value:[0,0,0,0,0,0,0],name:'七维向量',areaStyle:{color:'rgba(251,191,36,0.15)'},lineStyle:{color:'#fbbf24',width:2},itemStyle:{color:'#fbbf24'}}]}] });
+        document.getElementById('memCurrent').textContent = '—';
+        document.getElementById('memRecent').textContent = '—';
+        document.getElementById('memStatus').innerHTML = '🟢 记忆库正常 · 等待写入';
+        document.getElementById('logPanel').innerHTML = '<div class="log-entry"><span class="log-time">[系统]</span> 11步投研推理系统已就绪，等待投研输入...</div>';
+        addLog('🔄 系统已重置', 'ok');
+    }
+
+    init();
+    </script>
+</body>
+</html>
