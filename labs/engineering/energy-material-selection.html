@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>📡 高空能源传输链路 · 材料选型与模拟验证系统</title>
+    <title>📡 低空+高空混合空域能源调度系统</title>
     <link rel="stylesheet" href="../../assets/css/base.css">
     <style>
         body{background:#05030a;min-height:100vh;}
@@ -149,6 +149,78 @@
         .link-item .link-name{font-size:12px;font-weight:600;color:#c4b5fd;margin-bottom:3px;}
         .link-item .link-desc{font-size:10px;color:rgba(255,255,255,0.35);line-height:1.5;}
 
+        .drone-panel{border-color:rgba(34,211,238,0.15);background:linear-gradient(135deg,rgba(34,211,238,0.04),rgba(59,130,246,0.02));}
+        .drone-layout{display:grid;grid-template-columns:280px 1fr;gap:16px;}
+        @media(max-width:768px){.drone-layout{grid-template-columns:1fr;}}
+        .drone-fleet{background:rgba(0,0,0,0.2);border-radius:12px;border:1px solid rgba(34,211,238,0.12);padding:14px;}
+        .fleet-title{font-size:11px;font-weight:700;color:#22d3ee;margin-bottom:10px;display:flex;align-items:center;gap:6px;letter-spacing:0.3px;text-transform:uppercase;}
+        .drone-row{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;margin-bottom:6px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.04);transition:all .2s;}
+        .drone-row:last-child{margin-bottom:0;}
+        .drone-row.active{border-color:rgba(74,222,128,0.2);background:rgba(74,222,128,0.04);}
+        .drone-row.standby{border-color:rgba(250,204,21,0.15);background:rgba(250,204,21,0.03);}
+        .drone-row.faulty{border-color:rgba(248,113,113,0.2);background:rgba(248,113,113,0.04);}
+        .drone-id{font-family:'SF Mono',monospace;font-size:11px;font-weight:700;color:rgba(255,255,255,0.6);min-width:34px;}
+        .drone-status-icon{font-size:12px;flex-shrink:0;}
+        .drone-info{flex:1;}
+        .drone-status-text{font-size:10px;color:rgba(255,255,255,0.45);}
+        .drone-row.active .drone-status-text{color:rgba(74,222,128,0.7);}
+        .drone-row.standby .drone-status-text{color:rgba(250,204,21,0.7);}
+        .drone-row.faulty .drone-status-text{color:rgba(248,113,113,0.7);}
+        .drone-power{font-family:'SF Mono',monospace;font-size:11px;font-weight:700;color:#f1f5f9;text-align:right;min-width:50px;}
+        .drone-coverage{font-size:9px;color:rgba(255,255,255,0.3);text-align:right;}
+        .fleet-summary{margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.06);display:flex;flex-direction:column;gap:6px;}
+        .fleet-stat{display:flex;justify-content:space-between;align-items:center;font-size:11px;}
+        .fleet-stat .fl{color:rgba(255,255,255,0.4);}
+        .fleet-stat .fv{font-family:'SF Mono',monospace;font-weight:700;color:#22d3ee;}
+        .health-bar{height:5px;border-radius:3px;background:rgba(255,255,255,0.05);overflow:hidden;margin-top:4px;}
+        .health-bar-fill{height:100%;border-radius:3px;transition:width 0.6s ease,background 0.4s ease;}
+        .health-bar-fill.green{background:linear-gradient(90deg,#4ade80,#22c55e);}
+        .health-bar-fill.yellow{background:linear-gradient(90deg,#facc15,#eab308);}
+        .health-bar-fill.red{background:linear-gradient(90deg,#f87171,#ef4444);}
+
+        .drone-main{display:flex;flex-direction:column;gap:14px;}
+        .weather-panel{background:rgba(0,0,0,0.2);border-radius:12px;border:1px solid rgba(255,255,255,0.06);padding:14px;}
+        .weather-title{font-size:11px;font-weight:700;color:rgba(255,255,255,0.5);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.3px;}
+        .weather-btns{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;}
+        .weather-btn{padding:8px 16px;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.5);transition:all .25s;display:inline-flex;align-items:center;gap:6px;font-family:inherit;}
+        .weather-btn:hover{border-color:rgba(34,211,238,0.3);color:#67e8f9;}
+        .weather-btn.active-sunny{background:rgba(250,204,21,0.1);border-color:rgba(250,204,21,0.35);color:#facc15;box-shadow:0 0 12px rgba(250,204,21,0.1);}
+        .weather-btn.active-light{background:rgba(147,197,253,0.1);border-color:rgba(147,197,253,0.35);color:#93c5fd;box-shadow:0 0 12px rgba(147,197,253,0.1);}
+        .weather-btn.active-heavy{background:rgba(248,113,113,0.1);border-color:rgba(248,113,113,0.35);color:#f87171;box-shadow:0 0 12px rgba(248,113,113,0.1);}
+        .weather-status{font-size:11px;color:rgba(255,255,255,0.45);line-height:1.6;padding:8px 10px;border-radius:8px;background:rgba(0,0,0,0.2);}
+        .weather-status .pct{font-family:'SF Mono',monospace;font-weight:700;color:#facc15;}
+
+        .relay-panel{background:rgba(0,0,0,0.2);border-radius:12px;border:1px solid rgba(255,255,255,0.06);padding:14px;}
+        .relay-title{font-size:11px;font-weight:700;color:rgba(255,255,255,0.5);margin-bottom:12px;text-transform:uppercase;letter-spacing:0.3px;}
+        .relay-chain{display:flex;align-items:center;gap:0;flex-wrap:wrap;}
+        .relay-node{display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 10px;border-radius:10px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.05);min-width:72px;transition:all .3s;}
+        .relay-node.ok{border-color:rgba(74,222,128,0.25);background:rgba(74,222,128,0.05);}
+        .relay-node.degraded{border-color:rgba(250,204,21,0.25);background:rgba(250,204,21,0.05);}
+        .relay-node.broken{border-color:rgba(248,113,113,0.25);background:rgba(248,113,113,0.05);}
+        .relay-node-icon{font-size:16px;}
+        .relay-node-name{font-size:9px;color:rgba(255,255,255,0.5);font-weight:600;}
+        .relay-node-power{font-family:'SF Mono',monospace;font-size:10px;font-weight:700;color:#f1f5f9;}
+        .relay-node-status{font-size:11px;}
+        .relay-arrow{color:rgba(255,255,255,0.15);font-size:16px;padding:0 4px;flex-shrink:0;}
+        .relay-health{margin-top:12px;display:flex;align-items:center;gap:8px;font-size:11px;}
+        .relay-health .rh-label{color:rgba(255,255,255,0.4);}
+        .relay-health .rh-val{font-weight:700;padding:3px 10px;border-radius:6px;}
+        .relay-health .rh-val.green{background:rgba(74,222,128,0.12);color:#4ade80;}
+        .relay-health .rh-val.yellow{background:rgba(250,204,21,0.12);color:#facc15;}
+        .relay-health .rh-val.red{background:rgba(248,113,113,0.12);color:#f87171;}
+
+        .material-map{background:rgba(0,0,0,0.2);border-radius:12px;border:1px solid rgba(255,255,255,0.06);padding:14px;margin-top:14px;}
+        .material-title{font-size:11px;font-weight:700;color:rgba(255,255,255,0.5);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.3px;}
+        .mat-row{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;margin-bottom:6px;background:rgba(255,255,255,0.02);font-size:11px;}
+        .mat-row:last-child{margin-bottom:0;}
+        .mat-name{color:#c4b5fd;font-weight:600;min-width:110px;}
+        .mat-arrow{color:rgba(255,255,255,0.15);}
+        .mat-part{color:rgba(255,255,255,0.5);min-width:90px;}
+        .mat-exp{color:#fbbf24;font-size:10px;}
+        .drone-link-note{margin-top:12px;padding:10px 12px;border-radius:8px;background:rgba(167,139,250,0.05);border-left:2px solid rgba(167,139,250,0.3);font-size:10px;color:rgba(255,255,255,0.4);line-height:1.6;}
+        .drone-link-note strong{color:#c4b5fd;}
+        .layer-tag.u{background:rgba(34,211,238,0.12);color:#22d3ee;border:1px solid rgba(34,211,238,0.25);}
+
         .disclaimer{margin-top:28px;padding:14px 18px;border-radius:10px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.05);font-size:10px;color:rgba(255,255,255,0.25);text-align:center;line-height:1.6;}
 
         @keyframes fadeInUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
@@ -168,7 +240,7 @@
             <div class="breadcrumb">
                 <a href="../../index.html">🏠 总控台</a>
                 <span class="sep">/</span>
-                <span class="cur">📡 高空能源传输链路 · 材料选型验证</span>
+                <span class="cur">📡 低空+高空混合空域能源调度系统</span>
             </div>
 
             <div class="header">
@@ -177,9 +249,10 @@
                     <span class="badge vec">七维向量</span>
                     <span class="badge bin">01 解码</span>
                     <span class="badge">低空+高空混合空域</span>
+                    <span class="badge" style="background:rgba(34,211,238,0.08);border-color:rgba(34,211,238,0.2);color:#22d3ee;">无人机矩阵</span>
                 </div>
-                <h1>📡 高空能源传输链路 · 材料选型与模拟验证系统</h1>
-                <div class="sub">地面→低空→高空 · KMP→IPD→七维向量→01解码 完整联动<br>Game-OS 工程应用验证平台</div>
+                <h1>📡 低空+高空混合空域能源调度系统</h1>
+                <div class="sub">地面供能 → 微波传输 → 无人机矩阵 → 高空接收 → 储能分配 · KMP→IPD→七维向量→01解码完整联动<br>Game-OS 工程应用验证平台</div>
             </div>
 
             <div class="chain-flow" id="chainFlow">
@@ -188,6 +261,8 @@
                 <div class="chain-node" data-step="m">📐 M层·数学映射</div>
                 <span class="chain-arrow">→</span>
                 <div class="chain-node" data-step="p">🏔️ P层·物理映射</div>
+                <span class="chain-arrow">→</span>
+                <div class="chain-node" data-step="u">🚁 无人机矩阵</div>
                 <span class="chain-arrow">→</span>
                 <div class="chain-node" data-step="v">📊 七维向量</div>
                 <span class="chain-arrow">→</span>
@@ -268,6 +343,84 @@
                         </thead>
                         <tbody id="pTableBody"></tbody>
                     </table>
+                </div>
+            </div>
+
+            <div class="sec section-hidden" id="secU">
+                <h2 class="sec-title">
+                    🚁 低空无人机供电矩阵 · 雷雨应对与中继调度
+                    <span class="layer-tag u">调度层</span>
+                </h2>
+                <div class="panel drone-panel">
+                    <p style="font-size:12px;color:rgba(255,255,255,0.45);margin:0 0 14px;line-height:1.6;">地面→低空→高空 · 供电枢纽与动态调度。无人机矩阵作为低空核心中继层，负责微波能量接力传输。</p>
+                    <div class="drone-layout">
+                        <div class="drone-fleet">
+                            <div class="fleet-title">🚁 矩阵总览</div>
+                            <div id="droneFleet"></div>
+                            <div class="fleet-summary">
+                                <div class="fleet-stat">
+                                    <span class="fl">矩阵总输出</span>
+                                    <span class="fv" id="totalPower">125kW / 200kW</span>
+                                </div>
+                                <div class="fleet-stat">
+                                    <span class="fl">矩阵健康度</span>
+                                    <span class="fv" id="healthText">🟢 绿色 (82%)</span>
+                                </div>
+                                <div class="health-bar">
+                                    <div class="health-bar-fill green" id="healthBar" style="width:82%;"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="drone-main">
+                            <div class="weather-panel">
+                                <div class="weather-title">🌤️ 天气状态切换</div>
+                                <div class="weather-btns">
+                                    <button class="weather-btn active-sunny" data-weather="sunny" onclick="setWeather('sunny')">☀️ 晴朗</button>
+                                    <button class="weather-btn" data-weather="light" onclick="setWeather('light')">⛈️ 轻度雷雨</button>
+                                    <button class="weather-btn" data-weather="heavy" onclick="setWeather('heavy')">🌪️ 重度雷雨</button>
+                                </div>
+                                <div class="weather-status" id="weatherStatus">
+                                    当前状态：<strong style="color:#facc15;">☀️ 晴朗</strong> · 供电功率 <span class="pct">100%</span><br>
+                                    响应策略：<span style="color:#4ade80;">正常中继，全功率运行</span>
+                                </div>
+                            </div>
+                            <div class="relay-panel">
+                                <div class="relay-title">⚡ 供电中继状态</div>
+                                <div class="relay-chain" id="relayChain"></div>
+                                <div class="relay-health">
+                                    <span class="rh-label">链路健康度：</span>
+                                    <span class="rh-val green" id="relayHealthVal">🟢 绿色（正常）</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="material-map">
+                        <div class="material-title">🔩 材料与结构映射</div>
+                        <div class="mat-row">
+                            <span class="mat-name">碳纤维复合材料</span>
+                            <span class="mat-arrow">→</span>
+                            <span class="mat-part">机身结构</span>
+                            <span class="mat-arrow">→</span>
+                            <span class="mat-exp">悬臂单点vs多点锁止（结构冗余）</span>
+                        </div>
+                        <div class="mat-row">
+                            <span class="mat-name">耐辐射涂层</span>
+                            <span class="mat-arrow">→</span>
+                            <span class="mat-part">电子设备防护</span>
+                            <span class="mat-arrow">→</span>
+                            <span class="mat-exp">原子电子圈层排布（高空层级）</span>
+                        </div>
+                        <div class="mat-row">
+                            <span class="mat-name">轻质合金</span>
+                            <span class="mat-arrow">→</span>
+                            <span class="mat-part">动力系统支架</span>
+                            <span class="mat-arrow">→</span>
+                            <span class="mat-exp">简支梁多点分散承重（承重分布）</span>
+                        </div>
+                    </div>
+                    <div class="drone-link-note">
+                        🔗 <strong>与主线模块映射：</strong>AirMind引擎（低空调度）· 几何心智算力底座（结构冗余）· 通信信道实验（微波传输）
+                    </div>
                 </div>
             </div>
 
@@ -431,6 +584,159 @@ const materialPresets = {
 let currentData = null;
 let currentStep = 0;
 
+const droneData = {
+    sunny: {
+        pct: 1.0,
+        pctText: '100%',
+        pctColor: '#facc15',
+        strategy: '正常中继，全功率运行',
+        strategyColor: '#4ade80',
+        weatherIcon: '☀️',
+        weatherText: '晴朗',
+        drones: [
+            {id:'U-01', status:'active', statusText:'中继中', power:45, coverage:'半径8km'},
+            {id:'U-02', status:'active', statusText:'中继中', power:42, coverage:'半径7km'},
+            {id:'U-03', status:'standby', statusText:'待命中', power:0, coverage:'—'},
+            {id:'U-04', status:'faulty', statusText:'故障', power:0, coverage:'—'},
+            {id:'U-05', status:'active', statusText:'中继中', power:38, coverage:'半径6km'},
+        ],
+        relay: [
+            {name:'地面供能', icon:'🏭', power:50, state:'ok'},
+            {name:'U-01', icon:'🚁', power:45, state:'ok'},
+            {name:'U-05', icon:'🚁', power:38, state:'ok'},
+            {name:'高空接收端', icon:'🛰️', power:35, state:'ok'},
+        ],
+        healthPct: 82,
+        healthColor: 'green',
+        healthText: '🟢 绿色（正常）',
+        totalPower: '125kW / 200kW'
+    },
+    light: {
+        pct: 0.6,
+        pctText: '60%',
+        pctColor: '#93c5fd',
+        strategy: '启用防雷协议，切换至冗余链路',
+        strategyColor: '#facc15',
+        weatherIcon: '⛈️',
+        weatherText: '轻度雷雨',
+        drones: [
+            {id:'U-01', status:'active', statusText:'降功率中继', power:27, coverage:'半径6km'},
+            {id:'U-02', status:'standby', statusText:'防雷待命', power:0, coverage:'—'},
+            {id:'U-03', status:'active', statusText:'冗余启用', power:25, coverage:'半径5km'},
+            {id:'U-04', status:'faulty', statusText:'故障', power:0, coverage:'—'},
+            {id:'U-05', status:'active', statusText:'降功率中继', power:23, coverage:'半径4km'},
+        ],
+        relay: [
+            {name:'地面供能', icon:'🏭', power:50, state:'ok'},
+            {name:'U-01', icon:'🚁', power:27, state:'ok'},
+            {name:'U-03', icon:'🚁', power:25, state:'degraded'},
+            {name:'U-05', icon:'🚁', power:23, state:'degraded'},
+            {name:'高空接收端', icon:'🛰️', power:20, state:'degraded'},
+        ],
+        healthPct: 60,
+        healthColor: 'yellow',
+        healthText: '🟡 黄色（降级）',
+        totalPower: '75kW / 200kW'
+    },
+    heavy: {
+        pct: 0.3,
+        pctText: '30%',
+        pctColor: '#f87171',
+        strategy: '启用紧急备份，部分无人机降落避险',
+        strategyColor: '#f87171',
+        weatherIcon: '🌪️',
+        weatherText: '重度雷雨',
+        drones: [
+            {id:'U-01', status:'active', statusText:'紧急功率', power:14, coverage:'半径3km'},
+            {id:'U-02', status:'standby', statusText:'已降落', power:0, coverage:'—'},
+            {id:'U-03', status:'active', statusText:'紧急备份', power:13, coverage:'半径3km'},
+            {id:'U-04', status:'faulty', statusText:'故障', power:0, coverage:'—'},
+            {id:'U-05', status:'standby', statusText:'已降落', power:0, coverage:'—'},
+        ],
+        relay: [
+            {name:'地面供能', icon:'🏭', power:30, state:'degraded'},
+            {name:'U-01', icon:'🚁', power:14, state:'degraded'},
+            {name:'U-03', icon:'🚁', power:13, state:'degraded'},
+            {name:'高空接收端', icon:'🛰️', power:10, state:'broken'},
+        ],
+        healthPct: 30,
+        healthColor: 'red',
+        healthText: '🔴 红色（紧急）',
+        totalPower: '27kW / 200kW'
+    }
+};
+
+let currentWeather = 'sunny';
+
+function renderDroneFleet() {
+    const w = droneData[currentWeather];
+    const fleetEl = document.getElementById('droneFleet');
+    let html = '';
+    w.drones.forEach(d => {
+        const statusIcon = d.status === 'active' ? '🟢' : d.status === 'standby' ? '🟡' : '🔴';
+        html += `<div class="drone-row ${d.status}">
+            <span class="drone-id">${d.id}</span>
+            <span class="drone-status-icon">${statusIcon}</span>
+            <div class="drone-info">
+                <div class="drone-status-text">${d.statusText}</div>
+            </div>
+            <div style="text-align:right;">
+                <div class="drone-power">${d.power}kW</div>
+                <div class="drone-coverage">${d.coverage}</div>
+            </div>
+        </div>`;
+    });
+    fleetEl.innerHTML = html;
+
+    document.getElementById('totalPower').textContent = w.totalPower;
+    document.getElementById('healthText').textContent = w.healthText;
+    const hb = document.getElementById('healthBar');
+    hb.className = 'health-bar-fill ' + w.healthColor;
+    hb.style.width = w.healthPct + '%';
+}
+
+function renderRelayChain() {
+    const w = droneData[currentWeather];
+    const chainEl = document.getElementById('relayChain');
+    let html = '';
+    w.relay.forEach((node, i) => {
+        const stateClass = node.state === 'ok' ? 'ok' : node.state === 'degraded' ? 'degraded' : 'broken';
+        const statusIcon = node.state === 'ok' ? '✅' : node.state === 'degraded' ? '⚠️' : '❌';
+        html += `<div class="relay-node ${stateClass}">
+            <span class="relay-node-icon">${node.icon}</span>
+            <span class="relay-node-name">${node.name}</span>
+            <span class="relay-node-power">${node.power}kW</span>
+            <span class="relay-node-status">${statusIcon}</span>
+        </div>`;
+        if (i < w.relay.length - 1) {
+            html += '<span class="relay-arrow">→</span>';
+        }
+    });
+    chainEl.innerHTML = html;
+
+    const rhv = document.getElementById('relayHealthVal');
+    rhv.className = 'rh-val ' + w.healthColor;
+    rhv.textContent = w.healthText;
+}
+
+function setWeather(weather) {
+    currentWeather = weather;
+    document.querySelectorAll('.weather-btn').forEach(btn => {
+        btn.classList.remove('active-sunny', 'active-light', 'active-heavy');
+    });
+    const w = droneData[weather];
+    const activeClass = weather === 'sunny' ? 'active-sunny' : weather === 'light' ? 'active-light' : 'active-heavy';
+    document.querySelector(`[data-weather="${weather}"]`).classList.add(activeClass);
+
+    document.getElementById('weatherStatus').innerHTML = `
+        当前状态：<strong style="color:${w.pctColor};">${w.weatherIcon} ${w.weatherText}</strong> · 供电功率 <span class="pct" style="color:${w.pctColor};">${w.pctText}</span><br>
+        响应策略：<span style="color:${w.strategyColor};">${w.strategy}</span>
+    `;
+
+    renderDroneFleet();
+    renderRelayChain();
+}
+
 function fillPreset() {
     document.getElementById('reqInput').value = '高空太阳能电池板，要求轻质、耐氧化、耐辐射、高转化率，适用高度30km';
 }
@@ -540,8 +846,11 @@ function renderPLayer() {
     tbody.innerHTML = html;
 
     setTimeout(() => updateChain(3), pMap.length * 120 + 400);
-    setTimeout(() => showSection('secV'), pMap.length * 120 + 700);
-    setTimeout(() => { renderRadar(); renderThresholds(); }, pMap.length * 120 + 1000);
+    setTimeout(() => showSection('secU'), pMap.length * 120 + 700);
+    setTimeout(() => { renderDroneFleet(); renderRelayChain(); }, pMap.length * 120 + 1000);
+    setTimeout(() => updateChain(4), pMap.length * 120 + 1400);
+    setTimeout(() => showSection('secV'), pMap.length * 120 + 1700);
+    setTimeout(() => { renderRadar(); renderThresholds(); }, pMap.length * 120 + 2000);
 }
 
 function renderRadar() {
@@ -678,8 +987,8 @@ function renderThresholds() {
     });
     panel.innerHTML = html;
 
-    setTimeout(() => updateChain(4), 600);
-    setTimeout(() => updateChain(5), 800);
+    setTimeout(() => updateChain(5), 600);
+    setTimeout(() => updateChain(6), 800);
     setTimeout(() => showSection('secB'), 1000);
     setTimeout(() => renderBinAndCmd(), 1300);
 }
@@ -737,7 +1046,7 @@ function renderBinAndCmd() {
         `;
     }, dims.length * 150 + 400);
 
-    setTimeout(() => updateChain(6), dims.length * 150 + 800);
+    setTimeout(() => updateChain(7), dims.length * 150 + 800);
     setTimeout(() => showSection('secLink'), dims.length * 150 + 1100);
 }
 
@@ -752,7 +1061,7 @@ function showSection(id) {
 
 function updateChain(step) {
     currentStep = step;
-    const steps = ['k','m','p','v','t','b','x'];
+    const steps = ['k','m','p','u','v','t','b','x'];
     document.querySelectorAll('.chain-node').forEach((node, i) => {
         node.classList.remove('active', 'done');
         if (i < step) node.classList.add('done');
