@@ -1492,6 +1492,8 @@
             .lab-card .lab-card-name { font-size:12px; font-weight:600; color:#f1f5f9; margin-bottom:6px; line-height:1.4; }
             .lab-card .lab-card-desc { font-size:10px; color:rgba(255,255,255,0.35); line-height:1.5; margin-bottom:10px; }
             .lab-card .lab-card-btn { display:inline-flex; align-items:center; gap:4px; font-size:11px; font-weight:500; padding:4px 10px; border-radius:6px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); color:rgba(255,255,255,0.5); transition:all 0.2s; }
+            .lab-card-tag { position:absolute; top:8px; right:8px; font-size:9px; font-weight:600; padding:2px 7px; border-radius:4px; background:rgba(34,211,238,0.12); color:#22d3ee; border:1px solid rgba(34,211,238,0.25); letter-spacing:0.3px; }
+            .lab-cat-guide { margin-top:8px; font-size:11px; color:rgba(34,211,238,0.65); line-height:1.6; padding:8px 12px; background:rgba(34,211,238,0.05); border-left:2px solid rgba(34,211,238,0.4); border-radius:0 6px 6px 0; }
             .lab-cat-cybernetics .lab-card:hover .lab-card-btn { background:rgba(34,211,238,0.15); border-color:rgba(34,211,238,0.3); color:#22d3ee; }
             .lab-cat-structural .lab-card:hover .lab-card-btn { background:rgba(251,191,36,0.15); border-color:rgba(251,191,36,0.3); color:#fbbf24; }
             .lab-cat-cognitive .lab-card:hover .lab-card-btn { background:rgba(167,139,250,0.15); border-color:rgba(167,139,250,0.3); color:#a78bfa; }
@@ -1556,17 +1558,20 @@
                         <span class="lab-cat-count">12项</span>
                         <span class="lab-cat-desc">负反馈 · PID · 阻尼 · 稳态</span>
                     </div>
+                    <div class="lab-cat-guide">
+                        推荐观看顺序：PID水温负反馈调节 → 弹簧阻尼振动对比 → 阻尼三类振动对照 → 执行器饱和限幅熔断。这四组实验构成从「偏差检测 → 阻尼响应 → 阻尼分类 → 极端保护」的完整控制链路，与 KMP→IPD→七维向量体系中的 D（阻尼）和 0.68 熔断阈值直接对应。
+                    </div>
                     <div class="lab-grid">
-                        <div class="lab-card" data-exp="exp-1"><div class="lab-card-icon">🌡️</div><div class="lab-card-name">PID 水温负反馈调节</div><div class="lab-card-desc">比例-积分-微分控制器将水温收敛至设定点</div><span class="lab-card-btn">▶ 进入演示</span></div>
-                        <div class="lab-card" data-exp="exp-2"><div class="lab-card-icon">🔩</div><div class="lab-card-name">弹簧阻尼振动对比</div><div class="lab-card-desc">质量-弹簧-阻尼系统的衰减振荡过程</div><span class="lab-card-btn">▶ 进入演示</span></div>
+                        <div class="lab-card" data-exp="exp-1"><div class="lab-card-tag">① 偏差检测</div><div class="lab-card-icon">🌡️</div><div class="lab-card-name">PID 水温负反馈调节</div><div class="lab-card-desc">比例-积分-微分控制器将水温收敛至设定点</div><span class="lab-card-btn">▶ 进入演示</span></div>
+                        <div class="lab-card" data-exp="exp-2"><div class="lab-card-tag">② 阻尼响应</div><div class="lab-card-icon">🔩</div><div class="lab-card-name">弹簧阻尼振动对比</div><div class="lab-card-desc">质量-弹簧-阻尼系统的衰减振荡过程</div><span class="lab-card-btn">▶ 进入演示</span></div>
+                        <div class="lab-card" data-exp="exp-7"><div class="lab-card-tag">③ 阻尼分类</div><div class="lab-card-icon">〰️</div><div class="lab-card-name">阻尼三类振动对照</div><div class="lab-card-desc">欠阻尼/临界阻尼/过阻尼对比实验</div><span class="lab-card-btn">▶ 进入演示</span></div>
+                        <div class="lab-card" data-exp="exp-10"><div class="lab-card-tag">④ 极端保护</div><div class="lab-card-icon">⚠️</div><div class="lab-card-name">执行器饱和限幅熔断</div><div class="lab-card-desc">输出触碰0.68阈值触发饱和保护</div><span class="lab-card-btn">▶ 进入演示</span></div>
                         <div class="lab-card" data-exp="exp-3"><div class="lab-card-icon">💧</div><div class="lab-card-name">蓄水池水位调度</div><div class="lab-card-desc">入流/出流动态平衡维持水位稳态</div><span class="lab-card-btn">▶ 进入演示</span></div>
                         <div class="lab-card" data-exp="exp-4"><div class="lab-card-icon">🚦</div><div class="lab-card-name">排队论系统负载限流</div><div class="lab-card-desc">队列长度 vs 服务容量的拥塞控制</div><span class="lab-card-btn">▶ 进入演示</span></div>
                         <div class="lab-card" data-exp="exp-5"><div class="lab-card-icon">🔗</div><div class="lab-card-name">双容水箱串级液位控制</div><div class="lab-card-desc">两个耦合水箱的串联液位调节</div><span class="lab-card-btn">▶ 进入演示</span></div>
                         <div class="lab-card" data-exp="exp-6"><div class="lab-card-icon">📈</div><div class="lab-card-name">二阶惯性滞后调节</div><div class="lab-card-desc">二阶系统阶跃响应的S型曲线</div><span class="lab-card-btn">▶ 进入演示</span></div>
-                        <div class="lab-card" data-exp="exp-7"><div class="lab-card-icon">〰️</div><div class="lab-card-name">阻尼三类振动对照</div><div class="lab-card-desc">欠阻尼/临界阻尼/过阻尼对比实验</div><span class="lab-card-btn">▶ 进入演示</span></div>
                         <div class="lab-card" data-exp="exp-8"><div class="lab-card-icon">🎯</div><div class="lab-card-name">前馈预判补偿控制</div><div class="lab-card-desc">已知扰动下的前馈补偿vs纯反馈</div><span class="lab-card-btn">▶ 进入演示</span></div>
                         <div class="lab-card" data-exp="exp-9"><div class="lab-card-icon">🔄</div><div class="lab-card-name">串级双闭环控制系统</div><div class="lab-card-desc">内环快速随动+外环精确调节</div><span class="lab-card-btn">▶ 进入演示</span></div>
-                        <div class="lab-card" data-exp="exp-10"><div class="lab-card-icon">⚠️</div><div class="lab-card-name">执行器饱和限幅熔断</div><div class="lab-card-desc">输出触碰0.68阈值触发饱和保护</div><span class="lab-card-btn">▶ 进入演示</span></div>
                         <div class="lab-card" data-exp="exp-11"><div class="lab-card-icon">🌊</div><div class="lab-card-name">外界扰动抑制对照</div><div class="lab-card-desc">突发扰动后系统恢复稳态过程</div><span class="lab-card-btn">▶ 进入演示</span></div>
                         <div class="lab-card" data-exp="exp-12"><div class="lab-card-icon">🎮</div><div class="lab-card-name">伺服随动稳态跟踪</div><div class="lab-card-desc">输出信号跟随目标轨迹变化</div><span class="lab-card-btn">▶ 进入演示</span></div>
                     </div>

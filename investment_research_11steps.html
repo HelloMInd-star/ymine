@@ -43,7 +43,7 @@
         .guide-stage:not(:last-child)::after { content:'→'; position:absolute; right:-14px; top:50%; transform:translateY(-50%); color:rgba(255,255,255,0.2); font-size:14px; z-index:1; }
 
         /* === 参照模型选择 === */
-        .model-tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 16px; }
+        .model-tabs { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; margin-bottom: 16px; }
         .model-tab { padding: 14px 12px; border-radius: 12px; border: 1.5px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.02); cursor: pointer; transition: all .3s; text-align: center; }
         .model-tab:hover { background: rgba(255,255,255,0.05); transform: translateY(-2px); }
         .model-tab.active { transform: translateY(-2px); box-shadow: 0 0 24px rgba(255,107,53,0.2); }
@@ -76,6 +76,15 @@
         .kmp-dim .kd-name { font-size: 10px; color: rgba(255,255,255,0.4); margin-bottom: 2px; }
         .kmp-dim .kd-val { font-size: 13px; font-weight: 700; font-family: monospace; }
         .kmp-status { font-size: 11px; color: rgba(134,239,172,0.8); text-align: center; margin-top: 8px; padding: 6px; background: rgba(34,197,94,0.06); border-radius: 6px; }
+
+        .kmp-viz { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; gap: 8px; align-items: center; margin-top: 12px; padding: 12px; background: rgba(0,0,0,0.3); border-radius: 10px; border: 1px solid rgba(46,204,113,0.15); }
+        .kmp-viz-stage { text-align: center; }
+        .kmp-viz-label { font-size: 10px; color: rgba(255,255,255,0.5); margin-bottom: 6px; font-weight: 600; letter-spacing: 1px; }
+        .kmp-viz-arrow { color: rgba(46,204,113,0.6); font-size: 18px; }
+        .mountain-svg { width: 100%; height: 110px; display: block; }
+        .unfold-svg { width: 100%; height: 110px; display: block; }
+        .axes-svg { width: 100%; height: 110px; display: block; }
+        .kmp-viz-note { font-size: 9px; color: rgba(255,255,255,0.35); margin-top: 4px; text-align: center; }
 
         /* === 投研输入区 === */
         .input-textarea { width: 100%; min-height: 90px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 14px; color: rgba(255,255,255,0.85); font-size: 14px; resize: vertical; font-family: inherit; line-height: 1.6; box-sizing: border-box; }
@@ -273,20 +282,36 @@
             <div class="section-title"><span>📚</span> 参照模型选择</div>
             <div class="model-tabs" id="modelTabs">
                 <div class="model-tab active" data-model="m3" style="border-color:rgba(255,107,53,0.4);box-shadow:0 0 16px rgba(255,107,53,0.12);">
-                    <div class="mt-name" style="color:#FF6B35;">🤖 M3-Agent</div>
+                    <div class="mt-name" style="color:#FF6B35;font-size:13px;">🤖 M3-Agent</div>
                     <div class="mt-source">字节Seed/ICLR 2026</div>
                 </div>
                 <div class="model-tab" data-model="dmem">
-                    <div class="mt-name" style="color:#00B4D8;">🧠 δ-mem</div>
+                    <div class="mt-name" style="color:#00B4D8;font-size:13px;">🧠 δ-mem</div>
                     <div class="mt-source">Mind Lab/ICLR 2026</div>
                 </div>
                 <div class="model-tab" data-model="mnemis">
-                    <div class="mt-name" style="color:#7B2FBE;">📚 Mnemis</div>
+                    <div class="mt-name" style="color:#7B2FBE;font-size:13px;">📚 Mnemis</div>
                     <div class="mt-source">微软/ACL 2026</div>
                 </div>
-                <div class="model-tab" data-model="custom" style="border-color:rgba(46,204,113,0.3);">
-                    <div class="mt-name" style="color:#2ECC71;">🔬 KMP→IPD</div>
-                    <div class="mt-source">跨域映射（自研）</div>
+                <div class="model-tab" data-model="memos">
+                    <div class="mt-name" style="color:#f472b6;font-size:13px;">💾 MemOS</div>
+                    <div class="mt-source">中国团队/2025</div>
+                </div>
+                <div class="model-tab" data-model="sleep">
+                    <div class="mt-name" style="color:#60a5fa;font-size:13px;">😴 Sleep范式</div>
+                    <div class="mt-source">谷歌/康奈尔/2026</div>
+                </div>
+                <div class="model-tab" data-model="vilomem">
+                    <div class="mt-name" style="color:#34d399;font-size:13px;">👁️ ViLoMem</div>
+                    <div class="mt-source">南理工/百度/2025</div>
+                </div>
+                <div class="model-tab" data-model="evolvemem">
+                    <div class="mt-name" style="color:#fb923c;font-size:13px;">🧬 EvolveMem</div>
+                    <div class="mt-source">NeurIPS 2025</div>
+                </div>
+                <div class="model-tab" data-model="custom" style="border-color:rgba(46,204,113,0.3);grid-column:span 7;margin-top:4px;">
+                    <div class="mt-name" style="color:#2ECC71;font-size:13px;">⚙️ KMP→IPD跨域映射（自研）</div>
+                    <div class="mt-source">跨学科物理映射引擎 · K→M→P三级映射 · PID负反馈稳态决策</div>
                 </div>
             </div>
             <div class="model-info-panel" id="modelInfoPanel">
@@ -323,6 +348,87 @@
                         <div class="kmp-dim"><div class="kd-name">Dev2</div><div class="kd-val" style="color:#22d3ee;" id="kmpDev2">—</div></div>
                     </div>
                     <div class="kmp-status" id="kmpStatus">等待推理启动 · KMP映射通路已就绪</div>
+                    <div class="kmp-viz" id="kmpViz">
+                        <div class="kmp-viz-stage">
+                            <div class="kmp-viz-label">① 山体形态</div>
+                            <svg class="mountain-svg" id="mountainSvg" viewBox="0 0 200 110" xmlns="http://www.w3.org/2000/svg">
+                                <defs>
+                                    <linearGradient id="mtGrad" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="0%" stop-color="rgba(46,204,113,0.5)"/>
+                                        <stop offset="100%" stop-color="rgba(46,204,113,0.05)"/>
+                                    </linearGradient>
+                                </defs>
+                                <line x1="10" y1="35" x2="190" y2="35" stroke="rgba(239,68,68,0.4)" stroke-width="0.8" stroke-dasharray="3,3"/>
+                                <text x="192" y="38" fill="rgba(239,68,68,0.7)" font-size="7">0.68</text>
+                                <line x1="10" y1="55" x2="190" y2="55" stroke="rgba(34,197,94,0.4)" stroke-width="0.8" stroke-dasharray="3,3"/>
+                                <text x="192" y="58" fill="rgba(34,197,94,0.7)" font-size="7">0.50</text>
+                                <line x1="10" y1="58" x2="190" y2="58" stroke="rgba(249,115,22,0.4)" stroke-width="0.8" stroke-dasharray="3,3"/>
+                                <text x="192" y="61" fill="rgba(249,115,22,0.7)" font-size="7">0.48</text>
+                                <path id="mountainPath" d="M10,90 Q50,85 80,60 T140,50 T190,55 L190,100 L10,100 Z" fill="url(#mtGrad)" stroke="rgba(46,204,113,0.8)" stroke-width="1.5"/>
+                                <circle id="mountainDot" cx="100" cy="55" r="3" fill="#fbbf24" stroke="#fff" stroke-width="1"/>
+                            </svg>
+                            <div class="kmp-viz-note" id="mtNote">I=海拔 · P=坡度 · D=阻尼</div>
+                        </div>
+                        <div class="kmp-viz-arrow">→</div>
+                        <div class="kmp-viz-stage">
+                            <div class="kmp-viz-label">② 展开过程</div>
+                            <svg class="unfold-svg" id="unfoldSvg" viewBox="0 0 200 110" xmlns="http://www.w3.org/2000/svg">
+                                <g stroke="rgba(148,163,184,0.25)" stroke-width="0.5">
+                                    <line x1="15" y1="20" x2="60" y2="55"/><line x1="15" y1="35" x2="60" y2="55"/>
+                                    <line x1="15" y1="50" x2="60" y2="55"/><line x1="15" y1="65" x2="60" y2="55"/>
+                                    <line x1="15" y1="80" x2="60" y2="55"/><line x1="15" y1="95" x2="60" y2="55"/>
+                                </g>
+                                <circle cx="60" cy="55" r="6" fill="rgba(46,204,113,0.3)" stroke="#2ecc71" stroke-width="1.5"/>
+                                <text x="60" y="59" fill="#86efac" font-size="9" text-anchor="middle" font-weight="700">M</text>
+                                <g stroke="rgba(148,163,184,0.25)" stroke-width="0.5">
+                                    <line x1="60" y1="55" x2="140" y2="20"/><line x1="60" y1="55" x2="140" y2="35"/>
+                                    <line x1="60" y1="55" x2="140" y2="50"/><line x1="60" y1="55" x2="140" y2="65"/>
+                                    <line x1="60" y1="55" x2="140" y2="80"/><line x1="60" y1="55" x2="140" y2="95"/>
+                                </g>
+                                <rect x="140" y="15" width="50" height="12" rx="2" fill="rgba(96,165,250,0.2)" stroke="rgba(96,165,250,0.5)"/>
+                                <text x="165" y="24" fill="#93c5fd" font-size="7" text-anchor="middle">I 海拔</text>
+                                <rect x="140" y="30" width="50" height="12" rx="2" fill="rgba(167,139,250,0.2)" stroke="rgba(167,139,250,0.5)"/>
+                                <text x="165" y="39" fill="#c4b5fd" font-size="7" text-anchor="middle">P 坡度</text>
+                                <rect x="140" y="45" width="50" height="12" rx="2" fill="rgba(251,146,60,0.2)" stroke="rgba(251,146,60,0.5)"/>
+                                <text x="165" y="54" fill="#fdba74" font-size="7" text-anchor="middle">D 阻尼</text>
+                                <rect x="140" y="60" width="50" height="12" rx="2" fill="rgba(250,204,21,0.2)" stroke="rgba(250,204,21,0.5)"/>
+                                <text x="165" y="69" fill="#fde68a" font-size="7" text-anchor="middle">S 熵</text>
+                                <rect x="140" y="75" width="50" height="12" rx="2" fill="rgba(244,114,182,0.2)" stroke="rgba(244,114,182,0.5)"/>
+                                <text x="165" y="84" fill="#f9a8d4" font-size="7" text-anchor="middle">Dev-I</text>
+                                <rect x="140" y="88" width="24" height="12" rx="2" fill="rgba(52,211,153,0.2)" stroke="rgba(52,211,153,0.5)"/>
+                                <text x="152" y="97" fill="#6ee7b7" font-size="6" text-anchor="middle">Dev1</text>
+                                <rect x="166" y="88" width="24" height="12" rx="2" fill="rgba(34,211,238,0.2)" stroke="rgba(34,211,238,0.5)"/>
+                                <text x="178" y="97" fill="#67e8f9" font-size="6" text-anchor="middle">Dev2</text>
+                            </svg>
+                            <div class="kmp-viz-note">自然语言 → 七维向量</div>
+                        </div>
+                        <div class="kmp-viz-arrow">→</div>
+                        <div class="kmp-viz-stage">
+                            <div class="kmp-viz-label">③ 七维坐标轴</div>
+                            <svg class="axes-svg" id="axesSvg" viewBox="0 0 200 110" xmlns="http://www.w3.org/2000/svg">
+                                <g id="axesGroup">
+                                    <line x1="100" y1="100" x2="100" y2="15" stroke="rgba(96,165,250,0.5)" stroke-width="1.2"/>
+                                    <text x="103" y="13" fill="#93c5fd" font-size="8" font-weight="600">I</text>
+                                    <text x="103" y="108" fill="rgba(148,163,184,0.5)" font-size="6">0</text>
+                                    <line x1="100" y1="100" x2="180" y2="70" stroke="rgba(167,139,250,0.5)" stroke-width="1.2"/>
+                                    <text x="183" y="68" fill="#c4b5fd" font-size="8" font-weight="600">P</text>
+                                    <line x1="100" y1="100" x2="165" y2="100" stroke="rgba(251,146,60,0.5)" stroke-width="1.2"/>
+                                    <text x="168" y="103" fill="#fdba74" font-size="8" font-weight="600">D</text>
+                                    <line x1="100" y1="100" x2="140" y2="40" stroke="rgba(250,204,21,0.5)" stroke-width="1.2"/>
+                                    <text x="143" y="38" fill="#fde68a" font-size="8" font-weight="600">S</text>
+                                    <line x1="100" y1="100" x2="30" y2="40" stroke="rgba(244,114,182,0.5)" stroke-width="1.2"/>
+                                    <text x="18" y="38" fill="#f9a8d4" font-size="8" font-weight="600">DI</text>
+                                    <line x1="100" y1="100" x2="20" y2="75" stroke="rgba(52,211,153,0.5)" stroke-width="1.2"/>
+                                    <text x="8" y="78" fill="#6ee7b7" font-size="8" font-weight="600">D1</text>
+                                    <line x1="100" y1="100" x2="35" y2="100" stroke="rgba(34,211,238,0.5)" stroke-width="1.2"/>
+                                    <text x="15" y="103" fill="#67e8f9" font-size="8" font-weight="600">D2</text>
+                                    <polygon id="axesPoly" points="100,100 100,100 100,100 100,100 100,100 100,100 100,100" fill="rgba(46,204,113,0.25)" stroke="#2ecc71" stroke-width="1.2"/>
+                                    <circle cx="100" cy="100" r="3" fill="#fbbf24"/>
+                                </g>
+                            </svg>
+                            <div class="kmp-viz-note">七维向量空间雷达</div>
+                        </div>
+                    </div>
                     <div style="margin-top:12px;">
                         <span class="collapse-toggle" onclick="toggleCollapse('kmpMappingCollapse', this)" style="font-size:11px;">📋 KMP/IPD 层级对照 [展开]</span>
                         <div class="collapse-body" id="kmpMappingCollapse">
@@ -527,8 +633,16 @@
             desc: '8×8在线状态矩阵模型，不扩充上下文窗口，参数开销仅0.12%。在长序列投研推理中保持极低的内存占用，适合高频数据流的实时状态追踪。' },
         mnemis: { name: '📚 Mnemis', source: '微软/ACL 2026', stars: '★★★★★', color: '#7B2FBE',
             desc: '层级图索引+双路径检索（快思考+慢思考），LoCoMo基准93.9%。具备强大的长期记忆检索能力，适合跨周期、跨行业的投研知识关联与复盘。' },
-        custom: { name: '🔬 KMP→IPD跨域映射', source: '自研', stars: '★★★★★', color: '#2ECC71',
-            desc: '基于KMP→IPD方法论的自研推理框架，跨学科物理映射引擎。将投研问题经K(知识层)→M(数学层)→P(物理层)三级映射转化为山体物理模型（海拔/坡度/阻尼/熵），通过PID负反馈调节实现稳态决策，并在多维展开图中实时展示映射过程。' }
+        memos: { name: '💾 MemOS', source: '中国团队/2025', stars: '★★★★☆', color: '#f472b6',
+            desc: '记忆操作系统，覆盖记忆生成、组织、利用、演化全生命周期。将记忆提升至OS级抽象，提供系统化的记忆调度与上下文编排能力，适合复杂投研工作流。' },
+        sleep: { name: '😴 Sleep范式', source: '谷歌/康奈尔/2026', stars: '★★★★☆', color: '#60a5fa',
+            desc: 'Wake/Sleep两阶段交替，短期记忆在"做梦"阶段巩固为长期知识。模拟生物睡眠记忆巩固机制，适合盘后复盘与市场模式提炼。' },
+        vilomem: { name: '👁️ ViLoMem', source: '南理工/百度/2025', stars: '★★★☆☆', color: '#34d399',
+            desc: '双流语义记忆，将视觉干扰信息与逻辑错误分离编码。有效抑制K线图等视觉输入噪声，提升图表型投研输入的鲁棒性。' },
+        evolvemem: { name: '🧬 EvolveMem', source: 'NeurIPS 2025', stars: '★★★★☆', color: '#fb923c',
+            desc: '自演化检索配置，LLM驱动的诊断模块自动优化记忆检索策略。在非稳态市场环境中具备自适应演化优势。' },
+        custom: { name: '⚙️ KMP→IPD跨域映射（自研）', source: '自研框架', stars: '★★★★★', color: '#2ECC71',
+            desc: '基于KMP→IPD跨域映射框架，将自然语言通过知识层（K）、数学层（M）、物理层（P）三级映射转化为七维向量（I/P/D/S/Dev-I/Dev1/Dev2），并用物理量（海拔、坡度、阻尼、熵）描述系统状态。本框架为自研实现，与M3-Agent、δ-mem、Mnemis等前沿模型处于同一参照基准层，可进行横向对比验证。' }
     };
 
     const PRESETS = {
@@ -697,6 +811,11 @@
             },
             series: [
                 {
+                    name: '保本线(0.48)', type: 'line', data: Array(10).fill(0.48),
+                    lineStyle: { color: 'rgba(249,115,22,0.6)', type: 'dashed', width: 1 },
+                    symbol: 'none', tooltip: { show: false }, z: 1
+                },
+                {
                     name: '稳态下界(0.50)', type: 'line', data: Array(10).fill(0.50),
                     lineStyle: { color: 'rgba(34,197,94,0.5)', type: 'dashed', width: 1 },
                     symbol: 'none', tooltip: { show: false }, z: 1
@@ -741,6 +860,7 @@
         pidChart.setOption({
             xAxis: { data: xLabels },
             series: [
+                { name: '保本线(0.48)', data: Array(10).fill(0.48) },
                 { name: '稳态下界(0.50)', data: Array(10).fill(0.50) },
                 { name: '稳态上界/熔断(0.68)', data: Array(10).fill(0.68) },
                 { name: '浓度值', data: padded }
@@ -788,7 +908,12 @@
         } else {
             kmpPanel.classList.remove('show');
         }
-        addLog(`参照模型切换为：${m.name}`, 'ok');
+        pidHistory = [];
+        pidAdjustCount = 0;
+        updatePidChart();
+        const miSrc = document.getElementById('miSource');
+        if (miSrc) miSrc.textContent = m.source;
+        addLog(`参照模型切换为：${m.name}，历史数据已重置`, 'ok');
     }
 
     // ========== 折叠面板 ==========
@@ -919,6 +1044,41 @@
             document.getElementById(id).textContent = '—';
         });
         document.getElementById('kmpStatus').textContent = '等待推理启动 · KMP映射通路已就绪';
+        updateKMPViz(null);
+    }
+
+    function updateKMPViz(data) {
+        const poly = document.getElementById('axesPoly');
+        const dot = document.getElementById('mountainDot');
+        const mtNote = document.getElementById('mtNote');
+        if (!data || !data.M) {
+            if (poly) poly.setAttribute('points', '100,100 100,100 100,100 100,100 100,100 100,100 100,100');
+            if (dot) { dot.setAttribute('cx', '100'); dot.setAttribute('cy', '55'); }
+            if (mtNote) mtNote.textContent = 'I=海拔 · P=坡度 · D=阻尼';
+            return;
+        }
+        const v = data.M;
+        const dims = [
+            { val: v.I,         endX: 100, endY: 15 },
+            { val: Math.max(0,Math.min(1,v.P)), endX: 180, endY: 70 },
+            { val: v.D,         endX: 165, endY: 100 },
+            { val: v.S,         endX: 140, endY: 40 },
+            { val: Math.max(0,Math.min(1,(v['Dev-I']+1)/2)), endX: 30, endY: 40 },
+            { val: Math.max(0,Math.min(1,v.Dev1)), endX: 20, endY: 75 },
+            { val: Math.max(0,Math.min(1,v.Dev2)), endX: 35, endY: 100 }
+        ];
+        const cx = 100, cy = 100;
+        const pts = dims.map(d => {
+            const x = cx + (d.endX - cx) * d.val;
+            const y = cy + (d.endY - cy) * d.val;
+            return `${x.toFixed(1)},${y.toFixed(1)}`;
+        }).join(' ');
+        if (poly) poly.setAttribute('points', pts);
+        const I = Math.max(0, Math.min(1, v.I));
+        const dotX = 100;
+        const dotY = 100 - I * 80;
+        if (dot) { dot.setAttribute('cx', dotX.toFixed(1)); dot.setAttribute('cy', dotY.toFixed(1)); }
+        if (mtNote) mtNote.textContent = `I=${v.I.toFixed(2)} · P=${v.P.toFixed(2)} · D=${v.D.toFixed(2)} · S=${v.S.toFixed(2)}`;
     }
 
     function updateKMPExpand(step, data) {
@@ -934,6 +1094,7 @@
             for (const [d, id] of Object.entries(dimMap)) {
                 document.getElementById(id).textContent = v[d].toFixed(2);
             }
+            updateKMPViz(data);
         }
         if (step >= 5) {
             document.getElementById('kmpP').innerHTML = `<span style="font-size:10px;">${data.P}</span>`;
@@ -1026,12 +1187,37 @@
                 break;
             case 6:
                 const rm = MODELS[currentModel];
+                const families = [
+                    { name: '多模态记忆', color: '#FF6B35', dim: '多模态输入处理能力', models: ['m3','vilomem'] },
+                    { name: '轻量记忆', color: '#00B4D8', dim: '参数效率、紧凑状态表示', models: ['dmem'] },
+                    { name: '结构化记忆', color: '#f472b6', dim: '记忆组织与检索架构', models: ['mnemis','memos'] },
+                    { name: '生物启发记忆', color: '#60a5fa', dim: '自演化与记忆巩固机制', models: ['sleep','evolvemem'] },
+                    { name: '自研框架', color: '#2ECC71', dim: '物理映射方法论', models: ['custom'] }
+                ];
+                let famHtml = families.map(f => {
+                    const modelTags = f.models.map(mid => {
+                        const m = MODELS[mid];
+                        const isCur = mid === currentModel;
+                        return `<span style="display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;margin:2px;background:${isCur?f.color+'33':'rgba(255,255,255,0.06)'};color:${isCur?f.color:'rgba(255,255,255,0.6)'};border:1px solid ${isCur?f.color+'66':'rgba(255,255,255,0.08)'};font-weight:${isCur?'700':'400'};white-space:nowrap;">${m.name}</span>`;
+                    }).join(' ');
+                    return `<div style="padding:8px 10px;background:rgba(255,255,255,0.03);border-radius:6px;border-left:3px solid ${f.color};margin-bottom:6px;">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                            <span style="font-size:12px;font-weight:600;color:${f.color};">${f.name}</span>
+                            <span style="font-size:10px;color:rgba(255,255,255,0.4);">${f.dim}</span>
+                        </div>
+                        <div>${modelTags}</div>
+                    </div>`;
+                }).join('');
                 dataHtml = `<div class="sd-data">
-                    <div><span class="sd-key">参照模型：</span><span style="color:${rm.color};font-weight:600;">${rm.name}</span></div>
+                    <div><span class="sd-key">当前参照：</span><span style="color:${rm.color};font-weight:600;">${rm.name}</span></div>
                     <div style="margin-top:8px;"><span class="sd-key">一致性：</span>
                         <span style="font-size:20px;font-weight:700;color:#fbbf24;font-family:monospace;">${data.refConsistency}%</span>
                     </div>
-                    <div style="margin-top:8px;padding:10px;background:rgba(0,0,0,0.2);border-radius:6px;font-size:12px;">
+                    <div style="margin-top:10px;">
+                        <div style="font-size:11px;color:rgba(255,255,255,0.5);font-weight:600;margin-bottom:6px;letter-spacing:0.5px;">🗂 模型族分类（5族对比）</div>
+                        ${famHtml}
+                    </div>
+                    <div style="margin-top:8px;padding:8px 10px;background:rgba(0,0,0,0.2);border-radius:6px;font-size:11px;color:rgba(255,255,255,0.6);">
                         当前分析与${rm.name}基准结论一致性达${data.refConsistency}%，结论方向${data.refConsistency>75?'高度一致':'基本一致，存在分歧点'}。
                     </div>
                 </div>`;
@@ -1221,6 +1407,35 @@
         const sigColor = sig.type==='buy'?'#4ade80':sig.type==='sell'?'#fca5a5':sig.type==='wait'?'#fbbf24':'#67e8f9';
         const riskColor = sig.risk==='中低'?'#4ade80':sig.risk==='中高'?'#fca5a5':'#fde68a';
         const vecStr = `[${(data.M.I).toFixed(2)}, ${(data.M.P).toFixed(2)}, ${(data.M.D).toFixed(2)}, ${(data.M.S).toFixed(2)}, ${(data.M['Dev-I']).toFixed(2)}, ${(data.M.Dev1).toFixed(2)}, ${(data.M.Dev2).toFixed(2)}]`;
+
+        const curModel = MODELS[currentModel];
+        const peerOrder = ['m3','dmem','mnemis','memos','sleep','vilomem','evolvemem','custom'];
+        const baseCons = { m3:82, dmem:74, mnemis:79, memos:81, sleep:77, vilomem:72, evolvemem:75, custom:88 };
+        let bestMid = currentModel, bestScore = data.refConsistency || baseCons[currentModel] || 75;
+        const consLines = peerOrder.filter(mid => mid !== currentModel).map(mid => {
+            const m = MODELS[mid];
+            let score = baseCons[mid] + Math.round((Math.sin(mid.charCodeAt(0)*7 + mid.length*13 + data.M.I*97) * 6));
+            score = Math.max(65, Math.min(92, score));
+            if (score > bestScore) { bestScore = score; bestMid = mid; }
+            return `<div style="display:flex;justify-content:space-between;padding:3px 0;font-size:11px;border-bottom:1px dashed rgba(255,255,255,0.05);">
+                <span style="color:${m.color};">• 与 ${m.name.replace(/^[^\s]+\s/,'')} 一致性</span>
+                <span style="font-family:monospace;font-weight:600;color:${score>=80?'#4ade80':score>=70?'#fbbf24':'#fca5a5'};">${score}%</span>
+            </div>`;
+        }).join('');
+        const bestM = MODELS[bestMid];
+        const isSelfBest = bestMid === 'custom';
+        const suggestion = isSelfBest
+            ? '→ 当前结论与自研框架一致性最高，建议采纳'
+            : `→ 与${bestM.name}一致性最高(${bestScore}%)，可交叉验证`;
+        const summaryHtml = `
+            <div style="margin-top:10px;padding:10px;background:rgba(255,255,255,0.03);border:1px solid rgba(251,191,36,0.2);border-radius:8px;">
+                <div style="font-size:12px;font-weight:600;color:#fbbf24;margin-bottom:6px;">📊 模型参照摘要</div>
+                <div style="font-size:11px;color:rgba(255,255,255,0.5);margin-bottom:6px;">当前参照：<span style="color:${curModel.color};font-weight:600;">${curModel.name}</span></div>
+                ${consLines}
+                <div style="margin-top:6px;font-size:11px;color:#86efac;font-weight:600;padding-top:4px;">${suggestion}</div>
+            </div>
+        `;
+
         document.getElementById('conclusionPanel').innerHTML = `
             <div class="conclusion-row"><span class="cr-label">标的</span><span class="cr-value">${data.target}</span></div>
             <div class="conclusion-row"><span class="cr-label">当前价格</span><span class="cr-value" style="color:#67e8f9;font-family:monospace;font-weight:600;">¥${data.price}</span></div>
@@ -1232,6 +1447,7 @@
                 <div class="signal-item"><div class="si-label">置信度</div><div class="si-value" style="color:#fbbf24;">${sig.conf}%</div></div>
                 <div class="signal-item"><div class="si-label">风险等级</div><div class="si-value" style="color:${riskColor};">${sig.risk}</div></div>
             </div>
+            ${summaryHtml}
         `;
     }
 

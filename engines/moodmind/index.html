@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="../../assets/css/base.css">
     <script src="../../assets/js/bus.js"></script>
     <script src="../../models/common/normalizer.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
     <style>
         /* ===== 面包屑样式 ===== */
         .breadcrumb {
@@ -168,6 +169,70 @@
 
         .mapping-intro .intro-flow .node .n-status.locked {
             color: rgba(255, 255, 255, 0.15);
+        }
+
+        /* ===== 系统运行链路引导区 ===== */
+        .methodology-guide {
+            background: linear-gradient(135deg, rgba(167,139,250,0.06), rgba(96,165,250,0.03));
+            border: 1px solid rgba(167,139,250,0.2);
+            border-radius: 16px;
+            padding: 22px 26px;
+            margin-bottom: 28px;
+            opacity: 0;
+            animation: fadeInUp 0.6s ease 0.1s forwards;
+        }
+        .mg-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #c4b5fd;
+            margin-bottom: 4px;
+            text-align: center;
+        }
+        .mg-sub {
+            font-size: 12px;
+            color: rgba(255,255,255,0.35);
+            text-align: center;
+            margin-bottom: 18px;
+            letter-spacing: 1px;
+        }
+        .mg-flow {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr auto 1fr;
+            gap: 10px;
+            align-items: stretch;
+            margin-bottom: 14px;
+        }
+        .mg-card {
+            background: rgba(0,0,0,0.25);
+            border-radius: 12px;
+            padding: 14px 12px;
+            border: 1px solid rgba(255,255,255,0.06);
+            text-align: center;
+        }
+        .mg-card.k { border-color: rgba(96,165,250,0.3); }
+        .mg-card.m { border-color: rgba(167,139,250,0.3); }
+        .mg-card.p { border-color: rgba(251,146,60,0.3); }
+        .mg-card-num { font-size: 11px; color: rgba(255,255,255,0.4); margin-bottom: 4px; }
+        .mg-card-title { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+        .mg-card.k .mg-card-title { color: #93c5fd; }
+        .mg-card.m .mg-card-title { color: #c4b5fd; }
+        .mg-card.p .mg-card-title { color: #fdba74; }
+        .mg-card-desc { font-size: 11px; color: rgba(255,255,255,0.55); line-height: 1.5; margin-bottom: 6px; }
+        .mg-card-chain { font-size: 10px; color: rgba(255,255,255,0.3); font-family: monospace; }
+        .mg-arrow { display: flex; align-items: center; justify-content: center; color: rgba(167,139,250,0.5); font-size: 22px; font-weight: 300; }
+        .mg-note {
+            background: rgba(0,0,0,0.2);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font-size: 12px;
+            color: rgba(255,255,255,0.6);
+            line-height: 1.7;
+            border-left: 3px solid rgba(167,139,250,0.5);
+        }
+        .mg-note strong { color: #c4b5fd; font-weight: 600; }
+        @media (max-width: 768px) {
+            .mg-flow { grid-template-columns: 1fr; gap: 8px; }
+            .mg-arrow { transform: rotate(90deg); }
         }
 
         /* ===== 通用板块 ===== */
@@ -849,10 +914,128 @@
             line-height: 1.6;
             text-align: center;
         }
+
+        /* ===== A/B对照实验面板 ===== */
+        .ab-panel {
+            background: linear-gradient(135deg, rgba(96,165,250,0.05), rgba(167,139,250,0.04));
+            border: 1px solid rgba(96,165,250,0.2);
+            border-radius: 16px;
+            padding: 24px 26px;
+            margin-bottom: 24px;
+        }
+        .ab-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #93c5fd;
+            margin-bottom: 4px;
+        }
+        .ab-sub {
+            font-size: 12px;
+            color: rgba(255,255,255,0.4);
+            margin-bottom: 18px;
+        }
+        .ab-select-row {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 12px;
+            align-items: center;
+            margin-bottom: 18px;
+        }
+        .ab-select {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: #e2e8f0;
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: 13px;
+            width: 100%;
+            font-family: inherit;
+            cursor: pointer;
+        }
+        .ab-select:focus { outline: none; border-color: rgba(96,165,250,0.5); }
+        .ab-vs {
+            font-size: 18px; font-weight: 700; color: #fbbf24;
+            background: rgba(251,191,36,0.1);
+            border-radius: 50%; width: 40px; height: 40px;
+            display: flex; align-items: center; justify-content: center;
+            border: 2px solid rgba(251,191,36,0.3);
+        }
+        .ab-compare-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-bottom: 14px;
+        }
+        .ab-blogger-card {
+            background: rgba(0,0,0,0.3);
+            border-radius: 12px;
+            padding: 14px 16px;
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+        .ab-blogger-card.a { border-color: rgba(96,165,250,0.3); }
+        .ab-blogger-card.b { border-color: rgba(244,114,182,0.3); }
+        .ab-bc-name { font-size: 15px; font-weight: 700; margin-bottom: 10px; }
+        .ab-blogger-card.a .ab-bc-name { color: #93c5fd; }
+        .ab-blogger-card.b .ab-bc-name { color: #f9a8d4; }
+        .ab-bc-row { display: flex; justify-content: space-between; font-size: 12px; padding: 3px 0; border-bottom: 1px dashed rgba(255,255,255,0.05); }
+        .ab-bc-row .k { color: rgba(255,255,255,0.4); }
+        .ab-bc-row .v { font-family: monospace; font-weight: 600; }
+        .ab-conclusion {
+            background: rgba(74,222,128,0.06);
+            border-left: 3px solid rgba(74,222,128,0.5);
+            border-radius: 0 8px 8px 0;
+            padding: 12px 16px;
+            font-size: 13px;
+            color: rgba(255,255,255,0.75);
+            line-height: 1.7;
+        }
+        .ab-conclusion strong { color: #86efac; }
+
+        /* ===== 博主资产走势图 ===== */
+        .trend-panel {
+            background: linear-gradient(135deg, rgba(52,211,153,0.04), rgba(96,165,250,0.03));
+            border: 1px solid rgba(52,211,153,0.18);
+            border-radius: 16px;
+            padding: 24px 26px;
+            margin-bottom: 24px;
+        }
+        .trend-title { font-size: 18px; font-weight: 700; color: #6ee7b7; margin-bottom: 4px; }
+        .trend-sub { font-size: 12px; color: rgba(255,255,255,0.4); margin-bottom: 14px; }
+        .trend-chart { width: 100%; height: 320px; }
+        .trend-note { font-size: 11px; color: rgba(255,255,255,0.3); text-align: center; margin-top: 8px; font-style: italic; }
+
+        /* ===== 导出按钮区 ===== */
+        .export-bar {
+            text-align: center;
+            padding: 20px 0 8px;
+        }
+        .btn-export {
+            display: inline-block;
+            padding: 12px 32px;
+            background: linear-gradient(135deg, rgba(167,139,250,0.2), rgba(96,165,250,0.15));
+            border: 1.5px solid rgba(167,139,250,0.5);
+            color: #c4b5fd;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all .3s;
+        }
+        .btn-export:hover {
+            background: linear-gradient(135deg, rgba(167,139,250,0.35), rgba(96,165,250,0.25));
+            border-color: rgba(167,139,250,0.8);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(167,139,250,0.25);
+        }
+
         @media (max-width: 700px) {
             .bs-form-grid { grid-template-columns: 1fr; }
             .bs-result-grid { grid-template-columns: 1fr 1fr; }
             .blogger-sim { padding: 18px 14px; }
+            .ab-compare-grid { grid-template-columns: 1fr; }
+            .ab-select-row { grid-template-columns: 1fr; }
+            .ab-vs { margin: 0 auto; }
         }
 
         .bus-panel {
@@ -969,6 +1152,37 @@
                 <a href="../../index.html" style="display:inline-block;padding:12px 28px;background:rgba(192,132,252,0.1);border:1.5px solid rgba(192,132,252,0.3);color:#d8b4fe;border-radius:12px;text-decoration:none;font-weight:600;font-size:14px;transition:all 0.3s;" onmouseover="this.style.background='rgba(192,132,252,0.2)';this.style.borderColor='rgba(192,132,252,0.5)';this.style.transform='translateY(-2px)'" onmouseout="this.style.background='rgba(192,132,252,0.1)';this.style.borderColor='rgba(192,132,252,0.3)';this.style.transform='translateY(0)'">🏛️ 返回 Y.Mine 总控台</a>
                 <a href="/moodmind/" style="display:inline-block;padding:12px 28px;background:linear-gradient(135deg,rgba(168,85,247,0.25),rgba(124,58,237,0.15));border:1.5px solid rgba(192,132,252,0.6);color:#e9d5ff;border-radius:12px;text-decoration:none;font-weight:600;font-size:14px;transition:all 0.3s;" onmouseover="this.style.background='linear-gradient(135deg,rgba(168,85,247,0.4),rgba(124,58,237,0.25))';this.style.borderColor='rgba(192,132,252,0.9)';this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 24px rgba(168,85,247,0.25)'" onmouseout="this.style.background='linear-gradient(135deg,rgba(168,85,247,0.25),rgba(124,58,237,0.15))';this.style.borderColor='rgba(192,132,252,0.6)';this.style.transform='translateY(0)';this.style.boxShadow='none'">📈 进入 MoodMind 金融向量实验室 →</a>
                 <a href="http://localhost:8510" target="_blank" style="display:inline-block;padding:12px 28px;background:rgba(255,255,255,0.04);border:1.5px solid rgba(255,255,255,0.12);color:rgba(255,255,255,0.7);border-radius:12px;text-decoration:none;font-weight:500;font-size:14px;transition:all 0.3s;" onmouseover="this.style.background='rgba(255,255,255,0.08)';this.style.borderColor='rgba(255,255,255,0.25)';this.style.color='#fff'" onmouseout="this.style.background='rgba(255,255,255,0.04)';this.style.borderColor='rgba(255,255,255,0.12)';this.style.color='rgba(255,255,255,0.7)'">📊 数据大盘 (8510)</a>
+            </div>
+        </div>
+
+        <!-- ===== 系统运行链路引导 ===== -->
+        <div class="methodology-guide">
+            <div class="mg-title">📐 系统运行链路引导</div>
+            <div class="mg-sub">方法论映射 · 与主线关联</div>
+            <div class="mg-flow">
+                <div class="mg-card k">
+                    <div class="mg-card-num">①</div>
+                    <div class="mg-card-title">前景理论校正</div>
+                    <div class="mg-card-desc">以系统 0.5 稳态中轴线替代决策者私人沉没成本心理参照点，消除收益/损失框架带来的主观风险偏好偏移</div>
+                    <div class="mg-card-chain">K层 → I（海拔）</div>
+                </div>
+                <div class="mg-arrow">→</div>
+                <div class="mg-card m">
+                    <div class="mg-card-num">②</div>
+                    <div class="mg-card-title">四维量化映射</div>
+                    <div class="mg-card-desc">将流量盘、人设盘、变现盘、风险盘加权计算，输出 α 值（余弦相似度）</div>
+                    <div class="mg-card-chain">M层 → P层 → 七维向量</div>
+                </div>
+                <div class="mg-arrow">→</div>
+                <div class="mg-card p">
+                    <div class="mg-card-num">③</div>
+                    <div class="mg-card-title">博弈决策与盘活</div>
+                    <div class="mg-card-desc">红蓝海博弈定性（古诺/蜈蚣）→ 凯利配比 → 存量盘活 → 配置方案 → α/等级判定 → 写入记忆库</div>
+                    <div class="mg-card-chain">P层 → 存储层</div>
+                </div>
+            </div>
+            <div class="mg-note">
+                💡 <strong>MoodMind</strong> 是 <strong>KMP→IPD→七维向量</strong> 方法论在非标资产估值场景中的完整落地：用 <strong>α 值</strong>描述资产状态，用 <strong style="color:#4ade80;">0.50</strong>/<strong style="color:#ef4444;">0.68</strong>/<strong style="color:#f97316;">0.48</strong> 阈值控制风险边界，用四维加权映射实现不确定性资产的动态逼近。
             </div>
         </div>
 
@@ -1461,6 +1675,57 @@
                     ⚠️ 整套精细化估值调参、心理偏差量化模型处于内部持续自研迭代，本界面仅展示标准运行架构。前景理论纠偏自动规避沉没成本执念，防止死守低效老旧账号资产。
                 </div>
             </div>
+        </div>
+
+        <!-- ===== A/B对照实验面板 ===== -->
+        <div class="ab-panel">
+            <div class="ab-title">🧪 A/B对照实验</div>
+            <div class="ab-sub">博主对比 · 策略对比 · 自动业务建议</div>
+            <div class="ab-select-row">
+                <select class="ab-select" id="abSelectA">
+                    <option value="A">博主A（泛娱乐/腰部）</option>
+                    <option value="B">博主B（美妆/头部）</option>
+                    <option value="C">博主C（知识/尾部）</option>
+                </select>
+                <div class="ab-vs">VS</div>
+                <select class="ab-select" id="abSelectB">
+                    <option value="A">博主A（泛娱乐/腰部）</option>
+                    <option value="B" selected>博主B（美妆/头部）</option>
+                    <option value="C">博主C（知识/尾部）</option>
+                </select>
+            </div>
+            <div class="ab-compare-grid" id="abCompareGrid">
+                <!-- 动态生成 -->
+            </div>
+            <div class="ab-conclusion" id="abConclusion"></div>
+            <div style="margin-top:16px;">
+                <div style="font-size:12px;color:rgba(255,255,255,0.5);margin-bottom:8px;font-weight:600;">📊 策略A/B对比（当前策略 vs 优化策略）</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                    <div style="background:rgba(0,0,0,0.25);border-radius:8px;padding:10px 14px;border:1px solid rgba(251,146,60,0.25);">
+                        <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-bottom:4px;">当前策略</div>
+                        <div style="font-size:13px;color:#fdba74;font-weight:600;">α = <span id="stratCurAlpha">0.52</span></div>
+                        <div style="font-size:10px;color:rgba(255,255,255,0.4);margin-top:2px;">流量盘40% · 人设盘20% · 变现盘20% · 风险盘20%</div>
+                    </div>
+                    <div style="background:rgba(0,0,0,0.25);border-radius:8px;padding:10px 14px;border:1px solid rgba(74,222,128,0.25);">
+                        <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-bottom:4px;">优化策略</div>
+                        <div style="font-size:13px;color:#86efac;font-weight:600;">α = <span id="stratOptAlpha">0.67</span></div>
+                        <div style="font-size:10px;color:rgba(255,255,255,0.4);margin-top:2px;">流量盘25% · 人设盘30% · 变现盘30% · 风险盘15%</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== 博主资产走势图 ===== -->
+        <div class="trend-panel">
+            <div class="trend-title">📈 博主资产走势 · α值时序演化</div>
+            <div class="trend-sub">近12周 α 值变化趋势 · 含0.48/0.50/0.68风控阈值参考线</div>
+            <div class="trend-chart" id="bloggerTrendChart"></div>
+            <div class="trend-note">* 数据为模拟演示数据，用于展示 α 值时序演化趋势</div>
+        </div>
+
+        <!-- ===== 导出实验报告 ===== -->
+        <div class="export-bar">
+            <button class="btn-export" id="btnExportReport">📤 导出实验报告</button>
         </div>
 
         <!-- ===== 底部返回 ===== -->
@@ -1956,6 +2221,148 @@
         setInterval(function() {
             publishToAssetQuant();
         }, 15000);
+
+        // ===== A/B对照实验 + 博主走势图 + 导出报告 =====
+        (function() {
+            var BLOGGERS = {
+                A: { name: '博主A（泛娱乐·腰部）', cat: '泛娱乐', tier: '腰部', flow: 58, persona: 52, monetize: 45, risk: 48,
+                     alpha: 0.66, grade: '成长期', predReturn: '+18%', color: '#60a5fa',
+                     weekly: [0.42,0.45,0.48,0.50,0.53,0.55,0.57,0.59,0.61,0.63,0.65,0.66] },
+                B: { name: '博主B（美妆·头部）', cat: '美妆', tier: '头部', flow: 82, persona: 75, monetize: 70, risk: 35,
+                     alpha: 0.70, grade: '优质期', predReturn: '+25%', color: '#f472b6',
+                     weekly: [0.52,0.54,0.57,0.59,0.61,0.63,0.65,0.66,0.67,0.68,0.69,0.70] },
+                C: { name: '博主C（知识·尾部）', cat: '知识', tier: '尾部', flow: 32, persona: 40, monetize: 35, risk: 52,
+                     alpha: 0.48, grade: '观察预警', predReturn: '+6%', color: '#34d399',
+                     weekly: [0.38,0.40,0.41,0.42,0.43,0.44,0.45,0.46,0.46,0.47,0.47,0.48] }
+            };
+            var WEEKS = ['第1周','第2周','第3周','第4周','第5周','第6周','第7周','第8周','第9周','第10周','第11周','第12周'];
+
+            function renderAB() {
+                var aId = document.getElementById('abSelectA').value;
+                var bId = document.getElementById('abSelectB').value;
+                var a = BLOGGERS[aId], b = BLOGGERS[bId];
+                var grid = document.getElementById('abCompareGrid');
+                var conc = document.getElementById('abConclusion');
+                if (aId === bId) {
+                    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:rgba(255,255,255,0.4);padding:20px;font-size:13px;">⚠️ 请选择两个不同的博主进行对比</div>';
+                    conc.innerHTML = '';
+                    return;
+                }
+                function cardHtml(bl, side) {
+                    return '<div class="ab-blogger-card ' + side + '">' +
+                        '<div class="ab-bc-name">' + bl.name + '</div>' +
+                        '<div class="ab-bc-row"><span class="k">赛道</span><span class="v" style="color:' + bl.color + ';">' + bl.cat + '</span></div>' +
+                        '<div class="ab-bc-row"><span class="k">层级</span><span class="v">' + bl.tier + '</span></div>' +
+                        '<div class="ab-bc-row"><span class="k">流量盘</span><span class="v" style="color:#60a5fa;">' + bl.flow + '</span></div>' +
+                        '<div class="ab-bc-row"><span class="k">人设盘</span><span class="v" style="color:#c4b5fd;">' + bl.persona + '</span></div>' +
+                        '<div class="ab-bc-row"><span class="k">变现盘</span><span class="v" style="color:#fbbf24;">' + bl.monetize + '</span></div>' +
+                        '<div class="ab-bc-row"><span class="k">风险盘</span><span class="v" style="color:#f87171;">' + bl.risk + '</span></div>' +
+                        '<div class="ab-bc-row"><span class="k">α值</span><span class="v" style="color:' + (bl.alpha>=0.68?'#f87171':bl.alpha>=0.5?'#4ade80':'#fb923c') + ';">' + bl.alpha.toFixed(2) + '</span></div>' +
+                        '<div class="ab-bc-row"><span class="k">资产等级</span><span class="v">' + bl.grade + '</span></div>' +
+                        '<div class="ab-bc-row"><span class="k">预测回报</span><span class="v" style="color:#4ade80;">' + bl.predReturn + '</span></div>' +
+                    '</div>';
+                }
+                grid.innerHTML = cardHtml(a, 'a') + cardHtml(b, 'b');
+                var winner = a.alpha >= b.alpha ? a : b;
+                var loser = a.alpha >= b.alpha ? b : a;
+                var delta = (winner.alpha - loser.alpha).toFixed(2);
+                var advice = '💡 <strong>实验结论：</strong>' + winner.name + ' 的α值（' + winner.alpha.toFixed(2) + '）高于' + loser.name + '（' + loser.alpha.toFixed(2) + '），差值Δα=' + delta + '。' +
+                    (winner.tier === '头部' ? '建议优先签约头部博主，配置核心资源池，作为矩阵标杆账号运营。' :
+                     winner.tier === '腰部' ? '腰部博主处于成长期，建议作为重点培育对象，配合优化策略提升α值至0.65以上。' :
+                     '尾部博主目前处于观察预警区间，建议小仓位测试，通过蜈蚣序贯博弈模式分步盘活。');
+                if (winner.alpha >= 0.68) advice += ' ⚠️ 当前α已逼近0.68熔断线，注意高位估值回调风险。';
+                else if (winner.alpha < 0.50) advice += ' 当前α未达0.50稳态中轴，建议加大资源倾斜力度。';
+                conc.innerHTML = advice;
+
+                document.getElementById('stratCurAlpha').textContent = ((a.alpha + b.alpha) / 2 - 0.06).toFixed(2);
+                document.getElementById('stratOptAlpha').textContent = ((a.alpha + b.alpha) / 2 + 0.08).toFixed(2);
+            }
+            document.getElementById('abSelectA').addEventListener('change', renderAB);
+            document.getElementById('abSelectB').addEventListener('change', renderAB);
+            renderAB();
+
+            var chartDom = document.getElementById('bloggerTrendChart');
+            if (chartDom && typeof echarts !== 'undefined') {
+                var trendChart = echarts.init(chartDom, null, { renderer: 'canvas' });
+                trendChart.setOption({
+                    backgroundColor: 'transparent',
+                    tooltip: { trigger: 'axis', backgroundColor: 'rgba(15,23,42,0.9)', borderColor: 'rgba(167,139,250,0.3)', textStyle: { color: '#e2e8f0', fontSize: 12 } },
+                    legend: { data: ['博主A(泛娱乐·腰部)','博主B(美妆·头部)','博主C(知识·尾部)','保本线(0.48)','稳态中轴(0.50)','熔断线(0.68)'],
+                              textStyle: { color: 'rgba(255,255,255,0.6)', fontSize: 11 }, top: 8 },
+                    grid: { left: 45, right: 20, top: 50, bottom: 30 },
+                    xAxis: { type: 'category', data: WEEKS, axisLine: { lineStyle: { color: 'rgba(255,255,255,0.1)' } }, axisLabel: { color: 'rgba(255,255,255,0.4)', fontSize: 10 } },
+                    yAxis: { type: 'value', min: 0.30, max: 0.80, axisLine: { lineStyle: { color: 'rgba(255,255,255,0.1)' } }, splitLine: { lineStyle: { color: 'rgba(255,255,255,0.05)' } }, axisLabel: { color: 'rgba(255,255,255,0.4)', fontSize: 10, formatter: function(v){return v.toFixed(2);} } },
+                    series: [
+                        { name: '博主A(泛娱乐·腰部)', type: 'line', data: BLOGGERS.A.weekly, smooth: true, symbol: 'circle', symbolSize: 5,
+                          lineStyle: { color: BLOGGERS.A.color, width: 2 }, itemStyle: { color: BLOGGERS.A.color },
+                          areaStyle: { color: new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'rgba(96,165,250,0.2)'},{offset:1,color:'rgba(96,165,250,0)'}]) } },
+                        { name: '博主B(美妆·头部)', type: 'line', data: BLOGGERS.B.weekly, smooth: true, symbol: 'circle', symbolSize: 5,
+                          lineStyle: { color: BLOGGERS.B.color, width: 2 }, itemStyle: { color: BLOGGERS.B.color },
+                          areaStyle: { color: new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'rgba(244,114,182,0.2)'},{offset:1,color:'rgba(244,114,182,0)'}]) } },
+                        { name: '博主C(知识·尾部)', type: 'line', data: BLOGGERS.C.weekly, smooth: true, symbol: 'circle', symbolSize: 5,
+                          lineStyle: { color: BLOGGERS.C.color, width: 2 }, itemStyle: { color: BLOGGERS.C.color },
+                          areaStyle: { color: new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'rgba(52,211,153,0.2)'},{offset:1,color:'rgba(52,211,153,0)'}]) } },
+                        { name: '保本线(0.48)', type: 'line', data: Array(12).fill(0.48), lineStyle: { color: 'rgba(249,115,22,0.5)', type: 'dashed', width: 1 }, symbol: 'none', tooltip: { show: false } },
+                        { name: '稳态中轴(0.50)', type: 'line', data: Array(12).fill(0.50), lineStyle: { color: 'rgba(74,222,128,0.5)', type: 'dashed', width: 1 }, symbol: 'none', tooltip: { show: false } },
+                        { name: '熔断线(0.68)', type: 'line', data: Array(12).fill(0.68), lineStyle: { color: 'rgba(239,68,68,0.6)', type: 'dashed', width: 1 }, symbol: 'none', tooltip: { show: false } }
+                    ]
+                });
+                window.addEventListener('resize', function() { trendChart.resize(); });
+            }
+
+            document.getElementById('btnExportReport').addEventListener('click', function() {
+                var aId = document.getElementById('abSelectA').value;
+                var bId = document.getElementById('abSelectB').value;
+                var a = BLOGGERS[aId], b = BLOGGERS[bId];
+                var ts = new Date().toLocaleString('zh-CN');
+                var md = '# MoodMind · 非标资产计量实验报告\n\n';
+                md += '**生成时间：** ' + ts + '\n\n';
+                md += '---\n\n';
+                md += '## 一、实验设计\n\n';
+                md += '- 实验平台：MoodMind · 全域非标资产计量中台\n';
+                md += '- 方法论：KMP→IPD→七维向量映射框架（前景理论校正 + 四维加权 + 博弈决策）\n';
+                md += '- 风控阈值：保本线=0.48（橙）｜稳态中轴=0.50（绿）｜熔断线=0.68（红）\n\n';
+                md += '## 二、A/B博主对比数据\n\n';
+                md += '| 维度 | ' + a.name + ' | ' + b.name + ' |\n';
+                md += '|------|------|------|\n';
+                md += '| 赛道 | ' + a.cat + ' | ' + b.cat + ' |\n';
+                md += '| 层级 | ' + a.tier + ' | ' + b.tier + ' |\n';
+                md += '| 流量盘 | ' + a.flow + ' | ' + b.flow + ' |\n';
+                md += '| 人设盘 | ' + a.persona + ' | ' + b.persona + ' |\n';
+                md += '| 变现盘 | ' + a.monetize + ' | ' + b.monetize + ' |\n';
+                md += '| 风险盘 | ' + a.risk + ' | ' + b.risk + ' |\n';
+                md += '| α值 | **' + a.alpha.toFixed(2) + '** | **' + b.alpha.toFixed(2) + '** |\n';
+                md += '| 资产等级 | ' + a.grade + ' | ' + b.grade + ' |\n';
+                md += '| 预测回报率 | ' + a.predReturn + ' | ' + b.predReturn + ' |\n\n';
+                md += '## 三、α值变化趋势（近12周）\n\n';
+                md += '| 周次 | 博主A | 博主B | 博主C |\n';
+                md += '|------|-------|-------|-------|\n';
+                for (var i = 0; i < 12; i++) {
+                    md += '| ' + WEEKS[i] + ' | ' + BLOGGERS.A.weekly[i].toFixed(2) + ' | ' + BLOGGERS.B.weekly[i].toFixed(2) + ' | ' + BLOGGERS.C.weekly[i].toFixed(2) + ' |\n';
+                }
+                md += '\n';
+                md += '## 四、策略对比\n\n';
+                md += '- **当前策略**（流量40%/人设20%/变现20%/风险20%）：α ≈ ' + document.getElementById('stratCurAlpha').textContent + '\n';
+                md += '- **优化策略**（流量25%/人设30%/变现30%/风险15%）：α ≈ ' + document.getElementById('stratOptAlpha').textContent + '\n';
+                md += '- 优化后α提升约 **' + ((parseFloat(document.getElementById('stratOptAlpha').textContent) - parseFloat(document.getElementById('stratCurAlpha').textContent))*100).toFixed(0) + '%**\n\n';
+                md += '## 五、业务建议\n\n';
+                var winner = a.alpha >= b.alpha ? a : b;
+                md += '- 优先签约/培育对象：**' + winner.name + '**（α=' + winner.alpha.toFixed(2) + '，' + winner.grade + '）\n';
+                md += '- 建议采用优化策略权重配比（人设盘+变现盘双轮驱动），降低风险盘敞口\n';
+                md += '- 头部博主作为矩阵标杆，腰部博主作为成长培育池，尾部博主以小仓位测试+蜈蚣序贯盘活为主\n';
+                md += '- 风控提示：α>0.68触发熔断预警，α<0.48触发保本线预警\n\n';
+                md += '---\n*本报告由 MoodMind 自动生成，数据为模拟演示数据。*\n';
+
+                var blob = new Blob([md], { type: 'text/markdown;charset=utf-8' });
+                var url = URL.createObjectURL(blob);
+                var link = document.createElement('a');
+                var fn = 'MoodMind实验报告_' + new Date().toISOString().slice(0,10) + '.md';
+                link.href = url; link.download = fn;
+                document.body.appendChild(link); link.click(); document.body.removeChild(link);
+                setTimeout(function() { URL.revokeObjectURL(url); }, 500);
+                if (typeof logMsg === 'function') logMsg('实验报告已导出: ' + fn, 'success');
+            });
+        })();
     </script>
 
 </body>
