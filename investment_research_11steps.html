@@ -323,6 +323,21 @@
                         <div class="kmp-dim"><div class="kd-name">Dev2</div><div class="kd-val" style="color:#22d3ee;" id="kmpDev2">—</div></div>
                     </div>
                     <div class="kmp-status" id="kmpStatus">等待推理启动 · KMP映射通路已就绪</div>
+                    <div style="margin-top:12px;">
+                        <span class="collapse-toggle" onclick="toggleCollapse('kmpMappingCollapse', this)" style="font-size:11px;">📋 KMP/IPD 层级对照 [展开]</span>
+                        <div class="collapse-body" id="kmpMappingCollapse">
+                            <table class="pid-mapping-table" style="font-size:11px;">
+                                <thead><tr><th>层级</th><th>在投研推理中的含义</th><th>对应PID参数</th><th>对应11步</th></tr></thead>
+                                <tbody>
+                                    <tr><td style="color:#93c5fd;">K（知识层）</td><td>用户输入语义理解</td><td>触发PID调节的"输入信号"</td><td>步骤3</td></tr>
+                                    <tr><td style="color:#c4b5fd;">M（数学层）</td><td>七维向量计算 → 偏差值</td><td>P（比例增益）</td><td>步骤4</td></tr>
+                                    <tr><td style="color:#fdba74;">P（物理层）</td><td>IPD状态描述：I海拔/P坡度/D阻尼</td><td>目标值设定、偏差计算、调节方向</td><td>步骤5</td></tr>
+                                    <tr><td style="color:#67e8f9;">PID调节</td><td>执行调节回到稳态</td><td>P/I/D系数的实时计算</td><td>步骤8</td></tr>
+                                    <tr><td style="color:#86efac;">稳态区间</td><td>系统"健康状态"范围 0.5~0.68</td><td>目标值区间</td><td>步骤9</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -428,22 +443,6 @@
 
             <div style="font-size:12px;color:rgba(255,255,255,0.55);margin:12px 0 4px;">📊 偏差趋势图（最近10次调节）</div>
             <div class="pid-chart-wrap" id="pidChart"></div>
-
-            <div style="margin-top:12px;">
-                <span class="collapse-toggle" onclick="toggleCollapse('pidMappingCollapse', this)">📋 KMP/IPD 对应关系 [展开]</span>
-                <div class="collapse-body" id="pidMappingCollapse">
-                    <table class="pid-mapping-table">
-                        <thead><tr><th>层级</th><th>在投研推理中的含义</th><th>对应PID参数</th><th>对应11步</th></tr></thead>
-                        <tbody>
-                            <tr><td style="color:#93c5fd;">K（知识层）</td><td>用户输入语义理解</td><td>触发PID调节的"输入信号"</td><td>步骤3</td></tr>
-                            <tr><td style="color:#c4b5fd;">M（数学层）</td><td>七维向量计算 → 偏差值</td><td>P（比例增益）</td><td>步骤4</td></tr>
-                            <tr><td style="color:#fdba74;">P（物理层）</td><td>IPD状态描述：I海拔/P坡度/D阻尼</td><td>目标值设定、偏差计算、调节方向</td><td>步骤5</td></tr>
-                            <tr><td style="color:#67e8f9;">PID调节</td><td>执行调节回到稳态</td><td>P/I/D系数的实时计算</td><td>步骤8</td></tr>
-                            <tr><td style="color:#86efac;">稳态区间</td><td>系统"健康状态"范围 0.5~0.68</td><td>目标值区间</td><td>步骤9</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
         </div>
 
         <!-- 六、七维向量雷达图 + 七、投研结论输出区 -->
@@ -602,6 +601,8 @@
     let pidChart = null;
     let currentStep = 0;
     let isRunning = false;
+    let pidHistory = [];
+    let pidAdjustCount = 0;
 
     // ========== 初始化 ==========
     function init() {
@@ -657,18 +658,92 @@
 
     function initPidChart() {
         pidChart = echarts.init(document.getElementById('pidChart'));
+        const xLabels = Array.from({length:10},(_,i)=>`第${i+1}次`);
+        const emptyData = Array(10).fill(null);
         pidChart.setOption({
             backgroundColor: 'transparent',
-            grid: { top: 20, right: 15, bottom: 25, left: 40 },
-            tooltip: { backgroundColor: 'rgba(0,0,0,0.8)', borderColor: 'rgba(255,255,255,0.1)', textStyle: { color: '#fff', fontSize: 11 } },
-            xAxis: { type: 'category', data: Array.from({length:10},(_,i)=>`t-${9-i}`), axisLine:{lineStyle:{color:'rgba(255,255,255,0.1)'}}, axisLabel:{color:'rgba(255,255,255,0.3)',fontSize:10} },
-            yAxis: { type: 'value', min: 0.3, max: 0.8, axisLine:{lineStyle:{color:'rgba(255,255,255,0.1)'}}, axisLabel:{color:'rgba(255,255,255,0.3)',fontSize:10,formatter:v=>v.toFixed(2)}, splitLine:{lineStyle:{color:'rgba(255,255,255,0.04)'}} },
+            grid: { top: 25, right: 20, bottom: 30, left: 45 },
+            tooltip: {
+                trigger: 'axis',
+                backgroundColor: 'rgba(0,0,0,0.85)',
+                borderColor: 'rgba(255,255,255,0.1)',
+                textStyle: { color: '#fff', fontSize: 11 },
+                formatter: function(params) {
+                    let s = params[0].axisValue + '<br/>';
+                    params.forEach(p => {
+                        if (p.value !== null && p.value !== undefined) {
+                            s += `${p.marker} ${p.seriesName}：<b>${p.value.toFixed(3)}</b><br/>`;
+                        }
+                    });
+                    return s;
+                }
+            },
+            xAxis: {
+                type: 'category',
+                data: xLabels,
+                axisLine: { lineStyle: { color: 'rgba(255,255,255,0.15)' } },
+                axisLabel: { color: 'rgba(255,255,255,0.4)', fontSize: 10 },
+                axisTick: { show: false }
+            },
+            yAxis: {
+                type: 'value',
+                min: 0,
+                max: 1,
+                interval: 0.1,
+                axisLine: { show: false },
+                axisTick: { show: false },
+                axisLabel: { color: 'rgba(255,255,255,0.4)', fontSize: 10, formatter: v => v.toFixed(1) },
+                splitLine: { lineStyle: { color: 'rgba(255,255,255,0.05)' } }
+            },
             series: [
-                { name:'稳态下限', type:'line', data:Array(10).fill(0.5), lineStyle:{color:'rgba(34,197,94,0.4)',type:'dashed'}, symbol:'none', tooltip:{show:false} },
-                { name:'稳态上限(熔断)', type:'line', data:Array(10).fill(0.68), lineStyle:{color:'rgba(239,68,68,0.5)',type:'dashed'}, symbol:'none', tooltip:{show:false} },
-                { name:'浓度', type:'line', data:[0.50,0.52,0.48,0.55,0.60,0.57,0.54,0.58,0.56,0.55],
-                  lineStyle:{color:'#22d3ee',width:2}, itemStyle:{color:'#22d3ee'},
-                  areaStyle:{color:new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'rgba(34,211,238,0.2)'},{offset:1,color:'rgba(34,211,238,0)'}])} }
+                {
+                    name: '稳态下界(0.50)', type: 'line', data: Array(10).fill(0.50),
+                    lineStyle: { color: 'rgba(34,197,94,0.5)', type: 'dashed', width: 1 },
+                    symbol: 'none', tooltip: { show: false }, z: 1
+                },
+                {
+                    name: '稳态上界/熔断(0.68)', type: 'line', data: Array(10).fill(0.68),
+                    lineStyle: { color: 'rgba(239,68,68,0.6)', type: 'dashed', width: 1 },
+                    symbol: 'none', tooltip: { show: false }, z: 1
+                },
+                {
+                    name: '浓度值', type: 'line', data: emptyData,
+                    lineStyle: { color: '#22d3ee', width: 2.5 },
+                    itemStyle: { color: '#22d3ee', borderWidth: 2, borderColor: '#0e7490' },
+                    symbol: 'circle', symbolSize: 6,
+                    connectNulls: false,
+                    areaStyle: {
+                        color: new echarts.graphic.LinearGradient(0,0,0,1,[
+                            { offset: 0, color: 'rgba(34,211,238,0.25)' },
+                            { offset: 1, color: 'rgba(34,211,238,0.02)' }
+                        ])
+                    },
+                    z: 3,
+                    markArea: {
+                        silent: true,
+                        itemStyle: { color: 'rgba(34,197,94,0.04)' },
+                        data: [[{ yAxis: 0.50 }, { yAxis: 0.68 }]]
+                    }
+                }
+            ]
+        });
+    }
+
+    function updatePidChart() {
+        if (!pidChart) return;
+        const recent = pidHistory.slice(-10);
+        const padded = Array(10 - recent.length).fill(null).concat(recent);
+        const xLabels = Array.from({length:10},(_,i)=>{
+            const globalIdx = pidAdjustCount - 10 + i + 1;
+            if (globalIdx < 1) return '';
+            return `#${globalIdx}`;
+        });
+        pidChart.setOption({
+            xAxis: { data: xLabels },
+            series: [
+                { name: '稳态下界(0.50)', data: Array(10).fill(0.50) },
+                { name: '稳态上界/熔断(0.68)', data: Array(10).fill(0.68) },
+                { name: '浓度值', data: padded }
             ]
         });
     }
@@ -795,8 +870,8 @@
                 await sleep(300);
             }
             if (currentStep === 7) {
-                showPIDModule(data);
-                await sleep(1200);
+                await showPIDModule(data);
+                await sleep(300);
             }
             if (currentStep === 8) {
                 updateRadar(data.M, 1.0);
@@ -1043,32 +1118,32 @@
             <div class="sd-desc">${step.desc}</div>${dataHtml}`;
     }
 
-    function showPIDModule(data) {
-        document.getElementById('pidSection').style.display = 'block';
-        const v = data.M;
-        const I = Math.max(0, Math.min(1, v.I));
-        const target = 0.59;
+    function applyPIDState(I_raw, P_slope, target, iter) {
+        const I = Math.max(0, Math.min(1, I_raw));
         const error = I - target;
         const pos = I * 100;
 
         document.getElementById('pidCurrent').textContent = I.toFixed(2);
         document.getElementById('pidTarget').textContent = target.toFixed(2);
         document.getElementById('pidError').textContent = (error >= 0 ? '+' : '') + error.toFixed(2);
-        document.getElementById('pidIntegral').textContent = (error * 0.3).toFixed(2);
-        document.getElementById('pidDeriv').textContent = (v.P > 0 ? '+' : '') + (v.P * 0.05).toFixed(2);
+
+        const integral = error * (0.3 + iter * 0.08);
+        const deriv = P_slope * 0.05 + (iter > 0 ? (Math.random() - 0.5) * 0.01 : 0);
+        document.getElementById('pidIntegral').textContent = (integral >= 0 ? '+' : '') + integral.toFixed(2);
+        document.getElementById('pidDeriv').textContent = (deriv >= 0 ? '+' : '') + deriv.toFixed(2);
 
         let status, statusCls;
-        if (I >= 0.5 && I <= 0.68) { status = '轻度调节 · 系统稳定'; statusCls = 'green'; }
+        if (I > 0.75) { status = '⚠️ 熔断触发！'; statusCls = 'red'; }
+        else if (I > 0.68) { status = '中度调节（警惕偏高）'; statusCls = 'yellow'; }
+        else if (I >= 0.5 && I <= 0.68) { status = '轻度调节 · 系统稳定'; statusCls = 'green'; }
         else if (I >= 0.45 && I < 0.5) { status = '中度调节（I积分增益增大）'; statusCls = 'yellow'; }
-        else if (I < 0.45) { status = '强烈调节（P增益增大，D预测转向）'; statusCls = 'red'; }
-        else if (I > 0.68 && I <= 0.75) { status = '中度调节（警惕偏高）'; statusCls = 'yellow'; }
-        else { status = '⚠️ 熔断触发！'; statusCls = 'red'; }
+        else { status = '强烈调节（P增益增大，D预测转向）'; statusCls = 'red'; }
         document.getElementById('pidStatus').textContent = status;
         document.getElementById('pidStatus').className = 'ps-value ' + statusCls;
 
         const P_coef = (0.3 + Math.abs(error) * 2).toFixed(2);
         const I_coef = (0.08 + Math.abs(error) * 0.5).toFixed(2);
-        const D_coef = (0.05 + Math.abs(v.P) * 0.1).toFixed(2);
+        const D_coef = (0.05 + Math.abs(P_slope) * 0.1).toFixed(2);
         document.getElementById('pidP').textContent = P_coef;
         document.getElementById('pidI').textContent = I_coef;
         document.getElementById('pidD').textContent = D_coef;
@@ -1077,33 +1152,52 @@
         const outputAdj = Math.round(error * 15);
         document.getElementById('pidOutput').textContent = `💡 当前输出：调整算力分配 —— 语义解析 ${parseAdj>=0?'+':''}${parseAdj}%，认知输出 ${outputAdj>=0?'+':''}${outputAdj}%`;
 
-        document.getElementById('pidCurrentMarker').style.left = pos + '%';
+        const marker = document.getElementById('pidCurrentMarker');
+        if (marker) marker.style.left = pos + '%';
         document.getElementById('pidFuseCur').textContent = I.toFixed(2);
-        const dist = (0.68 - I).toFixed(2);
-        document.getElementById('pidFuseDist').textContent = dist;
+        const dist = (0.68 - I);
+        document.getElementById('pidFuseDist').textContent = (dist >= 0 ? '' : '') + dist.toFixed(2);
         const fuseEl = document.getElementById('pidFuseStatus');
         if (I > 0.68) { fuseEl.textContent = '🔴 已触发熔断！'; fuseEl.style.color = '#fca5a5'; }
         else if (I > 0.62) { fuseEl.textContent = '🟡 接近熔断线'; fuseEl.style.color = '#fde68a'; }
         else { fuseEl.textContent = '🟢 未触发'; fuseEl.style.color = '#4ade80'; }
 
-        // 更新趋势图
-        const ts = [];
-        let base = 0.50;
-        for (let i = 0; i < 10; i++) {
-            base += (Math.random() - 0.4) * 0.05;
-            base = Math.max(0.35, Math.min(0.75, base));
-            ts.push(+base.toFixed(3));
+        pidAdjustCount++;
+        pidHistory.push(+I.toFixed(3));
+        if (pidHistory.length > 50) pidHistory.shift();
+        updatePidChart();
+        return I;
+    }
+
+    async function showPIDModule(data) {
+        document.getElementById('pidSection').style.display = 'block';
+        setTimeout(() => { pidChart && pidChart.resize(); }, 50);
+        const v = data.M;
+        const target = 0.59;
+        let I = Math.max(0, Math.min(1, v.I));
+        const P = v.P;
+
+        I = applyPIDState(I, P, target, 0);
+        await sleep(180);
+
+        const fuseTriggered = I > 0.68;
+        const iters = fuseTriggered ? 3 : 6;
+        for (let i = 1; i <= iters; i++) {
+            const error = I - target;
+            let adjustment = -error * (0.25 + i * 0.06);
+            adjustment += (Math.random() - 0.5) * 0.015;
+            I = Math.max(0, Math.min(1, I + adjustment));
+            applyPIDState(I, P + (Math.random() - 0.5) * 0.05, target, i);
+            await sleep(140);
         }
-        ts[9] = +I.toFixed(3);
-        pidChart.setOption({
-            series: [
-                { name:'稳态下限', type:'line', data:Array(10).fill(0.5), lineStyle:{color:'rgba(34,197,94,0.4)',type:'dashed'}, symbol:'none', tooltip:{show:false} },
-                { name:'熔断线', type:'line', data:Array(10).fill(0.68), lineStyle:{color:'rgba(239,68,68,0.5)',type:'dashed'}, symbol:'none', tooltip:{show:false} },
-                { name:'浓度', type:'line', data:ts, lineStyle:{color:'#22d3ee',width:2}, itemStyle:{color:'#22d3ee'},
-                  areaStyle:{color:new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'rgba(34,211,238,0.2)'},{offset:1,color:'rgba(34,211,238,0)'}])} }
-            ]
-        });
-        addLog(`PID调节完成：当前浓度 ${I.toFixed(2)}，${status}`, 'ok');
+
+        const finalError = I - target;
+        let finalStatus;
+        if (I > 0.68) finalStatus = '中度调节（警惕偏高）';
+        else if (I >= 0.5 && I <= 0.68) finalStatus = '轻度调节 · 系统稳定';
+        else if (I >= 0.45) finalStatus = '中度调节（I积分增益增大）';
+        else finalStatus = '强烈调节';
+        addLog(`PID调节完成：当前浓度 ${I.toFixed(2)}，${finalStatus}`, 'ok');
     }
 
     function updateRadar(M, progress) {
@@ -1186,6 +1280,9 @@
         document.getElementById('memCurrent').textContent = '—';
         document.getElementById('memRecent').textContent = '—';
         document.getElementById('memStatus').innerHTML = '🟢 记忆库正常 · 等待写入';
+        pidHistory = [];
+        pidAdjustCount = 0;
+        updatePidChart();
         document.getElementById('logPanel').innerHTML = '<div class="log-entry"><span class="log-time">[系统]</span> 11步投研推理系统已就绪，等待投研输入...</div>';
         resetKMPExpand();
         addLog('🔄 系统已重置', 'ok');
