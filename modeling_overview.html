@@ -290,6 +290,14 @@
         .kmp-k { background: rgba(96,165,250,0.15); color: #60a5fa; }
         .kmp-m { background: rgba(167,139,250,0.15); color: #a78bfa; }
         .kmp-p { background: rgba(251,146,60,0.15); color: #fb923c; }
+        .subject-method-layer {
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid rgba(255,255,255,0.06);
+            font-size: 10px;
+            color: rgba(255,255,255,0.5);
+            font-weight: 600;
+        }
         
         .math-grid {
             display: grid;
@@ -406,6 +414,13 @@
         
         <div class="section">
             <div class="section-title">📊 学科博弈联动图</div>
+            <div style="text-align:center;margin:0 0 12px;padding:10px 16px;background:rgba(255,255,255,0.03);border:1px dashed rgba(255,255,255,0.1);border-radius:8px;font-size:12px;color:rgba(255,255,255,0.6);line-height:1.7;">
+                <span style="color:#4A90D9;font-weight:600;">底层学科</span> 提供方法论工具
+                <span style="color:rgba(255,255,255,0.3);margin:0 8px;">→</span>
+                <span style="color:#2ECC71;font-weight:600;">应用学科</span> 提供验证场景
+                <span style="color:rgba(255,255,255,0.3);margin:0 8px;">→</span>
+                <span style="color:#F39C12;font-weight:600;">认知学科（博弈）</span> 作为核心贯穿所有学科
+            </div>
             <div class="graph-container" id="graphChart"></div>
             <div style="display:flex;gap:16px;justify-content:center;margin-top:10px;flex-wrap:wrap;">
                 <span style="font-size:10px;color:rgba(255,255,255,0.4);display:flex;align-items:center;gap:5px;"><span style="width:10px;height:10px;border-radius:50%;background:#4A90D9;display:inline-block;"></span>底层学科</span>
@@ -519,20 +534,17 @@
         
         <div class="section">
             <div class="summary-card">
-                <div class="summary-stats">
-                    <div class="stat-item"><div class="stat-num">12</div><div class="stat-label">大学科覆盖</div></div>
-                    <div class="stat-item"><div class="stat-num">4</div><div class="stat-label">大数学支柱</div></div>
-                    <div class="stat-item"><div class="stat-num">31</div><div class="stat-label">组实验验证</div></div>
-                    <div class="stat-item"><div class="stat-num">7</div><div class="stat-label">前沿模型参照</div></div>
-                    <div class="stat-item"><div class="stat-num">25,424</div><div class="stat-label">次实验运行</div></div>
-                    <div class="stat-item"><div class="stat-num">297</div><div class="stat-label">次部署</div></div>
+                <div style="text-align:center;font-size:14px;font-weight:600;color:#fde68a;line-height:2;margin-bottom:10px;">
+                    12大学科覆盖 &nbsp;·&nbsp; 4大数学支柱 &nbsp;·&nbsp; 42组实验验证<br/>
+                    7个前沿模型参照 &nbsp;·&nbsp; 25,424次实验运行 &nbsp;·&nbsp; 316次部署
                 </div>
-                <div class="summary-texas">
+                <div class="summary-divider"></div>
+                <div class="summary-texas" style="margin:0 0 14px;justify-content:center;">
                     ♟️ 德州扑克沙盘 · 博弈底座交互验证案例 — 凯利公式 / 夏普比率 / 532动态权重 / 情绪识别
                 </div>
                 <div class="summary-divider"></div>
                 <div class="summary-method">统一方法论：KMP→IPD→七维向量→THRESHOLDS三基准</div>
-                <div class="summary-formula">系统状态 = f(原始数据, KMP映射, IPD参数, THRESHOLDS)</div>
+                <div class="summary-formula" style="margin-top:6px;">系统状态 = f(原始数据, KMP映射, IPD参数, THRESHOLDS)</div>
             </div>
         </div>
         
@@ -545,40 +557,52 @@
     (function(){
         var SUBJECTS = [
             { id:'math', icon:'📐', name:'数学', cat:'base', catLabel:'底层', keywords:'七维向量·结构拆分', color:'#4A90D9',
-              module:'七维向量、鸡兔同笼、线性代数', kmp:['m'], kmpLabels:['M层'], position:'M层数学映射，将语义转化为向量空间',
+              module:'七维向量、鸡兔同笼、线性代数', kmp:['k','m'], kmpLabels:['K层','M层'], position:'K层/M层数学映射，将语义转化为向量空间',
+              methodLayer:'📌 K层/M层',
               output:'七维向量值', desc:'基于线性代数构建状态空间，用向量和矩阵描述系统状态，通过结构拆分法从已知量反推未知结构，是所有学科建模的数学基础。' },
             { id:'physics', icon:'⚛️', name:'物理', cat:'base', catLabel:'底层', keywords:'PID·阻尼振动', color:'#5B9BD5',
               module:'PID水温、弹簧阻尼、控制论实验', kmp:['p'], kmpLabels:['P层'], position:'P层物理建模，用力学规律描述动态系统',
+              methodLayer:'📌 P层',
               output:'稳态偏差、振动曲线', desc:'用牛顿力学、控制论描述动态系统，PID调节器实现负反馈收敛，质量-弹簧-阻尼系统模拟振荡衰减，是系统稳态调节的物理基础。' },
             { id:'chemistry', icon:'🧪', name:'化学', cat:'base', catLabel:'底层', keywords:'熵值映射·反应平衡', color:'#6CA6E0',
               module:'熵值计算、热力学映射', kmp:['m','p'], kmpLabels:['M→P层'], position:'M→P层，从有序无序到热力学状态',
+              methodLayer:'📌 M→P层',
               output:'熵值', desc:'通过热力学熵值衡量系统有序/无序程度，熵增过程对应记忆衰减、信息损耗，化学平衡对应多空博弈均衡，熵减对应结构化存储。' },
             { id:'geology', icon:'🌍', name:'地质', cat:'base', catLabel:'底层', keywords:'地层·板块运动', color:'#7DB3E8',
               module:'地质分层、板块博弈（延伸）', kmp:['p'], kmpLabels:['P层'], position:'P层，多层结构与缓慢演化系统',
+              methodLayer:'📌 P层',
               output:'地层结构、板块应力', desc:'地层分层对应记忆层级结构，板块运动对应慢变量博弈，地质年代对应长期记忆巩固，是大时间尺度系统建模的参考。' },
             { id:'finance', icon:'📈', name:'金融', cat:'app', catLabel:'应用', keywords:'投研推理·非标估值', color:'#2ECC71',
               module:'11步投研、MoodMind非标估值', kmp:['m','p'], kmpLabels:['M→P层'], position:'M→P层，四维加权映射输出α值',
+              methodLayer:'📌 M→P层',
               output:'信号+置信度、α值', desc:'将金融资产通过流量盘/人设盘/变现盘/风险盘四维加权映射为α值（余弦相似度），前景理论校正心理偏差，凯利公式计算最优配比。' },
             { id:'economics', icon:'📊', name:'经济', cat:'app', catLabel:'应用', keywords:'供需均衡·宏观模型', color:'#3DDC84',
-              module:'古诺寡头、宏观供需（延伸）', kmp:['p'], kmpLabels:['P层'], position:'P层，多方博弈的均衡建模',
+              module:'古诺寡头、宏观供需（延伸）', kmp:['m'], kmpLabels:['M层'], position:'M层，多方博弈的均衡建模',
+              methodLayer:'📌 M层',
               output:'均衡价格、供需差', desc:'供需曲线交点决定均衡价格，古诺模型描述寡头产能博弈，宏观变量构成经济状态向量，是金融博弈的宏观背景。' },
             { id:'info', icon:'📡', name:'信息', cat:'app', catLabel:'应用', keywords:'信道·滤波·信号', color:'#4DEA90',
-              module:'信道噪声滤波、信息熵', kmp:['m','p'], kmpLabels:['M→P层'], position:'M→P层，信号处理与信息传递',
+              module:'信道噪声滤波、信息熵', kmp:['m'], kmpLabels:['M层'], position:'M层，信号处理与信息传递',
+              methodLayer:'📌 M层',
               output:'信噪比、收敛值', desc:'香农信息论建模信道容量，卡尔曼滤波从噪声中提取真实信号，信息熵衡量不确定性，是跨模块通信的理论基础。' },
             { id:'language', icon:'📝', name:'语言', cat:'app', catLabel:'应用', keywords:'语法拆解·多义词消歧', color:'#5EF89C',
               module:'MindSpeak引擎、语法结构', kmp:['k','m','p'], kmpLabels:['K→M→P层'], position:'贯穿K→M→P全链路，数理-语言同构',
+              methodLayer:'📌 K→M→P层',
               output:'语法结构、词义选择', desc:'将自然语言通过K层识别实体意图、M层拆解语法结构、P层输出语义向量，实现多义词消歧和数理-语言同构转换。' },
             { id:'game', icon:'♟️', name:'博弈', cat:'cog', catLabel:'核心', keywords:'纳什均衡·逆向归纳', color:'#F39C12',
-              module:'古诺、蜈蚣、德州扑克沙盘', kmp:['p'], kmpLabels:['P层'], position:'博弈底座，贯穿所有学科的核心层',
+              module:'古诺、蜈蚣、德州扑克沙盘', kmp:['p'], kmpLabels:['P层（核心底座）'], position:'博弈底座，贯穿所有学科的核心层',
+              methodLayer:'📌 P层（核心底座）',
               output:'均衡点、预测路径、决策指令', desc:'博弈是所有学科的核心底座：力的博弈、市场博弈、语义博弈、认知博弈。纳什均衡、逆向归纳、混合策略、反身性博弈统一描述多方策略互动。德州扑克沙盘是完整交互验证案例。' },
             { id:'control', icon:'🎛️', name:'控制', cat:'cog', catLabel:'认知', keywords:'系统稳态·负反馈', color:'#F1C40F',
               module:'PID负反馈、阻尼振动、熔断机制', kmp:['p'], kmpLabels:['P层'], position:'P层，系统收敛与稳态维持',
+              methodLayer:'📌 P层',
               output:'稳态偏差、控制量', desc:'控制论核心是负反馈调节，通过比例-积分-微分三项计算控制量，将系统输出收敛至设定稳态点，0.68阈值触发熔断保护。' },
             { id:'psycho', icon:'🧠', name:'心理', cat:'cog', catLabel:'认知', keywords:'前景理论·认知偏差', color:'#E67E22',
               module:'MoodMind前景校正、BART气球', kmp:['k'], kmpLabels:['K层'], position:'K层，认知偏差识别与校正',
+              methodLayer:'📌 K层',
               output:'偏差校正量', desc:'前景理论揭示收益/损失框架下的主观偏差，用系统0.5稳态中轴线替代私人沉没成本心理参照点，BART气球模拟风险决策。' },
             { id:'bio', icon:'🧬', name:'生物', cat:'cog', catLabel:'认知', keywords:'遗忘曲线·认知演化', color:'#E74C3C',
               module:'艾宾浩斯遗忘、三重脑', kmp:['k'], kmpLabels:['K层'], position:'K层，记忆与认知的生物基础',
+              methodLayer:'📌 K层',
               output:'记忆保持率、认知层级', desc:'模拟生物记忆遗忘规律，艾宾浩斯曲线描述记忆衰减，爬虫脑-边缘系统-新皮层三层认知结构，Sleep范式对应记忆巩固。' }
         ];
         
@@ -710,7 +734,11 @@
             var grid = document.getElementById('subjectsGrid');
             SUBJECTS.forEach(function(s){
                 var kmpTags = s.kmpLabels.map(function(l){
-                    var cls = l.indexOf('K')>-1?'kmp-k':l.indexOf('M')>-1?'kmp-m':'kmp-p';
+                    var cls;
+                    if(l.indexOf('K')>-1 && l.indexOf('M')===-1 && l.indexOf('P')===-1) cls='kmp-k';
+                    else if(l.indexOf('M')>-1 && l.indexOf('P')===-1) cls='kmp-m';
+                    else if(l.indexOf('P')>-1 && l.indexOf('M')===-1 && l.indexOf('K')===-1) cls='kmp-p';
+                    else cls='kmp-m';
                     return '<span class="kmp-tag '+cls+'">'+l+'</span>';
                 }).join('');
                 var catCls = s.cat==='base'?'cat-base':s.cat==='app'?'cat-app':'cat-cog';
@@ -722,6 +750,7 @@
                     '<div class="subject-icon">'+s.icon+'</div>'+
                     '<div class="subject-name" style="color:'+s.color+'">'+s.name+'</div>'+
                     '<div class="subject-keywords">'+s.keywords+'</div>'+
+                    '<div class="subject-method-layer" style="color:'+s.color+';opacity:0.85;">'+s.methodLayer+'</div>'+
                     '<div class="subject-detail">'+
                         '<div class="detail-row"><span class="detail-label">建模内容</span><span class="detail-value">'+s.desc+'</span></div>'+
                         '<div class="detail-row"><span class="detail-label">对应模块</span><span class="detail-value">'+s.module+'</span></div>'+
