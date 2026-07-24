@@ -167,6 +167,37 @@ body{background:#0a0a0f;color:#fff;font-family:'SF Pro Display',-apple-system,Bl
 .li-name{font-size:12px;font-weight:600;margin-bottom:3px;}
 .li-desc{font-size:10px;color:rgba(255,255,255,0.4);line-height:1.5;}
 
+/* ===== 风味分子结构模块 ===== */
+.molecule-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;}
+.mol-card{background:linear-gradient(135deg,rgba(255,255,255,0.04),rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:14px;cursor:pointer;transition:all 0.3s ease;position:relative;overflow:hidden;backdrop-filter:blur(8px);}
+.mol-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.1),transparent);}
+.mol-card::after{content:'';position:absolute;inset:0;border-radius:12px;pointer-events:none;opacity:0;transition:opacity 0.3s;box-shadow:inset 0 0 30px var(--mol-glow,rgba(245,158,11,0.1));}
+.mol-card:hover{transform:translateY(-3px);border-color:var(--mol-color,#f59e0b);background:linear-gradient(135deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02));box-shadow:0 8px 24px rgba(0,0,0,0.3),0 0 0 1px var(--mol-color,#f59e0b);}
+.mol-card:hover::after{opacity:1;}
+.mol-card.active{border-color:var(--mol-color,#f59e0b);background:linear-gradient(135deg,var(--mol-bg,rgba(245,158,11,0.08)),rgba(255,255,255,0.02));box-shadow:0 4px 16px var(--mol-shadow,rgba(245,158,11,0.15));}
+.mol-svg-wrap{height:100px;display:flex;align-items:center;justify-content:center;margin-bottom:10px;position:relative;}
+.mol-svg-wrap svg{width:100%;height:100%;}
+.mol-name{font-size:12px;font-weight:700;color:#fff;margin-bottom:4px;display:flex;align-items:center;gap:6px;}
+.mol-formula{font-family:'SF Mono',monospace;font-size:11px;color:var(--mol-color,#f59e0b);margin-bottom:6px;letter-spacing:0.3px;}
+.mol-dim{display:inline-flex;align-items:center;gap:4px;font-size:10px;padding:2px 8px;border-radius:10px;font-weight:600;}
+.mol-detail{margin-top:16px;padding:16px;background:rgba(0,0,0,0.25);border-radius:10px;border:1px solid rgba(255,255,255,0.06);display:none;animation:molDetailIn 0.35s ease;backdrop-filter:blur(8px);}
+.mol-detail.show{display:block;}
+@keyframes molDetailIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+.mol-detail-title{font-size:14px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+.mol-detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:11px;line-height:1.6;}
+@media(max-width:600px){.mol-detail-grid{grid-template-columns:1fr;}}
+.mol-detail-item{padding:8px 10px;background:rgba(255,255,255,0.03);border-radius:6px;border-left:2px solid var(--mol-color,#f59e0b);}
+.mol-detail-label{font-size:9px;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;}
+.mol-detail-val{color:rgba(255,255,255,0.8);}
+.mol-detail-desc{margin-top:10px;font-size:11px;color:rgba(255,255,255,0.5);line-height:1.7;padding-top:10px;border-top:1px solid rgba(255,255,255,0.05);}
+.atom-C{fill:#303030;stroke:#666;stroke-width:1.5;}
+.atom-H{fill:#fff;stroke:#aaa;stroke-width:1;}
+.atom-O{fill:#e74c3c;stroke:#c0392b;stroke-width:1.5;}
+.atom-N{fill:#3498db;stroke:#2980b9;stroke-width:1.5;}
+.atom-S{fill:#f1c40f;stroke:#d4ac0d;stroke-width:1.5;}
+.bond{stroke:rgba(255,255,255,0.5);stroke-width:2;stroke-linecap:round;}
+.bond-double{stroke:rgba(255,255,255,0.6);stroke-width:1.5;}
+
 .disclaimer{margin-top:30px;padding:16px;text-align:center;font-size:11px;color:rgba(255,255,255,0.25);border-top:1px solid rgba(255,255,255,0.04);}
 </style>
 </head>
@@ -249,6 +280,17 @@ body{background:#0a0a0f;color:#fff;font-family:'SF Pro Display',-apple-system,Bl
 </div>
 </div>
 </div>
+</div>
+</div>
+
+<div class="card">
+<div class="card-title">⚗️ 风味分子结构</div>
+<div class="card-desc">当前基酒的主要风味活性分子 · 点击分子卡片查看详细信息 · 关联七维向量维度</div>
+<div class="molecule-grid" id="moleculeGrid"></div>
+<div class="mol-detail" id="molDetail">
+<div class="mol-detail-title" id="molDetailTitle"></div>
+<div class="mol-detail-grid" id="molDetailGrid"></div>
+<div class="mol-detail-desc" id="molDetailDesc"></div>
 </div>
 </div>
 
@@ -409,6 +451,227 @@ const WINE_DATA={
         ]},
 };
 
+const MOLECULE_DATA={
+    wine:[
+        {name:'单宁酸',formula:'C₇₆H₅₂O₄₆',dim:{sym:'D',name:'苦涩',color:'#f59e0b'},color:'#8b4513',flavor:'涩感/结构感',source:'葡萄皮/籽/橡木桶',threshold:'0.1-0.4 g/L',
+         desc:'单宁是红葡萄酒的骨架物质，与唾液蛋白结合产生收敛涩感。优质单宁细腻丝滑，劣质单宁粗糙苦涩。是葡萄酒陈年潜力的关键指标。'},
+        {name:'酒石酸',formula:'C₄H₆O₆',dim:{sym:'P',name:'酸度',color:'#ec4899'},color:'#e74c3c',flavor:'清爽酸味',source:'葡萄天然果酸',threshold:'0.5-1.5 g/L',
+         desc:'葡萄酒中最重要的有机酸，赋予酒体清爽感和活力。冷稳定过程中会析出酒石酸氢钾结晶（"酒钻石"）。酸度平衡是葡萄酒口感协调的关键。'},
+        {name:'乙醇',formula:'C₂H₅OH',dim:{sym:'Dev2',name:'酒精度',color:'#f87171'},color:'#fbbf24',flavor:'灼热/甜润',source:'酵母发酵产物',threshold:'感知阈值 ~1%',
+         desc:'酒精是酒体的重要组成部分，带来温热感和甜润感，同时溶解其他风味物质。过高产生灼烧感，过低则酒体单薄。酒精度影响风味浓度计算。'},
+        {name:'乙酸乙酯',formula:'CH₃COOC₂H₅',dim:{sym:'I',name:'甜度',color:'#22d3ee'},color:'#3498db',flavor:'果香/酯香',source:'发酵副产物',threshold:'50-200 mg/L',
+         desc:'葡萄酒中最主要的酯类物质，带来清新的果香和花香，类似苹果、菠萝的香气。适量增添复杂度，过量则呈现指甲油般的刺鼻感（挥发酸过高）。'},
+        {name:'花青素',formula:'C₁₅H₁₁O₆⁺',dim:{sym:'S',name:'复杂度',color:'#a855f7'},color:'#9b59b6',flavor:'颜色/抗氧化',source:'葡萄皮色素',threshold:'0.1-1 g/L',
+         desc:'红葡萄酒颜色的来源，同时具有抗氧化活性。随陈年时间聚合，颜色从紫红转变为砖红，单宁与花青素结合形成稳定色素复合物。'},
+    ],
+    spirits:[
+        {name:'愈创木酚',formula:'C₇H₈O₂',dim:{sym:'D',name:'苦涩',color:'#f59e0b'},color:'#d35400',flavor:'烟熏/焦香',source:'橡木桶烘烤',threshold:'1-10 μg/L',
+         desc:'威士忌和白兰地在橡木桶陈酿过程中产生的烟熏风味物质，来自木质素热解。泥煤威士忌中含量更高，带来典型的消毒水/烟熏气息。'},
+        {name:'香草醛',formula:'C₈H₈O₃',dim:{sym:'I',name:'甜度',color:'#22d3ee'},color:'#f39c12',flavor:'香草/甜香',source:'橡木桶木质素',threshold:'0.1-1 mg/L',
+         desc:'橡木桶陈酿的标志性风味，带来香草般的甜润香气。波本桶陈酿的威士忌香草醛含量高，雪莉桶则带来更多果干和坚果香。'},
+        {name:'乙醇',formula:'C₂H₅OH',dim:{sym:'Dev2',name:'酒精度',color:'#f87171'},color:'#fbbf24',flavor:'灼热/刺激',source:'蒸馏浓缩',threshold:'感知阈值 ~1%',
+         desc:'洋酒经过蒸馏酒精度通常在40%以上，带来强烈的灼热感和刺激性。高酒精度是洋酒风味浓郁的基础，也是触发风味熔断的主要因素。'},
+        {name:'糠醛',formula:'C₅H₄O₂',dim:{sym:'S',name:'复杂度',color:'#a855f7'},color:'#e67e22',flavor:'杏仁/焦糖',source:'糖焦化反应',threshold:'5-50 mg/L',
+         desc:'在威士忌蒸馏和陈酿过程中由戊糖脱水形成，带来杏仁、焦糖和烘烤香气。是波本威士忌甜香的重要来源，也是朗姆酒焦糖风味的组成部分。'},
+        {name:'单宁',formula:'C₇₆H₅₂O₄₆',dim:{sym:'P',name:'酸度',color:'#ec4899'},color:'#8b4513',flavor:'涩感/结构',source:'橡木桶浸出',threshold:'0.05-0.3 g/L',
+         desc:'洋酒中的单宁主要来自橡木桶陈酿，比葡萄酒中的单宁更柔和，带来结构感和微涩，同时增添木质和香料风味。龙舌兰中的单宁来自龙舌兰植物纤维。'},
+    ],
+    baijiu:[
+        {name:'己酸乙酯',formula:'C₈H₁₆O₂',dim:{sym:'I',name:'甜度',color:'#22d3ee'},color:'#27ae60',flavor:'菠萝/果香',source:'己酸菌发酵',threshold:'0.5-2 mg/L',
+         desc:'浓香型白酒的主体香气成分，具有浓郁的菠萝、苹果等水果香气，是浓香型白酒"窖香"的主要来源。己酸乙酯含量是区分白酒香型的关键指标。'},
+        {name:'乙酸',formula:'CH₃COOH',dim:{sym:'P',name:'酸度',color:'#ec4899'},color:'#e74c3c',flavor:'醋酸/刺激',source:'醋酸菌代谢',threshold:'0.1-0.8 g/L',
+         desc:'白酒中主要的有机酸，带来酸爽的口感。适量乙酸能协调酒体，增强后味；过量则呈现尖锐的醋酸刺激感，是酒体不适饮的标志。'},
+        {name:'乙醇',formula:'C₂H₅OH',dim:{sym:'Dev2',name:'酒精度',color:'#f87171'},color:'#fbbf24',flavor:'灼热/刺激',source:'蒸馏发酵',threshold:'感知阈值 ~1%',
+         desc:'白酒酒精度通常在50-65%之间，高酒精度带来强烈灼烧感。中国白酒采用固态发酵，风味物质极其丰富，是世界上风味最复杂的蒸馏酒之一。'},
+        {name:'3-甲硫基丙醇',formula:'C₄H₁₀OS',dim:{sym:'S',name:'复杂度',color:'#a855f7'},color:'#95a5a6',flavor:'酱香/糟香',source:'美拉德反应',threshold:'10-100 μg/L',
+         desc:'酱香型白酒的特征风味物质之一，带有酱香、芝麻香和煮熟的土豆/肉香。由美拉德反应和酵母代谢产生，是茅台酒等酱香型白酒的关键风味成分。'},
+        {name:'乳酸乙酯',formula:'C₅H₁₀O₃',dim:{sym:'D',name:'苦涩',color:'#f59e0b'},color:'#f1c40f',flavor:'清甜/涩感',source:'乳酸菌发酵',threshold:'0.2-1.5 g/L',
+         desc:'清香型白酒的重要风味成分，带来清甜、柔和的口感，适量使酒体干净爽冽。过量则带来苦涩感和闷杂味，影响清香型白酒的"清、正、净、爽"风格。'},
+    ],
+    yaojiu:[
+        {name:'人参皂苷',formula:'C₄₂H₇₂O₁₄',dim:{sym:'S',name:'复杂度',color:'#a855f7'},color:'#27ae60',flavor:'微苦/回甘',source:'人参浸出',threshold:'10-100 mg/L',
+         desc:'人参酒的核心活性成分，属于三萜皂苷类化合物，带来特征的微苦后回甘口感。人参皂苷Rg1、Rb1等是主要活性成分，传统认为具有滋补功效。'},
+        {name:'枸杞多糖',formula:'(C₆H₁₀O₅)n',dim:{sym:'I',name:'甜度',color:'#22d3ee'},color:'#e74c3c',flavor:'甜润/厚重',source:'枸杞浸出',threshold:'1-10 g/L',
+         desc:'枸杞酒的主要甜味和醇厚感来源，是一种蛋白多糖，带来自然的甜润口感和厚重感。枸杞酒通常呈现宝石红色，甜度较高，苦度较低。'},
+        {name:'乙醇',formula:'C₂H₅OH',dim:{sym:'Dev2',name:'酒精度',color:'#f87171'},color:'#fbbf24',flavor:'溶剂/提取',source:'基酒溶剂',threshold:'感知阈值 ~1%',
+         desc:'药酒通常以高度白酒（50-60%）为基酒，利用乙醇作为溶剂提取药材中的有效成分。酒精度高有助于药材成分浸出，但口感刺激较强。'},
+        {name:'鹿茸多肽',formula:'氨基酸链',dim:{sym:'D',name:'苦涩',color:'#f59e0b'},color:'#8b4513',flavor:'腥涩/温补',source:'鹿茸浸出',threshold:'微量即感知',
+         desc:'鹿茸酒的特征成分，带来特殊的腥涩味和温补感。鹿茸富含氨基酸、多肽和激素样物质，传统认为具有补肾壮阳功效，苦涩味较重。'},
+    ],
+    fruit:[
+        {name:'柠檬酸',formula:'C₆H₈O₇',dim:{sym:'P',name:'酸度',color:'#ec4899'},color:'#f1c40f',flavor:'酸爽/清新',source:'水果天然酸',threshold:'0.5-3 g/L',
+         desc:'果酒中最主要的有机酸（尤其梅酒、柑橘类果酒），带来明亮清新的酸爽感。柠檬酸是果酒清爽口感的基础，与甜度平衡形成酸甜协调的口感。'},
+        {name:'果糖',formula:'C₆H₁₂O₆',dim:{sym:'I',name:'甜度',color:'#22d3ee'},color:'#e74c3c',flavor:'清甜/果香',source:'水果糖分',threshold:'直接感知',
+         desc:'果酒甜味的主要来源，比蔗糖更甜、更清爽。梅酒、荔枝酒通常甜度较高，残糖量50-150g/L，甜酸平衡是果酒口感的核心。'},
+        {name:'乙醇',formula:'C₂H₅OH',dim:{sym:'Dev2',name:'酒精度',color:'#f87171'},color:'#fbbf24',flavor:'微醺/柔和',source:'发酵产生',threshold:'感知阈值 ~1%',
+         desc:'果酒通常酒精度较低（8-15%），口感柔和，不易触发风味熔断。低酒精度使果酒更易饮，但也更需要酸甜平衡来支撑酒体结构。'},
+        {name:'芳樟醇',formula:'C₁₀H₁₈O',dim:{sym:'S',name:'复杂度',color:'#a855f7'},color:'#9b59b6',flavor:'花香/果香',source:'水果/花香气',threshold:'0.1-1 mg/L',
+         desc:'荔枝酒等热带水果酒的特征香气成分，具有清新的花香和柑橘类果香，类似薰衣草和铃兰的香气。是果酒优雅香气的重要来源。'},
+    ],
+    flower:[
+        {name:'β-紫罗兰酮',formula:'C₁₃H₂₀O',dim:{sym:'S',name:'复杂度',color:'#a855f7'},color:'#9b59b6',flavor:'桂花/紫罗兰',source:'桂花浸出',threshold:'0.01-0.1 mg/L',
+         desc:'桂花酒的核心香气物质，具有浓郁的桂花、紫罗兰和覆盆子香气，阈值极低，是桂花酒标志性甜香的来源，也是高级香水的常用香料。'},
+        {name:'香茅醇',formula:'C₁₀H₂₀O',dim:{sym:'I',name:'甜度',color:'#22d3ee'},color:'#e91e63',flavor:'玫瑰/甜香',source:'玫瑰花瓣',threshold:'0.1-1 mg/L',
+         desc:'玫瑰酒的主要香气成分，具有新鲜的玫瑰花香和清甜的香脂气息，类似天竺葵和蜂蜜的甜香。是玫瑰香气的灵魂物质，香气优雅持久。'},
+        {name:'乙醇',formula:'C₂H₅OH',dim:{sym:'Dev2',name:'酒精度',color:'#f87171'},color:'#fbbf24',flavor:'柔和/基酒',source:'基酒浸泡',threshold:'感知阈值 ~1%',
+         desc:'花酒通常以低度米酒或白酒为基酒（20-40%）浸泡鲜花制成，酒精度适中，花香与酒香融合，口感轻盈优雅，属于轻盈型酒体。'},
+        {name:'乙酸苄酯',formula:'C₉H₁₀O₂',dim:{sym:'P',name:'酸度',color:'#ec4899'},color:'#27ae60',flavor:'茉莉/清香',source:'茉莉花浸出',threshold:'0.1-2 mg/L',
+         desc:'茉莉酒的特征香气成分，具有清新的茉莉花香气和水果香，是茉莉花茶和茉莉酒的关键香气物质，带来优雅、清鲜的花香体验。'},
+    ],
+};
+
+function generateMolSVG(type,idx){
+    const fid='glow'+idx;
+    const bonds={
+        'ethanol':`
+            <line x1="80" y1="50" x2="110" y2="65" class="bond"/>
+            <line x1="110" y1="65" x2="110" y2="95" class="bond"/>
+            <circle cx="80" cy="50" r="12" class="atom-C"/><text x="80" y="54" fill="#fff" font-size="10" text-anchor="middle" font-family="SF Mono">C</text>
+            <circle cx="110" cy="65" r="12" class="atom-C"/><text x="110" y="69" fill="#fff" font-size="10" text-anchor="middle" font-family="SF Mono">C</text>
+            <circle cx="110" cy="95" r="10" class="atom-O"/><text x="110" y="99" fill="#fff" font-size="9" text-anchor="middle" font-family="SF Mono">O</text>
+        `,
+        'ester':`
+            <line x1="70" y1="55" x2="95" y2="70" class="bond"/>
+            <line x1="95" y1="70" x2="120" y2="55" class="bond"/>
+            <line x1="95" y1="70" x2="95" y2="90" class="bond-double"/>
+            <line x1="120" y1="55" x2="145" y2="70" class="bond"/>
+            <circle cx="70" cy="55" r="11" class="atom-C"/><text x="70" y="59" fill="#fff" font-size="9" text-anchor="middle" font-family="SF Mono">C</text>
+            <circle cx="95" cy="70" r="11" class="atom-C"/><text x="95" y="74" fill="#fff" font-size="9" text-anchor="middle" font-family="SF Mono">C</text>
+            <circle cx="95" cy="98" r="10" class="atom-O"/><text x="95" y="102" fill="#fff" font-size="9" text-anchor="middle" font-family="SF Mono">O</text>
+            <circle cx="120" cy="55" r="10" class="atom-O"/><text x="120" y="59" fill="#fff" font-size="9" text-anchor="middle" font-family="SF Mono">O</text>
+            <circle cx="145" cy="70" r="11" class="atom-C"/><text x="145" y="74" fill="#fff" font-size="9" text-anchor="middle" font-family="SF Mono">C</text>
+        `,
+        'acid':`
+            <line x1="75" y1="70" x2="100" y2="70" class="bond"/>
+            <line x1="100" y1="70" x2="100" y2="50" class="bond-double"/>
+            <line x1="100" y1="70" x2="125" y2="70" class="bond"/>
+            <circle cx="75" cy="70" r="11" class="atom-C"/><text x="75" y="74" fill="#fff" font-size="9" text-anchor="middle" font-family="SF Mono">C</text>
+            <circle cx="100" cy="70" r="11" class="atom-C"/><text x="100" y="74" fill="#fff" font-size="9" text-anchor="middle" font-family="SF Mono">C</text>
+            <circle cx="100" cy="42" r="10" class="atom-O"/><text x="100" y="46" fill="#fff" font-size="9" text-anchor="middle" font-family="SF Mono">O</text>
+            <circle cx="125" cy="70" r="10" class="atom-O"/><text x="125" y="74" fill="#fff" font-size="9" text-anchor="middle" font-family="SF Mono">O</text>
+        `,
+        'phenol':`
+            <polygon points="95,35 120,50 120,80 95,95 70,80 70,50" fill="none" class="bond"/>
+            <line x1="95" y1="35" x2="95" y2="20" class="bond"/>
+            <circle cx="95" cy="20" r="10" class="atom-O"/><text x="95" y="24" fill="#fff" font-size="9" text-anchor="middle" font-family="SF Mono">O</text>
+            <circle cx="95" cy="65" r="14" class="atom-C" opacity="0.3"/>
+        `,
+        'ring':`
+            <polygon points="95,30 125,48 125,82 95,100 65,82 65,48" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="2"/>
+            <line x1="95" y1="30" x2="125" y2="48" class="bond"/>
+            <line x1="125" y1="48" x2="125" y2="82" class="bond"/>
+            <line x1="125" y1="82" x2="95" y2="100" class="bond"/>
+            <line x1="95" y1="100" x2="65" y2="82" class="bond"/>
+            <line x1="65" y1="82" x2="65" y2="48" class="bond"/>
+            <line x1="65" y1="48" x2="95" y2="30" class="bond"/>
+            <line x1="95" y1="30" x2="95" y2="15" class="bond"/>
+            <circle cx="95" cy="15" r="9" class="atom-C"/><text x="95" y="18" fill="#fff" font-size="8" text-anchor="middle" font-family="SF Mono">R</text>
+        `,
+        'complex':`
+            <polygon points="95,25 118,40 118,70 95,85 72,70 72,40" fill="none" class="bond"/>
+            <line x1="95" y1="25" x2="95" y2="10" class="bond"/>
+            <line x1="118" y1="40" x2="138" y2="30" class="bond"/>
+            <line x1="72" y1="40" x2="52" y2="30" class="bond"/>
+            <line x1="118" y1="70" x2="138" y2="80" class="bond"/>
+            <line x1="72" y1="70" x2="52" y2="80" class="bond"/>
+            <circle cx="95" cy="10" r="8" class="atom-O"/><text x="95" y="13" fill="#fff" font-size="7" text-anchor="middle" font-family="SF Mono">O</text>
+            <circle cx="138" cy="30" r="8" class="atom-C"/><text x="138" y="33" fill="#fff" font-size="7" text-anchor="middle" font-family="SF Mono">C</text>
+            <circle cx="52" cy="30" r="8" class="atom-C"/><text x="52" y="33" fill="#fff" font-size="7" text-anchor="middle" font-family="SF Mono">C</text>
+            <circle cx="138" cy="80" r="8" class="atom-O"/><text x="138" y="83" fill="#fff" font-size="7" text-anchor="middle" font-family="SF Mono">O</text>
+            <circle cx="52" cy="80" r="8" class="atom-C"/><text x="52" y="83" fill="#fff" font-size="7" text-anchor="middle" font-family="SF Mono">C</text>
+            <circle cx="95" cy="55" r="16" fill="rgba(155,89,182,0.15)" stroke="rgba(155,89,182,0.4)" stroke-width="1"/>
+        `,
+        'terpene':`
+            <line x1="60" y1="75" x2="85" y2="60" class="bond"/>
+            <line x1="85" y1="60" x2="110" y2="75" class="bond"/>
+            <line x1="110" y1="75" x2="110" y2="45" class="bond"/>
+            <line x1="110" y1="45" x2="135" y2="30" class="bond"/>
+            <line x1="85" y1="60" x2="85" y2="35" class="bond-double"/>
+            <line x1="110" y1="75" x2="130" y2="90" class="bond"/>
+            <circle cx="60" cy="75" r="10" class="atom-C"/><text x="60" y="79" fill="#fff" font-size="8" text-anchor="middle" font-family="SF Mono">C</text>
+            <circle cx="85" cy="60" r="10" class="atom-C"/><text x="85" y="64" fill="#fff" font-size="8" text-anchor="middle" font-family="SF Mono">C</text>
+            <circle cx="110" cy="75" r="10" class="atom-C"/><text x="110" y="79" fill="#fff" font-size="8" text-anchor="middle" font-family="SF Mono">C</text>
+            <circle cx="110" cy="45" r="10" class="atom-C"/><text x="110" y="49" fill="#fff" font-size="8" text-anchor="middle" font-family="SF Mono">C</text>
+            <circle cx="135" cy="30" r="10" class="atom-C"/><text x="135" y="34" fill="#fff" font-size="8" text-anchor="middle" font-family="SF Mono">C</text>
+            <circle cx="130" cy="90" r="9" class="atom-O"/><text x="130" y="93" fill="#fff" font-size="8" text-anchor="middle" font-family="SF Mono">O</text>
+        `,
+    };
+    const templates=['complex','ester','acid','ethanol','phenol','ring','terpene'];
+    const t=templates[Math.abs(type.split('').reduce((a,c)=>a+c.charCodeAt(0),0))%templates.length];
+    return `<svg viewBox="0 0 170 110" xmlns="http://www.w3.org/2000/svg">
+        <defs><filter id="${fid}"><feGaussianBlur stdDeviation="1.5" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+        <g filter="url(#${fid})">${bonds[t]||bonds.complex}</g>
+        <circle cx="20" cy="15" r="3" fill="rgba(255,255,255,0.2)"/>
+        <circle cx="150" cy="25" r="2" fill="rgba(255,255,255,0.15)"/>
+        <circle cx="30" cy="95" r="2" fill="rgba(255,255,255,0.1)"/>
+    </svg>`;
+}
+
+let activeMolIdx=-1;
+
+function buildMolecules(){
+    const mols=MOLECULE_DATA[currentType]||MOLECULE_DATA.wine;
+    const grid=document.getElementById('moleculeGrid');
+    const w=WINE_DATA[currentType];
+    grid.innerHTML=mols.map((m,i)=>{
+        const dimColor=m.dim.color;
+        return `<div class="mol-card${i===activeMolIdx?' active':''}" data-idx="${i}" style="--mol-color:${m.color};--mol-glow:${m.color}22;--mol-shadow:${m.color}33;--mol-bg:${m.color}15;">
+            <div class="mol-svg-wrap">${generateMolSVG(m.name,i)}</div>
+            <div class="mol-name">${m.name}</div>
+            <div class="mol-formula">${m.formula}</div>
+            <span class="mol-dim" style="background:${dimColor}22;color:${dimColor};border:1px solid ${dimColor}44;">
+                <span style="font-weight:800;">${m.dim.sym}</span> · ${m.dim.name}
+            </span>
+        </div>`;
+    }).join('');
+    grid.querySelectorAll('.mol-card').forEach(c=>{
+        c.addEventListener('click',()=>showMolDetail(parseInt(c.dataset.idx)));
+    });
+    if(activeMolIdx>=0&&activeMolIdx<mols.length){
+        showMolDetail(activeMolIdx,false);
+    }else{
+        document.getElementById('molDetail').classList.remove('show');
+    }
+}
+
+function showMolDetail(idx,animate=true){
+    const mols=MOLECULE_DATA[currentType]||MOLECULE_DATA.wine;
+    if(activeMolIdx===idx&&animate){
+        activeMolIdx=-1;
+        document.getElementById('molDetail').classList.remove('show');
+        document.querySelectorAll('.mol-card').forEach(c=>c.classList.remove('active'));
+        return;
+    }
+    activeMolIdx=idx;
+    const m=mols[idx];
+    document.querySelectorAll('.mol-card').forEach((c,i)=>{
+        c.classList.toggle('active',i===idx);
+    });
+    const detail=document.getElementById('molDetail');
+    document.getElementById('molDetailTitle').innerHTML=`<span style="color:${m.color};">⚛️</span> ${m.name} <span style="font-family:'SF Mono',monospace;font-size:12px;color:${m.color};margin-left:8px;">${m.formula}</span>`;
+    document.getElementById('molDetailGrid').innerHTML=`
+        <div class="mol-detail-item" style="--mol-color:${m.color};">
+            <div class="mol-detail-label">🍷 风味特征</div>
+            <div class="mol-detail-val">${m.flavor}</div>
+        </div>
+        <div class="mol-detail-item" style="--mol-color:${m.color};">
+            <div class="mol-detail-label">📍 来源</div>
+            <div class="mol-detail-val">${m.source}</div>
+        </div>
+        <div class="mol-detail-item" style="--mol-color:${m.dim.color};">
+            <div class="mol-detail-label">📊 关联向量维度</div>
+            <div class="mol-detail-val"><b style="color:${m.dim.color};">${m.dim.sym}</b> / ${m.dim.name}</div>
+        </div>
+        <div class="mol-detail-item" style="--mol-color:${m.color};">
+            <div class="mol-detail-label">⚡ 感知阈值</div>
+            <div class="mol-detail-val">${m.threshold}</div>
+        </div>
+    `;
+    document.getElementById('molDetailDesc').textContent=m.desc;
+    detail.style.setProperty('--mol-color',m.color);
+    detail.classList.add('show');
+}
+
 let currentType='wine',currentSub=0;
 
 function buildWineUI(){
@@ -438,9 +701,10 @@ function buildSubs(){
 }
 
 function selectType(k){
-    currentType=k;currentSub=0;
+    currentType=k;currentSub=0;activeMolIdx=-1;
     buildWineUI();
     updateBottle();
+    buildMolecules();
 }
 function selectSub(i){
     currentSub=i;buildSubs();updateBottle();
@@ -775,6 +1039,7 @@ function addSpirit(){
 buildWineUI();
 applyParams();
 updateBottle();
+buildMolecules();
 drawRadar();
 renderVecTable();
 </script>
