@@ -1838,6 +1838,8 @@
             .lab-cat-econ .lab-card:hover { border-color: rgba(34,197,94,0.4); box-shadow: 0 6px 20px rgba(34,197,94,0.1); }
             .lab-cat-psych .lab-card:hover .lab-card-btn { background: rgba(236,72,153,0.15); border-color: rgba(236,72,153,0.3); color: #f472b6; }
             .lab-cat-econ .lab-card:hover .lab-card-btn { background: rgba(34,197,94,0.15); border-color: rgba(34,197,94,0.3); color: #22c55e; }
+            .lab-cat-psych .lab-cat-guide { color:rgba(236,72,153,0.65); background:rgba(236,72,153,0.05); border-left-color:rgba(236,72,153,0.4); }
+            .lab-cat-econ .lab-cat-guide { color:rgba(34,197,94,0.65); background:rgba(34,197,94,0.05); border-left-color:rgba(34,197,94,0.4); }
             </style>
 
             <div class="section-group lab-section">
@@ -1985,25 +1987,184 @@
                         <span class="lab-cat-icon">⚙️</span>
                         <span class="lab-cat-name">控制论与系统稳定类</span>
                         <span class="lab-cat-count">12项</span>
-                        <span class="lab-cat-desc">负反馈 · PID · 阻尼 · 稳态</span>
-                        <a href="labs/control_theory_lab.html" class="lab-cat-enter">🎛️ 进入总控交互界面</a>
+                        <span class="lab-cat-desc">负反馈 · PID · 阻尼 · 稳态 · I/D维度</span>
+                    </div>
+                    <div class="lab-cat-desc-block" style="margin:10px 0 8px;padding:12px 14px;background:linear-gradient(135deg,rgba(34,211,238,0.06),rgba(34,211,238,0.02));border:1px solid rgba(34,211,238,0.15);border-radius:10px;font-size:11px;line-height:1.7;color:rgba(34,211,238,0.75);">
+                        <div style="font-weight:600;color:#67e8f9;margin-bottom:6px;">⚙️ 控制论与系统稳定类 · 负反馈闭环控制</div>
+                        <div style="margin-bottom:6px;">12项 · PID控制 · 阻尼振动 · 串级闭环 · 扰动抑制 · 前馈补偿 · 饱和限幅</div>
+                        <div style="color:rgba(255,255,255,0.5);margin-bottom:6px;">本类别实验聚焦经典控制论中的负反馈闭环系统，验证系统从偏差检测到稳态收敛的完整控制链路：</div>
+                        <div style="color:rgba(255,255,255,0.4);padding-left:10px;">
+                            <div>• 偏差检测：PID三参数比例-积分-微分调节</div>
+                            <div>• 阻尼响应：质量-弹簧-阻尼系统衰减振荡</div>
+                            <div>• 阻尼分类：欠阻尼/临界阻尼/过阻尼对比</div>
+                            <div>• 极端保护：执行器饱和限幅与0.68熔断边界</div>
+                            <div>• 进阶控制：串级双环、前馈补偿、扰动抑制</div>
+                        </div>
+                        <div style="margin-top:6px;color:rgba(34,211,238,0.6);">直接映射七维向量体系中的 <b style="color:#67e8f9;">I（海拔·稳态偏差）</b> 和 <b style="color:#67e8f9;">D（阻尼·振荡抑制）</b> 维度。对应主线模块：控制论PID模拟器、THRESHOLDS三基准判定引擎。</div>
                     </div>
                     <div class="lab-cat-guide">
-                        推荐观看顺序：PID水温负反馈调节 → 弹簧阻尼振动对比 → 阻尼三类振动对照 → 执行器饱和限幅熔断。这四组实验构成从「偏差检测 → 阻尼响应 → 阻尼分类 → 极端保护」的完整控制链路，与 KMP→IPD→七维向量体系中的 D（阻尼）和 0.68 熔断阈值直接对应。
+                        推荐观看顺序：PID水温负反馈调节 → 弹簧阻尼振动对比 → 阻尼三类振动对照 → 执行器饱和限幅熔断 → 蓄水池水位调度 → 二阶惯性滞后调节 → 双容水箱串级液位控制 → 串级双闭环控制系统 → 外界扰动抑制对照 → 前馈预判补偿控制 → 排队论系统负载限流 → 伺服随动稳态跟踪。这12组实验构成从「偏差检测 → 阻尼响应 → 阻尼分类 → 极端保护 → 单变量稳态 → 二阶惯性 → 耦合系统 → 串级闭环 → 扰动抑制 → 前馈补偿 → 限流控制 → 随动跟踪」的完整控制链路，与 KMP→IPD→七维向量体系中的 I（海拔·稳态偏差）、D（阻尼）和 0.68 熔断阈值直接对应。
+                    </div>
+                    <div style="margin:10px 0 14px;">
+                        <a href="labs/control_theory_lab.html" style="display:inline-flex;align-items:center;gap:6px;padding:8px 18px;background:linear-gradient(135deg,rgba(34,211,238,0.12),rgba(34,211,238,0.06));border:1px solid rgba(34,211,238,0.3);border-radius:8px;color:#67e8f9;font-size:12px;font-weight:700;text-decoration:none;transition:all .2s;" onmouseover="this.style.background='linear-gradient(135deg,rgba(34,211,238,0.2),rgba(34,211,238,0.1))';this.style.borderColor='rgba(34,211,238,0.5)';this.style.transform='translateY(-1px)';" onmouseout="this.style.background='linear-gradient(135deg,rgba(34,211,238,0.12),rgba(34,211,238,0.06))';this.style.borderColor='rgba(34,211,238,0.3)';this.style.transform='translateY(0)';">🎛️ 进入总控交互界面</a>
                     </div>
                     <div class="lab-grid">
-                        <div class="lab-card" data-exp="exp-1"><div class="lab-card-tag">① 偏差检测</div><div class="lab-card-icon">🌡️</div><div class="lab-card-name">PID 水温负反馈调节</div><div class="lab-card-desc">比例-积分-微分控制器将水温收敛至设定点</div><span class="lab-card-btn">▶ 进入演示</span></div>
-                        <div class="lab-card" data-exp="exp-2"><div class="lab-card-tag">② 阻尼响应</div><div class="lab-card-icon">🔩</div><div class="lab-card-name">弹簧阻尼振动对比</div><div class="lab-card-desc">质量-弹簧-阻尼系统的衰减振荡过程</div><span class="lab-card-btn">▶ 进入演示</span></div>
-                        <div class="lab-card" data-exp="exp-7"><div class="lab-card-tag">③ 阻尼分类</div><div class="lab-card-icon">〰️</div><div class="lab-card-name">阻尼三类振动对照</div><div class="lab-card-desc">欠阻尼/临界阻尼/过阻尼对比实验</div><span class="lab-card-btn">▶ 进入演示</span></div>
-                        <div class="lab-card" data-exp="exp-10"><div class="lab-card-tag">④ 极端保护</div><div class="lab-card-icon">⚠️</div><div class="lab-card-name">执行器饱和限幅熔断</div><div class="lab-card-desc">输出触碰0.68阈值触发饱和保护</div><span class="lab-card-btn">▶ 进入演示</span></div>
-                        <div class="lab-card" data-exp="exp-3"><div class="lab-card-icon">💧</div><div class="lab-card-name">蓄水池水位调度</div><div class="lab-card-desc">入流/出流动态平衡维持水位稳态</div><span class="lab-card-btn">▶ 进入演示</span></div>
-                        <div class="lab-card" data-exp="exp-4"><div class="lab-card-icon">🚦</div><div class="lab-card-name">排队论系统负载限流</div><div class="lab-card-desc">队列长度 vs 服务容量的拥塞控制</div><span class="lab-card-btn">▶ 进入演示</span></div>
-                        <div class="lab-card" data-exp="exp-5"><div class="lab-card-icon">🔗</div><div class="lab-card-name">双容水箱串级液位控制</div><div class="lab-card-desc">两个耦合水箱的串联液位调节</div><span class="lab-card-btn">▶ 进入演示</span></div>
-                        <div class="lab-card" data-exp="exp-6"><div class="lab-card-icon">📈</div><div class="lab-card-name">二阶惯性滞后调节</div><div class="lab-card-desc">二阶系统阶跃响应的S型曲线</div><span class="lab-card-btn">▶ 进入演示</span></div>
-                        <div class="lab-card" data-exp="exp-8"><div class="lab-card-icon">🎯</div><div class="lab-card-name">前馈预判补偿控制</div><div class="lab-card-desc">已知扰动下的前馈补偿vs纯反馈</div><span class="lab-card-btn">▶ 进入演示</span></div>
-                        <div class="lab-card" data-exp="exp-9"><div class="lab-card-icon">🔄</div><div class="lab-card-name">串级双闭环控制系统</div><div class="lab-card-desc">内环快速随动+外环精确调节</div><span class="lab-card-btn">▶ 进入演示</span></div>
-                        <div class="lab-card" data-exp="exp-11"><div class="lab-card-icon">🌊</div><div class="lab-card-name">外界扰动抑制对照</div><div class="lab-card-desc">突发扰动后系统恢复稳态过程</div><span class="lab-card-btn">▶ 进入演示</span></div>
-                        <div class="lab-card" data-exp="exp-12"><div class="lab-card-icon">🎮</div><div class="lab-card-name">伺服随动稳态跟踪</div><div class="lab-card-desc">输出信号跟随目标轨迹变化</div><span class="lab-card-btn">▶ 进入演示</span></div>
+                        <div class="lab-card" data-exp="exp-1" style="border-color:rgba(34,211,238,0.3);background:rgba(34,211,238,0.04);position:relative;">
+                            <div class="lab-card-tag" style="background:rgba(34,211,238,0.12);color:#22d3ee;border-color:rgba(34,211,238,0.25);">① 偏差检测</div>
+                            <div class="lab-card-icon" style="font-size:26px;">🌡️</div>
+                            <div class="lab-card-name" style="color:#67e8f9;">PID 水温负反馈调节</div>
+                            <div class="lab-card-desc">比例-积分-微分控制器将水温收敛至设定点·Kp/Ki/Kd三参数协同</div>
+                            <div class="lab-card-meta">
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">验证维度：</span><span class="meta-val" style="color:#67e8f9;">I（海拔）+ D（阻尼）</span></span></div>
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">主线模块：</span><span class="meta-val">PID模拟器 — 负反馈闭环控制</span></span></div>
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">应用场景：</span><span class="meta-val" style="color:#22d3ee;">温度/液位/速度控制</span></span></div>
+                            </div>
+                            <div class="lab-card-status">📍 状态：★ 核心基准实验</div>
+                            <span class="lab-card-btn" style="background:rgba(34,211,238,0.15);border-color:rgba(34,211,238,0.4);color:#67e8f9;">▶ 进入演示</span>
+                        </div>
+                        <div class="lab-card" data-exp="exp-2" style="border-color:rgba(34,211,238,0.3);background:rgba(34,211,238,0.04);position:relative;">
+                            <div class="lab-card-tag" style="background:rgba(34,211,238,0.12);color:#22d3ee;border-color:rgba(34,211,238,0.25);">② 阻尼响应</div>
+                            <div class="lab-card-icon" style="font-size:26px;">🔩</div>
+                            <div class="lab-card-name" style="color:#67e8f9;">弹簧阻尼振动对比</div>
+                            <div class="lab-card-desc">质量-弹簧-阻尼系统的衰减振荡过程·D维度核心实验</div>
+                            <div class="lab-card-meta">
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">验证维度：</span><span class="meta-val" style="color:#67e8f9;">D（阻尼）</span></span></div>
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">主线模块：</span><span class="meta-val">阻尼振荡模型 — 振动衰减</span></span></div>
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">应用场景：</span><span class="meta-val" style="color:#22d3ee;">机械减振/飞行器姿态稳定</span></span></div>
+                            </div>
+                            <div class="lab-card-status">📍 状态：★ D维度基准</div>
+                            <span class="lab-card-btn" style="background:rgba(34,211,238,0.15);border-color:rgba(34,211,238,0.4);color:#67e8f9;">▶ 进入演示</span>
+                        </div>
+                        <div class="lab-card" data-exp="exp-7" style="border-color:rgba(34,211,238,0.3);background:rgba(34,211,238,0.04);position:relative;">
+                            <div class="lab-card-tag" style="background:rgba(34,211,238,0.12);color:#22d3ee;border-color:rgba(34,211,238,0.25);">③ 阻尼分类</div>
+                            <div class="lab-card-icon" style="font-size:26px;">〰️</div>
+                            <div class="lab-card-name" style="color:#67e8f9;">阻尼三类振动对照</div>
+                            <div class="lab-card-desc">欠阻尼/临界阻尼/过阻尼三类响应对比·阻尼比ζ参数扫描</div>
+                            <div class="lab-card-meta">
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">验证维度：</span><span class="meta-val" style="color:#67e8f9;">D（阻尼）</span></span></div>
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">主线模块：</span><span class="meta-val">阻尼分类器 — ζ参数空间</span></span></div>
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">应用场景：</span><span class="meta-val" style="color:#22d3ee;">系统整定/控制器参数优化</span></span></div>
+                            </div>
+                            <div class="lab-card-status">📍 状态：★ 阻尼分类核心</div>
+                            <span class="lab-card-btn" style="background:rgba(34,211,238,0.15);border-color:rgba(34,211,238,0.4);color:#67e8f9;">▶ 进入演示</span>
+                        </div>
+                        <div class="lab-card" data-exp="exp-10" style="border-color:rgba(248,113,113,0.3);background:rgba(248,113,113,0.04);position:relative;">
+                            <div class="lab-card-tag" style="background:rgba(248,113,113,0.12);color:#f87171;border-color:rgba(248,113,113,0.25);">④ 极端保护（0.68临界）</div>
+                            <div class="lab-card-icon" style="font-size:26px;">⚠️</div>
+                            <div class="lab-card-name" style="color:#fca5a5;">执行器饱和限幅熔断</div>
+                            <div class="lab-card-desc">输出触碰0.68阈值触发饱和保护·THRESHOLDS熔断边界验证</div>
+                            <div class="lab-card-meta">
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">验证维度：</span><span class="meta-val" style="color:#fca5a5;">THRESHOLDS 0.68熔断线</span></span></div>
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">主线模块：</span><span class="meta-val">THRESHOLDS引擎 — 安全熔断</span></span></div>
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">应用场景：</span><span class="meta-val" style="color:#f87171;">执行器保护/系统安全边界</span></span></div>
+                            </div>
+                            <div class="lab-card-status">📍 状态：★ 0.68熔断验证 · 安全红线</div>
+                            <span class="lab-card-btn" style="background:rgba(248,113,113,0.1);border-color:rgba(248,113,113,0.25);color:#f87171;">▶ 进入演示</span>
+                        </div>
+                        <div class="lab-card" data-exp="exp-3" style="border-color:rgba(34,211,238,0.3);background:rgba(34,211,238,0.04);position:relative;">
+                            <div class="lab-card-tag" style="background:rgba(34,211,238,0.12);color:#22d3ee;border-color:rgba(34,211,238,0.25);">⑤ 单变量稳态</div>
+                            <div class="lab-card-icon" style="font-size:26px;">💧</div>
+                            <div class="lab-card-name" style="color:#67e8f9;">蓄水池水位调度</div>
+                            <div class="lab-card-desc">入流/出流动态平衡维持水位稳态·I维度海拔基准</div>
+                            <div class="lab-card-meta">
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">验证维度：</span><span class="meta-val" style="color:#67e8f9;">I（海拔）</span></span></div>
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">主线模块：</span><span class="meta-val">单回路稳态控制 — 流量平衡</span></span></div>
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">应用场景：</span><span class="meta-val" style="color:#22d3ee;">液位/库存/资源调度</span></span></div>
+                            </div>
+                            <div class="lab-card-status">📍 状态：稳态基准实验</div>
+                            <span class="lab-card-btn" style="background:rgba(34,211,238,0.1);border-color:rgba(34,211,238,0.25);color:#22d3ee;">▶ 进入演示</span>
+                        </div>
+                        <div class="lab-card" data-exp="exp-6" style="border-color:rgba(34,211,238,0.3);background:rgba(34,211,238,0.04);position:relative;">
+                            <div class="lab-card-tag" style="background:rgba(34,211,238,0.12);color:#22d3ee;border-color:rgba(34,211,238,0.25);">⑥ 二阶惯性</div>
+                            <div class="lab-card-icon" style="font-size:26px;">📈</div>
+                            <div class="lab-card-name" style="color:#67e8f9;">二阶惯性滞后调节</div>
+                            <div class="lab-card-desc">二阶系统阶跃响应的S型曲线·惯性+滞后双参数</div>
+                            <div class="lab-card-meta">
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">验证维度：</span><span class="meta-val" style="color:#67e8f9;">I（海拔）+ P（坡度）</span></span></div>
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">主线模块：</span><span class="meta-val">二阶系统模型 — 惯性滞后</span></span></div>
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">应用场景：</span><span class="meta-val" style="color:#22d3ee;">热工/化工过程控制</span></span></div>
+                            </div>
+                            <div class="lab-card-status">📍 状态：二阶系统基准</div>
+                            <span class="lab-card-btn" style="background:rgba(34,211,238,0.1);border-color:rgba(34,211,238,0.25);color:#22d3ee;">▶ 进入演示</span>
+                        </div>
+                        <div class="lab-card" data-exp="exp-5" style="border-color:rgba(34,211,238,0.3);background:rgba(34,211,238,0.04);position:relative;">
+                            <div class="lab-card-tag" style="background:rgba(34,211,238,0.12);color:#22d3ee;border-color:rgba(34,211,238,0.25);">⑦ 耦合系统</div>
+                            <div class="lab-card-icon" style="font-size:26px;">🔗</div>
+                            <div class="lab-card-name" style="color:#67e8f9;">双容水箱串级液位控制</div>
+                            <div class="lab-card-desc">两个耦合水箱的串联液位调节·多变量耦合解耦</div>
+                            <div class="lab-card-meta">
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">验证维度：</span><span class="meta-val" style="color:#67e8f9;">Dev-I（偏差传递）</span></span></div>
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">主线模块：</span><span class="meta-val">耦合系统控制 — 串级解耦</span></span></div>
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">应用场景：</span><span class="meta-val" style="color:#22d3ee;">多级工业过程控制</span></span></div>
+                            </div>
+                            <div class="lab-card-status">📍 状态：耦合系统实验</div>
+                            <span class="lab-card-btn" style="background:rgba(34,211,238,0.1);border-color:rgba(34,211,238,0.25);color:#22d3ee;">▶ 进入演示</span>
+                        </div>
+                        <div class="lab-card" data-exp="exp-9" style="border-color:rgba(34,211,238,0.3);background:rgba(34,211,238,0.04);position:relative;">
+                            <div class="lab-card-tag" style="background:rgba(34,211,238,0.12);color:#22d3ee;border-color:rgba(34,211,238,0.25);">⑧ 串级闭环</div>
+                            <div class="lab-card-icon" style="font-size:26px;">🔄</div>
+                            <div class="lab-card-name" style="color:#67e8f9;">串级双闭环控制系统</div>
+                            <div class="lab-card-desc">内环快速随动+外环精确调节·双PID嵌套结构</div>
+                            <div class="lab-card-meta">
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">验证维度：</span><span class="meta-val" style="color:#67e8f9;">D（阻尼）+ P（坡度）</span></span></div>
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">主线模块：</span><span class="meta-val">串级控制架构 — 双环嵌套</span></span></div>
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">应用场景：</span><span class="meta-val" style="color:#22d3ee;">高精度伺服/飞行器控制</span></span></div>
+                            </div>
+                            <div class="lab-card-status">📍 状态：进阶控制架构</div>
+                            <span class="lab-card-btn" style="background:rgba(34,211,238,0.1);border-color:rgba(34,211,238,0.25);color:#22d3ee;">▶ 进入演示</span>
+                        </div>
+                        <div class="lab-card" data-exp="exp-11" style="border-color:rgba(34,211,238,0.3);background:rgba(34,211,238,0.04);position:relative;">
+                            <div class="lab-card-tag" style="background:rgba(34,211,238,0.12);color:#22d3ee;border-color:rgba(34,211,238,0.25);">⑨ 扰动抑制</div>
+                            <div class="lab-card-icon" style="font-size:26px;">🌊</div>
+                            <div class="lab-card-name" style="color:#67e8f9;">外界扰动抑制对照</div>
+                            <div class="lab-card-desc">突发扰动后系统恢复稳态过程·鲁棒性验证</div>
+                            <div class="lab-card-meta">
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">验证维度：</span><span class="meta-val" style="color:#67e8f9;">Dev1（回归度）</span></span></div>
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">主线模块：</span><span class="meta-val">鲁棒控制 — 扰动观测器</span></span></div>
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">应用场景：</span><span class="meta-val" style="color:#22d3ee;">抗干扰/飞行器阵风抑制</span></span></div>
+                            </div>
+                            <div class="lab-card-status">📍 状态：鲁棒性验证</div>
+                            <span class="lab-card-btn" style="background:rgba(34,211,238,0.1);border-color:rgba(34,211,238,0.25);color:#22d3ee;">▶ 进入演示</span>
+                        </div>
+                        <div class="lab-card" data-exp="exp-8" style="border-color:rgba(34,211,238,0.3);background:rgba(34,211,238,0.04);position:relative;">
+                            <div class="lab-card-tag" style="background:rgba(34,211,238,0.12);color:#22d3ee;border-color:rgba(34,211,238,0.25);">⑩ 前馈补偿</div>
+                            <div class="lab-card-icon" style="font-size:26px;">🎯</div>
+                            <div class="lab-card-name" style="color:#67e8f9;">前馈预判补偿控制</div>
+                            <div class="lab-card-desc">已知扰动下的前馈补偿vs纯反馈·预判式控制</div>
+                            <div class="lab-card-meta">
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">验证维度：</span><span class="meta-val" style="color:#67e8f9;">P（坡度·预判）</span></span></div>
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">主线模块：</span><span class="meta-val">前馈控制 — 已知扰动补偿</span></span></div>
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">应用场景：</span><span class="meta-val" style="color:#22d3ee;">轨迹跟踪/伺服系统</span></span></div>
+                            </div>
+                            <div class="lab-card-status">📍 状态：预判式控制</div>
+                            <span class="lab-card-btn" style="background:rgba(34,211,238,0.1);border-color:rgba(34,211,238,0.25);color:#22d3ee;">▶ 进入演示</span>
+                        </div>
+                        <div class="lab-card" data-exp="exp-4" style="border-color:rgba(34,211,238,0.3);background:rgba(34,211,238,0.04);position:relative;">
+                            <div class="lab-card-tag" style="background:rgba(34,211,238,0.12);color:#22d3ee;border-color:rgba(34,211,238,0.25);">⑪ 限流控制</div>
+                            <div class="lab-card-icon" style="font-size:26px;">🚦</div>
+                            <div class="lab-card-name" style="color:#67e8f9;">排队论系统负载限流</div>
+                            <div class="lab-card-desc">队列长度 vs 服务容量的拥塞控制·系统容量边界</div>
+                            <div class="lab-card-meta">
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">验证维度：</span><span class="meta-val" style="color:#67e8f9;">S（熵·排队复杂度）</span></span></div>
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">主线模块：</span><span class="meta-val">排队论模型 — 拥塞控制</span></span></div>
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">应用场景：</span><span class="meta-val" style="color:#22d3ee;">网络/服务限流/资源调度</span></span></div>
+                            </div>
+                            <div class="lab-card-status">📍 状态：容量控制实验</div>
+                            <span class="lab-card-btn" style="background:rgba(34,211,238,0.1);border-color:rgba(34,211,238,0.25);color:#22d3ee;">▶ 进入演示</span>
+                        </div>
+                        <div class="lab-card" data-exp="exp-12" style="border-color:rgba(34,211,238,0.3);background:rgba(34,211,238,0.04);position:relative;">
+                            <div class="lab-card-tag" style="background:rgba(34,211,238,0.12);color:#22d3ee;border-color:rgba(34,211,238,0.25);">⑫ 随动跟踪</div>
+                            <div class="lab-card-icon" style="font-size:26px;">🎮</div>
+                            <div class="lab-card-name" style="color:#67e8f9;">伺服随动稳态跟踪</div>
+                            <div class="lab-card-desc">输出信号跟随目标轨迹变化·动态跟踪精度验证</div>
+                            <div class="lab-card-meta">
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">验证维度：</span><span class="meta-val" style="color:#67e8f9;">P（坡度·响应速度）</span></span></div>
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">主线模块：</span><span class="meta-val">伺服系统 — 轨迹跟踪</span></span></div>
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">应用场景：</span><span class="meta-val" style="color:#22d3ee;">机器人/数控机床/雷达跟踪</span></span></div>
+                            </div>
+                            <div class="lab-card-status">📍 状态：动态跟踪终级</div>
+                            <span class="lab-card-btn" style="background:rgba(34,211,238,0.1);border-color:rgba(34,211,238,0.25);color:#22d3ee;">▶ 进入演示</span>
+                        </div>
                     </div>
                 </div>
 
@@ -2129,16 +2290,118 @@
                         <span class="lab-cat-icon">🧠</span>
                         <span class="lab-cat-name">认知与神经科学类</span>
                         <span class="lab-cat-count">7项</span>
-                        <span class="lab-cat-desc">决策 · 错觉 · 风险 · 多层认知</span>
+                        <span class="lab-cat-desc">决策 · 错觉 · 风险 · 多层认知 · S/Dev1维度</span>
+                    </div>
+                    <div class="lab-cat-desc-block" style="margin:10px 0 8px;padding:12px 14px;background:linear-gradient(135deg,rgba(167,139,250,0.06),rgba(167,139,250,0.02));border:1px solid rgba(167,139,250,0.15);border-radius:10px;font-size:11px;line-height:1.7;color:rgba(167,139,250,0.75);">
+                        <div style="font-weight:600;color:#c4b5fd;margin-bottom:6px;">🧠 认知与神经科学类 · 决策偏差与多层认知</div>
+                        <div style="margin-bottom:6px;">7项 · 空间寻优 · 风险决策 · 前景理论 · 双稳态感知 · 认知冲突 · 脑层叠加 · 知识翻译</div>
+                        <div style="color:rgba(255,255,255,0.5);margin-bottom:6px;">本类别实验从认知神经科学角度验证人类决策机制、感知偏差与多层信息处理过程：</div>
+                        <div style="color:rgba(255,255,255,0.4);padding-left:10px;">
+                            <div>• 空间收敛：水迷宫螺旋收敛寻优（强化学习基准）</div>
+                            <div>• 风险决策：BART气球充气风险爆破</div>
+                            <div>• 框架效应：前景理论收益/损失双框架偏差</div>
+                            <div>• 感知双稳态：奈克立方体视角翻转</div>
+                            <div>• 认知冲突：斯特鲁普颜色词干扰效应</div>
+                            <div>• 多层认知：爬虫脑-边缘系统-新皮层三层叠加</div>
+                            <div>• 知识翻译：语言→思维→算法→数学四层链路</div>
+                        </div>
+                        <div style="margin-top:6px;color:rgba(167,139,250,0.6);">直接映射七维向量体系中的 <b style="color:#c4b5fd;">S（熵·决策复杂度）</b> 和 <b style="color:#c4b5fd;">Dev1（回归度·认知偏差校正）</b> 维度。对应主线模块：MindSpeak思维-语言同构引擎、认知偏差校正模型。</div>
+                    </div>
+                    <div class="lab-cat-guide">
+                        推荐观看顺序：水迷宫空间收敛寻优 → BART气球风险浓度爆破 → 前景理论双框架决策偏差 → 奈克立方体双稳态视角 → 斯特鲁普双脑指令冲突 → 人脑多层演化圈层叠加 → 知识四层翻译链路。这七组实验构成从「空间寻优 → 风险决策 → 框架偏差 → 感知稳态 → 认知冲突 → 多层结构 → 知识链路」的完整认知验证链路。
                     </div>
                     <div class="lab-grid">
-                        <div class="lab-card" data-exp="exp-16"><div class="lab-card-icon">🗺️</div><div class="lab-card-name">水迷宫空间收敛寻优</div><div class="lab-card-desc">空间搜索路径螺旋收敛至目标点</div><span class="lab-card-btn">▶ 进入演示</span></div>
-                        <div class="lab-card" data-exp="exp-17"><div class="lab-card-icon">🎈</div><div class="lab-card-name">BART气球风险浓度爆破</div><div class="lab-card-desc">气球充气与风险决策的爆破阈值</div><span class="lab-card-btn">▶ 进入演示</span></div>
-                        <div class="lab-card" data-exp="exp-18"><div class="lab-card-icon">⚖️</div><div class="lab-card-name">前景理论双框架决策偏差</div><div class="lab-card-desc">收益框架vs损失框架下的决策差异</div><span class="lab-card-btn">▶ 进入演示</span></div>
-                        <div class="lab-card" data-exp="exp-19"><div class="lab-card-icon">🔲</div><div class="lab-card-name">奈克立方体双稳态视角</div><div class="lab-card-desc">多主体感知的双稳态视角翻转</div><span class="lab-card-btn">▶ 进入演示</span></div>
-                        <div class="lab-card" data-exp="exp-20"><div class="lab-card-icon">🔤</div><div class="lab-card-name">斯特鲁普双脑指令冲突</div><div class="lab-card-desc">颜色词义与字体颜色的认知冲突</div><span class="lab-card-btn">▶ 进入演示</span></div>
-                        <div class="lab-card" data-exp="exp-21"><div class="lab-card-icon">🧅</div><div class="lab-card-name">人脑多层演化圈层叠加</div><div class="lab-card-desc">爬虫脑-边缘系统-新皮层三层结构</div><span class="lab-card-btn">▶ 进入演示</span></div>
-                        <div class="lab-card" data-exp="exp-22"><div class="lab-card-icon">🔄</div><div class="lab-card-name">知识四层翻译链路</div><div class="lab-card-desc">语言→思维→算法→数学四层转化</div><span class="lab-card-btn">▶ 进入演示</span></div>
+                        <div class="lab-card" data-exp="exp-16" style="border-color:rgba(167,139,250,0.3);background:rgba(167,139,250,0.04);position:relative;">
+                            <div class="lab-card-tag" style="background:rgba(167,139,250,0.12);color:#a78bfa;border-color:rgba(167,139,250,0.25);">① 空间收敛</div>
+                            <div class="lab-card-icon" style="font-size:26px;">🗺️</div>
+                            <div class="lab-card-name" style="color:#c4b5fd;">水迷宫空间收敛寻优</div>
+                            <div class="lab-card-desc">空间搜索路径螺旋收敛至目标点·强化学习基准实验</div>
+                            <div class="lab-card-meta">
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">验证维度：</span><span class="meta-val" style="color:#c4b5fd;">P（坡度·收敛速度）</span></span></div>
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">主线模块：</span><span class="meta-val">强化学习基准 — 空间搜索</span></span></div>
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">应用场景：</span><span class="meta-val" style="color:#a78bfa;">导航/路径规划/寻优算法</span></span></div>
+                            </div>
+                            <div class="lab-card-status">📍 状态：★ 空间寻优基准</div>
+                            <span class="lab-card-btn" style="background:rgba(167,139,250,0.15);border-color:rgba(167,139,250,0.4);color:#c4b5fd;">▶ 进入演示</span>
+                        </div>
+                        <div class="lab-card" data-exp="exp-17" style="border-color:rgba(248,113,113,0.3);background:rgba(248,113,113,0.04);position:relative;">
+                            <div class="lab-card-tag" style="background:rgba(248,113,113,0.12);color:#f87171;border-color:rgba(248,113,113,0.25);">② 风险决策</div>
+                            <div class="lab-card-icon" style="font-size:26px;">🎈</div>
+                            <div class="lab-card-name" style="color:#fca5a5;">BART气球风险浓度爆破</div>
+                            <div class="lab-card-desc">气球充气与风险决策的爆破阈值·0.68熔断线决策映射</div>
+                            <div class="lab-card-meta">
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">验证维度：</span><span class="meta-val" style="color:#fca5a5;">THRESHOLDS 0.68</span></span></div>
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">主线模块：</span><span class="meta-val">风险决策模型 — BART范式</span></span></div>
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">应用场景：</span><span class="meta-val" style="color:#f87171;">风险偏好测量/投资决策</span></span></div>
+                            </div>
+                            <div class="lab-card-status">📍 状态：★ 风险决策基准·0.68映射</div>
+                            <span class="lab-card-btn" style="background:rgba(248,113,113,0.1);border-color:rgba(248,113,113,0.25);color:#f87171;">▶ 进入演示</span>
+                        </div>
+                        <div class="lab-card" data-exp="exp-18" style="border-color:rgba(236,72,153,0.3);background:rgba(236,72,153,0.04);position:relative;">
+                            <div class="lab-card-tag" style="background:rgba(236,72,153,0.12);color:#ec4899;border-color:rgba(236,72,153,0.25);">③ 框架偏差</div>
+                            <div class="lab-card-icon" style="font-size:26px;">⚖️</div>
+                            <div class="lab-card-name" style="color:#f9a8d4;">前景理论双框架决策偏差</div>
+                            <div class="lab-card-desc">收益框架vs损失框架下的决策差异·Dev3偏差核心实验</div>
+                            <div class="lab-card-meta">
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">验证维度：</span><span class="meta-val" style="color:#f9a8d4;">Dev3（估值偏差）</span></span></div>
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">主线模块：</span><span class="meta-val">前景理论 — 框架效应校正</span></span></div>
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">应用场景：</span><span class="meta-val" style="color:#ec4899;">投研决策/MoodMind估值</span></span></div>
+                            </div>
+                            <div class="lab-card-status">📍 状态：★ Dev3偏差基准</div>
+                            <span class="lab-card-btn" style="background:rgba(236,72,153,0.1);border-color:rgba(236,72,153,0.25);color:#f472b6;">▶ 进入演示</span>
+                        </div>
+                        <div class="lab-card" data-exp="exp-19" style="border-color:rgba(167,139,250,0.3);background:rgba(167,139,250,0.04);position:relative;">
+                            <div class="lab-card-tag" style="background:rgba(167,139,250,0.12);color:#a78bfa;border-color:rgba(167,139,250,0.25);">④ 感知稳态</div>
+                            <div class="lab-card-icon" style="font-size:26px;">🔲</div>
+                            <div class="lab-card-name" style="color:#c4b5fd;">奈克立方体双稳态视角</div>
+                            <div class="lab-card-desc">多主体感知的双稳态视角翻转·感知歧义与熵</div>
+                            <div class="lab-card-meta">
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">验证维度：</span><span class="meta-val" style="color:#c4b5fd;">S（熵·感知歧义）</span></span></div>
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">主线模块：</span><span class="meta-val">双稳态感知 — 视角切换</span></span></div>
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">应用场景：</span><span class="meta-val" style="color:#a78bfa;">多视角分析/歧义消解</span></span></div>
+                            </div>
+                            <div class="lab-card-status">📍 状态：感知歧义实验</div>
+                            <span class="lab-card-btn" style="background:rgba(167,139,250,0.1);border-color:rgba(167,139,250,0.25);color:#a78bfa;">▶ 进入演示</span>
+                        </div>
+                        <div class="lab-card" data-exp="exp-20" style="border-color:rgba(167,139,250,0.3);background:rgba(167,139,250,0.04);position:relative;">
+                            <div class="lab-card-tag" style="background:rgba(167,139,250,0.12);color:#a78bfa;border-color:rgba(167,139,250,0.25);">⑤ 认知冲突</div>
+                            <div class="lab-card-icon" style="font-size:26px;">🔤</div>
+                            <div class="lab-card-name" style="color:#c4b5fd;">斯特鲁普双脑指令冲突</div>
+                            <div class="lab-card-desc">颜色词义与字体颜色的认知冲突·自动控制vs受控处理</div>
+                            <div class="lab-card-meta">
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">验证维度：</span><span class="meta-val" style="color:#c4b5fd;">Dev1（回归度·冲突消解）</span></span></div>
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">主线模块：</span><span class="meta-val">认知冲突模型 — Stroop效应</span></span></div>
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">应用场景：</span><span class="meta-val" style="color:#a78bfa;">注意力/认知负荷测量</span></span></div>
+                            </div>
+                            <div class="lab-card-status">📍 状态：认知冲突基准</div>
+                            <span class="lab-card-btn" style="background:rgba(167,139,250,0.1);border-color:rgba(167,139,250,0.25);color:#a78bfa;">▶ 进入演示</span>
+                        </div>
+                        <div class="lab-card" data-exp="exp-21" style="border-color:rgba(167,139,250,0.3);background:rgba(167,139,250,0.04);position:relative;">
+                            <div class="lab-card-tag" style="background:rgba(167,139,250,0.12);color:#a78bfa;border-color:rgba(167,139,250,0.25);">⑥ 多层结构</div>
+                            <div class="lab-card-icon" style="font-size:26px;">🧅</div>
+                            <div class="lab-card-name" style="color:#c4b5fd;">人脑多层演化圈层叠加</div>
+                            <div class="lab-card-desc">爬虫脑-边缘系统-新皮层三层结构·多层认知架构</div>
+                            <div class="lab-card-meta">
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">验证维度：</span><span class="meta-val" style="color:#c4b5fd;">S（熵·层级复杂度）</span></span></div>
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">主线模块：</span><span class="meta-val">三层脑模型 — 演化认知架构</span></span></div>
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">应用场景：</span><span class="meta-val" style="color:#a78bfa;">决策分层/情绪理性分离</span></span></div>
+                            </div>
+                            <div class="lab-card-status">📍 状态：多层认知架构</div>
+                            <span class="lab-card-btn" style="background:rgba(167,139,250,0.1);border-color:rgba(167,139,250,0.25);color:#a78bfa;">▶ 进入演示</span>
+                        </div>
+                        <div class="lab-card" data-exp="exp-22" style="border-color:rgba(167,139,250,0.3);background:rgba(167,139,250,0.04);position:relative;">
+                            <div class="lab-card-tag" style="background:rgba(167,139,250,0.12);color:#a78bfa;border-color:rgba(167,139,250,0.25);">⑦ 知识链路</div>
+                            <div class="lab-card-icon" style="font-size:26px;">🔄</div>
+                            <div class="lab-card-name" style="color:#c4b5fd;">知识四层翻译链路</div>
+                            <div class="lab-card-desc">语言→思维→算法→数学四层转化·MindSpeak核心链路</div>
+                            <div class="lab-card-meta">
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">验证维度：</span><span class="meta-val" style="color:#c4b5fd;">Dev2（历史依赖·翻译链路）</span></span></div>
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">主线模块：</span><span class="meta-val">MindSpeak引擎 — 数理-语言同构</span></span></div>
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">应用场景：</span><span class="meta-val" style="color:#a78bfa;">AI推理/知识表示/符号接地</span></span></div>
+                            </div>
+                            <div class="lab-card-status">📍 状态：★ MindSpeak核心链路</div>
+                            <span class="lab-card-btn" style="background:rgba(167,139,250,0.1);border-color:rgba(167,139,250,0.25);color:#a78bfa;">▶ 进入演示</span>
+                        </div>
                     </div>
                 </div>
 
@@ -2146,33 +2409,62 @@
                     <div class="lab-cat-header">
                         <span class="lab-cat-icon">💭</span>
                         <span class="lab-cat-name">心理与行为类</span>
-                        <span class="new-badge">新增</span>
+                        <span class="new-badge">🆕 新增</span>
                         <span class="lab-cat-count">3项</span>
                         <span class="lab-cat-desc">认知偏差 · 前景理论 · 决策冲突 · Dev3</span>
                     </div>
-                    <div class="lab-cat-guide" style="background:rgba(236,72,153,0.05);border-left-color:rgba(236,72,153,0.4);color:rgba(236,72,153,0.65);">
-                        该类别实验专门测量人类决策中的认知偏差，为MoodMind非标资产估值中的前景理论偏差校正提供实证支撑，直接映射七维向量的Dev3（估值偏差）维度。
+                    <div class="lab-cat-desc-block" style="margin:10px 0 8px;padding:12px 14px;background:linear-gradient(135deg,rgba(236,72,153,0.06),rgba(236,72,153,0.02));border:1px solid rgba(236,72,153,0.15);border-radius:10px;font-size:11px;line-height:1.7;color:rgba(236,72,153,0.75);">
+                        <div style="font-weight:600;color:#f9a8d4;margin-bottom:6px;">💭 心理与行为类 · 认知偏差与决策校正 <span style="font-size:10px;background:rgba(236,72,153,0.2);padding:1px 6px;border-radius:4px;margin-left:6px;">🆕 新增</span></div>
+                        <div style="margin-bottom:6px;">3项 · 偏差量化 · 双框架效应 · 认知冲突速度 · Dev3估值偏差校正</div>
+                        <div style="color:rgba(255,255,255,0.5);margin-bottom:6px;">该类别实验专门测量人类决策中的认知偏差系数，为MoodMind非标资产估值中的前景理论偏差校正提供实证支撑：</div>
+                        <div style="color:rgba(255,255,255,0.4);padding-left:10px;">
+                            <div>• 偏差量化：损失厌恶、过度自信、锚定效应等偏差系数测量</div>
+                            <div>• 框架效应：收益/损失框架下决策偏好的系统性反转</div>
+                            <div>• 冲突速度：认知冲突对决策速度和准确率的影响</div>
+                        </div>
+                        <div style="margin-top:6px;color:rgba(236,72,153,0.6);">直接映射七维向量体系中的 <b style="color:#f9a8d4;">Dev3（估值偏差）</b> 和 <b style="color:#f9a8d4;">S（熵·决策复杂度）</b> 维度。对应主线模块：MoodMind情绪估值引擎、前景理论偏差校正器。</div>
+                    </div>
+                    <div class="lab-cat-guide">
+                        推荐观看顺序：认知偏差量化实验 → 前景理论双框架实验 → 斯特鲁普认知冲突实验。这三组实验构成从「偏差系数测量 → 框架效应验证 → 冲突速度影响」的完整认知偏差验证链路，为投研推理系统的偏差校正环节提供实证依据。
                     </div>
                     <div class="lab-grid">
-                        <div class="lab-card" data-exp="exp-30" style="border-color:rgba(236,72,153,0.3);background:rgba(236,72,153,0.04);">
-                            <div class="lab-card-tag new-badge" style="background:rgba(236,72,153,0.12);color:#f472b6;border-color:rgba(236,72,153,0.25);">新增</div>
-                            <div class="lab-card-icon">🧪</div>
+                        <div class="lab-card" data-exp="exp-30" style="border-color:rgba(236,72,153,0.3);background:rgba(236,72,153,0.04);position:relative;">
+                            <div class="lab-card-tag" style="background:rgba(236,72,153,0.12);color:#ec4899;border-color:rgba(236,72,153,0.25);">🆕 ① 偏差量化</div>
+                            <div class="lab-card-icon" style="font-size:26px;">🧪</div>
                             <div class="lab-card-name" style="color:#f9a8d4;">认知偏差量化实验</div>
                             <div class="lab-card-desc">测量损失厌恶、过度自信等偏差系数 → MoodMind前景理论校正</div>
+                            <div class="lab-card-meta">
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">验证维度：</span><span class="meta-val" style="color:#f9a8d4;">Dev3（估值偏差）</span></span></div>
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">主线模块：</span><span class="meta-val">MoodMind引擎 — 偏差系数测量</span></span></div>
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">应用场景：</span><span class="meta-val" style="color:#ec4899;">投资决策/情绪估值/偏差校正</span></span></div>
+                            </div>
+                            <div class="lab-card-status">📍 状态：🆕 Dev3量化核心实验</div>
                             <span class="lab-card-btn" style="background:rgba(236,72,153,0.1);border-color:rgba(236,72,153,0.25);color:#f472b6;">▶ 进入演示</span>
                         </div>
-                        <div class="lab-card" data-exp="exp-31" style="border-color:rgba(236,72,153,0.3);background:rgba(236,72,153,0.04);">
-                            <div class="lab-card-tag new-badge" style="background:rgba(236,72,153,0.12);color:#f472b6;border-color:rgba(236,72,153,0.25);">新增</div>
-                            <div class="lab-card-icon">⚖️</div>
+                        <div class="lab-card" data-exp="exp-31" style="border-color:rgba(236,72,153,0.3);background:rgba(236,72,153,0.04);position:relative;">
+                            <div class="lab-card-tag" style="background:rgba(236,72,153,0.12);color:#ec4899;border-color:rgba(236,72,153,0.25);">🆕 ② 框架效应</div>
+                            <div class="lab-card-icon" style="font-size:26px;">⚖️</div>
                             <div class="lab-card-name" style="color:#f9a8d4;">前景理论双框架实验</div>
-                            <div class="lab-card-desc">收益框架vs损失框架决策差异 → 七维向量S（熵）维度</div>
+                            <div class="lab-card-desc">收益框架vs损失框架决策差异 → 七维向量S（熵）维度验证</div>
+                            <div class="lab-card-meta">
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">验证维度：</span><span class="meta-val" style="color:#f9a8d4;">S（熵·框架复杂度）</span></span></div>
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">主线模块：</span><span class="meta-val">前景理论 — 双框架效应</span></span></div>
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">应用场景：</span><span class="meta-val" style="color:#ec4899;">营销/投研沟通/风险呈现</span></span></div>
+                            </div>
+                            <div class="lab-card-status">📍 状态：🆕 框架效应验证</div>
                             <span class="lab-card-btn" style="background:rgba(236,72,153,0.1);border-color:rgba(236,72,153,0.25);color:#f472b6;">▶ 进入演示</span>
                         </div>
-                        <div class="lab-card" data-exp="exp-32" style="border-color:rgba(236,72,153,0.3);background:rgba(236,72,153,0.04);">
-                            <div class="lab-card-tag new-badge" style="background:rgba(236,72,153,0.12);color:#f472b6;border-color:rgba(236,72,153,0.25);">新增</div>
-                            <div class="lab-card-icon">🔤</div>
+                        <div class="lab-card" data-exp="exp-32" style="border-color:rgba(236,72,153,0.3);background:rgba(236,72,153,0.04);position:relative;">
+                            <div class="lab-card-tag" style="background:rgba(236,72,153,0.12);color:#ec4899;border-color:rgba(236,72,153,0.25);">🆕 ③ 冲突速度</div>
+                            <div class="lab-card-icon" style="font-size:26px;">🔤</div>
                             <div class="lab-card-name" style="color:#f9a8d4;">斯特鲁普认知冲突实验</div>
                             <div class="lab-card-desc">认知冲突对决策速度影响 → 七维向量S和Dev1维度</div>
+                            <div class="lab-card-meta">
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">验证维度：</span><span class="meta-val" style="color:#f9a8d4;">S（熵）+ Dev1（回归）</span></span></div>
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">主线模块：</span><span class="meta-val">认知负荷模型 — Stroop效应</span></span></div>
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">应用场景：</span><span class="meta-val" style="color:#ec4899;">认知负荷测量/注意力评估</span></span></div>
+                            </div>
+                            <div class="lab-card-status">📍 状态：🆕 认知冲突速度</div>
                             <span class="lab-card-btn" style="background:rgba(236,72,153,0.1);border-color:rgba(236,72,153,0.25);color:#f472b6;">▶ 进入演示</span>
                         </div>
                     </div>
@@ -2183,15 +2475,93 @@
                         <span class="lab-cat-icon">♟️</span>
                         <span class="lab-cat-name">多方博弈演化类</span>
                         <span class="lab-cat-count">5项</span>
-                        <span class="lab-cat-desc">纳什均衡 · 合作演化 · 序贯博弈</span>
-                        <a href="labs/game_theory_lab.html" class="lab-cat-enter">♟️ 进入总控交互界面</a>
+                        <span class="lab-cat-desc">纳什均衡 · 合作演化 · 序贯博弈 · P/Dev-I维度</span>
+                    </div>
+                    <div class="lab-cat-desc-block" style="margin:10px 0 8px;padding:12px 14px;background:linear-gradient(135deg,rgba(248,113,113,0.06),rgba(248,113,113,0.02));border:1px solid rgba(248,113,113,0.15);border-radius:10px;font-size:11px;line-height:1.7;color:rgba(248,113,113,0.75);">
+                        <div style="font-weight:600;color:#fca5a5;margin-bottom:6px;">♟️ 多方博弈演化类 · 纳什均衡与合作演化</div>
+                        <div style="margin-bottom:6px;">5项 · 三方稳态博弈 · 囚徒困境 · 古诺寡头 · 猎鹿合作 · 蜈蚣序贯</div>
+                        <div style="color:rgba(255,255,255,0.5);margin-bottom:6px;">本类别实验验证多方博弈中的策略互动、均衡收敛与合作演化机制：</div>
+                        <div style="color:rgba(255,255,255,0.4);padding-left:10px;">
+                            <div>• 三方稳态：低空三方线性斜率收敛博弈（GameMind基准）</div>
+                            <div>• 合作演化：重复迭代囚徒困境中合作率的演化轨迹</div>
+                            <div>• 寡头竞争：古诺模型下产能决策收敛至纳什均衡</div>
+                            <div>• 信任合作：猎鹿博弈中安全vs协作的收益景观</div>
+                            <div>• 序贯递进：蜈蚣博弈多轮take/pass决策逆向归纳</div>
+                        </div>
+                        <div style="margin-top:6px;color:rgba(248,113,113,0.6);">直接映射七维向量体系中的 <b style="color:#fca5a5;">P（坡度·策略收敛速度）</b> 和 <b style="color:#fca5a5;">Dev-I（均衡偏离度）</b> 维度。对应主线模块：GameMind博弈决策引擎、纳什均衡模拟器。</div>
+                    </div>
+                    <div class="lab-cat-guide">
+                        推荐观看顺序：低空三方线性斜率稳态博弈 → 古诺寡头产能纳什均衡 → 重复迭代囚徒困境演化 → 猎鹿合作分工博弈 → 蜈蚣多轮序贯递进博弈。这五组实验构成从「三方稳态收敛 → 寡头产量均衡 → 重复博弈合作 → 信任协作选择 → 多轮序贯决策」的完整博弈验证链路。
+                    </div>
+                    <div style="margin:10px 0 14px;">
+                        <a href="labs/game_theory_lab.html" style="display:inline-flex;align-items:center;gap:6px;padding:8px 18px;background:linear-gradient(135deg,rgba(248,113,113,0.12),rgba(248,113,113,0.06));border:1px solid rgba(248,113,113,0.3);border-radius:8px;color:#fca5a5;font-size:12px;font-weight:700;text-decoration:none;transition:all .2s;" onmouseover="this.style.background='linear-gradient(135deg,rgba(248,113,113,0.2),rgba(248,113,113,0.1))';this.style.borderColor='rgba(248,113,113,0.5)';this.style.transform='translateY(-1px)';" onmouseout="this.style.background='linear-gradient(135deg,rgba(248,113,113,0.12),rgba(248,113,113,0.06))';this.style.borderColor='rgba(248,113,113,0.3)';this.style.transform='translateY(0)';">🎛️ 进入总控交互界面</a>
                     </div>
                     <div class="lab-grid">
-                        <div class="lab-card" data-exp="exp-23"><div class="lab-card-icon">✈️</div><div class="lab-card-name">低空三方线性斜率稳态博弈</div><div class="lab-card-desc">三方策略斜率收敛至均衡点</div><span class="lab-card-btn">▶ 进入演示</span></div>
-                        <div class="lab-card" data-exp="exp-24"><div class="lab-card-icon">🤝</div><div class="lab-card-name">重复迭代囚徒困境演化</div><div class="lab-card-desc">多轮博弈中合作率的演化轨迹</div><span class="lab-card-btn">▶ 进入演示</span></div>
-                        <div class="lab-card" data-exp="exp-25"><div class="lab-card-icon">🏭</div><div class="lab-card-name">古诺寡头产能纳什均衡</div><div class="lab-card-desc">寡头竞争产量收敛至古诺均衡</div><span class="lab-card-btn">▶ 进入演示</span></div>
-                        <div class="lab-card" data-exp="exp-26"><div class="lab-card-icon">🦌</div><div class="lab-card-name">猎鹿合作分工博弈</div><div class="lab-card-desc">合作猎鹿vs单独猎兔的收益景观</div><span class="lab-card-btn">▶ 进入演示</span></div>
-                        <div class="lab-card" data-exp="exp-27"><div class="lab-card-icon">🐛</div><div class="lab-card-name">蜈蚣多轮序贯递进博弈</div><div class="lab-card-desc">多轮take/pass决策节点的逆向归纳</div><span class="lab-card-btn">▶ 进入演示</span></div>
+                        <div class="lab-card" data-exp="exp-23" style="border-color:rgba(248,113,113,0.3);background:rgba(248,113,113,0.04);position:relative;">
+                            <div class="lab-card-tag" style="background:rgba(248,113,113,0.12);color:#f87171;border-color:rgba(248,113,113,0.25);">① 三方稳态</div>
+                            <div class="lab-card-icon" style="font-size:26px;">✈️</div>
+                            <div class="lab-card-name" style="color:#fca5a5;">低空三方线性斜率稳态博弈</div>
+                            <div class="lab-card-desc">三方策略斜率收敛至均衡点·GameMind引擎基准实验</div>
+                            <div class="lab-card-meta">
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">验证维度：</span><span class="meta-val" style="color:#fca5a5;">P（坡度）+ Dev-I（均衡偏离）</span></span></div>
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">主线模块：</span><span class="meta-val">GameMind引擎 — 三方博弈收敛</span></span></div>
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">应用场景：</span><span class="meta-val" style="color:#f87171;">低空交通调度/多主体协调</span></span></div>
+                            </div>
+                            <div class="lab-card-status">📍 状态：★ GameMind基准实验</div>
+                            <span class="lab-card-btn" style="background:rgba(248,113,113,0.1);border-color:rgba(248,113,113,0.25);color:#f87171;">▶ 进入演示</span>
+                        </div>
+                        <div class="lab-card" data-exp="exp-25" style="border-color:rgba(248,113,113,0.3);background:rgba(248,113,113,0.04);position:relative;">
+                            <div class="lab-card-tag" style="background:rgba(248,113,113,0.12);color:#f87171;border-color:rgba(248,113,113,0.25);">② 寡头均衡</div>
+                            <div class="lab-card-icon" style="font-size:26px;">🏭</div>
+                            <div class="lab-card-name" style="color:#fca5a5;">古诺寡头产能纳什均衡</div>
+                            <div class="lab-card-desc">寡头竞争产量收敛至古诺均衡·经典纳什均衡验证</div>
+                            <div class="lab-card-meta">
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">验证维度：</span><span class="meta-val" style="color:#fca5a5;">Dev-I（均衡偏离）</span></span></div>
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">主线模块：</span><span class="meta-val">纳什均衡模拟器 — 古诺模型</span></span></div>
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">应用场景：</span><span class="meta-val" style="color:#f87171;">产业竞争/产能决策/寡头分析</span></span></div>
+                            </div>
+                            <div class="lab-card-status">📍 状态：★ 纳什均衡核心实验</div>
+                            <span class="lab-card-btn" style="background:rgba(248,113,113,0.1);border-color:rgba(248,113,113,0.25);color:#f87171;">▶ 进入演示</span>
+                        </div>
+                        <div class="lab-card" data-exp="exp-24" style="border-color:rgba(248,113,113,0.3);background:rgba(248,113,113,0.04);position:relative;">
+                            <div class="lab-card-tag" style="background:rgba(248,113,113,0.12);color:#f87171;border-color:rgba(248,113,113,0.25);">③ 合作演化</div>
+                            <div class="lab-card-icon" style="font-size:26px;">🤝</div>
+                            <div class="lab-card-name" style="color:#fca5a5;">重复迭代囚徒困境演化</div>
+                            <div class="lab-card-desc">多轮博弈中合作率的演化轨迹·一报还一报策略胜出</div>
+                            <div class="lab-card-meta">
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">验证维度：</span><span class="meta-val" style="color:#fca5a5;">S（熵·策略多样性）</span></span></div>
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">主线模块：</span><span class="meta-val">演化博弈模型 — 合作涌现</span></span></div>
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">应用场景：</span><span class="meta-val" style="color:#f87171;">信任建立/合作机制设计</span></span></div>
+                            </div>
+                            <div class="lab-card-status">📍 状态：合作演化基准</div>
+                            <span class="lab-card-btn" style="background:rgba(248,113,113,0.1);border-color:rgba(248,113,113,0.25);color:#f87171;">▶ 进入演示</span>
+                        </div>
+                        <div class="lab-card" data-exp="exp-26" style="border-color:rgba(248,113,113,0.3);background:rgba(248,113,113,0.04);position:relative;">
+                            <div class="lab-card-tag" style="background:rgba(248,113,113,0.12);color:#f87171;border-color:rgba(248,113,113,0.25);">④ 信任协作</div>
+                            <div class="lab-card-icon" style="font-size:26px;">🦌</div>
+                            <div class="lab-card-name" style="color:#fca5a5;">猎鹿合作分工博弈</div>
+                            <div class="lab-card-desc">合作猎鹿vs单独猎兔的收益景观·信任阈值验证</div>
+                            <div class="lab-card-meta">
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">验证维度：</span><span class="meta-val" style="color:#fca5a5;">P（坡度·信任阈值）</span></span></div>
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">主线模块：</span><span class="meta-val">协调博弈模型 — 信任协作</span></span></div>
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">应用场景：</span><span class="meta-val" style="color:#f87171;">团队协作/联盟形成</span></span></div>
+                            </div>
+                            <div class="lab-card-status">📍 状态：信任协作实验</div>
+                            <span class="lab-card-btn" style="background:rgba(248,113,113,0.1);border-color:rgba(248,113,113,0.25);color:#f87171;">▶ 进入演示</span>
+                        </div>
+                        <div class="lab-card" data-exp="exp-27" style="border-color:rgba(248,113,113,0.3);background:rgba(248,113,113,0.04);position:relative;">
+                            <div class="lab-card-tag" style="background:rgba(248,113,113,0.12);color:#f87171;border-color:rgba(248,113,113,0.25);">⑤ 序贯决策</div>
+                            <div class="lab-card-icon" style="font-size:26px;">🐛</div>
+                            <div class="lab-card-name" style="color:#fca5a5;">蜈蚣多轮序贯递进博弈</div>
+                            <div class="lab-card-desc">多轮take/pass决策节点的逆向归纳·序贯理性验证</div>
+                            <div class="lab-card-meta">
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">验证维度：</span><span class="meta-val" style="color:#fca5a5;">Dev2（历史依赖·逆向归纳）</span></span></div>
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">主线模块：</span><span class="meta-val">序贯博弈模型 — 逆向归纳</span></span></div>
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">应用场景：</span><span class="meta-val" style="color:#f87171;">多轮谈判/长期合作关系</span></span></div>
+                            </div>
+                            <div class="lab-card-status">📍 状态：序贯决策实验</div>
+                            <span class="lab-card-btn" style="background:rgba(248,113,113,0.1);border-color:rgba(248,113,113,0.25);color:#f87171;">▶ 进入演示</span>
+                        </div>
                     </div>
                 </div>
 
@@ -2199,42 +2569,80 @@
                     <div class="lab-cat-header">
                         <span class="lab-cat-icon">📈</span>
                         <span class="lab-cat-name">经济学与市场类</span>
-                        <span class="new-badge econ">新增</span>
+                        <span class="new-badge econ">🆕 新增</span>
                         <span class="lab-cat-count">4项</span>
-                        <span class="lab-cat-desc">市场均衡 · 估值偏差 · 博弈决策 · Dev3</span>
-                        <a href="labs/market_equilibrium_lab.html" class="lab-cat-enter">📈 进入总控交互界面</a>
+                        <span class="lab-cat-desc">市场均衡 · 估值偏差 · 博弈决策 · Dev3维度</span>
                     </div>
-                    <div class="lab-cat-guide" style="background:rgba(34,197,94,0.05);border-left-color:rgba(34,197,94,0.4);color:rgba(34,197,94,0.65);">
-                        该类别实验模拟市场价格形成与价值偏离过程，为11步投研推理系统的"定价估值"环节提供实证依据，直接映射七维向量的Dev3（估值偏差）维度。
+                    <div class="lab-cat-desc-block" style="margin:10px 0 8px;padding:12px 14px;background:linear-gradient(135deg,rgba(34,197,94,0.06),rgba(34,197,94,0.02));border:1px solid rgba(34,197,94,0.15);border-radius:10px;font-size:11px;line-height:1.7;color:rgba(34,197,94,0.75);">
+                        <div style="font-weight:600;color:#86efac;margin-bottom:6px;">📈 经济学与市场类 · 市场均衡与估值偏差 <span style="font-size:10px;background:rgba(34,197,94,0.2);padding:1px 6px;border-radius:4px;margin-left:6px;">🆕 新增</span></div>
+                        <div style="margin-bottom:6px;">4项 · 供需均衡 · 估值偏差 · 博弈决策 · 价格偏离 · Dev3估值偏差</div>
+                        <div style="color:rgba(255,255,255,0.5);margin-bottom:6px;">该类别实验模拟市场价格形成与价值偏离过程，为11步投研推理系统的"定价估值"环节提供实证依据：</div>
+                        <div style="color:rgba(255,255,255,0.4);padding-left:10px;">
+                            <div>• 市场均衡：供需曲线交叉形成均衡价格（亚当斯密看不见的手）</div>
+                            <div>• 估值偏差：市场价格系统性偏离内在价值的机理</div>
+                            <div>• 博弈决策：多方博弈下的定价偏差与市场非效率</div>
+                            <div>• 价格偏离：Dev3维度直接验证——价格vs估算内在价值</div>
+                        </div>
+                        <div style="margin-top:6px;color:rgba(34,197,94,0.6);">直接映射七维向量体系中的 <b style="color:#86efac;">Dev3（估值偏差）</b> 维度。对应主线模块：市场均衡模拟器、11步投研推理系统定价估值环节。</div>
+                    </div>
+                    <div class="lab-cat-guide">
+                        推荐观看顺序：市场均衡实验 → 估值偏差实验 → 博弈决策实验 → 市场价格偏离内在价值实验。这四组实验构成从「均衡基准 → 偏差机理 → 博弈影响 → Dev3直接验证」的完整市场实证链路，为投研推理系统的定价估值环节提供理论基础。
+                    </div>
+                    <div style="margin:10px 0 14px;">
+                        <a href="labs/market_equilibrium_lab.html" style="display:inline-flex;align-items:center;gap:6px;padding:8px 18px;background:linear-gradient(135deg,rgba(34,197,94,0.12),rgba(34,197,94,0.06));border:1px solid rgba(34,197,94,0.3);border-radius:8px;color:#86efac;font-size:12px;font-weight:700;text-decoration:none;transition:all .2s;" onmouseover="this.style.background='linear-gradient(135deg,rgba(34,197,94,0.2),rgba(34,197,94,0.1))';this.style.borderColor='rgba(34,197,94,0.5)';this.style.transform='translateY(-1px)';" onmouseout="this.style.background='linear-gradient(135deg,rgba(34,197,94,0.12),rgba(34,197,94,0.06))';this.style.borderColor='rgba(34,197,94,0.3)';this.style.transform='translateY(0)';">🎛️ 进入总控交互界面</a>
                     </div>
                     <div class="lab-grid">
-                        <div class="lab-card" data-exp="exp-33" style="border-color:rgba(34,197,94,0.3);background:rgba(34,197,94,0.04);">
-                            <div class="lab-card-tag new-badge econ" style="background:rgba(34,197,94,0.12);color:#22c55e;border-color:rgba(34,197,94,0.25);">新增</div>
-                            <div class="lab-card-icon">⚖️</div>
+                        <div class="lab-card" data-exp="exp-33" style="border-color:rgba(34,197,94,0.3);background:rgba(34,197,94,0.04);position:relative;">
+                            <div class="lab-card-tag" style="background:rgba(34,197,94,0.12);color:#22c55e;border-color:rgba(34,197,94,0.25);">🆕 ① 均衡基准</div>
+                            <div class="lab-card-icon" style="font-size:26px;">⚖️</div>
                             <div class="lab-card-name" style="color:#86efac;">市场均衡实验</div>
-                            <div class="lab-card-desc">供需双方均衡价格形成过程 → 投研推理"定价估值"</div>
+                            <div class="lab-card-desc">供需双方均衡价格形成过程 → 投研推理"定价估值"基准</div>
+                            <div class="lab-card-meta">
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">验证维度：</span><span class="meta-val" style="color:#86efac;">I（海拔·均衡基准）</span></span></div>
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">主线模块：</span><span class="meta-val">市场均衡模拟器 — 供需曲线</span></span></div>
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">应用场景：</span><span class="meta-val" style="color:#22c55e;">定价估值/市场分析/均衡计算</span></span></div>
+                            </div>
+                            <div class="lab-card-status">📍 状态：🆕 市场均衡基准实验</div>
                             <span class="lab-card-btn" style="background:rgba(34,197,94,0.1);border-color:rgba(34,197,94,0.25);color:#22c55e;">▶ 进入演示</span>
                         </div>
-                        <div class="lab-card" data-exp="exp-34" style="border-color:rgba(34,197,94,0.3);background:rgba(34,197,94,0.04);">
-                            <div class="lab-card-tag new-badge econ" style="background:rgba(34,197,94,0.12);color:#22c55e;border-color:rgba(34,197,94,0.25);">新增</div>
-                            <div class="lab-card-icon">📊</div>
+                        <div class="lab-card" data-exp="exp-34" style="border-color:rgba(34,197,94,0.3);background:rgba(34,197,94,0.04);position:relative;">
+                            <div class="lab-card-tag" style="background:rgba(34,197,94,0.12);color:#22c55e;border-color:rgba(34,197,94,0.25);">🆕 ② 估值偏差</div>
+                            <div class="lab-card-icon" style="font-size:26px;">📊</div>
                             <div class="lab-card-name" style="color:#86efac;">估值偏差实验</div>
-                            <div class="lab-card-desc">市场价格偏离内在价值模拟 → 七维向量Dev3维度</div>
+                            <div class="lab-card-desc">市场价格偏离内在价值模拟 → 七维向量Dev3维度验证</div>
+                            <div class="lab-card-meta">
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">验证维度：</span><span class="meta-val" style="color:#86efac;">Dev3（估值偏差）</span></span></div>
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">主线模块：</span><span class="meta-val">估值偏差模型 — Dev3核心</span></span></div>
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">应用场景：</span><span class="meta-val" style="color:#22c55e;">资产定价/价值投资/偏差套利</span></span></div>
+                            </div>
+                            <div class="lab-card-status">📍 状态：🆕 Dev3维度核心实验</div>
                             <span class="lab-card-btn" style="background:rgba(34,197,94,0.1);border-color:rgba(34,197,94,0.25);color:#22c55e;">▶ 进入演示</span>
                         </div>
-                        <div class="lab-card" data-exp="exp-35" style="border-color:rgba(34,197,94,0.3);background:rgba(34,197,94,0.04);">
-                            <div class="lab-card-tag new-badge econ" style="background:rgba(34,197,94,0.12);color:#22c55e;border-color:rgba(34,197,94,0.25);">新增</div>
-                            <div class="lab-card-icon">🎯</div>
+                        <div class="lab-card" data-exp="exp-35" style="border-color:rgba(34,197,94,0.3);background:rgba(34,197,94,0.04);position:relative;">
+                            <div class="lab-card-tag" style="background:rgba(34,197,94,0.12);color:#22c55e;border-color:rgba(34,197,94,0.25);">🆕 ③ 博弈定价</div>
+                            <div class="lab-card-icon" style="font-size:26px;">🎯</div>
                             <div class="lab-card-name" style="color:#86efac;">博弈决策实验</div>
-                            <div class="lab-card-desc">多方博弈下决策偏差模拟 → GameMind博弈底座</div>
+                            <div class="lab-card-desc">多方博弈下决策偏差模拟 → GameMind博弈底座市场场景</div>
+                            <div class="lab-card-meta">
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">验证维度：</span><span class="meta-val" style="color:#86efac;">Dev-I + Dev3复合</span></span></div>
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">主线模块：</span><span class="meta-val">GameMind博弈底座 — 市场博弈</span></span></div>
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">应用场景：</span><span class="meta-val" style="color:#22c55e;">寡头定价/策略互动/市场博弈</span></span></div>
+                            </div>
+                            <div class="lab-card-status">📍 状态：🆕 博弈定价交叉实验</div>
                             <span class="lab-card-btn" style="background:rgba(34,197,94,0.1);border-color:rgba(34,197,94,0.25);color:#22c55e;">▶ 进入演示</span>
                         </div>
-                        <div class="lab-card" data-exp="exp-36" style="border-color:rgba(34,197,94,0.3);background:rgba(34,197,94,0.04);">
-                            <div class="lab-card-tag new-badge econ" style="background:rgba(34,197,94,0.12);color:#22c55e;border-color:rgba(34,197,94,0.25);">Dev3实验</div>
-                            <div class="lab-card-icon">💹</div>
-                            <div class="lab-card-name" style="color:#86efac;">市场价格偏离内在价值实验</div>
+                        <div class="lab-card" data-exp="exp-36" style="border-color:rgba(245,158,11,0.3);background:rgba(245,158,11,0.04);position:relative;">
+                            <div class="lab-card-tag" style="background:rgba(245,158,11,0.12);color:#f59e0b;border-color:rgba(245,158,11,0.25);">🆕 ④ Dev3直接验证</div>
+                            <div class="lab-card-icon" style="font-size:26px;">💹</div>
+                            <div class="lab-card-name" style="color:#fcd34d;">市场价格偏离内在价值实验</div>
                             <div class="lab-card-desc">价格与估算内在价值偏差验证 → 七维向量Dev3直接实验</div>
-                            <span class="lab-card-btn" style="background:rgba(34,197,94,0.1);border-color:rgba(34,197,94,0.25);color:#22c55e;">▶ 进入演示</span>
+                            <div class="lab-card-meta">
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">验证维度：</span><span class="meta-val" style="color:#fcd34d;">Dev3（估值偏差·直接验证）</span></span></div>
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">主线模块：</span><span class="meta-val">THRESHOLDS+Dev3 — 价格偏离</span></span></div>
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">应用场景：</span><span class="meta-val" style="color:#f59e0b;">估值建模/偏离预警/套利机会</span></span></div>
+                            </div>
+                            <div class="lab-card-status">📍 状态：🆕 Dev3直接验证·THRESHOLDS联动</div>
+                            <span class="lab-card-btn" style="background:rgba(245,158,11,0.1);border-color:rgba(245,158,11,0.25);color:#f59e0b;">▶ 进入演示</span>
                         </div>
                     </div>
                 </div>
@@ -2244,11 +2652,40 @@
                         <span class="lab-cat-icon">📡</span>
                         <span class="lab-cat-name">信息与通信信道类</span>
                         <span class="lab-cat-count">1项</span>
-                        <span class="lab-cat-desc">噪声 · 滤波 · 信号收敛</span>
-                        <a href="labs/signal_filter_lab.html" class="lab-cat-enter">📡 进入总控交互界面</a>
+                        <span class="lab-cat-desc">噪声 · 滤波 · 信号收敛 · Dev2维度</span>
+                    </div>
+                    <div class="lab-cat-desc-block" style="margin:10px 0 8px;padding:12px 14px;background:linear-gradient(135deg,rgba(74,222,128,0.06),rgba(74,222,128,0.02));border:1px solid rgba(74,222,128,0.15);border-radius:10px;font-size:11px;line-height:1.7;color:rgba(74,222,128,0.75);">
+                        <div style="font-weight:600;color:#86efac;margin-bottom:6px;">📡 信息与通信信道类 · 噪声滤波与信号收敛</div>
+                        <div style="margin-bottom:6px;">1项 · 信道噪声滤波收敛 · Dev2历史相似度差维度</div>
+                        <div style="color:rgba(255,255,255,0.5);margin-bottom:6px;">本类别实验验证含噪信号经滤波后向真实值收敛的信息论过程：</div>
+                        <div style="color:rgba(255,255,255,0.4);padding-left:10px;">
+                            <div>• 信号生成：正弦波/方波/扫频/阶跃信号源</div>
+                            <div>• 噪声注入：高斯白噪声叠加模拟信道干扰</div>
+                            <div>• 滤波收敛：滑动平均+低通滤波恢复原始信号</div>
+                            <div>• 质量评估：SNR信噪比、MSE均方误差、收敛度</div>
+                        </div>
+                        <div style="margin-top:6px;color:rgba(74,222,128,0.6);">直接映射七维向量体系中的 <b style="color:#86efac;">S（熵·噪声复杂度）</b> 和 <b style="color:#86efac;">Dev2（历史相似度差）</b> 维度。对应主线模块：信号滤波模拟器、信息收敛质量评估引擎。</div>
+                    </div>
+                    <div class="lab-cat-guide">
+                        推荐观看顺序：信道噪声滤波收敛（信号强度/噪声强度/滤波带宽/滤波阶数四参数调节，观察原始信号→含噪信号→滤波后信号三曲线对比）。本实验为信息论与通信系统的核心基准验证。
+                    </div>
+                    <div style="margin:10px 0 14px;">
+                        <a href="labs/signal_filter_lab.html" style="display:inline-flex;align-items:center;gap:6px;padding:8px 18px;background:linear-gradient(135deg,rgba(74,222,128,0.12),rgba(74,222,128,0.06));border:1px solid rgba(74,222,128,0.3);border-radius:8px;color:#86efac;font-size:12px;font-weight:700;text-decoration:none;transition:all .2s;" onmouseover="this.style.background='linear-gradient(135deg,rgba(74,222,128,0.2),rgba(74,222,128,0.1))';this.style.borderColor='rgba(74,222,128,0.5)';this.style.transform='translateY(-1px)';" onmouseout="this.style.background='linear-gradient(135deg,rgba(74,222,128,0.12),rgba(74,222,128,0.06))';this.style.borderColor='rgba(74,222,128,0.3)';this.style.transform='translateY(0)';">🎛️ 进入总控交互界面</a>
                     </div>
                     <div class="lab-grid">
-                        <div class="lab-card" data-exp="exp-28"><div class="lab-card-icon">📶</div><div class="lab-card-name">信道噪声滤波收敛</div><div class="lab-card-desc">含噪信号经滤波后收敛至真实值</div><span class="lab-card-btn">▶ 进入演示</span></div>
+                        <div class="lab-card" data-exp="exp-28" style="border-color:rgba(74,222,128,0.3);background:rgba(74,222,128,0.04);position:relative;">
+                            <div class="lab-card-tag" style="background:rgba(74,222,128,0.12);color:#4ade80;border-color:rgba(74,222,128,0.25);">① 滤波收敛</div>
+                            <div class="lab-card-icon" style="font-size:26px;">📶</div>
+                            <div class="lab-card-name" style="color:#86efac;">信道噪声滤波收敛</div>
+                            <div class="lab-card-desc">含噪信号经滤波后收敛至真实值·SNR/MSE/收敛度三指标</div>
+                            <div class="lab-card-meta">
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">验证维度：</span><span class="meta-val" style="color:#86efac;">S（熵）+ Dev2（历史相似度）</span></span></div>
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">主线模块：</span><span class="meta-val">信号滤波模拟器 — 噪声抑制</span></span></div>
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">应用场景：</span><span class="meta-val" style="color:#4ade80;">通信系统/信号处理/噪声滤波</span></span></div>
+                            </div>
+                            <div class="lab-card-status">📍 状态：★ Dev2维度核心实验</div>
+                            <span class="lab-card-btn" style="background:rgba(74,222,128,0.1);border-color:rgba(74,222,128,0.25);color:#4ade80;">▶ 进入演示</span>
+                        </div>
                     </div>
                 </div>
 
@@ -2257,9 +2694,26 @@
                         <span class="lab-cat-icon">🍸</span>
                         <span class="lab-cat-name">分子调酒实验室</span>
                         <span class="lab-cat-count">3项</span>
-                        <span class="new-badge" style="background:linear-gradient(135deg,#f59e0b,#f97316);color:#000;border:none;">实体物理实验组</span>
+                        <span class="new-badge" style="background:linear-gradient(135deg,#f59e0b,#f97316);color:#000;border:none;">🆕 实体物理实验组</span>
                         <span class="lab-cat-desc">味觉系统 · 圆锥浓度模型 · 三基准阈值</span>
-                        <a href="labs/molecular-mixology.html" class="lab-cat-enter" style="background:rgba(245,158,11,0.1);border-color:rgba(245,158,11,0.25);color:#f59e0b;">🍸 进入总控交互界面</a>
+                    </div>
+                    <div class="lab-cat-desc-block" style="margin:10px 0 8px;padding:12px 14px;background:linear-gradient(135deg,rgba(245,158,11,0.06),rgba(245,158,11,0.02));border:1px solid rgba(245,158,11,0.15);border-radius:10px;font-size:11px;line-height:1.7;color:rgba(245,158,11,0.75);">
+                        <div style="font-weight:600;color:#fcd34d;margin-bottom:6px;">🍸 分子调酒实验室 · 味觉系统跨域实体验证 <span style="font-size:10px;background:linear-gradient(135deg,#f59e0b,#f97316);color:#000;padding:1px 8px;border-radius:4px;margin-left:6px;font-weight:700;">🆕 实体物理</span></div>
+                        <div style="margin-bottom:6px;">3项 · 风味浓度归一化 · 0.50稳态配方验证 · 0.68熔断线测试 · S/D维度 · 圆锥浓度模型</div>
+                        <div style="color:rgba(255,255,255,0.5);margin-bottom:6px;">本实验组为 Game-OS 方法论在「味觉系统」域的跨领域实体物理验证，将金融域圆锥浓度模型迁移至风味浓度调配：</div>
+                        <div style="color:rgba(255,255,255,0.4);padding-left:10px;">
+                            <div>• 核心公式：C = m × ρ₀ / V(h)（质量×密度/圆锥体积）</div>
+                            <div>• 三基准阈值：0.48风味寡淡线 · 0.50口感均衡线 · 0.68风味熔断线</div>
+                            <div>• PID映射：基酒选择(K层)→配方参数(M层)→风味浓度(P层)</div>
+                            <div>• 分子结构：主要风味分子展示与七维向量对应</div>
+                        </div>
+                        <div style="margin-top:6px;color:rgba(245,158,11,0.6);">直接映射七维向量体系中的 <b style="color:#fcd34d;">S（熵·风味复杂度）</b> 和 <b style="color:#fcd34d;">D（阻尼·风味平衡）</b> 维度。对应主线模块：圆锥浓度模型、THRESHOLDS三基准判定、01解码→配方指令链路。</div>
+                    </div>
+                    <div class="lab-cat-guide">
+                        推荐观看顺序：① 风味浓度归一化曲线 → ② 0.50稳态中轴线配方验证 → ③ 0.68熔断线风味触发测试。这三组实验构成从「浓度归一化测绘 → 稳态配方验证 → 熔断边界测试」的完整味觉系统验证链路，圆锥浓度模型从金融资产定价平移至风味浓度调配，实现跨域方法论迁移验证。
+                    </div>
+                    <div style="margin:10px 0 14px;">
+                        <a href="labs/molecular-mixology.html" style="display:inline-flex;align-items:center;gap:6px;padding:8px 18px;background:linear-gradient(135deg,rgba(245,158,11,0.12),rgba(245,158,11,0.06));border:1px solid rgba(245,158,11,0.3);border-radius:8px;color:#fcd34d;font-size:12px;font-weight:700;text-decoration:none;transition:all .2s;" onmouseover="this.style.background='linear-gradient(135deg,rgba(245,158,11,0.2),rgba(245,158,11,0.1))';this.style.borderColor='rgba(245,158,11,0.5)';this.style.transform='translateY(-1px)';" onmouseout="this.style.background='linear-gradient(135deg,rgba(245,158,11,0.12),rgba(245,158,11,0.06))';this.style.borderColor='rgba(245,158,11,0.3)';this.style.transform='translateY(0)';">🎛️ 进入总控交互界面</a>
                     </div>
                     <div class="mixology-hero">
                         <div class="mixology-formula-box">
@@ -2280,49 +2734,46 @@
                             <a href="labs/molecular-mixology.html" class="mx-entry-btn">🍸 进入分子调酒实验室 →</a>
                         </div>
                     </div>
-                    <div class="lab-cat-guide">
-                        实验链路：① 风味浓度归一化曲线 → ② 0.50稳态中轴线配方验证 → ③ 0.68熔断线风味触发测试。本实验组为 Game-OS 方法论在「味觉系统」域的跨领域实体物理验证，圆锥浓度模型从金融资产定价平移至风味浓度调配。
-                    </div>
                     <div class="lab-grid">
-                        <div class="lab-card" onclick="window.location.href='labs/molecular-mixology.html'">
-                            <div class="lab-card-tag" style="background:rgba(74,222,128,0.12);color:#4ade80;border-color:rgba(74,222,128,0.25);">① 归一化</div>
-                            <div class="lab-card-icon">📐</div>
-                            <div class="lab-card-name">风味浓度归一化曲线</div>
+                        <a href="labs/molecular-mixology.html" class="lab-card" style="text-decoration:none;color:inherit;border-color:rgba(245,158,11,0.3);background:rgba(245,158,11,0.04);position:relative;">
+                            <div class="lab-card-tag" style="background:rgba(245,158,11,0.12);color:#f59e0b;border-color:rgba(245,158,11,0.25);">① 浓度归一化</div>
+                            <div class="lab-card-icon" style="font-size:26px;">📐</div>
+                            <div class="lab-card-name" style="color:#fcd34d;">风味浓度归一化曲线</div>
                             <div class="lab-card-desc">测绘溶质投入量与风味感知浓度的对应关系，验证 C=m·ρ₀/V 公式</div>
                             <div class="lab-card-meta">
-                                <div class="lab-meta-item"><span class="check">✓</span><span class="meta-label">验证维度：</span><span class="meta-val" style="color:#f59e0b;">S（熵）· D（阻尼）</span></div>
-                                <div class="lab-meta-item"><span class="check">✓</span><span class="meta-label">主线模块：</span><span class="meta-val">圆锥浓度模型</span></div>
-                                <div class="lab-meta-item"><span class="check">✓</span><span class="meta-label">空域场景：</span><span class="meta-val">实体物理实验</span></div>
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">验证维度：</span><span class="meta-val" style="color:#fcd34d;">S（熵）· D（阻尼）</span></span></div>
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">主线模块：</span><span class="meta-val">圆锥浓度模型 — 浓度映射</span></span></div>
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">应用场景：</span><span class="meta-val" style="color:#f59e0b;">实体物理实验·味觉系统</span></span></div>
                             </div>
                             <div class="lab-card-status" style="color:rgba(255,255,255,0.3);">⏳ 实验规划中</div>
-                            <span class="lab-card-btn">🔬 规划详情</span>
-                        </div>
-                        <div class="lab-card" onclick="window.location.href='labs/molecular-mixology.html'">
+                            <span class="lab-card-btn" style="background:rgba(245,158,11,0.1);border-color:rgba(245,158,11,0.25);color:#f59e0b;">🔬 规划详情</span>
+                        </a>
+                        <a href="labs/molecular-mixology.html" class="lab-card" style="text-decoration:none;color:inherit;border-color:rgba(251,191,36,0.3);background:rgba(251,191,36,0.04);position:relative;">
                             <div class="lab-card-tag" style="background:rgba(250,204,21,0.12);color:#facc15;border-color:rgba(250,204,21,0.25);">② 稳态验证</div>
-                            <div class="lab-card-icon">🍷</div>
-                            <div class="lab-card-name">0.50 稳态中轴线配方验证</div>
-                            <div class="lab-card-desc">寻找风味浓度收敛至0.50均衡线的精确配比，对应PID设定点</div>
+                            <div class="lab-card-icon" style="font-size:26px;">🍷</div>
+                            <div class="lab-card-name" style="color:#fde047;">0.50 稳态中轴线配方验证</div>
+                            <div class="lab-card-desc">寻找风味浓度收敛至0.50均衡线的精确配比，对应PID设定点控制</div>
                             <div class="lab-card-meta">
-                                <div class="lab-meta-item"><span class="check">✓</span><span class="meta-label">验证维度：</span><span class="meta-val" style="color:#facc15;">I（海拔）· Dev-I</span></div>
-                                <div class="lab-meta-item"><span class="check">✓</span><span class="meta-label">主线模块：</span><span class="meta-val">PID负反馈调节</span></div>
-                                <div class="lab-meta-item"><span class="check">✓</span><span class="meta-label">空域场景：</span><span class="meta-val">实体物理实验</span></div>
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">验证维度：</span><span class="meta-val" style="color:#fde047;">I（海拔）· Dev-I</span></span></div>
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">主线模块：</span><span class="meta-val">PID负反馈调节 — 风味稳态</span></span></div>
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">应用场景：</span><span class="meta-val" style="color:#facc15;">实体物理实验·配方配比</span></span></div>
                             </div>
                             <div class="lab-card-status" style="color:#22d3ee;">▶ 可演示（浓度模拟器）</div>
-                            <span class="lab-card-btn">🍸 进入演示</span>
-                        </div>
-                        <div class="lab-card" onclick="window.location.href='labs/molecular-mixology.html'">
-                            <div class="lab-card-tag" style="background:rgba(248,113,113,0.12);color:#f87171;border-color:rgba(248,113,113,0.25);">③ 熔断测试</div>
-                            <div class="lab-card-icon">🔥</div>
-                            <div class="lab-card-name">0.68 熔断线风味触发测试</div>
-                            <div class="lab-card-desc">验证浓度超越0.68后风味失衡（辛辣/苦涩）的临界感知</div>
+                            <span class="lab-card-btn" style="background:rgba(251,191,36,0.1);border-color:rgba(251,191,36,0.25);color:#fbbf24;">🍸 进入演示</span>
+                        </a>
+                        <a href="labs/molecular-mixology.html" class="lab-card" style="text-decoration:none;color:inherit;border-color:rgba(248,113,113,0.3);background:rgba(248,113,113,0.04);position:relative;">
+                            <div class="lab-card-tag" style="background:rgba(248,113,113,0.12);color:#f87171;border-color:rgba(248,113,113,0.25);">③ 熔断测试（0.68临界）</div>
+                            <div class="lab-card-icon" style="font-size:26px;">🔥</div>
+                            <div class="lab-card-name" style="color:#fca5a5;">0.68 熔断线风味触发测试</div>
+                            <div class="lab-card-desc">验证浓度超越0.68后风味失衡（辛辣/苦涩）的临界感知·THRESHOLDS熔断</div>
                             <div class="lab-card-meta">
-                                <div class="lab-meta-item"><span class="check">✓</span><span class="meta-label">验证维度：</span><span class="meta-val" style="color:#f87171;">D（阻尼）· 0.68熔断</span></div>
-                                <div class="lab-meta-item"><span class="check">✓</span><span class="meta-label">主线模块：</span><span class="meta-val">THRESHOLDS熔断机制</span></div>
-                                <div class="lab-meta-item"><span class="check">✓</span><span class="meta-label">空域场景：</span><span class="meta-val">实体物理实验</span></div>
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">验证维度：</span><span class="meta-val" style="color:#fca5a5;">D（阻尼）· 0.68熔断线</span></span></div>
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">主线模块：</span><span class="meta-val">THRESHOLDS熔断机制 — 风味边界</span></span></div>
+                                <div class="lab-meta-item"><span class="check">✅</span><span><span class="meta-label">应用场景：</span><span class="meta-val" style="color:#f87171;">实体物理实验·安全边界</span></span></div>
                             </div>
                             <div class="lab-card-status" style="color:rgba(255,255,255,0.3);">⏳ 实验规划中</div>
-                            <span class="lab-card-btn">🔬 规划详情</span>
-                        </div>
+                            <span class="lab-card-btn" style="background:rgba(248,113,113,0.1);border-color:rgba(248,113,113,0.25);color:#f87171;">🔬 规划详情</span>
+                        </a>
                     </div>
                 </div>
             </div>
