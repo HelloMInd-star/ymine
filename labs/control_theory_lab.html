@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>🎛️ 控制论与系统稳定 · PID模拟器</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg:#0a0a0f;--card:rgba(255,255,255,0.03);--border:rgba(255,255,255,0.07);
+  --text:#e2e8f0;--dim:rgba(255,255,255,0.45);--accent:#22d3ee;
+  --green:#22c55e;--gold:#fbbf24;--red:#f87171;--purple:#a78bfa;
+}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;line-height:1.6;min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;top:0;left:0;right:0;bottom:0;background:radial-gradient(ellipse at 20% 20%,rgba(34,211,238,0.06),transparent 60%),radial-gradient(ellipse at 80% 80%,rgba(167,139,250,0.05),transparent 60%);pointer-events:none;z-index:0;}
+.wrap{max-width:1400px;margin:0 auto;padding:24px;position:relative;z-index:1;}
+.breadcrumb{display:flex;align-items:center;gap:10px;margin-bottom:20px;font-size:13px;}
+.breadcrumb a{color:var(--accent);text-decoration:none;transition:color .2s;}
+.breadcrumb a:hover{color:#67e8f9;}
+.breadcrumb .sep{color:var(--dim);}
+.breadcrumb .cur{color:var(--dim);}
+.hero{background:linear-gradient(135deg,rgba(34,211,238,0.10),rgba(167,139,250,0.06));border:1px solid rgba(34,211,238,0.25);border-radius:16px;padding:28px 32px;margin-bottom:20px;position:relative;overflow:hidden;}
+.hero::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.04),transparent);transform:translateX(-100%);animation:scan 6s linear infinite;pointer-events:none;}
+@keyframes scan{to{transform:translateX(100%);}}
+.hero h1{font-size:28px;font-weight:800;background:linear-gradient(135deg,#67e8f9,#a78bfa,#22d3ee);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:6px;}
+.hero .sub{color:var(--dim);font-size:14px;letter-spacing:0.3px;}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:22px 24px;margin-bottom:18px;backdrop-filter:blur(8px);}
+.card-title{font-size:15px;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:8px;}
+.card-title .icon{font-size:18px;}
+.card-desc{font-size:12px;color:var(--dim);margin-bottom:16px;line-height:1.6;}
+.kmp-flow{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:10px;}
+.kmp-node{background:rgba(34,211,238,0.06);border:1px solid rgba(34,211,238,0.18);border-radius:10px;padding:12px 14px;text-align:center;position:relative;}
+.kmp-node .klabel{font-size:10px;color:var(--accent);font-weight:700;letter-spacing:1px;margin-bottom:4px;}
+.kmp-node .kname{font-size:12px;color:var(--text);font-weight:600;}
+.kmp-node .kdesc{font-size:10px;color:var(--dim);margin-top:3px;}
+.kmp-arrow{display:flex;align-items:center;justify-content:center;color:rgba(34,211,238,0.3);font-size:18px;}
+.main-grid{display:grid;grid-template-columns:280px 1fr;gap:18px;}
+.params{display:flex;flex-direction:column;gap:14px;}
+.param-group{background:rgba(0,0,0,0.2);border:1px solid var(--border);border-radius:10px;padding:14px;}
+.param-label{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-size:12px;}
+.param-label .pname{font-weight:600;display:flex;align-items:center;gap:6px;}
+.param-label .pval{font-family:'SF Mono',ui-monospace,monospace;color:var(--accent);font-size:13px;font-weight:700;}
+input[type=range]{width:100%;height:4px;-webkit-appearance:none;appearance:none;background:linear-gradient(90deg,rgba(34,211,238,0.3),rgba(167,139,250,0.3));border-radius:2px;outline:none;cursor:pointer;}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--accent);border:2px solid #0a0a0f;box-shadow:0 0 12px rgba(34,211,238,0.6);cursor:pointer;transition:transform .15s;}
+input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.2);}
+.target-input{display:flex;align-items:center;gap:8px;}
+.target-input input[type=number]{flex:1;background:rgba(0,0,0,0.3);border:1px solid var(--border);border-radius:6px;padding:6px 10px;color:var(--text);font-family:'SF Mono',monospace;font-size:13px;outline:none;}
+.target-input input[type=number]:focus{border-color:var(--accent);}
+.btn-run{width:100%;padding:12px;background:linear-gradient(135deg,var(--accent),#0891b2);border:none;border-radius:10px;color:#000;font-weight:700;font-size:14px;cursor:pointer;transition:all .3s;letter-spacing:0.5px;}
+.btn-run:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(34,211,238,0.3);}
+.btn-run:active{transform:translateY(0);}
+.btn-reset{width:100%;padding:10px;background:transparent;border:1px solid var(--border);border-radius:10px;color:var(--dim);font-size:12px;cursor:pointer;transition:all .2s;margin-top:8px;}
+.btn-reset:hover{border-color:var(--accent);color:var(--accent);}
+.charts-grid{display:grid;grid-template-rows:1fr 1fr;gap:18px;}
+.chart-box{background:rgba(0,0,0,0.2);border:1px solid var(--border);border-radius:10px;padding:14px;min-height:260px;}
+.chart-box .ctitle{font-size:12px;color:var(--dim);margin-bottom:8px;font-weight:600;display:flex;align-items:center;gap:6px;}
+.chart-inner{width:100%;height:220px;}
+.thresholds{background:linear-gradient(135deg,rgba(34,197,94,0.06),rgba(251,191,36,0.06),rgba(248,113,113,0.06));border:1px solid var(--border);border-radius:12px;padding:20px 24px;}
+.thresh-status{display:flex;align-items:center;gap:16px;margin-bottom:14px;flex-wrap:wrap;}
+.status-badge{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:20px;font-size:13px;font-weight:700;}
+.status-badge.green{background:rgba(34,197,94,0.12);border:1px solid rgba(34,197,94,0.3);color:var(--green);}
+.status-badge.gold{background:rgba(251,191,36,0.12);border:1px solid rgba(251,191,36,0.3);color:var(--gold);}
+.status-badge.red{background:rgba(248,113,113,0.12);border:1px solid rgba(248,113,113,0.3);color:var(--red);}
+.status-dot{width:8px;height:8px;border-radius:50%;background:currentColor;animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 8px currentColor;}50%{opacity:0.5;box-shadow:0 0 4px currentColor;}}
+.thresh-metric{font-family:'SF Mono',monospace;font-size:14px;color:var(--text);font-weight:600;}
+.thresh-bar{position:relative;height:28px;background:linear-gradient(90deg,rgba(34,197,94,0.15) 0%,rgba(34,197,94,0.15) 48%,rgba(251,191,36,0.2) 48%,rgba(251,191,36,0.2) 52%,rgba(248,113,113,0.15) 52%,rgba(248,113,113,0.15) 100%);border-radius:6px;overflow:hidden;margin-bottom:8px;}
+.thresh-line{position:absolute;top:0;bottom:0;width:2px;background:var(--gold);z-index:2;}
+.thresh-line::after{content:'0.50';position:absolute;top:-18px;left:50%;transform:translateX(-50%);font-size:9px;color:var(--gold);font-family:'SF Mono',monospace;white-space:nowrap;}
+.thresh-marker{position:absolute;top:2px;bottom:2px;width:6px;border-radius:3px;background:var(--accent);box-shadow:0 0 12px var(--accent);z-index:3;transition:left .5s ease;}
+.thresh-labels{display:flex;justify-content:space-between;font-size:10px;font-family:'SF Mono',monospace;}
+.thresh-labels .green{color:var(--green);}.thresh-labels .gold{color:var(--gold);}.thresh-labels .red{color:var(--red);}
+.exps-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;}
+.exp-item{display:flex;align-items:center;gap:10px;padding:12px 14px;background:rgba(0,0,0,0.2);border:1px solid var(--border);border-radius:10px;text-decoration:none;color:var(--dim);font-size:12px;transition:all .25s;cursor:pointer;}
+.exp-item:hover{border-color:rgba(34,211,238,0.3);background:rgba(34,211,238,0.05);color:var(--text);transform:translateY(-1px);}
+.exp-item .eicon{font-size:20px;flex-shrink:0;}
+.exp-item .ebody{flex:1;min-width:0;}
+.exp-item .ename{font-weight:600;color:var(--text);margin-bottom:2px;}
+.exp-item .earrow{opacity:0;transition:all .2s;color:var(--accent);}
+.exp-item:hover .earrow{opacity:1;transform:translateX(3px);}
+.footer{text-align:center;padding:24px 0 8px;font-size:11px;color:rgba(255,255,255,0.2);border-top:1px solid var(--border);margin-top:20px;}
+@media(max-width:900px){.main-grid{grid-template-columns:1fr;}.kmp-flow{grid-template-columns:repeat(2,1fr);}.charts-grid{grid-template-rows:auto auto;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="breadcrumb">
+    <a href="../index.html">← 返回实验管理台</a>
+    <span class="sep">/</span>
+    <span class="cur">🎛️ 控制论与系统稳定 · PID模拟器</span>
+  </div>
+  <div class="hero">
+    <h1>🎛️ 控制论与系统稳定 · PID模拟器</h1>
+    <div class="sub">Kp/Ki/Kd 参数调节 · 系统阶跃响应曲线 · 稳态偏差监控 · IPD阻尼维度验证</div>
+  </div>
+  <div class="card">
+    <div class="card-title"><span class="icon">📐</span>KMP→IPD 方法论映射</div>
+    <div class="card-desc">PID控制三参数映射至七维向量体系：比例P对应响应坡度(I/海拔)、积分I消除稳态偏差(P/坡度)、微分D预测阻尼(D/阻尼)</div>
+    <div class="kmp-flow">
+      <div class="kmp-node"><div class="klabel">K 层</div><div class="kname">输入偏差</div><div class="kdesc">设定值 vs 实际值</div></div>
+      <div class="kmp-node"><div class="klabel">M 层</div><div class="kname">PID参数</div><div class="kdesc">Kp比例/Ki积分/Kd微分</div></div>
+      <div class="kmp-node"><div class="klabel">P 层</div><div class="kname">物理响应</div><div class="kdesc">系统阶跃响应曲线</div></div>
+      <div class="kmp-node"><div class="klabel">IPD</div><div class="kname">I/P/D三维</div><div class="kdesc">海拔·坡度·阻尼</div></div>
+    </div>
+  </div>
+  <div class="main-grid">
+    <div class="params">
+      <div class="card" style="margin:0;">
+        <div class="card-title"><span class="icon">🎛️</span>参数调节区</div>
+        <div class="card-desc">调节PID三参数观察系统响应变化</div>
+        <div class="params" style="gap:14px;">
+          <div class="param-group">
+            <div class="param-label"><span class="pname">🔴 Kp 比例增益</span><span class="pval" id="kpVal">1.20</span></div>
+            <input type="range" id="kpSlider" min="0.1" max="5" step="0.05" value="1.2">
+          </div>
+          <div class="param-group">
+            <div class="param-label"><span class="pname">🟢 Ki 积分增益</span><span class="pval" id="kiVal">0.30</span></div>
+            <input type="range" id="kiSlider" min="0" max="2" step="0.05" value="0.3">
+          </div>
+          <div class="param-group">
+            <div class="param-label"><span class="pname">🔵 Kd 微分增益</span><span class="pval" id="kdVal">0.50</span></div>
+            <input type="range" id="kdSlider" min="0" max="2" step="0.05" value="0.5">
+          </div>
+          <div class="param-group">
+            <div class="param-label"><span class="pname">🎯 目标设定值</span></div>
+            <div class="target-input">
+              <input type="number" id="targetVal" value="0.50" min="0.1" max="0.9" step="0.01">
+            </div>
+          </div>
+          <button class="btn-run" id="btnRun">▶ 启动阶跃模拟</button>
+          <button class="btn-reset" id="btnReset">↺ 重置参数</button>
+        </div>
+      </div>
+    </div>
+    <div class="charts-grid">
+      <div class="chart-box">
+        <div class="ctitle">📈 系统阶跃响应曲线 · 设定值 vs 实际输出 vs 偏差</div>
+        <div class="chart-inner" id="respChart"></div>
+      </div>
+      <div class="chart-box">
+        <div class="ctitle">🎯 七维向量雷达图 · I(海拔) / P(坡度) / D(阻尼) / S(熵)</div>
+        <div class="chart-inner" id="radarChart"></div>
+      </div>
+    </div>
+  </div>
+  <div class="card thresholds" style="margin-top:18px;">
+    <div class="card-title"><span class="icon">📊</span>THRESHOLDS 三基准判定</div>
+    <div class="thresh-status">
+      <span class="status-badge gold" id="statusBadge"><span class="status-dot"></span><span id="statusText">稳态运行</span></span>
+      <span class="thresh-metric">稳态偏差: <b id="steadyErr" style="color:var(--accent);">0.06</b></span>
+      <span class="thresh-metric">超调量: <b id="overshoot" style="color:var(--purple);">12%</b></span>
+      <span class="thresh-metric">响应时间: <b id="settleTime" style="color:var(--green);">2.4s</b></span>
+    </div>
+    <div class="thresh-bar">
+      <div class="thresh-line" style="left:50%;"></div>
+      <div class="thresh-marker" id="threshMarker" style="left:50%;"></div>
+    </div>
+    <div class="thresh-labels">
+      <span class="green">0.48 保本线</span>
+      <span class="gold">0.50 稳态线</span>
+      <span class="red">0.68 熔断线</span>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title"><span class="icon">📋</span>关联实验入口</div>
+    <div class="card-desc">进入该类别下的具体实验演示</div>
+    <div class="exps-grid">
+      <a class="exp-item" href="#"><span class="eicon">🌡️</span><div class="ebody"><div class="ename">PID水温负反馈调节</div><div style="font-size:10px;color:var(--dim);">比例-积分-微分收敛至设定点</div></div><span class="earrow">▶</span></a>
+      <a class="exp-item" href="#"><span class="eicon">🔩</span><div class="ebody"><div class="ename">弹簧阻尼振动对比</div><div style="font-size:10px;color:var(--dim);">质量-弹簧-阻尼衰减振荡</div></div><span class="earrow">▶</span></a>
+      <a class="exp-item" href="#"><span class="eicon">〰️</span><div class="ebody"><div class="ename">阻尼三类振动对照</div><div style="font-size:10px;color:var(--dim);">欠阻尼/临界/过阻尼对比</div></div><span class="earrow">▶</span></a>
+      <a class="exp-item" href="#"><span class="eicon">⚠️</span><div class="ebody"><div class="ename">执行器饱和限幅熔断</div><div style="font-size:10px;color:var(--dim);">0.68阈值触发饱和保护</div></div><span class="earrow">▶</span></a>
+    </div>
+  </div>
+  <div class="footer">⚠️ 本页面为模拟演示数据，用于展示方法论框架 · KMP→IPD→七维向量→THRESHOLDS · Game-OS 仿真与实证实验室</div>
+</div>
+<script>
+const respChart=echarts.init(document.getElementById('respChart'),'dark');
+const radarChart=echarts.init(document.getElementById('radarChart'),'dark');
+let animTimer=null;
+const kpSlider=document.getElementById('kpSlider'),kiSlider=document.getElementById('kiSlider'),kdSlider=document.getElementById('kdSlider');
+const kpVal=document.getElementById('kpVal'),kiVal=document.getElementById('kiVal'),kdVal=document.getElementById('kdVal');
+const targetInput=document.getElementById('targetVal');
+function simulatePID(Kp,Ki,Kd,target,steps=200){
+  const dt=0.05;let y=0,integral=0,prevErr=target-y;
+  const setpoint=[],output=[],error=[];
+  for(let i=0;i<steps;i++){
+    const t=i*dt;const err=target-y;
+    integral+=err*dt;const deriv=(err-prevErr)/dt;
+    let u=Kp*err+Ki*integral+Kd*deriv;
+    u=Math.max(0,Math.min(1,u));
+    y+=u*dt*2+ (Math.random()-0.5)*0.005;
+    y=Math.max(0,Math.min(1,y));
+    prevErr=err;
+    setpoint.push([t,target]);output.push([t,y]);error.push([t,Math.abs(err)]);
+  }
+  return{setpoint,output,error,final:y};
+}
+function getPIDMetrics(Kp,Ki,Kd,target){
+  const res=simulatePID(Kp,Ki,Kd,target);
+  let overshoot=0,settleIdx=res.output.length-1;
+  for(let i=0;i<res.output.length;i++){const v=res.output[i][1];if(v-target>overshoot)overshoot=v-target;}
+  const tol=0.02;
+  for(let i=res.output.length-1;i>=0;i--){if(Math.abs(res.output[i][1]-target)>tol){settleIdx=i+1;break;}}
+  const steadyErr=Math.abs(res.final-target);
+  const settleTime=settleIdx*0.05;
+  return{res,overshoot:overshoot*100,steadyErr,settleTime};
+}
+function updateCharts(animate=false){
+  const Kp=parseFloat(kpSlider.value),Ki=parseFloat(kiSlider.value),Kd=parseFloat(kdSlider.value);
+  const target=parseFloat(targetInput.value)||0.5;
+  kpVal.textContent=Kp.toFixed(2);kiVal.textContent=Ki.toFixed(2);kdVal.textContent=Kd.toFixed(2);
+  const{res,overshoot,steadyErr,settleTime}=getPIDMetrics(Kp,Ki,Kd,target);
+  const pos=Math.min(1,Math.max(0,res.fnal||res.final))*100;
+  document.getElementById('threshMarker').style.left=pos+'%';
+  document.getElementById('steadyErr').textContent=steadyErr.toFixed(3);
+  document.getElementById('overshoot').textContent=overshoot.toFixed(1)+'%';
+  document.getElementById('settleTime').textContent=settleTime.toFixed(1)+'s';
+  const badge=document.getElementById('statusBadge'),stext=document.getElementById('statusText');
+  const val=res.final;
+  if(val>0.68){badge.className='status-badge red';stext.textContent='⚠️ 超调熔断';}
+  else if(val<0.48){badge.className='status-badge red';stext.textContent='⚠️ 响应不足';}
+  else if(Math.abs(val-target)<0.03){badge.className='status-badge green';stext.textContent='✅ 精准稳态';}
+  else{badge.className='status-badge gold';stext.textContent='🟡 稳态运行';}
+  respChart.setOption({
+    backgroundColor:'transparent',grid:{left:50,right:20,top:30,bottom:30},
+    tooltip:{trigger:'axis',backgroundColor:'rgba(0,0,0,0.8)',borderColor:'rgba(34,211,238,0.3)',textStyle:{color:'#e2e8f0'}},
+    legend:{data:['设定值','实际输出','偏差'],textStyle:{color:'rgba(255,255,255,0.5)'},top:0,right:10},
+    xAxis:{type:'value',name:'时间(s)',nameTextStyle:{color:'rgba(255,255,255,0.4)'},axisLine:{lineStyle:{color:'rgba(255,255,255,0.1)'}},splitLine:{lineStyle:{color:'rgba(255,255,255,0.04)'}},axisLabel:{color:'rgba(255,255,255,0.3)'}},
+    yAxis:{type:'value',min:0,max:1,name:'输出',nameTextStyle:{color:'rgba(255,255,255,0.4)'},axisLine:{lineStyle:{color:'rgba(255,255,255,0.1)'}},splitLine:{lineStyle:{color:'rgba(255,255,255,0.04)'}},axisLabel:{color:'rgba(255,255,255,0.3)'}},
+    series:[
+      {name:'设定值',type:'line',data:res.setpoint,lineStyle:{color:'#fbbf24',width:2,type:'dashed'},symbol:'none',animation:animate},
+      {name:'实际输出',type:'line',data:res.output,lineStyle:{color:'#22d3ee',width:2.5},symbol:'none',smooth:true,areaStyle:{color:new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'rgba(34,211,238,0.25)'},{offset:1,color:'rgba(34,211,238,0)'}])},animation:animate,animationDuration:1500},
+      {name:'偏差',type:'line',data:res.error,lineStyle:{color:'#f87171',width:1.5,type:'dotted'},symbol:'none',animation:animate}
+    ]
+  });
+  const dampFactor=Math.min(1,Kd/1.5);const spdFactor=Math.min(1,Kp/3);const intFactor=Math.min(1,Ki/1);
+  const I=Math.min(1,steadyErr*3+0.2),P=Math.min(1,spdFactor+0.2),D=Math.min(1,1-dampFactor+0.15),S=Math.min(1,overshoot/30+0.2);
+  const DevI=steadyErr*2,Dev1=1-Math.min(1,settleTime/8),Dev2=dampFactor*0.5;
+  radarChart.setOption({
+    backgroundColor:'transparent',
+    tooltip:{backgroundColor:'rgba(0,0,0,0.8)',borderColor:'rgba(34,211,238,0.3)',textStyle:{color:'#e2e8f0'}},
+    radar:{indicator:[
+      {name:'I 海拔',max:1},{name:'P 坡度',max:1},{name:'D 阻尼',max:1},{name:'S 熵',max:1},
+      {name:'Dev-I偏差',max:1},{name:'Dev1回归',max:1},{name:'Dev2历史',max:1}
+    ],shape:'polygon',splitNumber:4,axisName:{color:'rgba(255,255,255,0.5)',fontSize:11},splitLine:{lineStyle:{color:'rgba(255,255,255,0.06)'}},splitArea:{areaStyle:{color:['rgba(34,211,238,0.02)','rgba(167,139,250,0.02)']}},axisLine:{lineStyle:{color:'rgba(255,255,255,0.08)'}}},
+    series:[{type:'radar',data:[{value:[I,P,D,S,DevI,Dev1,Dev2],name:'PID系统状态',lineStyle:{color:'#22d3ee',width:2},areaStyle:{color:'rgba(34,211,238,0.15)'},itemStyle:{color:'#22d3ee'}}],animation:animate,animationDuration:1000}]
+  });
+}
+[kpSlider,kiSlider,kdSlider,targetInput].forEach(el=>el.addEventListener('input',()=>updateCharts(false)));
+document.getElementById('btnRun').addEventListener('click',()=>{
+  if(animTimer)clearInterval(animTimer);
+  updateCharts(true);
+});
+document.getElementById('btnReset').addEventListener('click',()=>{
+  kpSlider.value=1.2;kiSlider.value=0.3;kdSlider.value=0.5;targetInput.value=0.5;
+  updateCharts(true);
+});
+window.addEventListener('resize',()=>{respChart.resize();radarChart.resize();});
+updateCharts(true);
+</script>
+</body>
+</html>

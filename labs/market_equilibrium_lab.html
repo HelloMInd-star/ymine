@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>📈 经济学与市场 · 市场均衡模拟器</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg:#0a0a0f;--card:rgba(255,255,255,0.03);--border:rgba(255,255,255,0.07);
+  --text:#e2e8f0;--dim:rgba(255,255,255,0.45);--accent:#22c55e;
+  --green:#22c55e;--gold:#fbbf24;--red:#f87171;--purple:#a78bfa;--cyan:#22d3ee;
+}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;line-height:1.6;min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;top:0;left:0;right:0;bottom:0;background:radial-gradient(ellipse at 20% 20%,rgba(34,197,94,0.06),transparent 60%),radial-gradient(ellipse at 80% 80%,rgba(251,191,36,0.05),transparent 60%);pointer-events:none;z-index:0;}
+.wrap{max-width:1400px;margin:0 auto;padding:24px;position:relative;z-index:1;}
+.breadcrumb{display:flex;align-items:center;gap:10px;margin-bottom:20px;font-size:13px;}
+.breadcrumb a{color:var(--accent);text-decoration:none;transition:color .2s;}
+.breadcrumb a:hover{color:#4ade80;}
+.breadcrumb .sep{color:var(--dim);}.breadcrumb .cur{color:var(--dim);}
+.hero{background:linear-gradient(135deg,rgba(34,197,94,0.10),rgba(251,191,36,0.06));border:1px solid rgba(34,197,94,0.25);border-radius:16px;padding:28px 32px;margin-bottom:20px;position:relative;overflow:hidden;}
+.hero::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.04),transparent);transform:translateX(-100%);animation:scan 6s linear infinite;pointer-events:none;}
+@keyframes scan{to{transform:translateX(100%);}}
+.hero h1{font-size:28px;font-weight:800;background:linear-gradient(135deg,#86efac,#fbbf24,#22c55e);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:6px;}
+.hero .sub{color:var(--dim);font-size:14px;letter-spacing:0.3px;}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:22px 24px;margin-bottom:18px;backdrop-filter:blur(8px);}
+.card-title{font-size:15px;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:8px;}
+.card-title .icon{font-size:18px;}
+.card-desc{font-size:12px;color:var(--dim);margin-bottom:16px;line-height:1.6;}
+.kmp-flow{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:10px;}
+.kmp-node{background:rgba(34,197,94,0.06);border:1px solid rgba(34,197,94,0.18);border-radius:10px;padding:12px 14px;text-align:center;}
+.kmp-node .klabel{font-size:10px;color:var(--accent);font-weight:700;letter-spacing:1px;margin-bottom:4px;}
+.kmp-node .kname{font-size:12px;color:var(--text);font-weight:600;}
+.kmp-node .kdesc{font-size:10px;color:var(--dim);margin-top:3px;}
+.main-grid{display:grid;grid-template-columns:280px 1fr;gap:18px;}
+.params{display:flex;flex-direction:column;gap:14px;}
+.param-group{background:rgba(0,0,0,0.2);border:1px solid var(--border);border-radius:10px;padding:14px;}
+.param-label{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-size:12px;}
+.param-label .pname{font-weight:600;display:flex;align-items:center;gap:6px;}
+.param-label .pval{font-family:'SF Mono',ui-monospace,monospace;color:var(--accent);font-size:13px;font-weight:700;}
+input[type=range]{width:100%;height:4px;-webkit-appearance:none;appearance:none;background:linear-gradient(90deg,rgba(34,197,94,0.3),rgba(251,191,36,0.3));border-radius:2px;outline:none;cursor:pointer;}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--accent);border:2px solid #0a0a0f;box-shadow:0 0 12px rgba(34,197,94,0.6);cursor:pointer;transition:transform .15s;}
+input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.2);}
+.btn-run{width:100%;padding:12px;background:linear-gradient(135deg,var(--accent),#15803d);border:none;border-radius:10px;color:#000;font-weight:700;font-size:14px;cursor:pointer;transition:all .3s;letter-spacing:0.5px;}
+.btn-run:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(34,197,94,0.3);}
+.btn-reset{width:100%;padding:10px;background:transparent;border:1px solid var(--border);border-radius:10px;color:var(--dim);font-size:12px;cursor:pointer;transition:all .2s;margin-top:8px;}
+.btn-reset:hover{border-color:var(--accent);color:var(--accent);}
+.charts-grid{display:grid;grid-template-rows:1fr 1fr;gap:18px;}
+.chart-box{background:rgba(0,0,0,0.2);border:1px solid var(--border);border-radius:10px;padding:14px;min-height:260px;}
+.chart-box .ctitle{font-size:12px;color:var(--dim);margin-bottom:8px;font-weight:600;display:flex;align-items:center;gap:6px;}
+.chart-inner{width:100%;height:220px;}
+.metrics-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:10px;}
+.metric-card{background:rgba(0,0,0,0.2);border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center;}
+.metric-card .mlabel{font-size:10px;color:var(--dim);margin-bottom:4px;}
+.metric-card .mval{font-family:'SF Mono',monospace;font-size:16px;font-weight:700;color:var(--accent);}
+.thresholds{background:linear-gradient(135deg,rgba(34,197,94,0.06),rgba(251,191,36,0.06),rgba(248,113,113,0.06));border:1px solid var(--border);border-radius:12px;padding:20px 24px;}
+.thresh-status{display:flex;align-items:center;gap:16px;margin-bottom:14px;flex-wrap:wrap;}
+.status-badge{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:20px;font-size:13px;font-weight:700;}
+.status-badge.green{background:rgba(34,197,94,0.12);border:1px solid rgba(34,197,94,0.3);color:var(--green);}
+.status-badge.gold{background:rgba(251,191,36,0.12);border:1px solid rgba(251,191,36,0.3);color:var(--gold);}
+.status-badge.red{background:rgba(248,113,113,0.12);border:1px solid rgba(248,113,113,0.3);color:var(--red);}
+.status-dot{width:8px;height:8px;border-radius:50%;background:currentColor;animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 8px currentColor;}50%{opacity:0.5;box-shadow:0 0 4px currentColor;}}
+.thresh-metric{font-family:'SF Mono',monospace;font-size:14px;color:var(--text);font-weight:600;}
+.thresh-bar{position:relative;height:28px;background:linear-gradient(90deg,rgba(34,197,94,0.15) 0%,rgba(34,197,94,0.15) 48%,rgba(251,191,36,0.2) 48%,rgba(251,191,36,0.2) 52%,rgba(248,113,113,0.15) 52%,rgba(248,113,113,0.15) 100%);border-radius:6px;overflow:hidden;margin-bottom:8px;}
+.thresh-line{position:absolute;top:0;bottom:0;width:2px;background:var(--gold);z-index:2;}
+.thresh-line::after{content:'0.50';position:absolute;top:-18px;left:50%;transform:translateX(-50%);font-size:9px;color:var(--gold);font-family:'SF Mono',monospace;white-space:nowrap;}
+.thresh-marker{position:absolute;top:2px;bottom:2px;width:6px;border-radius:3px;background:var(--accent);box-shadow:0 0 12px var(--accent);z-index:3;transition:left .5s ease;}
+.thresh-labels{display:flex;justify-content:space-between;font-size:10px;font-family:'SF Mono',monospace;}
+.thresh-labels .green{color:var(--green);}.thresh-labels .gold{color:var(--gold);}.thresh-labels .red{color:var(--red);}
+.exps-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;}
+.exp-item{display:flex;align-items:center;gap:10px;padding:12px 14px;background:rgba(0,0,0,0.2);border:1px solid var(--border);border-radius:10px;text-decoration:none;color:var(--dim);font-size:12px;transition:all .25s;cursor:pointer;}
+.exp-item:hover{border-color:rgba(34,197,94,0.3);background:rgba(34,197,94,0.05);color:var(--text);transform:translateY(-1px);}
+.exp-item .eicon{font-size:20px;flex-shrink:0;}
+.exp-item .ebody{flex:1;min-width:0;}
+.exp-item .ename{font-weight:600;color:var(--text);margin-bottom:2px;}
+.exp-item .earrow{opacity:0;transition:all .2s;color:var(--accent);}
+.exp-item:hover .earrow{opacity:1;transform:translateX(3px);}
+.footer{text-align:center;padding:24px 0 8px;font-size:11px;color:rgba(255,255,255,0.2);border-top:1px solid var(--border);margin-top:20px;}
+@media(max-width:900px){.main-grid{grid-template-columns:1fr;}.kmp-flow{grid-template-columns:repeat(2,1fr);}.charts-grid{grid-template-rows:auto auto;}.metrics-row{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="breadcrumb">
+    <a href="../index.html">← 返回实验管理台</a>
+    <span class="sep">/</span>
+    <span class="cur">📈 经济学与市场 · 市场均衡模拟器</span>
+  </div>
+  <div class="hero">
+    <h1>📈 经济学与市场 · 市场均衡模拟器</h1>
+    <div class="sub">供需参数调节 · 均衡价格形成动态 · 市场状态监控 · Dev3估值偏差维度</div>
+  </div>
+  <div class="card">
+    <div class="card-title"><span class="icon">📐</span>KMP→IPD 方法论映射</div>
+    <div class="card-desc">市场均衡映射至七维向量体系：市场输入为K层、供需方程为M层、均衡价格形成为P层物理响应、Dev3维度衡量估值偏差</div>
+    <div class="kmp-flow">
+      <div class="kmp-node"><div class="klabel">K 层</div><div class="kname">市场输入</div><div class="kdesc">供需参数·初始价格</div></div>
+      <div class="kmp-node"><div class="klabel">M 层</div><div class="kname">供需方程</div><div class="kdesc">需求曲线·供给曲线</div></div>
+      <div class="kmp-node"><div class="klabel">P 层</div><div class="kname">均衡价格</div><div class="kdesc">市场出清·价格收敛</div></div>
+      <div class="kmp-node"><div class="klabel">IPD</div><div class="kname">Dev3偏差</div><div class="kdesc">估值偏差·价格偏离</div></div>
+    </div>
+  </div>
+  <div class="main-grid">
+    <div class="params">
+      <div class="card" style="margin:0;">
+        <div class="card-title"><span class="icon">🎛️</span>参数调节区</div>
+        <div class="card-desc">调节供需参数观察价格收敛</div>
+        <div class="params" style="gap:14px;">
+          <div class="param-group">
+            <div class="param-label"><span class="pname">🔴 需求弹性</span><span class="pval" id="demandVal">1.20</span></div>
+            <input type="range" id="demandSlider" min="0.3" max="3" step="0.05" value="1.2">
+          </div>
+          <div class="param-group">
+            <div class="param-label"><span class="pname">🔵 供给弹性</span><span class="pval" id="supplyVal">0.80</span></div>
+            <input type="range" id="supplySlider" min="0.3" max="3" step="0.05" value="0.8">
+          </div>
+          <div class="param-group">
+            <div class="param-label"><span class="pname">🟡 初始价格偏离</span><span class="pval" id="initVal">0.30</span></div>
+            <input type="range" id="initSlider" min="0" max="0.5" step="0.01" value="0.3">
+          </div>
+          <div class="param-group">
+            <div class="param-label"><span class="pname">🟢 市场摩擦系数</span><span class="pval" id="fricVal">0.20</span></div>
+            <input type="range" id="fricSlider" min="0" max="0.8" step="0.01" value="0.2">
+          </div>
+          <div class="metrics-row">
+            <div class="metric-card"><div class="mlabel">均衡价格</div><div class="mval" id="eqPrice">0.50</div></div>
+            <div class="metric-card"><div class="mlabel">均衡数量</div><div class="mval" id="eqQty">0.50</div></div>
+            <div class="metric-card"><div class="mlabel">社会福利</div><div class="mval" id="welfare">0.75</div></div>
+          </div>
+          <button class="btn-run" id="btnRun">▶ 启动市场模拟</button>
+          <button class="btn-reset" id="btnReset">↺ 重置参数</button>
+        </div>
+      </div>
+    </div>
+    <div class="charts-grid">
+      <div class="chart-box">
+        <div class="ctitle">📈 供需曲线与均衡收敛 · 需求曲线 / 供给曲线 / 价格动态</div>
+        <div class="chart-inner" id="supplyChart"></div>
+      </div>
+      <div class="chart-box">
+        <div class="ctitle">🎯 七维向量雷达图 · I(海拔) / Dev-I / Dev3(估值偏差)</div>
+        <div class="chart-inner" id="radarChart"></div>
+      </div>
+    </div>
+  </div>
+  <div class="card thresholds" style="margin-top:18px;">
+    <div class="card-title"><span class="icon">📊</span>THRESHOLDS 三基准判定</div>
+    <div class="thresh-status">
+      <span class="status-badge gold" id="statusBadge"><span class="status-dot"></span><span id="statusText">市场稳态</span></span>
+      <span class="thresh-metric">价格偏离: <b id="priceDev" style="color:var(--accent);">0.07</b></span>
+      <span class="thresh-metric">收敛期数: <b id="convPeriod" style="color:var(--green);">12</b></span>
+      <span class="thresh-metric">市场效率: <b id="mktEff" style="color:var(--purple);">92%</b></span>
+    </div>
+    <div class="thresh-bar">
+      <div class="thresh-line" style="left:50%;"></div>
+      <div class="thresh-marker" id="threshMarker" style="left:50%;"></div>
+    </div>
+    <div class="thresh-labels">
+      <span class="green">0.48 保本线</span>
+      <span class="gold">0.50 稳态线</span>
+      <span class="red">0.68 熔断线</span>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title"><span class="icon">📋</span>关联实验入口</div>
+    <div class="card-desc">进入该类别下的具体实验演示</div>
+    <div class="exps-grid">
+      <a class="exp-item" href="#"><span class="eicon">⚖️</span><div class="ebody"><div class="ename">市场均衡实验</div><div style="font-size:10px;color:var(--dim);">供需双方均衡价格形成</div></div><span class="earrow">▶</span></a>
+      <a class="exp-item" href="#"><span class="eicon">📊</span><div class="ebody"><div class="ename">估值偏差实验</div><div style="font-size:10px;color:var(--dim);">价格偏离内在价值模拟</div></div><span class="earrow">▶</span></a>
+      <a class="exp-item" href="#"><span class="eicon">🎯</span><div class="ebody"><div class="ename">博弈决策实验</div><div style="font-size:10px;color:var(--dim);">多方博弈下决策偏差</div></div><span class="earrow">▶</span></a>
+    </div>
+  </div>
+  <div class="footer">⚠️ 本页面为模拟演示数据，用于展示方法论框架 · KMP→IPD→七维向量→THRESHOLDS · Game-OS 仿真与实证实验室</div>
+</div>
+<script>
+const supplyChart=echarts.init(document.getElementById('supplyChart'),'dark');
+const radarChart=echarts.init(document.getElementById('radarChart'),'dark');
+const dSlider=document.getElementById('demandSlider'),sSlider=document.getElementById('supplySlider'),iSlider=document.getElementById('initSlider'),fSlider=document.getElementById('fricSlider');
+const dVal=document.getElementById('demandVal'),sVal=document.getElementById('supplyVal'),iVal=document.getElementById('initVal'),fVal=document.getElementById('fricVal');
+function simulateMarket(demandEl,supplyEl,initDev,friction){
+  const eqP=0.5;
+  const demandPts=[],supplyPts=[],priceHist=[[0,eqP+initDev]];
+  for(let q=0;q<=1;q+=0.02){
+    const dp=1-demandEl*q*0.8;
+    const sp=0.1+supplyEl*q*0.8;
+    demandPts.push([dp,q]);supplyPts.push([sp,q]);
+  }
+  const eqQ=(1-0.1)/(demandEl*0.8+supplyEl*0.8);
+  let p=eqP+initDev;
+  const lr=0.3*(1-friction);
+  for(let t=1;t<=60;t++){
+    const qd=Math.max(0,Math.min(1,(1-p)/(demandEl*0.8)));
+    const qs=Math.max(0,Math.min(1,(p-0.1)/(supplyEl*0.8)));
+    p+=lr*(qd-qs)+(Math.random()-0.5)*0.01*(1-friction);
+    p=Math.max(0,Math.min(1,p));
+    priceHist.push([t,p]);
+  }
+  let convP=60;
+  for(let t=60;t>=0;t--){if(Math.abs(priceHist[t][1]-eqP)>0.02){convP=t+1;break;}}
+  const finalDev=Math.abs(priceHist[priceHist.length-1][1]-eqP);
+  const welfare=0.5*(1-0.1)*eqQ*(1-finalDev*2);
+  return{demandPts,supplyPts,priceHist,eqP,eqQ,welfare:Math.max(0,Math.min(1,welfare)),finalDev,convP};
+}
+function updateCharts(animate=false){
+  const de=parseFloat(dSlider.value),se=parseFloat(sSlider.value),initD=parseFloat(iSlider.value),fric=parseFloat(fSlider.value);
+  dVal.textContent=de.toFixed(2);sVal.textContent=se.toFixed(2);iVal.textContent=initD.toFixed(2);fVal.textContent=fric.toFixed(2);
+  const res=simulateMarket(de,se,initD,fric);
+  document.getElementById('eqPrice').textContent=res.eqP.toFixed(2);
+  document.getElementById('eqQty').textContent=res.eqQ.toFixed(2);
+  document.getElementById('welfare').textContent=res.welfare.toFixed(2);
+  const score=0.5+(0.5-res.finalDev);
+  document.getElementById('threshMarker').style.left=(score*100)+'%';
+  document.getElementById('priceDev').textContent=res.finalDev.toFixed(3);
+  document.getElementById('convPeriod').textContent=res.convP;
+  document.getElementById('mktEff').textContent=(res.welfare*100).toFixed(0)+'%';
+  const badge=document.getElementById('statusBadge'),stext=document.getElementById('statusText');
+  if(score>0.68){badge.className='status-badge red';stext.textContent='⚠️ 市场泡沫';}
+  else if(score<0.48){badge.className='status-badge red';stext.textContent='⚠️ 市场萧条';}
+  else if(res.finalDev<0.03){badge.className='status-badge green';stext.textContent='✅ 市场出清';}
+  else{badge.className='status-badge gold';stext.textContent='🟡 市场稳态';}
+  supplyChart.setOption({
+    backgroundColor:'transparent',grid:{left:50,right:20,top:30,bottom:30},
+    tooltip:{trigger:'axis',backgroundColor:'rgba(0,0,0,0.8)',borderColor:'rgba(34,197,94,0.3)',textStyle:{color:'#e2e8f0'}},
+    legend:{data:['需求曲线','供给曲线','价格动态'],textStyle:{color:'rgba(255,255,255,0.5)'},top:0,right:10},
+    xAxis:{type:'value',name:'价格',nameTextStyle:{color:'rgba(255,255,255,0.4)'},min:0,max:1,axisLine:{lineStyle:{color:'rgba(255,255,255,0.1)'}},splitLine:{lineStyle:{color:'rgba(255,255,255,0.04)'}},axisLabel:{color:'rgba(255,255,255,0.3)'}},
+    yAxis:{type:'value',name:'数量',nameTextStyle:{color:'rgba(255,255,255,0.4)'},min:0,max:1,axisLine:{lineStyle:{color:'rgba(255,255,255,0.1)'}},splitLine:{lineStyle:{color:'rgba(255,255,255,0.04)'}},axisLabel:{color:'rgba(255,255,255,0.3)'}},
+    series:[
+      {name:'需求曲线',type:'line',data:res.demandPts,lineStyle:{color:'#f87171',width:2.5},symbol:'none',smooth:true,animation:animate},
+      {name:'供给曲线',type:'line',data:res.supplyPts,lineStyle:{color:'#22c55e',width:2.5},symbol:'none',smooth:true,animation:animate},
+      {name:'价格动态',type:'line',data:res.priceHist,lineStyle:{color:'#fbbf24',width:2,type:'dashed'},symbol:'none',animation:animate,animationDuration:1500},
+      {type:'scatter',data:[[res.eqP,res.eqQ]],symbolSize:14,itemStyle:{color:'#a78bfa',shadowBlur:20,shadowColor:'rgba(167,139,250,0.6)'},symbol:'pin',label:{show:true,formatter:'均衡点',color:'#a78bfa',fontSize:10,position:'top'}}
+    ]
+  });
+  const I=Math.min(1,res.finalDev*2.5+0.15),P=Math.min(1,1-res.convP/60+0.2),D=Math.min(1,0.3+fric*0.6),S=Math.min(1,(de+se)/4+0.2);
+  const DevI=res.finalDev*1.8,Dev1=res.welfare*0.7,Dev3=Math.min(1,res.finalDev*2+fric*0.3);
+  radarChart.setOption({
+    backgroundColor:'transparent',
+    tooltip:{backgroundColor:'rgba(0,0,0,0.8)',borderColor:'rgba(34,197,94,0.3)',textStyle:{color:'#e2e8f0'}},
+    radar:{indicator:[
+      {name:'I 海拔',max:1},{name:'P 坡度',max:1},{name:'D 阻尼',max:1},{name:'S 熵',max:1},
+      {name:'Dev-I偏差',max:1},{name:'Dev1回归',max:1},{name:'Dev3估值',max:1}
+    ],shape:'polygon',splitNumber:4,axisName:{color:'rgba(255,255,255,0.5)',fontSize:11},splitLine:{lineStyle:{color:'rgba(255,255,255,0.06)'}},splitArea:{areaStyle:{color:['rgba(34,197,94,0.02)','rgba(251,191,36,0.02)']}},axisLine:{lineStyle:{color:'rgba(255,255,255,0.08)'}}},
+    series:[{type:'radar',data:[{value:[I,P,D,S,DevI,Dev1,Dev3],name:'市场均衡状态',lineStyle:{color:'#22c55e',width:2},areaStyle:{color:'rgba(34,197,94,0.15)'},itemStyle:{color:'#22c55e'}}],animation:animate,animationDuration:1000}]
+  });
+}
+[dSlider,sSlider,iSlider,fSlider].forEach(el=>el.addEventListener('input',()=>updateCharts(false)));
+document.getElementById('btnRun').addEventListener('click',()=>updateCharts(true));
+document.getElementById('btnReset').addEventListener('click',()=>{
+  dSlider.value=1.2;sSlider.value=0.8;iSlider.value=0.3;fSlider.value=0.2;updateCharts(true);
+});
+window.addEventListener('resize',()=>{supplyChart.resize();radarChart.resize();});
+updateCharts(true);
+</script>
+</body>
+</html>
