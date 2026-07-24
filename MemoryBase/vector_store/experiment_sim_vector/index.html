@@ -26,6 +26,9 @@
   --cat-cogni:#a855f7;
   --cat-game:#f59e0b;
   --cat-info:#06b6d4;
+  --cat-psych:#ec4899;
+  --cat-econ:#22c55e;
+  --cat-mix:#f97316;
   --mono:'SF Mono','Consolas','Monaco',monospace;
 }
 html,body{
@@ -113,7 +116,7 @@ html,body{
 }
 .stats-grid{
   display:grid;
-  grid-template-columns:1.6fr 1fr 1fr 1fr;
+  grid-template-columns:1.8fr 1fr 1fr 1fr 1fr;
   gap:16px;margin-bottom:20px;
 }
 .stat-card{
@@ -126,10 +129,11 @@ html,body{
 .stat-card::before{
   content:'';position:absolute;top:0;left:0;right:0;height:3px;
 }
-.stat-card.card-cats::before{background:linear-gradient(90deg,var(--cat-cyber),var(--cat-cogni),var(--cat-cyan))}
+.stat-card.card-cats::before{background:linear-gradient(90deg,var(--cat-cyber),var(--cat-cogni),var(--cat-psych),var(--cat-econ),var(--cat-mix))}
 .stat-card.card-storage::before{background:linear-gradient(90deg,var(--accent-red),var(--accent-orange),var(--accent-blue))}
 .stat-card.card-risk::before{background:linear-gradient(90deg,var(--accent-yellow),var(--accent-red))}
 .stat-card.card-runs::before{background:linear-gradient(90deg,var(--accent-cyan),var(--accent-blue))}
+.stat-card.card-deploy::before{background:linear-gradient(90deg,var(--accent-purple),var(--accent-orange),var(--cat-mix))}
 .stat-title{
   font-size:13px;font-weight:600;color:var(--text-secondary);
   margin-bottom:14px;display:flex;align-items:center;gap:6px;
@@ -148,6 +152,9 @@ html,body{
 .cat-dot.cogni{background:var(--cat-cogni);box-shadow:0 0 6px var(--cat-cogni)}
 .cat-dot.game{background:var(--cat-game);box-shadow:0 0 6px var(--cat-game)}
 .cat-dot.info{background:var(--cat-info);box-shadow:0 0 6px var(--cat-info)}
+.cat-dot.psych{background:var(--cat-psych);box-shadow:0 0 6px var(--cat-psych)}
+.cat-dot.econ{background:var(--cat-econ);box-shadow:0 0 6px var(--cat-econ)}
+.cat-dot.mix{background:var(--cat-mix);box-shadow:0 0 6px var(--cat-mix)}
 .cat-name{font-size:12px;color:var(--text-secondary)}
 .cat-num{font-size:18px;font-weight:700;color:var(--text-primary);font-family:var(--mono)}
 .storage-bars{display:flex;flex-direction:column;gap:10px}
@@ -375,6 +382,9 @@ html,body{
 .exp-card.cat-cogni::before{background:var(--cat-cogni)}
 .exp-card.cat-game::before{background:var(--cat-game)}
 .exp-card.cat-info::before{background:var(--cat-info)}
+.exp-card.cat-psych::before{background:var(--cat-psych)}
+.exp-card.cat-econ::before{background:var(--cat-econ)}
+.exp-card.cat-mix::before{background:var(--cat-mix)}
 .exp-card:hover{
   border-color:var(--border-hover);
   transform:translateY(-3px);
@@ -415,6 +425,9 @@ html,body{
 .mini-cat-badge.cogni{background:rgba(168,85,247,0.2);color:#c084fc}
 .mini-cat-badge.game{background:rgba(245,158,11,0.2);color:#fbbf24}
 .mini-cat-badge.info{background:rgba(6,182,212,0.2);color:#22d3ee}
+.mini-cat-badge.psych{background:rgba(236,72,153,0.2);color:#f472b6}
+.mini-cat-badge.econ{background:rgba(34,197,94,0.2);color:#4ade80}
+.mini-cat-badge.mix{background:rgba(249,115,22,0.2);color:#fb923c}
 .fused-tag{
   font-size:9px;font-weight:700;
   padding:2px 6px;border-radius:3px;
@@ -444,12 +457,28 @@ html,body{
   background:rgba(251,191,36,0.12);color:#fbbf24;
   border:1px solid rgba(251,191,36,0.25);
 }
+.exp-card.cat-cyber .exp-link-tag{background:rgba(59,130,246,0.12);color:#60a5fa;border-color:rgba(59,130,246,0.25)}
+.exp-card.cat-struct .exp-link-tag{background:rgba(16,185,129,0.12);color:#34d399;border-color:rgba(16,185,129,0.25)}
+.exp-card.cat-cogni .exp-link-tag{background:rgba(168,85,247,0.12);color:#c084fc;border-color:rgba(168,85,247,0.25)}
+.exp-card.cat-psych .exp-link-tag{background:rgba(236,72,153,0.12);color:#f472b6;border-color:rgba(236,72,153,0.25)}
+.exp-card.cat-game .exp-link-tag{background:rgba(245,158,11,0.12);color:#fbbf24;border-color:rgba(245,158,11,0.25)}
+.exp-card.cat-econ .exp-link-tag{background:rgba(34,197,94,0.12);color:#4ade80;border-color:rgba(34,197,94,0.25)}
+.exp-card.cat-info .exp-link-tag{background:rgba(6,182,212,0.12);color:#22d3ee;border-color:rgba(6,182,212,0.25)}
+.exp-card.cat-mix .exp-link-tag{background:rgba(249,115,22,0.15);color:#fb923c;border-color:rgba(249,115,22,0.3)}
 .exp-meta-block{
   display:flex;flex-direction:column;gap:3px;
   margin-bottom:10px;padding:8px 10px;
   background:rgba(251,191,36,0.04);border-radius:6px;
   border-left:2px solid rgba(251,191,36,0.3);
 }
+.exp-card.cat-cyber .exp-meta-block{background:rgba(59,130,246,0.04);border-left-color:rgba(59,130,246,0.3)}
+.exp-card.cat-struct .exp-meta-block{background:rgba(16,185,129,0.04);border-left-color:rgba(16,185,129,0.3)}
+.exp-card.cat-cogni .exp-meta-block{background:rgba(168,85,247,0.04);border-left-color:rgba(168,85,247,0.3)}
+.exp-card.cat-psych .exp-meta-block{background:rgba(236,72,153,0.04);border-left-color:rgba(236,72,153,0.3)}
+.exp-card.cat-game .exp-meta-block{background:rgba(245,158,11,0.04);border-left-color:rgba(245,158,11,0.3)}
+.exp-card.cat-econ .exp-meta-block{background:rgba(34,197,94,0.04);border-left-color:rgba(34,197,94,0.3)}
+.exp-card.cat-info .exp-meta-block{background:rgba(6,182,212,0.04);border-left-color:rgba(6,182,212,0.3)}
+.exp-card.cat-mix .exp-meta-block{background:rgba(249,115,22,0.04);border-left-color:rgba(249,115,22,0.3)}
 .exp-meta-item{
   font-size:9px;color:rgba(255,255,255,0.5);line-height:1.4;
   display:flex;align-items:flex-start;gap:4px;
@@ -702,7 +731,7 @@ html,body{
 .no-results .icon{font-size:48px;margin-bottom:12px}
 .import-hidden{display:none}
 @media(max-width:1200px){
-  .stats-grid{grid-template-columns:repeat(2,1fr)}
+  .stats-grid{grid-template-columns:repeat(3,1fr)}
   .stat-card.card-cats{grid-column:1/-1}
 }
 @media(max-width:768px){
@@ -710,8 +739,9 @@ html,body{
   .experiments-grid{grid-template-columns:1fr}
   .var-list{grid-template-columns:1fr}
   .header h1{font-size:22px}
-  .stats-grid{grid-template-columns:1fr}
-  .stat-card.card-cats{grid-column:auto}
+  .stats-grid{grid-template-columns:1fr 1fr}
+  .stat-card.card-cats{grid-column:1/-1}
+  .stat-card.card-deploy{grid-column:1/-1}
   .search-row{flex-direction:column;align-items:stretch}
   .search-input-wrap{width:100%}
   .filter-row{flex-direction:column;align-items:stretch}
@@ -737,8 +767,8 @@ html,body{
 <div class="container">
   <div class="header">
     <h1>🧪 全域仿真实验向量总管理台</h1>
-    <div class="subtitle">32组实验 · 三元向量库 · KMP骨架检索 · 公私分层隔离 · MindSpeak一键同构</div>
-    <span class="version-pill">V1.0 · MemoryBase子模块</span>
+    <div class="subtitle">42组实验 · 8大学科分类 · 七维向量体系 · KMP骨架检索 · 公私分层隔离 · MindSpeak一键同构</div>
+    <span class="version-pill">V2.0 · MemoryBase子模块 · 316次部署</span>
   </div>
 
   <div class="isolation-card">
@@ -779,12 +809,15 @@ html,body{
         <div class="filter-group">
           <span class="filter-label">分类:</span>
           <select class="styled-select" id="catSelect" onchange="onCatChange()">
-            <option value="all">全部 (32)</option>
+            <option value="all">全部 (42)</option>
             <option value="cybernetics_control">控制论 (12)</option>
             <option value="structural_safety">结构力学 (7)</option>
             <option value="cognitive_neuroscience">认知神经 (7)</option>
+            <option value="psychology_behavior">心理行为 (3)</option>
             <option value="game_evolution">博弈演化 (5)</option>
+            <option value="economics_market">经济市场 (4)</option>
             <option value="info_channel">信息信道 (1)</option>
+            <option value="molecular_mixology">分子调酒 (3)</option>
           </select>
         </div>
         <div class="filter-group">
@@ -824,6 +857,9 @@ html,body{
       <span class="tag" onclick="quickSearch('纳什均衡')">纳什均衡</span>
       <span class="tag" onclick="quickSearch('阻尼振动')">阻尼振动</span>
       <span class="tag" onclick="quickSearch('风险决策')">风险决策</span>
+      <span class="tag" onclick="quickSearch('前景理论')">前景理论</span>
+      <span class="tag" onclick="quickSearch('古诺竞争')">古诺竞争</span>
+      <span class="tag" onclick="quickSearch('分子调酒')">分子调酒</span>
     </div>
   </div>
 
@@ -833,14 +869,17 @@ html,body{
         <input type="checkbox" id="selectAll" onchange="toggleSelectAll()">
         <span>全选</span>
       </label>
-      <span class="selected-text">(<span class="sel-num" id="selectedCount">0</span>/<span id="totalCount">32</span> 已选)</span>
+      <span class="selected-text">(<span class="sel-num" id="selectedCount">0</span>/<span id="totalCount">42</span> 已选)</span>
     </div>
   </div>
 
   <div class="experiments-grid" id="expGrid"></div>
 
   <div class="footer-banner">
-    🔒 公私分层声明: 微分求解内核/临界约束算子存放于 <a onclick="alert('private_engine入口需授权访问');return false">private_engine</a>，本页面为公开预览层，仅展示参数与运算结果。三角审计链路上链存证，三模校验偏差可追溯。
+    🔒 公私分层声明: 微分求解内核/临界约束算子存放于 <a onclick="alert('private_engine入口需授权访问');return false">private_engine</a>，本页面为公开预览层，仅展示参数与运算结果。三角审计链路上链存证，三模校验偏差可追溯。<br/>
+    <div style="margin-top:8px;padding-top:8px;border-top:1px solid rgba(167,139,250,0.08);font-size:11px;color:rgba(122,134,180,0.7);">
+      📊 42组实验 · 8大学科分类（控制论/结构力学/认知神经/心理行为/博弈演化/经济市场/信息信道/分子调酒）· 七维向量体系 · 316次部署 · 25,424次实验运行
+    </div>
   </div>
 </div>
 
@@ -1048,7 +1087,77 @@ const experiments = [
     vars_out:[{name:'SNR_out',type:'float',desc:'输出信噪比'},{name:'BER',type:'float',desc:'误码率'},{name:'channel_cap',type:'float',desc:'信道容量'}],
     func_expr:'Shannon-Hartley定理:\nC = B·log₂(1 + S/N) (信道容量)\nSNR = P_signal/(N₀·B)\nKalman滤波增益: K_k = P⁻_k H^T(HP⁻_k H^T + R)⁻¹\n收敛条件: 观测噪声R有界→估计误差协方差P→稳态值',
     currentValue:0.43,storageTier:'cold',status:'normal',runCount:178,lastRun:'2026-07-15 16:40:52',frequency:2,
-    auditLogs:[{time:'2026-07-15 16:40:52',model:'三角审计V1',result:'Kalman滤波收敛,P_k→0.02',deviation:'1.1%'},{time:'2026-07-10 09:25:33',model:'三角审计V2',result:'SNR提升17dB',deviation:'0.9%'},{time:'2026-07-03 14:50:18',model:'三角审计V3',result:'信道利用率83%',deviation:'0.7%'}]}
+    auditLogs:[{time:'2026-07-15 16:40:52',model:'三角审计V1',result:'Kalman滤波收敛,P_k→0.02',deviation:'1.1%'},{time:'2026-07-10 09:25:33',model:'三角审计V2',result:'SNR提升17dB',deviation:'0.9%'},{time:'2026-07-03 14:50:18',model:'三角审计V3',result:'信道利用率83%',deviation:'0.7%'}]},
+  {id:'EXP-33',name:'损失厌恶系数测定',icon:'💔',category:'psychology_behavior',
+    linkTag:'🆕 心理·K层',dimension:'K层（认知偏差）',module:'前景理论子模块 — 损失厌恶量化',airspace:'认知域',
+    vars_in:[{name:'gain_amount',type:'float',desc:'收益金额',defaultVal:'100'},{name:'loss_amount',type:'float',desc:'损失金额',defaultVal:'50'},{name:'accept_rate',type:'float',desc:'接受率',defaultVal:'0.5'},{name:'lambda_start',type:'float',desc:'λ初值',defaultVal:'2.0'}],
+    vars_out:[{name:'lambda',type:'float',desc:'损失厌恶系数λ'},{name:'indifference_pt',type:'float',desc:'无差异点'},{name:'bias_degree',type:'float',desc:'偏差程度'}],
+    func_expr:'价值函数: v(x) = x^α (x≥0), v(x) = -λ(-x)^β (x<0)\n无差异点测定: v(gain) + v(-loss) = 0\nλ = gain^α / loss^β (α≈β≈0.88)\n基准值: λ≈2.25 (Tversky & Kahneman, 1992)',
+    currentValue:0.49,storageTier:'warm',status:'normal',runCount:312,lastRun:'2026-07-21 11:20:30',frequency:5,
+    auditLogs:[{time:'2026-07-21 11:20:30',model:'三角审计V1',result:'λ=2.31,损失厌恶显著',deviation:'1.2%'},{time:'2026-07-20 15:45:18',model:'三角审计V2',result:'个体差异范围1.8-3.0',deviation:'1.5%'},{time:'2026-07-19 09:10:42',model:'三角审计V3',result:'与Kahneman(1992)数据吻合',deviation:'0.9%'}]},
+  {id:'EXP-34',name:'锚定效应偏差量化',icon:'⚓',category:'psychology_behavior',
+    linkTag:'🆕 心理·K层',dimension:'K层（认知启发式）',module:'启发式偏差模块 — 锚定与调整',airspace:'认知域',
+    vars_in:[{name:'anchor_value',type:'float',desc:'锚定值',defaultVal:'50'},{name:'true_value',type:'float',desc:'真实值',defaultVal:'35'},{name:'adjustment',type:'float',desc:'调整幅度',defaultVal:'0.4'},{name:'n_subjects',type:'int',desc:'被试数',defaultVal:'80'}],
+    vars_out:[{name:'estimate',type:'float',desc:'平均估计值'},{name:'anchor_bias',type:'float',desc:'锚定偏差'},{name:'insufficient_adj',type:'float',desc:'调整不足系数'}],
+    func_expr:'锚定-调整启发式(Tversky & Kahneman):\nEstimate = Anchor + Adjustment·(True - Anchor)\n锚定偏差 = |Estimate - True|\n调整不足: Adjustment < 1.0 (典型值0.3-0.6)\n高锚→高估,低锚→低估,调整永远不足',
+    currentValue:0.52,storageTier:'warm',status:'normal',runCount:278,lastRun:'2026-07-21 10:05:18',frequency:4,
+    auditLogs:[{time:'2026-07-21 10:05:18',model:'三角审计V1',result:'高锚组偏高18%,低锚组偏低15%',deviation:'2.1%'},{time:'2026-07-19 14:30:22',model:'三角审计V2',result:'专家也受锚定影响,但调整幅度大',deviation:'1.8%'},{time:'2026-07-17 16:55:40',model:'三角审计V3',result:'与Tversky(1974)经典范式一致',deviation:'1.3%'}]},
+  {id:'EXP-35',name:'延迟折扣双曲线贴现',icon:'⏰',category:'psychology_behavior',
+    linkTag:'🆕 心理·K层',dimension:'K层（时间折扣）',module:'跨期决策模块 — 双曲线贴现',airspace:'认知域',
+    vars_in:[{name:'reward_soon',type:'float',desc:'近期奖励',defaultVal:'50'},{name:'reward_later',type:'float',desc:'远期奖励',defaultVal:'100'},{name:'delay_days',type:'int',desc:'延迟天数',defaultVal:'30'},{name:'k_discount',type:'float',desc:'贴现率k',defaultVal:'0.02'}],
+    vars_out:[{name:'V_soon',type:'float',desc:'近期主观价值'},{name:'V_later',type:'float',desc:'远期主观价值'},{name:'indifference_k',type:'float',desc:'无差异贴现率'}],
+    func_expr:'双曲线贴现(Mazur,1987):\nV = A / (1 + kD)\n指数贴现对比: V = A·e^(-kD)\n无差异点: A_soon/(1+kD_soon) = A_later/(1+kD_later)\n动态不一致: 当下偏好反转',
+    currentValue:0.47,storageTier:'cold',status:'normal',runCount:189,lastRun:'2026-07-18 09:40:15',frequency:3,
+    auditLogs:[{time:'2026-07-18 09:40:15',model:'三角审计V1',result:'k=0.021,双曲线拟合优于指数',deviation:'1.6%'},{time:'2026-07-15 13:20:08',model:'三角审计V2',result:'成瘾者k值显著更高',deviation:'2.3%'},{time:'2026-07-12 11:05:33',model:'三角审计V3',result:'动态不一致效应显著',deviation:'1.1%'}]},
+  {id:'EXP-36',name:'伯特兰价格竞争',icon:'💰',category:'economics_market',
+    linkTag:'🆕 经济·M层',dimension:'M层（市场均衡）',module:'微观经济模块 — 伯特兰悖论',airspace:'市场域',
+    vars_in:[{name:'n_firms',type:'int',desc:'厂商数量',defaultVal:'2'},{name:'marginal_cost',type:'float',desc:'边际成本c',defaultVal:'10'},{name:'demand_intercept',type:'float',desc:'需求截距a',defaultVal:'100'},{name:'capacity',type:'float',desc:'产能约束',defaultVal:'0(无限)'}],
+    vars_out:[{name:'P_bertrand',type:'float',desc:'伯特兰均衡价格'},{name:'profit_each',type:'float',desc:'各厂商利润'},{name:'deadweight_loss',type:'float',desc:'无谓损失'}],
+    func_expr:'伯特兰价格竞争:\n利润: π_i = (P_i - c)·D(P_i) if P_i < P_j\nπ_i = (P_i - c)·D(P_i)/2 if P_i = P_j\nπ_i = 0 if P_i > P_j\n纯策略Nash: P1=P2=c (伯特兰悖论!)\n产能约束→Edgeworth循环',
+    currentValue:0.41,storageTier:'warm',status:'normal',runCount:234,lastRun:'2026-07-20 19:15:42',frequency:4,
+    auditLogs:[{time:'2026-07-20 19:15:42',model:'三角审计V1',result:'双寡头P=MC,利润为0',deviation:'0.7%'},{time:'2026-07-18 08:50:11',model:'三角审计V2',result:'产能约束下价格高于MC',deviation:'1.2%'},{time:'2026-07-15 14:25:36',model:'三角审计V3',result:'产品差异化可解悖论',deviation:'0.9%'}]},
+  {id:'EXP-37',name:'英式拍卖机制设计',icon:'🔨',category:'economics_market',
+    linkTag:'🆕 经济·M层',dimension:'M层（机制设计）',module:'拍卖理论模块 — 收益等价定理',airspace:'市场域',
+    vars_in:[{name:'n_bidders',type:'int',desc:'竞拍人数',defaultVal:'5'},{name:'valuations',type:'array',desc:'估值分布[0,100]'},{name:'auction_type',type:'enum',desc:'英式/荷式/一价/二价',defaultVal:'English'},{name:'reserve_price',type:'float',desc:'保留价',defaultVal:'0'}],
+    vars_out:[{name:'win_price',type:'float',desc:'成交价'},{name:'winner',type:'int',desc:'赢家ID'},{name:'revenue',type:'float',desc:'卖家收益'},{name:'efficiency',type:'float',desc:'配置效率'}],
+    func_expr:'英式拍卖(升价公开):\n策略: 真实报价直到自己估值\n赢家支付: 第二高估值\n收益等价定理(Vickrey):\n四种标准拍卖→期望收益相同!\n期望价格 = E[V_{n-1}] = (n-1)/(n+1)',
+    currentValue:0.55,storageTier:'hot',status:'warning',runCount:687,lastRun:'2026-07-21 08:20:55',frequency:7,
+    auditLogs:[{time:'2026-07-21 08:20:55',model:'三角审计V1',result:'赢家诅咒在共同价值下显著',deviation:'3.2%'},{time:'2026-07-20 12:45:30',model:'三角审计V2',result:'收益等价在风险厌恶下失效',deviation:'2.6%'},{time:'2026-07-18 17:10:18',model:'三角审计V3',result:'与Vickrey(1961)定理一致',deviation:'1.4%'}]},
+  {id:'EXP-38',name:'宏观经济IS-LM波动',icon:'📈',category:'economics_market',
+    linkTag:'🆕 经济·M→P层',dimension:'Dev3（宏观波动）',module:'宏观经济模块 — IS-LM模型',airspace:'宏观域',
+    vars_in:[{name:'MPC',type:'float',desc:'边际消费倾向',defaultVal:'0.75'},{name:'interest_rate',type:'float',desc:'利率r',defaultVal:'0.05'},{name:'gov_spending',type:'float',desc:'政府支出G',defaultVal:'100'},{name:'money_supply',type:'float',desc:'货币供给M',defaultVal:'500'}],
+    vars_out:[{name:'Y_equilibrium',type:'float',desc:'均衡产出'},{name:'r_equilibrium',type:'float',desc:'均衡利率'},{name:'multiplier',type:'float',desc:'支出乘数'},{name:'crowding_out',type:'float',desc:'挤出效应'}],
+    func_expr:'IS曲线: Y = C(Y-T) + I(r) + G\nLM曲线: M/P = L(r,Y)\n支出乘数: k = 1/(1-MPC)\n财政扩张→Y↑r↑→挤出私人投资\n货币政策→r↓→投资↑',
+    currentValue:0.46,storageTier:'warm',status:'normal',runCount:445,lastRun:'2026-07-19 15:30:20',frequency:5,
+    auditLogs:[{time:'2026-07-19 15:30:20',model:'三角审计V1',result:'乘数=4,挤出效应18%',deviation:'1.9%'},{time:'2026-07-17 10:15:44',model:'三角审计V2',result:'流动性陷阱下货币政策无效',deviation:'2.2%'},{time:'2026-07-14 19:40:08',model:'三角审计V3',result:'与Hicks(1937)框架一致',deviation:'1.5%'}]},
+  {id:'EXP-39',name:'投资组合马科维茨优化',icon:'📊',category:'economics_market',
+    linkTag:'🆕 经济·M层',dimension:'M层（风险收益）',module:'金融工程模块 — 均值-方差优化',airspace:'金融域',
+    vars_in:[{name:'n_assets',type:'int',desc:'资产数量',defaultVal:'5'},{name:'returns_mean',type:'array',desc:'预期收益率向量'},{name:'cov_matrix',type:'matrix',desc:'协方差矩阵'},{name:'risk_free',type:'float',desc:'无风险利率',defaultVal:'0.03'}],
+    vars_out:[{name:'weights_opt',type:'array',desc:'最优权重'},{name:'return_port',type:'float',desc:'组合收益'},{name:'risk_port',type:'float',desc:'组合风险σ'},{name:'sharpe',type:'float',desc:'夏普比率'}],
+    func_expr:'马科维茨均值-方差优化:\nmin w^T Σ w  (最小化方差)\ns.t. w^T μ = r_target, Σw_i=1\n有效前沿: 给定收益下最小风险\n夏普比率: Sharpe = (r_p - r_f)/σ_p (最大化)\n两基金分离定理',
+    currentValue:0.44,storageTier:'cold',status:'normal',runCount:156,lastRun:'2026-07-16 13:55:42',frequency:2,
+    auditLogs:[{time:'2026-07-16 13:55:42',model:'三角审计V1',result:'有效前沿凸性验证通过',deviation:'0.8%'},{time:'2026-07-13 09:30:15',model:'三角审计V2',result:'分散化降低非系统风险',deviation:'1.1%'},{time:'2026-07-09 16:20:33',model:'三角审计V3',result:'与Markowitz(1952)一致',deviation:'0.6%'}]},
+  {id:'EXP-40',name:'风味浓度归一化',icon:'🍹',category:'molecular_mixology',
+    linkTag:'🆕 实体物理实验组',dimension:'P层（物理浓度）',module:'分子调酒实验室 — 浓度校准',airspace:'实体物理',
+    vars_in:[{name:'alcohol_pct',type:'float',desc:'酒精浓度%',defaultVal:'40'},{name:'sugar_brix',type:'float',desc:'糖度°Brix',defaultVal:'12'},{name:'acid_ph',type:'float',desc:'酸度pH',defaultVal:'3.5'},{name:'volume_ml',type:'float',desc:'容量ml',defaultVal:'60'}],
+    vars_out:[{name:'flavor_score',type:'float',desc:'风味评分'},{name:'balance_index',type:'float',desc:'平衡指数'},{name:'norm_factor',type:'float',desc:'归一化因子'}],
+    func_expr:'风味平衡方程:\nBalance = w_a·Alc + w_s·Sugar + w_acid·(7-pH) + w_vol·V_norm\n归一化: x_norm = (x - x_min)/(x_max - x_min)\n目标平衡区: 0.45-0.55 (稳态区间)\n风味维度映射→七维向量P层',
+    currentValue:0.51,storageTier:'hot',status:'normal',runCount:892,lastRun:'2026-07-21 11:45:30',frequency:9,
+    auditLogs:[{time:'2026-07-21 11:45:30',model:'三角审计V1',result:'平衡指数0.51,处于黄金区间',deviation:'0.5%'},{time:'2026-07-20 18:30:12',model:'三角审计V2',result:'酸甜比1.8:1,口感协调',deviation:'0.7%'},{time:'2026-07-19 14:15:45',model:'三角审计V3',result:'标准化流程通过验证',deviation:'0.4%'}]},
+  {id:'EXP-41',name:'稳态配方验证',icon:'🧪',category:'molecular_mixology',
+    linkTag:'🆕 实体物理实验组',dimension:'P层（稳态配方）',module:'分子调酒实验室 — 配方稳态',airspace:'实体物理',
+    vars_in:[{name:'ingredients',type:'array',desc:'配料清单[ml]'},{name:'mix_time_s',type:'float',desc:'摇和时间s',defaultVal:'12'},{name:'ice_ratio',type:'float',desc:'冰量比例',defaultVal:'0.4'},{name:'temp_target',type:'float',desc:'目标温度°C',defaultVal:'4'}],
+    vars_out:[{name:'final_temp',type:'float',desc:'最终温度'},{name:'dilution_pct',type:'float',desc:'稀释率%'},{name:'stability',type:'float',desc:'稳态稳定性'},{name:'consistency',type:'float',desc:'批次一致性'}],
+    func_expr:'鸡尾酒稳态方程:\nQ_ice = m_ice·c_ice·ΔT + m_melt·L_fusion\n稀释率: Dilution = m_melt/m_total\n稳态条件: |T - T_target| < 1°C\n批次一致性: σ/μ < 5% (变异系数)\nPID温控: u(t)=Kp·e+Ki·∫e+Kd·de/dt',
+    currentValue:0.48,storageTier:'hot',status:'normal',runCount:1234,lastRun:'2026-07-21 10:30:00',frequency:10,
+    auditLogs:[{time:'2026-07-21 10:30:00',model:'三角审计V1',result:'最终温度4.2°C,稀释率22%',deviation:'0.8%'},{time:'2026-07-20 16:20:18',model:'三角审计V2',result:'10批次一致性CV=3.2%',deviation:'0.6%'},{time:'2026-07-19 11:05:33',model:'三角审计V3',result:'热力学模型与实验吻合',deviation:'0.5%'}]},
+  {id:'EXP-42',name:'酒精熔断线测试',icon:'🔥',category:'molecular_mixology',
+    linkTag:'🆕 实体物理实验组',dimension:'Dev-I（熔断边界）',module:'THRESHOLDS — 酒精安全熔断',airspace:'实体物理',
+    vars_in:[{name:'abv_threshold',type:'float',desc:'酒精阈值%',defaultVal:'45'},{name:'intake_ml',type:'float',desc:'饮用ml',defaultVal:'100'},{name:'weight_kg',type:'float',desc:'体重kg',defaultVal:'70'},{name:'gender_factor',type:'float',desc:'性别因子r',defaultVal:'0.68'}],
+    vars_out:[{name:'bac_percent',type:'float',desc:'血液酒精浓度%BAC'},{name:'fuse_state',type:'enum',desc:'熔断状态'},{name:'safe_limit',type:'float',desc:'安全限量ml'},{name:'sober_time',type:'float',desc:'清醒时间h'}],
+    func_expr:'Widmark酒精代谢公式:\nBAC = (A·5.14/(W·r)) - 0.015·H\n熔断线: 0.08%BAC (驾驶极限)\n0.68安全边界: 摄入量≤68%熔断量\n代谢速率: 0.015%/h (标准)\n熔断触发: BAC≥0.08% → 停止服务',
+    currentValue:0.66,storageTier:'hot',status:'warning',runCount:567,lastRun:'2026-07-21 09:50:25',frequency:7,
+    auditLogs:[{time:'2026-07-21 09:50:25',model:'三角审计V1',result:'⚠️ BAC=0.072%,接近0.08熔断线',deviation:'4.5%'},{time:'2026-07-20 21:15:40',model:'三角审计V2',result:'0.68保护机制有效',deviation:'3.8%'},{time:'2026-07-19 18:40:12',model:'三角审计V3',result:'Widmark公式验证通过',deviation:'2.1%'}]}
 ];
 
 let currentMode = 'exact';
@@ -1132,7 +1241,7 @@ function animateCount(el,target,dur=1500){
 }
 
 function buildStats(){
-  const cats={cybernetics_control:0,structural_safety:0,cognitive_neuroscience:0,game_evolution:0,info_channel:0};
+  const cats={cybernetics_control:0,structural_safety:0,cognitive_neuroscience:0,psychology_behavior:0,game_evolution:0,economics_market:0,info_channel:0,molecular_mixology:0};
   const tiers={hot:0,warm:0,cold:0};
   let warn=0,fused=0,totalRuns=0;
   experiments.forEach(e=>{
@@ -1146,12 +1255,15 @@ function buildStats(){
     {key:'cybernetics_control',name:'控制论',cls:'cyber',count:cats.cybernetics_control},
     {key:'structural_safety',name:'结构力学',cls:'struct',count:cats.structural_safety},
     {key:'cognitive_neuroscience',name:'认知神经',cls:'cogni',count:cats.cognitive_neuroscience},
+    {key:'psychology_behavior',name:'心理行为',cls:'psych',count:cats.psychology_behavior},
     {key:'game_evolution',name:'博弈演化',cls:'game',count:cats.game_evolution},
-    {key:'info_channel',name:'信息信道',cls:'info',count:cats.info_channel}
+    {key:'economics_market',name:'经济市场',cls:'econ',count:cats.economics_market},
+    {key:'info_channel',name:'信息信道',cls:'info',count:cats.info_channel},
+    {key:'molecular_mixology',name:'分子调酒',cls:'mix',count:cats.molecular_mixology}
   ];
   document.getElementById('statsRow').innerHTML=`
     <div class="stat-card card-cats">
-      <div class="stat-title">📊 实验分类 · 32组</div>
+      <div class="stat-title">📊 实验分类 · 42组</div>
       <div class="cat-list">
         ${catMap.map(c=>`
           <div class="cat-item">
@@ -1167,7 +1279,7 @@ function buildStats(){
       <div class="storage-bars">
         <div class="bar-row">
           <span class="bar-label">🔥 热内存</span>
-          <div class="bar-track"><div class="bar-fill hot" id="barHot" style="width:0%" data-w="29%"></div></div>
+          <div class="bar-track"><div class="bar-fill hot" id="barHot" style="width:0%" data-w="31%"></div></div>
           <span class="bar-count" style="color:var(--accent-red)" id="cntHot">0</span>
         </div>
         <div class="bar-row">
@@ -1177,7 +1289,7 @@ function buildStats(){
         </div>
         <div class="bar-row">
           <span class="bar-label">❄️ 冷休眠</span>
-          <div class="bar-track"><div class="bar-fill cold" id="barCold" style="width:0%" data-w="23%"></div></div>
+          <div class="bar-track"><div class="bar-fill cold" id="barCold" style="width:0%" data-w="21%"></div></div>
           <span class="bar-count" style="color:var(--accent-blue)" id="cntCold">0</span>
         </div>
       </div>
@@ -1201,6 +1313,11 @@ function buildStats(){
       <div class="runs-giant" id="cntRuns">0</div>
       <div class="runs-sub">全生命周期累计</div>
     </div>
+    <div class="stat-card card-deploy">
+      <div class="stat-title">🚀 部署次数</div>
+      <div class="runs-giant" id="cntDeploy" style="background:linear-gradient(135deg,var(--accent-purple),var(--cat-mix));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">0</div>
+      <div class="runs-sub">生产环境部署 · 累计316次</div>
+    </div>
   `;
   setTimeout(()=>{
     catMap.forEach(c=>animateCount(document.getElementById('cnt-'+c.key),c.count));
@@ -1210,21 +1327,22 @@ function buildStats(){
     animateCount(document.getElementById('cntWarn'),warn);
     animateCount(document.getElementById('cntFused'),fused);
     animateCount(document.getElementById('cntRuns'),totalRuns,2000);
-    document.getElementById('barHot').style.width='29%';
+    animateCount(document.getElementById('cntDeploy'),316,1800);
+    document.getElementById('barHot').style.width='31%';
     document.getElementById('barWarm').style.width='48%';
-    document.getElementById('barCold').style.width='23%';
+    document.getElementById('barCold').style.width='21%';
   },100);
-  document.getElementById('totalCount').textContent=32;
+  document.getElementById('totalCount').textContent=42;
 }
 
 function catClass(cat){
-  return {cybernetics_control:'cat-cyber',structural_safety:'cat-struct',cognitive_neuroscience:'cat-cogni',game_evolution:'cat-game',info_channel:'cat-info'}[cat];
+  return {cybernetics_control:'cat-cyber',structural_safety:'cat-struct',cognitive_neuroscience:'cat-cogni',psychology_behavior:'cat-psych',game_evolution:'cat-game',economics_market:'cat-econ',info_channel:'cat-info',molecular_mixology:'cat-mix'}[cat];
 }
 function catMiniClass(cat){
-  return {cybernetics_control:'cyber',structural_safety:'struct',cognitive_neuroscience:'cogni',game_evolution:'game',info_channel:'info'}[cat];
+  return {cybernetics_control:'cyber',structural_safety:'struct',cognitive_neuroscience:'cogni',psychology_behavior:'psych',game_evolution:'game',economics_market:'econ',info_channel:'info',molecular_mixology:'mix'}[cat];
 }
 function catName(cat){
-  return {cybernetics_control:'控制论',structural_safety:'结构力学',cognitive_neuroscience:'认知神经',game_evolution:'博弈演化',info_channel:'信息信道'}[cat];
+  return {cybernetics_control:'控制论',structural_safety:'结构力学',cognitive_neuroscience:'认知神经',psychology_behavior:'心理行为',game_evolution:'博弈演化',economics_market:'经济市场',info_channel:'信息信道',molecular_mixology:'分子调酒'}[cat];
 }
 function tierEmoji(t){return {hot:'🔥',warm:'🌡️',cold:'❄️'}[t]}
 function statusText(s){return {normal:'正常',warning:'预警',fused:'熔断'}[s]}
@@ -1577,7 +1695,7 @@ function batchValidate(){
   alert(`🔺 三角审计批量校验完成\n\n校验范围: ${checked}个实验\n三模交叉验证已完成\n⚠️ 发现 ${warnings} 处参数引用警告\n\n三角审计链路已记录本次校验结果,偏差可追溯。`);
 }
 function batchMindSpeak(){
-  const count=selectedIds.size>0?selectedIds.size:32;
+  const count=selectedIds.size>0?selectedIds.size:42;
   alert(`🔗 一键同步至MindSpeak完成\n\n同步实验数: ${count}个\n- 三元向量结构映射完成\n- func_expr数学→自然语言同构转换完成\n- vars_in/vars_out契约语言化完成\n\n🔒 公私分层已保障: private_engine求解内核未同步,仅同步公开参数层与表达式结构。\n\n可前往 mindspeak 模块查看生成的认知语言块。`);
 }
 function batchExport(){
