@@ -493,7 +493,7 @@ a{color:var(--cyan);text-decoration:none}
         <div class="sf-row"><span class="k">情绪FOMO指数</span><span class="v" id="sfFomo" style="color:var(--dim)">--</span></div>
         <div class="sf-row"><span class="k">信号置信度</span><span class="v" id="sfConf" style="color:var(--dim)">--</span></div>
         <div class="sf-row"><span class="k">机器推荐动作</span><span class="v" id="sfAction" style="color:var(--cyan)">--</span></div>
-        <div id="riskWarn" style="display:none;font-size:9px;color:var(--dim);margin-top:4px;padding:4px 6px;background:rgba(239,68,68,0.1);border-radius:3px;border-left:2px solid var(--red);"></div>
+        <div id="riskWarn" style="display:none;font-size:9px;color:var(--dim);margin-top:4px;padding:4px 6px;border-radius:3px;border-left:2px solid var(--red);background:rgba(239,68,68,0.1);"></div>
       </div>
 
       <!-- DCF估值锚 -->
@@ -712,8 +712,8 @@ function log(msg, cls=''){
   el.innerHTML = `<span class="ts">[${ts}]</span> ${msg}`;
   const box = $('logStream');
   box.appendChild(el);
-  setTimeout(()=>el.remove(),6000);
-  while(box.children.length>6) box.removeChild(box.firstChild);
+  setTimeout(()=>el.remove(),15000);
+  while(box.children.length>12) box.removeChild(box.firstChild);
 }
 
 /* ================================================================
@@ -735,22 +735,22 @@ function updateLightVector(autoCalc=true){
     state.lightIntensity = s;
   }
   const s = state.lightIntensity;
-  // 更新UI
   $('lightFill').style.width = (s*100).toFixed(0)+'%';
   const valEl = $('lightVal');
   valEl.textContent = (s*100).toFixed(0)+'%';
   valEl.style.color = s<0.3?'#86efac':s<0.6?'#fde047':s<0.8?'#f97316':'#fca5a5';
-  // 更新三个指标（基于强度波动）
-  const foldR = clamp(0.45 + (1-s)*0.35 + (Math.random()-0.5)*0.06, 0.3, 0.85);
-  const raiseR = clamp(0.08 + s*0.22 + (Math.random()-0.5)*0.04, 0.05, 0.40);
-  const allinR = clamp(s*s*0.12 + (Math.random()-0.5)*0.02, 0.005, 0.15);
-  state.foldRate = foldR; state.raiseRate = raiseR; state.allinRate = allinR;
-  $('lvFold').textContent = (foldR*100).toFixed(0)+'%';
-  $('lvFold').style.color = foldR>0.6?'#86efac':'#fde047';
-  $('lvRaise').textContent = (raiseR*100).toFixed(0)+'%';
-  $('lvRaise').style.color = raiseR>0.25?'#fca5a5':'#fde047';
-  $('lvAllin').textContent = (allinR*100).toFixed(1)+'%';
-  $('lvAllin').style.color = allinR>0.08?'#fca5a5':allinR>0.04?'#fde047':'#86efac';
+  const targetFold = clamp(0.45 + (1-s)*0.35, 0.3, 0.85);
+  const targetRaise = clamp(0.08 + s*0.22, 0.05, 0.40);
+  const targetAllin = clamp(s*s*0.12, 0.005, 0.15);
+  state.foldRate = state.foldRate*0.7 + targetFold*0.3;
+  state.raiseRate = state.raiseRate*0.7 + targetRaise*0.3;
+  state.allinRate = state.allinRate*0.7 + targetAllin*0.3;
+  $('lvFold').textContent = (state.foldRate*100).toFixed(0)+'%';
+  $('lvFold').style.color = state.foldRate>0.6?'#86efac':'#fde047';
+  $('lvRaise').textContent = (state.raiseRate*100).toFixed(0)+'%';
+  $('lvRaise').style.color = state.raiseRate>0.25?'#fca5a5':'#fde047';
+  $('lvAllin').textContent = (state.allinRate*100).toFixed(1)+'%';
+  $('lvAllin').style.color = state.allinRate>0.08?'#fca5a5':state.allinRate>0.04?'#fde047':'#86efac';
   // 提示文本
   const hint = $('lightHint');
   if(s<0.25) hint.textContent = '🌑 牌桌暗处 · 对手保守，外部不确定性低';
@@ -804,6 +804,15 @@ function updateRiskBadge(){
   if(warn){
     warnEl.textContent = warn;
     warnEl.style.display = 'block';
+    if(level==='high'){
+      warnEl.style.borderLeftColor = 'var(--red)';
+      warnEl.style.background = 'rgba(239,68,68,0.1)';
+      warnEl.style.color = '#fca5a5';
+    } else {
+      warnEl.style.borderLeftColor = '#fde047';
+      warnEl.style.background = 'rgba(253,224,71,0.08)';
+      warnEl.style.color = '#fde047';
+    }
   } else {
     warnEl.style.display = 'none';
   }
@@ -880,7 +889,10 @@ function recordDecision(action, won, correct){
     won: won,
     correct: correct,
     p: state.p,
+    pEstimate: state.pEstimate,
     fStar: state.fStar,
+    lightIntensity: state.lightIntensity,
+    riskLevel: state.riskLevel,
     timestamp: Date.now()
   };
   state.decisionHistory.push(rec);
@@ -907,28 +919,27 @@ function applyPID(won, correct){
   // 连续失败惩罚加重
   const recentLoss = state.decisionHistory.slice(-3).filter(h=>!h.won).length;
   if(recentLoss >= 3) error -= 0.10;
-  // PID计算
-  state.pidIntegral = clamp(state.pidIntegral + error*Ki, -0.25, 0.15);
+  // PID计算（带积分衰减：每轮积分项衰减15%，防止积分饱和导致无法恢复）
+  state.pidIntegral = clamp(state.pidIntegral * 0.85 + error*Ki, -0.25, 0.15);
   const derivative = error - state.pidPrevError;
   const adj = Kp*error + state.pidIntegral + Kd*derivative;
   state.pidPrevError = error;
   state.pidAdjFactor = clamp(state.pidAdjFactor + adj, 0.6, 1.15);
-  // 更新胜率估计：原始p * 调整因子
   state.pEstimate = clamp(state.p * state.pidAdjFactor, 0.05, 0.95);
-  // PID指示器
   const pid = $('pidIndicator');
   pid.style.display = 'inline-flex';
-  const pBefore = (state.p*100).toFixed(1);
+  const pBefore = ((state.pEstimate - (Kp*error + state.pidIntegral*0 + Kd*(error-state.pidPrevError))*state.p)/state.p * 100).toFixed(1);
+  const pBefore2 = (state.p * (state.pidAdjFactor) * 100).toFixed(1);
   const pAfter = (state.pEstimate*100).toFixed(1);
-  if(Math.abs(adj) < 0.01){
+  if(Math.abs(adj) < 0.005){
     pid.className = 'pid-indicator pid-neutral';
     pid.textContent = 'PID 稳态 · p估计 '+pAfter+'%';
   } else if(adj < 0){
     pid.className = 'pid-indicator pid-negative';
-    pid.textContent = '📉 PID负反馈 · 胜率修正 '+pBefore+'%→'+pAfter+'%（连续失败降权）';
+    pid.textContent = '📉 PID负反馈 · p估计 '+pBefore2+'%→'+pAfter+'%（连续失败降权）';
   } else {
     pid.className = 'pid-indicator pid-positive';
-    pid.textContent = '📈 PID正反馈 · 胜率修正 '+pBefore+'%→'+pAfter+'%（策略有效升权）';
+    pid.textContent = '📈 PID正反馈 · p估计 '+pBefore2+'%→'+pAfter+'%（策略有效升权）';
   }
 }
 
@@ -1196,9 +1207,10 @@ function updateMachine(){
     0.28 + Math.random()*0.12
   ];
   // 质量倍数：高胜率=品牌力强→各层转化率提升；低胜率/噪音大→下降
-  const qualityBoost = (state.p>0.65 ? 1.25 : state.p<0.35 ? 0.65 : 1.0)
+  const qualityBoost = (state.pEstimate>0.65 ? 1.25 : state.pEstimate<0.35 ? 0.65 : 1.0)
                      * (1 - state.noiseLevel*0.15)
-                     * (state.recAction==='FOLD' ? 0.5 : 1.0);
+                     * (state.recAction==='FOLD' ? 0.5 : 1.0)
+                     * (state.riskLevel==='high' ? 0.8 : 1.0);
   for(let i=0;i<5;i++){
     const v = Math.min(0.99, conv[i]*qualityBoost);
     $('fbar'+(i+1)).style.width = Math.max(2, v*100)+'%';
@@ -1207,9 +1219,8 @@ function updateMachine(){
   }
   // CAC（获客成本）：竞争激烈+噪音大 CAC上升；高p=强产品CAC下降
   // 真实互联网CAC≈80-300元/人
-  state.cac = Math.round(80 + (1-state.p)*180 + state.noiseLevel*80 + (state.bluffProb>0.5?30:0));
-  // LTV（客户终身价值）：高p=品牌溢价LTV高；噪音侵蚀LTV
-  state.ltv = Math.round(150 + state.p*380 - state.noiseLevel*40 - (state.recAction==='FOLD'?80:0));
+  state.cac = Math.round(80 + (1-state.pEstimate)*180 + state.noiseLevel*80 + (state.bluffProb>0.5?30:0) + (state.riskLevel==='high'?40:0));
+  state.ltv = Math.round(150 + state.pEstimate*380 - state.noiseLevel*40 - (state.recAction==='FOLD'?80:0) + (state.riskLevel==='low'?30:0));
   state.ltvcac = (state.ltv/state.cac).toFixed(2);
   $('cacVal').textContent = '¥'+state.cac;
   $('ltvVal').textContent = '¥'+state.ltv;
@@ -1220,18 +1231,16 @@ function updateMachine(){
   // σ(冲击)：由下注尺寸、赔率落差、噪音、对手bluff强度共同决定；错误决策大幅拉升σ
   const decisionDistortion = state.decision ? (state.decision!==state.recAction?0.8:0) : 0;
   state.sigma = clamp(
-    Math.abs(state.b - state.p)*1.6           // 赔率-胜率失衡
+    Math.abs(state.b - state.pEstimate)*1.6      // 赔率-胜率失衡（用调节后胜率）
     + (state.oppBluffing ? 0.5 : 0.2)         // 诈唬带来的不确定性
     + state.noiseLevel*0.6
+    + state.lightIntensity*0.4                 // 光照熵提升σ
     + decisionDistortion,                     // 决策错误额外惩罚
     0, 3
   );
-  // γ(反脆弱)：
-  //   正确决策按凯利下注 → γ 正向累积（f*·p·(LTV/CAC)）
-  //   错误决策（弃正EV / 接负EV）→ γ 扣减（反脆弱受损）
   if(state.decision){
     if(state.correct){
-      state.gamma += state.fStar * state.p * Math.min(state.ltvcac/3,1.5) * 0.25;
+      state.gamma += state.fStar * state.pEstimate * Math.min(state.ltvcac/3,1.5) * 0.25;
     } else {
       const penalty = (state.recAction==='FOLD' && state.decision!=='FOLD') ? 0.20  // 接了不该接的负EV
                     : (state.recAction!=='FOLD' && state.decision==='FOLD') ? 0.25  // 弃掉正EV（更痛）
@@ -1255,12 +1264,16 @@ function updateMachine(){
   // 发布到YBus
   if(window.YBus){
     YBus.publish('poker',{
-      stage:state.hand.stage,equity:state.p,kellyFraction:state.fStar,
+      stage:state.hand.stage,equity:state.pEstimate,kellyFraction:state.fStar,
       kellyAction:state.recAction,groundTruth:state.iv/100,coneState:state.coneState.toLowerCase(),
       gamma:state.gamma,pot:state.pot,stack:state.stack,pnl:state.finalPnL,
-      dcfPassed:state.margin>0,brandVolume:state.volume,timestamp:Date.now()
+      dcfPassed:state.margin>0,brandVolume:state.volume,lightIntensity:state.lightIntensity,
+      riskLevel:state.riskLevel,timestamp:Date.now()
     },{trusted:true});
   }
+
+  // 更新对手马脚显示（弃牌率/加注率随光照向量动态变化）
+  $('oppTells').innerHTML = `弃牌率 ${(state.foldRate*100).toFixed(0)}%<br>加注率 ${(state.raiseRate*100).toFixed(0)}%`;
 
   // 根据凯利给按钮加推荐标识（UI三键映射：FOLD/CALL；BIG_BET/ALL_IN→RAISE）
   const recoBtn = state.recAction==='FOLD'?'FOLD':state.recAction==='CALL'?'CALL':'RAISE';
@@ -1618,15 +1631,13 @@ function playerDecision(action){
 
   setTimeout(()=>{
     const optimal = state.recAction;
-    // 决策正确性判断：
-    // 1) 精确匹配最优动作 = 完全正确
-    // 2) RAISE推荐但CALL = 次优（偏保守，仍属正EV）
-    // 3) FOLD推荐但CALL/RAISE = 错误（接了负EV）
-    // 4) RAISE/BIG_BET/ALL_IN推荐但FOLD = 错误（弃掉正EV）
+    const isRaiseFamily = (a) => a==='RAISE'||a==='BIG_BET'||a==='ALL_IN';
     if(action === optimal){
       state.correct = true;
-    } else if( (optimal==='RAISE'||optimal==='BIG_BET'||optimal==='ALL_IN') && action==='CALL' ){
-      state.correct = 'partial'; // 偏保守，但仍是+EV
+    } else if(isRaiseFamily(optimal) && action==='RAISE'){
+      state.correct = true;
+    } else if(isRaiseFamily(optimal) && action==='CALL'){
+      state.correct = 'partial';
     } else {
       state.correct = false;
     }
@@ -1637,7 +1648,7 @@ function playerDecision(action){
       if(optimal==='FOLD'){
         log('✅ 你明智弃牌！面对强范围无利可图，保留了弹药','win');
       } else {
-        log(`❌ 你弃掉了 ${holeDesc}！胜率${(state.p*100).toFixed(0)}%的正EV牌被噪音吓退，把锅底让给了对手`,'lose');
+        log(`❌ 你弃掉了 ${holeDesc}！调节胜率${(state.pEstimate*100).toFixed(0)}%的正EV牌被噪音吓退，把锅底让给了对手`,'lose');
       }
     } else if(action==='CALL'){
       if(optimal==='FOLD'){
@@ -1645,13 +1656,14 @@ function playerDecision(action){
       } else if(optimal==='CALL'){
         log('✅ 你按凯利跟注——精准赔率匹配','win');
       } else {
-        log(`⚠️ 你跟注了——凯利f*=${(state.fStar*100).toFixed(1)}%建议${optimal==='RAISE'?'加注':'大注'}更优，仓位偏轻`,'machine');
+        log(`⚠️ 你跟注了——凯利f*=${(state.fStar*100).toFixed(1)}%建议${isRaiseFamily(optimal)?'加注/大注':'加注'}更优，仓位偏轻`,'machine');
       }
     } else if(action==='RAISE'){
       if(optimal==='FOLD'){
-        log('💥 你加注了！但胜率只有'+(state.p*100).toFixed(0)+'%，凯利f*='+(state.fStar*100).toFixed(1)+'%，这是赌博不是投资','lose');
+        log('💥 你加注了！但调节胜率只有'+(state.pEstimate*100).toFixed(0)+'%，凯利f*='+(state.fStar*100).toFixed(1)+'%，这是赌博不是投资','lose');
       } else {
-        log('✅ 你加注！按凯利f*='+(state.fStar*100).toFixed(1)+'%执行，机器精算通过','win');
+        const isBig = optimal==='BIG_BET'||optimal==='ALL_IN';
+        log(`✅ 你加注！按凯利f*=${(state.fStar*100).toFixed(1)}%${isBig?'（接近大注区间）':''}执行，机器精算通过`,'win');
       }
     }
 
@@ -1756,14 +1768,16 @@ function finalizeResult(won){
   } else if(state.correct==='partial'){
     title.textContent = '📈 险胜 · 但仓位非最优';
     title.style.color = '#fde047';
-    detail.innerHTML = `场景「${sc.name}」<br>你赢了这一手，但下注比例偏离凯利f*最优值${(state.fStar*100).toFixed(1)}%，仓位偏轻。长期EV会被仓位不足和摩擦成本吞噬——应该加注而不是跟注。`;
+    const optAct = state.recAction==='BIG_BET'?'大注':state.recAction==='ALL_IN'?'全仓':'加注';
+    detail.innerHTML = `场景「${sc.name}」<br>你赢了这一手，但下注比例偏离凯利f*最优值${(state.fStar*100).toFixed(1)}%，仓位偏轻。长期EV会被仓位不足和摩擦成本吞噬——应该${optAct}而不是跟注。`;
   } else {
     title.textContent = state.breakout==='down' ? '💥 击穿箱体下沿 · 决策失败' : '⚠️ 错误决策';
     title.style.color = '#fca5a5';
     const errType = (state.recAction==='FOLD'&&state.decision!=='FOLD')
       ? '你接了不该接的负EV赔率，在胜率不足时被贪婪驱动，市场用击穿惩罚了赌徒心态。'
       : '你被对手的诈唬/市场噪音吓退，在正EV时弃牌放弃了巨大价值，恐惧战胜了理性。';
-    detail.innerHTML = `场景「${sc.name}」<br>凯利f*=${(state.fStar*100).toFixed(1)}%推荐「${state.recAction==='FOLD'?'弃牌':state.recAction==='CALL'?'跟注':'加注'}」但你选了「${state.decision==='FOLD'?'弃牌':state.decision==='CALL'?'跟注':'加注'}」。${errType}`;
+    const pShow = (state.pEstimate*100).toFixed(0);
+    detail.innerHTML = `场景「${sc.name}」<br>凯利f*=${(state.fStar*100).toFixed(1)}%（调节胜率${pShow}%）推荐「${state.recAction==='FOLD'?'弃牌':state.recAction==='CALL'?'跟注':'加注'}」但你选了「${state.decision==='FOLD'?'弃牌':state.decision==='CALL'?'跟注':'加注'}」。${errType}`;
   }
   const pnlColor = state.finalPnL>=0?'#86efac':'#fca5a5';
   stat.innerHTML = `
@@ -1775,11 +1789,13 @@ function finalizeResult(won){
 
   // 决策反馈闭环：记录本次决策到历史，PID调节胜率估计
   const actName = {FOLD:'弃牌',CALL:'跟注',RAISE:'加注',BIG_BET:'大注',ALL_IN:'全仓'}[state.decision];
-  const pBefore = (state.p*100).toFixed(1);
+  const pBefore = (state.pEstimate*100).toFixed(1);
   recordDecision(state.decision, won, state.correct);
   const pAfter = (state.pEstimate*100).toFixed(1);
   const resultStr = won?'胜利':'失败';
-  log(`🔄 反馈闭环：本次决策[${actName}] → 结果：${resultStr} · 胜率更新 ${pBefore}%→${pAfter}% · PID因子 ${state.pidAdjFactor.toFixed(2)}`, won?'win':'lose');
+  const pidDelta = (parseFloat(pAfter)-parseFloat(pBefore)).toFixed(1);
+  const deltaTxt = Math.abs(parseFloat(pidDelta))<0.1?'(稳态)':pidDelta>0?`↑${pidDelta}%`:`↓${Math.abs(parseFloat(pidDelta))}%`;
+  log(`🔄 反馈闭环：本次决策[${actName}] → 结果：${resultStr} · 胜率 ${pBefore}%→${pAfter}% ${deltaTxt} · PID因子 ${state.pidAdjFactor.toFixed(2)}`, won?'win':'lose');
   const hist = state.decisionHistory;
   const hw = hist.filter(h=>h.won).length;
   log(`📊 历史回溯：${hw}/${hist.length}胜 (${(hw/Math.max(1,hist.length)*100).toFixed(0)}%) · ${state.riskLevel==='high'?'🔴高风险':state.riskLevel==='mid'?'🟡中风险':'🟢低风险'} · 光照熵${(state.lightIntensity*100).toFixed(0)}%`, 'machine');
@@ -1822,6 +1838,7 @@ function resetSimulation(){
   $('lightHint').textContent='☀ 牌桌平静 · 外部环境低不确定性';
   $('lightSlider').value=15;
   $('riskBadge').className='risk-badge low';$('riskBadge').innerHTML='🟢 低风险';$('riskWarn').style.display='none';
+  $('oppTells').innerHTML = '弃牌率 62%<br>加注率 18%';
   // 保留历史记忆（decisionHistory、PID状态跨轮次保留），仅重置显示
   updateHistoryWinrate();
   $('pidIndicator').style.display='none';
