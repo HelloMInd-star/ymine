@@ -470,6 +470,122 @@
         }
         .fsb-toggle:hover { background: rgba(167,139,250,0.2); }
 
+        /* ===== KMP方法论映射 ===== */
+        .kmp-methodology {
+            background: linear-gradient(135deg, rgba(167, 139, 250, 0.06), rgba(96, 165, 250, 0.04), rgba(0, 0, 0, 0.02));
+            border: 1px solid rgba(167, 139, 250, 0.18);
+            border-radius: 16px;
+            padding: 22px 24px 18px;
+            margin-bottom: 18px;
+            opacity: 0;
+            animation: fadeInUp 0.6s ease 0.02s forwards;
+        }
+        .kmp-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #a78bfa;
+            margin-bottom: 16px;
+            letter-spacing: 0.3px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .kmp-flow {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            align-items: center;
+        }
+        .kmp-step {
+            width: 100%;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 14px 18px;
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            transition: border-color 0.3s;
+        }
+        .kmp-step:hover {
+            border-color: rgba(255,255,255,0.1);
+        }
+        .kmp-step.k-layer { border-left: 3px solid #a78bfa; }
+        .kmp-step.m-layer { border-left: 3px solid #60a5fa; }
+        .kmp-step.p-layer { border-left: 3px solid #facc15; }
+        .kmp-step.ipd-layer { border-left: 3px solid #34d399; }
+        .kmp-step.thresh-layer { border-left: 3px solid #f87171; }
+        .kmp-step-icon { font-size: 20px; flex-shrink: 0; margin-top: 1px; }
+        .kmp-step-body { flex: 1; }
+        .kmp-step-label {
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+        .kmp-step.k-layer .kmp-step-label { color: #a78bfa; }
+        .kmp-step.m-layer .kmp-step-label { color: #60a5fa; }
+        .kmp-step.p-layer .kmp-step-label { color: #facc15; }
+        .kmp-step.ipd-layer .kmp-step-label { color: #34d399; }
+        .kmp-step.thresh-layer .kmp-step-label { color: #f87171; }
+        .kmp-step-desc {
+            font-size: 12px;
+            color: rgba(255,255,255,0.55);
+            line-height: 1.6;
+        }
+        .kmp-step-formula {
+            font-size: 11px;
+            color: rgba(255,255,255,0.35);
+            margin-top: 4px;
+            font-family: 'Courier New', monospace;
+        }
+        .kmp-arrow-down {
+            color: rgba(167, 139, 250, 0.3);
+            font-size: 16px;
+            line-height: 1;
+            padding: 2px 0;
+        }
+        .kmp-ipd-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-top: 6px;
+        }
+        .kmp-ipd-item {
+            background: rgba(52, 211, 153, 0.06);
+            border: 1px solid rgba(52, 211, 153, 0.12);
+            border-radius: 8px;
+            padding: 8px 10px;
+            text-align: center;
+        }
+        .kmp-ipd-item .ipd-key {
+            font-size: 13px;
+            font-weight: 700;
+            color: #34d399;
+        }
+        .kmp-ipd-item .ipd-val {
+            font-size: 11px;
+            color: rgba(255,255,255,0.5);
+            margin-top: 2px;
+        }
+        .kmp-thresh-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 6px;
+            flex-wrap: wrap;
+        }
+        .kmp-thresh-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .kmp-thresh-badge.t-048 { background: rgba(34,197,94,0.12); color: #22c55e; }
+        .kmp-thresh-badge.t-050 { background: rgba(250,204,21,0.12); color: #facc15; }
+        .kmp-thresh-badge.t-068 { background: rgba(248,113,113,0.12); color: #f87171; }
+
         /* ===== 精算流程总览 ===== */
         .flow-overview {
             background: rgba(255,255,255,0.02);
@@ -1592,6 +1708,16 @@
             .container {
                 padding: 20px 16px 18px;
             }
+            .kmp-methodology {
+                padding: 16px 14px 14px;
+            }
+            .kmp-step {
+                padding: 12px 12px;
+                gap: 10px;
+            }
+            .kmp-ipd-grid {
+                grid-template-columns: 1fr;
+            }
             .header h1 {
                 font-size: 24px;
             }
@@ -2292,6 +2418,71 @@
             <div class="fsb-right">
                 <span class="fsb-tag" id="funnelModeTag">手动模式</span>
                 <button class="fsb-toggle" id="funnelToggleBtn">切换接管</button>
+            </div>
+        </div>
+
+        <!-- ===== KMP方法论映射 ===== -->
+        <div class="kmp-methodology">
+            <div class="kmp-title">📐 方法论映射：KMP→IPD→七维向量 在金融估值场景中的落地</div>
+            <div class="kmp-flow">
+                <div class="kmp-step k-layer">
+                    <div class="kmp-step-icon">🟣</div>
+                    <div class="kmp-step-body">
+                        <div class="kmp-step-label">K层（知识层）· 输入层</div>
+                        <div class="kmp-step-desc">风险向量 + 定价模型 → 识别市场状态、资产类型、估值目标</div>
+                    </div>
+                </div>
+                <div class="kmp-arrow-down">↓</div>
+                <div class="kmp-step m-layer">
+                    <div class="kmp-step-icon">🔵</div>
+                    <div class="kmp-step-body">
+                        <div class="kmp-step-label">M层（数学层）· 浓度精算</div>
+                        <div class="kmp-step-desc">六维风险向量 → 三维评估值（余弦相似度 / 欧氏距离 / 点积距离）</div>
+                        <div class="kmp-step-formula">圆锥浓度模型：C = m × ρ₀ / V(h)</div>
+                    </div>
+                </div>
+                <div class="kmp-arrow-down">↓</div>
+                <div class="kmp-step p-layer">
+                    <div class="kmp-step-icon">🟡</div>
+                    <div class="kmp-step-body">
+                        <div class="kmp-step-label">P层（物理层）· 输出层</div>
+                        <div class="kmp-step-desc">资本定价 → 凯利配置 → 0.68 熔断风控</div>
+                        <div class="kmp-step-formula">资本定价公式：R = Rf + Rp × β</div>
+                    </div>
+                </div>
+                <div class="kmp-arrow-down">↓</div>
+                <div class="kmp-step ipd-layer">
+                    <div class="kmp-step-icon">🟢</div>
+                    <div class="kmp-step-body">
+                        <div class="kmp-step-label">IPD 提取</div>
+                        <div class="kmp-ipd-grid">
+                            <div class="kmp-ipd-item">
+                                <div class="ipd-key">I（海拔）</div>
+                                <div class="ipd-val">无风险利率 Rf<br><span style="color:rgba(255,255,255,0.3);font-size:10px;">中轴线锚点</span></div>
+                            </div>
+                            <div class="kmp-ipd-item">
+                                <div class="ipd-key">P（坡度）</div>
+                                <div class="ipd-val">风险溢价 Rp<br><span style="color:rgba(255,255,255,0.3);font-size:10px;">三维评估值</span></div>
+                            </div>
+                            <div class="kmp-ipd-item">
+                                <div class="ipd-key">D（阻尼）</div>
+                                <div class="ipd-val">β系数<br><span style="color:rgba(255,255,255,0.3);font-size:10px;">欧氏距离</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="kmp-arrow-down">↓</div>
+                <div class="kmp-step thresh-layer">
+                    <div class="kmp-step-icon">🔴</div>
+                    <div class="kmp-step-body">
+                        <div class="kmp-step-label">THRESHOLDS · 稳态阈值基准</div>
+                        <div class="kmp-thresh-row">
+                            <span class="kmp-thresh-badge t-048">0.48 保本线</span>
+                            <span class="kmp-thresh-badge t-050">0.50 稳态线</span>
+                            <span class="kmp-thresh-badge t-068">0.68 熔断线</span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
