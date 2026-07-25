@@ -226,6 +226,69 @@ a{color:var(--cyan);text-decoration:none}
 .cone-g .k{font-size:9px;color:var(--dim)}
 .cone-g .v{font-size:13px;font-weight:800;font-family:'SF Mono',monospace;margin-top:2px}
 
+/* 光照向量模块（七维向量 S=博弈熵） */
+.light-vector{
+  background:linear-gradient(135deg,rgba(245,200,66,0.06),rgba(239,68,68,0.04));
+  border:1px solid rgba(245,200,66,0.2);border-radius:8px;padding:10px;margin-bottom:12px;
+}
+.lv-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.lv-title{font-size:11px;font-weight:700;color:#fde047;display:flex;align-items:center;gap:6px}
+.lv-title::before{content:'☀';font-size:14px;filter:drop-shadow(0 0 4px rgba(245,200,66,0.6))}
+.lv-val{font-size:13px;font-weight:800;font-family:'SF Mono',monospace}
+.lv-bar-wrap{margin:6px 0}
+.lv-bar{height:8px;background:var(--bg);border-radius:4px;overflow:hidden;position:relative}
+.lv-fill{height:100%;border-radius:4px;transition:width .6s;background:linear-gradient(90deg,#22c55e,#fde042,#f97316,#ef4444)}
+.lv-labels{display:flex;justify-content:space-between;font-size:8px;color:var(--dim);margin-top:3px;letter-spacing:0.5px}
+.lv-metrics{display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;margin-top:8px}
+.lv-m{background:var(--bg);border-radius:4px;padding:5px 4px;text-align:center}
+.lv-m .k{font-size:8px;color:var(--dim)}
+.lv-m .v{font-size:11px;font-weight:700;font-family:'SF Mono',monospace;margin-top:1px}
+.lv-slider{width:100%;margin-top:6px;accent-color:#f5c842;cursor:pointer;height:4px}
+.lv-hint{font-size:9px;color:var(--dim);margin-top:4px;text-align:center;font-style:italic}
+
+/* 风险分层标签 */
+.risk-badge{
+  display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:10px;
+  font-size:9px;font-weight:700;letter-spacing:1px;margin-left:auto;
+}
+.risk-badge.low{background:rgba(34,197,94,0.15);color:#86efac;border:1px solid rgba(34,197,94,0.3)}
+.risk-badge.mid{background:rgba(251,191,36,0.15);color:#fde047;border:1px solid rgba(251,191,36,0.3)}
+.risk-badge.high{background:rgba(239,68,68,0.2);color:#fca5a5;border:1px solid rgba(239,68,68,0.4)}
+
+/* 历史胜率回溯模块（MindSpeak任务记忆层） */
+.hist-winrate{
+  background:var(--bg2);border:1px solid var(--line);border-radius:8px;padding:10px;margin-bottom:8px;
+}
+.hw-head{display:flex;align-items:center;gap:6px;margin-bottom:8px}
+.hw-title{font-size:10px;color:var(--cyan);letter-spacing:2px}
+.hw-title::before{content:'🧠';font-size:12px}
+.hw-main{display:flex;align-items:center;gap:10px}
+.hw-ring{
+  width:48px;height:48px;border-radius:50%;position:relative;flex-shrink:0;
+  background:conic-gradient(var(--cyan) var(--pct,0%), rgba(255,255,255,0.08) 0);
+  display:flex;align-items:center;justify-content:center;
+}
+.hw-ring::before{content:'';position:absolute;inset:4px;border-radius:50%;background:var(--bg2)}
+.hw-ring-val{position:relative;z-index:1;font-size:12px;font-weight:800;font-family:'SF Mono',monospace}
+.hw-info{flex:1;min-width:0}
+.hw-stat{font-size:11px;margin-bottom:3px}
+.hw-stat b{font-family:'SF Mono',monospace;color:#86efac}
+.hw-advice{font-size:9px;color:var(--dim);line-height:1.4;padding:4px 6px;background:rgba(0,0,0,0.25);border-radius:4px;border-left:2px solid var(--cyan)}
+.hw-advice.warn{border-left-color:#fde047;color:#fde047}
+.hw-advice.danger{border-left-color:#ef4444;color:#fca5a5}
+.hw-dots{display:flex;gap:3px;margin-top:6px;flex-wrap:wrap}
+.hw-dot{width:8px;height:8px;border-radius:2px;background:rgba(255,255,255,0.1)}
+.hw-dot.win{background:#22c55e}
+.hw-dot.lose{background:#ef4444}
+
+/* PID反馈指示 */
+.pid-indicator{
+  font-size:9px;padding:3px 6px;border-radius:3px;margin-top:4px;display:inline-flex;align-items:center;gap:4px;
+}
+.pid-positive{background:rgba(34,197,94,0.12);color:#86efac}
+.pid-negative{background:rgba(239,68,68,0.12);color:#fca5a5}
+.pid-neutral{background:rgba(255,255,255,0.06);color:var(--dim)}
+
 /* ===== 右：市场反馈层 ===== */
 .market-dot{background:var(--market);box-shadow:0 0 10px var(--market)}
 .kline-wrap{height:340px;position:relative;background:#0a0e16;border:1px solid var(--line);border-radius:8px;padding:8px;margin-bottom:10px}
@@ -424,12 +487,13 @@ a{color:var(--cyan);text-decoration:none}
 
       <!-- 信号过滤器（反诈唬） -->
       <div class="signal-filter">
-        <div class="sf-title">⚡ 信号过滤器 · 反人性干扰</div>
+        <div class="sf-title">⚡ 信号过滤器 · 反人性干扰 <span class="risk-badge low" id="riskBadge" style="margin-left:auto">🟢 低风险</span></div>
         <div class="sf-row"><span class="k">对手诈唬概率</span><span class="v" id="sfBluff" style="color:var(--dim)">--</span></div>
         <div class="sf-row"><span class="k">市场噪音强度</span><span class="v" id="sfNoise" style="color:var(--dim)">--</span></div>
         <div class="sf-row"><span class="k">情绪FOMO指数</span><span class="v" id="sfFomo" style="color:var(--dim)">--</span></div>
         <div class="sf-row"><span class="k">信号置信度</span><span class="v" id="sfConf" style="color:var(--dim)">--</span></div>
         <div class="sf-row"><span class="k">机器推荐动作</span><span class="v" id="sfAction" style="color:var(--cyan)">--</span></div>
+        <div id="riskWarn" style="display:none;font-size:9px;color:var(--dim);margin-top:4px;padding:4px 6px;background:rgba(239,68,68,0.1);border-radius:3px;border-left:2px solid var(--red);"></div>
       </div>
 
       <!-- DCF估值锚 -->
@@ -485,6 +549,31 @@ a{color:var(--cyan);text-decoration:none}
         </div>
       </div>
 
+      <!-- 光照向量模块（七维向量 S=博弈熵） -->
+      <div class="light-vector" style="margin-top:12px">
+        <div class="lv-head">
+          <div class="lv-title">光照向量 · 博弈熵 S</div>
+          <div class="lv-val" id="lightVal" style="color:#86efac">0%</div>
+        </div>
+        <div class="lv-bar-wrap">
+          <div class="lv-bar">
+            <div class="lv-fill" id="lightFill" style="width:0%"></div>
+          </div>
+        </div>
+        <div class="lv-labels">
+          <span>暗处·低扰动</span>
+          <span>均衡</span>
+          <span>强光·高熵</span>
+        </div>
+        <div class="lv-metrics">
+          <div class="lv-m"><div class="k">弃牌率</div><div class="v" id="lvFold" style="color:#86efac">62%</div></div>
+          <div class="lv-m"><div class="k">加注率</div><div class="v" id="lvRaise" style="color:#fde047">18%</div></div>
+          <div class="lv-m"><div class="k">ALL-IN</div><div class="v" id="lvAllin" style="color:#fca5a5">2%</div></div>
+        </div>
+        <input type="range" class="lv-slider" id="lightSlider" min="0" max="100" value="15" title="手动调节光照强度">
+        <div class="lv-hint" id="lightHint">☀ 牌桌平静 · 外部环境低不确定性</div>
+      </div>
+
     </div>
   </div>
 
@@ -513,6 +602,24 @@ a{color:var(--cyan);text-decoration:none}
         <div class="result-title" id="resultTitle"></div>
         <div class="result-detail" id="resultDetail"></div>
         <div class="result-stat" id="resultStat"></div>
+      </div>
+
+      <!-- 历史胜率回溯（MindSpeak任务记忆层） -->
+      <div class="hist-winrate" id="histWinrate">
+        <div class="hw-head">
+          <div class="hw-title">历史胜率回溯 · 任务记忆层</div>
+        </div>
+        <div class="hw-main">
+          <div class="hw-ring" id="hwRing" style="--pct:0%">
+            <div class="hw-ring-val" id="hwRingVal">--</div>
+          </div>
+          <div class="hw-info">
+            <div class="hw-stat">同类决策胜率：<b id="hwRate">--/--</b>（<b id="hwPct">--</b>）</div>
+            <div class="hw-advice" id="hwAdvice">等待决策记录...</div>
+            <div class="hw-dots" id="hwDots"></div>
+          </div>
+        </div>
+        <div id="pidIndicator" class="pid-indicator pid-neutral" style="display:none"></div>
       </div>
 
       <!-- 决策质量计分 -->
@@ -586,7 +693,15 @@ const state = {
   decision:null, correct:null, finalPnL:0, breakout:null,
   autoPlay:false,
   // 演示参数
-  scenario:null
+  scenario:null,
+  // 新增四模块状态
+  lightIntensity:0.15,      // 光照强度（博弈熵S）0-1
+  lightManual:false,        // 是否手动调节（用户滑条）
+  foldRate:0.62, raiseRate:0.18, allinRate:0.02,
+  riskLevel:'low',          // THRESHOLDS: low/mid/high
+  decisionHistory:[],       // 最近10次决策记录 [{action, actionType, won, correct, p, timestamp}]
+  pidIntegral:0, pidPrevError:0, pidAdjFactor:1.0, // PID调节：影响后续推荐权重
+  pEstimate:0.65            // 经反馈调节的胜率估计
 };
 
 /* ---------- 日志 ---------- */
@@ -599,6 +714,222 @@ function log(msg, cls=''){
   box.appendChild(el);
   setTimeout(()=>el.remove(),6000);
   while(box.children.length>6) box.removeChild(box.firstChild);
+}
+
+/* ================================================================
+ * 新增模块核心函数
+ * ================================================================ */
+
+/* ----- 光照向量（博弈熵S） ----- */
+function updateLightVector(autoCalc=true){
+  if(autoCalc && !state.lightManual && state.stage!==STAGE.IDLE && state.scenario){
+    // 自动计算：基于对手行为、噪音、bluff概率、σ冲击
+    const base = 0.15;
+    const s = clamp(
+      base + state.noiseLevel*0.25 + state.bluffProb*0.20
+      + state.fomoLevel*0.15 + Math.min(state.sigma/3,1)*0.20
+      + (state.oppBet>8000?0.15:state.oppBet>3000?0.08:0)
+      + (Math.random()-0.5)*0.06,
+      0.05, 0.98
+    );
+    state.lightIntensity = s;
+  }
+  const s = state.lightIntensity;
+  // 更新UI
+  $('lightFill').style.width = (s*100).toFixed(0)+'%';
+  const valEl = $('lightVal');
+  valEl.textContent = (s*100).toFixed(0)+'%';
+  valEl.style.color = s<0.3?'#86efac':s<0.6?'#fde047':s<0.8?'#f97316':'#fca5a5';
+  // 更新三个指标（基于强度波动）
+  const foldR = clamp(0.45 + (1-s)*0.35 + (Math.random()-0.5)*0.06, 0.3, 0.85);
+  const raiseR = clamp(0.08 + s*0.22 + (Math.random()-0.5)*0.04, 0.05, 0.40);
+  const allinR = clamp(s*s*0.12 + (Math.random()-0.5)*0.02, 0.005, 0.15);
+  state.foldRate = foldR; state.raiseRate = raiseR; state.allinRate = allinR;
+  $('lvFold').textContent = (foldR*100).toFixed(0)+'%';
+  $('lvFold').style.color = foldR>0.6?'#86efac':'#fde047';
+  $('lvRaise').textContent = (raiseR*100).toFixed(0)+'%';
+  $('lvRaise').style.color = raiseR>0.25?'#fca5a5':'#fde047';
+  $('lvAllin').textContent = (allinR*100).toFixed(1)+'%';
+  $('lvAllin').style.color = allinR>0.08?'#fca5a5':allinR>0.04?'#fde047':'#86efac';
+  // 提示文本
+  const hint = $('lightHint');
+  if(s<0.25) hint.textContent = '🌑 牌桌暗处 · 对手保守，外部不确定性低';
+  else if(s<0.45) hint.textContent = '🌤 柔光均衡 · 适度博弈，环境稳定';
+  else if(s<0.65) hint.textContent = '☀ 强光照射 · 对手活跃，博弈升温';
+  else if(s<0.85) hint.textContent = '🔥 强光高熵 · 诈唬频繁，高度不确定性';
+  else hint.textContent = '⚡ 眩光失控 · ALL-IN频发，极度混沌';
+  // 更新滑条（如果不是手动模式）
+  if(!state.lightManual) $('lightSlider').value = Math.round(s*100);
+}
+
+/* ----- 风险分层标签（THRESHOLDS: 0.48/0.50/0.68）----- */
+function updateRiskBadge(){
+  if(!state.scenario || state.stage===STAGE.IDLE){
+    $('riskBadge').className = 'risk-badge low';
+    $('riskBadge').innerHTML = '🟢 低风险';
+    $('riskWarn').style.display = 'none';
+    state.riskLevel = 'low';
+    return;
+  }
+  // THRESHOLDS三基准：
+  //   p < 0.48 → 高风险（胜率低于50%阈值）
+  //   0.48 ≤ p < 0.68 → 中风险（胜率在临界区）
+  //   p ≥ 0.68 → 低风险（显著优势）
+  // 同时考虑噪音、光照熵、凯利f*调整
+  const pAdj = state.pEstimate; // 经PID反馈调节的胜率
+  let level, badge, warn = '';
+  if(pAdj < 0.48){
+    level = 'high';
+    badge = '🔴 高风险';
+    warn = '⚠️ THRESHOLD=0.48 高风险边界：胜率不足50%，即使凯利推荐加注也建议减半仓位';
+  } else if(pAdj < 0.68){
+    level = 'mid';
+    badge = '🟡 中风险';
+    if(state.lightIntensity > 0.6) warn = '⚠️ 中等风险+高光照熵：噪音干扰强，建议凯利半仓以下';
+  } else {
+    level = 'low';
+    badge = '🟢 低风险';
+  }
+  // 高光照熵提升一级风险
+  if(state.lightIntensity > 0.75 && level !== 'high'){
+    level = level==='low'?'mid':'high';
+    badge = level==='mid'?'🟡 中风险':'🔴 高风险';
+    if(level==='mid') warn = '⚠️ 强光高熵升级风险：外部不确定性推升风险至中等';
+  }
+  state.riskLevel = level;
+  const rb = $('riskBadge');
+  rb.className = 'risk-badge '+level;
+  rb.innerHTML = badge;
+  const warnEl = $('riskWarn');
+  if(warn){
+    warnEl.textContent = warn;
+    warnEl.style.display = 'block';
+  } else {
+    warnEl.style.display = 'none';
+  }
+}
+
+/* ----- 历史胜率回溯（MindSpeak任务记忆层）----- */
+function getActionCategory(action){
+  // 将动作映射为粗粒度类别（用于同类决策匹配）
+  if(action==='FOLD') return 'FOLD';
+  if(action==='CALL') return 'CALL';
+  return 'RAISE'; // RAISE/BIG_BET/ALL_IN
+}
+function updateHistoryWinrate(currentActionCategory=null){
+  const hist = state.decisionHistory;
+  const ring = $('hwRing');
+  const ringVal = $('hwRingVal');
+  const rate = $('hwRate');
+  const pct = $('hwPct');
+  const advice = $('hwAdvice');
+  const dots = $('hwDots');
+  if(hist.length === 0){
+    ring.style.setProperty('--pct','0%');
+    ringVal.textContent = '--';
+    rate.textContent = '0/0';
+    pct.textContent = '--';
+    advice.textContent = '等待决策记录...';
+    advice.className = 'hw-advice';
+    dots.innerHTML = '';
+    return;
+  }
+  // 如果有当前动作上下文，过滤同类决策；否则用全量
+  let target = hist;
+  if(currentActionCategory){
+    const same = hist.filter(h => h.category === currentActionCategory);
+    if(same.length >= 2) target = same;
+  }
+  const wins = target.filter(h => h.won).length;
+  const total = target.length;
+  const wr = wins/total;
+  ring.style.setProperty('--pct', (wr*100).toFixed(0)+'%');
+  ringVal.textContent = (wr*100).toFixed(0)+'%';
+  ringVal.style.color = wr>=0.5?'#86efac':wr>=0.35?'#fde047':'#fca5a5';
+  rate.textContent = wins+'/'+total;
+  pct.textContent = (wr*100).toFixed(0)+'%';
+  pct.style.color = ringVal.style.color;
+  // 建议文案
+  advice.className = 'hw-advice';
+  if(total < 3){
+    advice.textContent = '📊 样本不足（'+total+'次），继续积累决策数据...';
+  } else if(wr >= 0.6){
+    advice.textContent = '✅ 同类决策胜率'+(wr*100).toFixed(0)+'%，策略有效，保持纪律';
+    advice.className = 'hw-advice';
+  } else if(wr >= 0.4){
+    advice.textContent = '⚠️ 同类决策胜率'+(wr*100).toFixed(0)+'%，建议谨慎加注，缩小仓位';
+    advice.className = 'hw-advice warn';
+  } else {
+    advice.textContent = '🔴 同类决策胜率仅'+(wr*100).toFixed(0)+'%，连续失败'+(total-wins)+'次，建议优先弃牌/跟注';
+    advice.className = 'hw-advice danger';
+  }
+  // 绘制近10次结果点阵
+  dots.innerHTML = '';
+  hist.slice(-10).forEach(h=>{
+    const d = document.createElement('div');
+    d.className = 'hw-dot '+(h.won?'win':'lose');
+    d.title = h.action + ' · ' + (h.won?'胜':'负') + ' · p='+(h.p*100).toFixed(0)+'%';
+    dots.appendChild(d);
+  });
+}
+function recordDecision(action, won, correct){
+  const cat = getActionCategory(action);
+  const rec = {
+    action: action,
+    category: cat,
+    won: won,
+    correct: correct,
+    p: state.p,
+    fStar: state.fStar,
+    timestamp: Date.now()
+  };
+  state.decisionHistory.push(rec);
+  if(state.decisionHistory.length > 10) state.decisionHistory.shift();
+  // PID负反馈调节
+  applyPID(won, correct);
+  updateHistoryWinrate(cat);
+}
+
+/* ----- PID负反馈调节（胜率修正）----- */
+function applyPID(won, correct){
+  // 目标：当连续失败/错误决策时，下调pEstimate使系统更保守；
+  //       当连续成功时，上调pEstimate但幅度受限（避免过度自信）。
+  // PID参数
+  const Kp = 0.15, Ki = 0.04, Kd = 0.08;
+  // 误差：期望胜率（凯利最优）vs 实际结果
+  // 正确决策+赢 → error=+（符合预期）；错误决策+输 → error=-（严重偏差）
+  let error;
+  if(correct===true && won) error = 0.08;       // 正确且赢：正向小反馈
+  else if(correct===true && !won) error = -0.03;// 正确但输（bad beat）：小负
+  else if(correct==='partial') error = won?0.02:-0.08;
+  else if(!won) error = -0.20;                  // 错误且输：强负反馈
+  else error = -0.10;                           // 错误但赢（运气）：中负反馈
+  // 连续失败惩罚加重
+  const recentLoss = state.decisionHistory.slice(-3).filter(h=>!h.won).length;
+  if(recentLoss >= 3) error -= 0.10;
+  // PID计算
+  state.pidIntegral = clamp(state.pidIntegral + error*Ki, -0.25, 0.15);
+  const derivative = error - state.pidPrevError;
+  const adj = Kp*error + state.pidIntegral + Kd*derivative;
+  state.pidPrevError = error;
+  state.pidAdjFactor = clamp(state.pidAdjFactor + adj, 0.6, 1.15);
+  // 更新胜率估计：原始p * 调整因子
+  state.pEstimate = clamp(state.p * state.pidAdjFactor, 0.05, 0.95);
+  // PID指示器
+  const pid = $('pidIndicator');
+  pid.style.display = 'inline-flex';
+  const pBefore = (state.p*100).toFixed(1);
+  const pAfter = (state.pEstimate*100).toFixed(1);
+  if(Math.abs(adj) < 0.01){
+    pid.className = 'pid-indicator pid-neutral';
+    pid.textContent = 'PID 稳态 · p估计 '+pAfter+'%';
+  } else if(adj < 0){
+    pid.className = 'pid-indicator pid-negative';
+    pid.textContent = '📉 PID负反馈 · 胜率修正 '+pBefore+'%→'+pAfter+'%（连续失败降权）';
+  } else {
+    pid.className = 'pid-indicator pid-positive';
+    pid.textContent = '📈 PID正反馈 · 胜率修正 '+pBefore+'%→'+pAfter+'%（策略有效升权）';
+  }
 }
 
 /* ---------- 场景预设（4个真实扑克/投资场景）---------- */
@@ -795,15 +1126,25 @@ function computeKelly(p,b,fraction=0.5){
   return {f_star:f,edge,action};
 }
 function updateMachine(){
-  // 凯利仪表
-  const k = computeKelly(state.p, state.b, 0.5);
+  // 同步pEstimate：保持PID调节因子（如果本轮p被更新，重新应用因子）
+  state.pEstimate = clamp(state.p * state.pidAdjFactor, 0.05, 0.95);
+  // 凯利仪表：使用经PID反馈调节后的pEstimate（而非原始p），让历史失败影响当前推荐
+  const pForKelly = state.pEstimate;
+  const k = computeKelly(pForKelly, state.b, 0.5);
   state.fStar = k.f_star;
   state.ev = k.edge;
   state.recAction = k.action;
 
-  $('meterP').textContent = (state.p*100).toFixed(1)+'%';
-  $('meterP').className = 'meter-val '+(state.p>0.6?'good':state.p>0.4?'warn':'bad');
-  $('meterPSub').textContent = state.p>0.6?'强牌，正期望':state.p>0.4?'边缘牌，需精算':'弱牌，风险高';
+  // 显示原始胜率+调节后胜率
+  const adjDelta = state.pEstimate - state.p;
+  const pRawTxt = (state.p*100).toFixed(1)+'%';
+  const pAdjTxt = (state.pEstimate*100).toFixed(1)+'%';
+  $('meterP').textContent = pAdjTxt;
+  $('meterP').className = 'meter-val '+(state.pEstimate>0.6?'good':state.pEstimate>0.4?'warn':'bad');
+  const subTxt = Math.abs(adjDelta)>0.005
+    ? `原始 ${pRawTxt} → ${adjDelta>0?'↑':'↓'}${pAdjTxt} (记忆反馈)`
+    : (state.pEstimate>0.6?'强牌，正期望':state.pEstimate>0.4?'边缘牌，需精算':'弱牌，风险高');
+  $('meterPSub').textContent = subTxt;
 
   $('meterB').textContent = state.b.toFixed(2);
   $('meterB').className = 'meter-val '+(state.b>1.5?'good':'warn');
@@ -924,6 +1265,14 @@ function updateMachine(){
   // 根据凯利给按钮加推荐标识（UI三键映射：FOLD/CALL；BIG_BET/ALL_IN→RAISE）
   const recoBtn = state.recAction==='FOLD'?'FOLD':state.recAction==='CALL'?'CALL':'RAISE';
   setBtnsEnabled(true,true,true,recoBtn);
+
+  // 更新新增模块
+  updateLightVector();
+  updateRiskBadge();
+  // 当处于思考阶段，根据当前推荐动作类别显示历史胜率
+  if(state.stage===STAGE.THINKING){
+    updateHistoryWinrate(getActionCategory(recoBtn));
+  }
 }
 
 /* ================================================================
@@ -1173,9 +1522,16 @@ function startSimulation(){
   state.p = sc.trueP; state.b = sc.b;
   state.decision=null; state.correct=null;
   state.decisionPhase = 0; // 0=preflop已下注, 1=等待决策
+  // 新模块初始化（保留跨轮次的历史记忆和PID状态，但重置本轮相关）
+  state.lightIntensity = 0.2; state.lightManual = false;
+  state.foldRate=0.62; state.raiseRate=0.18; state.allinRate=0.02;
+  state.pEstimate = clamp(state.p * state.pidAdjFactor, 0.05, 0.95); // 应用历史PID调节因子
+  $('lightSlider').value = 20;
+  $('pidIndicator').style.display = 'none';
   $('oppAvatar').classList.add('thinking');
   $('oppName').textContent = 'SHARK_888'; // 可扩展不同对手
   $('oppTells').innerHTML = '弃牌率 62%<br>加注率 18%';
+  updateLightVector(false); // 初始化光照UI
 
   // 显示底牌名（动态描述）
   const holeDesc = sc.hole.map(c=>c.r+c.s).join('');
@@ -1417,6 +1773,17 @@ function finalizeResult(won){
     <div class="rs-item"><div class="rs-k">K线</div><div class="rs-v" style="color:${state.breakout==='up'?'#86efac':'#fca5a5'}">${state.breakout==='up'?'↑突破':'↓击穿'}</div></div>
   `;
 
+  // 决策反馈闭环：记录本次决策到历史，PID调节胜率估计
+  const actName = {FOLD:'弃牌',CALL:'跟注',RAISE:'加注',BIG_BET:'大注',ALL_IN:'全仓'}[state.decision];
+  const pBefore = (state.p*100).toFixed(1);
+  recordDecision(state.decision, won, state.correct);
+  const pAfter = (state.pEstimate*100).toFixed(1);
+  const resultStr = won?'胜利':'失败';
+  log(`🔄 反馈闭环：本次决策[${actName}] → 结果：${resultStr} · 胜率更新 ${pBefore}%→${pAfter}% · PID因子 ${state.pidAdjFactor.toFixed(2)}`, won?'win':'lose');
+  const hist = state.decisionHistory;
+  const hw = hist.filter(h=>h.won).length;
+  log(`📊 历史回溯：${hw}/${hist.length}胜 (${(hw/Math.max(1,hist.length)*100).toFixed(0)}%) · ${state.riskLevel==='high'?'🔴高风险':state.riskLevel==='mid'?'🟡中风险':'🟢低风险'} · 光照熵${(state.lightIntensity*100).toFixed(0)}%`, 'machine');
+
   setStage(STAGE.DONE);
   $('btnStart').disabled = false;
   $('btnStart').textContent = '▶ 再次模拟';
@@ -1448,6 +1815,16 @@ function resetSimulation(){
   $('cacVal').textContent='--';$('ltvVal').textContent='--';$('ltvcacVal').textContent='--';
   $('coneSigma').textContent='0.0';$('coneGamma').textContent='0.00';$('coneVolume').textContent='0';
   $('coneStateTag').className='cone-state-tag calm';$('coneStateTag').textContent='CALM 平静';
+  // 重置新增模块
+  state.lightIntensity=0.15;state.lightManual=false;state.riskLevel='low';
+  $('lightFill').style.width='15%';$('lightVal').textContent='15%';$('lightVal').style.color='#86efac';
+  $('lvFold').textContent='62%';$('lvRaise').textContent='18%';$('lvAllin').textContent='2%';
+  $('lightHint').textContent='☀ 牌桌平静 · 外部环境低不确定性';
+  $('lightSlider').value=15;
+  $('riskBadge').className='risk-badge low';$('riskBadge').innerHTML='🟢 低风险';$('riskWarn').style.display='none';
+  // 保留历史记忆（decisionHistory、PID状态跨轮次保留），仅重置显示
+  updateHistoryWinrate();
+  $('pidIndicator').style.display='none';
   $('klinePrice').textContent='¥68.50';$('klineChange').textContent='--';$('klineVol').textContent='成交量: --';
   ['scoreHuman','scoreKelly','scoreDCF','scoreGamma','scoreTotal'].forEach(id=>$(id).textContent='--');
   $('scoreTotalLabel').textContent='等待决策';
@@ -1463,6 +1840,18 @@ $('btnReset').addEventListener('click', resetSimulation);
 $('btnFold').addEventListener('click',()=>playerDecision('FOLD'));
 $('btnCall').addEventListener('click',()=>playerDecision('CALL'));
 $('btnRaise').addEventListener('click',()=>playerDecision('RAISE'));
+
+// 光照向量滑条交互（手动模式）
+$('lightSlider').addEventListener('input', (e)=>{
+  state.lightManual = true;
+  state.lightIntensity = parseInt(e.target.value)/100;
+  updateLightVector(false);
+  updateRiskBadge();
+});
+$('lightSlider').addEventListener('dblclick', ()=>{
+  state.lightManual = false;
+  log('光照向量恢复自动模式','machine');
+});
 
 window.addEventListener('resize', ()=>{ if(state.candles.length) drawKline(); });
 
@@ -1484,11 +1873,16 @@ window.addEventListener('storage', e=>{
 /* ---------- 初始化 ---------- */
 setStage(STAGE.IDLE);
 updateStacks();
+// 初始化新增模块
+updateLightVector(false);
+updateRiskBadge();
+updateHistoryWinrate();
 // 初始状态就画一组默认K线（箱体震荡），避免右侧黑空
 setTimeout(()=>{
   try{ initKline(); }catch(e){ console.warn('initKline on load skipped:',e); }
 },50);
 log('终极模拟沙盘已就绪 · 点击 [开始模拟] 体验人机合一决策流','machine');
+log('四层升级：☀光照向量(S博弈熵) · 🧠历史回溯(任务记忆) · 🚦风险分层(THRESHOLDS) · 🔄PID反馈闭环','machine');
 log('三层架构：左=人性(扑克+诈唬+噪音) | 中=机器(Kelly+DCF+圆锥) | 右=市场(K线+箱体突破)','machine');
 
 })();
