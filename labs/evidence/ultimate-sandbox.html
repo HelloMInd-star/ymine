@@ -40,7 +40,7 @@ a{color:var(--cyan);text-decoration:none}
 
 /* ===== 三栏主体 ===== */
 .main{
-  display:grid;grid-template-columns:minmax(240px,280px) 1fr minmax(300px,360px);gap:1px;
+  display:grid;grid-template-columns:minmax(260px,300px) 1fr minmax(280px,340px);gap:1px;
   flex:1;background:var(--line);min-height:0;min-width:0;overflow:hidden;
 }
 .panel{background:var(--bg);display:flex;flex-direction:column;overflow:hidden;min-height:0;min-width:0;}
@@ -52,6 +52,10 @@ a{color:var(--cyan);text-decoration:none}
 .panel-head .name{font-size:13px;font-weight:700;letter-spacing:1px;flex-shrink:0}
 .panel-head .role{font-size:10px;color:var(--dim);letter-spacing:1px;margin-left:auto;flex-shrink:0;overflow:hidden;text-overflow:ellipsis}
 .panel-body{flex:1;overflow-y:auto;padding:14px;position:relative;min-height:0;min-width:0;}
+.panel-body > *:last-child{margin-bottom:0}
+#humanBody{padding-bottom:12px;}
+#machineBody{padding-bottom:12px;}
+#marketBody{padding-bottom:110px;}
 .panel-body::-webkit-scrollbar{width:4px}
 .panel-body::-webkit-scrollbar-thumb{background:var(--line);border-radius:2px}
 
@@ -60,13 +64,13 @@ a{color:var(--cyan);text-decoration:none}
 /* 对手信息 */
 .opponent-card{
   background:linear-gradient(135deg,rgba(249,115,22,0.08),rgba(239,68,68,0.05));
-  border:1px solid rgba(249,115,22,0.2);border-radius:10px;padding:12px;margin-bottom:12px;
+  border:1px solid rgba(249,115,22,0.2);border-radius:10px;padding:10px;margin-bottom:8px;
 }
-.opp-top{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.opp-top{display:flex;align-items:center;gap:8px;margin-bottom:8px}
 .opp-avatar{
-  width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,#7c2d12,#b45309);
-  display:flex;align-items:center;justify-content:center;font-size:20px;
-  border:2px solid rgba(249,115,22,0.4);position:relative;
+  width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#7c2d12,#b45309);
+  display:flex;align-items:center;justify-content:center;font-size:18px;
+  border:2px solid rgba(249,115,22,0.4);position:relative;flex-shrink:0;
 }
 .opp-avatar.thinking::after{
   content:'';position:absolute;inset:-4px;border:2px solid var(--human);border-radius:50%;
@@ -77,19 +81,19 @@ a{color:var(--cyan);text-decoration:none}
 .opp-stack{font-size:11px;color:var(--dim)}
 .opp-tells{font-size:10px;color:var(--gold);margin-left:auto;text-align:right;line-height:1.4}
 .opp-bet{
-  text-align:center;padding:8px;border-radius:6px;
+  text-align:center;padding:6px;border-radius:6px;
   background:rgba(239,68,68,0.15);border:1px dashed rgba(239,68,68,0.4);
-  font-size:12px;margin-bottom:10px;
+  font-size:12px;margin-bottom:8px;
 }
 .opp-bet.big{background:rgba(239,68,68,0.25);border-style:solid;animation:shake .4s}
 @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-3px)}75%{transform:translateX(3px)}}
 .opp-bet .label{color:var(--dim);font-size:10px}
-.opp-bet .amt{font-size:18px;font-weight:800;color:#fca5a5}
+.opp-bet .amt{font-size:16px;font-weight:800;color:#fca5a5}
 
 /* 噪音干扰带 */
 .noise-bar{
-  background:rgba(0,0,0,0.3);border-radius:6px;padding:8px 10px;margin-bottom:10px;
-  font-size:10px;line-height:1.6;max-height:76px;overflow:hidden;position:relative;
+  background:rgba(0,0,0,0.3);border-radius:6px;padding:8px 10px;margin-bottom:8px;
+  font-size:10px;line-height:1.5;max-height:60px;overflow:hidden;position:relative;
 }
 .noise-bar::before{
   content:'📡 市场噪音 / 对手信号';position:absolute;top:4px;right:8px;
@@ -105,36 +109,36 @@ a{color:var(--cyan);text-decoration:none}
 /* 牌桌 */
 .poker-table{
   background:radial-gradient(ellipse at center,#0f2014 0%,#071108 100%);
-  border:3px solid #1a3a20;border-radius:50%/40%;padding:18px 14px;
-  position:relative;margin:10px 0;
+  border:3px solid #1a3a20;border-radius:50%/40%;padding:12px 10px;
+  position:relative;margin:4px 0;overflow:visible;
 }
-.community-cards,.hole-cards-row{display:flex;gap:6px;justify-content:center}
-.hole-cards-row{margin-top:12px}
+.community-cards,.hole-cards-row{display:flex;gap:4px;justify-content:center}
+.hole-cards-row{margin-top:6px}
 .cmini{
-  width:34px;height:48px;border-radius:4px;background:#fff;color:#000;
+  width:26px;height:36px;border-radius:3px;background:#fff;color:#000;
   display:flex;flex-direction:column;align-items:center;justify-content:center;
-  font-size:10px;font-weight:700;flex-shrink:0;
+  font-size:8px;font-weight:700;flex-shrink:0;
   box-shadow:0 2px 6px rgba(0,0,0,0.5);position:relative;
 }
 .cmini.red{color:#c00}
 .cmini.back{background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:transparent;background-image:repeating-linear-gradient(45deg,rgba(255,255,255,0.1) 0 4px,transparent 4px 8px)}
 .cmini.dealing{animation:deal .4s ease-out}
 @keyframes deal{from{transform:translateY(-60px) rotate(-20deg);opacity:0}to{transform:translateY(0);opacity:1}}
-.pot-info{text-align:center;margin-top:10px;font-size:10px;color:#86efac}
-.pot-info .pot{font-size:15px;font-weight:800;color:#fde047}
+.pot-info{text-align:center;margin-top:8px;font-size:10px;color:#86efac}
+.pot-info .pot{font-size:14px;font-weight:800;color:#fde047}
 
 /* 我的信息 */
 .me-card{
   background:linear-gradient(135deg,rgba(34,211,238,0.08),rgba(59,130,246,0.05));
-  border:1px solid rgba(34,211,238,0.2);border-radius:10px;padding:12px;
+  border:1px solid rgba(34,211,238,0.2);border-radius:10px;padding:10px;
 }
-.me-top{display:flex;align-items:center;gap:10px;margin-bottom:8px}
-.me-avatar{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#0e7490,#0369a1);display:flex;align-items:center;justify-content:center;font-size:18px;border:2px solid var(--cyan)}
+.me-top{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.me-avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#0e7490,#0369a1);display:flex;align-items:center;justify-content:center;font-size:16px;border:2px solid var(--cyan);flex-shrink:0}
 .me-name{font-size:13px;font-weight:700}
 .me-stack{font-size:11px;color:var(--dim)}
 .me-bet-amt{margin-left:auto;font-size:12px;color:var(--cyan)}
 
-.action-btns{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:10px}
+.action-btns{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:8px}
 .act-btn{
   padding:9px 4px;border:1px solid var(--line);border-radius:6px;background:var(--bg3);
   color:var(--text);font-size:11px;font-weight:700;cursor:pointer;transition:all .15s;
@@ -258,10 +262,10 @@ a{color:var(--cyan);text-decoration:none}
 
 /* 日志流 */
 .log-stream{
-  position:absolute;bottom:0;left:0;right:0;max-height:120px;overflow:hidden;
-  padding:8px 12px;background:linear-gradient(transparent,rgba(0,0,0,0.7));
+  position:absolute;bottom:0;left:0;right:0;max-height:100px;overflow:hidden;
+  padding:20px 12px 8px;background:linear-gradient(transparent,rgba(7,9,15,0.95));
   font-family:'SF Mono',ui-monospace,monospace;font-size:10px;line-height:1.5;
-  pointer-events:none;
+  pointer-events:none;z-index:5;
 }
 .log-line{opacity:0;animation:logIn .3s forwards}
 @keyframes logIn{to{opacity:.85}}
@@ -280,10 +284,10 @@ a{color:var(--cyan);text-decoration:none}
 .pulse-line{position:absolute;pointer-events:none;z-index:20}
 
 /* 响应式 - 始终保持三栏终端风格 */
-@media (max-width:1400px){.main{grid-template-columns:minmax(220px,260px) 1fr minmax(280px,340px)}}
-@media (max-width:1200px){.main{grid-template-columns:minmax(200px,240px) 1fr minmax(260px,320px)}.panel-body{padding:10px}.topbar{gap:8px;padding:0 12px}.topbar .tag{display:none}}
-@media (max-width:1000px){.main{grid-template-columns:minmax(180px,220px) 1fr minmax(240px,280px);gap:0}.topbar .brand-sub{display:none}.topbar div[style*="font-size:20px"]{display:none}.meter-group{grid-template-columns:1fr}.opponent-card,.me-card,.dcf-box,.signal-filter,.funnel-stats,.cone-meter{padding:8px;margin-bottom:8px}}
-@media (max-width:900px){.main{grid-template-columns:minmax(160px,200px) 1fr minmax(220px,260px)}.topbar a:nth-child(2){display:none}.poker-table{padding:12px 8px}}
+@media (max-width:1400px){.main{grid-template-columns:minmax(240px,280px) 1fr minmax(270px,330px)}}
+@media (max-width:1200px){.main{grid-template-columns:minmax(230px,260px) 1fr minmax(260px,310px)}.panel-body{padding:10px}.topbar{gap:8px;padding:0 12px}.topbar .tag{display:none}}
+@media (max-width:1000px){.main{grid-template-columns:minmax(210px,240px) 1fr minmax(240px,280px);gap:0}.topbar .brand-sub{display:none}.topbar div[style*="font-size:20px"]{display:none}.meter-group{grid-template-columns:1fr}.opponent-card,.me-card,.dcf-box,.signal-filter,.funnel-stats,.cone-meter{padding:8px;margin-bottom:8px}}
+@media (max-width:900px){.main{grid-template-columns:minmax(200px,220px) 1fr minmax(220px,260px)}.topbar a:nth-child(2){display:none}.poker-table{padding:12px 8px}.cmini{width:26px;height:36px;font-size:8px}}
 </style>
 </head>
 <body>
@@ -524,12 +528,12 @@ a{color:var(--cyan);text-decoration:none}
         <div style="text-align:center;font-size:10px;color:var(--dim);letter-spacing:1px" id="scoreTotalLabel">等待决策</div>
       </div>
 
+      <!-- 日志流（只在右栏底部显示） -->
+      <div class="log-stream" id="logStream" style="position:absolute;bottom:0;left:0;right:0;max-height:100px"></div>
+
     </div>
   </div>
 </div>
-
-<!-- 全局日志流（覆盖在body上） -->
-<div class="log-stream" id="logStream"></div>
 
 <!-- ========== 引入 YBus ========== -->
 <script src="../../assets/js/bus.js"></script>
@@ -709,7 +713,7 @@ function renderCards(holeCards, communityCards){
     const el = document.createElement('div');
     el.className = 'cmini dealing'+(c.red?' red':'');
     el.style.animationDelay = (i*0.15)+'s';
-    el.innerHTML = `<div>${c.r}</div><div style="font-size:14px;line-height:1">${c.s}</div>`;
+    el.innerHTML = `<div>${c.r}</div><div style="font-size:10px;line-height:1">${c.s}</div>`;
     hc.appendChild(el);
   });
   const cc = $('communityCards'); cc.innerHTML='';
@@ -721,7 +725,7 @@ function renderCards(holeCards, communityCards){
       const actualC = communityCards[i];
       el.className = 'cmini dealing'+(actualC.red?' red':'');
       el.style.animationDelay = (0.3+i*0.12)+'s';
-      el.innerHTML = `<div>${actualC.r}</div><div style="font-size:14px;line-height:1">${actualC.s}</div>`;
+      el.innerHTML = `<div>${actualC.r}</div><div style="font-size:10px;line-height:1">${actualC.s}</div>`;
     } else {
       el.className='cmini back';
       el.textContent='?';
