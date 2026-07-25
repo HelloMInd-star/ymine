@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Y.Mine · 金融估值模拟器 · 风险向量精算</title>
+    <title>Y.Mine · 金融估值精算引擎 · 7维风险向量 + KMP→IPD→七维向量</title>
     <link rel="stylesheet" href="../../assets/css/base.css">
     <script src="../../assets/js/bus.js"></script>
     <script src="../../assets/js/cone-game-theory.js"></script>
@@ -339,6 +339,31 @@
             background: #a78bfa;
             cursor: pointer;
             box-shadow: 0 0 20px rgba(167, 139, 250, 0.15);
+        }
+
+        .simulator-section .sim-grid .ctrl.ctrl-light label span {
+            color: #fbbf24;
+        }
+        .simulator-section .sim-grid .ctrl.ctrl-light input[type="range"] {
+            accent-color: #fbbf24;
+        }
+        .simulator-section .sim-grid .ctrl.ctrl-light input[type="range"]::-webkit-slider-thumb {
+            background: #fbbf24;
+            box-shadow: 0 0 20px rgba(251, 191, 36, 0.3);
+        }
+        .light-vector-note {
+            margin-top: 10px;
+            padding: 10px 14px;
+            background: rgba(251, 191, 36, 0.05);
+            border: 1px solid rgba(251, 191, 36, 0.12);
+            border-radius: 8px;
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.45);
+            line-height: 1.6;
+        }
+        .light-vector-note strong {
+            color: #fbbf24;
+            font-weight: 600;
         }
 
         .simulator-section .result-panel {
@@ -2389,7 +2414,7 @@
         <div class="header">
             <div class="badge">🧪 风险向量精算 · 浓度稳态</div>
             <h1>金融估值模拟器 · 风险向量精算</h1>
-            <div class="sub">6维风险向量 × 圆锥浓度模型 = CAPM 估值 · 0.68 稳态铁律</div>
+            <div class="sub">7维风险向量（含光照） × 圆锥浓度模型 = CAPM 估值 · 0.68 稳态铁律</div>
         </div>
 
         <!-- ===== 使用说明 ===== -->
@@ -2437,7 +2462,7 @@
                     <div class="kmp-step-icon">🔵</div>
                     <div class="kmp-step-body">
                         <div class="kmp-step-label">M层（数学层）· 浓度精算</div>
-                        <div class="kmp-step-desc">六维风险向量 → 三维评估值（余弦相似度 / 欧氏距离 / 点积距离）</div>
+                        <div class="kmp-step-desc">七维风险向量 → 三维评估值（余弦相似度 / 欧氏距离 / 点积距离）</div>
                         <div class="kmp-step-formula">圆锥浓度模型：C = m × ρ₀ / V(h)</div>
                     </div>
                 </div>
@@ -3118,7 +3143,7 @@
                 <strong>💡 核心模型：</strong>资本定价 = <span class="highlight">无风险利率 Rf</span> + <span style="color:#a78bfa;">风险溢价 Rp</span> × <span style="color:#60a5fa;">β系数</span><br>
                 浓度约束：<span class="highlight">C = m × ρ₀ / V(h)</span>（溶质质量 × 信源密度 / 市场容积）<br>
                 稳态铁律：<span style="color:#facc15;">0.48 保本 / 0.50 中轴 / 0.68 熔断</span><br>
-                风险向量：6维空间 → 向量模长 × 余弦相似度 = 组合风险收益率
+                风险向量：7维空间（凯利/杠杆/夏普/回撤/边际/机会成本/<strong style="color:#fbbf24;">光照</strong>）→ 向量模长 × 余弦相似度 = 组合风险收益率
             </p>
         </div>
 
@@ -3130,7 +3155,7 @@
             </div>
             <div class="kt-item">
                 <div class="kt-icon">📊</div>
-                <div class="kt-text">6维风险向量<br><span class="hl">向量模长 × 方向相似度</span></div>
+                <div class="kt-text">7维风险向量<br><span class="hl">含光照维度 · 向量模长 × 方向相似度</span></div>
             </div>
             <div class="kt-item">
                 <div class="kt-icon">⚠️</div>
@@ -3147,7 +3172,7 @@
             </div>
             <div class="meta-item">
                 <div class="ml">🧠 风险向量 · 估算逻辑</div>
-                <div class="mv">基于 <span class="hl">6维风险向量</span> × <span style="color:#60a5fa;">圆锥浓度模型</span> 精算<br><span class="sub">实时动态计算 · 物理化学级精度</span></div>
+                <div class="mv">基于 <span class="hl">7维风险向量</span>（含☀️光照） × <span style="color:#60a5fa;">圆锥浓度模型</span> 精算<br><span class="sub">实时动态计算 · 物理化学级精度</span></div>
             </div>
             <div class="meta-item" style="grid-column:1/-1;">
                 <div class="ml">🔁 两种估值路径的差异</div>
@@ -3472,13 +3497,13 @@
         </div>
 
         <!-- ============================================================ -->
-        <!-- ===== 模拟器1：6维风险向量空间 ===== -->
+        <!-- ===== 模拟器1：7维风险向量空间 ===== -->
         <!-- ============================================================ -->
         <div class="section-anchor" id="section-riskvector"></div>
         <div class="simulator-section">
-            <div class="sim-title">📊 6维风险向量空间 <span class="tag">输入层</span></div>
+            <div class="sim-title">📊 7维风险向量空间 <span class="tag">输入层</span></div>
             <div class="sim-sub">
-                <span class="hl">凯利比率</span> × <span class="hl-blue">财务杠杆</span> × <span style="color:#facc15;">夏普比率</span> × 最大回撤 × 边际递减 × 机会成本
+                <span class="hl">凯利比率</span> × <span class="hl-blue">财务杠杆</span> × <span style="color:#facc15;">夏普比率</span> × 最大回撤 × 边际递减 × 机会成本 × <span style="color:#fbbf24;">☀️光照强度</span>
                 <br>向量模长 × 最优向量余弦相似度 = 组合风险收益率
             </div>
 
@@ -3513,6 +3538,15 @@
                     <input type="range" id="ocInput" min="0.05" max="0.70" step="0.01" value="0.30" />
                     <span class="sub-hint">选择此方案的机会损失</span>
                 </div>
+                <div class="ctrl ctrl-light">
+                    <label>☀️ 光照强度 L <span id="lightVal">0.50</span></label>
+                    <input type="range" id="lightInput" min="0" max="1" step="0.01" value="0.50" />
+                    <span class="sub-hint">外部环境综合强度（S·博弈熵）</span>
+                </div>
+            </div>
+
+            <div class="light-vector-note">
+                <strong>☀️ 光照向量（L）：</strong>四维加权合成 L = w₁L₁ + w₂L₂ + w₃L₃ + w₄L₄（个股成交量活跃度/市场舆论热度/行业政策强度/产业链景气度），对应七维向量中的 <strong>S（博弈熵）</strong>维度。光照不足(&lt;0.48)·偏弱(&lt;0.50)·温和(0.50~0.68)·过热(&gt;0.68)四态直接影响风险溢价。
             </div>
 
             <div class="result-panel">
@@ -3842,7 +3876,7 @@
                     <div>
                         <div style="font-size: 10px; color: rgba(255,255,255,0.15); margin-bottom: 4px;">⚖️ 溶质质量 m</div>
                         <div style="font-size: 20px; font-weight: 700; color: #facc15; margin-bottom: 6px;" id="coneMVal">0.65</div>
-                        <div style="font-size: 9px; color: rgba(255,255,255,0.08); margin-top: 2px;">向量模长（6维风险）</div>
+                        <div style="font-size: 9px; color: rgba(255,255,255,0.08); margin-top: 2px;">向量模长（7维风险·含光照）</div>
                     </div>
                     <div>
                         <div style="font-size: 10px; color: rgba(255,255,255,0.15); margin-bottom: 4px;">🧪 浓度 C</div>
@@ -6305,7 +6339,7 @@
         })();
 
         // ================================================================
-        // ===== 6维风险向量计算引擎 =====
+        // ===== 7维风险向量计算引擎 =====
         // ================================================================
         (function() {
             const kellyInput = document.getElementById('kellyInput');
@@ -6314,6 +6348,7 @@
             const mddInput = document.getElementById('mddInput');
             const dimInput = document.getElementById('dimInput');
             const ocInput = document.getElementById('ocInput');
+            const lightInput = document.getElementById('lightInput');
 
             const kellyVal = document.getElementById('kellyVal');
             const leverageVal = document.getElementById('leverageVal');
@@ -6321,6 +6356,7 @@
             const mddVal = document.getElementById('mddVal');
             const dimVal = document.getElementById('dimVal');
             const ocVal = document.getElementById('ocVal');
+            const lightVal = document.getElementById('lightVal');
 
             const vecMagnitude = document.getElementById('vecMagnitude');
             const vecCosine = document.getElementById('vecCosine');
@@ -6328,14 +6364,14 @@
             const vecRp = document.getElementById('vecRp');
             const vecAdvice = document.getElementById('vecAdvice');
 
-            const V_opt = [0.65, 3.0, 3.5, 0.30, 0.75, 0.40];
+            const V_opt = [0.65, 3.0, 3.5, 0.30, 0.75, 0.40, 0.50];
 
             function calcVectorMag(v) {
-                return Math.sqrt(v[0]*v[0] + v[1]*v[1] + v[2]*v[2] + v[3]*v[3] + v[4]*v[4] + v[5]*v[5]);
+                return Math.sqrt(v[0]*v[0] + v[1]*v[1] + v[2]*v[2] + v[3]*v[3] + v[4]*v[4] + v[5]*v[5] + v[6]*v[6]);
             }
 
             function calcDot(a, b) {
-                return a[0]*b[0] + a[1]*b[1] + a[2]*b[2] + a[3]*b[3] + a[4]*b[4] + a[5]*b[5];
+                return a[0]*b[0] + a[1]*b[1] + a[2]*b[2] + a[3]*b[3] + a[4]*b[4] + a[5]*b[5] + a[6]*b[6];
             }
 
             function updateRiskVector() {
@@ -6345,6 +6381,7 @@
                 const mdd = parseFloat(mddInput.value);
                 const dim = parseFloat(dimInput.value);
                 const oc = parseFloat(ocInput.value);
+                const light = parseFloat(lightInput.value);
 
                 kellyVal.textContent = f_star.toFixed(2);
                 leverageVal.textContent = L.toFixed(1);
@@ -6352,8 +6389,9 @@
                 mddVal.textContent = mdd.toFixed(2);
                 dimVal.textContent = dim.toFixed(2);
                 ocVal.textContent = oc.toFixed(2);
+                lightVal.textContent = light.toFixed(2);
 
-                const V = [f_star, L, SR, mdd, dim, oc];
+                const V = [f_star, L, SR, mdd, dim, oc, light];
 
                 const magV = calcVectorMag(V);
                 const magOpt = calcVectorMag(V_opt);
@@ -6370,6 +6408,7 @@
 
                 window.vectorMagnitude = magV;
                 window.vectorRp = Rp;
+                window.vectorLight = light;
 
                 let advice = '';
                 let adviceColor = '#22c55e';
@@ -6388,11 +6427,17 @@
                     adviceColor = '#f87171';
                 }
 
+                if (light > 0.68) {
+                    advice += ' <span style="color:#f87171;">☀️光照过热，注意外部风险熔断！</span>';
+                } else if (light < 0.48) {
+                    advice += ' <span style="color:#60a5fa;">🌑光照不足，市场环境偏冷。</span>';
+                }
+
                 vecAdvice.innerHTML = '💡 ' + advice;
                 vecAdvice.style.borderLeftColor = adviceColor;
 
                 if (typeof YMineRiskCB !== 'undefined' && YMineRiskCB.update) {
-                    YMineRiskCB.update({ mdd: mdd });
+                    YMineRiskCB.update({ mdd: mdd, light: light });
                 }
 
                 if (typeof updateConeFromVector === 'function') {
@@ -6415,6 +6460,7 @@
                 mddInput.addEventListener('input', updateRiskVector);
                 dimInput.addEventListener('input', updateRiskVector);
                 ocInput.addEventListener('input', updateRiskVector);
+                lightInput.addEventListener('input', updateRiskVector);
                 updateRiskVector();
             }
 
