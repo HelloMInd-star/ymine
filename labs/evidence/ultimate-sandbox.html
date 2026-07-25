@@ -12,15 +12,16 @@
   --purple:#a78bfa;--cyan:#22d3ee;--dim:#64748b;--text:#e5e7eb;
   --human:#f97316;--machine:#22d3ee;--market:#a78bfa;
 }
-html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;overflow-x:hidden;}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;overflow:hidden;}
+body{display:flex;flex-direction:column;position:relative;}
 a{color:var(--cyan);text-decoration:none}
 
 /* ===== 顶部标题栏 ===== */
 .topbar{
-  height:56px;padding:0 24px;display:flex;align-items:center;gap:20px;
+  height:56px;padding:0 16px;display:flex;align-items:center;gap:12px;
   background:linear-gradient(180deg,rgba(21,27,41,0.95),rgba(7,9,15,0.9));
   border-bottom:1px solid var(--line);position:relative;z-index:10;
-  backdrop-filter:blur(12px);
+  backdrop-filter:blur(12px);flex-shrink:0;overflow:hidden;white-space:nowrap;
 }
 .brand{font-size:15px;font-weight:800;letter-spacing:2px;background:linear-gradient(90deg,var(--gold),var(--cyan));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
 .brand-sub{font-size:11px;color:var(--dim);margin-left:-10px}
@@ -39,18 +40,18 @@ a{color:var(--cyan);text-decoration:none}
 
 /* ===== 三栏主体 ===== */
 .main{
-  display:grid;grid-template-columns:340px 1fr 480px;gap:1px;
-  height:calc(100vh - 56px);background:var(--line);
+  display:grid;grid-template-columns:minmax(240px,280px) 1fr minmax(300px,360px);gap:1px;
+  flex:1;background:var(--line);min-height:0;min-width:0;overflow:hidden;
 }
-.panel{background:var(--bg);display:flex;flex-direction:column;overflow:hidden}
+.panel{background:var(--bg);display:flex;flex-direction:column;overflow:hidden;min-height:0;min-width:0;}
 .panel-head{
-  padding:12px 16px;border-bottom:1px solid var(--line);
-  display:flex;align-items:center;gap:10px;flex-shrink:0;
+  padding:10px 12px;border-bottom:1px solid var(--line);
+  display:flex;align-items:center;gap:8px;flex-shrink:0;white-space:nowrap;
 }
-.panel-head .dot{width:8px;height:8px;border-radius:50%}
-.panel-head .name{font-size:13px;font-weight:700;letter-spacing:1px}
-.panel-head .role{font-size:10px;color:var(--dim);letter-spacing:1px;margin-left:auto}
-.panel-body{flex:1;overflow-y:auto;padding:14px;position:relative}
+.panel-head .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.panel-head .name{font-size:13px;font-weight:700;letter-spacing:1px;flex-shrink:0}
+.panel-head .role{font-size:10px;color:var(--dim);letter-spacing:1px;margin-left:auto;flex-shrink:0;overflow:hidden;text-overflow:ellipsis}
+.panel-body{flex:1;overflow-y:auto;padding:14px;position:relative;min-height:0;min-width:0;}
 .panel-body::-webkit-scrollbar{width:4px}
 .panel-body::-webkit-scrollbar-thumb{background:var(--line);border-radius:2px}
 
@@ -278,8 +279,11 @@ a{color:var(--cyan);text-decoration:none}
 /* 数据脉冲连线 */
 .pulse-line{position:absolute;pointer-events:none;z-index:20}
 
-/* 响应式 */
-@media (max-width:1200px){.main{grid-template-columns:300px 1fr 400px}}
+/* 响应式 - 始终保持三栏终端风格 */
+@media (max-width:1400px){.main{grid-template-columns:minmax(220px,260px) 1fr minmax(280px,340px)}}
+@media (max-width:1200px){.main{grid-template-columns:minmax(200px,240px) 1fr minmax(260px,320px)}.panel-body{padding:10px}.topbar{gap:8px;padding:0 12px}.topbar .tag{display:none}}
+@media (max-width:1000px){.main{grid-template-columns:minmax(180px,220px) 1fr minmax(240px,280px);gap:0}.topbar .brand-sub{display:none}.topbar div[style*="font-size:20px"]{display:none}.meter-group{grid-template-columns:1fr}.opponent-card,.me-card,.dcf-box,.signal-filter,.funnel-stats,.cone-meter{padding:8px;margin-bottom:8px}}
+@media (max-width:900px){.main{grid-template-columns:minmax(160px,200px) 1fr minmax(220px,260px)}.topbar a:nth-child(2){display:none}.poker-table{padding:12px 8px}}
 </style>
 </head>
 <body>
@@ -288,17 +292,17 @@ a{color:var(--cyan);text-decoration:none}
 
 <!-- ========== 顶部标题栏 ========== -->
 <div class="topbar">
-  <a href="../../index.html" class="btn-back" title="返回首页" style="padding:6px 12px;border:1px solid var(--line);background:transparent;color:var(--dim);border-radius:6px;cursor:pointer;font-size:12px;text-decoration:none;display:inline-flex;align-items:center;gap:4px;transition:all .2s" onmouseover="this.style.color='var(--text)';this.style.borderColor='var(--dim)'" onmouseout="this.style.color='var(--dim)';this.style.borderColor='var(--line)'">← 返回</a>
-  <a href="../../modeling_overview.html" title="返回全领域建模总览" style="padding:6px 12px;border:1px solid rgba(46,204,113,0.3);background:rgba(46,204,113,0.08);color:#2ecc71;border-radius:6px;cursor:pointer;font-size:12px;text-decoration:none;display:inline-flex;align-items:center;gap:4px;transition:all .2s;margin-left:4px" onmouseover="this.style.background='rgba(46,204,113,0.15)';this.style.borderColor='rgba(46,204,113,0.5)'" onmouseout="this.style.background='rgba(46,204,113,0.08)';this.style.borderColor='rgba(46,204,113,0.3)'">← 返回建模总览</a>
-  <div class="brand">Y.MINE</div>
-  <div class="brand-sub">终极模拟沙盘</div>
-  <div style="font-size:20px;color:var(--gold);margin:0 8px">×</div>
-  <div style="font-size:13px;font-weight:700;color:var(--cyan);letter-spacing:2px">人性博弈 → 机器精算 → 市场反馈</div>
+  <a href="../../index.html" class="btn-back" title="返回首页" style="padding:6px 12px;border:1px solid var(--line);background:transparent;color:var(--dim);border-radius:6px;cursor:pointer;font-size:12px;text-decoration:none;display:inline-flex;align-items:center;gap:4px;transition:all .2s;flex-shrink:0" onmouseover="this.style.color='var(--text)';this.style.borderColor='var(--dim)'" onmouseout="this.style.color='var(--dim)';this.style.borderColor='var(--line)'">← 返回</a>
+  <a href="../../modeling_overview.html" title="返回全领域建模总览" style="padding:6px 12px;border:1px solid rgba(46,204,113,0.3);background:rgba(46,204,113,0.08);color:#2ecc71;border-radius:6px;cursor:pointer;font-size:12px;text-decoration:none;display:inline-flex;align-items:center;gap:4px;transition:all .2s;flex-shrink:0" onmouseover="this.style.background='rgba(46,204,113,0.15)';this.style.borderColor='rgba(46,204,113,0.5)'" onmouseout="this.style.background='rgba(46,204,113,0.08)';this.style.borderColor='rgba(46,204,113,0.3)'">← 建模总览</a>
+  <div class="brand" style="flex-shrink:0">Y.MINE</div>
+  <div class="brand-sub" style="flex-shrink:0">终极模拟沙盘</div>
+  <div style="font-size:20px;color:var(--gold);margin:0 8px;flex-shrink:0;opacity:0.5">×</div>
+  <div style="font-size:12px;font-weight:600;color:var(--cyan);letter-spacing:1px;overflow:hidden;text-overflow:ellipsis;min-width:0;flex:0 1 auto">人性博弈 → 机器精算 → 市场反馈</div>
   <div class="sep"></div>
-  <span class="tag" id="ybusTag">YBus: <span id="ybusState" style="color:var(--dim)">standby</span></span>
-  <span class="tag" id="stageTag">阶段: <span id="stageName">待命</span></span>
-  <button class="btn-reset" id="btnReset">↻ 重置</button>
-  <button class="btn-start" id="btnStart">▶ 开始模拟</button>
+  <span class="tag" id="ybusTag" style="flex-shrink:0">YBus: <span id="ybusState" style="color:var(--dim)">standby</span></span>
+  <span class="tag" id="stageTag" style="flex-shrink:0">阶段: <span id="stageName">待命</span></span>
+  <button class="btn-reset" id="btnReset" style="flex-shrink:0">↻ 重置</button>
+  <button class="btn-start" id="btnStart" style="flex-shrink:0">▶ 开始模拟</button>
 </div>
 
 <!-- ========== 三栏主体 ========== -->
