@@ -364,6 +364,55 @@
             opacity: 0.6;
         }
 
+        /* ===== 学习记忆系统阶段标签 ===== */
+        .learn-tag {
+            display: inline-flex;
+            align-items: center;
+            font-size: 9px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 5px;
+            letter-spacing: 0.3px;
+            margin-left: 8px;
+            vertical-align: middle;
+            line-height: 1.4;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        .learn-tag.lt-purple { background: linear-gradient(135deg,rgba(167,139,250,0.2),rgba(59,130,246,0.15)); border: 1px solid rgba(167,139,250,0.4); color: #c4b5fd; }
+        .learn-tag.lt-green { background: linear-gradient(135deg,rgba(34,197,94,0.2),rgba(59,130,246,0.15)); border: 1px solid rgba(34,197,94,0.4); color: #86efac; }
+        .learn-tag.lt-red { background: linear-gradient(135deg,rgba(248,113,113,0.2),rgba(167,139,250,0.15)); border: 1px solid rgba(248,113,113,0.4); color: #fca5a5; }
+        .learn-tag.lt-cyan { background: rgba(6,182,212,0.15); border: 1px solid rgba(6,182,212,0.35); color: #67e8f9; }
+        .learn-tag.lt-violet { background: rgba(168,85,247,0.15); border: 1px solid rgba(168,85,247,0.35); color: #c084fc; }
+        .learn-tag.lt-pink { background: rgba(236,72,153,0.15); border: 1px solid rgba(236,72,153,0.35); color: #f9a8d4; }
+        .learn-tag.lt-blue { background: rgba(59,130,246,0.15); border: 1px solid rgba(59,130,246,0.35); color: #93c5fd; }
+        .learn-tag.lt-gold { background: linear-gradient(135deg,rgba(250,204,21,0.2),rgba(251,146,60,0.15)); border: 1px solid rgba(250,204,21,0.4); color: #fde68a; }
+        .learn-tag.lt-teal { background: linear-gradient(135deg,rgba(34,211,238,0.2),rgba(251,191,36,0.15)); border: 1px solid rgba(34,211,238,0.4); color: #67e8f9; }
+        .learn-tag.lt-amber { background: rgba(245,158,11,0.15); border: 1px solid rgba(245,158,11,0.35); color: #fbbf24; }
+        .learn-tag.lt-indigo { background: linear-gradient(135deg,rgba(99,102,241,0.2),rgba(139,92,246,0.15)); border: 1px solid rgba(99,102,241,0.4); color: #a5b4fc; }
+        .learn-tag-corner {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 6;
+            font-size: 9px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 6px;
+            letter-spacing: 0.3px;
+            backdrop-filter: blur(6px);
+            display: inline-block;
+            line-height: 1;
+        }
+        .learn-tag-corner.lt-purple { background: linear-gradient(135deg,rgba(167,139,250,0.2),rgba(59,130,246,0.15)); border: 1px solid rgba(167,139,250,0.4); color: #c4b5fd !important; }
+        .learn-tag-corner.lt-green { background: linear-gradient(135deg,rgba(34,197,94,0.2),rgba(59,130,246,0.15)); border: 1px solid rgba(34,197,94,0.4); color: #86efac !important; }
+        .learn-tag-corner.lt-red { background: linear-gradient(135deg,rgba(248,113,113,0.2),rgba(167,139,250,0.15)); border: 1px solid rgba(248,113,113,0.4); color: #fca5a5 !important; }
+        .learn-tag-corner.lt-indigo { background: linear-gradient(135deg,rgba(99,102,241,0.2),rgba(139,92,246,0.15)); border: 1px solid rgba(99,102,241,0.4); color: #a5b4fc !important; }
+        .learn-tag-corner.lt-amber { background: rgba(245,158,11,0.15); border: 1px solid rgba(245,158,11,0.35); color: #fbbf24 !important; }
+        .primary-card { position: relative; padding-top: 36px; }
+        .gm-base-hero { padding-top: 38px; }
+        .primary-card .ptitle, .primary-card .ptitle + * { position: relative; z-index: 2; }
+
         /* ===== 底部 ===== */
         .footer {
             display: flex;
@@ -1033,12 +1082,13 @@
         @media (max-width:680px){
             .subengine-grid{grid-template-columns:1fr;}
             .mind-grid,.mind-grid.four{grid-template-columns:1fr;}
-            .gm-base-hero{flex-direction:column;text-align:center;gap:14px;padding:18px;}
+            .gm-base-hero{flex-direction:column;text-align:center;gap:14px;padding:32px 18px 18px;}
             .gm-base-hero .gm-icon{font-size:42px;}
             .gm-base-hero .gm-title{font-size:16px;}
             .gm-base-hero .gm-tags{justify-content:center;}
             .gm-base-hero .gm-arrow{display:none;}
             .gm-base-hero .gm-badge{position:static;display:inline-block;margin-bottom:6px;}
+            .primary-card{padding:32px 16px 16px !important;}
         }
 
         /* ===== 响应式（页面独有部分） ===== */
@@ -1219,11 +1269,13 @@
                      onmouseover="this.style.borderColor='rgba(34,197,94,0.7)';this.style.transform='translateY(-2px)';this.style.boxShadow='0 12px 40px rgba(34,197,94,0.25)';"
                      onmouseout="this.style.borderColor='rgba(34,197,94,0.4)';this.style.transform='';this.style.boxShadow='0 0 30px rgba(34,197,94,0.1)';">
                     <div style="content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.06),transparent);transform:translateX(-100%);animation:fvecScan 5s linear infinite;pointer-events:none;"></div>
-                    <span style="position:absolute;top:12px;right:12px;font-size:10px;font-weight:700;padding:4px 10px;border-radius:6px;background:linear-gradient(135deg,rgba(34,197,94,0.2),rgba(96,165,250,0.15));border:1px solid rgba(34,197,94,0.4);color:#86efac;letter-spacing:0.3px;z-index:5;backdrop-filter:blur(4px);">🧠 学习 · 向量底座</span>
                     <style>@keyframes fvecScan{to{transform:translateX(100%);}}</style>
                     <div style="font-size:44px;filter:drop-shadow(0 0 16px rgba(34,197,94,0.6));flex-shrink:0;">📊</div>
                     <div style="flex:1;min-width:0;">
-                        <div style="font-size:18px;font-weight:700;background:linear-gradient(135deg,#4ade80,#60a5fa,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:0.5px;margin-bottom:4px;">11维金融向量体系</div>
+                        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px;">
+                            <span style="font-size:18px;font-weight:700;background:linear-gradient(135deg,#4ade80,#60a5fa,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:0.5px;">11维金融向量体系</span>
+                            <span class="learn-tag lt-green">🧠 学习 · 向量底座</span>
+                        </div>
                         <div style="font-size:12px;color:rgba(255,255,255,0.55);line-height:1.6;margin-bottom:6px;">四维通用基座 + 七维金融专属维度 · 跨领域检索与量化定价</div>
                         <div style="font-size:11px;color:rgba(255,255,255,0.35);line-height:1.5;">七维向量在金融场景中的专业化扩展</div>
                     </div>
@@ -1266,6 +1318,7 @@
                 <!-- 双主入口卡片 -->
                 <div class="primary-grid">
                     <a href="game-os-main/total-index.html" class="primary-card gameos">
+                        <span class="learn-tag-corner lt-indigo" style="top:8px;left:50%;right:auto;transform:translateX(-50%);">🧠 学习 · 公理底座</span>
                         <span class="picon">🏛️</span>
                         <div class="pbody">
                             <div class="ptitle">Game-OS 数理操作系统</div>
@@ -1278,8 +1331,8 @@
                         </div>
                         <span class="parrow">▶</span>
                     </a>
-                    <a href="investment_research_11steps.html" class="primary-card elevenstep" style="position:relative;">
-                        <span style="position:absolute;top:12px;right:12px;font-size:10px;font-weight:700;padding:4px 10px;border-radius:6px;background:linear-gradient(135deg,rgba(167,139,250,0.2),rgba(59,130,246,0.15));border:1px solid rgba(167,139,250,0.4);color:#c4b5fd;letter-spacing:0.3px;z-index:5;backdrop-filter:blur(4px);">🧠 学习 · 推理决策</span>
+                    <a href="investment_research_11steps.html" class="primary-card elevenstep">
+                        <span class="learn-tag-corner lt-purple" style="top:8px;left:50%;right:auto;transform:translateX(-50%);">🧠 学习 · 推理决策</span>
                         <span class="picon">🚀</span>
                         <div class="pbody">
                             <div class="ptitle">11步投研推理系统 · 多模态参照与精算决策</div>
@@ -1296,8 +1349,8 @@
                         </div>
                         <span class="parrow">▶</span>
                     </a>
-                    <a href="ymine-studio.html" class="primary-card engine" style="position:relative;">
-                        <span style="position:absolute;top:12px;right:12px;font-size:10px;font-weight:700;padding:4px 10px;border-radius:6px;background:linear-gradient(135deg,rgba(34,197,94,0.2),rgba(59,130,246,0.15));border:1px solid rgba(34,197,94,0.4);color:#86efac;letter-spacing:0.3px;z-index:5;backdrop-filter:blur(4px);">🧠 学习 · 闭环验证</span>
+                    <a href="ymine-studio.html" class="primary-card engine">
+                        <span class="learn-tag-corner lt-green" style="top:8px;left:50%;right:auto;transform:translateX(-50%);">🧠 学习 · 闭环验证</span>
                         <span class="picon">⚡</span>
                         <div class="pbody">
                             <div class="ptitle">十步闭环量化引擎</div>
@@ -1311,6 +1364,7 @@
                         <span class="parrow">▶</span>
                     </a>
                     <a href="modeling_overview.html" class="primary-card modeling" style="border-color:rgba(251,191,36,0.3);background:linear-gradient(135deg,rgba(251,191,36,0.06),rgba(0,0,0,0.1));">
+                        <span class="learn-tag-corner lt-amber" style="top:8px;left:50%;right:auto;transform:translateX(-50%);">🧠 学习 · 全域建模</span>
                         <span class="picon" style="color:#fbbf24;">🧮</span>
                         <div class="pbody">
                             <div class="ptitle" style="color:#fde68a;">全领域建模总览</div>
@@ -1332,19 +1386,28 @@
                 <div class="mind-grid">
                     <a href="labs/evidence/circle-lab.html" class="mind-card" style="border-color:rgba(34,211,238,0.25);background:linear-gradient(135deg,rgba(34,211,238,0.08),rgba(0,0,0,0.1));">
                         <span class="micon">🧠</span>
-                        <div class="mname" style="color:#67e8f9;">Game-OS认知画圈引擎</div>
+                        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+                            <div class="mname" style="color:#67e8f9;">Game-OS认知画圈引擎</div>
+                            <span class="learn-tag lt-cyan">🧠 学习 · 认知建模</span>
+                        </div>
                         <div class="msub">全域稳态认知引擎 · 静态求解·供需动力学·AI闭环迭代·运动-认知耦合·3→1→1→3→100架构·偏差对照</div>
                         <div class="mrow"><span class="mtag" style="color:#67e8f9;">核心数理引擎</span><span class="marrow" style="color:#67e8f9;">★</span></div>
                     </a>
                     <a href="engines/geom-compute/index.html" class="mind-card" style="border-color:rgba(34,211,238,0.25);background:linear-gradient(135deg,rgba(34,211,238,0.08),rgba(0,0,0,0.1));">
                         <span class="micon">🏗️</span>
-                        <div class="mname" style="color:#67e8f9;">几何心智算力底座</div>
+                        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+                            <div class="mname" style="color:#67e8f9;">几何心智算力底座</div>
+                            <span class="learn-tag lt-teal">🧠 学习 · 算力调度</span>
+                        </div>
                         <div class="msub">全域大模型算力错峰调度 · V/S/L几何算力模型 · 0.48/0.5/0.68全局阈值 · 二进制硬件落地</div>
                         <div class="mrow"><span class="mtag" style="color:#67e8f9;">底层物理基座</span><span class="marrow" style="color:#67e8f9;">★</span></div>
                     </a>
                     <a href="MemoryBase/index.html" class="mind-card" style="border-color:rgba(96,165,250,0.3);background:linear-gradient(135deg,rgba(96,165,250,0.10),rgba(167,139,250,0.06));">
                         <span class="micon">💾</span>
-                        <div class="mname" style="color:#93c5fd;">MemoryBase 记忆基座</div>
+                        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+                            <div class="mname" style="color:#93c5fd;">MemoryBase 记忆基座</div>
+                            <span class="learn-tag lt-blue">🧠 学习 · 存储检索</span>
+                        </div>
                         <div class="msub">全域公共底层记忆底座 · 四级净化漏斗·三层存储·KMP检索·金融IPD向量库·历史方案盘活</div>
                         <div class="mrow"><span class="mtag" style="color:#93c5fd;">公共记忆基座</span><span class="marrow" style="color:#93c5fd;">★</span></div>
                     </a>
@@ -1397,8 +1460,8 @@
                 <div style="margin-top:28px;padding-top:20px;border-top:1px solid rgba(255,255,255,0.06);">
                     <div style="font-size:12px;text-transform:uppercase;letter-spacing:1.5px;color:rgba(167,139,250,0.7);margin:0 0 14px;font-weight:700;">🧬 心智引擎矩阵 · GameMind 总基座 + 四大平行子引擎</div>
 
-                    <a href="engines/gamemind/index.html" class="gm-base-hero" style="position:relative;">
-                        <span style="position:absolute;top:12px;right:12px;font-size:10px;font-weight:700;padding:4px 10px;border-radius:6px;background:linear-gradient(135deg,rgba(248,113,113,0.2),rgba(167,139,250,0.15));border:1px solid rgba(248,113,113,0.4);color:#fca5a5;letter-spacing:0.3px;z-index:5;backdrop-filter:blur(4px);">🧠 学习 · 博弈演化</span>
+                    <a href="engines/gamemind/index.html" class="gm-base-hero">
+                        <span class="learn-tag-corner lt-red" style="top:10px;left:50%;right:auto;transform:translateX(-50%);">🧠 学习 · 博弈演化</span>
                         <span class="gm-badge">⚡ 通用底层公共博弈基座</span>
                         <span class="gm-icon">⚡</span>
                         <div class="gm-body">
@@ -1414,31 +1477,39 @@
                     </a>
 
                     <div class="subengine-grid">
-                        <a href="engines/airmind/index.html" class="subengine-card airmind" style="position:relative;">
-                            <span style="position:absolute;top:10px;right:10px;font-size:9px;font-weight:700;padding:3px 8px;border-radius:5px;background:rgba(6,182,212,0.15);border:1px solid rgba(6,182,212,0.35);color:#67e8f9;letter-spacing:0.3px;z-index:5;">🧠 学习 · 空间建模</span>
+                        <a href="engines/airmind/index.html" class="subengine-card airmind">
                             <span class="se-icon">🛩️</span>
-                            <div class="se-name">AirMind · 低空全域人机神经协同调度引擎 V2.0</div>
+                            <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+                                <div class="se-name">AirMind · 低空全域人机神经协同调度引擎 V2.0</div>
+                                <span class="learn-tag lt-cyan">🧠 学习 · 空间建模</span>
+                            </div>
                             <div class="se-desc">无人机·通航·民航三方空域博弈·双层阻尼力学·串级PID控制·人机神经协同·三维空地对照</div>
                             <div class="se-row"><span class="se-tag">V2.0 商用完整版</span><span class="se-arrow">★</span></div>
                         </a>
-                        <a href="engines/evolvemind/index.html" class="subengine-card evolvemind" style="position:relative;">
-                            <span style="position:absolute;top:10px;right:10px;font-size:9px;font-weight:700;padding:3px 8px;border-radius:5px;background:rgba(168,85,247,0.15);border:1px solid rgba(168,85,247,0.35);color:#c084fc;letter-spacing:0.3px;z-index:5;">🧠 学习 · 感知交互</span>
+                        <a href="engines/evolvemind/index.html" class="subengine-card evolvemind">
                             <span class="se-icon">🧠</span>
-                            <div class="se-name">人机思维交互引擎</div>
+                            <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+                                <div class="se-name">人机思维交互引擎</div>
+                                <span class="learn-tag lt-violet">🧠 学习 · 感知交互</span>
+                            </div>
                             <div class="se-desc">语言拆解·语义映射·算力联动·01解码·海拔模拟·交互映射演示</div>
                             <div class="se-row"><span class="se-tag">交互映射引擎</span><span class="se-arrow">→</span></div>
                         </a>
-                        <a href="engines/moodmind/index.html" class="subengine-card moodmind" style="position:relative;">
-                            <span style="position:absolute;top:10px;right:10px;font-size:9px;font-weight:700;padding:3px 8px;border-radius:5px;background:rgba(236,72,153,0.15);border:1px solid rgba(236,72,153,0.35);color:#f9a8d4;letter-spacing:0.3px;z-index:5;">🧠 学习 · 状态表征</span>
+                        <a href="engines/moodmind/index.html" class="subengine-card moodmind">
                             <span class="se-icon">💜</span>
-                            <div class="se-name">MoodMind · 全域非标资产计量中台</div>
+                            <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+                                <div class="se-name">MoodMind · 全域非标资产计量中台</div>
+                                <span class="learn-tag lt-pink">🧠 学习 · 状态表征</span>
+                            </div>
                             <div class="se-desc">前景理论偏差校正·古诺/蜈蚣双博弈定性·四维穿透式估值·沉没成本盘活·GameMind凯利配比·博主矩阵模拟器</div>
                             <div class="se-row"><span class="se-tag">全域非标资产计量中台</span><span class="se-arrow">→</span></div>
                         </a>
-                        <a href="engines/mindspeak/index.html" class="subengine-card mindspeak" style="position:relative;">
-                            <span style="position:absolute;top:10px;right:10px;font-size:9px;font-weight:700;padding:3px 8px;border-radius:5px;background:rgba(59,130,246,0.15);border:1px solid rgba(59,130,246,0.35);color:#93c5fd;letter-spacing:0.3px;z-index:5;">🧠 学习 · 跨域编码</span>
+                        <a href="engines/mindspeak/index.html" class="subengine-card mindspeak">
                             <span class="se-icon">🗣️</span>
-                            <div class="se-name">MindSpeak · 四层跨域数理同构翻译引擎 V19.0</div>
+                            <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+                                <div class="se-name">MindSpeak · 四层跨域数理同构翻译引擎 V19.0</div>
+                                <span class="learn-tag lt-blue">🧠 学习 · 跨域编码</span>
+                            </div>
                             <div class="se-desc">语言→思维→算法→数学四层同构映射·跨域翻译·置信度核·密码矩阵·向量4D算子</div>
                             <div class="se-row"><span class="se-tag">V19.0 完整版</span><span class="se-arrow">★</span></div>
                         </a>
@@ -1519,9 +1590,9 @@
                         <span class="icon">⚡</span> 终极沙盘 · 人性×机器×市场
                         <span class="arrow">→</span>
                     </a>
-                    <a href="labs/engineering/music-soundfield.html" class="nav-card hot" style="border-color:rgba(236,72,153,0.5);background:linear-gradient(135deg,rgba(236,72,153,0.10),rgba(168,85,247,0.06),rgba(0,0,0,0.1));position:relative;">
-                        <span style="position:absolute;top:8px;right:8px;font-size:9px;font-weight:700;padding:2px 7px;border-radius:4px;background:rgba(236,72,153,0.15);border:1px solid rgba(236,72,153,0.35);color:#f9a8d4;letter-spacing:0.3px;z-index:5;">🧠 学习 · 内容生成</span>
+                    <a href="labs/engineering/music-soundfield.html" class="nav-card hot" style="border-color:rgba(236,72,153,0.5);background:linear-gradient(135deg,rgba(236,72,153,0.10),rgba(168,85,247,0.06),rgba(0,0,0,0.1));display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
                         <span class="icon">🎵</span> AI音乐生成与物理声场修复系统
+                        <span class="learn-tag lt-pink">🧠 学习 · 内容生成</span>
                         <span class="arrow" style="color:#ec4899;">🎼</span>
                     </a>
                     <a href="labs/engineering/audio_repair.html" class="nav-card hot" style="border-color:rgba(6,182,212,0.5);background:linear-gradient(135deg,rgba(6,182,212,0.10),rgba(139,92,246,0.06),rgba(0,0,0,0.1));">
@@ -1562,11 +1633,11 @@
 
             <!-- ===== 独立入口：金融估值精算引擎 · 7维风险向量 ===== -->
             <div class="section-group">
-                <a href="labs/evidence/marketing-reinvented.html" class="nav-card hot" style="display:flex;flex-direction:column;align-items:stretch;gap:6px;padding:20px 24px;border-color:rgba(250,204,21,0.5);background:linear-gradient(135deg,rgba(250,204,21,0.10),rgba(251,146,60,0.06),rgba(167,139,250,0.04),rgba(0,0,0,0.1));position:relative;">
-                    <span style="position:absolute;top:12px;right:12px;font-size:10px;font-weight:700;padding:4px 10px;border-radius:6px;background:linear-gradient(135deg,rgba(250,204,21,0.2),rgba(251,146,60,0.15));border:1px solid rgba(250,204,21,0.4);color:#fde68a;letter-spacing:0.3px;z-index:5;backdrop-filter:blur(4px);">🧠 学习 · 量化建模</span>
-                    <div style="display:flex;align-items:center;gap:10px;">
+                <a href="labs/evidence/marketing-reinvented.html" class="nav-card hot" style="display:flex;flex-direction:column;align-items:stretch;gap:6px;padding:20px 24px;border-color:rgba(250,204,21,0.5);background:linear-gradient(135deg,rgba(250,204,21,0.10),rgba(251,146,60,0.06),rgba(167,139,250,0.04),rgba(0,0,0,0.1));">
+                    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
                         <span class="icon" style="font-size:22px;">📊</span>
                         <span style="font-size:15px;font-weight:700;color:#f1f5f9;letter-spacing:-0.2px;">金融估值精算引擎 · 7维风险向量 + KMP→IPD→七维向量</span>
+                        <span class="learn-tag lt-gold">🧠 学习 · 量化建模</span>
                         <span class="arrow" style="margin-left:auto;color:#facc15;font-size:14px;">▶</span>
                     </div>
                     <div style="font-size:11px;color:rgba(255,255,255,0.45);line-height:1.6;padding-left:32px;">
@@ -2047,12 +2118,12 @@
                             <div class="eo-cat-dims">Dev2（历史依赖）</div>
                             <div style="font-size:10px;color:#4ade80;margin-top:6px;font-weight:600;">▶ 进入总控交互界面</div>
                         </a>
-                        <a href="labs/molecular-mixology.html" class="eo-cat-card mixology" style="text-decoration:none;color:inherit;cursor:pointer;display:block;position:relative;">
-                            <span style="position:absolute;top:10px;right:10px;font-size:9px;font-weight:700;padding:3px 8px;border-radius:5px;background:rgba(245,158,11,0.15);border:1px solid rgba(245,158,11,0.35);color:#fbbf24;letter-spacing:0.3px;z-index:5;">🧠 学习 · 跨域验证</span>
-                            <div class="eo-cat-head">
+                        <a href="labs/molecular-mixology.html" class="eo-cat-card mixology" style="text-decoration:none;color:inherit;cursor:pointer;display:block;">
+                            <div class="eo-cat-head" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
                                 <span class="eo-cat-icon">🍸</span>
                                 <span class="eo-cat-name">分子调酒实验室</span>
-                                <span class="new-badge" style="background:linear-gradient(135deg,#f59e0b,#f97316);color:#000;border:none;">实体物理</span>
+                                <span class="learn-tag lt-amber">🧠 学习 · 跨域验证</span>
+                                <span class="new-badge" style="background:linear-gradient(135deg,#f59e0b,#f97316);color:#000;border:none;margin-left:auto;">实体物理</span>
                                 <span class="eo-cat-count">3项</span>
                             </div>
                             <div class="eo-cat-desc" style="font-size:9px;color:rgba(245,158,11,0.6);margin-top:3px;">味觉系统跨域验证+视频生成</div>
@@ -2092,9 +2163,11 @@
                     </a>
                 </div>
 
-                <a href="MemoryBase/vector_store/experiment_sim_vector/index.html" class="lab-base-card" style="background:linear-gradient(135deg,rgba(34,211,238,0.14),rgba(251,191,36,0.08));border-color:rgba(34,211,238,0.4);position:relative;">
-                    <span style="position:absolute;top:14px;right:14px;font-size:10px;font-weight:700;padding:4px 10px;border-radius:6px;background:linear-gradient(135deg,rgba(34,211,238,0.2),rgba(251,191,36,0.15));border:1px solid rgba(34,211,238,0.4);color:#67e8f9;letter-spacing:0.3px;z-index:5;backdrop-filter:blur(4px);">🧠 学习 · 验证迭代</span>
-                    <div class="base-tag" style="background:linear-gradient(135deg,#22d3ee,#fbbf24);">🧪 全域仿真实验向量总管理台</div>
+                <a href="MemoryBase/vector_store/experiment_sim_vector/index.html" class="lab-base-card" style="background:linear-gradient(135deg,rgba(34,211,238,0.14),rgba(251,191,36,0.08));border-color:rgba(34,211,238,0.4);">
+                    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+                        <div class="base-tag" style="background:linear-gradient(135deg,#22d3ee,#fbbf24);margin-bottom:0;">🧪 全域仿真实验向量总管理台</div>
+                        <span class="learn-tag lt-teal">🧠 学习 · 验证迭代</span>
+                    </div>
                     <div class="base-title"><span class="icon">📊</span>全域仿真实验向量总管理台 · 39个实验入口 · KMP骨架检索 · 双人工决策闸门</div>
                     <div class="base-desc">vars_in自变量 / vars_out因变量 / func_expr函数三元结构化存储 · 三级仓储冷热温分配 · 三角审计日志 · MindSpeak一键数理-语言同构 · 公私分层隔离(求解内核在private_engine)</div>
                     <span class="base-arrow" style="color:#22d3ee;">▶</span>
