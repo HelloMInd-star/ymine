@@ -343,7 +343,7 @@
 
         .simulator-section .result-panel {
             display: grid;
-            grid-template-columns: 1fr 1fr 1fr 1fr;
+            grid-template-columns: repeat(6, 1fr);
             gap: 10px;
             background: rgba(255, 255, 255, 0.02);
             border-radius: 12px;
@@ -2687,10 +2687,11 @@
         <!-- ============================================================ -->
         <div class="section-anchor" id="section-riskvector"></div>
         <div class="simulator-section">
-            <div class="sim-title">📊 6维风险向量空间 <span class="tag">输入层</span></div>
+            <div class="sim-title">📊 6+4维风险向量空间 <span class="tag">输入层 + ☀️光照扰动</span></div>
             <div class="sim-sub">
                 <span class="hl">凯利比率</span> × <span class="hl-blue">财务杠杆</span> × <span style="color:#facc15;">夏普比率</span> × 最大回撤 × 边际递减 × 机会成本
-                <br>向量模长 × 最优向量余弦相似度 = 组合风险收益率
+                <br>+ <span style="color:#fbbf24;">☀️光照向量组 L⃗</span>（成交量L₁·舆论L₂·政策L₃·产业链L₄）→ 外部扰动注入博弈熵S
+                <br>向量模长 × 最优向量余弦相似度 × 光照扰动系数 = 组合风险收益率
             </div>
 
             <div class="sim-grid">
@@ -2726,11 +2727,39 @@
                 </div>
             </div>
 
+            <div style="margin-top: 18px; padding: 14px 16px; background: rgba(251,191,36,0.04); border: 1px solid rgba(251,191,36,0.12); border-radius: 12px;">
+                <div style="font-size: 11px; font-weight: 600; color: #fde68a; letter-spacing: 0.5px; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                    <span style="font-size: 16px;">☀️</span> 光照向量组 L⃗ = (L₁, L₂, L₃, L₄) · 外部环境扰动层 · 加权合成后注入博弈熵S
+                </div>
+                <div class="sim-grid" style="margin-bottom: 0;">
+                    <div class="ctrl">
+                        <label>📊 L₁ 成交量活跃度 <span id="lightVolVal" style="color:#fde68a;">0.50</span></label>
+                        <input type="range" id="lightVolInput" min="0" max="1" step="0.01" value="0.50" style="accent-color: #fbbf24;" />
+                        <span class="sub-hint" style="color: rgba(251,191,36,0.3);">市场成交热度 · 权重 30%</span>
+                    </div>
+                    <div class="ctrl">
+                        <label>💬 L₂ 舆论热度 <span id="lightSentVal" style="color:#fde68a;">0.40</span></label>
+                        <input type="range" id="lightSentInput" min="0" max="1" step="0.01" value="0.40" style="accent-color: #fbbf24;" />
+                        <span class="sub-hint" style="color: rgba(251,191,36,0.3);">社交媒体情绪 · 权重 25%</span>
+                    </div>
+                    <div class="ctrl">
+                        <label>🏛️ L₃ 政策强度 <span id="lightPolVal" style="color:#fde68a;">0.30</span></label>
+                        <input type="range" id="lightPolInput" min="0" max="1" step="0.01" value="0.30" style="accent-color: #fbbf24;" />
+                        <span class="sub-hint" style="color: rgba(251,191,36,0.3);">监管/货币/财政政策 · 权重 25%</span>
+                    </div>
+                    <div class="ctrl">
+                        <label>🔗 L₄ 产业链景气度 <span id="lightChainVal" style="color:#fde68a;">0.45</span></label>
+                        <input type="range" id="lightChainInput" min="0" max="1" step="0.01" value="0.45" style="accent-color: #fbbf24;" />
+                        <span class="sub-hint" style="color: rgba(251,191,36,0.3);">上下游供需状态 · 权重 20%</span>
+                    </div>
+                </div>
+            </div>
+
             <div class="result-panel">
                 <div class="metric">
                     <div class="ml">向量模长</div>
                     <div class="mv" id="vecMagnitude">—</div>
-                    <div class="sub-hint">||V|| 整体强度</div>
+                    <div class="sub-hint">||V|| 内部强度</div>
                 </div>
                 <div class="metric">
                     <div class="ml">余弦相似度</div>
@@ -2738,14 +2767,24 @@
                     <div class="sub-hint">与最优向量方向</div>
                 </div>
                 <div class="metric">
+                    <div class="ml" style="color: #fde68a;">☀️ 光照扰动系数</div>
+                    <div class="mv" id="lightDisturbCoef" style="color: #fbbf24;">—</div>
+                    <div class="sub-hint" style="color: rgba(251,191,36,0.4);">L⃗加权合成 → σ扰动</div>
+                </div>
+                <div class="metric">
                     <div class="ml">组合风险收益率</div>
                     <div class="mv gold" id="vecReturn">—</div>
-                    <div class="sub-hint">模长 × 余弦</div>
+                    <div class="sub-hint">模长×余弦×光照系数</div>
                 </div>
                 <div class="metric">
                     <div class="ml">风险溢价 Rp</div>
                     <div class="mv green" id="vecRp">—</div>
-                    <div class="sub-hint">注入 圆锥稳态定价</div>
+                    <div class="sub-hint">注入圆锥稳态定价</div>
+                </div>
+                <div class="metric">
+                    <div class="ml" style="color: #fb923c;">⚠️ 博弈熵S</div>
+                    <div class="mv" id="entropyS" style="color: #fb923c;">—</div>
+                    <div class="sub-hint" style="color: rgba(251,146,60,0.4);">含光照扰动的不确定性</div>
                 </div>
             </div>
 
@@ -5334,7 +5373,7 @@
         })();
 
         // ================================================================
-        // ===== 6维风险向量计算引擎 =====
+        // ===== 6+4维风险向量计算引擎（含☀️光照扰动） =====
         // ================================================================
         (function() {
             const kellyInput = document.getElementById('kellyInput');
@@ -5344,6 +5383,11 @@
             const dimInput = document.getElementById('dimInput');
             const ocInput = document.getElementById('ocInput');
 
+            const lightVolInput = document.getElementById('lightVolInput');
+            const lightSentInput = document.getElementById('lightSentInput');
+            const lightPolInput = document.getElementById('lightPolInput');
+            const lightChainInput = document.getElementById('lightChainInput');
+
             const kellyVal = document.getElementById('kellyVal');
             const leverageVal = document.getElementById('leverageVal');
             const sharpeVal = document.getElementById('sharpeVal');
@@ -5351,20 +5395,40 @@
             const dimVal = document.getElementById('dimVal');
             const ocVal = document.getElementById('ocVal');
 
+            const lightVolVal = document.getElementById('lightVolVal');
+            const lightSentVal = document.getElementById('lightSentVal');
+            const lightPolVal = document.getElementById('lightPolVal');
+            const lightChainVal = document.getElementById('lightChainVal');
+
             const vecMagnitude = document.getElementById('vecMagnitude');
             const vecCosine = document.getElementById('vecCosine');
+            const lightDisturbCoef = document.getElementById('lightDisturbCoef');
             const vecReturn = document.getElementById('vecReturn');
             const vecRp = document.getElementById('vecRp');
+            const entropyS = document.getElementById('entropyS');
             const vecAdvice = document.getElementById('vecAdvice');
 
             const V_opt = [0.65, 3.0, 3.5, 0.30, 0.75, 0.40];
 
+            const LIGHT_WEIGHTS = { vol: 0.30, sent: 0.25, pol: 0.25, chain: 0.20 };
+
             function calcVectorMag(v) {
-                return Math.sqrt(v[0]*v[0] + v[1]*v[1] + v[2]*v[2] + v[3]*v[3] + v[4]*v[4] + v[5]*v[5]);
+                let sum = 0;
+                for (let i = 0; i < v.length; i++) sum += v[i] * v[i];
+                return Math.sqrt(sum);
             }
 
             function calcDot(a, b) {
-                return a[0]*b[0] + a[1]*b[1] + a[2]*b[2] + a[3]*b[3] + a[4]*b[4] + a[5]*b[5];
+                let sum = 0;
+                const len = Math.min(a.length, b.length);
+                for (let i = 0; i < len; i++) sum += a[i] * b[i];
+                return sum;
+            }
+
+            function calcLightDisturbance(L1, L2, L3, L4) {
+                const weighted = L1 * LIGHT_WEIGHTS.vol + L2 * LIGHT_WEIGHTS.sent + L3 * LIGHT_WEIGHTS.pol + L4 * LIGHT_WEIGHTS.chain;
+                const sigma = 0.7 + weighted * 0.6;
+                return { weighted, sigma, L1, L2, L3, L4 };
             }
 
             function updateRiskVector() {
@@ -5375,12 +5439,22 @@
                 const dim = parseFloat(dimInput.value);
                 const oc = parseFloat(ocInput.value);
 
+                const L1 = parseFloat(lightVolInput.value);
+                const L2 = parseFloat(lightSentInput.value);
+                const L3 = parseFloat(lightPolInput.value);
+                const L4 = parseFloat(lightChainInput.value);
+
                 kellyVal.textContent = f_star.toFixed(2);
                 leverageVal.textContent = L.toFixed(1);
                 sharpeVal.textContent = SR.toFixed(1);
                 mddVal.textContent = mdd.toFixed(2);
                 dimVal.textContent = dim.toFixed(2);
                 ocVal.textContent = oc.toFixed(2);
+
+                lightVolVal.textContent = L1.toFixed(2);
+                lightSentVal.textContent = L2.toFixed(2);
+                lightPolVal.textContent = L3.toFixed(2);
+                lightChainVal.textContent = L4.toFixed(2);
 
                 const V = [f_star, L, SR, mdd, dim, oc];
 
@@ -5389,31 +5463,49 @@
                 const dotProd = calcDot(V, V_opt);
                 const cosTheta = dotProd / (magV * magOpt);
 
-                const scaledReturn = magV * cosTheta * 0.05;
+                const lightResult = calcLightDisturbance(L1, L2, L3, L4);
+                const sigma = lightResult.sigma;
+
+                const S_entropy = mdd * (0.4 + L1 * 0.2 + L2 * 0.15 + L3 * 0.15 + L4 * 0.1);
+
+                const scaledReturn = magV * cosTheta * sigma * 0.045;
                 const Rp = scaledReturn * 100;
 
                 vecMagnitude.textContent = magV.toFixed(3);
                 vecCosine.textContent = cosTheta.toFixed(3);
+                lightDisturbCoef.textContent = sigma.toFixed(3);
                 vecReturn.textContent = (scaledReturn * 100).toFixed(2) + '%';
                 vecRp.textContent = Rp.toFixed(2) + '%';
+                entropyS.textContent = S_entropy.toFixed(3);
 
                 window.vectorMagnitude = magV;
                 window.vectorRp = Rp;
+                window.lightDisturbance = sigma;
+                window.entropyS = S_entropy;
 
                 let advice = '';
                 let adviceColor = '#22c55e';
 
-                if (cosTheta > 0.95) {
-                    advice = '🚀 <strong>最优向量对齐！</strong>风险收益结构接近理论最优，建议全力推进。';
+                const lightWarn = sigma > 1.15;
+                const highEntropy = S_entropy > 0.35;
+
+                if (cosTheta > 0.95 && !lightWarn) {
+                    advice = '🚀 <strong>最优向量对齐！</strong>风险收益结构接近理论最优，光照扰动平稳，建议全力推进。';
                     adviceColor = '#22c55e';
                 } else if (cosTheta > 0.85) {
-                    advice = '✅ <strong>向量方向良好。</strong>整体结构健康，可适度调整个别维度优化收益。';
-                    adviceColor = '#22c55e';
+                    advice = '✅ <strong>向量方向良好。</strong>整体结构健康';
+                    if (lightWarn) advice += '，但☀️光照扰动偏高(' + sigma.toFixed(2) + ')，建议关注外部环境变化';
+                    advice += '，可适度调整个别维度优化收益。';
+                    adviceColor = lightWarn ? '#facc15' : '#22c55e';
                 } else if (cosTheta > 0.70) {
-                    advice = '⚖️ <strong>中性区间。</strong>建议调整杠杆或夏普比率以提升组合效率。';
+                    advice = '⚖️ <strong>中性区间。</strong>建议调整杠杆或夏普比率以提升组合效率';
+                    if (highEntropy) advice += '；博弈熵S=' + S_entropy.toFixed(2) + '偏高，不确定性较大';
+                    advice += '。';
                     adviceColor = '#facc15';
                 } else {
-                    advice = '⚠️ <strong>向量偏离较大。</strong>风险收益结构不合理，建议重新审视参数配置。';
+                    advice = '⚠️ <strong>向量偏离较大。</strong>风险收益结构不合理';
+                    if (highEntropy) advice += '，博弈熵S=' + S_entropy.toFixed(2) + '处于高风险区';
+                    advice += '，建议重新审视参数配置。';
                     adviceColor = '#f87171';
                 }
 
@@ -5421,11 +5513,11 @@
                 vecAdvice.style.borderLeftColor = adviceColor;
 
                 if (typeof YMineRiskCB !== 'undefined' && YMineRiskCB.update) {
-                    YMineRiskCB.update({ mdd: mdd });
+                    YMineRiskCB.update({ mdd: mdd, lightDisturb: sigma, entropyS: S_entropy });
                 }
 
                 if (typeof updateConeFromVector === 'function') {
-                    updateConeFromVector(magV);
+                    updateConeFromVector(magV * sigma);
                 }
 
                 if (typeof window.updateFormula === 'function') {
@@ -5444,6 +5536,10 @@
                 mddInput.addEventListener('input', updateRiskVector);
                 dimInput.addEventListener('input', updateRiskVector);
                 ocInput.addEventListener('input', updateRiskVector);
+                if (lightVolInput) lightVolInput.addEventListener('input', updateRiskVector);
+                if (lightSentInput) lightSentInput.addEventListener('input', updateRiskVector);
+                if (lightPolInput) lightPolInput.addEventListener('input', updateRiskVector);
+                if (lightChainInput) lightChainInput.addEventListener('input', updateRiskVector);
                 updateRiskVector();
             }
 
