@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>Game-OS Test Runner</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: #0a0e1a; color: #c8d6e5; font-family: 'SF Mono', 'Consolas', monospace; padding: 24px; line-height: 1.6; }
+h1 { color: #60a5fa; font-size: 20px; margin-bottom: 8px; letter-spacing: 2px; }
+h2 { color: #a78bfa; font-size: 15px; margin: 24px 0 12px; padding-left: 12px; border-left: 3px solid #a78bfa; }
+.summary { display: flex; gap: 24px; margin: 16px 0 24px; padding: 16px; background: rgba(96,165,250,0.08); border: 1px solid rgba(96,165,250,0.2); border-radius: 8px; }
+.summary .stat { text-align: center; }
+.summary .v { font-size: 28px; font-weight: 700; }
+.summary .v.pass { color: #22c55e; }
+.summary .v.fail { color: #ef4444; }
+.summary .v.total { color: #60a5fa; }
+.summary .l { font-size: 11px; color: #5a7294; letter-spacing: 1px; text-transform: uppercase; margin-top: 4px; }
+.test { padding: 4px 0 4px 24px; font-size: 13px; position: relative; }
+.test::before { position: absolute; left: 0; font-weight: 700; }
+.test.pass { color: #4ade80; }
+.test.pass::before { content: '✓'; color: #22c55e; }
+.test.fail { color: #f87171; background: rgba(239,68,68,0.08); padding: 6px 0 6px 24px; border-radius: 4px; margin: 2px 0; }
+.test.fail::before { content: '✗'; color: #ef4444; }
+.test .err { color: #fca5a5; font-size: 12px; margin-top: 2px; padding-left: 8px; }
+.fail-list { margin-top: 24px; padding: 16px; background: rgba(239,68,68,0.06); border: 1px solid rgba(239,68,68,0.2); border-radius: 8px; display: none; }
+.fail-list.show { display: block; }
+.fail-list h3 { color: #f87171; font-size: 14px; margin-bottom: 8px; }
+#running { color: #fbbf24; font-size: 13px; padding: 8px 0; }
+</style>
+</head>
+<body>
+
+<h1>⚡ GAME-OS FRONTEND TEST RUNNER</h1>
+<div class="summary">
+  <div class="stat"><div class="v total" id="sTotal">0</div><div class="l">Total</div></div>
+  <div class="stat"><div class="v pass" id="sPass">0</div><div class="l">Passed</div></div>
+  <div class="stat"><div class="v fail" id="sFail">0</div><div class="l">Failed</div></div>
+</div>
+<div id="running">⏳ Running tests...</div>
+<div id="results"></div>
+<div class="fail-list" id="failList"><h3>FAILED TESTS:</h3><div id="failContent"></div></div>
+
+<script src="../models/common/normalizer.js"></script>
+<script src="../models/calc/calc-config.js"></script>
+<script src="../models/gamemind/gamemind-config.js"></script>
+<script src="../models/compute/compute-config.js"></script>
+<script src="../models/calc/calc-model.js"></script>
+<script src="../models/gamemind/gamemind-model.js"></script>
+<script src="../models/compute/compute-model.js"></script>
+<script src="../assets/js/risk-circuit-breaker.js"></script>
+<script src="../assets/js/triangle-audit.js"></script>
+
+<script>
+(function() {
+    'use strict';
+
+    let passCount = 0;
+    let failCount = 0;
+    let totalCount = 0;
+    const failures = [];
+    const resultsEl = document.getElementById('results');
+    const runningEl = document.getElementById('running');
+
+    function section(title) {
+        const h = document.createElement('h2');
+        h.textContent = title;
+        resultsEl.appendChild(h);
+    }
+
+    function test(name, fn) {
+        totalCount++;
+        const div = document.createElement('div');
+        div.className = 'test';
+        try {
+            fn();
+            passCount++;
+            div.classList.add('pass');
+            div.textContent = name;
+        } catch (err) {
+            failCount++;
+            div.classList.add('fail');
+            div.textContent = name;
+            const errDiv = document.createElement('div');
+            errDiv.className = 'err';
+            errDiv.textContent = err.message;
+            div.appendChild(errDiv);
+            failures.push({ name: name, error: err.message });
+        }
+        resultsEl.appendChild(div);
+        updateSummary();
+    }
+
+    function assert(cond, msg) {
+        if (!cond) throw new Error(msg || 'Assertion failed');
+    }
+
+    function approxEqual(a, b, epsilon) {
+        epsilon = epsilon || 0.0001;
+        if (Math.abs(a - b) > epsilon) {
+            throw new Error('Expected ~' + b + ', got ' + a);
+        }
+    }
+
+    function updateSummary() {
+        document.getElementById('sTotal').textContent = totalCount;
+        document.getElementById('sPass').textContent = passCount;
+        document.getElementById('sFail').textContent = failCount;
+    }
+
+    function showFailures() {
+        if (failCount > 0) {
+            const fl = document.getElementById('failList');
+            fl.classList.add('show');
+            const fc = document.getElementById('failContent');
+            fc.innerHTML = failures.map(function(f) {
+                return '<div class="test fail" style="margin:4px 0;">' + f.name + '<div class="err">' + f.error + '</div></div>';
+            }).join('');
+        }
+    }
+
+    async function runAsync(name, fn) {
+        totalCount++;
+        const div = document.createElement('div');
+        div.className = 'test';
+        try {
+            await fn();
+            passCount++;
+            div.classList.add('pass');
+            div.textContent = name;
+        } catch (err) {
+            failCount++;
+            div.classList.add('fail');
+            div.textContent = name;
+            const errDiv = document.createElement('div');
+            errDiv.className = 'err';
+            errDiv.textContent = err.message || String(err);
+            div.appendChild(errDiv);
+            failures.push({ name: name, error: err.message || String(err) });
+        }
+        resultsEl.appendChild(div);
+        updateSummary();
+    }
+
+    async function runAll() {
+        // ================================================================
+        // YModels.common
+        // ================================================================
+        section('YModels.common: Normalizer Utilities');
+
+        var C = window.YModels.common;
+
+        test('THRESHOLDS: BREAKEVEN=0.48, STEADY=0.50, FUSE=0.68', function() {
+            assert(C.THRESHOLDS.BREAKEVEN === 0.48, 'BREAKEVEN should be 0.48');
+            assert(C.THRESHOLDS.STEADY === 0.50, 'STEADY should be 0.50');
+            assert(C.THRESHOLDS.FUSE === 0.68, 'FUSE should be 0.68');
+            assert(Object.isFrozen(C.THRESHOLDS), 'THRESHOLDS should be frozen');
+        });
+
+        test('clamp01: clamps to [0,1] range', function() {
+            assert(C.clamp01(0.5) === 0.5);
+            assert(C.clamp01(-0.5) === 0);
+            assert(C.clamp01(1.5) === 1);
+            assert(C.clamp01(NaN) === 0);
+            assert(C.clamp01(null) === 0);
+        });
+
+        test('clamp: supports arbitrary [min,max]', function() {
+            assert(C.clamp(5, 0, 10) === 5);
+            assert(C.clamp(-1, 0, 10) === 0);
+            assert(C.clamp(11, 0, 10) === 10);
+            assert(C.clamp(NaN, 0, 10) === 0);
+        });
+
+        test('absDiff: returns absolute difference', function() {
+            approxEqual(C.absDiff(5, 3), 2);
+            approxEqual(C.absDiff(3, 5), 2);
+            approxEqual(C.absDiff(0, 0), 0);
+        });
+
+        test('isValidNumber: correctly identifies numbers', function() {
+            assert(C.isValidNumber(0) === true);
+            assert(C.isValidNumber(-1.5) === true);
+            assert(C.isValidNumber(NaN) === false);
+            assert(C.isValidNumber(Infinity) === false);
+            assert(C.isValidNumber('5') === false);
+            assert(C.isValidNumber(null) === false);
+        });
+
+        test('safeNum: handles invalid inputs', function() {
+            assert(C.safeNum(42, 0) === 42);
+            assert(C.safeNum(null, 5) === 5);
+            assert(C.safeNum(undefined, 7) === 7);
+            assert(C.safeNum(NaN, 0) === 0);
+            assert(C.safeNum('bad', 99) === 99);
+        });
+
+        test('safeObj: returns object or default', function() {
+            var o = { a: 1 };
+            assert(C.safeObj(o, {}) === o);
+            assert(C.safeObj(null, {x:1}).x === 1);
+            assert(C.safeObj([1,2], {y:2}).y === 2);
+        });
+
+        test('safeArr: returns array or default', function() {
+            var a = [1,2];
+            assert(C.safeArr(a, []) === a);
+            assert(Array.isArray(C.safeArr(null, [99])));
+            assert(C.safeArr(null, [99])[0] === 99);
+        });
+
+        test('safeStr: returns string or default', function() {
+            assert(C.safeStr('hello', '') === 'hello');
+            assert(C.safeStr('', 'def') === 'def');
+            assert(C.safeStr(null, 'x') === 'x');
+        });
+
+        test('safeBool: parses booleans and truthy/falsy values', function() {
+            assert(C.safeBool(true) === true);
+            assert(C.safeBool(false) === false);
+            assert(C.safeBool('true') === true);
+            assert(C.safeBool('false') === false);
+            assert(C.safeBool(1) === true);
+            assert(C.safeBool(0) === false);
+        });
+
+        test('hashObj: returns consistent hash for same object', function() {
+            var h1 = C.hashObj({ a: 1, b: 2 });
+            var h2 = C.hashObj({ a: 1, b: 2 });
+            assert(h1 === h2, 'Same object should produce same hash');
+            assert(typeof h1 === 'string' && h1.length > 0);
+        });
+
+        test('generateId: returns unique IDs with optional prefix', function() {
+            var id1 = C.generateId();
+            var id2 = C.generateId();
+            var id3 = C.generateId('test');
+            assert(id1 !== id2, 'IDs should be unique');
+            assert(id3.indexOf('test-') === 0, 'Prefix should be applied');
+            assert(id1.indexOf('ymid-') === 0, 'Default prefix should be ymid');
+        });
+
+        test('deepClone: creates independent copy', function() {
+            var orig = { a: { b: [1, 2, { c: 3 }] } };
+            var clone = C.deepClone(orig);
+            assert(clone !== orig, 'Top-level should be new object');
+            assert(clone.a !== orig.a, 'Nested objects should be cloned');
+            assert(clone.a.b !== orig.a.b, 'Arrays should be cloned');
+            clone.a.b[2].c = 99;
+            assert(orig.a.b[2].c === 3, 'Modifying clone should not affect original');
+        });
+
+        test('roundTo: rounds to specified decimals', function() {
+            assert(C.roundTo(1.2345, 2) === 1.23);
+            assert(C.roundTo(1.235, 2) === 1.24);
+            assert(C.roundTo(NaN, 2) === 0);
+        });
+
+        // ================================================================
+        // YModels.calc (Financial Valuation + Kelly)
+        // ================================================================
+        section('YModels.calc: Financial Valuation & Kelly Position');
+
+        test('calc: createInstance returns {evaluate, destroy}', function() {
+            var inst = YModels.calc.createInstance({});
+            assert(typeof inst.evaluate === 'function');
+            assert(typeof inst.destroy === 'function');
+            inst.destroy();
+        });
+
+        test('calc: evaluate returns valid result structure', function() {
+            var inst = YModels.calc.createInstance({ beta: 1.0, growthRate: 0.05 });
+            var r = inst.evaluate();
+            assert(r.error === undefined, 'Should not have error, got: ' + (r.message || ''));
+            assert(typeof r.valuationScore === 'number', 'Should have valuationScore');
+            assert(typeof r.positionRecommendation === 'number', 'Should have positionRecommendation');
+            assert(typeof r.riskLevel === 'string', 'Should have riskLevel');
+            assert(typeof r.breakEvenCheck === 'boolean', 'Should have breakEvenCheck');
+            assert(typeof r.fuseCheck === 'boolean', 'Should have fuseCheck');
+            assert(r.valuationScore >= 0 && r.valuationScore <= 1);
+            assert(r.positionRecommendation >= 0 && r.positionRecommendation <= 1);
+            inst.destroy();
+        });
+
+        test('calc: fuseCheck is false when fuse triggered → position=0', function() {
+            var inst = YModels.calc.createInstance({
+                beta: -0.5, costOfDebt: 0.01, growthRate: 0.5, margin: 0.8,
+                peRatio: 5, fairPe: 50, debtRatio: 0.1, taxRate: 0.1
+            });
+            var r = inst.evaluate();
+            if (!r.fuseCheck) {
+                assert(r.positionRecommendation === 0, 'Position must be 0 when fuse fails');
+            }
+            inst.destroy();
+        });
+
+        test('calc: destroyed instance returns error', function() {
+            var inst = YModels.calc.createInstance({});
+            inst.destroy();
+            var r = inst.evaluate();
+            assert(r.error === true, 'Destroyed instance should return error');
+        });
+
+        test('calc: null input does not crash', function() {
+            var inst = YModels.calc.createInstance(null);
+            var r = inst.evaluate();
+            assert(typeof r.valuationScore === 'number', 'Should not crash on null input');
+            inst.destroy();
+        });
+
+        test('calc: positionRecommendation always in [0,1]', function() {
+            for (var i = 0; i < 20; i++) {
+                var inst = YModels.calc.createInstance({
+                    beta: Math.random() * 2,
+                    growthRate: Math.random() * 0.2,
+                    margin: Math.random() * 0.3,
+                    winRate: Math.random(),
+                    winLossRatio: 0.5 + Math.random() * 2
+                });
+                var r = inst.evaluate();
+                assert(r.positionRecommendation >= 0, 'Position must be >= 0, got ' + r.positionRecommendation);
+                assert(r.positionRecommendation <= 1, 'Position must be <= 1, got ' + r.positionRecommendation);
+                inst.destroy();
+            }
+        });
+
+        test('calc: riskLevel is one of LOW/MEDIUM/HIGH/FUSE', function() {
+            var levels = ['LOW', 'MEDIUM', 'HIGH', 'FUSE'];
+            var inst = YModels.calc.createInstance({ beta: 1.0, growthRate: 0.05 });
+            var r = inst.evaluate();
+            assert(levels.indexOf(r.riskLevel) !== -1, 'Invalid riskLevel: ' + r.riskLevel);
+            inst.destroy();
+        });
+
+        // ================================================================
+        // YModels.gamemind
+        // ================================================================
+        section('YModels.gamemind: Nash Equilibrium / Game Theory');
+
+        test('gamemind: createInstance returns valid instance', function() {
+            var inst = YModels.gamemind.createInstance({});
+            assert(typeof inst.evaluate === 'function');
+            assert(typeof inst.destroy === 'function');
+            inst.destroy();
+        });
+
+        test('gamemind: evaluate returns valid result structure', function() {
+            var inst = YModels.gamemind.createInstance({
+                competitionIntensity: 0.5, marketGrowth: 0.5
+            });
+            var r = inst.evaluate();
+            assert(r.error === undefined, 'Should not error');
+            assert(typeof r.equilibriumScore === 'number');
+            assert(typeof r.strategyRecommendation === 'number');
+            assert(typeof r.marketRegime === 'string');
+            assert(typeof r.nashStability === 'number');
+            assert(typeof r.fuseCheck === 'boolean');
+            assert(['RED_OCEAN', 'BLUE_OCEAN'].indexOf(r.marketRegime) !== -1, 'Invalid regime: ' + r.marketRegime);
+            assert(r.equilibriumScore >= 0 && r.equilibriumScore <= 1);
+            assert(r.strategyRecommendation >= 0 && r.strategyRecommendation <= 1);
+            inst.destroy();
+        });
+
+        test('gamemind: destroyed instance returns error', function() {
+            var inst = YModels.gamemind.createInstance({});
+            inst.destroy();
+            var r = inst.evaluate();
+            assert(r.error === true);
+        });
+
+        test('gamemind: all output values in [0,1] across random inputs', function() {
+            for (var i = 0; i < 20; i++) {
+                var inst = YModels.gamemind.createInstance({
+                    competitionIntensity: Math.random(),
+                    marketGrowth: Math.random(),
+                    cooperationBonus: Math.random() * 0.5,
+                    priceWarCost: Math.random() * 0.5
+                });
+                var r = inst.evaluate();
+                assert(r.equilibriumScore >= 0 && r.equilibriumScore <= 1);
+                assert(r.strategyRecommendation >= 0 && r.strategyRecommendation <= 1);
+                assert(r.nashStability >= 0 && r.nashStability <= 1);
+                inst.destroy();
+            }
+        });
+
+        // ================================================================
+        // YModels.compute
+        // ================================================================
+        section('YModels.compute: V/S/L Compute Load Model');
+
+        test('compute: createInstance returns valid instance', function() {
+            var inst = YModels.compute.createInstance({});
+            assert(typeof inst.evaluate === 'function');
+            inst.destroy();
+        });
+
+        test('compute: evaluate returns valid result structure', function() {
+            var inst = YModels.compute.createInstance({
+                volume: 1.0, surface: 1.0, length: 1.0
+            });
+            var r = inst.evaluate();
+            assert(r.error === undefined);
+            assert(typeof r.computeEfficiency === 'number');
+            assert(typeof r.loadScore === 'number');
+            assert(typeof r.peakShaveRequired === 'boolean');
+            assert(typeof r.availableCapacity === 'number');
+            assert(typeof r.fuseCheck === 'boolean');
+            assert(r.computeEfficiency >= 0 && r.computeEfficiency <= 1);
+            assert(r.loadScore >= 0 && r.loadScore <= 1);
+            assert(r.availableCapacity >= 0 && r.availableCapacity <= 1);
+            inst.destroy();
+        });
+
+        test('compute: destroyed instance returns error', function() {
+            var inst = YModels.compute.createInstance({});
+            inst.destroy();
+            var r = inst.evaluate();
+            assert(r.error === true);
+        });
+
+        // ================================================================
+        // Risk Circuit Breaker
+        // ================================================================
+        section('RiskCircuitBreaker: Frontend Circuit Breaker (YMineRiskCB)');
+
+        var RB = window.YMineRiskCB;
+
+        test('RB: getState returns state object with isHalted', function() {
+            var s = RB.getState();
+            assert(typeof s === 'object');
+            assert(typeof s.isHalted === 'boolean');
+            assert(typeof s.state === 'object');
+            assert(typeof s.thresholds === 'object');
+        });
+
+        function resetRB() {
+            RB.update({ coneC: 0.5, zScore: 0, mdd: 0.1, drawdown: 0.05, manualHalt: false, npvNegative: false, irrBelowHurdle: false });
+            RB.setManualHalt(false);
+        }
+
+        test('RB: normal state (coneC=0.5) not halted', function() {
+            resetRB();
+            var r = RB.evaluate();
+            assert(r.halted === false, 'Normal state should not be halted');
+        });
+
+        test('RB: coneC >= 0.68 triggers CONE_C_BREACH fuse', function() {
+            resetRB();
+            RB.update({ coneC: 0.7 });
+            var r = RB.evaluate();
+            assert(r.halted === true, 'coneC=0.7 must trigger halt');
+            assert(r.fuseIds.indexOf('CONE_C_BREACH') !== -1, 'Should have CONE_C_BREACH fuse, got: ' + r.fuseIds.join(','));
+        });
+
+        test('RB: coneC exactly at boundary (0.68) triggers fuse', function() {
+            resetRB();
+            RB.update({ coneC: 0.68 });
+            var r = RB.evaluate();
+            assert(r.halted === true, 'coneC=0.68 (boundary) must trigger halt');
+            assert(r.fuseIds.indexOf('CONE_C_BREACH') !== -1);
+        });
+
+        test('RB: coneC just below boundary (0.67) does not trigger CONE_C_BREACH', function() {
+            resetRB();
+            RB.update({ coneC: 0.67 });
+            var r = RB.evaluate();
+            assert(r.fuseIds.indexOf('CONE_C_BREACH') === -1, 'coneC=0.67 should NOT trigger CONE_C_BREACH, fuseIds: ' + r.fuseIds.join(','));
+        });
+
+        test('RB: |zScore| >= 2 triggers ZSCORE_BLACK_SWAN', function() {
+            resetRB();
+            RB.update({ coneC: 0.5, zScore: 2.5 });
+            var r = RB.evaluate();
+            assert(r.halted === true, 'zScore=2.5 must trigger halt');
+            assert(r.fuseIds.indexOf('ZSCORE_BLACK_SWAN') !== -1, 'Should have ZSCORE_BLACK_SWAN fuse, got: ' + r.fuseIds.join(','));
+        });
+
+        test('RB: |zScore| >= 3 triggers ZSCORE_MELTDOWN', function() {
+            resetRB();
+            RB.update({ coneC: 0.5, zScore: 3.5 });
+            var r = RB.evaluate();
+            assert(r.halted === true);
+            assert(r.fuseIds.indexOf('ZSCORE_MELTDOWN') !== -1, 'Should have ZSCORE_MELTDOWN fuse, got: ' + r.fuseIds.join(','));
+        });
+
+        test('RB: mdd >= 0.5 triggers MDD_BREACH', function() {
+            resetRB();
+            RB.update({ coneC: 0.5, zScore: 0, mdd: 0.6 });
+            var r = RB.evaluate();
+            assert(r.halted === true, 'MDD=0.6 must trigger halt');
+            assert(r.fuseIds.indexOf('MDD_BREACH') !== -1, 'Should have MDD_BREACH fuse, got: ' + r.fuseIds.join(','));
+        });
+
+        test('RB: manualHalt triggers MANUAL_HALT', function() {
+            resetRB();
+            RB.setManualHalt(true);
+            var r = RB.evaluate();
+            assert(r.halted === true);
+            assert(r.fuseIds.indexOf('MANUAL_HALT') !== -1, 'Should have MANUAL_HALT fuse');
+            RB.setManualHalt(false);
+        });
+
+        test('RB: enforce() returns actual=0 when halted (coneC=0.8)', function() {
+            resetRB();
+            RB.update({ coneC: 0.8 });
+            var r = RB.enforce(0.5);
+            assert(r.halted === true);
+            assert(r.actual === 0, 'Enforced position must be 0 when halted, got ' + r.actual);
+        });
+
+        test('RB: enforce() respects ABSOLUTE_HARD_CAP of 0.25', function() {
+            resetRB();
+            RB.update({ coneC: 0.5 });
+            var r = RB.enforce(0.5);
+            assert(r.halted === false, 'Should not be halted at coneC=0.5');
+            assert(r.actual <= 0.25, 'Position cannot exceed absolute hard cap 0.25, got ' + r.actual);
+        });
+
+        test('RB: enforce() returns caps and reductions arrays', function() {
+            resetRB();
+            RB.update({ coneC: 0.5 });
+            var r = RB.enforce(0.5);
+            assert(Array.isArray(r.caps), 'caps should be array');
+            assert(Array.isArray(r.reductions), 'reductions should be array');
+        });
+
+        test('RB: setManualHalt(true) triggers halt then reset', function() {
+            resetRB();
+            assert(RB.evaluate().halted === false, 'Should start not halted');
+            RB.setManualHalt(true);
+            assert(RB.evaluate().halted === true, 'After setManualHalt(true) must be halted');
+            RB.setManualHalt(false);
+            assert(RB.evaluate().halted === false, 'After setManualHalt(false) must not be halted');
+        });
+
+        // ================================================================
+        // Triangle Audit (异步 Promise-based)
+        // ================================================================
+        section('YTriangleAudit: Three-Model Redundancy Audit');
+
+        var TA = window.YTriangleAudit;
+
+        test('TA: AUDIT_STATUS constants defined', function() {
+            assert(TA.AUDIT_STATUS.PASSED === 'PASSED');
+            assert(TA.AUDIT_STATUS.WARNING === 'WARNING');
+            assert(TA.AUDIT_STATUS.BLOCKED === 'BLOCKED');
+            assert(TA.ERROR_THRESHOLD === 0.02);
+        });
+
+        await runAsync('TA: result structure has all required fields (scores, diffs, status)', async function() {
+            var r = await TA.runAudit({ beta: 1.0, growthRate: 0.05 }, { silent: true });
+            assert(r.auditId && typeof r.auditId === 'string', 'Should have auditId string');
+            assert(r.timestamp && typeof r.timestamp === 'number', 'Should have timestamp');
+            assert(['PASSED','WARNING','BLOCKED','ERROR'].indexOf(r.status) !== -1, 'Status must be one of PASSED/WARNING/BLOCKED/ERROR, got: ' + r.status);
+            assert(typeof r.passed === 'boolean', 'Should have passed boolean');
+            assert(typeof r.blocked === 'boolean', 'Should have blocked boolean');
+            assert(typeof r.anomalyCount === 'number', 'Should have anomalyCount');
+            assert(r.scores !== null && typeof r.scores === 'object', 'Should have scores object');
+            assert(typeof r.scores.A === 'number', 'scores.A must be number (calc valuationScore)');
+            assert(typeof r.scores.B === 'number', 'scores.B must be number (gamemind equilibriumScore)');
+            assert(typeof r.scores.C === 'number', 'scores.C must be number (compute loadScore)');
+            assert(r.scores.A >= 0 && r.scores.A <= 1, 'scores.A in [0,1]');
+            assert(r.scores.B >= 0 && r.scores.B <= 1, 'scores.B in [0,1]');
+            assert(r.scores.C >= 0 && r.scores.C <= 1, 'scores.C in [0,1]');
+        });
+
+        await runAsync('TA: diffs object has AB/BC/AC with ERROR_THRESHOLD=0.02', async function() {
+            var r = await TA.runAudit({ beta: 1.0, growthRate: 0.05 }, { silent: true });
+            assert(r.diffs !== null, 'Should have diffs object when not blocked by model failures');
+            assert(typeof r.diffs.AB === 'number', 'diffs.AB must be number (calc vs gamemind)');
+            assert(typeof r.diffs.BC === 'number', 'diffs.BC must be number (gamemind vs compute)');
+            assert(typeof r.diffs.AC === 'number', 'diffs.AC must be number (calc vs compute)');
+            assert(r.diffs.threshold === 0.02, 'diffs.threshold must be ERROR_THRESHOLD=0.02');
+            assert(r.diffs.AB >= 0, 'diffAB must be non-negative');
+            assert(r.diffs.BC >= 0, 'diffBC must be non-negative');
+            assert(r.diffs.AC >= 0, 'diffAC must be non-negative');
+        });
+
+        await runAsync('TA: anomalyCount matches number of pairs exceeding 0.02 threshold', async function() {
+            var r = await TA.runAudit({ beta: 1.0, growthRate: 0.05 }, { silent: true });
+            var expectedAnomalies = 0;
+            if (r.diffs) {
+                if (r.diffs.AB > 0.02) expectedAnomalies++;
+                if (r.diffs.BC > 0.02) expectedAnomalies++;
+                if (r.diffs.AC > 0.02) expectedAnomalies++;
+            }
+            assert(r.anomalyCount === expectedAnomalies, 'anomalyCount should match count of pairs > 0.02: expected ' + expectedAnomalies + ', got ' + r.anomalyCount);
+        });
+
+        await runAsync('TA: BLOCKED triggered when ≥2 pairs diverge (extreme inputs)', async function() {
+            var r = await TA.runAudit({ beta: -5, growthRate: 0.9, competitionIntensity: 0.0, marketGrowth: 0.0, volume: 10.0, surface: 0.01, length: 0.01 }, { silent: true });
+            assert(r.blocked === true || r.passed === false, 'Extreme divergent inputs must block (status=' + r.status + ')');
+            assert(r.anomalyCount >= 2, 'Must have ≥2 anomalies for BLOCKED, got ' + r.anomalyCount);
+            assert(r.finalScore === null, 'finalScore must be null when BLOCKED');
+        });
+
+        await runAsync('TA: WARNING allows single-anomaly correction (passed=true, blocked=false)', async function() {
+            var r = await TA.runAudit({ valuationScore: 0.5, volume: 5.0, surface: 0.1, length: 0.1 }, { silent: true });
+            if (r.anomalyCount === 1) {
+                assert(r.status === 'WARNING', 'Single anomaly should be WARNING');
+                assert(r.passed === true, 'Single anomaly should pass (mean-corrected)');
+                assert(r.blocked === false, 'Single anomaly should not block');
+                assert(r.finalScore !== null, 'finalScore must be set for WARNING');
+            }
+        });
+
+        await runAsync('TA: fuseTriggered=true iff finalScore !== null and ≥ 0.68', async function() {
+            var r = await TA.runAudit({ beta: -2, growthRate: 0.5, competitionIntensity: 0.1, marketGrowth: 0.9, volume: 0.5 }, { silent: true });
+            if (r.finalScore !== null) {
+                assert(typeof r.fuseTriggered === 'boolean', 'fuseTriggered must be boolean');
+                assert(r.fuseTriggered === (r.finalScore >= 0.68), 'fuseTriggered must equal (finalScore >= 0.68)');
+            }
+        });
+
+        await runAsync('TA: getLastResult returns latest audit result after completion', async function() {
+            var r1 = await TA.runAudit({ beta: 1.0 }, { silent: true });
+            var last = TA.getLastResult();
+            assert(last !== null, 'getLastResult must return non-null after audit');
+            assert(last.auditId === r1.auditId, 'getLastResult auditId must match latest run');
+            assert(last.timestamp === r1.timestamp, 'getLastResult timestamp must match');
+        });
+
+        await runAsync('TA: isRunning() returns false after audit completes', async function() {
+            await TA.runAudit({ beta: 1.0 }, { silent: true });
+            assert(TA.isRunning() === false, 'isRunning must be false after completion');
+        });
+
+        await runAsync('TA: modelResults contains all three model outputs', async function() {
+            var r = await TA.runAudit({ beta: 1.0 }, { silent: true });
+            assert(r.modelResults && typeof r.modelResults === 'object', 'Should have modelResults');
+            assert(r.modelResults.calc && typeof r.modelResults.calc === 'object', 'modelResults.calc exists');
+            assert(r.modelResults.game && typeof r.modelResults.game === 'object', 'modelResults.game exists');
+            assert(r.modelResults.compute && typeof r.modelResults.compute === 'object', 'modelResults.compute exists');
+        });
+
+        // ================================================================
+        // Final Verdict
+        // ================================================================
+        section('VERDICT');
+        var badge = document.createElement('div');
+        badge.style.cssText = 'padding:16px;border-radius:8px;font-size:16px;font-weight:700;text-align:center;margin-top:8px;';
+        if (failCount === 0) {
+            badge.style.background = 'rgba(34,197,94,0.1)';
+            badge.style.border = '1px solid rgba(34,197,94,0.3)';
+            badge.style.color = '#4ade80';
+            badge.textContent = '✓ ALL ' + totalCount + ' TESTS PASSED';
+        } else {
+            badge.style.background = 'rgba(239,68,68,0.1)';
+            badge.style.border = '1px solid rgba(239,68,68,0.3)';
+            badge.style.color = '#f87171';
+            badge.textContent = '✗ ' + failCount + '/' + totalCount + ' TESTS FAILED';
+        }
+        resultsEl.appendChild(badge);
+
+        runningEl.style.display = 'none';
+        showFailures();
+    }
+
+    runAll();
+})();
+</script>
+</body>
+</html>
