@@ -1,16 +1,17 @@
-# Game-OS V2.2 Batch1
+# Game-OS V2.2
 
-> **博弈论驱动的全域认知操作系统 · 生产稳定版**
+> **博弈论驱动的全域认知操作系统 · P0整改完成版**
 >
 > 不是又一个 AI Agent 框架。这是一套从数学底层重新设计的、有安全边界的、可验证的跨领域决策操作系统。
 
 | 项目属性 | 内容 |
 |----------|------|
-| 版本 | V2.2 Batch1 (Final) |
+| 版本 | V2.2 P0-Rectified |
 | 综合合规度 | **97.71/100 (A+级)** |
-| 审计状态 | ✅ 七轮专项审计全部通过，正式闭环交付 |
+| 审计状态 | ✅ 七轮专项审计全部通过，P0整改完成，单元测试覆盖核心模块 |
 | 三阈值基准 | 0.48保本 / 0.50稳态 / 0.68熔断 |
-| 发布日期 | 2026-07-21 |
+| 单元测试 | ✅ 124个测试全部通过 (Node.js 73 + 浏览器 51) |
+| 更新日期 | 2026-07-26 |
 
 ---
 
@@ -91,30 +92,40 @@ workspace/
 ├── index.html                     # 🎯 主控台入口
 ├── ymine-studio.html              # 🛠️ YMine Studio全功能控制台
 │
+├── models/                        # 🧮 三模型冗余独立实现（三角审计A/B/C）
+│   ├── common/normalizer.js       # 🔧 唯一工具函数库（唯一事实源）
+│   ├── calc/                      # A: 金融精算模型 (WACC/DCF/Kelly)
+│   ├── gamemind/                  # B: 博弈论纳什均衡模型
+│   └── compute/                   # C: V/S/L几何算力负载模型
+│
 ├── assets/js/                     # 核心公共引擎层（L2）
 │   ├── bus.js                     # 🚌 YBus三分区消息总线
-│   ├── risk-circuit-breaker.js    # 🛡️ 全局风控熔断
-│   ├── triangle-audit.js          # 🔺 三模型冗余审计
+│   ├── risk-circuit-breaker.js    # 🛡️ 前端全局风控熔断
+│   ├── triangle-audit.js          # 🔺 三模型冗余审计（STEP9门控）
 │   ├── quant-engine.js            # 📊 十步量化投资引擎
 │   ├── valuation-engine.js        # 💰 DCF+实物期权估值
 │   ├── cone-game-theory.js        # 🎯 0.68锥心博弈论
 │   ├── mcn-alpha-engine.js        # 📈 MCNα引擎
 │   └── poker-egg.js               # 🃏 德州扑克GTO模块
 │
-├── game-os-main/core-engine/      # 底层内核（L2）
+├── game-os-main/core-engine/      # Node.js后端内核（L2）
+│   ├── _internal.js               # 🔧 内部工具（委托YModels.common）
 │   ├── safety-fuse.js             # 🔥 七类安全熔断基线
 │   ├── kelly-base.js              # Kelly仓位公式
-│   ├── four-layer-control.js      # 四层管控
-│   └── triangle-loopback.js       # 三角闭环
+│   ├── four-layer-control.js      # 四层管控(L1-L4)
+│   ├── fat-lean-band.js           # 动态松紧带(FAT/NEUTRAL/LEAN)
+│   ├── circle-boundary.js         # 圆环边界
+│   ├── triangle-loopback.js       # 三角闭环
+│   ├── common-api.js              # 公共API层
+│   └── eleven-layer-public.js     # 十一层公开接口
 │
-├── engines/                       # 七大独立引擎（L3）
+├── engines/                       # 六大独立引擎（L3）
 │   ├── airmind/                   # AirMind 低空调度引擎
 │   ├── evolvemind/                # EvolveMind 演化引擎
 │   ├── financemind/               # FinanceMind 金融引擎
 │   ├── gamemind/                  # GameMind 博弈总基座
 │   ├── geom-compute/              # GeomCompute 几何计算引擎
-│   ├── mindspeak/                 # MindSpeak 认知语言引擎
-│   └── moodmind/                  # MoodMind 情绪估值引擎
+│   └── mindspeak/                 # MindSpeak 认知语言引擎
 │
 ├── game-os-main/business-modules/ # 五大垂直业务（L3）
 │   ├── circle-cognitive/          # 圆环认知
@@ -123,15 +134,31 @@ workspace/
 │   ├── mcn-valuation/             # MCN估值
 │   └── wall-street-11step/        # 华尔街十一
 │
-├── labs/                          # 31组仿真实验室（L4）
-│   └── evidence/                  # 17个通用实证实验室
+├── labs/                          # 仿真实验室（L4）
+│   ├── evidence/                  # 通用实证实验室
+│   ├── engineering/               # 工程实验室
+│   ├── finance-evidence-lab/      # 金融实证实验室
+│   ├── marketing/                 # 营销实验室
+│   └── structural-mechanics/      # 结构力学实验室
+│
+├── tests/                         # ✅ 单元测试套件
+│   ├── core-engine.test.js        # Node.js后端测试 (73 tests)
+│   └── runner.html                # 浏览器前端测试 (51 tests)
 │
 ├── *-private-engine/              # 🔒 私有涉密引擎（物理隔离）
+│   ├── airmind-private-engine/
+│   ├── financemind-private-engine/
+│   ├── mindspeak-private-engine/
+│   ├── isomorphism-block-private-engine/
+│   ├── traditional-culture-vector-private-engine/
+│   └── ymine-circle-cognitive-engine/
 │
 ├── moodmind_lab/                  # MoodMind Python后端
 ├── ms-lab/                        # MS-Lab Python后端
+├── tools/                         # 链接检查/修复工具集
+├── docs/system-v21-rectification/ # 📚 V2.2七轮审计报告+P0整改
 │
-└── docs/system-v21-rectification/ # 📚 V2.2七轮审计报告
+└── MemoryBase/                    # 向量存储与记忆库
 ```
 
 ---
@@ -183,6 +210,44 @@ YBus.THRESHOLDS.FUSE       // 0.68 熔断线
 
 ---
 
+## 单元测试
+
+Game-OS P0整改后建立了完整的单元测试体系，覆盖三大核心安全模块：
+
+| 测试套件 | 运行环境 | 测试数 | 覆盖模块 |
+|----------|---------|--------|---------|
+| [core-engine.test.js](file:///workspace/tests/core-engine.test.js) | Node.js | 73 | Internal工具函数、Kelly仓位、SafetyFuse熔断、四层控制、FatLeanBand |
+| [runner.html](file:///workspace/tests/runner.html) | 浏览器 | 51 | YModels三模型、RiskCircuitBreaker前端熔断、TriangleAudit三角审计 |
+| **合计** | - | **124** | **全部通过 ✅** |
+
+### 运行测试
+
+```bash
+# Node.js后端测试
+cd /workspace && node tests/core-engine.test.js
+
+# 浏览器前端测试
+cd /workspace && python3 -m http.server 8080
+# 打开 http://localhost:8080/tests/runner.html
+```
+
+测试覆盖的P0关键安全路径：
+- **Kelly仓位计算**：raw Kelly、half/quarter Kelly缩放、optimal band校准、边界值测试
+- **熔断触发逻辑**：coneC≥0.68（精确到0.679/0.68边界）、zScore 2σ/3σ分级、MDD≥50%、手动停机、强制平仓0、硬顶0.25
+- **三角审计**：结果结构完整性、diffs三元组、anomalyCount计数、BLOCKED(≥2异常)、WARNING(单组修正)、fuseTriggered(≥0.68)
+
+---
+
+## P0整改完成项 (2026-07-26)
+
+| P0项 | 描述 | 状态 |
+|------|------|------|
+| P0-1 | 统一工具函数库：YModels.common为唯一事实源，_internal.js委托调用 | ✅ |
+| P0-2 | 清理冗余目录：airmind/、mindspeak/、pages/等根目录重定向页删除，路径统一到engines/ | ✅ |
+| P0-3 | 添加单元测试：Kelly仓位、熔断逻辑、三角审计共124个测试 | ✅ |
+
+---
+
 ## 设计哲学
 
 **我们不相信任何单一模型的输出。**
@@ -208,7 +273,8 @@ Game-OS走了一条不同的路：
 | V2.0 | 2026-Q1 | YBus总线 + 三大引擎 |
 | V2.1 | 2026-Q2 | 31实验室 + 5业务模块 + 全链路熔断 |
 | V2.2 Batch1 | 2026-03~07 | 七轮专项审计 → 25个A类缺陷100%修复 → 全域终验通过 |
-| **V2.2 Batch1 Final** | **2026-07-21** | **🎊 正式闭环交付** |
+| V2.2 Batch1 Final | 2026-07-21 | 正式闭环交付 |
+| **V2.2 P0-Rectified** | **2026-07-26** | **✅ P0整改：统一工具库、清理冗余目录、新增124个单元测试** |
 
 ---
 
@@ -236,21 +302,23 @@ Game-OS V2.2 Batch1 为内部研究/教学/仿真平台。
 
 ```
 ==========================================================
-  G A M E - O S   V 2 . 2   B A T C H 1   F I N A L
+  G A M E - O S   V 2 . 2   P 0 - R E C T I F I E D
 ==========================================================
 
   七轮专项审计 ......... ✅ 全部通过
   A类缺陷修复 ........... ✅ 25/25 (100%)
+  P0整改项 .............. ✅ 3/3 (100%)
   全域合规度 ............ ✅ 97.71/100 (A+)
   安全红线 .............. ✅ 7/7 零违反
+  单元测试 .............. ✅ 124/124 全部通过
   YBus通道数 ............ ✅ 31个
-  模块冒烟测试 .......... ✅ 7引擎+5业务+22+实验室全部通过
+  工具函数库 ............ ✅ 统一为单一事实源
 
-  🎊 正式闭环交付 · 可投入生产使用 🎊
+  🎯 P0整改完成 · 核心模块测试覆盖 🎯
 
 ==========================================================
 ```
 
 ---
 
-*README版本：V2.2 Batch1 Final | 更新日期：2026-07-21*
+*README版本：V2.2 P0-Rectified | 更新日期：2026-07-26*
