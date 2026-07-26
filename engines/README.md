@@ -1,24 +1,35 @@
-# Engines · 独立平行子引擎层
+# 🧠 Engines · 七大独立认知引擎
 
-本目录为五层架构的第2层，包含各大独立平行子引擎。
+Game-OS 核心能力层。每个引擎是一个独立的认知模块，通过 YBus 消息总线通信，互不直接依赖。
 
-## 架构说明
+## 快速索引
 
-每个子引擎目录包含：
-- `index.html` - 对外公开演示入口
-- `assets/` - 子引擎专属静态资源（如适用）
-- `modules/` - 子引擎专属模块（如适用）
-- `*-private-engine/` - 对应子引擎的涉密内核（SEALED_FOR_COPYRIGHT_DEPOSIT）
+| 引擎 | 入口 | 职责 | 核心能力 |
+|------|------|------|---------|
+| **GameMind** | [gamemind/](gamemind/index.html) | 博弈总基座 | 纳什均衡求解、Cournot博弈、蜈蚣博弈 |
+| **AirMind** | [airmind/](airmind/index.html) | 低空调度引擎 | 空域冲突检测、级联阻尼权重、对流算法 |
+| **FinanceMind** | [financemind/](financemind/index.html) | 金融引擎 | WACC/DCF估值、CAPM锥心定价、破产风险 |
+| **MindSpeak** | [mindspeak/](mindspeak/index.html) | 认知语言引擎 | 四层认知向量、4D向量算子、置信核 |
+| **GeomCompute** | [geom-compute/](geom-compute/index.html) | 几何计算引擎 | V/S/L算力模型、错峰调度、KV-cache优化 |
+| **EvolveMind** | [evolvemind/](evolvemind/index.html) | 演化引擎 | 思维演化、三层记忆、偏误参数化 |
+| **MoodMind** | [moodmind/](moodmind/index.html) | 情绪估值引擎 | 非标资产计量、KMP评分、情绪向量 |
 
-## 子引擎列表
+## 目录约定
 
-| 目录 | 说明 |
-|------|------|
-| gamemind/ | GameMind 全域通用博弈总基座，全系统公共底层 |
-| airmind/ | AirMind V2.0 低空全域人机神经协同调度引擎 |
-| airmind-private-engine/ | AirMind 私有涉密内核 |
-| mindspeak/ | MindSpeak V19.0 四层跨域数理同构翻译引擎 |
-| mindspeak-private-engine/ | MindSpeak 私有涉密内核 |
-| evolvemind/ | EvolveMind 进阶思维认知演化引擎 |
-| moodmind/ | MoodMind 非标资产估值底座 |
-| geom-compute/ | 几何心智空间·全域大模型算力错峰调度与二进制底层执行底座 |
+每个公开引擎目录包含：
+- `index.html` — 对外演示入口
+- `README.md` — 引擎说明文档
+- `assets/` 或 `js/` — 引擎专属静态资源（如适用）
+
+## 🔒 私有引擎
+
+涉密内核物理隔离于独立目录，公开层仅暴露 stub 占位：
+
+| 私有引擎 | 位置 | 对应公开引擎 |
+|---------|------|------------|
+| airmind-private-engine | [airmind-private-engine/](airmind-private-engine/) | AirMind |
+| financemind-private-engine | [financemind-private-engine/](financemind-private-engine/) | FinanceMind |
+| mindspeak-private-engine | [mindspeak-private-engine/](mindspeak-private-engine/) | MindSpeak |
+| isomorphism-block-private-engine | ../isomorphism-block-private-engine/ | 同构拦截引擎 |
+| traditional-culture-vector-private-engine | ../traditional-culture-vector-private-engine/ | 文化向量引擎 |
+| ymine-circle-cognitive-engine | ../ymine-circle-cognitive-engine/ | 圆环认知引擎 |
