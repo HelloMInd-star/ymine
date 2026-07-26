@@ -3,15 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>11维金融向量体系 · Y.Mine</title>
+    <title>11维金融向量体系 · 可交互向量库演示系统 · Y.Mine</title>
     <link rel="stylesheet" href="assets/css/base.css?v=2">
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
     <style>
         body {
             padding: 20px;
             background: #0b0b1a;
         }
         .main-content {
-            max-width: 1200px;
+            max-width: 1400px;
             width: 100%;
             margin: 0 auto;
             padding: 0;
@@ -38,14 +39,32 @@
             filter: drop-shadow(0 0 24px rgba(34,197,94,0.5));
         }
         .page-title {
-            font-size: 32px;
+            font-size: 30px;
             font-weight: 700;
             background: linear-gradient(135deg, #4ade80, #60a5fa, #a78bfa);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
             letter-spacing: -0.5px;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
+        }
+        .interactive-badge {
+            display: inline-block;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 6px;
+            background: linear-gradient(135deg, rgba(34,197,94,0.2), rgba(59,130,246,0.2));
+            border: 1px solid rgba(34,197,94,0.4);
+            color: #4ade80;
+            letter-spacing: 0.8px;
+            margin-left: 10px;
+            vertical-align: middle;
+            animation: badgePulse 2s ease-in-out infinite;
+        }
+        @keyframes badgePulse {
+            0%, 100% { box-shadow: 0 0 8px rgba(34,197,94,0.2); }
+            50% { box-shadow: 0 0 16px rgba(34,197,94,0.4); }
         }
         .page-subtitle {
             font-size: 15px;
@@ -100,21 +119,12 @@
             margin-bottom: 16px;
             letter-spacing: 0.5px;
         }
-        .card-badge.green {
-            background: rgba(34,197,94,0.12);
-            border: 1px solid rgba(34,197,94,0.3);
-            color: #4ade80;
-        }
-        .card-badge.purple {
-            background: rgba(167,139,250,0.12);
-            border: 1px solid rgba(167,139,250,0.3);
-            color: #c4b5fd;
-        }
-        .card-badge.blue {
-            background: rgba(59,130,246,0.12);
-            border: 1px solid rgba(59,130,246,0.3);
-            color: #93c5fd;
-        }
+        .card-badge.green { background: rgba(34,197,94,0.12); border: 1px solid rgba(34,197,94,0.3); color: #4ade80; }
+        .card-badge.purple { background: rgba(167,139,250,0.12); border: 1px solid rgba(167,139,250,0.3); color: #c4b5fd; }
+        .card-badge.blue { background: rgba(59,130,246,0.12); border: 1px solid rgba(59,130,246,0.3); color: #93c5fd; }
+        .card-badge.amber { background: rgba(251,191,36,0.12); border: 1px solid rgba(251,191,36,0.3); color: #fde68a; }
+        .card-badge.cyan { background: rgba(34,211,238,0.12); border: 1px solid rgba(34,211,238,0.3); color: #67e8f9; }
+        .card-badge.rose { background: rgba(244,114,182,0.12); border: 1px solid rgba(244,114,182,0.3); color: #f9a8d4; }
         .card-title {
             font-size: 20px;
             font-weight: 700;
@@ -148,47 +158,68 @@
             padding-bottom: 8px;
             border-bottom: 1px solid rgba(255,255,255,0.06);
         }
-        .dim-section.generic h4 {
-            color: #60a5fa;
-        }
-        .dim-section.finance h4 {
-            color: #4ade80;
-        }
+        .dim-section.generic h4 { color: #60a5fa; }
+        .dim-section.finance h4 { color: #4ade80; }
         .dim-item {
             display: flex;
-            align-items: flex-start;
+            align-items: center;
             gap: 10px;
-            padding: 10px 12px;
+            padding: 8px 12px;
             background: rgba(255,255,255,0.015);
             border-radius: 8px;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             transition: all 0.2s;
         }
-        .dim-item:hover {
-            background: rgba(255,255,255,0.03);
-        }
+        .dim-item:hover { background: rgba(255,255,255,0.03); }
         .dim-code {
             font-family: 'SF Mono', ui-monospace, monospace;
             font-weight: 700;
             font-size: 14px;
             flex-shrink: 0;
-            min-width: 40px;
+            min-width: 36px;
         }
-        .dim-section.generic .dim-code {
-            color: #60a5fa;
-        }
-        .dim-section.finance .dim-code {
-            color: #4ade80;
-        }
+        .dim-section.generic .dim-code { color: #60a5fa; }
+        .dim-section.finance .dim-code { color: #4ade80; }
         .dim-desc {
             font-size: 13px;
             color: rgba(255,255,255,0.6);
             line-height: 1.5;
+            flex: 1;
         }
         .dim-label {
             font-size: 11px;
             color: rgba(255,255,255,0.35);
             margin-left: 6px;
+        }
+        .dim-slider {
+            width: 100px;
+            -webkit-appearance: none;
+            appearance: none;
+            height: 4px;
+            border-radius: 2px;
+            background: rgba(255,255,255,0.1);
+            outline: none;
+            flex-shrink: 0;
+        }
+        .dim-section.generic .dim-slider { background: linear-gradient(90deg, rgba(96,165,250,0.3), rgba(96,165,250,0.1)); }
+        .dim-section.finance .dim-slider { background: linear-gradient(90deg, rgba(74,222,128,0.3), rgba(74,222,128,0.1)); }
+        .dim-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        .dim-section.generic .dim-slider::-webkit-slider-thumb { background: #60a5fa; box-shadow: 0 0 8px rgba(96,165,250,0.5); }
+        .dim-section.finance .dim-slider::-webkit-slider-thumb { background: #4ade80; box-shadow: 0 0 8px rgba(74,222,128,0.5); }
+        .dim-value {
+            font-family: 'SF Mono', ui-monospace, monospace;
+            font-size: 12px;
+            color: #fde68a;
+            min-width: 36px;
+            text-align: right;
+            flex-shrink: 0;
         }
         .mapping-table {
             width: 100%;
@@ -204,14 +235,9 @@
             font-size: 12px;
             font-weight: 600;
             color: #c4b5fd;
-            letter-spacing: 0.5px;
         }
-        .mapping-table th:first-child {
-            border-radius: 10px 0 0 0;
-        }
-        .mapping-table th:last-child {
-            border-radius: 0 10px 0 0;
-        }
+        .mapping-table th:first-child { border-radius: 10px 0 0 0; }
+        .mapping-table th:last-child { border-radius: 0 10px 0 0; }
         .mapping-table td {
             border: 1px solid rgba(255,255,255,0.05);
             padding: 12px 16px;
@@ -219,15 +245,9 @@
             color: rgba(255,255,255,0.7);
             background: rgba(255,255,255,0.01);
         }
-        .mapping-table tr:last-child td:first-child {
-            border-radius: 0 0 0 10px;
-        }
-        .mapping-table tr:last-child td:last-child {
-            border-radius: 0 0 10px 0;
-        }
-        .mapping-table tr:hover td {
-            background: rgba(255,255,255,0.03);
-        }
+        .mapping-table tr:last-child td:first-child { border-radius: 0 0 0 10px; }
+        .mapping-table tr:last-child td:last-child { border-radius: 0 0 10px 0; }
+        .mapping-table tr:hover td { background: rgba(255,255,255,0.03); }
         .vec-tag {
             display: inline-block;
             font-family: 'SF Mono', ui-monospace, monospace;
@@ -237,252 +257,1065 @@
             border-radius: 4px;
             margin: 0 2px;
         }
-        .vec-tag.generic {
-            background: rgba(96,165,250,0.15);
-            color: #93c5fd;
-            border: 1px solid rgba(96,165,250,0.3);
-        }
-        .vec-tag.finance {
-            background: rgba(74,222,128,0.15);
-            color: #86efac;
-            border: 1px solid rgba(74,222,128,0.3);
-        }
+        .vec-tag.generic { background: rgba(96,165,250,0.15); color: #93c5fd; border: 1px solid rgba(96,165,250,0.3); }
+        .vec-tag.finance { background: rgba(74,222,128,0.15); color: #86efac; border: 1px solid rgba(74,222,128,0.3); }
         .rule-box {
             background: linear-gradient(135deg, rgba(59,130,246,0.08), rgba(167,139,250,0.06));
             border: 1px solid rgba(59,130,246,0.2);
             border-radius: 12px;
             padding: 20px;
         }
-        .rule-text {
-            font-size: 14px;
-            color: rgba(255,255,255,0.7);
-            line-height: 1.8;
-        }
-        .rule-highlight {
-            color: #fde68a;
-            font-weight: 600;
-            font-family: 'SF Mono', ui-monospace, monospace;
-        }
+        .rule-text { font-size: 14px; color: rgba(255,255,255,0.7); line-height: 1.8; }
+        .rule-highlight { color: #fde68a; font-weight: 600; font-family: 'SF Mono', ui-monospace, monospace; }
         .threshold-indicator {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            margin-top: 16px;
-            padding: 10px 16px;
-            background: rgba(251,191,36,0.08);
-            border: 1px solid rgba(251,191,36,0.25);
-            border-radius: 8px;
+            display: inline-flex; align-items: center; gap: 8px; margin-top: 16px;
+            padding: 10px 16px; background: rgba(251,191,36,0.08);
+            border: 1px solid rgba(251,191,36,0.25); border-radius: 8px;
         }
         .threshold-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: #fbbf24;
-            box-shadow: 0 0 12px rgba(251,191,36,0.5);
-            animation: pulse 2s ease-in-out infinite;
+            width: 10px; height: 10px; border-radius: 50%; background: #fbbf24;
+            box-shadow: 0 0 12px rgba(251,191,36,0.5); animation: pulse 2s ease-in-out infinite;
         }
-        @keyframes pulse {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.6; transform: scale(0.9); }
+        @keyframes pulse { 0%,100%{opacity:1;transform:scale(1);} 50%{opacity:.6;transform:scale(.9);} }
+        .threshold-text { font-size: 13px; color: #fde68a; font-weight: 500; }
+
+        /* ===== 操作按钮栏 ===== */
+        .action-bar {
+            display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px;
         }
-        .threshold-text {
-            font-size: 13px;
-            color: #fde68a;
-            font-weight: 500;
-        }
-        .page-footer {
-            text-align: center;
-            padding: 30px 20px;
-            margin-top: 20px;
-            border-top: 1px solid rgba(255,255,255,0.04);
-            font-size: 12px;
-            color: rgba(255,255,255,0.25);
+        .btn {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 10px 18px; border-radius: 10px; font-size: 13px; font-weight: 600;
+            cursor: pointer; transition: all 0.25s; border: 1px solid; text-decoration: none;
             letter-spacing: 0.3px;
         }
-        @keyframes scanLine {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
+        .btn-primary {
+            background: linear-gradient(135deg, rgba(34,197,94,0.2), rgba(34,197,94,0.1));
+            border-color: rgba(34,197,94,0.4); color: #4ade80;
         }
-        .scan-effect {
-            position: relative;
-            overflow: hidden;
+        .btn-primary:hover { background: linear-gradient(135deg, rgba(34,197,94,0.3), rgba(34,197,94,0.15)); border-color: rgba(34,197,94,0.7); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(34,197,94,0.2); }
+        .btn-secondary {
+            background: rgba(255,255,255,0.03); border-color: rgba(255,255,255,0.1); color: rgba(255,255,255,0.6);
         }
+        .btn-secondary:hover { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.2); color: #f1f5f9; }
+        .btn-danger {
+            background: rgba(239,68,68,0.08); border-color: rgba(239,68,68,0.25); color: #f87171;
+        }
+        .btn-danger:hover { background: rgba(239,68,68,0.15); border-color: rgba(239,68,68,0.5); }
+        .btn-amber {
+            background: rgba(251,191,36,0.08); border-color: rgba(251,191,36,0.25); color: #fde68a;
+        }
+        .btn-amber:hover { background: rgba(251,191,36,0.15); border-color: rgba(251,191,36,0.5); }
+        .btn-cyan {
+            background: rgba(34,211,238,0.08); border-color: rgba(34,211,238,0.25); color: #67e8f9;
+        }
+        .btn-cyan:hover { background: rgba(34,211,238,0.15); border-color: rgba(34,211,238,0.5); }
+        .btn-sm { padding: 6px 12px; font-size: 11px; }
+
+        /* 当前向量显示 */
+        .current-vector-display {
+            background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 12px; padding: 16px 20px; margin-bottom: 20px;
+            font-family: 'SF Mono', ui-monospace, monospace; font-size: 13px;
+            color: #fde68a; word-break: break-all; line-height: 1.8;
+        }
+        .current-vector-display .cv-label {
+            font-size: 11px; color: rgba(255,255,255,0.4); text-transform: uppercase;
+            letter-spacing: 1px; margin-bottom: 8px; font-family: system-ui, sans-serif;
+        }
+
+        /* 历史记录列表 */
+        .history-list { max-height: 360px; overflow-y: auto; padding-right: 4px; }
+        .history-list::-webkit-scrollbar { width: 4px; }
+        .history-list::-webkit-scrollbar-thumb { background: rgba(167,139,250,0.2); border-radius: 2px; }
+        .history-item {
+            display: flex; align-items: center; gap: 12px;
+            padding: 12px 14px; background: rgba(255,255,255,0.015);
+            border: 1px solid rgba(255,255,255,0.04); border-radius: 10px;
+            margin-bottom: 8px; transition: all 0.2s;
+        }
+        .history-item:hover { background: rgba(255,255,255,0.03); border-color: rgba(255,255,255,0.08); }
+        .history-time {
+            font-family: 'SF Mono', ui-monospace, monospace; font-size: 11px;
+            color: rgba(255,255,255,0.35); flex-shrink: 0; min-width: 140px;
+        }
+        .history-vec {
+            flex: 1; font-family: 'SF Mono', ui-monospace, monospace;
+            font-size: 11px; color: rgba(255,255,255,0.5); overflow: hidden;
+            text-overflow: ellipsis; white-space: nowrap;
+        }
+        .history-actions { display: flex; gap: 6px; flex-shrink: 0; }
+        .empty-state {
+            text-align: center; padding: 40px 20px; color: rgba(255,255,255,0.2); font-size: 13px;
+        }
+        .empty-state .empty-icon { font-size: 40px; margin-bottom: 10px; opacity: 0.3; }
+
+        /* 相似度结果 */
+        .similarity-grid {
+            display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; margin-bottom: 20px;
+        }
+        .sim-metric {
+            background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 12px; padding: 18px; text-align: center;
+        }
+        .sim-metric .sim-label {
+            font-size: 11px; color: rgba(255,255,255,0.4); text-transform: uppercase;
+            letter-spacing: 1px; margin-bottom: 8px;
+        }
+        .sim-metric .sim-value {
+            font-family: 'SF Mono', ui-monospace, monospace; font-size: 28px;
+            font-weight: 700; margin-bottom: 6px;
+        }
+        .sim-metric.cosine .sim-value { color: #4ade80; }
+        .sim-metric.euclidean .sim-value { color: #60a5fa; }
+        .sim-metric.dot .sim-value { color: #c4b5fd; }
+        .sim-metric .sim-desc { font-size: 11px; color: rgba(255,255,255,0.3); }
+        .sim-level {
+            display: flex; align-items: center; justify-content: center; gap: 16px;
+            padding: 14px; background: rgba(0,0,0,0.2); border-radius: 10px;
+            font-size: 13px; color: rgba(255,255,255,0.5); flex-wrap: wrap;
+        }
+        .sim-level .level-dot { font-size: 16px; }
+        .sim-results-list { margin-top: 16px; }
+        .sim-result-item {
+            display: flex; align-items: center; gap: 12px;
+            padding: 10px 14px; background: rgba(255,255,255,0.01);
+            border-radius: 8px; margin-bottom: 6px; font-size: 12px;
+        }
+        .sim-result-item .sr-rank {
+            width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center;
+            justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0;
+            font-family: 'SF Mono', ui-monospace, monospace;
+        }
+        .sim-result-item .sr-rank.top1 { background: rgba(251,191,36,0.2); color: #fde68a; }
+        .sim-result-item .sr-rank.top2 { background: rgba(148,163,184,0.2); color: #cbd5e1; }
+        .sim-result-item .sr-rank.top3 { background: rgba(180,83,9,0.2); color: #fdba74; }
+        .sim-result-item .sr-rank.normal { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.4); }
+        .sim-result-item .sr-sim {
+            font-family: 'SF Mono', ui-monospace, monospace; font-weight: 700;
+            min-width: 52px; flex-shrink: 0;
+        }
+        .sim-result-item .sr-sim.high { color: #4ade80; }
+        .sim-result-item .sr-sim.mid { color: #fde68a; }
+        .sim-result-item .sr-sim.low { color: #f87171; }
+        .sim-result-item .sr-time { color: rgba(255,255,255,0.3); font-size: 11px; flex-shrink: 0; }
+        .sim-result-item .sr-vec { flex: 1; font-family: 'SF Mono', ui-monospace, monospace; color: rgba(255,255,255,0.45); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+        /* 图表区域 */
+        .chart-container { width: 100%; height: 380px; margin-bottom: 20px; }
+        .chart-tabs {
+            display: flex; gap: 6px; margin-bottom: 14px;
+        }
+        .chart-tab {
+            padding: 6px 14px; border-radius: 6px; font-size: 11px; font-weight: 600;
+            cursor: pointer; transition: all 0.2s; border: 1px solid rgba(255,255,255,0.08);
+            background: rgba(255,255,255,0.02); color: rgba(255,255,255,0.4); letter-spacing: 0.3px;
+        }
+        .chart-tab:hover { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.7); }
+        .chart-tab.active { background: rgba(96,165,250,0.15); border-color: rgba(96,165,250,0.3); color: #93c5fd; }
+
+        /* 跨域检索 */
+        .cross-domain-panel {
+            background: rgba(0,0,0,0.25); border: 1px solid rgba(34,211,238,0.15);
+            border-radius: 12px; padding: 20px; margin-bottom: 16px;
+        }
+        .cd-template-selector { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
+        .cd-template-btn {
+            padding: 8px 16px; border-radius: 8px; font-size: 12px; font-weight: 600;
+            cursor: pointer; border: 1px solid; transition: all 0.2s; background: transparent;
+        }
+        .cd-template-btn.mech { border-color: rgba(251,191,36,0.3); color: #fde68a; background: rgba(251,191,36,0.06); }
+        .cd-template-btn.mech:hover { background: rgba(251,191,36,0.12); border-color: rgba(251,191,36,0.5); }
+        .cd-template-btn.mol { border-color: rgba(167,139,250,0.3); color: #c4b5fd; background: rgba(167,139,250,0.06); }
+        .cd-template-btn.mol:hover { background: rgba(167,139,250,0.12); border-color: rgba(167,139,250,0.5); }
+        .cd-template-vec {
+            font-family: 'SF Mono', ui-monospace, monospace; font-size: 12px;
+            color: rgba(255,255,255,0.5); background: rgba(0,0,0,0.3);
+            padding: 10px 14px; border-radius: 8px; margin-bottom: 14px; word-break: break-all;
+        }
+        .cd-result-item {
+            display: flex; gap: 12px; padding: 12px 14px;
+            background: rgba(255,255,255,0.015); border-radius: 8px; margin-bottom: 8px;
+            border-left: 3px solid;
+        }
+        .cd-result-item.high { border-left-color: #4ade80; }
+        .cd-result-item.mid { border-left-color: #fde68a; }
+        .cd-result-item.low { border-left-color: #f87171; }
+        .cd-result-item .cd-rank {
+            font-family: 'SF Mono', ui-monospace, monospace; font-weight: 700;
+            font-size: 18px; min-width: 30px;
+        }
+        .cd-result-item.high .cd-rank { color: #4ade80; }
+        .cd-result-item.mid .cd-rank { color: #fde68a; }
+        .cd-result-item.low .cd-rank { color: #f87171; }
+        .cd-result-item .cd-body { flex: 1; }
+        .cd-result-item .cd-sim { font-family: 'SF Mono', ui-monospace, monospace; font-weight: 700; font-size: 14px; }
+        .cd-result-item.high .cd-sim { color: #4ade80; }
+        .cd-result-item.mid .cd-sim { color: #fde68a; }
+        .cd-result-item.low .cd-sim { color: #f87171; }
+        .cd-result-item .cd-reason { font-size: 11px; color: rgba(255,255,255,0.35); margin-top: 4px; }
+        .cd-result-item .cd-vec { font-family: 'SF Mono', ui-monospace, monospace; font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 4px; word-break: break-all; }
+
+        /* 机器编码 */
+        .encoding-section { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .enc-table { width: 100%; border-collapse: separate; border-spacing: 0; }
+        .enc-table th {
+            background: rgba(244,114,182,0.08); border: 1px solid rgba(244,114,182,0.2);
+            padding: 8px 10px; font-size: 10px; color: #f9a8d4; text-align: center; font-weight: 600;
+        }
+        .enc-table th:first-child { border-radius: 8px 0 0 0; }
+        .enc-table th:last-child { border-radius: 0 8px 0 0; }
+        .enc-table td {
+            border: 1px solid rgba(255,255,255,0.04); padding: 6px 10px;
+            font-family: 'SF Mono', ui-monospace, monospace; font-size: 11px;
+            text-align: center; color: rgba(255,255,255,0.6); background: rgba(255,255,255,0.01);
+        }
+        .enc-table tr:last-child td:first-child { border-radius: 0 0 0 8px; }
+        .enc-table tr:last-child td:last-child { border-radius: 0 0 8px 0; }
+        .enc-table td.dim-name { color: #f9a8d4; font-weight: 600; text-align: left; }
+        .enc-table td.bin { color: #4ade80; letter-spacing: 1px; }
+        .binary-stream {
+            background: rgba(0,0,0,0.4); border: 1px solid rgba(244,114,182,0.2);
+            border-radius: 10px; padding: 16px; margin-top: 16px;
+        }
+        .binary-stream .bs-label {
+            font-size: 10px; color: rgba(255,255,255,0.3); text-transform: uppercase;
+            letter-spacing: 1px; margin-bottom: 10px;
+        }
+        .binary-stream .bs-value {
+            font-family: 'SF Mono', ui-monospace, monospace; font-size: 13px;
+            color: #4ade80; word-break: break-all; line-height: 2; letter-spacing: 2px;
+        }
+        .binary-stream .bs-note {
+            margin-top: 10px; font-size: 11px; color: rgba(255,255,255,0.3);
+            padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.04);
+        }
+
+        .page-footer {
+            text-align: center; padding: 30px 20px; margin-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.04); font-size: 12px;
+            color: rgba(255,255,255,0.25); letter-spacing: 0.3px;
+        }
+        .db-status {
+            display: inline-flex; align-items: center; gap: 6px; font-size: 11px;
+            color: rgba(255,255,255,0.3); margin-left: 12px;
+        }
+        .db-status .db-dot {
+            width: 6px; height: 6px; border-radius: 50%; background: #22c55e;
+            box-shadow: 0 0 6px rgba(34,197,94,0.4);
+        }
+        .toast {
+            position: fixed; top: 20px; right: 20px; padding: 12px 20px;
+            border-radius: 10px; font-size: 13px; font-weight: 500; z-index: 9999;
+            transform: translateX(120%); transition: transform 0.3s ease;
+            backdrop-filter: blur(12px);
+        }
+        .toast.show { transform: translateX(0); }
+        .toast.success { background: rgba(34,197,94,0.15); border: 1px solid rgba(34,197,94,0.3); color: #4ade80; }
+        .toast.error { background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.3); color: #f87171; }
+        .toast.info { background: rgba(59,130,246,0.15); border: 1px solid rgba(59,130,246,0.3); color: #93c5fd; }
+
+        @keyframes scanLine { 0%{transform:translateX(-100%);} 100%{transform:translateX(100%);} }
+        .scan-effect { position: relative; overflow: hidden; }
         .scan-effect::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
+            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
             background: linear-gradient(90deg, transparent, rgba(255,255,255,0.03), transparent);
-            animation: scanLine 4s linear infinite;
-            pointer-events: none;
+            animation: scanLine 4s linear infinite; pointer-events: none;
         }
-        @media (max-width: 768px) {
-            .dim-grid {
-                grid-template-columns: 1fr;
-            }
-            .page-title {
-                font-size: 24px;
-            }
-            .vector-formula {
-                font-size: 14px;
-                padding: 16px;
-            }
-            .content-card {
-                padding: 20px;
-            }
+
+        @media (max-width: 900px) {
+            .dim-grid { grid-template-columns: 1fr; }
+            .similarity-grid { grid-template-columns: 1fr; }
+            .encoding-section { grid-template-columns: 1fr; }
+            .page-title { font-size: 22px; }
+            .content-card { padding: 20px; }
+            .history-item { flex-wrap: wrap; }
+            .chart-container { height: 300px; }
         }
     </style>
 </head>
 <body>
     <div id="glow"></div>
+    <div id="toast" class="toast"></div>
     <div class="main-content">
         <div class="page-header">
             <div class="page-icon">📊</div>
-            <h1 class="page-title">11维金融向量体系</h1>
+            <h1 class="page-title">11维金融向量体系<span class="interactive-badge">可交互向量库演示系统</span></h1>
             <p class="page-subtitle">四维通用基座 + 七维金融专属维度 · 跨领域检索与量化定价</p>
             <a href="index.html" class="back-btn">← 返回总控台</a>
         </div>
 
+        <!-- ① 向量结构总览 -->
         <div class="content-card scan-effect">
             <span class="card-badge green">① 向量结构总览</span>
-            <h2 class="card-title">向量结构总览</h2>
-            <div class="vector-formula">
-                11维金融向量 = [v₀, v₁, v₂, v₃, f₄, f₅, f₆, f₇, f₈, f₉, f₁₀]
-            </div>
+            <h2 class="card-title">向量结构总览 <span class="db-status"><span class="db-dot" id="dbDot"></span><span id="dbStatus">IndexedDB 就绪</span></span></h2>
+            <div class="vector-formula">11维金融向量 = [v₀, v₁, v₂, v₃, f₄, f₅, f₆, f₇, f₈, f₉, f₁₀]</div>
             <div class="dim-grid">
                 <div class="dim-section generic">
-                    <h4>前4维：通用语法基座（跨领域互通）</h4>
-                    <div class="dim-item">
-                        <span class="dim-code">v₀</span>
-                        <span class="dim-desc">
-                            <strong>金融标的主体</strong><span class="dim-label">（名词）</span>
-                        </span>
-                    </div>
-                    <div class="dim-item">
-                        <span class="dim-code">v₁</span>
-                        <span class="dim-desc">
-                            <strong>行情运行动作</strong><span class="dim-label">（动词）</span>
-                        </span>
-                    </div>
-                    <div class="dim-item">
-                        <span class="dim-code">v₂</span>
-                        <span class="dim-desc">
-                            <strong>基础属性幅值</strong><span class="dim-label">（形容词）</span>
-                        </span>
-                    </div>
-                    <div class="dim-item">
-                        <span class="dim-code">v₃</span>
-                        <span class="dim-desc">
-                            <strong>外部宏观扰动</strong><span class="dim-label">（副词）</span>
-                        </span>
-                    </div>
+                    <h4>前4维：通用语法基座（跨领域互通）— 可调节</h4>
+                    <div class="dim-item"><span class="dim-code">v₀</span><span class="dim-desc"><strong>金融标的主体</strong><span class="dim-label">（名词）</span></span><input type="range" class="dim-slider" data-key="v0" min="0" max="1" step="0.01" value="0.50"><span class="dim-value" id="val-v0">0.50</span></div>
+                    <div class="dim-item"><span class="dim-code">v₁</span><span class="dim-desc"><strong>行情运行动作</strong><span class="dim-label">（动词）</span></span><input type="range" class="dim-slider" data-key="v1" min="0" max="1" step="0.01" value="0.60"><span class="dim-value" id="val-v1">0.60</span></div>
+                    <div class="dim-item"><span class="dim-code">v₂</span><span class="dim-desc"><strong>基础属性幅值</strong><span class="dim-label">（形容词）</span></span><input type="range" class="dim-slider" data-key="v2" min="0" max="1" step="0.01" value="0.70"><span class="dim-value" id="val-v2">0.70</span></div>
+                    <div class="dim-item"><span class="dim-code">v₃</span><span class="dim-desc"><strong>外部宏观扰动</strong><span class="dim-label">（副词）</span></span><input type="range" class="dim-slider" data-key="v3" min="0" max="1" step="0.01" value="0.40"><span class="dim-value" id="val-v3">0.40</span></div>
                 </div>
                 <div class="dim-section finance">
-                    <h4>后7维：金融专属维度</h4>
-                    <div class="dim-item">
-                        <span class="dim-code">f₄</span>
-                        <span class="dim-desc"><strong>箱体位置</strong></span>
-                    </div>
-                    <div class="dim-item">
-                        <span class="dim-code">f₅</span>
-                        <span class="dim-desc"><strong>支撑压力位</strong></span>
-                    </div>
-                    <div class="dim-item">
-                        <span class="dim-code">f₆</span>
-                        <span class="dim-desc"><strong>筹码集中度</strong></span>
-                    </div>
-                    <div class="dim-item">
-                        <span class="dim-code">f₇</span>
-                        <span class="dim-desc"><strong>周期相位</strong></span>
-                    </div>
-                    <div class="dim-item">
-                        <span class="dim-code">f₈</span>
-                        <span class="dim-desc"><strong>凯利仓位系数</strong></span>
-                    </div>
-                    <div class="dim-item">
-                        <span class="dim-code">f₉</span>
-                        <span class="dim-desc"><strong>风险冗余度</strong></span>
-                    </div>
-                    <div class="dim-item">
-                        <span class="dim-code">f₁₀</span>
-                        <span class="dim-desc"><strong>暴跌安全阈值</strong></span>
+                    <h4>后7维：金融专属维度 — 可调节</h4>
+                    <div class="dim-item"><span class="dim-code">f₄</span><span class="dim-desc"><strong>箱体位置</strong></span><input type="range" class="dim-slider" data-key="f4" min="0" max="1" step="0.01" value="0.55"><span class="dim-value" id="val-f4">0.55</span></div>
+                    <div class="dim-item"><span class="dim-code">f₅</span><span class="dim-desc"><strong>支撑压力位</strong></span><input type="range" class="dim-slider" data-key="f5" min="0" max="1" step="0.01" value="0.65"><span class="dim-value" id="val-f5">0.65</span></div>
+                    <div class="dim-item"><span class="dim-code">f₆</span><span class="dim-desc"><strong>筹码集中度</strong></span><input type="range" class="dim-slider" data-key="f6" min="0" max="1" step="0.01" value="0.45"><span class="dim-value" id="val-f6">0.45</span></div>
+                    <div class="dim-item"><span class="dim-code">f₇</span><span class="dim-desc"><strong>周期相位</strong></span><input type="range" class="dim-slider" data-key="f7" min="0" max="1" step="0.01" value="0.75"><span class="dim-value" id="val-f7">0.75</span></div>
+                    <div class="dim-item"><span class="dim-code">f₈</span><span class="dim-desc"><strong>凯利仓位系数</strong></span><input type="range" class="dim-slider" data-key="f8" min="0" max="1" step="0.01" value="0.60"><span class="dim-value" id="val-f8">0.60</span></div>
+                    <div class="dim-item"><span class="dim-code">f₉</span><span class="dim-desc"><strong>风险冗余度</strong></span><input type="range" class="dim-slider" data-key="f9" min="0" max="1" step="0.01" value="0.50"><span class="dim-value" id="val-f9">0.50</span></div>
+                    <div class="dim-item"><span class="dim-code">f₁₀</span><span class="dim-desc"><strong>暴跌安全阈值</strong></span><input type="range" class="dim-slider" data-key="f10" min="0" max="1" step="0.01" value="0.35"><span class="dim-value" id="val-f10">0.35</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ② 向量库操作区 -->
+        <div class="content-card">
+            <span class="card-badge amber">② 向量库操作</span>
+            <h2 class="card-title">向量库操作区</h2>
+            <div class="action-bar">
+                <button class="btn btn-primary" onclick="saveCurrentVector()">💾 保存当前向量</button>
+                <button class="btn btn-cyan" onclick="doRandomize()">🎲 随机生成向量</button>
+                <button class="btn btn-amber" onclick="loadSampleData()">📥 加载示例数据</button>
+                <button class="btn btn-danger" onclick="clearAllVectors()">🗑️ 清空向量库</button>
+            </div>
+            <div class="current-vector-display">
+                <div class="cv-label">当前向量值（拖动滑块实时更新）</div>
+                <div id="currentVectorStr">[0.50, 0.60, 0.70, 0.40, 0.55, 0.65, 0.45, 0.75, 0.60, 0.50, 0.35]</div>
+            </div>
+            <div style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:12px;">📋 历史记录（<span id="historyCount">0</span> 条，IndexedDB持久化）</div>
+            <div class="history-list" id="historyList">
+                <div class="empty-state"><div class="empty-icon">📭</div>暂无保存的向量，拖动滑块调整后点击"保存当前向量"</div>
+            </div>
+        </div>
+
+        <!-- ③ 相似度检索面板 -->
+        <div class="content-card">
+            <span class="card-badge purple">③ 相似度检索</span>
+            <h2 class="card-title">相似度检索面板</h2>
+            <p style="font-size:12px;color:rgba(255,255,255,0.35);margin-bottom:16px;">选择一条历史记录，系统计算当前向量与其三种距离度量</p>
+            <div class="similarity-grid">
+                <div class="sim-metric cosine">
+                    <div class="sim-label">余弦相似度</div>
+                    <div class="sim-value" id="simCosine">--</div>
+                    <div class="sim-desc">cos(θ) = A·B/(|A||B|)</div>
+                </div>
+                <div class="sim-metric euclidean">
+                    <div class="sim-label">欧氏距离</div>
+                    <div class="sim-value" id="simEuclidean">--</div>
+                    <div class="sim-desc">√Σ(Ai-Bi)²</div>
+                </div>
+                <div class="sim-metric dot">
+                    <div class="sim-label">点积距离</div>
+                    <div class="sim-value" id="simDot">--</div>
+                    <div class="sim-desc">Σ(Ai×Bi)</div>
+                </div>
+            </div>
+            <div class="sim-level">
+                <span>相似度分级：</span>
+                <span><span class="level-dot">🟢</span> 高相似（>75%）</span>
+                <span><span class="level-dot">🟡</span> 中相似（50-75%）</span>
+                <span><span class="level-dot">🔴</span> 低相似（<50%）</span>
+            </div>
+            <div id="simTargetInfo" style="margin-top:14px;font-size:12px;color:rgba(255,255,255,0.3);text-align:center;">点击历史记录中的"查看相似"来计算相似度</div>
+            <div class="sim-results-list" id="simResultsList"></div>
+        </div>
+
+        <!-- ④ 多维可视化面板 -->
+        <div class="content-card">
+            <span class="card-badge blue">④ 多维可视化</span>
+            <h2 class="card-title">向量趋势图</h2>
+            <div class="chart-tabs">
+                <div class="chart-tab active" data-group="all" onclick="switchChartGroup('all',this)">全部11维</div>
+                <div class="chart-tab" data-group="generic" onclick="switchChartGroup('generic',this)">前4维通用基座</div>
+                <div class="chart-tab" data-group="finance" onclick="switchChartGroup('finance',this)">后7维金融专属</div>
+            </div>
+            <div class="chart-container" id="trendChart"></div>
+            <h2 class="card-title" style="margin-top:24px;">向量分布散点图（PCA降维到2D）</h2>
+            <div class="chart-container" id="scatterChart"></div>
+            <h2 class="card-title" style="margin-top:24px;">当前向量雷达图</h2>
+            <div class="chart-container" id="radarChart"></div>
+        </div>
+
+        <!-- ⑤ 跨领域检索模拟 -->
+        <div class="content-card">
+            <span class="card-badge cyan">⑤ 跨域检索模拟</span>
+            <h2 class="card-title">跨领域检索模拟</h2>
+            <p style="font-size:12px;color:rgba(255,255,255,0.35);margin-bottom:16px;">前4维通用维度是跨领域公共接口。选择其他领域的向量模板，在金融向量库中检索最相似的样本</p>
+            <div class="cross-domain-panel">
+                <div class="cd-template-selector">
+                    <button class="cd-template-btn mech" onclick="runCrossDomain('mech')">🔧 力学向量模板</button>
+                    <button class="cd-template-btn mol" onclick="runCrossDomain('mol')">🧬 分子结构向量模板</button>
+                </div>
+                <div id="cdTemplateVec" class="cd-template-vec">点击上方按钮选择一个跨领域模板开始检索</div>
+                <div id="cdResults"></div>
+            </div>
+        </div>
+
+        <!-- ⑥ 机器编码模拟 -->
+        <div class="content-card">
+            <span class="card-badge rose">⑥ 机器编码</span>
+            <h2 class="card-title">机器编码模拟</h2>
+            <p style="font-size:12px;color:rgba(255,255,255,0.35);margin-bottom:16px;">将11维浮点向量（0~1）量化为8位二进制（0~255），拼接为88位机器可读指令序列</p>
+            <div class="encoding-section">
+                <div>
+                    <table class="enc-table">
+                        <thead><tr><th>维度</th><th>原始值</th><th>量化值</th><th>8位二进制</th></tr></thead>
+                        <tbody id="encTableBody"></tbody>
+                    </table>
+                </div>
+                <div>
+                    <div class="binary-stream">
+                        <div class="bs-label">88位机器指令序列</div>
+                        <div class="bs-value" id="binaryStream"></div>
+                        <div class="bs-note">⚡ 机器指令可被硬件直接执行 · 每维度8bit × 11维度 = 88bit</div>
                     </div>
                 </div>
             </div>
         </div>
 
+        <!-- 与七维向量对应关系 -->
         <div class="content-card">
-            <span class="card-badge purple">② 维度映射</span>
+            <span class="card-badge purple">附 维度映射</span>
             <h2 class="card-title">与七维向量对应关系</h2>
             <table class="mapping-table">
-                <thead>
-                    <tr>
-                        <th>七维向量</th>
-                        <th>11维金融向量对应</th>
-                    </tr>
-                </thead>
+                <thead><tr><th>七维向量</th><th>11维金融向量对应</th></tr></thead>
                 <tbody>
-                    <tr>
-                        <td><strong>I</strong>（箱体海拔）</td>
-                        <td><span class="vec-tag generic">v₁</span> + <span class="vec-tag finance">f₄</span></td>
-                    </tr>
-                    <tr>
-                        <td><strong>P</strong>（坡度动量）</td>
-                        <td><span class="vec-tag finance">f₅</span></td>
-                    </tr>
-                    <tr>
-                        <td><strong>D</strong>（阻尼衰减）</td>
-                        <td><span class="vec-tag generic">v₂</span> + <span class="vec-tag finance">f₆</span></td>
-                    </tr>
-                    <tr>
-                        <td><strong>S</strong>（博弈熵）</td>
-                        <td><span class="vec-tag generic">v₃</span></td>
-                    </tr>
-                    <tr>
-                        <td><strong>Dev-I</strong>（容积偏差）</td>
-                        <td><span class="vec-tag finance">f₇</span></td>
-                    </tr>
-                    <tr>
-                        <td><strong>Dev1</strong>（均值回归差）</td>
-                        <td><span class="vec-tag finance">f₈</span></td>
-                    </tr>
-                    <tr>
-                        <td><strong>Dev2</strong>（历史相似度差）</td>
-                        <td><span class="vec-tag finance">f₉</span> + <span class="vec-tag finance">f₁₀</span></td>
-                    </tr>
+                    <tr><td><strong>I</strong>（箱体海拔）</td><td><span class="vec-tag generic">v₁</span> + <span class="vec-tag finance">f₄</span></td></tr>
+                    <tr><td><strong>P</strong>（坡度动量）</td><td><span class="vec-tag finance">f₅</span></td></tr>
+                    <tr><td><strong>D</strong>（阻尼衰减）</td><td><span class="vec-tag generic">v₂</span> + <span class="vec-tag finance">f₆</span></td></tr>
+                    <tr><td><strong>S</strong>（博弈熵）</td><td><span class="vec-tag generic">v₃</span></td></tr>
+                    <tr><td><strong>Dev-I</strong>（容积偏差）</td><td><span class="vec-tag finance">f₇</span></td></tr>
+                    <tr><td><strong>Dev1</strong>（均值回归差）</td><td><span class="vec-tag finance">f₈</span></td></tr>
+                    <tr><td><strong>Dev2</strong>（历史相似度差）</td><td><span class="vec-tag finance">f₉</span> + <span class="vec-tag finance">f₁₀</span></td></tr>
                 </tbody>
             </table>
-        </div>
-
-        <div class="content-card">
-            <span class="card-badge blue">③ 跨域检索</span>
-            <h2 class="card-title">跨领域检索规则</h2>
             <div class="rule-box">
-                <p class="rule-text">
-                    前<span class="rule-highlight">4个通用维度（v₀-v₃）</span>是金融向量与力学向量、分子结构向量之间的<span class="rule-highlight">"公共接口"</span>。
-                </p>
-                <p class="rule-text" style="margin-top:12px;">
-                    当相似度 <span class="rule-highlight">> 75%</span> 时，系统自动将其他领域的结构标记为<span class="rule-highlight">"可参考样本"</span>，实现跨领域知识迁移。
-                </p>
-                <div class="threshold-indicator">
-                    <span class="threshold-dot"></span>
-                    <span class="threshold-text">相似度阈值：75% · 触发跨域知识迁移</span>
-                </div>
+                <p class="rule-text">前<span class="rule-highlight">4个通用维度（v₀-v₃）</span>是金融向量与力学向量、分子结构向量之间的<span class="rule-highlight">"公共接口"</span>。</p>
+                <p class="rule-text" style="margin-top:12px;">当相似度 <span class="rule-highlight">> 75%</span> 时，系统自动将其他领域的结构标记为<span class="rule-highlight">"可参考样本"</span>，实现跨领域知识迁移。</p>
+                <div class="threshold-indicator"><span class="threshold-dot"></span><span class="threshold-text">相似度阈值：75% · 触发跨域知识迁移</span></div>
             </div>
         </div>
 
-        <div class="page-footer">
-            本页面展示11维金融向量体系，是七维向量在金融场景中的专业化扩展。
-        </div>
+        <div class="page-footer">本页面展示11维金融向量体系，是七维向量在金融场景中的专业化扩展。</div>
     </div>
 
     <script>
-        document.addEventListener('mousemove', (e) => {
-            document.documentElement.style.setProperty('--x', e.clientX + 'px');
-            document.documentElement.style.setProperty('--y', e.clientY + 'px');
+    (function(){
+        'use strict';
+
+        const DIM_KEYS = ['v0','v1','v2','v3','f4','f5','f6','f7','f8','f9','f10'];
+        const DIM_LABELS = {
+            v0:'v₀ 金融标的主体', v1:'v₁ 行情运行动作', v2:'v₂ 基础属性幅值', v3:'v₃ 外部宏观扰动',
+            f4:'f₄ 箱体位置', f5:'f₅ 支撑压力位', f6:'f₆ 筹码集中度', f7:'f₇ 周期相位',
+            f8:'f₈ 凯利仓位系数', f9:'f₉ 风险冗余度', f10:'f₁₀ 暴跌安全阈值'
+        };
+        const DB_NAME = 'FinanceVectorDB';
+        const DB_STORE = 'vectors';
+        const DB_VERSION = 1;
+        let db = null;
+        let allRecords = [];
+        let charts = { trend: null, scatter: null, radar: null };
+        let currentChartGroup = 'all';
+        let selectedTargetId = null;
+
+        // ===== Toast =====
+        function showToast(msg, type='info'){
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.className = 'toast ' + type;
+            requestAnimationFrame(()=>t.classList.add('show'));
+            setTimeout(()=>t.classList.remove('show'), 2500);
+        }
+
+        // ===== IndexedDB =====
+        function openDB(){
+            return new Promise((resolve,reject)=>{
+                const req = indexedDB.open(DB_NAME, DB_VERSION);
+                req.onupgradeneeded = (e)=>{
+                    const d = e.target.result;
+                    if(!d.objectStoreNames.contains(DB_STORE)){
+                        const store = d.createObjectStore(DB_STORE, {keyPath:'id'});
+                        store.createIndex('timestamp','timestamp',{unique:false});
+                    }
+                };
+                req.onsuccess = (e)=>{ db = e.target.result; resolve(db); };
+                req.onerror = (e)=>{ reject(e.target.error); };
+            });
+        }
+        function dbAdd(record){
+            return new Promise((resolve,reject)=>{
+                const tx = db.transaction(DB_STORE,'readwrite');
+                tx.objectStore(DB_STORE).add(record);
+                tx.oncomplete = ()=>resolve();
+                tx.onerror = (e)=>reject(e.target.error);
+            });
+        }
+        function dbGetAll(){
+            return new Promise((resolve,reject)=>{
+                const tx = db.transaction(DB_STORE,'readonly');
+                const req = tx.objectStore(DB_STORE).getAll();
+                req.onsuccess = ()=>resolve(req.result);
+                req.onerror = (e)=>reject(e.target.error);
+            });
+        }
+        function dbDelete(id){
+            return new Promise((resolve,reject)=>{
+                const tx = db.transaction(DB_STORE,'readwrite');
+                tx.objectStore(DB_STORE).delete(id);
+                tx.oncomplete = ()=>resolve();
+                tx.onerror = (e)=>reject(e.target.error);
+            });
+        }
+        function dbClear(){
+            return new Promise((resolve,reject)=>{
+                const tx = db.transaction(DB_STORE,'readwrite');
+                tx.objectStore(DB_STORE).clear();
+                tx.oncomplete = ()=>resolve();
+                tx.onerror = (e)=>reject(e.target.error);
+            });
+        }
+
+        // ===== Vector helpers =====
+        function getCurrentVector(){
+            const v = {};
+            DIM_KEYS.forEach(k=>{ v[k] = parseFloat(document.querySelector(`.dim-slider[data-key="${k}"]`).value); });
+            return v;
+        }
+        function vecToArr(v){ return DIM_KEYS.map(k=>v[k]); }
+        function arrToVec(a){ const v={}; DIM_KEYS.forEach((k,i)=>v[k]=a[i]); return v; }
+        function fmtVec(v){ return '[' + DIM_KEYS.map(k=>v[k].toFixed(2)).join(', ') + ']'; }
+        function fmtArr(a){ return '[' + a.map(x=>x.toFixed(2)).join(', ') + ']'; }
+
+        // ===== Similarity metrics =====
+        function cosineSimilarity(a,b){
+            let dot=0,na=0,nb=0;
+            for(let i=0;i<a.length;i++){ dot+=a[i]*b[i]; na+=a[i]*a[i]; nb+=b[i]*b[i]; }
+            const d = Math.sqrt(na)*Math.sqrt(nb);
+            return d===0 ? 0 : dot/d;
+        }
+        function euclideanDistance(a,b){
+            let s=0; for(let i=0;i<a.length;i++) s+=(a[i]-b[i])**2;
+            return Math.sqrt(s);
+        }
+        function dotProduct(a,b){
+            let s=0; for(let i=0;i<a.length;i++) s+=a[i]*b[i];
+            return s;
+        }
+
+        // ===== UUID =====
+        function uuid(){
+            return 'v_' + Date.now().toString(36) + '_' + Math.random().toString(36).substr(2,6);
+        }
+
+        // ===== Update current vector display =====
+        function updateCurrentDisplay(){
+            const v = getCurrentVector();
+            document.getElementById('currentVectorStr').textContent = fmtVec(v);
+            DIM_KEYS.forEach(k=>{
+                const el = document.getElementById('val-'+k);
+                if(el) el.textContent = v[k].toFixed(2);
+            });
+            updateEncoding();
+            updateRadarChart();
+        }
+
+        // ===== Save vector =====
+        async function saveCurrentVector(){
+            const v = getCurrentVector();
+            const record = {
+                id: uuid(),
+                timestamp: Date.now(),
+                vector: v,
+                metadata: { source: '金融估值精算引擎', label: new Date().toLocaleString('zh-CN',{hour12:false}) }
+            };
+            try{
+                await dbAdd(record);
+                showToast('✅ 向量已保存到向量库', 'success');
+                await refreshHistory();
+            }catch(e){
+                showToast('❌ 保存失败: '+e.message, 'error');
+            }
+        }
+
+        // ===== Delete vector =====
+        async function deleteVector(id){
+            await dbDelete(id);
+            showToast('🗑️ 已删除', 'info');
+            if(selectedTargetId === id){
+                selectedTargetId = null;
+                document.getElementById('simTargetInfo').textContent = '点击历史记录中的"查看相似"来计算相似度';
+                document.getElementById('simCosine').textContent = '--';
+                document.getElementById('simEuclidean').textContent = '--';
+                document.getElementById('simDot').textContent = '--';
+                document.getElementById('simResultsList').innerHTML = '';
+            }
+            await refreshHistory();
+        }
+
+        // ===== Clear all =====
+        async function clearAllVectors(){
+            if(!confirm('确定清空向量库中所有记录？此操作不可恢复。')) return;
+            await dbClear();
+            showToast('🗑️ 向量库已清空', 'info');
+            selectedTargetId = null;
+            await refreshHistory();
+        }
+
+        // ===== Randomize =====
+        function doRandomize(){
+            DIM_KEYS.forEach(k=>{
+                const slider = document.querySelector(`.dim-slider[data-key="${k}"]`);
+                slider.value = (Math.random()*0.6+0.2).toFixed(2);
+            });
+            updateCurrentDisplay();
+            showToast('🎲 已生成随机向量', 'info');
+        }
+
+        // ===== Load sample data =====
+        async function loadSampleData(){
+            const samples = [
+                {v0:0.72,v1:0.45,v2:0.63,v3:0.28,f4:0.51,f5:0.72,f6:0.38,f7:0.66,f8:0.55,f9:0.42,f10:0.33},
+                {v0:0.35,v1:0.82,v2:0.41,v3:0.55,f4:0.68,f5:0.45,f6:0.72,f7:0.33,f8:0.71,f9:0.58,f10:0.25},
+                {v0:0.58,v1:0.33,v2:0.77,v3:0.62,f4:0.42,f5:0.58,f6:0.55,f7:0.81,f8:0.38,f9:0.73,f10:0.48},
+                {v0:0.91,v1:0.25,v2:0.18,v3:0.72,f4:0.35,f5:0.82,f6:0.28,f7:0.45,f8:0.62,f9:0.31,f10:0.72},
+                {v0:0.44,v1:0.68,v2:0.52,v3:0.38,f4:0.77,f5:0.33,f6:0.61,f7:0.52,f8:0.44,f9:0.65,f10:0.38}
+            ];
+            for(const sv of samples){
+                await dbAdd({id:uuid(), timestamp:Date.now()-Math.floor(Math.random()*86400000), vector:sv, metadata:{source:'示例数据', label:'示例向量'}});
+            }
+            showToast('📥 已加载5条示例数据', 'success');
+            await refreshHistory();
+        }
+
+        // ===== Refresh history list =====
+        async function refreshHistory(){
+            allRecords = await dbGetAll();
+            allRecords.sort((a,b)=>b.timestamp-a.timestamp);
+            const list = document.getElementById('historyList');
+            document.getElementById('historyCount').textContent = allRecords.length;
+            document.getElementById('dbStatus').textContent = 'IndexedDB 已连接 · '+allRecords.length+' 条记录';
+            if(allRecords.length === 0){
+                list.innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div>暂无保存的向量，拖动滑块调整后点击"保存当前向量"</div>';
+            }else{
+                list.innerHTML = allRecords.map(r=>{
+                    const t = new Date(r.timestamp);
+                    const ts = t.toLocaleString('zh-CN',{hour12:false});
+                    return `<div class="history-item">
+                        <span class="history-time">${ts}</span>
+                        <span class="history-vec" title="${fmtVec(r.vector)}">${fmtVec(r.vector)}</span>
+                        <div class="history-actions">
+                            <button class="btn btn-sm btn-cyan" onclick="viewSimilar('${r.id}')">查看相似</button>
+                            <button class="btn btn-sm btn-secondary" onclick="loadToEditor('${r.id}')">载入</button>
+                            <button class="btn btn-sm btn-danger" onclick="deleteVector('${r.id}')">删除</button>
+                        </div>
+                    </div>`;
+                }).join('');
+            }
+            updateTrendChart();
+            updateScatterChart();
+            updateRadarChart();
+        }
+
+        // ===== Load record to editor =====
+        function loadToEditor(id){
+            const r = allRecords.find(x=>x.id===id);
+            if(!r) return;
+            DIM_KEYS.forEach(k=>{
+                const slider = document.querySelector(`.dim-slider[data-key="${k}"]`);
+                slider.value = r.vector[k].toFixed(2);
+            });
+            updateCurrentDisplay();
+            showToast('📋 向量已载入编辑器', 'info');
+        }
+
+        // ===== View similar =====
+        function viewSimilar(id){
+            const target = allRecords.find(x=>x.id===id);
+            if(!target) return;
+            selectedTargetId = id;
+            const curArr = vecToArr(getCurrentVector());
+            const tArr = vecToArr(target.vector);
+            const cos = cosineSimilarity(curArr, tArr);
+            const euc = euclideanDistance(curArr, tArr);
+            const dot = dotProduct(curArr, tArr);
+
+            document.getElementById('simCosine').textContent = (cos*100).toFixed(1)+'%';
+            document.getElementById('simEuclidean').textContent = euc.toFixed(3);
+            document.getElementById('simDot').textContent = dot.toFixed(3);
+
+            const cosLevel = cos > 0.75 ? 'high' : cos > 0.5 ? 'mid' : 'low';
+            const cosLabel = cos > 0.75 ? '🟢 高相似' : cos > 0.5 ? '🟡 中相似' : '🔴 低相似';
+            document.getElementById('simTargetInfo').innerHTML = `对比目标：${new Date(target.timestamp).toLocaleString('zh-CN',{hour12:false})} · ${fmtVec(target.vector)} · <strong style="color:${cosLevel==='high'?'#4ade80':cosLevel==='mid'?'#fde68a':'#f87171'}">${cosLabel}</strong>`;
+
+            const results = allRecords
+                .filter(r=>r.id!==id)
+                .map(r=>{
+                    const a = vecToArr(r.vector);
+                    return { record:r, cos:cosineSimilarity(curArr,a) };
+                })
+                .sort((a,b)=>b.cos-a.cos)
+                .slice(0,5);
+
+            const rl = document.getElementById('simResultsList');
+            if(results.length === 0){
+                rl.innerHTML = '<div style="text-align:center;padding:20px;color:rgba(255,255,255,0.2);font-size:12px;">需要至少2条记录才能生成相似排名</div>';
+            }else{
+                rl.innerHTML = '<div style="font-size:11px;color:rgba(255,255,255,0.3);margin:12px 0 8px;">当前向量 vs 向量库 Top-5 相似向量：</div>' +
+                    results.map((r,i)=>{
+                        const lvl = r.cos>0.75?'high':r.cos>0.5?'mid':'low';
+                        const rk = i===0?'top1':i===1?'top2':i===2?'top3':'normal';
+                        return `<div class="sim-result-item">
+                            <span class="sr-rank ${rk}">#${i+1}</span>
+                            <span class="sr-sim ${lvl}">${(r.cos*100).toFixed(1)}%</span>
+                            <span class="sr-time">${new Date(r.record.timestamp).toLocaleString('zh-CN',{hour12:false})}</span>
+                            <span class="sr-vec">${fmtVec(r.record.vector)}</span>
+                        </div>`;
+                    }).join('');
+            }
+        }
+
+        // ===== Cross-domain retrieval =====
+        const CROSS_TEMPLATES = {
+            mech: {
+                name: '力学向量模板',
+                vec: [0.6, 0.3, 0.8, 0.2, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+                reasons: {
+                    v0:'力学系统主体（名词）',
+                    v1:'力学运动方向与行情v₁一致',
+                    v2:'力学阻尼系数映射到v₂幅值',
+                    v3:'力学外力扰动映射到v₃副词'
+                }
+            },
+            mol: {
+                name: '分子结构向量模板',
+                vec: [0.4, 0.7, 0.5, 0.3, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+                reasons: {
+                    v0:'分子主体类型（名词）',
+                    v1:'分子振动方向与行情v₁一致',
+                    v2:'分子键能强度映射到v₂幅值',
+                    v3:'分子外部温度映射到v₃扰动'
+                }
+            }
+        };
+
+        function runCrossDomain(type){
+            const tpl = CROSS_TEMPLATES[type];
+            document.getElementById('cdTemplateVec').textContent = `${tpl.name}：${fmtArr(tpl.vec)}（前4维有值，后7维为0——只有"通用基座"维度）`;
+            const results = allRecords.map(r=>({
+                record:r,
+                cos:cosineSimilarity(tpl.vec, vecToArr(r.vector))
+            })).sort((a,b)=>b.cos-a.cos).slice(0,3);
+
+            const container = document.getElementById('cdResults');
+            if(results.length === 0){
+                container.innerHTML = '<div style="text-align:center;padding:20px;color:rgba(255,255,255,0.2);font-size:12px;">向量库为空，请先保存一些向量或加载示例数据</div>';
+                return;
+            }
+            container.innerHTML = `<div style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:10px;">检索结果：找到 ${results.length} 个相似金融样本，最高相似度 ${(results[0].cos*100).toFixed(1)}%</div>` +
+                results.map((r,i)=>{
+                    const lvl = r.cos>0.75?'high':r.cos>0.5?'mid':'low';
+                    const vKeys = ['v0','v1','v2','v3'];
+                    const reasonParts = vKeys.filter(k=>Math.abs(r.record.vector[k]-tpl.vec[DIM_KEYS.indexOf(k)])<0.3).map(k=>{
+                        return `${DIM_LABELS[k].split(' ')[0]}偏差${Math.abs(r.record.vector[k]-tpl.vec[DIM_KEYS.indexOf(k)]).toFixed(2)}`;
+                    });
+                    return `<div class="cd-result-item ${lvl}">
+                        <div class="cd-rank">#${i+1}</div>
+                        <div class="cd-body">
+                            <div><span class="cd-sim">${(r.cos*100).toFixed(1)}%</span> <span style="font-size:11px;color:rgba(255,255,255,0.3);margin-left:8px;">${new Date(r.record.timestamp).toLocaleString('zh-CN',{hour12:false})}</span></div>
+                            <div class="cd-reason">相似原因：${reasonParts.length>0?reasonParts.join('、'):'整体结构接近'}</div>
+                            <div class="cd-vec">${fmtVec(r.record.vector)}</div>
+                        </div>
+                    </div>`;
+                }).join('');
+            showToast(`🔗 ${tpl.name}检索完成，Top-1相似度${(results[0].cos*100).toFixed(1)}%`, results[0].cos>0.75?'success':'info');
+        }
+
+        // ===== PCA (simplified: power iteration for top 2 components) =====
+        function pcaReduce(data, dims=2){
+            if(data.length < 2) return data.map(()=>[0,0]);
+            const n = data[0].length;
+            let mean = new Array(n).fill(0);
+            data.forEach(row=>row.forEach((v,i)=>mean[i]+=v));
+            mean = mean.map(v=>v/data.length);
+            const centered = data.map(row=>row.map((v,i)=>v-mean[i]));
+            function covMatrix(){
+                const c = Array.from({length:n},()=>new Array(n).fill(0));
+                for(let i=0;i<n;i++) for(let j=0;j<n;j++){
+                    let s=0; centered.forEach(r=>s+=r[i]*r[j]);
+                    c[i][j] = s/(centered.length-1);
+                }
+                return c;
+            }
+            const cov = covMatrix();
+            function powerIterate(mat, maxIter=100){
+                let vec = new Array(n).fill(0).map(()=>Math.random()-0.5);
+                for(let it=0;it<maxIter;it++){
+                    let nvec = new Array(n).fill(0);
+                    for(let i=0;i<n;i++) for(let j=0;j<n;j++) nvec[i]+=mat[i][j]*vec[j];
+                    const norm = Math.sqrt(nvec.reduce((s,v)=>s+v*v,0));
+                    if(norm===0) break;
+                    vec = nvec.map(v=>v/norm);
+                }
+                return vec;
+            }
+            const pc1 = powerIterate(cov);
+            function deflate(mat, pc){
+                const d = mat.map(row=>row.slice());
+                const lambda = pc.reduce((s,v,i)=>s+v*mat[i].reduce((ss,vv,j)=>ss+vv*pc[j],0),0);
+                for(let i=0;i<n;i++) for(let j=0;j<n;j++) d[i][j] -= lambda*pc[i]*pc[j];
+                return d;
+            }
+            const cov2 = deflate(cov, pc1);
+            const pc2 = powerIterate(cov2);
+            return centered.map(row=>[
+                row.reduce((s,v,i)=>s+v*pc1[i],0),
+                row.reduce((s,v,i)=>s+v*pc2[i],0)
+            ]);
+        }
+
+        // ===== K-means (simplified) =====
+        function kmeans(points, k=3, maxIter=50){
+            if(points.length <= k) return points.map((_,i)=>i);
+            const centroids = [];
+            const used = new Set();
+            while(centroids.length<k){
+                const idx = Math.floor(Math.random()*points.length);
+                if(!used.has(idx)){ used.add(idx); centroids.push(points[idx].slice()); }
+            }
+            let labels = new Array(points.length).fill(0);
+            for(let it=0;it<maxIter;it++){
+                let changed = false;
+                points.forEach((p,i)=>{
+                    let best=0, bestD=Infinity;
+                    centroids.forEach((c,ci)=>{
+                        const d = (p[0]-c[0])**2+(p[1]-c[1])**2;
+                        if(d<bestD){bestD=d;best=ci;}
+                    });
+                    if(labels[i]!==best){labels[i]=best;changed=true;}
+                });
+                if(!changed) break;
+                const sums = Array.from({length:k},()=>[0,0,0]);
+                points.forEach((p,i)=>{sums[labels[i]][0]+=p[0];sums[labels[i]][1]+=p[1];sums[labels[i]][2]++;});
+                sums.forEach((s,i)=>{ if(s[2]>0){centroids[i]=[s[0]/s[2],s[1]/s[2]];} });
+            }
+            return labels;
+        }
+
+        // ===== ECharts =====
+        function initCharts(){
+            charts.trend = echarts.init(document.getElementById('trendChart'), null, {renderer:'canvas'});
+            charts.scatter = echarts.init(document.getElementById('scatterChart'), null, {renderer:'canvas'});
+            charts.radar = echarts.init(document.getElementById('radarChart'), null, {renderer:'canvas'});
+            window.addEventListener('resize', ()=>{
+                Object.values(charts).forEach(c=>c&&c.resize());
+            });
+        }
+
+        function getDimGroupKeys(group){
+            if(group==='generic') return DIM_KEYS.slice(0,4);
+            if(group==='finance') return DIM_KEYS.slice(4);
+            return DIM_KEYS;
+        }
+        const GEN_COLORS = ['#60a5fa','#818cf8','#38bdf8','#a78bfa'];
+        const FIN_COLORS = ['#4ade80','#22c55e','#86efac','#fbbf24','#fb923c','#f87171','#f472b6'];
+        function getDimColor(k){
+            const idx = DIM_KEYS.indexOf(k);
+            if(idx<4) return GEN_COLORS[idx];
+            return FIN_COLORS[idx-4];
+        }
+        function shortLabel(k){
+            const m = {v0:'v₀',v1:'v₁',v2:'v₂',v3:'v₃',f4:'f₄',f5:'f₅',f6:'f₆',f7:'f₇',f8:'f₈',f9:'f₉',f10:'f₁₀'};
+            return m[k]||k;
+        }
+
+        function updateTrendChart(){
+            if(!charts.trend) return;
+            const keys = getDimGroupKeys(currentChartGroup);
+            const sorted = [...allRecords].sort((a,b)=>a.timestamp-b.timestamp);
+            const xData = sorted.map(r=>{
+                const d=new Date(r.timestamp);
+                return (d.getMonth()+1)+'/'+d.getDate()+' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+            });
+            const series = keys.map(k=>({
+                name: shortLabel(k)+' '+DIM_LABELS[k].split(' ')[1],
+                type:'line',
+                data: sorted.map(r=>+r.vector[k].toFixed(3)),
+                smooth:true,
+                symbol:'circle',
+                symbolSize:4,
+                lineStyle:{width:2,color:getDimColor(k)},
+                itemStyle:{color:getDimColor(k)},
+                areaStyle:{opacity:0.05,color:getDimColor(k)}
+            }));
+            charts.trend.setOption({
+                backgroundColor:'transparent',
+                tooltip:{trigger:'axis',backgroundColor:'rgba(15,15,30,0.9)',borderColor:'rgba(255,255,255,0.1)',textStyle:{color:'#f1f5f9',fontSize:11}},
+                legend:{textStyle:{color:'rgba(255,255,255,0.5)',fontSize:10},top:0,type:'scroll'},
+                grid:{left:50,right:20,top:40,bottom:30},
+                xAxis:{type:'category',data:xData,axisLine:{lineStyle:{color:'rgba(255,255,255,0.1)'}},axisLabel:{color:'rgba(255,255,255,0.3)',fontSize:10}},
+                yAxis:{type:'value',min:0,max:1,axisLine:{lineStyle:{color:'rgba(255,255,255,0.1)'}},axisLabel:{color:'rgba(255,255,255,0.3)',fontSize:10},splitLine:{lineStyle:{color:'rgba(255,255,255,0.04)'}}},
+                series
+            }, true);
+        }
+
+        function switchChartGroup(group, el){
+            currentChartGroup = group;
+            document.querySelectorAll('.chart-tab').forEach(t=>t.classList.remove('active'));
+            if(el) el.classList.add('active');
+            updateTrendChart();
+        }
+
+        function updateScatterChart(){
+            if(!charts.scatter) return;
+            if(allRecords.length < 2){
+                charts.scatter.setOption({
+                    backgroundColor:'transparent',
+                    title:{text:'需要至少2条向量记录才能绘制散点图',left:'center',top:'center',textStyle:{color:'rgba(255,255,255,0.2)',fontSize:13,fontWeight:400}},
+                    xAxis:{show:false},yAxis:{show:false},series:[]
+                }, true);
+                return;
+            }
+            const data = allRecords.map(r=>vecToArr(r.vector));
+            const coords = pcaReduce(data, 2);
+            const labels = kmeans(coords, Math.min(3, coords.length));
+            const palette = ['#4ade80','#60a5fa','#fbbf24','#f472b6','#a78bfa'];
+            const series = [];
+            const clusterGroups = {};
+            coords.forEach((c,i)=>{
+                const cl = labels[i];
+                if(!clusterGroups[cl]) clusterGroups[cl] = [];
+                clusterGroups[cl].push({
+                    value: c,
+                    vec: fmtVec(allRecords[i].vector),
+                    time: new Date(allRecords[i].timestamp).toLocaleString('zh-CN',{hour12:false})
+                });
+            });
+            Object.keys(clusterGroups).forEach(cl=>{
+                series.push({
+                    name:'聚类'+(parseInt(cl)+1),
+                    type:'scatter',
+                    data: clusterGroups[cl],
+                    symbolSize:14,
+                    itemStyle:{color:palette[parseInt(cl)%palette.length],opacity:0.8,shadowBlur:10,shadowColor:palette[parseInt(cl)%palette.length]+'40'},
+                    emphasis:{itemStyle:{opacity:1,shadowBlur:20}}
+                });
+            });
+            charts.scatter.setOption({
+                backgroundColor:'transparent',
+                tooltip:{
+                    trigger:'item',
+                    backgroundColor:'rgba(15,15,30,0.9)',borderColor:'rgba(255,255,255,0.1)',textStyle:{color:'#f1f5f9',fontSize:11},
+                    formatter:function(p){ return `${p.data.time}<br/>${p.data.vec}`; }
+                },
+                legend:{textStyle:{color:'rgba(255,255,255,0.5)',fontSize:10},top:0},
+                grid:{left:50,right:20,top:40,bottom:30},
+                xAxis:{type:'value',axisLine:{lineStyle:{color:'rgba(255,255,255,0.1)'}},axisLabel:{color:'rgba(255,255,255,0.3)',fontSize:10},splitLine:{lineStyle:{color:'rgba(255,255,255,0.04)'}},name:'PC1',nameTextStyle:{color:'rgba(255,255,255,0.3)',fontSize:10}},
+                yAxis:{type:'value',axisLine:{lineStyle:{color:'rgba(255,255,255,0.1)'}},axisLabel:{color:'rgba(255,255,255,0.3)',fontSize:10},splitLine:{lineStyle:{color:'rgba(255,255,255,0.04)'}},name:'PC2',nameTextStyle:{color:'rgba(255,255,255,0.3)',fontSize:10}},
+                series
+            }, true);
+        }
+
+        function updateRadarChart(){
+            if(!charts.radar) return;
+            const curV = getCurrentVector();
+            const avgV = {};
+            DIM_KEYS.forEach(k=>avgV[k]=0);
+            if(allRecords.length>0){
+                allRecords.forEach(r=>DIM_KEYS.forEach(k=>avgV[k]+=r.vector[k]));
+                DIM_KEYS.forEach(k=>avgV[k]/=allRecords.length);
+            }else{
+                DIM_KEYS.forEach(k=>avgV[k]=0.5);
+            }
+            const indicators = DIM_KEYS.map(k=>({name:shortLabel(k),max:1,min:0}));
+            charts.radar.setOption({
+                backgroundColor:'transparent',
+                tooltip:{backgroundColor:'rgba(15,15,30,0.9)',borderColor:'rgba(255,255,255,0.1)',textStyle:{color:'#f1f5f9',fontSize:11}},
+                legend:{data:['当前向量','历史均值'],textStyle:{color:'rgba(255,255,255,0.5)',fontSize:11},top:0},
+                radar:{
+                    indicator:indicators,
+                    shape:'polygon',
+                    splitNumber:5,
+                    axisName:{color:'rgba(255,255,255,0.5)',fontSize:11},
+                    splitLine:{lineStyle:{color:'rgba(255,255,255,0.06)'}},
+                    splitArea:{areaStyle:{color:['rgba(255,255,255,0.01)','rgba(255,255,255,0.02)']}},
+                    axisLine:{lineStyle:{color:'rgba(255,255,255,0.08)'}}
+                },
+                series:[{
+                    type:'radar',
+                    data:[
+                        {value:DIM_KEYS.map(k=>+curV[k].toFixed(3)),name:'当前向量',lineStyle:{color:'#4ade80',width:2},areaStyle:{color:'rgba(74,222,128,0.15)'},itemStyle:{color:'#4ade80'}},
+                        {value:DIM_KEYS.map(k=>+avgV[k].toFixed(3)),name:'历史均值',lineStyle:{color:'#a78bfa',width:2,type:'dashed'},areaStyle:{color:'rgba(167,139,250,0.08)'},itemStyle:{color:'#a78bfa'}}
+                    ]
+                }]
+            }, true);
+        }
+
+        // ===== Machine encoding =====
+        function toBinary8(v){
+            const q = Math.round(v*255);
+            return q.toString(2).padStart(8,'0');
+        }
+        function updateEncoding(){
+            const v = getCurrentVector();
+            const tbody = document.getElementById('encTableBody');
+            const rows = [];
+            let fullBinary = '';
+            DIM_KEYS.forEach(k=>{
+                const raw = v[k];
+                const quant = Math.round(raw*255);
+                const bin = toBinary8(raw);
+                fullBinary += bin + ' ';
+                rows.push(`<tr><td class="dim-name">${shortLabel(k)}</td><td>${raw.toFixed(2)}</td><td>${quant}</td><td class="bin">${bin}</td></tr>`);
+            });
+            tbody.innerHTML = rows.join('');
+            document.getElementById('binaryStream').textContent = fullBinary.trim();
+        }
+
+        // ===== Slider bindings =====
+        function initSliders(){
+            document.querySelectorAll('.dim-slider').forEach(slider=>{
+                slider.addEventListener('input', ()=>{ updateCurrentDisplay(); });
+            });
+        }
+
+        // ===== Mouse glow =====
+        document.addEventListener('mousemove',(e)=>{
+            document.documentElement.style.setProperty('--x',e.clientX+'px');
+            document.documentElement.style.setProperty('--y',e.clientY+'px');
         });
+
+        // ===== Init =====
+        async function init(){
+            try{
+                await openDB();
+                document.getElementById('dbStatus').textContent = 'IndexedDB 已连接 · '+allRecords.length+' 条记录';
+            }catch(e){
+                document.getElementById('dbDot').style.background = '#f87171';
+                document.getElementById('dbDot').style.boxShadow = '0 0 6px rgba(248,113,113,0.4)';
+                document.getElementById('dbStatus').textContent = 'IndexedDB 不可用';
+                showToast('⚠️ IndexedDB不可用，数据无法持久化', 'error');
+            }
+            initSliders();
+            initCharts();
+            updateCurrentDisplay();
+            await refreshHistory();
+        }
+
+        window.saveCurrentVector = saveCurrentVector;
+        window.deleteVector = deleteVector;
+        window.clearAllVectors = clearAllVectors;
+        window.doRandomize = doRandomize;
+        window.loadSampleData = loadSampleData;
+        window.viewSimilar = viewSimilar;
+        window.loadToEditor = loadToEditor;
+        window.runCrossDomain = runCrossDomain;
+        window.switchChartGroup = switchChartGroup;
+
+        init();
+    })();
     </script>
 </body>
 </html>
