@@ -198,6 +198,73 @@ body{background:#0a0a0f;color:#fff;font-family:'SF Pro Display',-apple-system,Bl
 .bond{stroke:rgba(255,255,255,0.5);stroke-width:2;stroke-linecap:round;}
 .bond-double{stroke:rgba(255,255,255,0.6);stroke-width:1.5;}
 
+/* ===== 基酒品牌下拉菜单 ===== */
+.brand-select-wrap{margin-bottom:14px;}
+.brand-select{width:100%;padding:10px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.1);background:rgba(0,0,0,0.3);color:#fff;font-size:12px;font-family:inherit;cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23f59e0b' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;backdrop-filter:blur(8px);transition:all .2s;}
+.brand-select:hover{border-color:rgba(245,158,11,0.4);background-color:rgba(245,158,11,0.05);}
+.brand-select:focus{outline:none;border-color:rgba(245,158,11,0.6);box-shadow:0 0 0 3px rgba(245,158,11,0.1);}
+.brand-select option{background:#1a1a2e;color:#fff;}
+.brand-info{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px;}
+.bi-item{padding:8px;background:rgba(0,0,0,0.2);border-radius:8px;border:1px solid rgba(255,255,255,0.05);text-align:center;}
+.bi-label{font-size:9px;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;}
+.bi-val{font-family:'SF Mono',monospace;font-size:14px;font-weight:700;color:#fbbf24;}
+
+/* ===== 水果配料交互面板 ===== */
+.fruits-panel{margin-top:18px;padding-top:18px;border-top:1px solid rgba(255,255,255,0.06);}
+.fruits-panel-title{font-size:12px;font-weight:600;margin-bottom:12px;display:flex;align-items:center;gap:8px;color:rgba(255,255,255,0.8);}
+.fruits-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;}
+.fruit-card{padding:12px;border-radius:12px;border:1.5px solid rgba(255,255,255,0.06);background:rgba(255,255,255,0.02);cursor:pointer;transition:all 0.3s ease;position:relative;overflow:hidden;}
+.fruit-card:hover{border-color:rgba(255,255,255,0.12);background:rgba(255,255,255,0.04);transform:translateY(-1px);}
+.fruit-card.active{border-color:var(--fruit-color,#f59e0b);background:linear-gradient(135deg,var(--fruit-bg,rgba(245,158,11,0.08)),rgba(255,255,255,0.02));box-shadow:0 4px 16px var(--fruit-shadow,rgba(245,158,11,0.15));}
+.fruit-header{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+.fruit-icon{font-size:24px;}
+.fruit-name{font-size:12px;font-weight:600;}
+.fruit-controls{display:none;flex-direction:column;gap:8px;}
+.fruit-card.active .fruit-controls{display:flex;}
+.fruit-control-row{display:flex;align-items:center;gap:8px;}
+.fc-label{font-size:10px;color:rgba(255,255,255,0.5);min-width:52px;}
+.fc-slider{flex:1;-webkit-appearance:none;height:4px;border-radius:2px;background:rgba(255,255,255,0.08);outline:none;}
+.fc-slider::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--fruit-color,#f59e0b);cursor:pointer;box-shadow:0 0 8px var(--fruit-shadow,rgba(245,158,11,0.4));}
+.fc-val{font-family:'SF Mono',monospace;font-size:11px;font-weight:600;min-width:36px;text-align:right;color:var(--fruit-color,#fbbf24);}
+.fruit-effect{font-size:9px;color:rgba(255,255,255,0.4);margin-top:4px;padding-top:6px;border-top:1px solid rgba(255,255,255,0.04);display:none;}
+.fruit-card.active .fruit-effect{display:block;}
+.fe-tag{display:inline-block;padding:1px 6px;border-radius:8px;font-size:9px;margin:2px;font-weight:600;}
+
+/* ===== 风味演变时间轴 ===== */
+.timeline-section{margin-top:18px;padding-top:18px;border-top:1px solid rgba(255,255,255,0.06);}
+.timeline-title{font-size:12px;font-weight:600;margin-bottom:12px;display:flex;align-items:center;gap:8px;color:rgba(255,255,255,0.8);}
+.timeline-wrap{position:relative;padding:16px 0 24px;}
+.timeline-track{position:relative;height:6px;background:linear-gradient(90deg,rgba(74,222,128,0.2),rgba(250,204,21,0.3),rgba(248,113,113,0.2));border-radius:3px;cursor:pointer;}
+.timeline-progress{position:absolute;left:0;top:0;height:100%;background:linear-gradient(90deg,#4ade80,#facc15,#f87171);border-radius:3px;box-shadow:0 0 12px rgba(250,204,21,0.4);transition:width 0.15s;}
+.timeline-thumb{position:absolute;top:50%;transform:translate(-50%,-50%);width:18px;height:18px;border-radius:50%;background:linear-gradient(135deg,#fbbf24,#f59e0b);box-shadow:0 0 12px rgba(245,158,11,0.6),0 2px 6px rgba(0,0,0,0.3);cursor:grab;border:2px solid rgba(255,255,255,0.3);transition:transform 0.15s;z-index:2;}
+.timeline-thumb:hover{transform:translate(-50%,-50%) scale(1.15);}
+.timeline-thumb:active{cursor:grabbing;}
+.timeline-nodes{position:absolute;top:0;left:0;right:0;height:6px;pointer-events:none;}
+.tn-marker{position:absolute;top:-4px;width:2px;height:14px;background:rgba(255,255,255,0.3);}
+.tn-label{position:absolute;top:18px;transform:translateX(-50%);font-size:9px;color:rgba(255,255,255,0.4);font-family:'SF Mono',monospace;white-space:nowrap;}
+.tn-label.active{color:#fbbf24;font-weight:700;text-shadow:0 0 8px rgba(251,191,36,0.4);}
+.timeline-info{display:flex;justify-content:space-between;align-items:center;margin-top:28px;}
+.tl-current-time{font-family:'SF Mono',monospace;font-size:20px;font-weight:700;color:#fbbf24;text-shadow:0 0 12px rgba(251,191,36,0.3);}
+.tl-phase{font-size:11px;padding:4px 12px;border-radius:16px;font-weight:600;}
+.phase-0{background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.5);}
+.phase-6{background:rgba(34,211,238,0.1);color:#22d3ee;border:1px solid rgba(34,211,238,0.2);}
+.phase-24{background:rgba(250,204,21,0.1);color:#facc15;border:1px solid rgba(250,204,21,0.2);}
+.phase-48{background:rgba(249,115,22,0.1);color:#f97316;border:1px solid rgba(249,115,22,0.2);}
+.phase-72{background:rgba(248,113,113,0.1);color:#f87171;border:1px solid rgba(248,113,113,0.2);}
+.timeline-vec-preview{margin-top:14px;padding:12px;background:rgba(0,0,0,0.2);border-radius:10px;border:1px solid rgba(255,255,255,0.05);}
+.tvp-title{font-size:10px;color:rgba(255,255,255,0.4);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px;}
+.tvp-bars{display:flex;flex-direction:column;gap:6px;}
+.tvp-row{display:flex;align-items:center;gap:8px;}
+.tvp-label{font-size:9px;color:rgba(255,255,255,0.5);min-width:50px;}
+.tvp-bar-wrap{flex:1;height:4px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden;}
+.tvp-bar-fill{height:100%;border-radius:2px;transition:width 0.3s ease,background 0.3s ease;}
+.tvp-val{font-family:'SF Mono',monospace;font-size:10px;font-weight:600;min-width:30px;text-align:right;}
+
+/* ===== 视频生成入口 ===== */
+.video-entry-btn{display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;border:none;font-family:inherit;transition:all .25s;background:linear-gradient(135deg,rgba(245,158,11,0.15),rgba(251,191,36,0.08));color:#f59e0b;border:1px solid rgba(245,158,11,0.3);backdrop-filter:blur(8px);margin-left:12px;}
+.video-entry-btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(245,158,11,0.25);background:linear-gradient(135deg,rgba(245,158,11,0.25),rgba(251,191,36,0.12));}
+.video-entry-btn::before{content:'🎬';font-size:16px;}
+
 .disclaimer{margin-top:30px;padding:16px;text-align:center;font-size:11px;color:rgba(255,255,255,0.25);border-top:1px solid rgba(255,255,255,0.04);}
 </style>
 </head>
@@ -208,6 +275,9 @@ body{background:#0a0a0f;color:#fff;font-family:'SF Pro Display',-apple-system,Bl
 <a href="../index.html" class="back-btn">← 返回总控台</a>
 <div class="crumb"><a href="../index.html">⬡ Game-OS</a> / 仿真实验室 / 分子调酒</div>
 <h1 class="page-title">🍸 分子调酒实验室</h1>
+<div style="margin-bottom:12px;">
+<button class="video-entry-btn" onclick="alert('🎬 Remotion 视频项目已创建在 /video/ 目录下。\\n\\n运行方式：\\ncd video && npm install && npm start\\n\\n然后在浏览器中打开 Remotion Studio 预览视频，或运行 npm run build 渲染为 MP4。')">生成分子调酒视频</button>
+</div>
 <div class="page-subtitle">风味浓度稳态验证 · 圆锥浓度模型 · 0.48/0.50/0.68 三基准阈值 · PID负反馈调节 · 味觉系统跨域验证</div>
 </div>
 
@@ -252,6 +322,53 @@ body{background:#0a0a0f;color:#fff;font-family:'SF Pro Display',-apple-system,Bl
 <span class="param-label"><span class="param-icon">🌿</span>苦度</span>
 <input type="range" class="param-slider" id="pBitter" min="0" max="100" value="40">
 <span class="param-val" id="vBitter">0.40</span>
+</div>
+<div class="param-row">
+<span class="param-label"><span class="param-icon">🍊</span>果香</span>
+<input type="range" class="param-slider" id="pFruit" min="0" max="100" value="20">
+<span class="param-val" id="vFruit">0.20</span>
+</div>
+</div>
+
+<div class="brand-select-wrap">
+<div class="ws-label">🏷️ 品牌选择</div>
+<select class="brand-select" id="brandSelect" onchange="selectBrand(this.value)">
+<option value="">-- 选择具体品牌 --</option>
+</select>
+<div class="brand-info" id="brandInfo" style="display:none;">
+<div class="bi-item"><div class="bi-label">酒精度</div><div class="bi-val" id="biAlc">-</div></div>
+<div class="bi-item"><div class="bi-label">精米步合</div><div class="bi-val" id="biRice">-</div></div>
+<div class="bi-item"><div class="bi-label">风味类型</div><div class="bi-val" id="biFlavor" style="font-size:10px;">-</div></div>
+</div>
+</div>
+
+<div class="fruits-panel">
+<div class="fruits-panel-title">🍎 水果配料</div>
+<div class="fruits-grid" id="fruitsGrid"></div>
+</div>
+
+<div class="timeline-section">
+<div class="timeline-title">⏱️ 风味演变时间轴</div>
+<div class="timeline-wrap">
+<div class="timeline-track" id="timelineTrack">
+<div class="timeline-progress" id="timelineProgress" style="width:0%"></div>
+<div class="timeline-thumb" id="timelineThumb" style="left:0%"></div>
+<div class="timeline-nodes">
+<div class="tn-marker" style="left:0%"><div class="tn-label" style="left:0%" id="tn0">0h 初始</div></div>
+<div class="tn-marker" style="left:8.33%"><div class="tn-label" style="left:8.33%" id="tn6">6h 出味</div></div>
+<div class="tn-marker" style="left:33.33%"><div class="tn-label" style="left:33.33%" id="tn24">24h 变化</div></div>
+<div class="tn-marker" style="left:66.67%"><div class="tn-label" style="left:66.67%" id="tn48">48h 充分</div></div>
+<div class="tn-marker" style="left:100%"><div class="tn-label" style="left:100%;transform:translateX(-100%)" id="tn72">72h 极限</div></div>
+</div>
+</div>
+<div class="timeline-info">
+<div class="tl-current-time" id="tlCurrentTime">00h</div>
+<div class="tl-phase phase-0" id="tlPhase">⚪ 初始状态</div>
+</div>
+<div class="timeline-vec-preview">
+<div class="tvp-title">📊 当前浸泡时间风味向量预览</div>
+<div class="tvp-bars" id="tvpBars"></div>
+</div>
 </div>
 </div>
 </div>
@@ -410,115 +527,120 @@ KMP→IPD→七维向量→THRESHOLDS→01解码 · Game-OS 仿真与实证实�
 </div>
 
 <script>
+const BRAND_DATA={
+    sake:{
+        '獭祭 二割三分':{alcohol:0.16,rice:0.23,flavor:'果香·绵柔',params:{alcohol:0.45,sweet:0.55,sour:0.35,bitter:0.2}},
+        '獭祭 三割九分':{alcohol:0.16,rice:0.39,flavor:'清爽·果香',params:{alcohol:0.45,sweet:0.5,sour:0.4,bitter:0.25}},
+        '月桂冠 上撰':{alcohol:0.15,rice:0.60,flavor:'淡丽·辛口',params:{alcohol:0.42,sweet:0.3,sour:0.5,bitter:0.3}},
+        '月桂冠 纯米大吟酿':{alcohol:0.16,rice:0.45,flavor:'吟酿香·花果',params:{alcohol:0.45,sweet:0.45,sour:0.4,bitter:0.22}},
+    },
+    whisky:{
+        '尊尼获加黑方':{alcohol:0.40,rice:0,flavor:'烟熏·麦芽',params:{alcohol:0.8,sweet:0.35,sour:0.2,bitter:0.6}},
+        '麦卡伦12年':{alcohol:0.40,rice:0,flavor:'雪莉桶·干果',params:{alcohol:0.8,sweet:0.5,sour:0.15,bitter:0.5}},
+        '麦卡伦18年':{alcohol:0.43,rice:0,flavor:'浓郁·木质',params:{alcohol:0.85,sweet:0.55,sour:0.15,bitter:0.55}},
+    },
+    baijiu:{
+        '茅台':{alcohol:0.53,rice:0,flavor:'酱香·醇厚',params:{alcohol:0.9,sweet:0.25,sour:0.3,bitter:0.65}},
+        '五粮液':{alcohol:0.52,rice:0,flavor:'浓香·甘美',params:{alcohol:0.88,sweet:0.4,sour:0.3,bitter:0.55}},
+        '泸州老窖':{alcohol:0.52,rice:0,flavor:'浓香·绵甜',params:{alcohol:0.85,sweet:0.35,sour:0.35,bitter:0.5}},
+        '汾酒':{alcohol:0.53,rice:0,flavor:'清香·纯正',params:{alcohol:0.88,sweet:0.25,sour:0.3,bitter:0.4}},
+    },
+    foreign:{
+        '斯米诺红牌':{alcohol:0.375,rice:0,flavor:'纯净·中性',params:{alcohol:0.75,sweet:0.2,sour:0.2,bitter:0.3}},
+        '绝对伏特加':{alcohol:0.40,rice:0,flavor:'纯净·顺滑',params:{alcohol:0.8,sweet:0.2,sour:0.2,bitter:0.25}},
+        '英人牌金酒':{alcohol:0.40,rice:0,flavor:'杜松子·草本',params:{alcohol:0.8,sweet:0.15,sour:0.25,bitter:0.5}},
+    },
+};
+
 const WINE_DATA={
-    wine:{icon:'🍷',name:'葡萄酒',color:'#8b2a3f',glass:'linear-gradient(90deg,rgba(100,40,55,0.08),rgba(140,50,70,0.15),rgba(100,40,55,0.08))',liquid:'linear-gradient(180deg,rgba(139,42,63,0.3),rgba(100,25,45,0.75))',shadow:'rgba(139,42,63,0.2)',glow:'rgba(139,42,63,0.15)',
+    sake:{icon:'🍶',name:'日本清酒',color:'#f0e6d2',glass:'linear-gradient(90deg,rgba(240,230,210,0.06),rgba(245,235,215,0.12),rgba(240,230,210,0.06))',liquid:'linear-gradient(180deg,rgba(245,235,210,0.25),rgba(230,215,180,0.5))',shadow:'rgba(240,230,210,0.2)',glow:'rgba(240,230,210,0.15)',
         subs:[
-            {name:'干红葡萄酒',params:{alcohol:0.65,sweet:0.15,sour:0.7,bitter:0.5}},
-            {name:'干白葡萄酒',params:{alcohol:0.55,sweet:0.1,sour:0.65,bitter:0.3}},
-            {name:'甜白葡萄酒',params:{alcohol:0.45,sweet:0.75,sour:0.4,bitter:0.15}},
-            {name:'起泡酒',params:{alcohol:0.5,sweet:0.55,sour:0.55,bitter:0.2}},
+            {name:'大吟酿',params:{alcohol:0.45,sweet:0.55,sour:0.35,bitter:0.2}},
+            {name:'纯米吟酿',params:{alcohol:0.45,sweet:0.45,sour:0.4,bitter:0.25}},
+            {name:'本酿造',params:{alcohol:0.42,sweet:0.3,sour:0.5,bitter:0.35}},
+            {name:'普通酒',params:{alcohol:0.40,sweet:0.25,sour:0.55,bitter:0.4}},
         ]},
-    spirits:{icon:'🥃',name:'洋酒',color:'#c17f3e',glass:'linear-gradient(90deg,rgba(130,80,30,0.08),rgba(193,127,62,0.15),rgba(130,80,30,0.08))',liquid:'linear-gradient(180deg,rgba(193,127,62,0.35),rgba(140,80,20,0.8))',shadow:'rgba(193,127,62,0.2)',glow:'rgba(193,127,62,0.15)',
+    whisky:{icon:'🥃',name:'威士忌',color:'#c17f3e',glass:'linear-gradient(90deg,rgba(130,80,30,0.08),rgba(193,127,62,0.15),rgba(130,80,30,0.08))',liquid:'linear-gradient(180deg,rgba(193,127,62,0.4),rgba(140,80,20,0.85))',shadow:'rgba(193,127,62,0.2)',glow:'rgba(193,127,62,0.15)',
         subs:[
-            {name:'威士忌',params:{alcohol:0.85,sweet:0.25,sour:0.2,bitter:0.65}},
-            {name:'白兰地',params:{alcohol:0.8,sweet:0.35,sour:0.25,bitter:0.5}},
+            {name:'调和威士忌',params:{alcohol:0.8,sweet:0.35,sour:0.2,bitter:0.6}},
+            {name:'单一麦芽',params:{alcohol:0.85,sweet:0.45,sour:0.15,bitter:0.55}},
+            {name:'波本威士忌',params:{alcohol:0.8,sweet:0.6,sour:0.15,bitter:0.45}},
+        ]},
+    baijiu:{icon:'🍶',name:'中国白酒',color:'#e8e0d0',glass:'linear-gradient(90deg,rgba(200,190,170,0.06),rgba(235,225,210,0.12),rgba(200,190,170,0.06))',liquid:'linear-gradient(180deg,rgba(240,230,210,0.25),rgba(220,210,185,0.5))',shadow:'rgba(200,190,170,0.15)',glow:'rgba(200,190,170,0.1)',
+        subs:[
+            {name:'酱香型',params:{alcohol:0.9,sweet:0.25,sour:0.3,bitter:0.65}},
+            {name:'浓香型',params:{alcohol:0.85,sweet:0.4,sour:0.35,bitter:0.55}},
+            {name:'清香型',params:{alcohol:0.85,sweet:0.25,sour:0.3,bitter:0.4}},
+        ]},
+    foreign:{icon:'🍸',name:'其他洋酒',color:'#88ccff',glass:'linear-gradient(90deg,rgba(100,180,255,0.06),rgba(136,204,255,0.12),rgba(100,180,255,0.06))',liquid:'linear-gradient(180deg,rgba(136,204,255,0.2),rgba(100,160,220,0.45))',shadow:'rgba(136,204,255,0.2)',glow:'rgba(136,204,255,0.1)',
+        subs:[
+            {name:'伏特加',params:{alcohol:0.78,sweet:0.2,sour:0.2,bitter:0.3}},
+            {name:'金酒',params:{alcohol:0.8,sweet:0.15,sour:0.25,bitter:0.5}},
             {name:'朗姆酒',params:{alcohol:0.75,sweet:0.55,sour:0.15,bitter:0.35}},
             {name:'龙舌兰',params:{alcohol:0.8,sweet:0.2,sour:0.35,bitter:0.55}},
-        ]},
-    baijiu:{icon:'🍶',name:'白酒',color:'#e8e0d0',glass:'linear-gradient(90deg,rgba(200,190,170,0.06),rgba(235,225,210,0.12),rgba(200,190,170,0.06))',liquid:'linear-gradient(180deg,rgba(240,230,210,0.25),rgba(220,210,185,0.5))',shadow:'rgba(200,190,170,0.15)',glow:'rgba(200,190,170,0.1)',
-        subs:[
-            {name:'酱香型',params:{alcohol:0.9,sweet:0.15,sour:0.3,bitter:0.7}},
-            {name:'浓香型',params:{alcohol:0.85,sweet:0.3,sour:0.35,bitter:0.55}},
-            {name:'清香型',params:{alcohol:0.8,sweet:0.2,sour:0.3,bitter:0.4}},
-        ]},
-    yaojiu:{icon:'🍯',name:'药酒',color:'#8b5a2b',glass:'linear-gradient(90deg,rgba(90,50,15,0.08),rgba(139,90,43,0.15),rgba(90,50,15,0.08))',liquid:'linear-gradient(180deg,rgba(139,90,43,0.4),rgba(80,45,10,0.8))',shadow:'rgba(139,90,43,0.2)',glow:'rgba(139,90,43,0.15)',
-        subs:[
-            {name:'人参酒',params:{alcohol:0.7,sweet:0.45,sour:0.2,bitter:0.75}},
-            {name:'枸杞酒',params:{alcohol:0.6,sweet:0.65,sour:0.25,bitter:0.45}},
-            {name:'鹿茸酒',params:{alcohol:0.75,sweet:0.35,sour:0.15,bitter:0.8}},
-        ]},
-    fruit:{icon:'🍎',name:'果酒',color:'#e8708a',glass:'linear-gradient(90deg,rgba(200,80,100,0.08),rgba(232,112,138,0.14),rgba(200,80,100,0.08))',liquid:'linear-gradient(180deg,rgba(232,112,138,0.35),rgba(200,60,90,0.7))',shadow:'rgba(232,112,138,0.2)',glow:'rgba(232,112,138,0.12)',
-        subs:[
-            {name:'梅酒',params:{alcohol:0.4,sweet:0.8,sour:0.65,bitter:0.2}},
-            {name:'荔枝酒',params:{alcohol:0.35,sweet:0.85,sour:0.3,bitter:0.1}},
-            {name:'苹果酒',params:{alcohol:0.3,sweet:0.65,sour:0.6,bitter:0.15}},
-        ]},
-    flower:{icon:'🌸',name:'花酒',color:'#c9a0dc',glass:'linear-gradient(90deg,rgba(160,120,190,0.08),rgba(201,160,220,0.12),rgba(160,120,190,0.08))',liquid:'linear-gradient(180deg,rgba(201,160,220,0.3),rgba(160,110,190,0.65))',shadow:'rgba(201,160,220,0.2)',glow:'rgba(201,160,220,0.12)',
-        subs:[
-            {name:'桂花酒',params:{alcohol:0.35,sweet:0.7,sour:0.25,bitter:0.2}},
-            {name:'玫瑰酒',params:{alcohol:0.4,sweet:0.6,sour:0.3,bitter:0.25}},
-            {name:'茉莉酒',params:{alcohol:0.35,sweet:0.5,sour:0.35,bitter:0.3}},
         ]},
 };
 
 const MOLECULE_DATA={
-    wine:[
-        {name:'单宁酸',formula:'C₇₆H₅₂O₄₆',dim:{sym:'D',name:'苦涩',color:'#f59e0b'},color:'#8b4513',flavor:'涩感/结构感',source:'葡萄皮/籽/橡木桶',threshold:'0.1-0.4 g/L',
-         desc:'单宁是红葡萄酒的骨架物质，与唾液蛋白结合产生收敛涩感。优质单宁细腻丝滑，劣质单宁粗糙苦涩。是葡萄酒陈年潜力的关键指标。'},
-        {name:'酒石酸',formula:'C₄H₆O₆',dim:{sym:'P',name:'酸度',color:'#ec4899'},color:'#e74c3c',flavor:'清爽酸味',source:'葡萄天然果酸',threshold:'0.5-1.5 g/L',
-         desc:'葡萄酒中最重要的有机酸，赋予酒体清爽感和活力。冷稳定过程中会析出酒石酸氢钾结晶（"酒钻石"）。酸度平衡是葡萄酒口感协调的关键。'},
-        {name:'乙醇',formula:'C₂H₅OH',dim:{sym:'Dev2',name:'酒精度',color:'#f87171'},color:'#fbbf24',flavor:'灼热/甜润',source:'酵母发酵产物',threshold:'感知阈值 ~1%',
-         desc:'酒精是酒体的重要组成部分，带来温热感和甜润感，同时溶解其他风味物质。过高产生灼烧感，过低则酒体单薄。酒精度影响风味浓度计算。'},
-        {name:'乙酸乙酯',formula:'CH₃COOC₂H₅',dim:{sym:'I',name:'甜度',color:'#22d3ee'},color:'#3498db',flavor:'果香/酯香',source:'发酵副产物',threshold:'50-200 mg/L',
-         desc:'葡萄酒中最主要的酯类物质，带来清新的果香和花香，类似苹果、菠萝的香气。适量增添复杂度，过量则呈现指甲油般的刺鼻感（挥发酸过高）。'},
-        {name:'花青素',formula:'C₁₅H₁₁O₆⁺',dim:{sym:'S',name:'复杂度',color:'#a855f7'},color:'#9b59b6',flavor:'颜色/抗氧化',source:'葡萄皮色素',threshold:'0.1-1 g/L',
-         desc:'红葡萄酒颜色的来源，同时具有抗氧化活性。随陈年时间聚合，颜色从紫红转变为砖红，单宁与花青素结合形成稳定色素复合物。'},
+    sake:[
+        {name:'乙酸异戊酯',formula:'C₇H₁₄O₂',dim:{sym:'I',name:'甜度',color:'#22d3ee'},color:'#f0e6d2',flavor:'香蕉/果香',source:'吟酿酵母发酵',threshold:'1-5 mg/L',
+         desc:'清酒吟酿香的核心成分，带来香蕉、苹果等清新果香，是大吟酿和吟酿酒的标志性香气物质。精米步合越低，吟酿香越浓郁。'},
+        {name:'己酸乙酯',formula:'C₈H₁₆O₂',dim:{sym:'S',name:'复杂度',color:'#a855f7'},color:'#d4c4a8',flavor:'菠萝/甜香',source:'酵母发酵',threshold:'0.5-3 mg/L',
+         desc:'带来菠萝、甜瓜等热带水果香气，与乙酸异戊酯共同构成清酒的花果香调。獭祭等高端纯米大吟酿中含量丰富。'},
+        {name:'乙醇',formula:'C₂H₅OH',dim:{sym:'Dev2',name:'酒精度',color:'#f87171'},color:'#fbbf24',flavor:'温润/甜感',source:'米曲发酵',threshold:'感知阈值 ~1%',
+         desc:'清酒酒精度通常在15-16%，口感温润柔和，与葡萄酒相比酸度更低，氨基酸带来的鲜味（umami）是其特色。'},
+        {name:'琥珀酸',formula:'C₄H₆O₄',dim:{sym:'P',name:'酸度',color:'#ec4899'},color:'#e8dcc8',flavor:'鲜味/微酸',source:'乳酸菌发酵',threshold:'0.1-0.5 g/L',
+         desc:'清酒中重要的有机酸，带来柔和的酸味和独特的鲜味，与氨基酸协同构成清酒"旨味"的基础。'},
+        {name:'氨基酸',formula:'多种',dim:{sym:'D',name:'苦涩',color:'#f59e0b'},color:'#c8b898',flavor:'鲜味/醇厚',source:'米蛋白分解',threshold:'直接感知',
+         desc:'清酒富含多种氨基酸（谷氨酸、丙氨酸等），带来醇厚感和鲜味，是清酒口感圆润的关键。精米步合高的普通酒氨基酸含量更高。'},
     ],
-    spirits:[
-        {name:'愈创木酚',formula:'C₇H₈O₂',dim:{sym:'D',name:'苦涩',color:'#f59e0b'},color:'#d35400',flavor:'烟熏/焦香',source:'橡木桶烘烤',threshold:'1-10 μg/L',
-         desc:'威士忌和白兰地在橡木桶陈酿过程中产生的烟熏风味物质，来自木质素热解。泥煤威士忌中含量更高，带来典型的消毒水/烟熏气息。'},
+    whisky:[
+        {name:'愈创木酚',formula:'C₇H₈O₂',dim:{sym:'D',name:'苦涩',color:'#f59e0b'},color:'#d35400',flavor:'烟熏/焦香',source:'橡木桶烘烤/泥煤',threshold:'1-10 μg/L',
+         desc:'威士忌在橡木桶陈酿过程中产生的烟熏风味物质，泥煤威士忌中含量更高，带来典型的消毒水/烟熏气息。'},
         {name:'香草醛',formula:'C₈H₈O₃',dim:{sym:'I',name:'甜度',color:'#22d3ee'},color:'#f39c12',flavor:'香草/甜香',source:'橡木桶木质素',threshold:'0.1-1 mg/L',
-         desc:'橡木桶陈酿的标志性风味，带来香草般的甜润香气。波本桶陈酿的威士忌香草醛含量高，雪莉桶则带来更多果干和坚果香。'},
+         desc:'橡木桶陈酿的标志性风味，带来香草般的甜润香气。波本桶陈酿的威士忌香草醛含量高，雪莉桶带来更多果干香。'},
         {name:'乙醇',formula:'C₂H₅OH',dim:{sym:'Dev2',name:'酒精度',color:'#f87171'},color:'#fbbf24',flavor:'灼热/刺激',source:'蒸馏浓缩',threshold:'感知阈值 ~1%',
-         desc:'洋酒经过蒸馏酒精度通常在40%以上，带来强烈的灼热感和刺激性。高酒精度是洋酒风味浓郁的基础，也是触发风味熔断的主要因素。'},
+         desc:'威士忌经过蒸馏酒精度通常在40%以上，带来强烈的灼热感和刺激性。高酒精度是威士忌风味浓郁的基础。'},
         {name:'糠醛',formula:'C₅H₄O₂',dim:{sym:'S',name:'复杂度',color:'#a855f7'},color:'#e67e22',flavor:'杏仁/焦糖',source:'糖焦化反应',threshold:'5-50 mg/L',
-         desc:'在威士忌蒸馏和陈酿过程中由戊糖脱水形成，带来杏仁、焦糖和烘烤香气。是波本威士忌甜香的重要来源，也是朗姆酒焦糖风味的组成部分。'},
-        {name:'单宁',formula:'C₇₆H₅₂O₄₆',dim:{sym:'P',name:'酸度',color:'#ec4899'},color:'#8b4513',flavor:'涩感/结构',source:'橡木桶浸出',threshold:'0.05-0.3 g/L',
-         desc:'洋酒中的单宁主要来自橡木桶陈酿，比葡萄酒中的单宁更柔和，带来结构感和微涩，同时增添木质和香料风味。龙舌兰中的单宁来自龙舌兰植物纤维。'},
+         desc:'在威士忌蒸馏和陈酿过程中形成，带来杏仁、焦糖和烘烤香气，是波本威士忌甜香的重要来源。'},
+        {name:'鞣质单宁',formula:'C₇₆H₅₂O₄₆',dim:{sym:'P',name:'酸度',color:'#ec4899'},color:'#8b4513',flavor:'涩感/结构',source:'橡木桶浸出',threshold:'0.05-0.3 g/L',
+         desc:'威士忌中的单宁主要来自橡木桶陈酿，比葡萄酒中的单宁更柔和，带来结构感和微涩，增添木质和香料风味。'},
     ],
     baijiu:[
         {name:'己酸乙酯',formula:'C₈H₁₆O₂',dim:{sym:'I',name:'甜度',color:'#22d3ee'},color:'#27ae60',flavor:'菠萝/果香',source:'己酸菌发酵',threshold:'0.5-2 mg/L',
-         desc:'浓香型白酒的主体香气成分，具有浓郁的菠萝、苹果等水果香气，是浓香型白酒"窖香"的主要来源。己酸乙酯含量是区分白酒香型的关键指标。'},
+         desc:'浓香型白酒的主体香气成分，具有浓郁的菠萝、苹果等水果香气，是浓香型白酒"窖香"的主要来源。'},
         {name:'乙酸',formula:'CH₃COOH',dim:{sym:'P',name:'酸度',color:'#ec4899'},color:'#e74c3c',flavor:'醋酸/刺激',source:'醋酸菌代谢',threshold:'0.1-0.8 g/L',
-         desc:'白酒中主要的有机酸，带来酸爽的口感。适量乙酸能协调酒体，增强后味；过量则呈现尖锐的醋酸刺激感，是酒体不适饮的标志。'},
+         desc:'白酒中主要的有机酸，带来酸爽的口感。适量乙酸协调酒体，过量则呈现尖锐的醋酸刺激感。'},
         {name:'乙醇',formula:'C₂H₅OH',dim:{sym:'Dev2',name:'酒精度',color:'#f87171'},color:'#fbbf24',flavor:'灼热/刺激',source:'蒸馏发酵',threshold:'感知阈值 ~1%',
-         desc:'白酒酒精度通常在50-65%之间，高酒精度带来强烈灼烧感。中国白酒采用固态发酵，风味物质极其丰富，是世界上风味最复杂的蒸馏酒之一。'},
+         desc:'白酒酒精度通常在50-65%之间，高酒精度带来强烈灼烧感。中国白酒采用固态发酵，风味物质极其丰富。'},
         {name:'3-甲硫基丙醇',formula:'C₄H₁₀OS',dim:{sym:'S',name:'复杂度',color:'#a855f7'},color:'#95a5a6',flavor:'酱香/糟香',source:'美拉德反应',threshold:'10-100 μg/L',
-         desc:'酱香型白酒的特征风味物质之一，带有酱香、芝麻香和煮熟的土豆/肉香。由美拉德反应和酵母代谢产生，是茅台酒等酱香型白酒的关键风味成分。'},
+         desc:'酱香型白酒的特征风味物质之一，带有酱香、芝麻香，是茅台酒等酱香型白酒的关键风味成分。'},
         {name:'乳酸乙酯',formula:'C₅H₁₀O₃',dim:{sym:'D',name:'苦涩',color:'#f59e0b'},color:'#f1c40f',flavor:'清甜/涩感',source:'乳酸菌发酵',threshold:'0.2-1.5 g/L',
-         desc:'清香型白酒的重要风味成分，带来清甜、柔和的口感，适量使酒体干净爽冽。过量则带来苦涩感和闷杂味，影响清香型白酒的"清、正、净、爽"风格。'},
+         desc:'清香型白酒的重要风味成分，带来清甜、柔和的口感，适量使酒体干净爽冽。'},
     ],
-    yaojiu:[
-        {name:'人参皂苷',formula:'C₄₂H₇₂O₁₄',dim:{sym:'S',name:'复杂度',color:'#a855f7'},color:'#27ae60',flavor:'微苦/回甘',source:'人参浸出',threshold:'10-100 mg/L',
-         desc:'人参酒的核心活性成分，属于三萜皂苷类化合物，带来特征的微苦后回甘口感。人参皂苷Rg1、Rb1等是主要活性成分，传统认为具有滋补功效。'},
-        {name:'枸杞多糖',formula:'(C₆H₁₀O₅)n',dim:{sym:'I',name:'甜度',color:'#22d3ee'},color:'#e74c3c',flavor:'甜润/厚重',source:'枸杞浸出',threshold:'1-10 g/L',
-         desc:'枸杞酒的主要甜味和醇厚感来源，是一种蛋白多糖，带来自然的甜润口感和厚重感。枸杞酒通常呈现宝石红色，甜度较高，苦度较低。'},
-        {name:'乙醇',formula:'C₂H₅OH',dim:{sym:'Dev2',name:'酒精度',color:'#f87171'},color:'#fbbf24',flavor:'溶剂/提取',source:'基酒溶剂',threshold:'感知阈值 ~1%',
-         desc:'药酒通常以高度白酒（50-60%）为基酒，利用乙醇作为溶剂提取药材中的有效成分。酒精度高有助于药材成分浸出，但口感刺激较强。'},
-        {name:'鹿茸多肽',formula:'氨基酸链',dim:{sym:'D',name:'苦涩',color:'#f59e0b'},color:'#8b4513',flavor:'腥涩/温补',source:'鹿茸浸出',threshold:'微量即感知',
-         desc:'鹿茸酒的特征成分，带来特殊的腥涩味和温补感。鹿茸富含氨基酸、多肽和激素样物质，传统认为具有补肾壮阳功效，苦涩味较重。'},
-    ],
-    fruit:[
-        {name:'柠檬酸',formula:'C₆H₈O₇',dim:{sym:'P',name:'酸度',color:'#ec4899'},color:'#f1c40f',flavor:'酸爽/清新',source:'水果天然酸',threshold:'0.5-3 g/L',
-         desc:'果酒中最主要的有机酸（尤其梅酒、柑橘类果酒），带来明亮清新的酸爽感。柠檬酸是果酒清爽口感的基础，与甜度平衡形成酸甜协调的口感。'},
-        {name:'果糖',formula:'C₆H₁₂O₆',dim:{sym:'I',name:'甜度',color:'#22d3ee'},color:'#e74c3c',flavor:'清甜/果香',source:'水果糖分',threshold:'直接感知',
-         desc:'果酒甜味的主要来源，比蔗糖更甜、更清爽。梅酒、荔枝酒通常甜度较高，残糖量50-150g/L，甜酸平衡是果酒口感的核心。'},
-        {name:'乙醇',formula:'C₂H₅OH',dim:{sym:'Dev2',name:'酒精度',color:'#f87171'},color:'#fbbf24',flavor:'微醺/柔和',source:'发酵产生',threshold:'感知阈值 ~1%',
-         desc:'果酒通常酒精度较低（8-15%），口感柔和，不易触发风味熔断。低酒精度使果酒更易饮，但也更需要酸甜平衡来支撑酒体结构。'},
-        {name:'芳樟醇',formula:'C₁₀H₁₈O',dim:{sym:'S',name:'复杂度',color:'#a855f7'},color:'#9b59b6',flavor:'花香/果香',source:'水果/花香气',threshold:'0.1-1 mg/L',
-         desc:'荔枝酒等热带水果酒的特征香气成分，具有清新的花香和柑橘类果香，类似薰衣草和铃兰的香气。是果酒优雅香气的重要来源。'},
-    ],
-    flower:[
-        {name:'β-紫罗兰酮',formula:'C₁₃H₂₀O',dim:{sym:'S',name:'复杂度',color:'#a855f7'},color:'#9b59b6',flavor:'桂花/紫罗兰',source:'桂花浸出',threshold:'0.01-0.1 mg/L',
-         desc:'桂花酒的核心香气物质，具有浓郁的桂花、紫罗兰和覆盆子香气，阈值极低，是桂花酒标志性甜香的来源，也是高级香水的常用香料。'},
-        {name:'香茅醇',formula:'C₁₀H₂₀O',dim:{sym:'I',name:'甜度',color:'#22d3ee'},color:'#e91e63',flavor:'玫瑰/甜香',source:'玫瑰花瓣',threshold:'0.1-1 mg/L',
-         desc:'玫瑰酒的主要香气成分，具有新鲜的玫瑰花香和清甜的香脂气息，类似天竺葵和蜂蜜的甜香。是玫瑰香气的灵魂物质，香气优雅持久。'},
-        {name:'乙醇',formula:'C₂H₅OH',dim:{sym:'Dev2',name:'酒精度',color:'#f87171'},color:'#fbbf24',flavor:'柔和/基酒',source:'基酒浸泡',threshold:'感知阈值 ~1%',
-         desc:'花酒通常以低度米酒或白酒为基酒（20-40%）浸泡鲜花制成，酒精度适中，花香与酒香融合，口感轻盈优雅，属于轻盈型酒体。'},
-        {name:'乙酸苄酯',formula:'C₉H₁₀O₂',dim:{sym:'P',name:'酸度',color:'#ec4899'},color:'#27ae60',flavor:'茉莉/清香',source:'茉莉花浸出',threshold:'0.1-2 mg/L',
-         desc:'茉莉酒的特征香气成分，具有清新的茉莉花香气和水果香，是茉莉花茶和茉莉酒的关键香气物质，带来优雅、清鲜的花香体验。'},
+    foreign:[
+        {name:'α-松油醇',formula:'C₁₀H₁₈O',dim:{sym:'S',name:'复杂度',color:'#a855f7'},color:'#88ccff',flavor:'杜松/草本',source:'杜松子',threshold:'0.1-1 mg/L',
+         desc:'金酒（Gin）的核心风味物质，来自杜松子，带来清新的松树、草本和柑橘香气，是金酒区别于其他烈酒的标志。'},
+        {name:'乙醇',formula:'C₂H₅OH',dim:{sym:'Dev2',name:'酒精度',color:'#f87171'},color:'#fbbf24',flavor:'纯净/灼热',source:'蒸馏',threshold:'感知阈值 ~1%',
+         desc:'伏特加等中性烈酒酒精度通常在37.5-40%，经过多次蒸馏和过滤，风味纯净，是鸡尾酒的常用基酒。'},
+        {name:'柠檬烯',formula:'C₁₀H₁₆',dim:{sym:'I',name:'甜度',color:'#22d3ee'},color:'#aaddff',flavor:'柑橘/清新',source:'果皮/草本',threshold:'0.5-5 mg/L',
+         desc:'带来清新的柑橘类果香，常见于金酒和风味伏特加中，增添明快的果香气。'},
+        {name:'丁香油酚',formula:'C₁₀H₁₂O₂',dim:{sym:'D',name:'苦涩',color:'#f59e0b'},color:'#6699cc',flavor:'丁香/香料',source:'香料添加',threshold:'0.1-2 mg/L',
+         desc:'金酒中常见的香料成分，带来丁香般的辛香和微苦，与杜松子香协同构成复杂的草本风味。'},
+        {name:'乙醛',formula:'C₂H₄O',dim:{sym:'P',name:'酸度',color:'#ec4899'},color:'#77aadd',flavor:'刺激/清新',source:'发酵副产物',threshold:'10-100 mg/L',
+         desc:'适量乙醛带来清新的果香和穿透力，过量则呈现刺激性的青苹果味和涩感，是伏特加纯净口感需要控制的成分。'},
     ],
 };
+
+const FRUITS_DATA={
+    lemon:{icon:'🍋',name:'柠檬片',color:'#fde047',bg:'rgba(253,224,71,0.08)',shadow:'rgba(253,224,71,0.2)',effects:{sweet:0,sour:0.8,bitter:0.2,fruit:0.6}},
+    orange:{icon:'🍊',name:'橙子片',color:'#fb923c',bg:'rgba(251,146,60,0.08)',shadow:'rgba(251,146,60,0.2)',effects:{sweet:0.4,sour:0.5,bitter:0.1,fruit:0.8}},
+    apple:{icon:'🍎',name:'苹果片',color:'#ef4444',bg:'rgba(239,68,68,0.08)',shadow:'rgba(239,68,68,0.2)',effects:{sweet:0.6,sour:0.3,bitter:0.05,fruit:0.7}},
+    peach:{icon:'🍑',name:'桃子片',color:'#f9a8d4',bg:'rgba(249,168,212,0.08)',shadow:'rgba(249,168,212,0.2)',effects:{sweet:0.8,sour:0.2,bitter:0,fruit:0.9}},
+};
+
+let activeFruits={};
+let infusionTime=0;
 
 function generateMolSVG(type,idx){
     const fid='glow'+idx;
@@ -672,7 +794,8 @@ function showMolDetail(idx,animate=true){
     detail.classList.add('show');
 }
 
-let currentType='wine',currentSub=0;
+let currentType='sake',currentSub=0;
+let currentBrand='';
 
 function buildWineUI(){
     const grid=document.getElementById('wineTypesGrid');
@@ -701,24 +824,225 @@ function buildSubs(){
 }
 
 function selectType(k){
-    currentType=k;currentSub=0;activeMolIdx=-1;
+    currentType=k;currentSub=0;currentBrand='';activeMolIdx=-1;activeFruits={};infusionTime=0;
     buildWineUI();
     updateBottle();
     buildMolecules();
+    buildBrandSelect();
+    buildFruits();
+    updateTimeline();
 }
 function selectSub(i){
-    currentSub=i;buildSubs();updateBottle();
+    currentSub=i;currentBrand='';buildSubs();updateBottle();buildBrandSelect();
+}
+
+function buildBrandSelect(){
+    const sel=document.getElementById('brandSelect');
+    const info=document.getElementById('brandInfo');
+    const brands=BRAND_DATA[currentType];
+    if(!brands){sel.innerHTML='<option value="">-- 该类别暂无品牌数据 --</option>';info.style.display='none';return;}
+    let opts='<option value="">-- 选择具体品牌 --</option>';
+    Object.keys(brands).forEach(b=>{opts+=`<option value="${b}"${b===currentBrand?' selected':''}>${b}</option>`;});
+    sel.innerHTML=opts;
+    if(currentBrand&&brands[currentBrand]){
+        const b=brands[currentBrand];
+        info.style.display='grid';
+        document.getElementById('biAlc').textContent=(b.alcohol*100).toFixed(0)+'%';
+        document.getElementById('biRice').textContent=b.rice>0?(b.rice*100).toFixed(0)+'%':'-';
+        document.getElementById('biFlavor').textContent=b.flavor;
+        const sliders=[
+            ['pAlcohol','vAlcohol',b.params.alcohol],
+            ['pSweet','vSweet',b.params.sweet],
+            ['pSour','vSour',b.params.sour],
+            ['pBitter','vBitter',b.params.bitter],
+        ];
+        sliders.forEach(([sid,vid,val])=>{
+            document.getElementById(sid).value=val*100;
+            document.getElementById(vid).textContent=val.toFixed(2);
+        });
+        document.getElementById('cwiSub').textContent=currentBrand;
+        conc=calcConcentration();
+        document.getElementById('mSlider').value=conc*100;
+        updateDisplay();drawRadar();updateLiquidH();
+    }else{info.style.display='none';}
+}
+
+function selectBrand(name){
+    currentBrand=name;
+    buildBrandSelect();
+    document.getElementById('verifyResult').classList.remove('show');
+}
+
+function buildFruits(){
+    const grid=document.getElementById('fruitsGrid');
+    grid.innerHTML=Object.entries(FRUITS_DATA).map(([k,f])=>{
+        const isActive=activeFruits[k]!==undefined;
+        const data=activeFruits[k]||{amount:0,time:0};
+        return `<div class="fruit-card${isActive?' active':''}" data-fruit="${k}" style="--fruit-color:${f.color};--fruit-bg:${f.bg};--fruit-shadow:${f.shadow};" onclick="toggleFruit('${k}')">
+            <div class="fruit-header">
+                <span class="fruit-icon">${f.icon}</span>
+                <span class="fruit-name">${f.name}</span>
+            </div>
+            <div class="fruit-controls">
+                <div class="fruit-control-row">
+                    <span class="fc-label">用量</span>
+                    <input type="range" class="fc-slider" min="0" max="5" step="1" value="${data.amount}" oninput="updateFruit('${k}','amount',this.value);event.stopPropagation();">
+                    <span class="fc-val" id="fAmt_${k}">${data.amount}片</span>
+                </div>
+                <div class="fruit-control-row">
+                    <span class="fc-label">浸泡</span>
+                    <input type="range" class="fc-slider" min="0" max="72" step="1" value="${data.time}" oninput="updateFruit('${k}','time',this.value);event.stopPropagation();">
+                    <span class="fc-val" id="fTime_${k}">${data.time}h</span>
+                </div>
+            </div>
+            <div class="fruit-effect">
+                ${f.effects.sweet>0?`<span class="fe-tag" style="background:rgba(34,211,238,0.15);color:#22d3ee;">甜度+${Math.round(f.effects.sweet*100)}%</span>`:''}
+                ${f.effects.sour>0?`<span class="fe-tag" style="background:rgba(236,72,153,0.15);color:#ec4899;">酸度+${Math.round(f.effects.sour*100)}%</span>`:''}
+                ${f.effects.bitter>0?`<span class="fe-tag" style="background:rgba(245,158,11,0.15);color:#f59e0b;">苦度+${Math.round(f.effects.bitter*100)}%</span>`:''}
+                ${f.effects.fruit>0?`<span class="fe-tag" style="background:rgba(168,85,247,0.15);color:#a855f7;">果香+${Math.round(f.effects.fruit*100)}%</span>`:''}
+            </div>
+        </div>`;
+    }).join('');
+    document.getElementById('pFruit').value=Math.round(getFruitInfluence().fruit*100);
+    document.getElementById('vFruit').textContent=getFruitInfluence().fruit.toFixed(2);
+}
+
+function toggleFruit(k){
+    if(activeFruits[k]){delete activeFruits[k];}
+    else{activeFruits[k]={amount:1,time:0};}
+    buildFruits();
+    applyFruitEffects();
+}
+
+function updateFruit(k,prop,val){
+    if(!activeFruits[k])return;
+    activeFruits[k][prop]=parseInt(val);
+    document.getElementById('fAmt_'+k).textContent=activeFruits[k].amount+'片';
+    document.getElementById('fTime_'+k).textContent=activeFruits[k].time+'h';
+    applyFruitEffects();
+}
+
+function getFruitInfluence(){
+    let sweet=0,sour=0,bitter=0,fruit=0;
+    Object.entries(activeFruits).forEach(([k,d])=>{
+        if(d.amount<=0)return;
+        const f=FRUITS_DATA[k];
+        const tFactor=Math.min(1,d.time/24);
+        const aFactor=d.amount/5;
+        const factor=aFactor*(0.3+tFactor*0.7);
+        sweet+=f.effects.sweet*factor;
+        sour+=f.effects.sour*factor;
+        bitter+=f.effects.bitter*factor;
+        fruit+=f.effects.fruit*factor;
+    });
+    return{
+        sweet:Math.min(0.4,sweet),
+        sour:Math.min(0.4,sour),
+        bitter:Math.min(0.3,bitter),
+        fruit:Math.min(1,fruit),
+    };
+}
+
+function applyFruitEffects(){
+    const w=WINE_DATA[currentType],s=w.subs[currentSub];
+    const base=currentBrand&&BRAND_DATA[currentType]&&BRAND_DATA[currentType][currentBrand]?BRAND_DATA[currentType][currentBrand].params:s.params;
+    const infl=getFruitInfluence();
+    const alcVal=base.alcohol;
+    const sweetVal=Math.min(1,base.sweet+infl.sweet);
+    const sourVal=Math.min(1,base.sour+infl.sour);
+    const bitterVal=Math.min(1,base.bitter+infl.bitter);
+    document.getElementById('pAlcohol').value=alcVal*100;document.getElementById('vAlcohol').textContent=alcVal.toFixed(2);
+    document.getElementById('pSweet').value=sweetVal*100;document.getElementById('vSweet').textContent=sweetVal.toFixed(2);
+    document.getElementById('pSour').value=sourVal*100;document.getElementById('vSour').textContent=sourVal.toFixed(2);
+    document.getElementById('pBitter').value=bitterVal*100;document.getElementById('vBitter').textContent=bitterVal.toFixed(2);
+    document.getElementById('pFruit').value=infl.fruit*100;document.getElementById('vFruit').textContent=infl.fruit.toFixed(2);
+    conc=calcConcentration();document.getElementById('mSlider').value=conc*100;
+    updateDisplay();drawRadar();updateLiquidH();
+    updateTimelineVecPreview();
+    document.getElementById('verifyResult').classList.remove('show');
+}
+
+function buildTimeline(){
+    updateTimeline();
+    const track=document.getElementById('timelineTrack');
+    const thumb=document.getElementById('timelineThumb');
+    let dragging=false;
+    const setPos=(clientX)=>{
+        const rect=track.getBoundingClientRect();
+        let pct=(clientX-rect.left)/rect.width*100;
+        pct=Math.max(0,Math.min(100,pct));
+        infusionTime=Math.round(pct/100*72);
+        updateTimeline();
+    };
+    thumb.addEventListener('mousedown',(e)=>{dragging=true;e.preventDefault();});
+    track.addEventListener('click',(e)=>{if(!dragging)setPos(e.clientX);});
+    document.addEventListener('mousemove',(e)=>{if(dragging)setPos(e.clientX);});
+    document.addEventListener('mouseup',()=>{dragging=false;});
+    thumb.addEventListener('touchstart',(e)=>{dragging=true;e.preventDefault();});
+    track.addEventListener('touchmove',(e)=>{if(dragging&&e.touches[0])setPos(e.touches[0].clientX);});
+    document.addEventListener('touchend',()=>{dragging=false;});
+}
+
+function updateTimeline(){
+    const pct=infusionTime/72*100;
+    document.getElementById('timelineProgress').style.width=pct+'%';
+    document.getElementById('timelineThumb').style.left=pct+'%';
+    document.getElementById('tlCurrentTime').textContent=String(infusionTime).padStart(2,'0')+'h';
+    ['tn0','tn6','tn24','tn48','tn72'].forEach(id=>document.getElementById(id).classList.remove('active'));
+    let phase,phaseClass;
+    if(infusionTime<6){phase='⚪ 初始状态';phaseClass='phase-0';document.getElementById('tn0').classList.add('active');}
+    else if(infusionTime<24){phase='🔵 开始出味';phaseClass='phase-6';document.getElementById('tn6').classList.add('active');}
+    else if(infusionTime<48){phase='🟡 明显变化';phaseClass='phase-24';document.getElementById('tn24').classList.add('active');}
+    else if(infusionTime<72){phase='🟠 充分浸泡';phaseClass='phase-48';document.getElementById('tn48').classList.add('active');}
+    else{phase='🔴 浸泡极限';phaseClass='phase-72';document.getElementById('tn72').classList.add('active');}
+    const phaseEl=document.getElementById('tlPhase');
+    phaseEl.textContent=phase;phaseEl.className='tl-phase '+phaseClass;
+    updateTimelineVecPreview();
+}
+
+function updateTimelineVecPreview(){
+    const p=getParams();
+    const infl=getFruitInfluence();
+    const tFactor=infusionTime>0?Math.min(1,infusionTime/24):0;
+    const previewSweet=Math.min(1,p.sweet+infl.sweet*(0.3+tFactor*0.7));
+    const previewSour=Math.min(1,p.sour+infl.sour*(0.3+tFactor*0.7));
+    const previewBitter=Math.min(1,p.bitter+infl.bitter*(0.3+tFactor*0.7));
+    const previewFruit=infl.fruit*(0.3+tFactor*0.7);
+    const previewAlc=p.alcohol;
+    const vecs=[
+        {name:'甜度',val:previewSweet,color:'#22d3ee'},
+        {name:'酸度',val:previewSour,color:'#ec4899'},
+        {name:'苦涩',val:previewBitter,color:'#f59e0b'},
+        {name:'果香',val:previewFruit,color:'#a855f7'},
+        {name:'酒精度',val:previewAlc,color:'#f87171'},
+    ];
+    document.getElementById('tvpBars').innerHTML=vecs.map(v=>`
+        <div class="tvp-row">
+            <span class="tvp-label" style="color:${v.color}">${v.name}</span>
+            <div class="tvp-bar-wrap"><div class="tvp-bar-fill" style="width:${v.val*100}%;background:${v.color};box-shadow:0 0 6px ${v.color}44;"></div></div>
+            <span class="tvp-val" style="color:${v.color}">${v.val.toFixed(2)}</span>
+        </div>
+    `).join('');
 }
 
 function applyParams(){
     const w=WINE_DATA[currentType],s=w.subs[currentSub];
-    const sliders=[['pAlcohol','vAlcohol',s.params.alcohol],['pSweet','vSweet',s.params.sweet],['pSour','vSour',s.params.sour],['pBitter','vBitter',s.params.bitter]];
+    const base=currentBrand&&BRAND_DATA[currentType]&&BRAND_DATA[currentType][currentBrand]?BRAND_DATA[currentType][currentBrand].params:s.params;
+    const infl=getFruitInfluence();
+    const sliders=[
+        ['pAlcohol','vAlcohol',base.alcohol],
+        ['pSweet','vSweet',Math.min(1,base.sweet+infl.sweet)],
+        ['pSour','vSour',Math.min(1,base.sour+infl.sour)],
+        ['pBitter','vBitter',Math.min(1,base.bitter+infl.bitter)],
+    ];
     sliders.forEach(([sid,vid,val])=>{
         document.getElementById(sid).value=val*100;
         document.getElementById(vid).textContent=val.toFixed(2);
     });
+    document.getElementById('pFruit').value=infl.fruit*100;
+    document.getElementById('vFruit').textContent=infl.fruit.toFixed(2);
     document.getElementById('cwiType').textContent=w.icon+' '+w.name;
-    document.getElementById('cwiSub').textContent=s.name;
+    document.getElementById('cwiSub').textContent=currentBrand||s.name;
     conc=calcConcentration();
     document.getElementById('mSlider').value=conc*100;
     updateDisplay();drawRadar();
@@ -730,12 +1054,13 @@ function getParams(){
         sweet:document.getElementById('pSweet').value/100,
         sour:document.getElementById('pSour').value/100,
         bitter:document.getElementById('pBitter').value/100,
+        fruit:document.getElementById('pFruit')?document.getElementById('pFruit').value/100:0,
     };
 }
 
 function calcConcentration(){
     const p=getParams();
-    const c=0.15+p.alcohol*0.35+p.sweet*0.15+p.sour*0.15+p.bitter*0.2;
+    const c=0.15+p.alcohol*0.35+p.sweet*0.15+p.sour*0.15+p.bitter*0.2+p.fruit*0.1;
     return Math.max(0.05,Math.min(0.95,c));
 }
 
@@ -745,11 +1070,12 @@ document.getElementById('pSour').addEventListener('input',onParamChange);
 document.getElementById('pBitter').addEventListener('input',onParamChange);
 function onParamChange(e){
     const v=e.target.value/100;
-    const map={pAlcohol:'vAlcohol',pSweet:'vSweet',pSour:'vSour',pBitter:'vBitter'};
-    document.getElementById(map[e.target.id]).textContent=v.toFixed(2);
+    const map={pAlcohol:'vAlcohol',pSweet:'vSweet',pSour:'vSour',pBitter:'vBitter',pFruit:'vFruit'};
+    if(map[e.target.id])document.getElementById(map[e.target.id]).textContent=v.toFixed(2);
     conc=calcConcentration();
     document.getElementById('mSlider').value=conc*100;
     updateDisplay();drawRadar();updateLiquidH();
+    updateTimelineVecPreview();
     document.getElementById('verifyResult').classList.remove('show');
 }
 
@@ -795,9 +1121,9 @@ function calcVec(){
         Math.min(1,p.sweet*1.2),
         Math.min(1,p.sour*1.1),
         Math.min(1,(p.bitter+p.alcohol*0.5)*0.9),
-        Math.min(1,(p.alcohol*0.3+p.sweet*0.25+p.sour*0.25+p.bitter*0.2)*1.1),
+        Math.min(1,(p.alcohol*0.25+p.sweet*0.2+p.sour*0.2+p.bitter*0.15+p.fruit*0.35)*1.15),
         Math.min(1,Math.abs(calcConcentration()-0.5)*2.2),
-        Math.min(1,1-Math.abs(0.5-((p.sweet+p.sour+p.bitter)/3))*1.5),
+        Math.min(1,1-Math.abs(0.5-((p.sweet+p.sour+p.bitter+p.fruit*0.5)/3.5))*1.5),
         Math.min(1,p.alcohol*1.1),
     ];
 }
@@ -1040,6 +1366,9 @@ buildWineUI();
 applyParams();
 updateBottle();
 buildMolecules();
+buildBrandSelect();
+buildFruits();
+buildTimeline();
 drawRadar();
 renderVecTable();
 </script>
