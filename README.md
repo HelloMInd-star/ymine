@@ -119,13 +119,14 @@ workspace/
 │   ├── common-api.js              # 公共API层
 │   └── eleven-layer-public.js     # 十一层公开接口
 │
-├── engines/                       # 六大独立引擎（L3）
+├── engines/                       # 七大独立引擎（L3）
 │   ├── airmind/                   # AirMind 低空调度引擎
 │   ├── evolvemind/                # EvolveMind 演化引擎
 │   ├── financemind/               # FinanceMind 金融引擎
 │   ├── gamemind/                  # GameMind 博弈总基座
 │   ├── geom-compute/              # GeomCompute 几何计算引擎
-│   └── mindspeak/                 # MindSpeak 认知语言引擎
+│   ├── mindspeak/                 # MindSpeak 认知语言引擎
+│   └── moodmind/                  # MoodMind 情绪估值引擎（前端入口）
 │
 ├── game-os-main/business-modules/ # 五大垂直业务（L3）
 │   ├── circle-cognitive/          # 圆环认知
@@ -311,7 +312,7 @@ Game-OS V2.2 Batch1 为内部研究/教学/仿真平台。
   全域合规度 ............ ✅ 97.71/100 (A+)
   安全红线 .............. ✅ 7/7 零违反
   单元测试 .............. ✅ 124/124 全部通过
-  YBus通道数 ............ ✅ 31个
+  YBus通道数 ............ ✅ 35个（三分区隔离）
   工具函数库 ............ ✅ 统一为单一事实源
 
   🎯 P0整改完成 · 核心模块测试覆盖 🎯
