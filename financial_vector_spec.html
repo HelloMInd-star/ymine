@@ -72,6 +72,13 @@
             letter-spacing: 0.3px;
             margin-bottom: 20px;
         }
+        .header-actions {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
         .back-btn {
             display: inline-flex;
             align-items: center;
@@ -91,6 +98,25 @@
             border-color: rgba(255,255,255,0.2);
             color: #f1f5f9;
             transform: translateX(-3px);
+        }
+        .unified-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 18px;
+            background: linear-gradient(135deg, rgba(167,139,250,0.15), rgba(34,211,238,0.10), rgba(34,197,94,0.08));
+            border: 1px solid rgba(167,139,250,0.4);
+            border-radius: 10px;
+            color: #c4b5fd;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            box-shadow: 0 0 20px rgba(167,139,250,0.15);
+            animation: unifiedGlow 3s ease-in-out infinite;
+        }
+        @keyframes unifiedGlow {
+            0%, 100% { box-shadow: 0 0 12px rgba(167,139,250,0.12); }
+            50% { box-shadow: 0 0 24px rgba(167,139,250,0.25), 0 0 40px rgba(34,211,238,0.1); }
         }
         .content-card {
             background: rgba(255,255,255,0.02);
@@ -259,6 +285,7 @@
         }
         .vec-tag.generic { background: rgba(96,165,250,0.15); color: #93c5fd; border: 1px solid rgba(96,165,250,0.3); }
         .vec-tag.finance { background: rgba(74,222,128,0.15); color: #86efac; border: 1px solid rgba(74,222,128,0.3); }
+        .vec-tag.light { background: rgba(251,191,36,0.15); color: #fde68a; border: 1px solid rgba(251,191,36,0.3); }
         .rule-box {
             background: linear-gradient(135deg, rgba(59,130,246,0.08), rgba(167,139,250,0.06));
             border: 1px solid rgba(59,130,246,0.2);
@@ -279,7 +306,6 @@
         @keyframes pulse { 0%,100%{opacity:1;transform:scale(1);} 50%{opacity:.6;transform:scale(.9);} }
         .threshold-text { font-size: 13px; color: #fde68a; font-weight: 500; }
 
-        /* ===== 操作按钮栏 ===== */
         .action-bar {
             display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px;
         }
@@ -311,8 +337,13 @@
         }
         .btn-cyan:hover { background: rgba(34,211,238,0.15); border-color: rgba(34,211,238,0.5); }
         .btn-sm { padding: 6px 12px; font-size: 11px; }
+        .btn-expand {
+            background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.5); padding: 4px 10px; font-size: 11px; border-radius: 6px;
+            cursor: pointer; transition: all 0.2s; font-weight: 500;
+        }
+        .btn-expand:hover { background: rgba(255,255,255,0.08); color: #f1f5f9; border-color: rgba(255,255,255,0.2); }
 
-        /* 当前向量显示 */
         .current-vector-display {
             background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.06);
             border-radius: 12px; padding: 16px 20px; margin-bottom: 20px;
@@ -324,33 +355,61 @@
             letter-spacing: 1px; margin-bottom: 8px; font-family: system-ui, sans-serif;
         }
 
-        /* 历史记录列表 */
-        .history-list { max-height: 360px; overflow-y: auto; padding-right: 4px; }
+        .history-list { max-height: 420px; overflow-y: auto; padding-right: 4px; }
         .history-list::-webkit-scrollbar { width: 4px; }
         .history-list::-webkit-scrollbar-thumb { background: rgba(167,139,250,0.2); border-radius: 2px; }
         .history-item {
-            display: flex; align-items: center; gap: 12px;
-            padding: 12px 14px; background: rgba(255,255,255,0.015);
-            border: 1px solid rgba(255,255,255,0.04); border-radius: 10px;
-            margin-bottom: 8px; transition: all 0.2s;
+            display: flex; flex-direction: column; gap: 8px;
+            padding: 14px 16px; background: rgba(255,255,255,0.015);
+            border: 1.5px solid rgba(255,255,255,0.05); border-radius: 10px;
+            margin-bottom: 10px; transition: all 0.3s;
         }
-        .history-item:hover { background: rgba(255,255,255,0.03); border-color: rgba(255,255,255,0.08); }
+        .history-item:hover { background: rgba(255,255,255,0.03); border-color: rgba(255,255,255,0.1); }
+        .history-item.selected {
+            border-color: rgba(251,191,36,0.6);
+            background: linear-gradient(135deg, rgba(251,191,36,0.08), rgba(251,191,36,0.03));
+            box-shadow: 0 0 20px rgba(251,191,36,0.15), inset 0 0 20px rgba(251,191,36,0.03);
+            animation: selectedPulse 2s ease-in-out infinite;
+        }
+        @keyframes selectedPulse {
+            0%, 100% { box-shadow: 0 0 16px rgba(251,191,36,0.12), inset 0 0 16px rgba(251,191,36,0.02); }
+            50% { box-shadow: 0 0 28px rgba(251,191,36,0.25), inset 0 0 24px rgba(251,191,36,0.05); }
+        }
+        .history-item-header {
+            display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+        }
         .history-time {
             font-family: 'SF Mono', ui-monospace, monospace; font-size: 11px;
             color: rgba(255,255,255,0.35); flex-shrink: 0; min-width: 140px;
         }
-        .history-vec {
+        .history-vec-summary {
             flex: 1; font-family: 'SF Mono', ui-monospace, monospace;
-            font-size: 11px; color: rgba(255,255,255,0.5); overflow: hidden;
-            text-overflow: ellipsis; white-space: nowrap;
+            font-size: 11px; color: rgba(255,255,255,0.55); min-width: 200px;
         }
-        .history-actions { display: flex; gap: 6px; flex-shrink: 0; }
+        .history-vec-summary .sum-tag {
+            color: #93c5fd; font-weight: 600;
+        }
+        .history-vec-full {
+            font-family: 'SF Mono', ui-monospace, monospace;
+            font-size: 11px; color: rgba(255,255,255,0.4); line-height: 1.8;
+            padding: 10px 12px; background: rgba(0,0,0,0.2); border-radius: 6px;
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(120px,1fr)); gap: 4px 12px;
+        }
+        .history-vec-full .full-dim {
+            display: flex; align-items: center; gap: 4px;
+        }
+        .history-vec-full .full-dim .fd-k {
+            font-weight: 600; min-width: 24px;
+        }
+        .history-vec-full .full-dim .fd-k.g { color: #93c5fd; }
+        .history-vec-full .full-dim .fd-k.f { color: #86efac; }
+        .history-vec-full .full-dim .fd-v { color: #fde68a; }
+        .history-actions { display: flex; gap: 6px; flex-shrink: 0; align-items: center; margin-left: auto; }
         .empty-state {
             text-align: center; padding: 40px 20px; color: rgba(255,255,255,0.2); font-size: 13px;
         }
         .empty-state .empty-icon { font-size: 40px; margin-bottom: 10px; opacity: 0.3; }
 
-        /* 相似度结果 */
         .similarity-grid {
             display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; margin-bottom: 20px;
         }
@@ -401,8 +460,7 @@
         .sim-result-item .sr-time { color: rgba(255,255,255,0.3); font-size: 11px; flex-shrink: 0; }
         .sim-result-item .sr-vec { flex: 1; font-family: 'SF Mono', ui-monospace, monospace; color: rgba(255,255,255,0.45); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-        /* 图表区域 */
-        .chart-container { width: 100%; height: 380px; margin-bottom: 20px; }
+        .chart-container { width: 100%; height: 380px; margin-bottom: 8px; }
         .chart-tabs {
             display: flex; gap: 6px; margin-bottom: 14px;
         }
@@ -413,8 +471,21 @@
         }
         .chart-tab:hover { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.7); }
         .chart-tab.active { background: rgba(96,165,250,0.15); border-color: rgba(96,165,250,0.3); color: #93c5fd; }
+        .scatter-legend {
+            display: flex; align-items: center; justify-content: center; gap: 24px;
+            padding: 14px; background: rgba(0,0,0,0.2); border-radius: 10px;
+            font-size: 12px; color: rgba(255,255,255,0.5); margin-bottom: 20px; flex-wrap: wrap;
+        }
+        .scatter-legend .legend-item {
+            display: flex; align-items: center; gap: 8px;
+        }
+        .scatter-legend .legend-dot {
+            width: 12px; height: 12px; border-radius: 50%;
+        }
+        .scatter-legend .legend-dot.high { background: #f87171; box-shadow: 0 0 8px rgba(248,113,113,0.4); }
+        .scatter-legend .legend-dot.mid { background: #fbbf24; box-shadow: 0 0 8px rgba(251,191,36,0.4); }
+        .scatter-legend .legend-dot.low { background: #60a5fa; box-shadow: 0 0 8px rgba(96,165,250,0.4); }
 
-        /* 跨域检索 */
         .cross-domain-panel {
             background: rgba(0,0,0,0.25); border: 1px solid rgba(34,211,238,0.15);
             border-radius: 12px; padding: 20px; margin-bottom: 16px;
@@ -434,29 +505,48 @@
             padding: 10px 14px; border-radius: 8px; margin-bottom: 14px; word-break: break-all;
         }
         .cd-result-item {
-            display: flex; gap: 12px; padding: 12px 14px;
-            background: rgba(255,255,255,0.015); border-radius: 8px; margin-bottom: 8px;
+            padding: 14px 16px;
+            background: rgba(255,255,255,0.015); border-radius: 10px; margin-bottom: 10px;
             border-left: 3px solid;
         }
         .cd-result-item.high { border-left-color: #4ade80; }
         .cd-result-item.mid { border-left-color: #fde68a; }
         .cd-result-item.low { border-left-color: #f87171; }
-        .cd-result-item .cd-rank {
+        .cd-result-header {
+            display: flex; align-items: center; gap: 12px; margin-bottom: 8px;
+        }
+        .cd-rank {
             font-family: 'SF Mono', ui-monospace, monospace; font-weight: 700;
             font-size: 18px; min-width: 30px;
         }
         .cd-result-item.high .cd-rank { color: #4ade80; }
         .cd-result-item.mid .cd-rank { color: #fde68a; }
         .cd-result-item.low .cd-rank { color: #f87171; }
-        .cd-result-item .cd-body { flex: 1; }
-        .cd-result-item .cd-sim { font-family: 'SF Mono', ui-monospace, monospace; font-weight: 700; font-size: 14px; }
+        .cd-sim { font-family: 'SF Mono', ui-monospace, monospace; font-weight: 700; font-size: 16px; }
         .cd-result-item.high .cd-sim { color: #4ade80; }
         .cd-result-item.mid .cd-sim { color: #fde68a; }
         .cd-result-item.low .cd-sim { color: #f87171; }
-        .cd-result-item .cd-reason { font-size: 11px; color: rgba(255,255,255,0.35); margin-top: 4px; }
-        .cd-result-item .cd-vec { font-family: 'SF Mono', ui-monospace, monospace; font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 4px; word-break: break-all; }
+        .cd-time { font-size: 11px; color: rgba(255,255,255,0.3); }
+        .cd-reasons {
+            background: rgba(0,0,0,0.2); border-radius: 8px; padding: 10px 14px; margin: 8px 0;
+            border: 1px solid rgba(255,255,255,0.04);
+        }
+        .cd-reasons-title {
+            font-size: 11px; color: rgba(255,255,255,0.4); font-weight: 600;
+            letter-spacing: 0.5px; margin-bottom: 8px; text-transform: uppercase;
+        }
+        .cd-reason-item {
+            font-size: 11px; color: rgba(255,255,255,0.55); line-height: 1.7;
+            padding-left: 12px; position: relative;
+        }
+        .cd-reason-item::before {
+            content: '→'; position: absolute; left: 0; color: #67e8f9; font-weight: 700;
+        }
+        .cd-reason-item .reason-contrib {
+            color: #4ade80; font-weight: 600; font-family: 'SF Mono', monospace;
+        }
+        .cd-vec { font-family: 'SF Mono', ui-monospace, monospace; font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 6px; word-break: break-all; }
 
-        /* 机器编码 */
         .encoding-section { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
         .enc-table { width: 100%; border-collapse: separate; border-spacing: 0; }
         .enc-table th {
@@ -529,20 +619,26 @@
             .encoding-section { grid-template-columns: 1fr; }
             .page-title { font-size: 22px; }
             .content-card { padding: 20px; }
-            .history-item { flex-wrap: wrap; }
+            .history-item-header { flex-direction: column; align-items: flex-start; }
+            .history-actions { margin-left: 0; }
             .chart-container { height: 300px; }
+            .header-actions { flex-direction: column; }
         }
     </style>
 </head>
 <body>
     <div id="glow"></div>
     <div id="toast" class="toast"></div>
+
     <div class="main-content">
         <div class="page-header">
             <div class="page-icon">📊</div>
             <h1 class="page-title">11维金融向量体系<span class="interactive-badge">可交互向量库演示系统</span></h1>
-            <p class="page-subtitle">四维通用基座 + 七维金融专属维度 · 跨领域检索与量化定价</p>
-            <a href="index.html" class="back-btn">← 返回总控台</a>
+            <p class="page-subtitle">四维通用基座 + 七维金融专属维度（含☀️光照组映射） · 跨领域检索与量化定价</p>
+            <div class="header-actions">
+                <a href="index.html" class="back-btn">← 返回总控台</a>
+                <span class="unified-badge">📦 统一向量底座 · 共享存储/检索/可视化/编码</span>
+            </div>
         </div>
 
         <!-- ① 向量结构总览 -->
@@ -556,7 +652,7 @@
                     <div class="dim-item"><span class="dim-code">v₀</span><span class="dim-desc"><strong>金融标的主体</strong><span class="dim-label">（名词）</span></span><input type="range" class="dim-slider" data-key="v0" min="0" max="1" step="0.01" value="0.50"><span class="dim-value" id="val-v0">0.50</span></div>
                     <div class="dim-item"><span class="dim-code">v₁</span><span class="dim-desc"><strong>行情运行动作</strong><span class="dim-label">（动词）</span></span><input type="range" class="dim-slider" data-key="v1" min="0" max="1" step="0.01" value="0.60"><span class="dim-value" id="val-v1">0.60</span></div>
                     <div class="dim-item"><span class="dim-code">v₂</span><span class="dim-desc"><strong>基础属性幅值</strong><span class="dim-label">（形容词）</span></span><input type="range" class="dim-slider" data-key="v2" min="0" max="1" step="0.01" value="0.70"><span class="dim-value" id="val-v2">0.70</span></div>
-                    <div class="dim-item"><span class="dim-code">v₃</span><span class="dim-desc"><strong>外部宏观扰动</strong><span class="dim-label">（副词）</span></span><input type="range" class="dim-slider" data-key="v3" min="0" max="1" step="0.01" value="0.40"><span class="dim-value" id="val-v3">0.40</span></div>
+                    <div class="dim-item"><span class="dim-code">v₃</span><span class="dim-desc"><strong>外部宏观扰动</strong><span class="dim-label">（副词·含☀️光照组L₁-L₄扰动输入）</span></span><input type="range" class="dim-slider" data-key="v3" min="0" max="1" step="0.01" value="0.40"><span class="dim-value" id="val-v3">0.40</span></div>
                 </div>
                 <div class="dim-section finance">
                     <h4>后7维：金融专属维度 — 可调节</h4>
@@ -585,7 +681,7 @@
                 <div class="cv-label">当前向量值（拖动滑块实时更新）</div>
                 <div id="currentVectorStr">[0.50, 0.60, 0.70, 0.40, 0.55, 0.65, 0.45, 0.75, 0.60, 0.50, 0.35]</div>
             </div>
-            <div style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:12px;">📋 历史记录（<span id="historyCount">0</span> 条，IndexedDB持久化）</div>
+            <div style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:12px;">📋 历史记录（<span id="historyCount">0</span> 条，IndexedDB持久化 · 默认显示前4维摘要，点击展开查看完整11维）</div>
             <div class="history-list" id="historyList">
                 <div class="empty-state"><div class="empty-icon">📭</div>暂无保存的向量，拖动滑块调整后点击"保存当前向量"</div>
             </div>
@@ -595,7 +691,7 @@
         <div class="content-card">
             <span class="card-badge purple">③ 相似度检索</span>
             <h2 class="card-title">相似度检索面板</h2>
-            <p style="font-size:12px;color:rgba(255,255,255,0.35);margin-bottom:16px;">选择一条历史记录，系统计算当前向量与其三种距离度量</p>
+            <p style="font-size:12px;color:rgba(255,255,255,0.35);margin-bottom:16px;">点击历史记录中的"查看相似"，该记录会高亮显示，结果自动展示于此</p>
             <div class="similarity-grid">
                 <div class="sim-metric cosine">
                     <div class="sim-label">余弦相似度</div>
@@ -633,8 +729,13 @@
                 <div class="chart-tab" data-group="finance" onclick="switchChartGroup('finance',this)">后7维金融专属</div>
             </div>
             <div class="chart-container" id="trendChart"></div>
-            <h2 class="card-title" style="margin-top:24px;">向量分布散点图（PCA降维到2D）</h2>
+            <h2 class="card-title" style="margin-top:24px;">向量分布散点图（PCA降维到2D · 按与当前向量相似度着色）</h2>
             <div class="chart-container" id="scatterChart"></div>
+            <div class="scatter-legend">
+                <div class="legend-item"><span class="legend-dot high"></span>🔴 高相似簇（相似度 > 75%）</div>
+                <div class="legend-item"><span class="legend-dot mid"></span>🟡 中相似簇（相似度 50-75%）</div>
+                <div class="legend-item"><span class="legend-dot low"></span>🔵 低相似簇（相似度 < 50%）</div>
+            </div>
             <h2 class="card-title" style="margin-top:24px;">当前向量雷达图</h2>
             <div class="chart-container" id="radarChart"></div>
         </div>
@@ -643,7 +744,7 @@
         <div class="content-card">
             <span class="card-badge cyan">⑤ 跨域检索模拟</span>
             <h2 class="card-title">跨领域检索模拟</h2>
-            <p style="font-size:12px;color:rgba(255,255,255,0.35);margin-bottom:16px;">前4维通用维度是跨领域公共接口。选择其他领域的向量模板，在金融向量库中检索最相似的样本</p>
+            <p style="font-size:12px;color:rgba(255,255,255,0.35);margin-bottom:16px;">前4维通用维度是跨领域公共接口。选择其他领域的向量模板，在金融向量库中检索最相似的样本，并查看相似原因</p>
             <div class="cross-domain-panel">
                 <div class="cd-template-selector">
                     <button class="cd-template-btn mech" onclick="runCrossDomain('mech')">🔧 力学向量模板</button>
@@ -686,7 +787,7 @@
                     <tr><td><strong>I</strong>（箱体海拔）</td><td><span class="vec-tag generic">v₁</span> + <span class="vec-tag finance">f₄</span></td></tr>
                     <tr><td><strong>P</strong>（坡度动量）</td><td><span class="vec-tag finance">f₅</span></td></tr>
                     <tr><td><strong>D</strong>（阻尼衰减）</td><td><span class="vec-tag generic">v₂</span> + <span class="vec-tag finance">f₆</span></td></tr>
-                    <tr><td><strong>S</strong>（博弈熵）</td><td><span class="vec-tag generic">v₃</span></td></tr>
+                    <tr><td><strong>S</strong>（博弈熵）</td><td><span class="vec-tag generic">v₃</span> + <span class="vec-tag light">☀️光照组L₁-L₄</span>（成交量/舆论/政策/产业链扰动输入）</td></tr>
                     <tr><td><strong>Dev-I</strong>（容积偏差）</td><td><span class="vec-tag finance">f₇</span></td></tr>
                     <tr><td><strong>Dev1</strong>（均值回归差）</td><td><span class="vec-tag finance">f₈</span></td></tr>
                     <tr><td><strong>Dev2</strong>（历史相似度差）</td><td><span class="vec-tag finance">f₉</span> + <span class="vec-tag finance">f₁₀</span></td></tr>
@@ -694,12 +795,13 @@
             </table>
             <div class="rule-box">
                 <p class="rule-text">前<span class="rule-highlight">4个通用维度（v₀-v₃）</span>是金融向量与力学向量、分子结构向量之间的<span class="rule-highlight">"公共接口"</span>。</p>
+                <p class="rule-text" style="margin-top:12px;">其中<span class="rule-highlight">v₃（外部宏观扰动）</span>接入<span class="rule-highlight">☀️光照向量组L⃗=(L₁,L₂,L₃,L₄)</span>：成交量活跃度、舆论热度、政策强度、产业链景气度，四路加权合成后作为S（博弈熵）维度的外部扰动参数。</p>
                 <p class="rule-text" style="margin-top:12px;">当相似度 <span class="rule-highlight">> 75%</span> 时，系统自动将其他领域的结构标记为<span class="rule-highlight">"可参考样本"</span>，实现跨领域知识迁移。</p>
-                <div class="threshold-indicator"><span class="threshold-dot"></span><span class="threshold-text">相似度阈值：75% · 触发跨域知识迁移</span></div>
+                <div class="threshold-indicator"><span class="threshold-dot"></span><span class="threshold-text">相似度阈值：75% · 触发跨域知识迁移 · 光照扰动联动博弈熵</span></div>
             </div>
         </div>
 
-        <div class="page-footer">本页面展示11维金融向量体系，是七维向量在金融场景中的专业化扩展。</div>
+        <div class="page-footer">📦 统一向量底座 · 本页面展示11维金融向量体系，是七维向量在金融场景中的专业化扩展，所有模块共享同一套存储、检索、可视化与编码逻辑。</div>
     </div>
 
     <script>
@@ -707,11 +809,14 @@
         'use strict';
 
         const DIM_KEYS = ['v0','v1','v2','v3','f4','f5','f6','f7','f8','f9','f10'];
+        const DIM_SHORT = {v0:'v₀',v1:'v₁',v2:'v₂',v3:'v₃',f4:'f₄',f5:'f₅',f6:'f₆',f7:'f₇',f8:'f₈',f9:'f₉',f10:'f₁₀'};
         const DIM_LABELS = {
             v0:'v₀ 金融标的主体', v1:'v₁ 行情运行动作', v2:'v₂ 基础属性幅值', v3:'v₃ 外部宏观扰动',
             f4:'f₄ 箱体位置', f5:'f₅ 支撑压力位', f6:'f₆ 筹码集中度', f7:'f₇ 周期相位',
             f8:'f₈ 凯利仓位系数', f9:'f₉ 风险冗余度', f10:'f₁₀ 暴跌安全阈值'
         };
+        const DIM_TYPE = {};
+        DIM_KEYS.forEach((k,i)=>{ DIM_TYPE[k] = i<4 ? 'g' : 'f'; });
         const DB_NAME = 'FinanceVectorDB';
         const DB_STORE = 'vectors';
         const DB_VERSION = 1;
@@ -720,8 +825,8 @@
         let charts = { trend: null, scatter: null, radar: null };
         let currentChartGroup = 'all';
         let selectedTargetId = null;
+        const expandedRecords = new Set();
 
-        // ===== Toast =====
         function showToast(msg, type='info'){
             const t = document.getElementById('toast');
             t.textContent = msg;
@@ -730,7 +835,6 @@
             setTimeout(()=>t.classList.remove('show'), 2500);
         }
 
-        // ===== IndexedDB =====
         function openDB(){
             return new Promise((resolve,reject)=>{
                 const req = indexedDB.open(DB_NAME, DB_VERSION);
@@ -778,7 +882,6 @@
             });
         }
 
-        // ===== Vector helpers =====
         function getCurrentVector(){
             const v = {};
             DIM_KEYS.forEach(k=>{ v[k] = parseFloat(document.querySelector(`.dim-slider[data-key="${k}"]`).value); });
@@ -788,8 +891,18 @@
         function arrToVec(a){ const v={}; DIM_KEYS.forEach((k,i)=>v[k]=a[i]); return v; }
         function fmtVec(v){ return '[' + DIM_KEYS.map(k=>v[k].toFixed(2)).join(', ') + ']'; }
         function fmtArr(a){ return '[' + a.map(x=>x.toFixed(2)).join(', ') + ']'; }
+        function fmtVecSummary(v){
+            return DIM_KEYS.slice(0,4).map(k=>{
+                return '<span class="sum-tag">'+DIM_SHORT[k]+'</span>='+v[k].toFixed(2);
+            }).join(', ') + ' …';
+        }
+        function fmtVecFull(v){
+            return DIM_KEYS.map(k=>{
+                const cls = DIM_TYPE[k]==='g' ? 'g' : 'f';
+                return '<span class="full-dim"><span class="fd-k '+cls+'">'+DIM_SHORT[k]+'</span><span class="fd-v">'+v[k].toFixed(2)+'</span></span>';
+            }).join('');
+        }
 
-        // ===== Similarity metrics =====
         function cosineSimilarity(a,b){
             let dot=0,na=0,nb=0;
             for(let i=0;i<a.length;i++){ dot+=a[i]*b[i]; na+=a[i]*a[i]; nb+=b[i]*b[i]; }
@@ -805,12 +918,10 @@
             return s;
         }
 
-        // ===== UUID =====
         function uuid(){
             return 'v_' + Date.now().toString(36) + '_' + Math.random().toString(36).substr(2,6);
         }
 
-        // ===== Update current vector display =====
         function updateCurrentDisplay(){
             const v = getCurrentVector();
             document.getElementById('currentVectorStr').textContent = fmtVec(v);
@@ -820,9 +931,9 @@
             });
             updateEncoding();
             updateRadarChart();
+            if(allRecords.length > 1) updateScatterChart();
         }
 
-        // ===== Save vector =====
         async function saveCurrentVector(){
             const v = getCurrentVector();
             const record = {
@@ -840,31 +951,35 @@
             }
         }
 
-        // ===== Delete vector =====
         async function deleteVector(id){
             await dbDelete(id);
             showToast('🗑️ 已删除', 'info');
+            expandedRecords.delete(id);
             if(selectedTargetId === id){
                 selectedTargetId = null;
-                document.getElementById('simTargetInfo').textContent = '点击历史记录中的"查看相似"来计算相似度';
-                document.getElementById('simCosine').textContent = '--';
-                document.getElementById('simEuclidean').textContent = '--';
-                document.getElementById('simDot').textContent = '--';
-                document.getElementById('simResultsList').innerHTML = '';
+                clearSimPanel();
             }
             await refreshHistory();
         }
 
-        // ===== Clear all =====
+        function clearSimPanel(){
+            document.getElementById('simTargetInfo').textContent = '点击历史记录中的"查看相似"来计算相似度';
+            document.getElementById('simCosine').textContent = '--';
+            document.getElementById('simEuclidean').textContent = '--';
+            document.getElementById('simDot').textContent = '--';
+            document.getElementById('simResultsList').innerHTML = '';
+        }
+
         async function clearAllVectors(){
             if(!confirm('确定清空向量库中所有记录？此操作不可恢复。')) return;
             await dbClear();
             showToast('🗑️ 向量库已清空', 'info');
             selectedTargetId = null;
+            expandedRecords.clear();
+            clearSimPanel();
             await refreshHistory();
         }
 
-        // ===== Randomize =====
         function doRandomize(){
             DIM_KEYS.forEach(k=>{
                 const slider = document.querySelector(`.dim-slider[data-key="${k}"]`);
@@ -874,7 +989,6 @@
             showToast('🎲 已生成随机向量', 'info');
         }
 
-        // ===== Load sample data =====
         async function loadSampleData(){
             const samples = [
                 {v0:0.72,v1:0.45,v2:0.63,v3:0.28,f4:0.51,f5:0.72,f6:0.38,f7:0.66,f8:0.55,f9:0.42,f10:0.33},
@@ -890,7 +1004,15 @@
             await refreshHistory();
         }
 
-        // ===== Refresh history list =====
+        function toggleExpand(id){
+            if(expandedRecords.has(id)){
+                expandedRecords.delete(id);
+            }else{
+                expandedRecords.add(id);
+            }
+            refreshHistory();
+        }
+
         async function refreshHistory(){
             allRecords = await dbGetAll();
             allRecords.sort((a,b)=>b.timestamp-a.timestamp);
@@ -903,14 +1025,22 @@
                 list.innerHTML = allRecords.map(r=>{
                     const t = new Date(r.timestamp);
                     const ts = t.toLocaleString('zh-CN',{hour12:false});
-                    return `<div class="history-item">
-                        <span class="history-time">${ts}</span>
-                        <span class="history-vec" title="${fmtVec(r.vector)}">${fmtVec(r.vector)}</span>
-                        <div class="history-actions">
-                            <button class="btn btn-sm btn-cyan" onclick="viewSimilar('${r.id}')">查看相似</button>
-                            <button class="btn btn-sm btn-secondary" onclick="loadToEditor('${r.id}')">载入</button>
-                            <button class="btn btn-sm btn-danger" onclick="deleteVector('${r.id}')">删除</button>
+                    const isExpanded = expandedRecords.has(r.id);
+                    const isSelected = selectedTargetId === r.id;
+                    const selectedClass = isSelected ? ' selected' : '';
+                    const expandBtnText = isExpanded ? '收起 ▲' : '展开 ▼';
+                    return `<div class="history-item${selectedClass}" data-id="${r.id}">
+                        <div class="history-item-header">
+                            <span class="history-time">${ts}</span>
+                            <span class="history-vec-summary">${fmtVecSummary(r.vector)}</span>
+                            <div class="history-actions">
+                                <button class="btn-expand" onclick="toggleExpand('${r.id}')">${expandBtnText}</button>
+                                <button class="btn btn-sm btn-cyan" onclick="viewSimilar('${r.id}')">查看相似</button>
+                                <button class="btn btn-sm btn-secondary" onclick="loadToEditor('${r.id}')">载入</button>
+                                <button class="btn btn-sm btn-danger" onclick="deleteVector('${r.id}')">删除</button>
+                            </div>
                         </div>
+                        ${isExpanded ? '<div class="history-vec-full">'+fmtVecFull(r.vector)+'</div>' : ''}
                     </div>`;
                 }).join('');
             }
@@ -919,7 +1049,6 @@
             updateRadarChart();
         }
 
-        // ===== Load record to editor =====
         function loadToEditor(id){
             const r = allRecords.find(x=>x.id===id);
             if(!r) return;
@@ -931,7 +1060,6 @@
             showToast('📋 向量已载入编辑器', 'info');
         }
 
-        // ===== View similar =====
         function viewSimilar(id){
             const target = allRecords.find(x=>x.id===id);
             if(!target) return;
@@ -948,7 +1076,8 @@
 
             const cosLevel = cos > 0.75 ? 'high' : cos > 0.5 ? 'mid' : 'low';
             const cosLabel = cos > 0.75 ? '🟢 高相似' : cos > 0.5 ? '🟡 中相似' : '🔴 低相似';
-            document.getElementById('simTargetInfo').innerHTML = `对比目标：${new Date(target.timestamp).toLocaleString('zh-CN',{hour12:false})} · ${fmtVec(target.vector)} · <strong style="color:${cosLevel==='high'?'#4ade80':cosLevel==='mid'?'#fde68a':'#f87171'}">${cosLabel}</strong>`;
+            const levelColor = cosLevel==='high'?'#4ade80':cosLevel==='mid'?'#fde68a':'#f87171';
+            document.getElementById('simTargetInfo').innerHTML = `对比目标：${new Date(target.timestamp).toLocaleString('zh-CN',{hour12:false})} · <strong style="color:${levelColor}">${cosLabel}</strong> · 余弦相似度 <strong style="color:${levelColor}">${(cos*100).toFixed(1)}%</strong>`;
 
             const results = allRecords
                 .filter(r=>r.id!==id)
@@ -975,38 +1104,66 @@
                         </div>`;
                     }).join('');
             }
+            refreshHistory();
+            showToast(`🔍 相似度计算完成：${(cos*100).toFixed(1)}%`, cos>0.75?'success':'info');
         }
 
-        // ===== Cross-domain retrieval =====
-        const CROSS_TEMPLATES = {
+        const REASON_TEMPLATES = {
             mech: {
-                name: '力学向量模板',
-                vec: [0.6, 0.3, 0.8, 0.2, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
-                reasons: {
-                    v0:'力学系统主体（名词）',
-                    v1:'力学运动方向与行情v₁一致',
-                    v2:'力学阻尼系数映射到v₂幅值',
-                    v3:'力学外力扰动映射到v₃副词'
-                }
+                v0: { desc: 'v₀（金融标的主体）与力学系统主体一致', baseContrib: 10 },
+                v1: { desc: 'v₁（行情运行方向）与力学振动方向一致', baseContrib: 12 },
+                v2: { desc: 'v₂（基础属性幅值）与力学振幅特征匹配', baseContrib: 8 },
+                v3: { desc: 'v₃（外部宏观扰动）与力学外力扰动对应', baseContrib: 6 }
             },
             mol: {
-                name: '分子结构向量模板',
-                vec: [0.4, 0.7, 0.5, 0.3, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
-                reasons: {
-                    v0:'分子主体类型（名词）',
-                    v1:'分子振动方向与行情v₁一致',
-                    v2:'分子键能强度映射到v₂幅值',
-                    v3:'分子外部温度映射到v₃扰动'
+                v0: { desc: 'v₀（金融标的主体）与分子主体类型一致', baseContrib: 9 },
+                v1: { desc: 'v₁（行情运行方向）与分子振动方向一致', baseContrib: 11 },
+                v2: { desc: 'v₂（基础属性幅值）与分子键能强度匹配', baseContrib: 10 },
+                v3: { desc: 'v₃（外部宏观扰动）与分子外部温度对应', baseContrib: 7 }
+            }
+        };
+
+        function generateReasons(templateVec, recordVec, type){
+            const templates = REASON_TEMPLATES[type];
+            const vKeys = ['v0','v1','v2','v3'];
+            const reasons = [];
+            let totalSim = 0;
+            vKeys.forEach(k=>{
+                const idx = DIM_KEYS.indexOf(k);
+                const diff = Math.abs(recordVec[k] - templateVec[idx]);
+                const match = 1 - diff;
+                const contrib = Math.round(templates[k].baseContrib * match);
+                totalSim += contrib;
+                if(contrib >= 4){
+                    reasons.push({
+                        text: templates[k].desc,
+                        contrib: contrib,
+                        match: match
+                    });
                 }
+            });
+            reasons.sort((a,b)=>b.contrib-a.contrib);
+            return { reasons, totalSim };
+        }
+
+        const CROSS_TEMPLATES = {
+            mech: {
+                name: '🔧 力学向量模板',
+                vec: [0.6, 0.3, 0.8, 0.2, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+            },
+            mol: {
+                name: '🧬 分子结构向量模板',
+                vec: [0.4, 0.7, 0.5, 0.3, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
             }
         };
 
         function runCrossDomain(type){
             const tpl = CROSS_TEMPLATES[type];
-            document.getElementById('cdTemplateVec').textContent = `${tpl.name}：${fmtArr(tpl.vec)}（前4维有值，后7维为0——只有"通用基座"维度）`;
+            document.getElementById('cdTemplateVec').textContent = `${tpl.name}：${fmtArr(tpl.vec)}（前4维有值，后7维为0——只有"通用基座"维度参与跨域匹配）`;
             const results = allRecords.map(r=>({
                 record:r,
-                cos:cosineSimilarity(tpl.vec, vecToArr(r.vector))
+                cos:cosineSimilarity(tpl.vec, vecToArr(r.vector)),
+                reasons: generateReasons(tpl.vec, r.vector, type)
             })).sort((a,b)=>b.cos-a.cos).slice(0,3);
 
             const container = document.getElementById('cdResults');
@@ -1017,23 +1174,25 @@
             container.innerHTML = `<div style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:10px;">检索结果：找到 ${results.length} 个相似金融样本，最高相似度 ${(results[0].cos*100).toFixed(1)}%</div>` +
                 results.map((r,i)=>{
                     const lvl = r.cos>0.75?'high':r.cos>0.5?'mid':'low';
-                    const vKeys = ['v0','v1','v2','v3'];
-                    const reasonParts = vKeys.filter(k=>Math.abs(r.record.vector[k]-tpl.vec[DIM_KEYS.indexOf(k)])<0.3).map(k=>{
-                        return `${DIM_LABELS[k].split(' ')[0]}偏差${Math.abs(r.record.vector[k]-tpl.vec[DIM_KEYS.indexOf(k)]).toFixed(2)}`;
-                    });
+                    const reasonHtml = r.reasons.reasons.map(rs=>{
+                        return `<div class="cd-reason-item">${rs.text}，相似度贡献 <span class="reason-contrib">+${rs.contrib}%</span></div>`;
+                    }).join('');
                     return `<div class="cd-result-item ${lvl}">
-                        <div class="cd-rank">#${i+1}</div>
-                        <div class="cd-body">
-                            <div><span class="cd-sim">${(r.cos*100).toFixed(1)}%</span> <span style="font-size:11px;color:rgba(255,255,255,0.3);margin-left:8px;">${new Date(r.record.timestamp).toLocaleString('zh-CN',{hour12:false})}</span></div>
-                            <div class="cd-reason">相似原因：${reasonParts.length>0?reasonParts.join('、'):'整体结构接近'}</div>
-                            <div class="cd-vec">${fmtVec(r.record.vector)}</div>
+                        <div class="cd-result-header">
+                            <div class="cd-rank">#${i+1}</div>
+                            <div class="cd-sim">${(r.cos*100).toFixed(1)}%</div>
+                            <div class="cd-time">${new Date(r.record.timestamp).toLocaleString('zh-CN',{hour12:false})}</div>
                         </div>
+                        <div class="cd-reasons">
+                            <div class="cd-reasons-title">💡 相似原因解释</div>
+                            ${reasonHtml}
+                        </div>
+                        <div class="cd-vec">${fmtVec(r.record.vector)}</div>
                     </div>`;
                 }).join('');
             showToast(`🔗 ${tpl.name}检索完成，Top-1相似度${(results[0].cos*100).toFixed(1)}%`, results[0].cos>0.75?'success':'info');
         }
 
-        // ===== PCA (simplified: power iteration for top 2 components) =====
         function pcaReduce(data, dims=2){
             if(data.length < 2) return data.map(()=>[0,0]);
             const n = data[0].length;
@@ -1076,35 +1235,6 @@
             ]);
         }
 
-        // ===== K-means (simplified) =====
-        function kmeans(points, k=3, maxIter=50){
-            if(points.length <= k) return points.map((_,i)=>i);
-            const centroids = [];
-            const used = new Set();
-            while(centroids.length<k){
-                const idx = Math.floor(Math.random()*points.length);
-                if(!used.has(idx)){ used.add(idx); centroids.push(points[idx].slice()); }
-            }
-            let labels = new Array(points.length).fill(0);
-            for(let it=0;it<maxIter;it++){
-                let changed = false;
-                points.forEach((p,i)=>{
-                    let best=0, bestD=Infinity;
-                    centroids.forEach((c,ci)=>{
-                        const d = (p[0]-c[0])**2+(p[1]-c[1])**2;
-                        if(d<bestD){bestD=d;best=ci;}
-                    });
-                    if(labels[i]!==best){labels[i]=best;changed=true;}
-                });
-                if(!changed) break;
-                const sums = Array.from({length:k},()=>[0,0,0]);
-                points.forEach((p,i)=>{sums[labels[i]][0]+=p[0];sums[labels[i]][1]+=p[1];sums[labels[i]][2]++;});
-                sums.forEach((s,i)=>{ if(s[2]>0){centroids[i]=[s[0]/s[2],s[1]/s[2]];} });
-            }
-            return labels;
-        }
-
-        // ===== ECharts =====
         function initCharts(){
             charts.trend = echarts.init(document.getElementById('trendChart'), null, {renderer:'canvas'});
             charts.scatter = echarts.init(document.getElementById('scatterChart'), null, {renderer:'canvas'});
@@ -1127,8 +1257,7 @@
             return FIN_COLORS[idx-4];
         }
         function shortLabel(k){
-            const m = {v0:'v₀',v1:'v₁',v2:'v₂',v3:'v₃',f4:'f₄',f5:'f₅',f6:'f₆',f7:'f₇',f8:'f₈',f9:'f₉',f10:'f₁₀'};
-            return m[k]||k;
+            return DIM_SHORT[k]||k;
         }
 
         function updateTrendChart(){
@@ -1178,39 +1307,59 @@
                 }, true);
                 return;
             }
+            const curArr = vecToArr(getCurrentVector());
             const data = allRecords.map(r=>vecToArr(r.vector));
             const coords = pcaReduce(data, 2);
-            const labels = kmeans(coords, Math.min(3, coords.length));
-            const palette = ['#4ade80','#60a5fa','#fbbf24','#f472b6','#a78bfa'];
-            const series = [];
-            const clusterGroups = {};
+
+            const highPts = [], midPts = [], lowPts = [];
             coords.forEach((c,i)=>{
-                const cl = labels[i];
-                if(!clusterGroups[cl]) clusterGroups[cl] = [];
-                clusterGroups[cl].push({
+                const cos = cosineSimilarity(curArr, data[i]);
+                const pt = {
                     value: c,
                     vec: fmtVec(allRecords[i].vector),
-                    time: new Date(allRecords[i].timestamp).toLocaleString('zh-CN',{hour12:false})
-                });
+                    time: new Date(allRecords[i].timestamp).toLocaleString('zh-CN',{hour12:false}),
+                    sim: (cos*100).toFixed(1)+'%'
+                };
+                if(cos > 0.75) highPts.push(pt);
+                else if(cos > 0.5) midPts.push(pt);
+                else lowPts.push(pt);
             });
-            Object.keys(clusterGroups).forEach(cl=>{
-                series.push({
-                    name:'聚类'+(parseInt(cl)+1),
+
+            const series = [
+                {
+                    name:'🔴 高相似簇 (>75%)',
                     type:'scatter',
-                    data: clusterGroups[cl],
+                    data: highPts,
+                    symbolSize:16,
+                    itemStyle:{color:'#f87171',opacity:0.85,shadowBlur:12,shadowColor:'rgba(248,113,113,0.4)'},
+                    emphasis:{itemStyle:{opacity:1,shadowBlur:24,shadowColor:'rgba(248,113,113,0.6)'}}
+                },
+                {
+                    name:'🟡 中相似簇 (50-75%)',
+                    type:'scatter',
+                    data: midPts,
                     symbolSize:14,
-                    itemStyle:{color:palette[parseInt(cl)%palette.length],opacity:0.8,shadowBlur:10,shadowColor:palette[parseInt(cl)%palette.length]+'40'},
-                    emphasis:{itemStyle:{opacity:1,shadowBlur:20}}
-                });
-            });
+                    itemStyle:{color:'#fbbf24',opacity:0.85,shadowBlur:12,shadowColor:'rgba(251,191,36,0.4)'},
+                    emphasis:{itemStyle:{opacity:1,shadowBlur:24,shadowColor:'rgba(251,191,36,0.6)'}}
+                },
+                {
+                    name:'🔵 低相似簇 (<50%)',
+                    type:'scatter',
+                    data: lowPts,
+                    symbolSize:12,
+                    itemStyle:{color:'#60a5fa',opacity:0.85,shadowBlur:10,shadowColor:'rgba(96,165,250,0.4)'},
+                    emphasis:{itemStyle:{opacity:1,shadowBlur:20,shadowColor:'rgba(96,165,250,0.6)'}}
+                }
+            ].filter(s=>s.data.length > 0);
+
             charts.scatter.setOption({
                 backgroundColor:'transparent',
                 tooltip:{
                     trigger:'item',
                     backgroundColor:'rgba(15,15,30,0.9)',borderColor:'rgba(255,255,255,0.1)',textStyle:{color:'#f1f5f9',fontSize:11},
-                    formatter:function(p){ return `${p.data.time}<br/>${p.data.vec}`; }
+                    formatter:function(p){ return `${p.data.time}<br/>相似度: ${p.data.sim}<br/>${p.data.vec}`; }
                 },
-                legend:{textStyle:{color:'rgba(255,255,255,0.5)',fontSize:10},top:0},
+                legend:{data:series.map(s=>s.name),textStyle:{color:'rgba(255,255,255,0.5)',fontSize:10},top:0},
                 grid:{left:50,right:20,top:40,bottom:30},
                 xAxis:{type:'value',axisLine:{lineStyle:{color:'rgba(255,255,255,0.1)'}},axisLabel:{color:'rgba(255,255,255,0.3)',fontSize:10},splitLine:{lineStyle:{color:'rgba(255,255,255,0.04)'}},name:'PC1',nameTextStyle:{color:'rgba(255,255,255,0.3)',fontSize:10}},
                 yAxis:{type:'value',axisLine:{lineStyle:{color:'rgba(255,255,255,0.1)'}},axisLabel:{color:'rgba(255,255,255,0.3)',fontSize:10},splitLine:{lineStyle:{color:'rgba(255,255,255,0.04)'}},name:'PC2',nameTextStyle:{color:'rgba(255,255,255,0.3)',fontSize:10}},
@@ -1253,7 +1402,6 @@
             }, true);
         }
 
-        // ===== Machine encoding =====
         function toBinary8(v){
             const q = Math.round(v*255);
             return q.toString(2).padStart(8,'0');
@@ -1274,20 +1422,17 @@
             document.getElementById('binaryStream').textContent = fullBinary.trim();
         }
 
-        // ===== Slider bindings =====
         function initSliders(){
             document.querySelectorAll('.dim-slider').forEach(slider=>{
                 slider.addEventListener('input', ()=>{ updateCurrentDisplay(); });
             });
         }
 
-        // ===== Mouse glow =====
         document.addEventListener('mousemove',(e)=>{
             document.documentElement.style.setProperty('--x',e.clientX+'px');
             document.documentElement.style.setProperty('--y',e.clientY+'px');
         });
 
-        // ===== Init =====
         async function init(){
             try{
                 await openDB();
@@ -1313,6 +1458,7 @@
         window.loadToEditor = loadToEditor;
         window.runCrossDomain = runCrossDomain;
         window.switchChartGroup = switchChartGroup;
+        window.toggleExpand = toggleExpand;
 
         init();
     })();
