@@ -1699,12 +1699,33 @@
                 font-weight: 600;
             }
             .eo-cat-grid {
-                display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                display: flex;
+                flex-direction: row;
+                flex-wrap: nowrap;
                 gap: 10px;
                 margin-bottom: 18px;
+                overflow-x: auto;
+                overflow-y: hidden;
+                padding-bottom: 8px;
+                -webkit-overflow-scrolling: touch;
+            }
+            .eo-cat-grid::-webkit-scrollbar {
+                height: 6px;
+            }
+            .eo-cat-grid::-webkit-scrollbar-track {
+                background: rgba(255,255,255,0.03);
+                border-radius: 3px;
+            }
+            .eo-cat-grid::-webkit-scrollbar-thumb {
+                background: rgba(34,211,238,0.3);
+                border-radius: 3px;
+            }
+            .eo-cat-grid::-webkit-scrollbar-thumb:hover {
+                background: rgba(34,211,238,0.5);
             }
             .eo-cat-card {
+                flex: 0 0 auto;
+                min-width: 180px;
                 background: rgba(255,255,255,0.03);
                 border: 1px solid rgba(255,255,255,0.08);
                 border-radius: 10px;
@@ -1893,7 +1914,7 @@
                     <div class="eo-header">
                         <div class="eo-title">
                             <span>📊</span>
-                            <span>实证验证总览 · 42组实验验证体系</span>
+                            <span>全域仿真实验向量总管理台 · 39个实验入口</span>
                         </div>
                         <div class="eo-stats-row">
                             <div class="eo-stat">覆盖<span class="eo-stat-num">8</span>大类别</div>
@@ -1908,7 +1929,7 @@
                             <div class="eo-cat-head">
                                 <span class="eo-cat-icon">⚙️</span>
                                 <span class="eo-cat-name">控制论与系统稳定</span>
-                                <span class="eo-cat-count">12项</span>
+                                <span class="eo-cat-count">11项</span>
                             </div>
                             <div class="eo-cat-dims">I（海拔）、D（阻尼）</div>
                             <div style="font-size:10px;color:#22d3ee;margin-top:6px;font-weight:600;">▶ 进入总控交互界面</div>
@@ -1917,7 +1938,7 @@
                             <div class="eo-cat-head">
                                 <span class="eo-cat-icon">🏗️</span>
                                 <span class="eo-cat-name">结构力学与冗余安全</span>
-                                <span class="eo-cat-count">7项</span>
+                                <span class="eo-cat-count">6项</span>
                             </div>
                             <div class="eo-cat-desc" style="font-size:9px;color:rgba(251,191,36,0.6);margin-top:3px;">低空+高空混合空域验证</div>
                             <div class="eo-cat-dims">D（阻尼）、Dev-I</div>
@@ -1972,7 +1993,7 @@
                                 <span class="eo-cat-icon">🍸</span>
                                 <span class="eo-cat-name">分子调酒实验室</span>
                                 <span class="new-badge" style="background:linear-gradient(135deg,#f59e0b,#f97316);color:#000;border:none;">实体物理</span>
-                                <span class="eo-cat-count">3项</span>
+                                <span class="eo-cat-count">2项</span>
                             </div>
                             <div class="eo-cat-desc" style="font-size:9px;color:rgba(245,158,11,0.6);margin-top:3px;">味觉系统跨域验证</div>
                             <div class="eo-cat-dims">S、D · 圆锥浓度模型</div>
@@ -1996,7 +2017,7 @@
 
                     <div class="eo-flow-section">
                         <div class="eo-flow-chain">
-                            <span class="eo-flow-node hl">42组实验</span>
+                            <span class="eo-flow-node hl">39个入口</span>
                             <span class="eo-flow-arrow">──→</span>
                             <span class="eo-flow-node">七维向量</span>
                             <span class="eo-flow-arrow">──→</span>
@@ -2007,13 +2028,13 @@
                     </div>
 
                     <a href="MemoryBase/vector_store/experiment_sim_vector/index.html" class="eo-enter-btn">
-                        ▶ 进入全域仿真实验向量总管理台
+                        ▶ 进入全域仿真实验向量总管理台（39入口）
                     </a>
                 </div>
 
                 <a href="MemoryBase/vector_store/experiment_sim_vector/index.html" class="lab-base-card" style="background:linear-gradient(135deg,rgba(34,211,238,0.14),rgba(251,191,36,0.08));border-color:rgba(34,211,238,0.4);">
                     <div class="base-tag" style="background:linear-gradient(135deg,#22d3ee,#fbbf24);">🧪 全域仿真实验向量总管理台</div>
-                    <div class="base-title"><span class="icon">📊</span>39组实验三元向量总库 · KMP骨架检索 · 双人工决策闸门</div>
+                    <div class="base-title"><span class="icon">📊</span>全域仿真实验向量总管理台 · 39个实验入口 · KMP骨架检索 · 双人工决策闸门</div>
                     <div class="base-desc">vars_in自变量 / vars_out因变量 / func_expr函数三元结构化存储 · 三级仓储冷热温分配 · 三角审计日志 · MindSpeak一键数理-语言同构 · 公私分层隔离(求解内核在private_engine)</div>
                     <span class="base-arrow" style="color:#22d3ee;">▶</span>
                 </a>
@@ -2022,12 +2043,12 @@
                     <div class="lab-cat-header">
                         <span class="lab-cat-icon">⚙️</span>
                         <span class="lab-cat-name">控制论与系统稳定类</span>
-                        <span class="lab-cat-count">12项</span>
+                        <span class="lab-cat-count">11项</span>
                         <span class="lab-cat-desc">负反馈 · PID · 阻尼 · 稳态 · I/D维度</span>
                     </div>
                     <div class="lab-cat-desc-block" style="margin:10px 0 8px;padding:12px 14px;background:linear-gradient(135deg,rgba(34,211,238,0.06),rgba(34,211,238,0.02));border:1px solid rgba(34,211,238,0.15);border-radius:10px;font-size:11px;line-height:1.7;color:rgba(34,211,238,0.75);">
                         <div style="font-weight:600;color:#67e8f9;margin-bottom:6px;">⚙️ 控制论与系统稳定类 · 负反馈闭环控制</div>
-                        <div style="margin-bottom:6px;">12项 · PID控制 · 阻尼振动 · 串级闭环 · 扰动抑制 · 前馈补偿 · 饱和限幅</div>
+                        <div style="margin-bottom:6px;">11项 · PID控制 · 阻尼振动 · 串级闭环 · 扰动抑制 · 前馈补偿 · 饱和限幅</div>
                         <div style="color:rgba(255,255,255,0.5);margin-bottom:6px;">本类别实验聚焦经典控制论中的负反馈闭环系统，验证系统从偏差检测到稳态收敛的完整控制链路：</div>
                         <div style="color:rgba(255,255,255,0.4);padding-left:10px;">
                             <div>• 偏差检测：PID三参数比例-积分-微分调节</div>
@@ -2208,12 +2229,12 @@
                     <div class="lab-cat-header">
                         <span class="lab-cat-icon">🏗️</span>
                         <span class="lab-cat-name">结构力学与冗余安全类</span>
-                        <span class="lab-cat-count">7项</span>
+                        <span class="lab-cat-count">6项</span>
                         <span class="lab-cat-desc">低空+高空混合空域验证 · D（阻尼）· Dev-I</span>
                     </div>
                     <div class="lab-cat-desc-block" style="margin:10px 0 8px;padding:12px 14px;background:linear-gradient(135deg,rgba(251,191,36,0.06),rgba(251,191,36,0.02));border:1px solid rgba(251,191,36,0.15);border-radius:10px;font-size:11px;line-height:1.7;color:rgba(251,191,36,0.75);">
                         <div style="font-weight:600;color:#fcd34d;margin-bottom:6px;">🏗️ 结构力学与冗余安全类 · 低空+高空混合空域验证</div>
-                        <div style="margin-bottom:6px;">7项 · 宏观落体 · 介观原子 · 微观分子 · 承重 · 冗余 · 堆积形态 · 爆破临界</div>
+                        <div style="margin-bottom:6px;">6项 · 宏观落体 · 介观原子 · 微观分子 · 承重 · 冗余 · 安全边界</div>
                         <div style="color:rgba(255,255,255,0.5);margin-bottom:6px;">本类别实验聚焦飞行器在低空+高空混合空域中的力学行为、结构冗余与安全边界验证：</div>
                         <div style="color:rgba(255,255,255,0.4);padding-left:10px;">
                             <div>• 低空基准：无人机双层阻尼与串级PID控制</div>
@@ -2729,13 +2750,13 @@
                     <div class="lab-cat-header">
                         <span class="lab-cat-icon">🍸</span>
                         <span class="lab-cat-name">分子调酒实验室</span>
-                        <span class="lab-cat-count">3项</span>
+                        <span class="lab-cat-count">2项</span>
                         <span class="new-badge" style="background:linear-gradient(135deg,#f59e0b,#f97316);color:#000;border:none;">🆕 实体物理实验组</span>
                         <span class="lab-cat-desc">味觉系统 · 圆锥浓度模型 · 三基准阈值</span>
                     </div>
                     <div class="lab-cat-desc-block" style="margin:10px 0 8px;padding:12px 14px;background:linear-gradient(135deg,rgba(245,158,11,0.06),rgba(245,158,11,0.02));border:1px solid rgba(245,158,11,0.15);border-radius:10px;font-size:11px;line-height:1.7;color:rgba(245,158,11,0.75);">
                         <div style="font-weight:600;color:#fcd34d;margin-bottom:6px;">🍸 分子调酒实验室 · 味觉系统跨域实体验证 <span style="font-size:10px;background:linear-gradient(135deg,#f59e0b,#f97316);color:#000;padding:1px 8px;border-radius:4px;margin-left:6px;font-weight:700;">🆕 实体物理</span></div>
-                        <div style="margin-bottom:6px;">3项 · 风味浓度归一化 · 0.50稳态配方验证 · 0.68熔断线测试 · S/D维度 · 圆锥浓度模型</div>
+                        <div style="margin-bottom:6px;">2项 · 风味浓度归一化 · 0.50稳态配方验证 · 0.68熔断线测试 · S/D维度 · 圆锥浓度模型</div>
                         <div style="color:rgba(255,255,255,0.5);margin-bottom:6px;">本实验组为 Game-OS 方法论在「味觉系统」域的跨领域实体物理验证，将金融域圆锥浓度模型迁移至风味浓度调配：</div>
                         <div style="color:rgba(255,255,255,0.4);padding-left:10px;">
                             <div>• 核心公式：C = m × ρ₀ / V(h)（质量×密度/圆锥体积）</div>
