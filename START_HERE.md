@@ -20,7 +20,7 @@
 | 目录 | 说明 | 文档 |
 |------|------|------|
 | [engines/](engines/) | 🧠 七大独立认知引擎（核心能力层） | [engines/README.md](engines/README.md) |
-| [labs/](labs/) | 🔬 31间仿真实验室（验证层） | [labs/README.md](labs/README.md) |
+| [labs/](labs/) | 🔬 39个仿真实验入口 · 全域仿真实验向量总管理台（验证层） | [labs/README.md](labs/README.md) |
 | [game-os-main/](game-os-main/) | ⚙️ Node.js后端内核（执行层） | [game-os-main/README.md](game-os-main/README.md) |
 | `*-private-engine/` | 🔒 私有涉密引擎（物理隔离，仅Stub） | — |
 | [assets/](assets/) | 🎨 静态资源（CSS/JS） | — |
@@ -54,7 +54,7 @@ bash start_all.sh
 1. **先看README**：[README.md](README.md) — 项目完整介绍、核心亮点、架构总览
 2. **再开总控台**：[index.html](index.html) — 可视化导航所有模块
 3. **深入引擎**：[engines/README.md](engines/README.md) — 七大引擎职责详解
-4. **体验实验**：[labs/README.md](labs/README.md) — 31间实验室分类导览
+4. **体验实验**：[labs/README.md](labs/README.md) — 39个实验入口分类导览（横向滚动总览）
 
 ---
 
