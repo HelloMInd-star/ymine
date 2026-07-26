@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Y.Mine · Game-OS 全域架构总览</title>
+    <title>Y.Mine · 锥心博弈沙盘 · Verifiable Reward 可验证信号系统</title>
     <link rel="stylesheet" href="../../assets/css/base.css">
     <script src="../../assets/js/bus.js"></script>
     <style>
@@ -55,6 +55,137 @@
             color: rgba(255, 255, 255, 0.25);
             font-weight: 300;
             margin-top: 2px;
+        }
+
+        /* ===== Verifiable Reward 可验证信号系统标注区 ===== */
+        .vr-banner {
+            margin: 16px 0 20px;
+            padding: 14px 18px;
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.06), rgba(59, 130, 246, 0.04), rgba(167, 139, 250, 0.05));
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            opacity: 0;
+            animation: fadeInUp 0.7s ease 0.15s forwards;
+            position: relative;
+            overflow: hidden;
+        }
+        .vr-banner::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #22c55e, #3b82f6, #a78bfa);
+            opacity: 0.6;
+        }
+        .vr-banner.state-warn {
+            background: linear-gradient(135deg, rgba(251, 191, 36, 0.08), rgba(251, 146, 60, 0.05), rgba(239, 68, 68, 0.03));
+            border-color: rgba(251, 191, 36, 0.2);
+        }
+        .vr-banner.state-warn::before {
+            background: linear-gradient(90deg, #fbbf24, #fb923c, #f97316);
+        }
+        .vr-banner.state-danger {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.10), rgba(248, 113, 113, 0.06), rgba(167, 139, 250, 0.04));
+            border-color: rgba(239, 68, 68, 0.25);
+        }
+        .vr-banner.state-danger::before {
+            background: linear-gradient(90deg, #ef4444, #f87171, #a78bfa);
+            animation: pulseDanger 1.2s ease-in-out infinite;
+        }
+        @keyframes pulseDanger {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
+        .vr-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.75);
+            letter-spacing: 0.3px;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .vr-title .vr-icon {
+            font-size: 15px;
+            filter: drop-shadow(0 0 6px rgba(167, 139, 250, 0.5));
+        }
+        .vr-desc {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.35);
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+        .vr-status-row {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        .vr-status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+        }
+        .vr-status-badge.safe {
+            background: rgba(34, 197, 94, 0.12);
+            border: 1px solid rgba(34, 197, 94, 0.35);
+            color: #4ade80;
+        }
+        .vr-status-badge.warn {
+            background: rgba(251, 191, 36, 0.12);
+            border: 1px solid rgba(251, 191, 36, 0.35);
+            color: #fde047;
+        }
+        .vr-status-badge.danger {
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid rgba(239, 68, 68, 0.4);
+            color: #fca5a5;
+            animation: pulseBadge 1.5s ease-in-out infinite;
+        }
+        @keyframes pulseBadge {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+            50% { box-shadow: 0 0 12px 2px rgba(239, 68, 68, 0.2); }
+        }
+        .vr-status-dot {
+            width: 8px; height: 8px; border-radius: 50%;
+            display: inline-block;
+        }
+        .vr-status-badge.safe .vr-status-dot { background: #22c55e; box-shadow: 0 0 8px rgba(34, 197, 94, 0.6); }
+        .vr-status-badge.warn .vr-status-dot { background: #fbbf24; box-shadow: 0 0 8px rgba(251, 191, 36, 0.6); }
+        .vr-status-badge.danger .vr-status-dot { background: #ef4444; box-shadow: 0 0 8px rgba(239, 68, 68, 0.6); animation: blink 0.8s ease-in-out infinite; }
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+        .vr-thresholds {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.3);
+            font-family: 'SF Mono', ui-monospace, monospace;
+        }
+        .vr-thr {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+        .vr-thr.t1 { background: rgba(251, 146, 60, 0.1); color: #fb923c; }
+        .vr-thr.t2 { background: rgba(34, 197, 94, 0.1); color: #4ade80; }
+        .vr-thr.t3 { background: rgba(239, 68, 68, 0.1); color: #f87171; }
+        .vr-signal-val {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.4);
+            font-family: 'SF Mono', ui-monospace, monospace;
+            margin-left: auto;
         }
 
         .back-link {
@@ -378,9 +509,35 @@
 
         <!-- ===== 头部 ===== -->
         <div class="header">
-            <div class="badge">🏗️ 底层操作系统</div>
-            <h1>Game-OS 全域架构总览</h1>
-            <div class="sub">博弈底座 · 低空经济 · 精算映射 · 物流底座 · 算力底座</div>
+            <div class="badge">🧪 锥心博弈沙盘</div>
+            <h1>🧪 锥心博弈沙盘 · 博弈收敛到 0.68</h1>
+            <div class="sub">多模态强化学习信号验证 · THRESHOLDS 三基准实时判定 · Verifiable Reward System</div>
+        </div>
+
+        <!-- ===== Verifiable Reward 可验证信号系统标注区 ===== -->
+        <div class="vr-banner" id="vrBanner">
+            <div class="vr-title">
+                <span class="vr-icon">🔬</span>
+                Verifiable Reward 可验证信号系统
+            </div>
+            <div class="vr-desc">
+                本沙盘基于 THRESHOLDS 三基准（0.48 保本 / 0.50 稳态 / 0.68 熔断），在多模态交互场景中提取可验证的决策信号，实时输出"安全 / 预警 / 熔断"三种状态。
+            </div>
+            <div class="vr-status-row">
+                <div class="vr-status-badge safe" id="vrStatusBadge">
+                    <span class="vr-status-dot"></span>
+                    <span id="vrStatusText">🟢 安全</span>
+                    <span id="vrStatusVal" style="font-family:'SF Mono',monospace;opacity:0.8;">(0.52)</span>
+                </div>
+                <div class="vr-thresholds">
+                    <span class="vr-thr t1">0.48 保本</span>
+                    <span style="color:rgba(255,255,255,0.15);">|</span>
+                    <span class="vr-thr t2">0.50 稳态</span>
+                    <span style="color:rgba(255,255,255,0.15);">|</span>
+                    <span class="vr-thr t3">0.68 熔断</span>
+                </div>
+                <div class="vr-signal-val" id="vrSignalDetail">signal = 0.52 · 稳态区间</div>
+            </div>
         </div>
 
         <!-- ===== 架构概览 ===== -->
@@ -573,6 +730,55 @@
         }
 
         // ================================================================
+        // ===== Verifiable Reward 可验证信号系统 · 状态更新 =====
+        // ================================================================
+        function updateVRStatus(signal, detail) {
+            const banner = document.getElementById('vrBanner');
+            const badge = document.getElementById('vrStatusBadge');
+            const statusText = document.getElementById('vrStatusText');
+            const statusVal = document.getElementById('vrStatusVal');
+            const signalDetail = document.getElementById('vrSignalDetail');
+            if (!banner || !badge) return;
+
+            const s = Math.max(0, Math.min(1, signal));
+            banner.classList.remove('state-warn', 'state-danger');
+            badge.classList.remove('safe', 'warn', 'danger');
+
+            let state, emoji, label;
+            if (s < 0.48) {
+                state = 'safe';
+                emoji = '🟢';
+                label = '安全（保本线内）';
+                banner.classList.add('state-safe');
+            } else if (s <= 0.58) {
+                state = 'safe';
+                emoji = '🟢';
+                label = '安全';
+                banner.classList.add('state-safe');
+            } else if (s < 0.68) {
+                state = 'warn';
+                emoji = '🟡';
+                label = '预警';
+                banner.classList.add('state-warn');
+            } else {
+                state = 'danger';
+                emoji = '🔴';
+                label = '熔断';
+                banner.classList.add('state-danger');
+            }
+
+            badge.classList.add(state);
+            statusText.textContent = emoji + ' ' + label;
+            statusVal.textContent = '(' + s.toFixed(2) + ')';
+            if (detail !== undefined) {
+                signalDetail.textContent = detail;
+            } else {
+                const zone = s < 0.48 ? '保本安全区' : s <= 0.50 ? '稳态区间' : s < 0.68 ? '预警逼近区' : '熔断触发区';
+                signalDetail.textContent = 'signal = ' + s.toFixed(2) + ' · ' + zone;
+            }
+        }
+
+        // ================================================================
         // ===== 导航切换 =====
         // ================================================================
         const archItems = document.querySelectorAll('.arch-item');
@@ -641,6 +847,16 @@
                 const manualPct = 100 - autoPct;
                 ratioDisplay.textContent = Math.max(0, Math.min(100, autoPct)) + '% / ' + Math.max(0, Math.min(100,
                     manualPct)) + '%';
+
+                // Verifiable Reward 信号计算
+                const deviation = Math.abs(p - 0.5) * 0.7;
+                const syncRisk = (1 - sync) * 0.04;
+                const kellyRisk = Math.max(0, f - 0.30) * 0.6;
+                const convergenceDrift = Math.abs(time - 0.5) * 0.03;
+                let vrSignal = 0.48 + deviation + syncRisk + kellyRisk + convergenceDrift;
+                vrSignal = Math.max(0, Math.min(1, vrSignal));
+                const vrZone = vrSignal < 0.48 ? '保本安全区' : vrSignal <= 0.58 ? '稳态安全区' : vrSignal < 0.68 ? '预警逼近区' : '熔断触发区';
+                updateVRStatus(vrSignal, 'signal=' + vrSignal.toFixed(2) + ' · p=' + p.toFixed(2) + ' f*=' + (f*100).toFixed(0) + '% sync=' + Math.round(sync*100) + '% · ' + vrZone);
 
                 ctx.clearRect(0, 0, w, h);
 
