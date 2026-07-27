@@ -21,6 +21,7 @@
 
 [🚀 快速启动](#-30秒快速启动) ·
 [🎯 体验路径](#-推荐体验路径) ·
+[🎬 视频演示](#-视频生成演示remotion) ·
 [⚡ 核心亮点](#-核心亮点) ·
 [🏗️ 架构总览](#️-架构总览) ·
 [🔌 API文档](#-rest-api-端点速查) ·
@@ -37,6 +38,7 @@
 - [30秒快速启动](#-30秒快速启动)
 - [全栈服务启动指南](#-全栈服务启动指南)
 - [推荐体验路径](#-推荐体验路径)
+- [🎬 视频生成演示](#-视频生成演示remotion)
 - [核心亮点](#-核心亮点)
 - [系统规模](#-系统规模)
 - [REST API端点](#-rest-api-端点速查)
@@ -118,6 +120,43 @@ npm run dev
 | 🧠 **第7站** | [engines/mindspeak/index.html](engines/mindspeak/index.html) | MindSpeak四层认知引擎演示 |
 | 📊 **第8站** | http://localhost:8501 | Streamlit数据仪表盘（需启动streamlit） |
 | 🎬 **第9站** | http://localhost:3000 | Remotion视频生成预览（需启动npm run dev） |
+
+---
+
+## 🎬 视频生成演示（Remotion）
+
+Game-OS V2.5 已集成 **Remotion** 视频生成能力，分子调酒实验室（Molecular Mixology）可作为 3D 可视化示例场景。基于 React + Three.js 实现，支持自定义 3D 场景编辑与 MP4 视频导出。
+
+### 🚀 启动预览
+
+```bash
+cd video
+npm install
+npm start          # 或 npm run dev
+```
+
+启动成功后访问 **http://localhost:3000** 进入 Remotion Studio 预览界面。
+
+![终端启动日志](docs/screenshots/remotion-terminal.png)
+
+### 🎥 预览效果
+
+在 Remotion Studio 中可实时预览 3D 分子动画，支持时间轴拖拽、播放控制、参数调整：
+
+![浏览器预览界面](docs/screenshots/remotion-preview.png)
+
+**视频规格**：1920×1080 · 30 FPS · 时长 18 秒，包含 TitleOverlay 标题层、Subtitles 字幕层等多轨道合成。
+
+### 📤 渲染导出 MP4
+
+```bash
+cd video
+npm run build
+```
+
+渲染完成后视频文件输出至：`video/output/video.mp4`
+
+> **技术说明**：该功能基于 **React + Three.js (@react-three/fiber)** 实现，支持自定义 3D 场景、Shader 材质、相机动画，并可通过 Remotion 的 `<Composition>` API 批量参数化渲染。
 
 ---
 
