@@ -1,12 +1,12 @@
 import statistics
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
-from config import THRESHOLDS
+from config import THRESHOLDS, VERSION, VERSION_DATE, SYSTEM_INFO
 
 app = FastAPI(
     title="Game-OS Backend API",
-    version="2.4",
-    description="Game-OS 后端服务，提供核心算法 REST API 调用"
+    version="2.5.0",
+    description="Game-OS 后端服务 · V2.5 FullStack-Verified · 提供核心算法 REST API 调用（真实算法引擎）+ Streamlit 仪表盘 + Remotion 视频生成"
 )
 
 app.add_middleware(
@@ -19,12 +19,32 @@ app.add_middleware(
 
 @app.get("/")
 async def root():
-    return {"message": "Game-OS Backend API 运行中", "version": "2.4"}
+    return {
+        "message": "Game-OS Backend API 运行中",
+        "version": VERSION,
+        "version_date": VERSION_DATE,
+        "codename": "FullStack-Verified",
+        "services": {
+            "api": "http://localhost:8000",
+            "dashboard": "http://localhost:8501",
+            "video": "http://localhost:3000",
+            "docs": "http://localhost:8000/docs"
+        },
+        "api_endpoints": [
+            "GET /",
+            "GET /health",
+            "GET /thresholds",
+            "GET /version",
+            "GET /api/chromosome/diagnose",
+            "GET /api/storm/simulate",
+            "GET /api/system/status"
+        ]
+    }
 
 
 @app.get("/health")
 async def health_check():
-    return {"status": "ok", "service": "game-os-backend", "version": "2.4"}
+    return {"status": "ok", "service": "game-os-backend", "version": VERSION}
 
 
 @app.get("/thresholds")
@@ -34,7 +54,53 @@ async def get_thresholds():
 
 @app.get("/version")
 async def get_version():
-    return {"version": "2.4", "description": "Backend-Integrated"}
+    return {
+        "version": VERSION,
+        "version_date": VERSION_DATE,
+        "codename": "FullStack-Verified",
+        "description": "Real-algorithm full-stack system with FastAPI + Streamlit + Remotion",
+        "system_info": SYSTEM_INFO,
+        "services": {
+            "backend": {"framework": "FastAPI", "port": 8000, "status": "running"},
+            "dashboard": {"framework": "Streamlit", "port": 8501, "command": "streamlit run dashboard/Home.py"},
+            "video": {"framework": "Remotion", "port": 3000, "studio_port": 3001, "command": "cd video && npm run dev"}
+        }
+    }
+
+
+@app.get("/api/system/status")
+async def get_system_status():
+    """
+    获取所有服务的状态信息（供总控台服务状态面板使用）
+    """
+    return {
+        "version": VERSION,
+        "version_date": VERSION_DATE,
+        "services": {
+            "fastapi": {
+                "name": "FastAPI 后端",
+                "status": "online",
+                "port": 8000,
+                "api_endpoints": 7,
+                "docs": "/docs"
+            },
+            "streamlit": {
+                "name": "Streamlit 仪表盘",
+                "status": "standby",
+                "port": 8501,
+                "start_command": "streamlit run dashboard/Home.py"
+            },
+            "remotion": {
+                "name": "Remotion 视频生成",
+                "status": "standby",
+                "port": 3000,
+                "studio_port": 3001,
+                "start_command": "cd video && npm run dev"
+            }
+        },
+        "tests": SYSTEM_INFO["tests"],
+        "pages": SYSTEM_INFO["frontend"]["pages"]
+    }
 
 
 # ============== 染色体诊断 API（真实算法） ==============

@@ -12,7 +12,7 @@ router = APIRouter(prefix="/api/storm", tags=["storm"])
 
 @router.get("/status")
 def status():
-    return {"module": "storm-energy-simulator", "status": "ready", "version": "2.4"}
+    return {"module": "storm-energy-simulator", "status": "ready", "version": "2.5"}
 
 
 @router.get("/simulate")

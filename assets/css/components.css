@@ -1,5 +1,5 @@
-/* ===== Y.Mine 公共组件库 v1.0 ===== */
-/* 横幅卡片、快速入口、状态徽章、阈值条、按钮、动效、工具类 */
+/* ===== Y.Mine 公共组件库 v2.5 ===== */
+/* 横幅卡片、快速入口、状态徽章、阈值条、按钮、动效、工具类、服务状态面板 */
 
 /* ===== 全局动效关键帧 ===== */
 @keyframes vrDotPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.6;transform:scale(.8)}}
@@ -380,3 +380,137 @@ input[type=range].vr-slider::-moz-range-thumb{
     .qe-icon{width:38px;height:38px;border-radius:10px}
     .qe-icon svg{width:24px;height:24px}
 }
+
+/* ===== V2.5 全栈服务状态面板 ===== */
+.service-status-panel{
+    margin-top:14px;
+    padding:18px 22px;
+    background:linear-gradient(135deg,rgba(15,23,42,0.95),rgba(30,41,59,0.85));
+    border:1px solid rgba(99,102,241,0.25);
+    border-radius:14px;
+    position:relative;
+    overflow:hidden;
+}
+.service-status-panel::before{
+    content:'';position:absolute;top:0;left:0;right:0;height:2px;
+    background:linear-gradient(90deg,#6366f1,#8b5cf6,#06b6d4);
+}
+.service-status-header{
+    display:flex;align-items:center;justify-content:space-between;
+    margin-bottom:16px;flex-wrap:wrap;gap:10px;
+}
+.service-status-title{
+    display:flex;align-items:center;gap:10px;
+    font-size:13px;font-weight:700;color:#c7d2fe;
+    text-transform:uppercase;letter-spacing:1px;
+}
+.service-status-title svg{width:20px;height:20px;color:#818cf8}
+.service-status-meta{
+    display:flex;gap:16px;font-size:11px;color:rgba(255,255,255,0.45);
+    font-family:'SF Mono',ui-monospace,monospace;
+}
+.service-status-meta span{display:flex;align-items:center;gap:5px}
+.service-cards{
+    display:grid;grid-template-columns:repeat(3,1fr);gap:12px;
+}
+.service-card{
+    padding:14px 16px;
+    background:rgba(255,255,255,0.03);
+    border:1px solid rgba(255,255,255,0.06);
+    border-radius:10px;
+    transition:all .25s ease;
+    position:relative;overflow:hidden;
+}
+.service-card:hover{
+    background:rgba(255,255,255,0.06);
+    border-color:rgba(255,255,255,0.12);
+    transform:translateY(-2px);
+}
+.service-card.online{border-color:rgba(74,222,128,0.4);background:rgba(74,222,128,0.06)}
+.service-card.standby{border-color:rgba(251,191,36,0.3);background:rgba(251,191,36,0.04)}
+.service-card.offline{border-color:rgba(248,113,113,0.3);background:rgba(248,113,113,0.04)}
+.service-card-head{
+    display:flex;align-items:center;justify-content:space-between;
+    margin-bottom:10px;
+}
+.service-card-name{
+    display:flex;align-items:center;gap:8px;
+    font-size:12px;font-weight:600;color:rgba(255,255,255,0.9);
+}
+.service-card-name .svc-icon{
+    width:28px;height:28px;border-radius:8px;
+    display:flex;align-items:center;justify-content:center;
+    background:rgba(99,102,241,0.2);
+}
+.service-card.online .svc-icon{background:rgba(74,222,128,0.2)}
+.service-card.standby .svc-icon{background:rgba(251,191,36,0.15)}
+.service-card.offline .svc-icon{background:rgba(248,113,113,0.15)}
+.service-card-name .svc-icon svg{width:16px;height:16px}
+.service-status-badge{
+    display:inline-flex;align-items:center;gap:5px;
+    padding:3px 8px;border-radius:20px;
+    font-size:10px;font-weight:700;text-transform:uppercase;
+    letter-spacing:0.5px;
+}
+.service-status-badge.online{
+    background:rgba(74,222,128,0.15);color:#4ade80;
+}
+.service-status-badge.standby{
+    background:rgba(251,191,36,0.12);color:#fbbf24;
+}
+.service-status-badge.offline{
+    background:rgba(248,113,113,0.12);color:#f87171;
+}
+.service-status-badge .dot{
+    width:6px;height:6px;border-radius:50%;
+    background:currentColor;
+}
+.service-card.online .service-status-badge .dot{animation:vrDotPulse 2s infinite}
+.service-card-metrics{
+    display:grid;grid-template-columns:repeat(2,1fr);gap:8px;
+}
+.service-metric{
+    display:flex;flex-direction:column;gap:2px;
+}
+.service-metric-val{
+    font-family:'SF Mono',ui-monospace,monospace;
+    font-size:15px;font-weight:700;color:#fff;line-height:1;
+}
+.service-metric-val.port{color:#67e8f9}
+.service-metric-val.count{color:#a5b4fc}
+.service-metric-label{
+    font-size:9px;color:rgba(255,255,255,0.4);
+    text-transform:uppercase;letter-spacing:0.5px;
+}
+.service-card-cmd{
+    margin-top:10px;padding-top:10px;
+    border-top:1px solid rgba(255,255,255,0.05);
+    font-family:'SF Mono',ui-monospace,monospace;
+    font-size:10px;color:rgba(255,255,255,0.35);
+    word-break:break-all;
+}
+.service-card.online .service-card-cmd{color:rgba(103,232,249,0.6)}
+.service-apis-grid{
+    margin-top:14px;padding-top:14px;
+    border-top:1px solid rgba(255,255,255,0.05);
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px;
+}
+.api-endpoint-chip{
+    display:flex;align-items:center;gap:8px;
+    padding:7px 11px;border-radius:8px;
+    background:rgba(255,255,255,0.03);
+    border:1px solid rgba(255,255,255,0.06);
+    font-family:'SF Mono',ui-monospace,monospace;
+    font-size:11px;
+}
+.api-method{
+    font-size:9px;font-weight:800;padding:2px 6px;border-radius:4px;
+    background:rgba(34,211,238,0.15);color:#22d3ee;
+}
+.api-method.get{background:rgba(34,211,238,0.15);color:#22d3ee}
+.api-path{color:rgba(255,255,255,0.65)}
+@media(max-width:800px){
+    .service-cards{grid-template-columns:1fr}
+    .service-status-meta{font-size:10px;gap:10px}
+}
+

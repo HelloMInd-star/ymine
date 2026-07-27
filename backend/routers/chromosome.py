@@ -12,7 +12,7 @@ router = APIRouter(prefix="/api/chromosome", tags=["chromosome"])
 
 @router.get("/status")
 def status():
-    return {"module": "chromosome-diagnostic", "status": "ready", "version": "2.4"}
+    return {"module": "chromosome-diagnostic", "status": "ready", "version": "2.5"}
 
 
 @router.get("/diagnose")

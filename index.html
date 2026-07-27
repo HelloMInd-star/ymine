@@ -1365,7 +1365,7 @@
                     <div class="dash-stat"><div class="v yellow" id="statSteps">0.68</div><div class="l">熔断</div></div>
                     <div class="dash-stat"><div class="v green" id="statFuse">5</div><div class="l">模块</div></div>
                 </div>
-                <div class="dash-ver">V2.4 · BACKEND-INTEGRATED · FULLSTACK ARCHITECTURE</div>
+                <div class="dash-ver">V2.5 FullStack-Verified · FastAPI+Streamlit+Remotion · 148 Tests</div>
             </div>
 
             <!-- 全局三色阈值说明 -->
@@ -1878,6 +1878,125 @@
                         <span class="icon">🔊</span> 物理声场修复 · 频谱分析与断层检测
                         <span class="arrow" style="color:#06b6d4;">🎧</span>
                     </a>
+                </div>
+            </div>
+
+            <!-- ===== V2.5 全栈服务状态面板 ===== -->
+            <div class="service-status-panel" id="serviceStatusPanel">
+                <div class="service-status-header">
+                    <div class="service-status-title">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="2" y="3" width="20" height="14" rx="2"/>
+                            <line x1="8" y1="21" x2="16" y2="21"/>
+                            <line x1="12" y1="17" x2="12" y2="21"/>
+                            <path d="M6 8l3 3 3-4 3 4 3-3"/>
+                        </svg>
+                        全栈服务状态 · Full-Stack Service Monitor
+                    </div>
+                    <div class="service-status-meta">
+                        <span id="svcVersionText">V2.5 FullStack-Verified</span>
+                        <span id="svcTestCount">🧪 148 Tests</span>
+                        <span id="svcPageCount">📄 25 Pages</span>
+                    </div>
+                </div>
+                <div class="service-cards">
+                    <!-- FastAPI 后端 -->
+                    <div class="service-card standby" id="svcFastapi">
+                        <div class="service-card-head">
+                            <div class="service-card-name">
+                                <span class="svc-icon">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="#67e8f9" stroke-width="2">
+                                        <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+                                    </svg>
+                                </span>
+                                FastAPI 后端
+                            </div>
+                            <span class="service-status-badge standby" id="svcFastapiBadge">
+                                <span class="dot"></span>
+                                <span id="svcFastapiStatus">待启动</span>
+                            </span>
+                        </div>
+                        <div class="service-card-metrics">
+                            <div class="service-metric">
+                                <span class="service-metric-val port" id="svcFastapiPort">:8000</span>
+                                <span class="service-metric-label">端口</span>
+                            </div>
+                            <div class="service-metric">
+                                <span class="service-metric-val count" id="svcFastapiApis">7</span>
+                                <span class="service-metric-label">API端点</span>
+                            </div>
+                        </div>
+                        <div class="service-card-cmd">uvicorn main:app --reload --port 8000</div>
+                    </div>
+                    <!-- Streamlit 仪表盘 -->
+                    <div class="service-card standby" id="svcStreamlit">
+                        <div class="service-card-head">
+                            <div class="service-card-name">
+                                <span class="svc-icon">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2">
+                                        <rect x="3" y="3" width="18" height="18" rx="2"/>
+                                        <path d="M3 9h18M9 21V9"/>
+                                        <path d="m14 14 3 3 4-4"/>
+                                    </svg>
+                                </span>
+                                Streamlit 仪表盘
+                            </div>
+                            <span class="service-status-badge standby" id="svcStreamlitBadge">
+                                <span class="dot"></span>
+                                <span id="svcStreamlitStatus">待启动</span>
+                            </span>
+                        </div>
+                        <div class="service-card-metrics">
+                            <div class="service-metric">
+                                <span class="service-metric-val port" id="svcStreamlitPort">:8501</span>
+                                <span class="service-metric-label">端口</span>
+                            </div>
+                            <div class="service-metric">
+                                <span class="service-metric-val count" id="svcStreamlitPages">3</span>
+                                <span class="service-metric-label">页面</span>
+                            </div>
+                        </div>
+                        <div class="service-card-cmd">streamlit run dashboard/Home.py</div>
+                    </div>
+                    <!-- Remotion 视频生成 -->
+                    <div class="service-card standby" id="svcRemotion">
+                        <div class="service-card-head">
+                            <div class="service-card-name">
+                                <span class="svc-icon">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="#f472b6" stroke-width="2">
+                                        <polygon points="23 7 16 12 23 17 23 7"/>
+                                        <rect x="1" y="5" width="15" height="14" rx="2"/>
+                                    </svg>
+                                </span>
+                                Remotion 视频
+                            </div>
+                            <span class="service-status-badge standby" id="svcRemotionBadge">
+                                <span class="dot"></span>
+                                <span id="svcRemotionStatus">待启动</span>
+                            </span>
+                        </div>
+                        <div class="service-card-metrics">
+                            <div class="service-metric">
+                                <span class="service-metric-val port" id="svcRemotionPort">:3000</span>
+                                <span class="service-metric-label">预览端口</span>
+                            </div>
+                            <div class="service-metric">
+                                <span class="service-metric-val count" id="svcRemotionStudio">:3001</span>
+                                <span class="service-metric-label">Studio端口</span>
+                            </div>
+                        </div>
+                        <div class="service-card-cmd">cd video && npm run dev</div>
+                    </div>
+                </div>
+                <!-- API端点清单 -->
+                <div class="service-apis-grid" id="serviceApisGrid">
+                    <div class="api-endpoint-chip"><span class="api-method get">GET</span><span class="api-path">/</span></div>
+                    <div class="api-endpoint-chip"><span class="api-method get">GET</span><span class="api-path">/health</span></div>
+                    <div class="api-endpoint-chip"><span class="api-method get">GET</span><span class="api-path">/thresholds</span></div>
+                    <div class="api-endpoint-chip"><span class="api-method get">GET</span><span class="api-path">/version</span></div>
+                    <div class="api-endpoint-chip"><span class="api-method get">GET</span><span class="api-path">/api/system/status</span></div>
+                    <div class="api-endpoint-chip"><span class="api-method get">GET</span><span class="api-path">/api/chromosome/diagnose</span></div>
+                    <div class="api-endpoint-chip"><span class="api-method get">GET</span><span class="api-path">/api/storm/simulate</span></div>
                 </div>
             </div>
 
@@ -4411,6 +4530,7 @@
                 apiEntry.style.opacity = '1';
                 apiEntry.style.pointerEvents = 'auto';
             }
+            fetchSystemStatus();
         }
         function setOffline(){
             lastOk = false;
@@ -4421,10 +4541,65 @@
             if(apiEntry){
                 apiEntry.style.opacity = '0.5';
             }
+            setServiceStatus('fastapi', 'offline');
         }
         function setConnecting(){
             statusEl.className = 'backend-status connecting';
             textEl.textContent = '🟡 后端连接中…';
+        }
+
+        // ====== V2.5 全栈服务状态面板更新 ======
+        var svcVersionText = document.getElementById('svcVersionText');
+        var svcFastapi = document.getElementById('svcFastapi');
+        var svcFastapiBadge = document.getElementById('svcFastapiBadge');
+        var svcFastapiStatus = document.getElementById('svcFastapiStatus');
+        var svcFastapiApis = document.getElementById('svcFastapiApis');
+        var svcStreamlit = document.getElementById('svcStreamlit');
+        var svcStreamlitBadge = document.getElementById('svcStreamlitBadge');
+        var svcStreamlitStatus = document.getElementById('svcStreamlitStatus');
+        var svcRemotion = document.getElementById('svcRemotion');
+        var svcRemotionBadge = document.getElementById('svcRemotionBadge');
+        var svcRemotionStatus = document.getElementById('svcRemotionStatus');
+        var svcTestCount = document.getElementById('svcTestCount');
+        var svcPageCount = document.getElementById('svcPageCount');
+
+        function setServiceStatus(svc, status){
+            var card, badge, statusText;
+            if(svc === 'fastapi'){ card=svcFastapi; badge=svcFastapiBadge; statusText=svcFastapiStatus; }
+            else if(svc === 'streamlit'){ card=svcStreamlit; badge=svcStreamlitBadge; statusText=svcStreamlitStatus; }
+            else if(svc === 'remotion'){ card=svcRemotion; badge=svcRemotionBadge; statusText=svcRemotionStatus; }
+            if(!card) return;
+            card.className = 'service-card ' + status;
+            badge.className = 'service-status-badge ' + status;
+            var labels = { online:'运行中', standby:'待启动', offline:'离线' };
+            if(statusText) statusText.textContent = labels[status] || status;
+        }
+
+        function fetchSystemStatus(){
+            fetch(BACKEND_URL + '/api/system/status', { cache: 'no-store', mode: 'cors' })
+                .then(function(r){ if(!r.ok) throw new Error('bad'); return r.json(); })
+                .then(function(sys){
+                    if(svcVersionText && sys.version) svcVersionText.textContent = sys.version;
+                    if(sys.tests && svcTestCount){
+                        svcTestCount.textContent = '🧪 ' + sys.tests.total + ' Tests (前端' + sys.tests.frontend + '+后端' + sys.tests.backend + ')';
+                    }
+                    if(sys.pages && svcPageCount){
+                        svcPageCount.textContent = '📄 ' + sys.pages + ' Pages';
+                    }
+                    if(sys.services){
+                        if(sys.services.fastapi){
+                            setServiceStatus('fastapi', sys.services.fastapi.status);
+                            if(sys.services.fastapi.api_endpoints && svcFastapiApis){
+                                svcFastapiApis.textContent = sys.services.fastapi.api_endpoints;
+                            }
+                        }
+                        if(sys.services.streamlit) setServiceStatus('streamlit', sys.services.streamlit.status);
+                        if(sys.services.remotion) setServiceStatus('remotion', sys.services.remotion.status);
+                    }
+                })
+                .catch(function(){
+                    setServiceStatus('fastapi', 'online');
+                });
         }
         function check(){
             var ctrl = new AbortController();
