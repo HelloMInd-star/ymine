@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Y.Mine · ⚡ 风暴能量分配模拟器</title>
+    <link rel="stylesheet" href="../../assets/css/base.css">
+    <script src="../../assets/js/bus.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+    <style>
+        .breadcrumb {
+            display: flex; align-items: center; gap: 8px;
+            font-size: 13px; margin-bottom: 8px; flex-wrap: wrap;
+        }
+        .breadcrumb a { color: rgba(255,255,255,0.5); text-decoration: none; transition: color .2s; }
+        .breadcrumb a:hover { color: rgba(255,255,255,0.8); }
+        .breadcrumb .sep { color: rgba(255,255,255,0.2); }
+        .breadcrumb .current { color: rgba(255,255,255,0.7); }
+
+        .container {
+            max-width: 1200px; width: 100%;
+            background: radial-gradient(ellipse at 30% 30%, #0f0e1a, #0b0b1a 70%, #05030a);
+            border-radius: 32px; padding: 48px 52px 44px;
+            border: 1px solid rgba(255,255,255,0.06);
+            box-shadow: 0 30px 80px rgba(30,10,80,0.5);
+            position: relative; overflow: hidden; z-index: 1;
+        }
+        .header { text-align: center; margin-bottom: 24px; opacity: 0; animation: fadeInUp 0.8s ease forwards; }
+        .badge {
+            display: inline-block; background: rgba(99,102,241,0.08);
+            border: 1px solid rgba(99,102,241,0.2); color: #a5b4fc;
+            font-size: 13px; padding: 4px 16px; border-radius: 20px;
+            letter-spacing: 0.3px; margin-bottom: 12px;
+        }
+        .header h1 {
+            font-size: 30px; font-weight: 700; color: #f1f5f9; letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #fde047, #fb923c, #f87171, #a78bfa);
+            background-size: 300% 300%; -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent; animation: gradientFlow 6s ease-in-out infinite;
+        }
+        .header .sub { font-size: 14px; color: rgba(255,255,255,0.35); font-weight: 300; margin-top: 6px; }
+
+        /* VR Banner */
+        .vr-banner {
+            margin: 16px 0 24px; padding: 14px 18px;
+            background: linear-gradient(135deg, rgba(99,102,241,0.06), rgba(168,85,247,0.04), rgba(251,191,36,0.04));
+            border: 1px solid rgba(255,255,255,0.08); border-radius: 12px;
+            position: relative; overflow: hidden;
+            opacity: 0; animation: fadeInUp 0.7s ease 0.1s forwards;
+        }
+        .vr-banner::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+            background: linear-gradient(90deg, #6366f1, #a855f7, #fbbf24); opacity: 0.6;
+        }
+        .vr-banner.state-warn {
+            background: linear-gradient(135deg, rgba(251,191,36,0.08), rgba(251,146,60,0.05), rgba(239,68,68,0.03));
+            border-color: rgba(251,191,36,0.2);
+        }
+        .vr-banner.state-warn::before { background: linear-gradient(90deg, #fbbf24, #fb923c, #f97316); }
+        .vr-banner.state-danger {
+            background: linear-gradient(135deg, rgba(239,68,68,0.10), rgba(248,113,113,0.06), rgba(167,139,250,0.04));
+            border-color: rgba(239,68,68,0.25);
+        }
+        .vr-banner.state-danger::before {
+            background: linear-gradient(90deg, #ef4444, #f87171, #a78bfa);
+            animation: pulseDanger 1.2s ease-in-out infinite;
+        }
+        @keyframes pulseDanger { 0%,100%{opacity:.6} 50%{opacity:1} }
+        .vr-title {
+            font-size: 13px; font-weight: 700; color: rgba(255,255,255,0.75);
+            letter-spacing: 0.3px; margin-bottom: 6px; display: flex; align-items: center; gap: 8px;
+        }
+        .vr-desc { font-size: 11px; color: rgba(255,255,255,0.35); line-height: 1.6; margin-bottom: 10px; }
+        .vr-status-row { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+        .vr-status-badge {
+            display: inline-flex; align-items: center; gap: 7px;
+            padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 700;
+        }
+        .vr-status-badge.safe { background: rgba(34,197,94,0.12); border: 1px solid rgba(34,197,94,0.35); color: #4ade80; }
+        .vr-status-badge.warn { background: rgba(251,191,36,0.12); border: 1px solid rgba(251,191,36,0.35); color: #fde047; }
+        .vr-status-badge.danger {
+            background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.4); color: #fca5a5;
+            animation: pulseBadge 1.5s ease-in-out infinite;
+        }
+        @keyframes pulseBadge { 0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,0)} 50%{box-shadow:0 0 12px 2px rgba(239,68,68,0.2)} }
+        .vr-status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+        .vr-status-badge.safe .vr-status-dot { background: #22c55e; box-shadow: 0 0 8px rgba(34,197,94,0.6); }
+        .vr-status-badge.warn .vr-status-dot { background: #fbbf24; box-shadow: 0 0 8px rgba(251,191,36,0.6); }
+        .vr-status-badge.danger .vr-status-dot {
+            background: #ef4444; box-shadow: 0 0 8px rgba(239,68,68,0.6);
+            animation: blink 0.8s ease-in-out infinite;
+        }
+        @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.4} }
+        .vr-thresholds {
+            display: flex; align-items: center; gap: 10px;
+            font-size: 10px; color: rgba(255,255,255,0.3); font-family: 'SF Mono',ui-monospace,monospace;
+        }
+        .vr-thr { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 4px; }
+        .vr-thr.t1 { background: rgba(251,146,60,0.1); color: #fb923c; }
+        .vr-thr.t2 { background: rgba(34,197,94,0.1); color: #4ade80; }
+        .vr-thr.t3 { background: rgba(239,68,68,0.1); color: #f87171; }
+        .vr-signal-val {
+            font-size: 11px; color: rgba(255,255,255,0.4);
+            font-family: 'SF Mono',ui-monospace,monospace; margin-left: auto;
+        }
+
+        /* Control Bar */
+        .control-bar {
+            display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+            padding: 16px 20px; margin-bottom: 20px;
+            background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 14px;
+            opacity: 0; animation: fadeInUp 0.7s ease 0.2s forwards;
+        }
+        .ctrl-btn {
+            padding: 9px 22px; border-radius: 8px; font-size: 13px; font-weight: 700;
+            border: none; cursor: pointer; transition: all .2s; letter-spacing: 0.3px;
+        }
+        .ctrl-btn.start {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6); color: #fff;
+            box-shadow: 0 4px 16px rgba(99,102,241,0.3);
+        }
+        .ctrl-btn.start:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(99,102,241,0.45); }
+        .ctrl-btn.start.running {
+            background: linear-gradient(135deg, #f59e0b, #f97316);
+            box-shadow: 0 4px 16px rgba(245,158,11,0.3);
+        }
+        .ctrl-btn.reset {
+            background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12);
+            color: rgba(255,255,255,0.6);
+        }
+        .ctrl-btn.reset:hover { background: rgba(255,255,255,0.1); color: #fff; }
+
+        .energy-slider-group {
+            display: flex; align-items: center; gap: 12px; flex: 1; min-width: 240px;
+            padding-left: 16px; border-left: 1px solid rgba(255,255,255,0.06);
+        }
+        .energy-slider-group label {
+            font-size: 12px; color: rgba(255,255,255,0.5); white-space: nowrap; font-weight: 600;
+        }
+        .energy-slider-group .val {
+            font-family: 'SF Mono',ui-monospace,monospace; font-size: 14px;
+            color: #fde047; font-weight: 700; min-width: 36px;
+        }
+        .energy-slider-group input[type="range"] {
+            flex: 1; -webkit-appearance: none; height: 6px; border-radius: 3px;
+            background: linear-gradient(90deg, #6366f1, #a855f7, #fbbf24, #f87171);
+            outline: none; cursor: pointer;
+        }
+        .energy-slider-group input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%;
+            background: #fff; box-shadow: 0 0 10px rgba(255,255,255,0.4);
+            cursor: grab; border: 2px solid #a78bfa;
+        }
+
+        .time-display {
+            font-family: 'SF Mono',ui-monospace,monospace; font-size: 12px;
+            color: rgba(255,255,255,0.4); padding: 4px 10px;
+            background: rgba(255,255,255,0.03); border-radius: 6px;
+        }
+
+        /* Main Grid */
+        .main-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
+            margin-bottom: 20px;
+            opacity: 0; animation: fadeInUp 0.7s ease 0.3s forwards;
+        }
+
+        /* Leg Metric Cards */
+        .leg-card {
+            padding: 20px; border-radius: 14px; position: relative; overflow: hidden;
+        }
+        .leg-card.lightning {
+            background: linear-gradient(135deg, rgba(251,191,36,0.06), rgba(245,158,11,0.04));
+            border: 1px solid rgba(251,191,36,0.15);
+        }
+        .leg-card.wind {
+            background: linear-gradient(135deg, rgba(99,102,241,0.06), rgba(139,92,246,0.04));
+            border: 1px solid rgba(99,102,241,0.15);
+        }
+        .leg-head { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+        .leg-icon { font-size: 28px; }
+        .leg-title { font-size: 15px; font-weight: 700; color: #f1f5f9; }
+        .leg-sub { font-size: 11px; color: rgba(255,255,255,0.35); margin-top: 2px; }
+        .leg-value {
+            font-family: 'SF Mono',ui-monospace,monospace; font-size: 32px; font-weight: 700;
+            margin: 8px 0 4px;
+        }
+        .leg-card.lightning .leg-value { color: #fde047; }
+        .leg-card.wind .leg-value { color: #818cf8; }
+        .leg-unit { font-size: 13px; color: rgba(255,255,255,0.35); font-weight: 400; }
+        .leg-bar-wrap {
+            height: 8px; background: rgba(255,255,255,0.06); border-radius: 4px;
+            margin-top: 12px; overflow: hidden; position: relative;
+        }
+        .leg-bar { height: 100%; border-radius: 4px; transition: width .3s ease; }
+        .leg-card.lightning .leg-bar {
+            background: linear-gradient(90deg, #f59e0b, #fbbf24, #fde047);
+            box-shadow: 0 0 12px rgba(251,191,36,0.3);
+        }
+        .leg-card.wind .leg-bar {
+            background: linear-gradient(90deg, #4f46e5, #6366f1, #818cf8);
+            box-shadow: 0 0 12px rgba(99,102,241,0.3);
+        }
+        .leg-threshold-marks {
+            display: flex; justify-content: space-between; margin-top: 6px;
+            font-size: 9px; font-family: 'SF Mono',monospace; color: rgba(255,255,255,0.2);
+        }
+        .leg-risk {
+            margin-top: 10px; font-size: 11px; font-weight: 600;
+            display: inline-flex; align-items: center; gap: 5px;
+            padding: 3px 10px; border-radius: 6px;
+        }
+        .leg-risk.normal { background: rgba(34,197,94,0.1); color: #4ade80; }
+        .leg-risk.warn { background: rgba(251,191,36,0.1); color: #fde047; }
+        .leg-risk.danger { background: rgba(239,68,68,0.12); color: #fca5a5; }
+
+        /* Chart Area */
+        .chart-area {
+            display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 20px;
+            opacity: 0; animation: fadeInUp 0.7s ease 0.4s forwards;
+        }
+        .chart-box {
+            background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 14px; padding: 20px;
+        }
+        .chart-box h3 {
+            font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.6);
+            margin: 0 0 14px; display: flex; align-items: center; gap: 8px;
+        }
+        #trendChart { width: 100%; height: 260px; }
+        #donutChart { width: 100%; height: 260px; }
+
+        /* Status Indicator */
+        .status-panel {
+            display: flex; align-items: center; gap: 24px; padding: 20px 24px;
+            background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 14px; margin-bottom: 20px;
+            opacity: 0; animation: fadeInUp 0.7s ease 0.5s forwards;
+        }
+        .status-title { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.5); margin-right: 8px; }
+        .status-light-group { display: flex; gap: 20px; }
+        .status-light {
+            display: flex; align-items: center; gap: 8px;
+            font-size: 12px; color: rgba(255,255,255,0.35); font-weight: 600;
+            transition: all .3s;
+        }
+        .status-light .dot {
+            width: 14px; height: 14px; border-radius: 50%;
+            background: rgba(255,255,255,0.08); border: 2px solid rgba(255,255,255,0.1);
+            transition: all .3s;
+        }
+        .status-light.active.green { color: #4ade80; }
+        .status-light.active.green .dot {
+            background: #22c55e; border-color: #4ade80;
+            box-shadow: 0 0 16px rgba(34,197,94,0.5);
+        }
+        .status-light.active.yellow { color: #fde047; }
+        .status-light.active.yellow .dot {
+            background: #fbbf24; border-color: #fde047;
+            box-shadow: 0 0 16px rgba(251,191,36,0.5);
+            animation: blink 1s ease-in-out infinite;
+        }
+        .status-light.active.red { color: #fca5a5; }
+        .status-light.active.red .dot {
+            background: #ef4444; border-color: #f87171;
+            box-shadow: 0 0 20px rgba(239,68,68,0.6);
+            animation: blink 0.6s ease-in-out infinite;
+        }
+
+        /* Diagnostic Report */
+        .report-box {
+            background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 14px; padding: 20px 24px;
+            opacity: 0; animation: fadeInUp 0.7s ease 0.6s forwards;
+        }
+        .report-box h3 {
+            font-size: 14px; font-weight: 700; color: rgba(255,255,255,0.7);
+            margin: 0 0 14px; display: flex; align-items: center; gap: 8px;
+        }
+        .report-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 10px;
+        }
+        .report-item {
+            padding: 10px 14px; background: rgba(255,255,255,0.02);
+            border-left: 3px solid rgba(255,255,255,0.1);
+            border-radius: 0 8px 8px 0; font-size: 12px; color: rgba(255,255,255,0.5);
+        }
+        .report-item .ri-label { color: rgba(255,255,255,0.35); margin-right: 6px; }
+        .report-item .ri-val { font-family: 'SF Mono',monospace; font-weight: 700; }
+        .report-item .ri-val.green { color: #4ade80; }
+        .report-item .ri-val.yellow { color: #fde047; }
+        .report-item .ri-val.red { color: #f87171; }
+        .report-item.warn { border-left-color: rgba(251,191,36,0.5); background: rgba(251,191,36,0.04); }
+        .report-item.danger { border-left-color: rgba(239,68,68,0.5); background: rgba(239,68,68,0.04); }
+
+        .back-link {
+            text-align: center; margin-top: 28px; padding-top: 14px;
+            border-top: 1px solid rgba(255,255,255,0.03);
+        }
+        .back-link a {
+            color: rgba(255,255,255,0.35); text-decoration: none; font-size: 13px;
+            transition: color .2s;
+        }
+        .back-link a:hover { color: #a78bfa; }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes gradientFlow {
+            0%,100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+    </style>
+</head>
+<body>
+    <div id="glow"></div>
+    <div class="container">
+        <!-- Breadcrumb -->
+        <div class="breadcrumb">
+            <a href="../../index.html">Y.Mine总控台</a><span class="sep">›</span>
+            <a href="../../index.html#labs">认知科研实验组</a><span class="sep">›</span>
+            <a href="../../index.html#labs">仿真实验室</a><span class="sep">›</span>
+            <span class="current">⚡ 风暴能量分配模拟器</span>
+        </div>
+
+        <!-- Header -->
+        <div class="header">
+            <div class="badge">⚡ 多模态强化学习 · 能量守恒实验</div>
+            <h1>⚡ 风暴能量分配模拟器 v1.0</h1>
+            <div class="sub">雷（头）— 闪电（腿A）— 大风（腿B）· 腿间斜率此消彼长 · THRESHOLDS 三基准熔断</div>
+        </div>
+
+        <!-- VR Banner -->
+        <div class="vr-banner" id="vrBanner">
+            <div class="vr-title">
+                <span class="vr-icon">🔬</span>
+                Verifiable Reward · 风暴能量信号系统
+            </div>
+            <div class="vr-desc">
+                本模拟器基于 THRESHOLDS 三基准（0.48 安全 / 0.58 预警 / 0.68 熔断），监测雷暴系统能量分配的腿间斜率，实时输出"正常 / 预警 / 熔断"三种状态。
+            </div>
+            <div class="vr-status-row">
+                <div class="vr-status-badge safe" id="vrStatusBadge">
+                    <span class="vr-status-dot"></span>
+                    <span id="vrStatusText">🟢 正常</span>
+                    <span id="vrStatusVal" style="font-family:'SF Mono',monospace;opacity:0.8;">(0.42)</span>
+                </div>
+                <div class="vr-thresholds">
+                    <span class="vr-thr t1">0.48 安全</span>
+                    <span style="color:rgba(255,255,255,0.15);">|</span>
+                    <span class="vr-thr t2">0.58 预警</span>
+                    <span style="color:rgba(255,255,255,0.15);">|</span>
+                    <span class="vr-thr t3">0.68 熔断</span>
+                </div>
+                <div class="vr-signal-val" id="vrSignalDetail">signal = 0.42 · 能量平衡</div>
+            </div>
+        </div>
+
+        <!-- Control Bar -->
+        <div class="control-bar">
+            <button class="ctrl-btn start" id="btnStart">▶ 启动模拟</button>
+            <button class="ctrl-btn reset" id="btnReset">↺ 重置</button>
+            <div class="energy-slider-group">
+                <label>总能量池（头）</label>
+                <input type="range" id="energySlider" min="0" max="100" step="1" value="60" />
+                <span class="val" id="energyVal">60</span>
+            </div>
+            <div class="time-display" id="timeDisplay">t = 0.0s</div>
+        </div>
+
+        <!-- Leg Metrics -->
+        <div class="main-grid">
+            <div class="leg-card lightning">
+                <div class="leg-head">
+                    <span class="leg-icon">⚡</span>
+                    <div>
+                        <div class="leg-title">闪电斜率（腿A）</div>
+                        <div class="leg-sub">Lightning Frequency Slope</div>
+                    </div>
+                </div>
+                <div class="leg-value"><span id="lightningVal">3.8</span><span class="leg-unit"> 次/分钟</span></div>
+                <div class="leg-bar-wrap">
+                    <div class="leg-bar" id="lightningBar" style="width:38%;"></div>
+                </div>
+                <div class="leg-threshold-marks">
+                    <span>0</span><span>0.48</span><span>0.58</span><span>0.68</span><span>10</span>
+                </div>
+                <div class="leg-risk normal" id="lightningRisk">● 正常范围</div>
+            </div>
+            <div class="leg-card wind">
+                <div class="leg-head">
+                    <span class="leg-icon">🌪️</span>
+                    <div>
+                        <div class="leg-title">风力斜率（腿B）</div>
+                        <div class="leg-sub">Wind Speed Slope</div>
+                    </div>
+                </div>
+                <div class="leg-value"><span id="windVal">2.2</span><span class="leg-unit"> m/s²</span></div>
+                <div class="leg-bar-wrap">
+                    <div class="leg-bar" id="windBar" style="width:22%;"></div>
+                </div>
+                <div class="leg-threshold-marks">
+                    <span>0</span><span>0.48</span><span>0.58</span><span>0.68</span><span>10</span>
+                </div>
+                <div class="leg-risk normal" id="windRisk">● 正常范围</div>
+            </div>
+        </div>
+
+        <!-- Charts -->
+        <div class="chart-area">
+            <div class="chart-box">
+                <h3>📈 实时趋势曲线（时间 vs 斜率）</h3>
+                <div id="trendChart"></div>
+            </div>
+            <div class="chart-box">
+                <h3>🍩 能量分配圆环图</h3>
+                <div id="donutChart"></div>
+            </div>
+        </div>
+
+        <!-- Status Indicator -->
+        <div class="status-panel">
+            <span class="status-title">系统状态：</span>
+            <div class="status-light-group">
+                <div class="status-light active green" id="lightGreen">
+                    <span class="dot"></span><span>🟢 正常</span>
+                </div>
+                <div class="status-light" id="lightYellow">
+                    <span class="dot"></span><span>🟡 预警中</span>
+                </div>
+                <div class="status-light" id="lightRed">
+                    <span class="dot"></span><span>🔴 已熔断</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Diagnostic Report -->
+        <div class="report-box">
+            <h3>📋 诊断报告</h3>
+            <div class="report-grid" id="reportGrid">
+            </div>
+        </div>
+
+        <div class="back-link">
+            <a href="../../index.html#labs">← 返回总控台 · 仿真与实证实验室</a>
+        </div>
+    </div>
+
+    <script>
+    (function(){
+        const THRESHOLDS = { SAFE: 0.48, WARN: 0.58, DANGER: 0.68 };
+        let running = false;
+        let animId = null;
+        let simTime = 0;
+        let totalEnergy = 0.6;
+        let lightningData = [];
+        let windData = [];
+        let timeData = [];
+        let phase = 0;
+        const MAX_POINTS = 80;
+
+        const trendChart = echarts.init(document.getElementById('trendChart'), null, {renderer:'canvas'});
+        const donutChart = echarts.init(document.getElementById('donutChart'), null, {renderer:'canvas'});
+
+        function initCharts() {
+            trendChart.setOption({
+                backgroundColor: 'transparent',
+                tooltip: {
+                    trigger: 'axis', backgroundColor: 'rgba(15,15,30,0.95)',
+                    borderColor: 'rgba(167,139,250,0.3)', textStyle: {color:'#e2e8f0', fontSize:11},
+                    formatter: function(params) {
+                        let s = 't = ' + params[0].axisValue + 's<br/>';
+                        params.forEach(p => { s += p.marker + p.seriesName + ': <b>' + p.value.toFixed(2) + '</b><br/>'; });
+                        return s;
+                    }
+                },
+                legend: { data: ['闪电斜率(腿A)','风力斜率(腿B)'], textStyle:{color:'rgba(255,255,255,0.4)', fontSize:11}, top: 0 },
+                grid: { left: 42, right: 16, top: 32, bottom: 28 },
+                xAxis: {
+                    type: 'category', data: [],
+                    axisLine: {lineStyle:{color:'rgba(255,255,255,0.1)'}},
+                    axisLabel: {color:'rgba(255,255,255,0.3)', fontSize:10},
+                    splitLine: {show:false}
+                },
+                yAxis: {
+                    type: 'value', min: 0, max: 10,
+                    axisLine: {show:false}, axisTick: {show:false},
+                    axisLabel: {color:'rgba(255,255,255,0.3)', fontSize:10},
+                    splitLine: {lineStyle:{color:'rgba(255,255,255,0.04)'}}
+                },
+                series: [
+                    {
+                        name: '闪电斜率(腿A)', type: 'line', data: [], smooth: true,
+                        lineStyle: {color:'#fbbf24', width:2},
+                        itemStyle: {color:'#fbbf24'},
+                        areaStyle: {color: {type:'linear',x:0,y:0,x2:0,y2:1,colorStops:[
+                            {offset:0,color:'rgba(251,191,36,0.25)'},{offset:1,color:'rgba(251,191,36,0)'}
+                        ]}},
+                        symbol: 'none', animation: false
+                    },
+                    {
+                        name: '风力斜率(腿B)', type: 'line', data: [], smooth: true,
+                        lineStyle: {color:'#818cf8', width:2},
+                        itemStyle: {color:'#818cf8'},
+                        areaStyle: {color: {type:'linear',x:0,y:0,x2:0,y2:1,colorStops:[
+                            {offset:0,color:'rgba(129,140,248,0.25)'},{offset:1,color:'rgba(129,140,248,0)'}
+                        ]}},
+                        symbol: 'none', animation: false
+                    }
+                ]
+            });
+
+            donutChart.setOption({
+                backgroundColor: 'transparent',
+                tooltip: {
+                    trigger: 'item', backgroundColor: 'rgba(15,15,30,0.95)',
+                    borderColor: 'rgba(167,139,250,0.3)', textStyle:{color:'#e2e8f0',fontSize:11},
+                    formatter: '{b}: {c}% ({d}%)'
+                },
+                series: [{
+                    type: 'pie', radius: ['45%', '72%'], center: ['50%','50%'],
+                    avoidLabelOverlap: false,
+                    itemStyle: { borderRadius: 6, borderColor: '#0b0b1a', borderWidth: 3 },
+                    label: {
+                        show: true, position: 'center',
+                        formatter: function() { return '{v|能量分配}\n{a|⚡ 雷暴系统}'; },
+                        rich: {
+                            v: {fontSize:14,fontWeight:700,color:'#e2e8f0',lineHeight:24},
+                            a: {fontSize:10,color:'rgba(255,255,255,0.4)'}
+                        }
+                    },
+                    data: [
+                        {value:65,name:'闪电(腿A)',itemStyle:{color:'#fbbf24'}},
+                        {value:35,name:'风力(腿B)',itemStyle:{color:'#818cf8'}}
+                    ]
+                }]
+            });
+        }
+
+        function getRiskLevel(v) {
+            if (v < THRESHOLDS.WARN) return 'normal';
+            if (v < THRESHOLDS.DANGER) return 'warn';
+            return 'danger';
+        }
+        function riskLabel(level) {
+            return {normal:'● 正常范围',warn:'⚠ 接近预警',danger:'🔴 超阈值熔断'}[level];
+        }
+        function riskColor(level) {
+            return {normal:'#4ade80',warn:'#fde047',danger:'#f87171'}[level];
+        }
+
+        function updateVR(signal) {
+            const banner = document.getElementById('vrBanner');
+            const badge = document.getElementById('vrStatusBadge');
+            const st = document.getElementById('vrStatusText');
+            const sv = document.getElementById('vrStatusVal');
+            const sd = document.getElementById('vrSignalDetail');
+            banner.classList.remove('state-warn','state-danger');
+            badge.classList.remove('safe','warn','danger');
+            let cls, emoji, label, zone;
+            if (signal < THRESHOLDS.SAFE) {
+                cls='safe'; emoji='🟢'; label='安全'; zone='能量平衡区';
+            } else if (signal < THRESHOLDS.WARN) {
+                cls='safe'; emoji='🟢'; label='正常'; zone='正常波动区';
+            } else if (signal < THRESHOLDS.DANGER) {
+                cls='warn'; emoji='🟡'; label='预警'; zone='能量失衡预警';
+                banner.classList.add('state-warn');
+            } else {
+                cls='danger'; emoji='🔴'; label='熔断'; zone='能量过载熔断';
+                banner.classList.add('state-danger');
+            }
+            badge.classList.add(cls);
+            st.textContent = emoji + ' ' + label;
+            sv.textContent = '(' + signal.toFixed(2) + ')';
+            const lNorm = Math.min(10, lastLightning)/10;
+            const wNorm = Math.min(10, lastWind)/10;
+            sd.textContent = 'signal=' + signal.toFixed(2) + ' · L=' + lastLightning.toFixed(1) + ' W=' + lastWind.toFixed(1) + ' · ' + zone;
+        }
+
+        let lastLightning = 3.8, lastWind = 2.2;
+
+        function tick() {
+            if (!running) return;
+            simTime += 0.1;
+            phase += 0.025;
+
+            const stormPhase = Math.sin(phase * 0.7) * 0.5 + 0.5;
+            const imbalance = Math.sin(phase * 1.3) * 0.4;
+            const noise1 = (Math.random() - 0.5) * 0.6;
+            const noise2 = (Math.random() - 0.5) * 0.6;
+
+            const energyFactor = totalEnergy * 10;
+            const lightningShare = 0.5 + imbalance * 0.4;
+            const windShare = 1 - lightningShare;
+
+            let lBase = energyFactor * lightningShare * (0.7 + stormPhase * 0.6) + noise1;
+            let wBase = energyFactor * windShare * (0.5 + (1-stormPhase) * 0.5) + noise2;
+            lBase = Math.max(0, Math.min(10, lBase));
+            wBase = Math.max(0, Math.min(10, wBase));
+
+            lastLightning = lastLightning * 0.7 + lBase * 0.3;
+            lastWind = lastWind * 0.7 + wBase * 0.3;
+
+            lightningData.push(lastLightning);
+            windData.push(lastWind);
+            timeData.push(simTime.toFixed(1));
+            if (lightningData.length > MAX_POINTS) {
+                lightningData.shift(); windData.shift(); timeData.shift();
+            }
+
+            trendChart.setOption({
+                xAxis: {data: timeData},
+                series: [{data: lightningData},{data: windData}]
+            });
+
+            const lPct = lastLightning/10*100;
+            const wPct = lastWind/10*100;
+            const lShare = lastLightning + lastWind > 0 ? lastLightning/(lastLightning+lastWind)*100 : 50;
+            const wShare = 100 - lShare;
+            donutChart.setOption({
+                series: [{data: [
+                    {value: Math.round(lShare), name:'闪电(腿A)', itemStyle:{color:'#fbbf24'}},
+                    {value: Math.round(wShare), name:'风力(腿B)', itemStyle:{color:'#818cf8'}}
+                ]}]
+            });
+
+            document.getElementById('lightningVal').textContent = lastLightning.toFixed(1);
+            document.getElementById('windVal').textContent = lastWind.toFixed(1);
+            document.getElementById('lightningBar').style.width = lPct + '%';
+            document.getElementById('windBar').style.width = wPct + '%';
+            document.getElementById('timeDisplay').textContent = 't = ' + simTime.toFixed(1) + 's';
+
+            const lRisk = getRiskLevel(lastLightning/10);
+            const wRisk = getRiskLevel(lastWind/10);
+            const lEl = document.getElementById('lightningRisk');
+            const wEl = document.getElementById('windRisk');
+            lEl.className = 'leg-risk ' + lRisk; lEl.textContent = riskLabel(lRisk);
+            wEl.className = 'leg-risk ' + wRisk; wEl.textContent = riskLabel(wRisk);
+
+            const overallSignal = Math.max(lastLightning/10, lastWind/10);
+            updateVR(overallSignal);
+
+            const gr = document.getElementById('lightGreen');
+            const yl = document.getElementById('lightYellow');
+            const rd = document.getElementById('lightRed');
+            gr.classList.remove('active'); yl.classList.remove('active'); rd.classList.remove('active');
+            let sysStatus, sysColor;
+            if (overallSignal < THRESHOLDS.WARN) {
+                gr.classList.add('active'); sysStatus='正常'; sysColor='green';
+            } else if (overallSignal < THRESHOLDS.DANGER) {
+                yl.classList.add('active'); sysStatus='预警中'; sysColor='yellow';
+            } else {
+                rd.classList.add('active'); sysStatus='已熔断'; sysColor='red';
+            }
+
+            renderReport(lShare, wShare, sysStatus, sysColor);
+
+            animId = requestAnimationFrame(tick);
+        }
+
+        function renderReport(lShare, wShare, sysStatus, sysColor) {
+            const lvl = (v) => {
+                if (v<THRESHOLDS.WARN) return 'green';
+                if (v<THRESHOLDS.DANGER) return 'yellow';
+                return 'red';
+            };
+            const lN = lastLightning/10, wN = lastWind/10;
+            const items = [
+                {label:'当前闪电斜率', val:lastLightning.toFixed(1)+' 次/分钟', cls:lvl(lN)},
+                {label:'当前风力斜率', val:lastWind.toFixed(1)+' m/s²', cls:lvl(wN)},
+                {label:'能量分配', val:'闪电 '+Math.round(lShare)+'% / 风力 '+Math.round(wShare)+'%', cls:'green'},
+                {label:'总能量池', val:Math.round(totalEnergy*100)+'%', cls:'green'},
+                {label:'系统状态', val:'🟢 '+sysStatus, cls:sysColor},
+                {label:'守恒校验', val: (Math.abs(lShare+wShare-100)<0.5)?'✓ 能量守恒':'✗ 异常', cls: (Math.abs(lShare+wShare-100)<0.5)?'green':'red'}
+            ];
+            const grid = document.getElementById('reportGrid');
+            grid.innerHTML = items.map(it => {
+                const extra = (it.cls==='yellow')?' class="report-item warn"':(it.cls==='red'?' class="report-item danger"':'');
+                return '<div'+extra+'><span class="ri-label">'+it.label+'：</span><span class="ri-val '+it.cls+'">'+it.val+'</span></div>';
+            }).join('');
+        }
+
+        function reset() {
+            running = false;
+            if (animId) cancelAnimationFrame(animId);
+            simTime = 0; phase = 0;
+            lightningData = []; windData = []; timeData = [];
+            lastLightning = 3.8; lastWind = 2.2; totalEnergy = 0.6;
+            document.getElementById('energySlider').value = 60;
+            document.getElementById('energyVal').textContent = '60';
+            document.getElementById('btnStart').textContent = '▶ 启动模拟';
+            document.getElementById('btnStart').classList.remove('running');
+
+            document.getElementById('lightningVal').textContent = '3.8';
+            document.getElementById('windVal').textContent = '2.2';
+            document.getElementById('lightningBar').style.width = '38%';
+            document.getElementById('windBar').style.width = '22%';
+            document.getElementById('timeDisplay').textContent = 't = 0.0s';
+            document.getElementById('lightningRisk').className = 'leg-risk normal';
+            document.getElementById('lightningRisk').textContent = '● 正常范围';
+            document.getElementById('windRisk').className = 'leg-risk normal';
+            document.getElementById('windRisk').textContent = '● 正常范围';
+
+            trendChart.setOption({xAxis:{data:[]},series:[{data:[]},{data:[]}]});
+            donutChart.setOption({series:[{data:[
+                {value:63,name:'闪电(腿A)',itemStyle:{color:'#fbbf24'}},
+                {value:37,name:'风力(腿B)',itemStyle:{color:'#818cf8'}}
+            ]}]});
+
+            document.getElementById('lightGreen').classList.add('active');
+            document.getElementById('lightYellow').classList.remove('active');
+            document.getElementById('lightRed').classList.remove('active');
+            updateVR(Math.max(0.38,0.22));
+            renderReport(63,37,'正常','green');
+        }
+
+        document.getElementById('btnStart').addEventListener('click', function(){
+            running = !running;
+            this.textContent = running ? '⏸ 暂停模拟' : '▶ 启动模拟';
+            this.classList.toggle('running', running);
+            if (running) tick();
+        });
+        document.getElementById('btnReset').addEventListener('click', reset);
+        document.getElementById('energySlider').addEventListener('input', function(){
+            totalEnergy = parseInt(this.value)/100;
+            document.getElementById('energyVal').textContent = this.value;
+        });
+        window.addEventListener('resize', function(){
+            trendChart.resize(); donutChart.resize();
+        });
+
+        initCharts();
+        reset();
+    })();
+    </script>
+</body>
+</html>
