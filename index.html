@@ -2076,10 +2076,25 @@
             /* 图标区 */
             .vr-banner-icon {
                 position:relative; flex-shrink:0;
-                width:72px; height:72px; border-radius:18px;
+                width:76px; height:76px; border-radius:20px;
                 display:flex; align-items:center; justify-content:center;
-                font-size:40px;
+                font-size:42px; line-height:1; text-align:center;
                 transition:transform .3s ease;
+            }
+            .vr-banner-icon-emoji{
+                display:flex; align-items:center; justify-content:center;
+                width:48px; height:48px;
+                position:relative; z-index:1;
+            }
+            .vr-banner-icon-emoji svg{
+                width:100%; height:100%; display:block;
+                filter:drop-shadow(0 2px 8px rgba(0,0,0,0.5));
+            }
+            .vr-chr .vr-banner-icon-emoji svg{
+                filter:drop-shadow(0 2px 8px rgba(0,0,0,0.5)) drop-shadow(0 0 10px rgba(168,85,247,0.5));
+            }
+            .vr-storm .vr-banner-icon-emoji svg{
+                filter:drop-shadow(0 2px 8px rgba(0,0,0,0.5)) drop-shadow(0 0 10px rgba(251,191,36,0.5));
             }
             .vr-chr .vr-banner-icon{
                 background:linear-gradient(135deg,rgba(168,85,247,0.25),rgba(99,102,241,0.12));
@@ -2092,8 +2107,8 @@
                 box-shadow:0 0 20px rgba(99,102,241,0.15);
             }
             .vr-banner-icon::before{
-                content:''; position:absolute; inset:-4px; border-radius:22px;
-                border:1px solid transparent; pointer-events:none;
+                content:''; position:absolute; inset:-5px; border-radius:24px;
+                pointer-events:none; z-index:0;
                 transition:all .3s ease;
             }
             .vr-banner-card:hover .vr-banner-icon{ transform:scale(1.08) rotate(-3deg); }
@@ -3180,7 +3195,35 @@
                         <!-- ① 染色体锚定诊断仪 -->
                         <a href="labs/evidence/chromosome_diagnostic.html" class="vr-banner-card vr-chr">
                             <div class="vr-banner-icon">
-                                🧬
+                                <span class="vr-banner-icon-emoji">
+                                    <svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                                        <defs>
+                                            <linearGradient id="dnaGrad1" x1="0%" y1="0%" x2="0%" y2="100%">
+                                                <stop offset="0%" stop-color="#f0abfc"/>
+                                                <stop offset="50%" stop-color="#c084fc"/>
+                                                <stop offset="100%" stop-color="#a78bfa"/>
+                                            </linearGradient>
+                                            <linearGradient id="dnaGrad2" x1="0%" y1="0%" x2="0%" y2="100%">
+                                                <stop offset="0%" stop-color="#c4b5fd"/>
+                                                <stop offset="50%" stop-color="#818cf8"/>
+                                                <stop offset="100%" stop-color="#6366f1"/>
+                                            </linearGradient>
+                                        </defs>
+                                        <path d="M14 6 C26 14, 26 34, 14 42" fill="none" stroke="url(#dnaGrad1)" stroke-width="3" stroke-linecap="round"/>
+                                        <path d="M34 6 C22 14, 22 34, 34 42" fill="none" stroke="url(#dnaGrad2)" stroke-width="3" stroke-linecap="round"/>
+                                        <g stroke="#e879f9" stroke-width="2" stroke-linecap="round" opacity="0.9">
+                                            <line x1="15" y1="12" x2="33" y2="12"/>
+                                            <line x1="14" y1="19" x2="34" y2="19"/>
+                                            <line x1="14" y1="24" x2="34" y2="24"/>
+                                            <line x1="14" y1="29" x2="34" y2="29"/>
+                                            <line x1="15" y1="36" x2="33" y2="36"/>
+                                        </g>
+                                        <circle cx="14" cy="6" r="3" fill="#f0abfc"/>
+                                        <circle cx="34" cy="6" r="3" fill="#c4b5fd"/>
+                                        <circle cx="14" cy="42" r="3" fill="#a78bfa"/>
+                                        <circle cx="34" cy="42" r="3" fill="#6366f1"/>
+                                    </svg>
+                                </span>
                                 <span class="vr-banner-seq">1</span>
                             </div>
                             <div class="vr-banner-body">
@@ -3221,7 +3264,21 @@
                         <!-- ② 风暴能量分配模拟器 -->
                         <a href="labs/evidence/storm_energy_simulator.html" class="vr-banner-card vr-storm">
                             <div class="vr-banner-icon">
-                                ⚡
+                                <span class="vr-banner-icon-emoji">
+                                    <svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                                        <defs>
+                                            <linearGradient id="boltGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                                <stop offset="0%" stop-color="#fde047"/>
+                                                <stop offset="50%" stop-color="#fbbf24"/>
+                                                <stop offset="100%" stop-color="#f97316"/>
+                                            </linearGradient>
+                                        </defs>
+                                        <path d="M27 4 L10 27 L21 27 L17 44 L38 19 L26 19 L30 4 Z"
+                                              fill="url(#boltGrad)" stroke="#fde047" stroke-width="1.5" stroke-linejoin="round"/>
+                                        <path d="M24 10 L16 26 L22 26 L20 38 L32 21 L25 21 Z"
+                                              fill="rgba(255,255,255,0.25)"/>
+                                    </svg>
+                                </span>
                                 <span class="vr-banner-seq">2</span>
                             </div>
                             <div class="vr-banner-body">
