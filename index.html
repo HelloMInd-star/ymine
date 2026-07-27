@@ -593,6 +593,89 @@
         }
         .backend-status .backend-dot{display:none;}
 
+        /* API 演示面板 */
+        .api-demo-panel{
+            background:linear-gradient(135deg,rgba(14,165,233,0.04),rgba(99,102,241,0.03),rgba(0,0,0,0.2));
+            border:1px solid rgba(14,165,233,0.2);
+            border-radius:12px;padding:18px 20px;margin-bottom:28px;
+            position:relative;overflow:hidden;
+        }
+        .api-demo-panel::before{
+            content:'';position:absolute;top:0;left:0;right:0;height:2px;
+            background:linear-gradient(90deg,transparent,rgba(14,165,233,0.6),rgba(99,102,241,0.6),transparent);
+        }
+        .api-demo-header{
+            display:flex;align-items:center;justify-content:space-between;
+            margin-bottom:14px;flex-wrap:wrap;gap:8px;
+        }
+        .api-demo-title{
+            font-size:13px;font-weight:700;color:#e2e8f0;
+            display:flex;align-items:center;gap:8px;
+        }
+        .api-demo-title .api-icon{font-size:16px;}
+        .api-demo-conn{
+            font-size:10px;font-family:'SF Mono',ui-monospace,monospace;
+            padding:3px 10px;border-radius:12px;
+            background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);color:#f87171;
+            display:inline-flex;align-items:center;gap:5px;
+        }
+        .api-demo-conn.online{
+            background:rgba(34,197,94,0.08);border-color:rgba(34,197,94,0.25);color:#4ade80;
+        }
+        .api-demo-btns{
+            display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px;
+        }
+        .api-demo-btn{
+            background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);
+            border-radius:8px;padding:12px 14px;cursor:pointer;
+            transition:all .25s ease;display:flex;flex-direction:column;gap:4px;
+            text-align:left;color:#cbd5e1;font-family:inherit;
+        }
+        .api-demo-btn:hover:not(:disabled){
+            background:rgba(14,165,233,0.08);border-color:rgba(14,165,233,0.35);
+            transform:translateY(-1px);box-shadow:0 4px 12px rgba(14,165,233,0.1);
+        }
+        .api-demo-btn:disabled{
+            opacity:0.4;cursor:not-allowed;
+        }
+        .api-demo-btn.loading{
+            background:rgba(251,191,36,0.06);border-color:rgba(251,191,36,0.25);
+        }
+        .api-demo-btn .api-endpoint{
+            font-family:'SF Mono',ui-monospace,monospace;font-size:12px;
+            color:#38bdf8;font-weight:600;
+        }
+        .api-demo-btn .api-label{
+            font-size:10px;color:rgba(255,255,255,0.5);
+        }
+        .api-demo-btn .api-action{
+            font-size:10px;color:#94a3b8;margin-top:2px;
+            display:inline-flex;align-items:center;gap:4px;
+        }
+        .api-demo-btn.loading .api-action{color:#fbbf24;}
+        .api-demo-result{
+            background:rgba(0,0,0,0.35);border:1px solid rgba(255,255,255,0.06);
+            border-radius:8px;padding:12px 14px;margin-bottom:10px;
+            font-family:'SF Mono',ui-monospace,monospace;font-size:11px;
+            color:#94a3b8;line-height:1.6;max-height:240px;overflow:auto;
+            white-space:pre-wrap;word-break:break-all;
+        }
+        .api-demo-result.has-data{color:#a5f3fc;}
+        .api-demo-result.error{color:#fca5a5;border-color:rgba(239,68,68,0.2);background:rgba(239,68,68,0.05);}
+        .api-demo-status{
+            font-size:10px;font-family:'SF Mono',ui-monospace,monospace;
+            color:#64748b;display:flex;align-items:center;gap:8px;
+        }
+        .api-demo-status.success{color:#4ade80;}
+        .api-demo-status.fail{color:#f87171;}
+        .api-demo-status .api-spinner{
+            width:10px;height:10px;border:2px solid rgba(251,191,36,0.2);
+            border-top-color:#fbbf24;border-radius:50%;
+            animation:apiSpin 0.8s linear infinite;display:none;
+        }
+        .api-demo-status.loading .api-spinner{display:inline-block;}
+        @keyframes apiSpin{to{transform:rotate(360deg);}}
+
         /* 心智品牌区（默认3列，.four变体为4列） */
         .mind-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px;}
         .mind-grid.four{grid-template-columns:repeat(4,1fr);}
@@ -1756,6 +1839,42 @@
                         <span class="icon">🔊</span> 物理声场修复 · 频谱分析与断层检测
                         <span class="arrow" style="color:#06b6d4;">🎧</span>
                     </a>
+                </div>
+            </div>
+
+            <!-- ===== API 演示面板（板块三·工具链 下方独立卡片） ===== -->
+            <div class="api-demo-panel" id="apiDemoPanel">
+                <div class="api-demo-header">
+                    <div class="api-demo-title">
+                        <span class="api-icon">📡</span>
+                        <span>API 演示面板 · 后端服务调用测试</span>
+                    </div>
+                    <div class="api-demo-conn" id="apiDemoConn">
+                        <span id="apiDemoConnText">🔴 未连接</span>
+                    </div>
+                </div>
+                <div class="api-demo-btns">
+                    <button class="api-demo-btn" data-endpoint="/thresholds" data-method="GET" disabled>
+                        <span class="api-endpoint">GET /thresholds</span>
+                        <span class="api-label">获取全局阈值常量</span>
+                        <span class="api-action"><span class="api-btn-text">▶ 调用</span></span>
+                    </button>
+                    <button class="api-demo-btn" data-endpoint="/api/chromosome/diagnose" data-method="GET" disabled>
+                        <span class="api-endpoint">GET /chromosome</span>
+                        <span class="api-label">染色体锚定诊断</span>
+                        <span class="api-action"><span class="api-btn-text">▶ 调用</span></span>
+                    </button>
+                    <button class="api-demo-btn" data-endpoint="/api/storm/simulate" data-method="GET" disabled>
+                        <span class="api-endpoint">GET /storm</span>
+                        <span class="api-label">风暴能量分配模拟</span>
+                        <span class="api-action"><span class="api-btn-text">▶ 调用</span></span>
+                    </button>
+                </div>
+                <div class="api-demo-result" id="apiDemoResult">// 点击上方按钮调用后端 API，返回结果将在此处显示
+// 状态：等待调用…</div>
+                <div class="api-demo-status" id="apiDemoStatus">
+                    <span class="api-spinner"></span>
+                    <span id="apiDemoStatusText">⚡ 就绪 · 等待后端连接</span>
                 </div>
             </div>
 
@@ -4259,6 +4378,95 @@
         pollTimer = setInterval(check, POLL_INTERVAL);
         window.addEventListener('beforeunload', function(){
             if(pollTimer) clearInterval(pollTimer);
+        });
+
+        // ====== API 演示面板与后端状态联动 ======
+        var apiDemoConn = document.getElementById('apiDemoConn');
+        var apiDemoConnText = document.getElementById('apiDemoConnText');
+        var apiDemoBtns = document.querySelectorAll('.api-demo-btn');
+        var apiDemoResult = document.getElementById('apiDemoResult');
+        var apiDemoStatus = document.getElementById('apiDemoStatus');
+        var apiDemoStatusText = document.getElementById('apiDemoStatusText');
+        var apiDemoOnline = false;
+
+        function setApiDemoOnline(online){
+            apiDemoOnline = online;
+            if(online){
+                apiDemoConn.className = 'api-demo-conn online';
+                apiDemoConnText.textContent = '🟢 FastAPI 后端已连接';
+                apiDemoBtns.forEach(function(b){ if(!b.classList.contains('loading')) b.disabled = false; });
+                apiDemoStatus.className = 'api-demo-status';
+                apiDemoStatusText.textContent = '⚡ 就绪 · 点击按钮调用 API';
+            } else {
+                apiDemoConn.className = 'api-demo-conn';
+                apiDemoConnText.textContent = '🔴 未连接';
+                apiDemoBtns.forEach(function(b){ b.disabled = true; b.classList.remove('loading'); b.querySelector('.api-btn-text').textContent='▶ 调用'; });
+                apiDemoStatus.className = 'api-demo-status fail';
+                apiDemoStatusText.textContent = '⚠ 后端未连接，请先启动 FastAPI 服务';
+                apiDemoResult.className = 'api-demo-result error';
+                apiDemoResult.textContent = '// 后端未连接\n// 启动命令：cd backend && pip install -r requirements.txt && uvicorn main:app --reload\n// 或在项目根目录：uvicorn main:app --reload';
+            }
+        }
+        // 监听顶部后端状态指示器的变化（通过轮询检查 statusEl class）
+        var _observerTick = setInterval(function(){
+            if(!statusEl){ return; }
+            var isOnline = statusEl.classList.contains('online');
+            if(isOnline !== apiDemoOnline){ setApiDemoOnline(isOnline); }
+        }, 800);
+
+        // 首次渲染前延迟一下，等待顶部指示器完成首次检测
+        setTimeout(function(){ setApiDemoOnline(lastOk); }, 1500);
+
+        // 按钮点击事件
+        apiDemoBtns.forEach(function(btn){
+            btn.addEventListener('click', function(){
+                if(!apiDemoOnline || btn.classList.contains('loading')) return;
+                var endpoint = btn.getAttribute('data-endpoint');
+                var method = btn.getAttribute('data-method') || 'GET';
+                var btnText = btn.querySelector('.api-btn-text');
+                var origText = btnText.textContent;
+
+                // 进入loading
+                btn.classList.add('loading');
+                btn.disabled = true;
+                btnText.textContent = '⏳ 加载中…';
+                apiDemoResult.className = 'api-demo-result';
+                apiDemoResult.textContent = '// 请求发送中… ' + method + ' ' + BACKEND_URL + endpoint;
+                apiDemoStatus.className = 'api-demo-status loading';
+                apiDemoStatusText.textContent = '⌛ 请求已发出，等待响应…';
+
+                var t0 = performance.now();
+                var ctrl = new AbortController();
+                var to = setTimeout(function(){ ctrl.abort(); }, 8000);
+
+                fetch(BACKEND_URL + endpoint, { signal: ctrl.signal, cache: 'no-store', method: method, mode: 'cors' })
+                    .then(function(r){
+                        clearTimeout(to);
+                        var dt = Math.round(performance.now() - t0);
+                        if(!r.ok) throw new Error('HTTP ' + r.status);
+                        return r.json().then(function(data){ return {data:data, dt:dt, status:r.status}; });
+                    })
+                    .then(function(res){
+                        var pretty = JSON.stringify(res.data, null, 2);
+                        apiDemoResult.className = 'api-demo-result has-data';
+                        apiDemoResult.textContent = pretty;
+                        apiDemoStatus.className = 'api-demo-status success';
+                        apiDemoStatusText.textContent = '✅ 调用成功 · HTTP ' + res.status + ' · 响应时间 ' + res.dt + 'ms · ' + method + ' ' + endpoint;
+                    })
+                    .catch(function(err){
+                        clearTimeout(to);
+                        var dt = Math.round(performance.now() - t0);
+                        apiDemoResult.className = 'api-demo-result error';
+                        apiDemoResult.textContent = '// ❌ 请求失败\n// 错误：' + (err.message || err) + '\n// 端点：' + method + ' ' + BACKEND_URL + endpoint;
+                        apiDemoStatus.className = 'api-demo-status fail';
+                        apiDemoStatusText.textContent = '❌ 调用失败 · ' + (err.message || '网络错误') + ' · ' + dt + 'ms';
+                    })
+                    .finally(function(){
+                        btn.classList.remove('loading');
+                        if(apiDemoOnline){ btn.disabled = false; }
+                        btnText.textContent = origText;
+                    });
+            });
         });
     })();
     </script>
