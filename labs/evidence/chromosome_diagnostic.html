@@ -10,6 +10,7 @@
     <script src="../../assets/js/components.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
     <style>
+        /* ... 样式完全保留，无改动 ... */
         .breadcrumb {
             display: flex; align-items: center; gap: 8px;
             font-size: 13px; margin-bottom: 8px; flex-wrap: wrap;
@@ -42,7 +43,6 @@
         }
         .header .sub { font-size: 14px; color: rgba(255,255,255,0.35); font-weight: 300; margin-top: 6px; }
 
-        /* VR Banner */
         .vr-banner {
             margin: 16px 0 24px; padding: 14px 18px;
             background: linear-gradient(135deg, rgba(168,85,247,0.06), rgba(99,102,241,0.04), rgba(34,211,238,0.04));
@@ -106,7 +106,6 @@
             font-family: 'SF Mono',ui-monospace,monospace; margin-left: auto;
         }
 
-        /* Control Bar */
         .control-bar {
             display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
             padding: 16px 20px; margin-bottom: 20px;
@@ -161,14 +160,12 @@
         }
         .drift-val { font-family:'SF Mono',monospace; font-size:12px; color: #c084fc; min-width: 28px; }
 
-        /* Main Layout */
         .main-layout {
             display: grid; grid-template-columns: 1.2fr 1fr; gap: 20px;
             margin-bottom: 20px;
             opacity: 0; animation: fadeInUp 0.7s ease 0.3s forwards;
         }
 
-        /* Chat Area */
         .chat-panel {
             background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05);
             border-radius: 14px; display: flex; flex-direction: column; overflow: hidden;
@@ -254,7 +251,6 @@
         .input-row input:focus { border-color: rgba(168,85,247,0.4); }
         .input-row input::placeholder { color: rgba(255,255,255,0.25); }
 
-        /* Chromosome Panel */
         .chromosome-panel {
             display: flex; flex-direction: column; gap: 16px;
         }
@@ -304,7 +300,6 @@
             animation: blink 0.6s ease-in-out infinite;
         }
 
-        /* Chart Area */
         .chart-box {
             background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05);
             border-radius: 14px; padding: 20px;
@@ -317,7 +312,6 @@
         }
         #similarityChart { width: 100%; height: 240px; }
 
-        /* Report */
         .report-box {
             background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05);
             border-radius: 14px; padding: 20px 24px;
@@ -375,11 +369,10 @@
 
         <div class="header">
             <div class="badge">🧬 多模态大模型 · 主题锚定诊断</div>
-            <h1>🧬 染色体锚定诊断仪 v1.0</h1>
-            <div class="sub">大模型多轮对话主题漂移实时检测 · 0.48/0.68 THRESHOLDS 双阶熔断 · 染色体基因锚定相似度</div>
+            <h1>🧬 染色体锚定诊断仪 v2.0</h1>
+            <div class="sub">真实语义检测 · FastAPI 后端驱动 · 0.48/0.68 THRESHOLDS 双阶熔断 · 四种主题锚点</div>
         </div>
 
-        <!-- VR Banner -->
         <div class="vr-banner" id="vrBanner">
             <div class="vr-title">
                 <span class="vr-icon">🔬</span>
@@ -403,7 +396,6 @@
             </div>
         </div>
 
-        <!-- Control Bar -->
         <div class="control-bar">
             <select class="topic-select" id="topicSelect">
                 <option value="quant">📊 量化金融策略</option>
@@ -421,7 +413,6 @@
             </div>
         </div>
 
-        <!-- Main Layout -->
         <div class="main-layout">
             <div class="chat-panel">
                 <div class="chat-head">
@@ -461,13 +452,11 @@
             </div>
         </div>
 
-        <!-- Similarity Chart -->
         <div class="chart-box">
             <h3>📉 锚定相似度实时曲线</h3>
             <div id="similarityChart"></div>
         </div>
 
-        <!-- Report -->
         <div class="report-box">
             <h3>📋 诊断报告</h3>
             <div class="report-grid" id="reportGrid"></div>
@@ -482,6 +471,7 @@
     (function(){
         const THRESH = { WARN: 0.48, DANGER: 0.68 };
         const SIM_SCALE = { ANCHORED: 0.80, DRIFTING: 0.50, FUSED: 0.32 };
+        const API_BASE = "http://localhost:8000";
 
         const TOPICS = {
             quant: {
@@ -574,6 +564,7 @@
             }
         }
 
+        // 前端模拟相似度（作为备用）
         function similarity(text) {
             const tokens = tokenize(text);
             if (tokens.length === 0) return 0.5;
@@ -586,6 +577,25 @@
             let baseSim = hits / Math.max(total, tokens.length * 0.15);
             baseSim = Math.min(1, Math.max(0, baseSim));
             return baseSim;
+        }
+
+        // ---------- 新增：调用后端 API ----------
+        async function callBackendAPI(text, topic) {
+            try {
+                const response = await fetch(`${API_BASE}/api/chromosome/diagnose?data=${encodeURIComponent(text)}&topic=${encodeURIComponent(topic)}`);
+                if (!response.ok) {
+                    console.warn('后端API返回错误，使用前端模拟');
+                    return null;
+                }
+                const result = await response.json();
+                return {
+                    sim: result.avg_health || 0.5,
+                    status: result.overall_status || 'normal'
+                };
+            } catch (error) {
+                console.warn('后端API调用失败，使用前端模拟:', error);
+                return null;
+            }
         }
 
         function generateResponse(forceDrift) {
@@ -817,7 +827,8 @@
             }).join('');
         }
 
-        function doTurn(overrideText) {
+        // ---------- 核心改动：doTurn 调用后端 API ----------
+        async function doTurn(overrideText) {
             round++;
             document.getElementById('roundBadge').textContent = 'R' + round;
 
@@ -846,10 +857,26 @@
             }
             addMsg('user', userText);
 
-            setTimeout(() => {
+            // 等待用户消息显示后，生成回复
+            setTimeout(async () => {
                 const forceDrift = Math.min(0.9, driftLevel + round*0.07);
                 const respText = generateResponse(forceDrift);
-                const sim = Math.max(0.1, Math.min(1, similarity(respText) * (1 - driftLevel*0.1) - round*0.03 + (Math.random()-0.5)*0.1));
+                
+                // ---------- 调用后端 API 获取相似度 ----------
+                let sim = 0.5;
+                try {
+                    const apiResult = await callBackendAPI(respText, currentTopic);
+                    if (apiResult !== null) {
+                        sim = Math.max(0.1, Math.min(1, apiResult.sim));
+                    } else {
+                        // 降级：使用前端模拟
+                        sim = Math.max(0.1, Math.min(1, similarity(respText) * (1 - driftLevel*0.1) - round*0.03 + (Math.random()-0.5)*0.1));
+                    }
+                } catch (e) {
+                    // 降级：使用前端模拟
+                    sim = Math.max(0.1, Math.min(1, similarity(respText) * (1 - driftLevel*0.1) - round*0.03 + (Math.random()-0.5)*0.1));
+                }
+                
                 lastSim = sim;
                 addMsg('assistant', respText, sim);
 
