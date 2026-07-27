@@ -591,10 +591,7 @@
         .backend-status.connecting{
             background:rgba(251,191,36,0.08);border-color:rgba(251,191,36,0.2);color:#fbbf24;
         }
-        .backend-status .backend-dot{width:6px;height:6px;border-radius:50%;background:currentColor;animation:backendPulse 2s infinite;}
-        @keyframes backendPulse{0%,100%{opacity:1;box-shadow:0 0 0 0 currentColor;}50%{opacity:0.5;box-shadow:0 0 0 3px rgba(255,255,255,0);}}
-        .backend-status.online .backend-dot{animation:backendPulse 2s infinite;}
-        .backend-status:not(.online) .backend-dot{animation:none;opacity:0.7;}
+        .backend-status .backend-dot{display:none;}
 
         /* 心智品牌区（默认3列，.four变体为4列） */
         .mind-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px;}
@@ -1257,7 +1254,7 @@
                 <div class="audit-status" id="auditStatus"><span class="audit-dot"></span><span id="auditStatusText">三角审计待命</span></div>
                 <a href="http://localhost:8000/docs" target="_blank" class="backend-status connecting" id="backendStatus" title="点击查看API文档">
                     <span class="backend-dot"></span>
-                    <span id="backendStatusText">后端服务：检测中…</span>
+                    <span id="backendStatusText">🟡 后端连接中…</span>
                 </a>
             </div>
 
@@ -4219,7 +4216,7 @@
             statusEl.className = 'backend-status online';
             statusEl.href = BACKEND_URL + '/docs';
             statusEl.title = '后端已连接 · 版本 ' + (data && data.version ? data.version : '') + ' · 点击查看API文档';
-            textEl.textContent = '后端服务：已连接';
+            textEl.textContent = '🟢 后端已连接';
             if(apiEntry){
                 apiEntry.style.opacity = '1';
                 apiEntry.style.pointerEvents = 'auto';
@@ -4230,14 +4227,14 @@
             statusEl.className = 'backend-status';
             statusEl.href = BACKEND_URL + '/docs';
             statusEl.title = '后端未连接 · 点击尝试打开API文档';
-            textEl.textContent = '后端服务：未连接';
+            textEl.textContent = '🔴 后端未连接';
             if(apiEntry){
                 apiEntry.style.opacity = '0.5';
             }
         }
         function setConnecting(){
             statusEl.className = 'backend-status connecting';
-            textEl.textContent = '后端服务：检测中…';
+            textEl.textContent = '🟡 后端连接中…';
         }
         function check(){
             var ctrl = new AbortController();
