@@ -1,5 +1,5 @@
 """
-Game-OS V2.3 FastAPI Backend
+Game-OS V2.4 FastAPI Backend
 ============================
 Main API entry point. Provides REST access to core algorithms
 (threshold judgment, vector computation, simulation analysis)
@@ -47,7 +47,7 @@ app.include_router(storm.router)
 @app.get("/", tags=["root"])
 def root():
     return {
-        "name": "🔺 Game-OS V2.3 API",
+        "name": "🔺 Game-OS V2.4 API",
         "version": VERSION,
         "status": "running",
         "docs": "/docs",
@@ -85,4 +85,4 @@ def get_thresholds():
 
 @app.get("/version", tags=["root"])
 def get_version():
-    return {"version": VERSION, "name": "Component-Optimized"}
+    return {"version": VERSION, "name": "Backend-Integrated"}

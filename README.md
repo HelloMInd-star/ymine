@@ -1,12 +1,12 @@
 <div align="center">
 
-# 🔺 Game-OS V2.3
+# 🔺 Game-OS V2.4
 
 ### 博弈论驱动的全域认知操作系统
 
 > **全球首个以「圆锥博弈论」为统一数学基座，融合博弈论、控制论、认知科学、量化金融四大学科的跨领域决策操作系统——不是给大模型加壳，而是从底层重新设计了决策的生成、校验、熔断和审计全链路。**
 
-[![Version](https://img.shields.io/badge/version-V2.3_Component--Optimized-blueviolet)](#)
+[![Version](https://img.shields.io/badge/version-V2.4_Backend--Integrated-blueviolet)](#)
 [![Audit](https://img.shields.io/badge/audit-7%E8%BD%AE%E9%80%9A%E8%BF%87-success)](#)
 [![Tests](https://img.shields.io/badge/tests-148%20passed-brightgreen)](#)
 [![Compliance](https://img.shields.io/badge/compliance-97.71%2F100_(A%2B)-orange)](#)
@@ -40,7 +40,7 @@
 ## 🚀 30秒快速启动
 
 ```bash
-# 方式一：纯前端，无需安装任何依赖
+# 方式一：前端部分无需额外依赖，后端 FastAPI 需 Python 环境（见方式二）
 python3 -m http.server 8080
 # 浏览器打开 http://localhost:8080/index.html
 ```
@@ -97,11 +97,12 @@ uvicorn main:app --reload --port 8000
 - **11维金融向量体系**：金融信号多维特征向量展示框架
 - **大模型学习记忆系统**：KMP·IPD·7D向量框架基座
 
-### 🚀 FastAPI 后端支持（V2.3新增）
-- 系统内置 **FastAPI 后端服务**，支持通过 REST API 调用核心算法（阈值判定、向量计算、仿真实验分析），实现前后端分离部署
-- 自动生成 **Swagger UI** 文档（`/docs`），所有接口在线调试
-- CORS 已配置，支持跨域调用，后端独立部署时前端无缝衔接
-- 核心端点：`/health`（健康检查）、`/thresholds`（全局阈值）、`/api/chromosome/diagnose`（染色体诊断）、`/api/storm/simulate`（风暴能量模拟）
+### 🚀 FastAPI 后端支持（V2.4新增）
+系统内置 **FastAPI 后端服务**，核心算法已从 JavaScript 模拟迁移至 Python 后端，支持 REST API 调用
+- 总控台顶部实时显示后端连接状态：「🟢 已连接」/「🔴 未连接」
+- 自动生成 **Swagger UI** 文档（`/docs`），所有接口在线可调试
+- CORS 已配置，支持跨域调用，前端与后端可独立部署
+- 核心端点：`/health`、`/thresholds`、`/api/chromosome/diagnose`、`/api/storm/simulate`
 
 ---
 
@@ -134,7 +135,7 @@ workspace/
 ├── index.html                     # 🎯 主控台入口（推荐从这里开始）
 ├── ymine-studio.html              # 🛠️ YMine Studio全功能控制台
 │
-├── backend/                       # 🚀 FastAPI 后端服务（V2.3新增）
+├── backend/                       # 🚀 FastAPI 后端服务（V2.4新增）
 │   ├── main.py                    #    API 主入口（/health, /thresholds, /version）
 │   ├── config.py                  #    全局阈值常量（唯一事实源）
 │   ├── routers/                   #    路由模块
@@ -343,12 +344,13 @@ Game-OS走了一条不同的路：
 | V2.2 Batch1 | 2026-03~07 | 七轮专项审计 → 25个A类缺陷100%修复 |
 | V2.2 P0-Rectified | 2026-07-26 | P0整改：仓库整理、39个实验入口横向总览、统一工具库、124个单元测试 |
 | **V2.3 Component-Optimized** | **2026-07-27** | **✅ 公共组件层抽取(components.css/js)、VR可验证信号类2个新实验、横幅式特色入口、YBus+VRComponents单元测试24项新增、测试总数148** |
+| **V2.4 Backend-Integrated** | **2026-07-27** | **🚀 新增 FastAPI 后端服务，系统从纯前端演示升级为前后端分离的全栈架构；9个REST API端点（健康检查/阈值/染色体诊断/风暴模拟）；总控台后端状态指示器实时联动 /health；自动Swagger UI文档；CORS跨域支持** |
 
 ---
 
 ## ⚠️ 许可证与免责
 
-Game-OS V2.3 为内部研究/教学/仿真平台。
+Game-OS V2.4 为内部研究/教学/仿真平台。
 - ✅ 所有公开代码为原创或开源教学级实现
 - 🔒 私有引擎目录（`*-private-engine/`）包含商业机密，未经授权不得访问
 - ⚠️ 金融模型在公开层为简化教学版本，**不构成投资建议**

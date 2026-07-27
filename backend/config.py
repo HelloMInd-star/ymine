@@ -1,5 +1,5 @@
 """
-Game-OS V2.3 FastAPI Backend
+Game-OS V2.4 FastAPI Backend
 ============================
 Threshold constants shared across all API endpoints — single source of truth
 mirroring the frontend YBus.THRESHOLDS constants.
@@ -20,4 +20,4 @@ RISK_LEVELS = [
     {"max": 1.01,                    "label": "熔断",   "color": "#ef4444", "level": "danger"},
 ]
 
-VERSION = "V2.3 Component-Optimized"
+VERSION = "V2.4 Backend-Integrated"
