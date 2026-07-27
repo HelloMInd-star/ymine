@@ -9,8 +9,12 @@ router = APIRouter()
 logger = logging.getLogger(__name__)
 
 # ---------- 1. 加载语义模型 ----------
-model = SentenceTransformer('paraphrase-multilingual-MiniLM-L12-v2')
-logger.info("语义模型加载成功")
+try:
+    model = SentenceTransformer('paraphrase-multilingual-MiniLM-L12-v2')
+    logger.info("语义模型加载成功")
+except Exception as e:
+    logger.error(f"模型加载失败: {e}")
+    raise
 
 # ---------- 2. 主题锚点库 ----------
 TOPIC_ANCHORS = {
