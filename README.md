@@ -79,15 +79,16 @@ uvicorn main:app --reload --port 8000
 # 访问：http://localhost:8000/docs (Swagger UI 自动文档)
 ```
 
-### 2. Streamlit 数据仪表盘
+### 2. Streamlit 数据仪表盘（V2.5 规划中 · 代码即将推送）
 ```bash
 # 端口：8501
+# ⚠️ 预计2026年8月可用，当前版本以 FastAPI + 前端主控台为核心演示
 pip install streamlit pandas numpy plotly
 streamlit run dashboard/Home.py
 # 访问：http://localhost:8501
 ```
 
-Streamlit仪表盘包含3个页面：
+Streamlit仪表盘规划包含3个页面：
 - **Home.py**：系统概览仪表盘
 - **pages/1_Chromosome_Lab.py**：染色体诊断实验台
 - **pages/2_Storm_Simulator.py**：风暴能量模拟实验室
