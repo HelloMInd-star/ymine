@@ -5,7 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Y.Mine · 🧬 染色体锚定诊断仪</title>
     <link rel="stylesheet" href="../../assets/css/base.css">
+    <link rel="stylesheet" href="../../assets/css/components.css">
     <script src="../../assets/js/bus.js"></script>
+    <script src="../../assets/js/components.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
     <style>
         .breadcrumb {
@@ -543,7 +545,7 @@
         let fused = false;
         let lastSim = 1.0;
 
-        const simChart = echarts.init(document.getElementById('similarityChart'), null, {renderer:'canvas'});
+        const simChart = VR.echarts.trackChart(echarts.init(document.getElementById('similarityChart'), 'ymine-dark', {renderer:'canvas'}));
         const chrCanvas = document.getElementById('chrCanvas');
         const chrCtx = chrCanvas.getContext('2d');
 

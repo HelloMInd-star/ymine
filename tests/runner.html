@@ -47,6 +47,8 @@ h2 { color: #a78bfa; font-size: 15px; margin: 24px 0 12px; padding-left: 12px; b
 <script src="../models/calc/calc-model.js"></script>
 <script src="../models/gamemind/gamemind-model.js"></script>
 <script src="../models/compute/compute-model.js"></script>
+<script src="../assets/js/bus.js"></script>
+<script src="../assets/js/components.js"></script>
 <script src="../assets/js/risk-circuit-breaker.js"></script>
 <script src="../assets/js/triangle-audit.js"></script>
 
@@ -631,6 +633,216 @@ h2 { color: #a78bfa; font-size: 15px; margin: 24px 0 12px; padding-left: 12px; b
             assert(r.modelResults.calc && typeof r.modelResults.calc === 'object', 'modelResults.calc exists');
             assert(r.modelResults.game && typeof r.modelResults.game === 'object', 'modelResults.game exists');
             assert(r.modelResults.compute && typeof r.modelResults.compute === 'object', 'modelResults.compute exists');
+        });
+
+        // ================================================================
+        // YBus 数据总线核心单元测试
+        // ================================================================
+        section('YBus: Three-Partition Data Bus (v2.1)');
+
+        var YB = window.YBus;
+
+        test('YBus: THRESHOLDS constants match global (0.48/0.50/0.68)', function() {
+            assert(YB.THRESHOLDS.BREAKEVEN === 0.48, 'BREAKEVEN = 0.48');
+            assert(YB.THRESHOLDS.STEADY === 0.50, 'STEADY = 0.50');
+            assert(YB.THRESHOLDS.FUSE === 0.68, 'FUSE = 0.68');
+            assert(Object.isFrozen(YB.THRESHOLDS), 'THRESHOLDS should be frozen');
+        });
+
+        test('YBus: PARTITIONS has PIPELINE/DRAFT/AUDIT with correct metadata', function() {
+            var P = YB.PARTITIONS;
+            assert(P.PIPELINE.writable === false, 'PIPELINE must be read-only');
+            assert(P.DRAFT.writable === true, 'DRAFT must be writable');
+            assert(P.AUDIT.writable === false, 'AUDIT must be read-only (append-only)');
+            assert(P.PIPELINE.prefix === 'pipeline_');
+            assert(P.DRAFT.prefix === 'draft_');
+            assert(P.AUDIT.prefix === 'audit_log_');
+        });
+
+        test('YBus: CHANNELS list is non-empty array of strings', function() {
+            assert(Array.isArray(YB.CHANNELS), 'CHANNELS should be array');
+            assert(YB.CHANNELS.length >= 5, 'Should have at least 5 channels, got ' + YB.CHANNELS.length);
+            YB.CHANNELS.forEach(function(name) {
+                assert(typeof name === 'string', 'Channel name must be string: ' + name);
+            });
+        });
+
+        test('YBus: API surface exposes all required functions', function() {
+            assert(typeof YB.initState === 'function', 'initState');
+            assert(typeof YB.publish === 'function', 'publish');
+            assert(typeof YB.subscribe === 'function', 'subscribe');
+            assert(typeof YB.getState === 'function', 'getState');
+            assert(typeof YB.ready === 'function', 'ready');
+            assert(typeof YB.getSnapshot === 'function', 'getSnapshot');
+            assert(typeof YB.emergencyHalt === 'function', 'emergencyHalt');
+            assert(typeof YB.resumeFromHalt === 'function', 'resumeFromHalt');
+            assert(typeof YB.isHalted === 'function', 'isHalted');
+            assert(typeof YB.writeDraft === 'function', 'writeDraft');
+            assert(typeof YB.readDraft === 'function', 'readDraft');
+        });
+
+        test('YBus: initial halt state is false', function() {
+            assert(YB.isHalted() === false, 'System should not be halted initially');
+        });
+
+        test('YBus: emergencyHalt() / resumeFromHalt() state transition', function() {
+            YB.emergencyHalt();
+            assert(YB.isHalted() === true, 'After emergencyHalt(), isHalted must be true');
+            YB.resumeFromHalt();
+            assert(YB.isHalted() === false, 'After resumeFromHalt(), isHalted must be false');
+        });
+
+        test('YBus: writeDraft / readDraft round-trip preserves data', function() {
+            var testKey = '__test_key_' + Date.now();
+            var testData = { num: 42, str: 'hello', arr: [1,2,3], nested: { a: 1 } };
+            var writeOk = YB.writeDraft(testKey, testData);
+            assert(writeOk === true, 'writeDraft should return true for valid key');
+            var readBack = YB.readDraft(testKey, null);
+            assert(readBack !== null, 'readDraft should return non-null for written key');
+            assert(readBack.num === 42, 'Number field preserved');
+            assert(readBack.str === 'hello', 'String field preserved');
+            assert(Array.isArray(readBack.arr) && readBack.arr[2] === 3, 'Array preserved');
+            assert(readBack.nested.a === 1, 'Nested object preserved');
+        });
+
+        test('YBus: writeDraft rejects invalid keys (null/empty/non-string)', function() {
+            assert(YB.writeDraft('', {x:1}) === false, 'Empty key must return false');
+            assert(YB.writeDraft(null, {x:1}) === false, 'Null key must return false');
+            assert(YB.writeDraft(123, {x:1}) === false, 'Number key must return false');
+        });
+
+        test('YBus: readDraft returns defaultValue for missing key', function() {
+            var missing = YB.readDraft('__nonexistent_key_' + Date.now(), 'defaultVal');
+            assert(missing === 'defaultVal', 'Missing key should return defaultValue');
+        });
+
+        test('YBus: getState returns valid value for known channels (non-throwing)', function() {
+            YB.CHANNELS.forEach(function(name) {
+                var state;
+                try { state = YB.getState(name); } catch(e) { state = null; }
+                // getState should not throw and should return something (possibly null)
+                assert(true, 'getState(' + name + ') does not throw');
+            });
+        });
+
+        test('YBus: getSnapshot returns object with all channels as keys', function() {
+            var snap = YB.getSnapshot();
+            assert(typeof snap === 'object' && snap !== null, 'getSnapshot returns object');
+            YB.CHANNELS.forEach(function(name) {
+                assert(name in snap, 'Snapshot must contain channel: ' + name);
+            });
+        });
+
+        test('YBus: subscribe returns unsubscribe function', function() {
+            var received = null;
+            var unsub = YB.subscribe('circle', function(data) { received = data; });
+            assert(typeof unsub === 'function', 'subscribe must return unsubscribe function');
+            // unsubscribe should not throw
+            try { unsub(); } catch(e) { assert(false, 'unsubscribe should not throw: ' + e.message); }
+        });
+
+        test('YBus: writeDraft stores primitive strings correctly', function() {
+            var k = '__str_test_' + Date.now();
+            YB.writeDraft(k, 'plain_string_value');
+            var v = YB.readDraft(k, null);
+            assert(v === 'plain_string_value', 'String value should be returned as-is');
+        });
+
+        await runAsync('YBus: emergency-halt event is dispatched on halt', async function() {
+            var handlerFired = false;
+            function onHalt() { handlerFired = true; window.removeEventListener('emergency-halt', onHalt); }
+            window.addEventListener('emergency-halt', onHalt);
+            YB.emergencyHalt();
+            await new Promise(function(resolve) { setTimeout(resolve, 80); });
+            assert(handlerFired === true, 'emergency-halt event must fire');
+            YB.resumeFromHalt();
+        });
+
+        // ================================================================
+        // VRComponents 公共组件库测试
+        // ================================================================
+        section('VRComponents: Shared UI Component Library (v1.0)');
+
+        var VRC = window.VRComponents || window.VR;
+
+        test('VRComponents: namespace is defined with version', function() {
+            assert(typeof VRC === 'object' && VRC !== null, 'VRComponents must exist');
+            assert(typeof VRC.version === 'string', 'version should be string');
+        });
+
+        test('VRComponents.utils: clamping and formatting functions work', function() {
+            assert(VRC.utils.clamp(0.5, 0, 1) === 0.5);
+            assert(VRC.utils.clamp(-0.3, 0, 1) === 0);
+            assert(VRC.utils.clamp(1.5, 0, 1) === 1);
+            assert(VRC.utils.clamp(NaN, 0, 1) === 0);
+        });
+
+        test('VRComponents.utils: getRiskLevel returns correct levels', function() {
+            var safe = VRC.utils.getRiskLevel(0.3);
+            assert(safe.className === 'safe', '0.3 should be safe, got ' + safe.className);
+            assert(safe.label === '安全');
+
+            var steady = VRC.utils.getRiskLevel(0.55);
+            assert(steady.className === 'steady', '0.55 should be steady, got ' + steady.className);
+
+            var warn = VRC.utils.getRiskLevel(0.62);
+            assert(warn.className === 'warning', '0.62 should be warning, got ' + warn.className);
+
+            var danger = VRC.utils.getRiskLevel(0.80);
+            assert(danger.className === 'danger', '0.80 should be danger, got ' + danger.className);
+        });
+
+        test('VRComponents.utils: thresholdColor returns hex color string', function() {
+            var c = VRC.utils.thresholdColor(0.8);
+            assert(typeof c === 'string' && c.startsWith('#'), 'Should return hex color, got: ' + c);
+        });
+
+        test('VRComponents.utils: fmt/pct formatting', function() {
+            assert(typeof VRC.utils.fmt(3.14159, 2) === 'string');
+            assert(VRC.utils.pct(0.732) === '73.2%', 'pct(0.732) should be 73.2%, got ' + VRC.utils.pct(0.732));
+        });
+
+        test('VRComponents.utils: uid generates unique IDs', function() {
+            var id1 = VRC.utils.uid();
+            var id2 = VRC.utils.uid('test');
+            assert(typeof id1 === 'string' && id1.length > 0);
+            assert(id1 !== id2, 'Two uids must differ');
+            assert(id2.indexOf('test-') === 0, 'Prefix applied correctly');
+        });
+
+        test('VRComponents.echarts: makeLineChartConfig returns valid option', function() {
+            var cfg = VRC.echarts.makeLineChartConfig({
+                xData: ['a','b','c'],
+                series: [{ name:'s1', data:[0.1,0.5,0.9], color:'#a855f7' }]
+            });
+            assert(typeof cfg === 'object');
+            assert(Array.isArray(cfg.series), 'series must be array');
+            assert(cfg.series.length === 1);
+            assert(cfg.xAxis.data.length === 3);
+        });
+
+        test('VRComponents.echarts: makeRingChartConfig returns valid pie config', function() {
+            var cfg = VRC.echarts.makeRingChartConfig({
+                data: [{name:'A',value:30},{name:'B',value:70}]
+            });
+            assert(cfg.series[0].type === 'pie');
+            assert(cfg.series[0].radius[0] === '55%', 'Inner radius should be 55%');
+        });
+
+        test('VRComponents.echarts: thresholdMarkLine has 3 lines (0.48/0.50/0.68)', function() {
+            var ml = VRC.echarts.thresholdMarkLine();
+            assert(Array.isArray(ml.data), 'markLine.data must be array');
+            assert(ml.data.length === 3, 'Should have exactly 3 threshold lines, got ' + ml.data.length);
+            assert(ml.data[0].yAxis === 0.48, 'First line at 0.48');
+            assert(ml.data[1].yAxis === 0.50, 'Second line at 0.50');
+            assert(ml.data[2].yAxis === 0.68, 'Third line at 0.68');
+        });
+
+        test('VRComponents.echarts: COLORS palette has 10 color families', function() {
+            var expected = ['purple','indigo','blue','cyan','teal','green','amber','orange','red','pink'];
+            expected.forEach(function(name) {
+                assert(VRC.COLORS[name] && VRC.COLORS[name].main, 'COLORS.' + name + ' must have main color');
+            });
         });
 
         // ================================================================

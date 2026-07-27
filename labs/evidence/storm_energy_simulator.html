@@ -5,7 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Y.Mine · ⚡ 风暴能量分配模拟器</title>
     <link rel="stylesheet" href="../../assets/css/base.css">
+    <link rel="stylesheet" href="../../assets/css/components.css">
     <script src="../../assets/js/bus.js"></script>
+    <script src="../../assets/js/components.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
     <style>
         .breadcrumb {
@@ -462,8 +464,8 @@
         let phase = 0;
         const MAX_POINTS = 80;
 
-        const trendChart = echarts.init(document.getElementById('trendChart'), null, {renderer:'canvas'});
-        const donutChart = echarts.init(document.getElementById('donutChart'), null, {renderer:'canvas'});
+        const trendChart = VR.echarts.trackChart(echarts.init(document.getElementById('trendChart'), 'ymine-dark', {renderer:'canvas'}));
+        const donutChart = VR.echarts.trackChart(echarts.init(document.getElementById('donutChart'), 'ymine-dark', {renderer:'canvas'}));
 
         function initCharts() {
             trendChart.setOption({
