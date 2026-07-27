@@ -14,7 +14,7 @@
 """
 
 VERSION = "V2.5 FullStack-Verified"
-VERSION_DATE = "2025-07-27"
+VERSION_DATE = "2026-07-27"
 
 THRESHOLDS = {
     "breakeven": 0.48,

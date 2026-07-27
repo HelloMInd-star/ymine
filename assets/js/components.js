@@ -369,10 +369,10 @@
     /** ========== 控制台Banner ========== */
     function printBanner(){
         var msg = [
-            '%c 🔺 G A M E - O S  V2.2  P0-RECTIFIED ',
-            'background:linear-gradient(135deg,#6366f1,#a855f7);color:#fff;font-size:14px;font-weight:bold;padding:6px 12px;border-radius:4px;',
-            '\n%c 博弈论驱动的全域认知操作系统 · 七轮审计通过 · 124测试通过 · 97.71/100 A+ ',
-            'color:#a78bfa;font-size:11px;padding:4px 0;'
+            '%c 🔺 G A M E - O S  V2.5  FULLSTACK-VERIFIED ',
+            'background:linear-gradient(135deg,#6366f1,#06b6d4,#a855f7);color:#fff;font-size:14px;font-weight:bold;padding:6px 12px;border-radius:4px;',
+            '\n%c 博弈论驱动的全域认知操作系统 · FastAPI+Streamlit+Remotion · 148项测试通过 · 97.71/100 A+ ',
+            'color:#67e8f9;font-size:11px;padding:4px 0;'
         ];
         try{ console.log(msg.join(''), msg[1], msg[3]); }catch(e){}
     }

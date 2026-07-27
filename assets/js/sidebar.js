@@ -158,7 +158,7 @@
             html += '</div>';
         });
 
-        html += '<div class="footer-nav">v2.2 · 五层架构</div>';
+        html += '<div class="footer-nav">V2.5 FullStack-Verified</div>';
 
         container.innerHTML = html;
     }
