@@ -158,7 +158,7 @@
             html += '</div>';
         });
 
-        html += '<div class="footer-nav">V2.5 FullStack-Verified</div>';
+        html += '<div class="footer-nav">Game-OS V2.5 · 金融可信决策AI中台</div>';
 
         container.innerHTML = html;
     }

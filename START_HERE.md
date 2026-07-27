@@ -1,6 +1,6 @@
-# 🚀 Game-OS 快速导航
+# 🚀 Game-OS V2.5 · 金融可信决策AI中台 快速启动指南
 
-> **博弈论驱动的全域认知操作系统 · V2.5 FullStack-Verified**
+> **面向金融资管机构的可信赖决策AI中台 · V2.5 FullStack-Verified**
 
 ---
 
