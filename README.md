@@ -40,12 +40,21 @@
 ## 🚀 30秒快速启动
 
 ```bash
-# 纯前端，无需安装任何依赖
+# 方式一：纯前端，无需安装任何依赖
 python3 -m http.server 8080
 # 浏览器打开 http://localhost:8080/index.html
 ```
 
+```bash
+# 方式二：启动 FastAPI 后端（支持API调用/前后端分离部署）
+cd backend
+pip install -r requirements.txt
+uvicorn main:app --reload --port 8000
+# 访问 http://localhost:8000/docs 查看 API 文档（自动生成Swagger UI）
+```
+
 打开后右上角红色「🛑 紧急停机」按钮是**真实可用**的——按下后所有决策输出立即阻断，仓位强制归零。
+总控台顶部会实时显示「🟢 后端服务：已连接」或「🔴 后端服务：未连接」状态。
 
 ---
 
@@ -88,6 +97,12 @@ python3 -m http.server 8080
 - **11维金融向量体系**：金融信号多维特征向量展示框架
 - **大模型学习记忆系统**：KMP·IPD·7D向量框架基座
 
+### 🚀 FastAPI 后端支持（V2.3新增）
+- 系统内置 **FastAPI 后端服务**，支持通过 REST API 调用核心算法（阈值判定、向量计算、仿真实验分析），实现前后端分离部署
+- 自动生成 **Swagger UI** 文档（`/docs`），所有接口在线调试
+- CORS 已配置，支持跨域调用，后端独立部署时前端无缝衔接
+- 核心端点：`/health`（健康检查）、`/thresholds`（全局阈值）、`/api/chromosome/diagnose`（染色体诊断）、`/api/storm/simulate`（风暴能量模拟）
+
 ---
 
 ## 📊 系统规模
@@ -101,6 +116,7 @@ python3 -m http.server 8080
 | 仿真实验入口 | **45个**（含2个VR可验证信号实验） |
 | 横幅式特色入口 | **4张** |
 | 快速入口卡片 | **4张** |
+| FastAPI后端API端点 | **9个**（/health、/thresholds、/version、/api/chromosome/*、/api/storm/*） |
 | YBus通信通道 | 标准通道全覆盖 |
 | 单元测试 | **148个（全部通过）** |
 | Node.js后端测试 | 73个 |
@@ -117,6 +133,14 @@ python3 -m http.server 8080
 workspace/
 ├── index.html                     # 🎯 主控台入口（推荐从这里开始）
 ├── ymine-studio.html              # 🛠️ YMine Studio全功能控制台
+│
+├── backend/                       # 🚀 FastAPI 后端服务（V2.3新增）
+│   ├── main.py                    #    API 主入口（/health, /thresholds, /version）
+│   ├── config.py                  #    全局阈值常量（唯一事实源）
+│   ├── routers/                   #    路由模块
+│   │   ├── chromosome.py          #       染色体锚定诊断 API
+│   │   └── storm.py               #       风暴能量模拟 API
+│   └── requirements.txt           #    Python 依赖（fastapi/uvicorn/pydantic）
 │
 ├── assets/                        # ⚙️ 核心公共资源层
 │   ├── css/

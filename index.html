@@ -577,6 +577,25 @@
         .audit-status .audit-dot{width:6px;height:6px;border-radius:50%;background:currentColor;animation:auditPulse 2s infinite;}
         @keyframes auditPulse{0%,100%{opacity:1;}50%{opacity:0.3;}}
 
+        /* 后端服务状态指示器 */
+        .backend-status{
+            display:inline-flex;align-items:center;gap:6px;
+            font-size:10px;padding:3px 10px;border-radius:12px;
+            background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);color:#f87171;
+            font-family:'SF Mono',ui-monospace,monospace;cursor:pointer;
+            transition:all .3s ease;text-decoration:none;
+        }
+        .backend-status.online{
+            background:rgba(34,197,94,0.08);border-color:rgba(34,197,94,0.25);color:#4ade80;
+        }
+        .backend-status.connecting{
+            background:rgba(251,191,36,0.08);border-color:rgba(251,191,36,0.2);color:#fbbf24;
+        }
+        .backend-status .backend-dot{width:6px;height:6px;border-radius:50%;background:currentColor;animation:backendPulse 2s infinite;}
+        @keyframes backendPulse{0%,100%{opacity:1;box-shadow:0 0 0 0 currentColor;}50%{opacity:0.5;box-shadow:0 0 0 3px rgba(255,255,255,0);}}
+        .backend-status.online .backend-dot{animation:backendPulse 2s infinite;}
+        .backend-status:not(.online) .backend-dot{animation:none;opacity:0.7;}
+
         /* 心智品牌区（默认3列，.four变体为4列） */
         .mind-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px;}
         .mind-grid.four{grid-template-columns:repeat(4,1fr);}
@@ -1236,6 +1255,10 @@
                 <div class="th-item"><span class="th-dot gold"></span><span>0.50 稳态中轴线</span></div>
                 <div class="th-item"><span class="th-dot red"></span><span>0.68 熔断警戒线</span></div>
                 <div class="audit-status" id="auditStatus"><span class="audit-dot"></span><span id="auditStatusText">三角审计待命</span></div>
+                <a href="http://localhost:8000/docs" target="_blank" class="backend-status connecting" id="backendStatus" title="点击查看API文档">
+                    <span class="backend-dot"></span>
+                    <span id="backendStatusText">后端服务：检测中…</span>
+                </a>
             </div>
 
             <!-- ===== 框架引导横幅 · 统一格式 ===== -->
@@ -1711,6 +1734,10 @@
                 </div>
                 <div style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,0.2);margin:18px 0 10px;font-weight:600;">🔧 通用工具</div>
                 <div class="nav-grid">
+                    <a href="http://localhost:8000/docs" target="_blank" class="nav-card hot" id="apiDocsEntry" style="border-color:rgba(14,165,233,0.4);background:linear-gradient(135deg,rgba(14,165,233,0.10),rgba(99,102,241,0.06),rgba(0,0,0,0.05));">
+                        <span class="icon">📡</span> API 文档 · FastAPI Swagger
+                        <span class="arrow" style="color:#38bdf8;">🔌</span>
+                    </a>
                     <a href="labs/evidence/binary-solver.html" class="nav-card">
                         <span class="icon">🧩</span> 二元拆分解题器
                         <span class="arrow">→</span>
@@ -4172,6 +4199,71 @@
 
             log('引擎就绪 · 快捷键：N=新牌 F=弃牌 C=跟注 R=加注 A=ALL-IN 空格=下一条街', 'sys');
         })();
+    </script>
+
+    <!-- 后端健康状态轮询 -->
+    <script>
+    (function(){
+        var BACKEND_URL = 'http://localhost:8000';
+        var HEALTH_URL = BACKEND_URL + '/health';
+        var POLL_INTERVAL = 5000;
+        var FAIL_TIMEOUT = 3000;
+        var statusEl = document.getElementById('backendStatus');
+        var textEl = document.getElementById('backendStatusText');
+        var apiEntry = document.getElementById('apiDocsEntry');
+        var lastOk = false;
+        var pollTimer = null;
+
+        function setOnline(data){
+            lastOk = true;
+            statusEl.className = 'backend-status online';
+            statusEl.href = BACKEND_URL + '/docs';
+            statusEl.title = '后端已连接 · 版本 ' + (data && data.version ? data.version : '') + ' · 点击查看API文档';
+            textEl.textContent = '后端服务：已连接';
+            if(apiEntry){
+                apiEntry.style.opacity = '1';
+                apiEntry.style.pointerEvents = 'auto';
+            }
+        }
+        function setOffline(){
+            lastOk = false;
+            statusEl.className = 'backend-status';
+            statusEl.href = BACKEND_URL + '/docs';
+            statusEl.title = '后端未连接 · 点击尝试打开API文档';
+            textEl.textContent = '后端服务：未连接';
+            if(apiEntry){
+                apiEntry.style.opacity = '0.5';
+            }
+        }
+        function setConnecting(){
+            statusEl.className = 'backend-status connecting';
+            textEl.textContent = '后端服务：检测中…';
+        }
+        function check(){
+            var ctrl = new AbortController();
+            var t = setTimeout(function(){ ctrl.abort(); }, FAIL_TIMEOUT);
+            fetch(HEALTH_URL, { signal: ctrl.signal, cache: 'no-store', mode: 'cors' })
+                .then(function(r){
+                    clearTimeout(t);
+                    if(!r.ok) throw new Error('bad status');
+                    return r.json();
+                })
+                .then(function(data){
+                    if(data && data.status === 'ok'){ setOnline(data); }
+                    else { setOffline(); }
+                })
+                .catch(function(){
+                    clearTimeout(t);
+                    setOffline();
+                });
+        }
+        setConnecting();
+        check();
+        pollTimer = setInterval(check, POLL_INTERVAL);
+        window.addEventListener('beforeunload', function(){
+            if(pollTimer) clearInterval(pollTimer);
+        });
+    })();
     </script>
 
 </body>
