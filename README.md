@@ -8,14 +8,17 @@
 >
 > **核心价值：通过「三模型冗余审计」+「七层熔断体系」，将AI决策的幻觉率从行业平均的15%降低至可审计的0.5%以内，解决大模型在投资风控、量化投研等场景中"不可信、不可控"的致命缺陷。**
 
-✅ V2.5 实现 FastAPI + Streamlit + Remotion 全栈验证
-✅ 148 项单元测试全部通过 · 七轮安全审计 A+ 合规度
+✅ V2.5 实现 FastAPI + Streamlit + Remotion 全栈验证  
+✅ 148 项单元测试全部通过 · 七轮安全审计 A+ 合规度  
 ✅ 7 个 REST API 端点 · 真实算法引擎
 
 [![Version](https://img.shields.io/badge/version-V2.5_FullStack--Verified-blueviolet)](#)
 [![Audit](https://img.shields.io/badge/audit-7%E8%BD%AE%E9%80%9A%E8%BF%87-success)](#)
 [![Tests](https://img.shields.io/badge/tests-148%20passed-brightgreen)](#)
 [![Compliance](https://img.shields.io/badge/compliance-97.71%2F100_(A%2B)-orange)](#)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.140.0-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+[![Streamlit](https://img.shields.io/badge/Streamlit-1.60.0-FF4B4B?logo=streamlit&logoColor=white)](https://streamlit.io/)
+[![Remotion](https://img.shields.io/badge/Remotion-4.0.0-000000?logo=remotion&logoColor=white)](https://www.remotion.dev/)
 
 **三阈值基准 · 0.48保本 / 0.50稳态 / 0.68熔断**
 
@@ -81,26 +84,29 @@ uvicorn main:app --reload --port 8000
 # 访问：http://localhost:8000/docs (Swagger UI 自动文档)
 ```
 
-### 2. Streamlit 数据仪表盘（V2.5 规划中 · 代码即将推送）
+### 2. Streamlit 数据仪表盘（V2.5新增）
 ```bash
 # 端口：8501
-# ⚠️ 预计2026年8月可用，当前版本以 FastAPI + 前端主控台为核心演示
 pip install streamlit pandas numpy plotly
 streamlit run dashboard/Home.py
 # 访问：http://localhost:8501
 ```
 
-Streamlit仪表盘规划包含3个页面：
-- **Home.py**：系统概览仪表盘
+![Streamlit 终端启动日志](docs/screenshots/dashboard-terminal.png)
+
+Streamlit仪表盘包含3个页面：
+- **Home.py**：系统概览仪表盘，实时调用 `/health`、`/thresholds`、`/version` API 展示后端状态
 - **pages/1_Chromosome_Lab.py**：染色体诊断实验台
 - **pages/2_Storm_Simulator.py**：风暴能量模拟实验室
+
+![Streamlit 仪表盘实时界面](docs/screenshots/dashboard-preview.png)
 
 ### 3. Remotion 视频生成
 ```bash
 # 预览端口：3000，Studio端口：3001
 cd video
 npm install
-npm run dev
+npm start          # 或 npm run dev
 # 访问：http://localhost:3000 (视频预览)
 # 或：npm start 启动 Remotion Studio (端口3001)
 ```
