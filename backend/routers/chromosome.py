@@ -1,78 +1,115 @@
-import statistics
 from fastapi import APIRouter, Query
-import sys, os
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-try:
-    from config import THRESHOLDS
-except Exception:
-    THRESHOLDS = {"breakeven": 0.48, "steady": 0.50, "fuse": 0.68}
+from sentence_transformers import SentenceTransformer
+import numpy as np
+from sklearn.metrics.pairwise import cosine_similarity
+import jieba.posseg as pseg
+import logging
 
-router = APIRouter(prefix="/api/chromosome", tags=["chromosome"])
+router = APIRouter()
+logger = logging.getLogger(__name__)
 
+# ---------- 1. 加载语义模型 ----------
+model = SentenceTransformer('paraphrase-multilingual-MiniLM-L12-v2')
+logger.info("语义模型加载成功")
 
-@router.get("/status")
-def status():
-    return {"module": "chromosome-diagnostic", "status": "ready", "version": "2.5"}
+# ---------- 2. 主题锚点库 ----------
+TOPIC_ANCHORS = {
+    "quant": {
+        "label": "量化金融策略",
+        "anchor_text": "量化策略与风控收益波动率仓位管理",
+    },
+    "medical": {
+        "label": "医疗诊断辅助",
+        "anchor_text": "症状诊断治疗用药检查病历分析",
+    },
+    "code": {
+        "label": "编程代码生成",
+        "anchor_text": "代码函数算法调试测试框架设计",
+    },
+    "edu": {
+        "label": "教育知识问答",
+        "anchor_text": "知识学习课程理解概念方法练习",
+    }
+}
 
+# ---------- 3. 语法片段拆解 ----------
+def extract_syntax_fragments(text):
+    words = pseg.cut(text)
+    fragments = {
+        '主语': [], '谓语': [], '宾语': [],
+        '定语': [], '状语': [], '补语': []
+    }
+    for word, flag in words:
+        if flag.startswith('n') or flag in ['nr', 'ns', 'nt']:
+            fragments['主语'].append(word)
+        elif flag.startswith('v'):
+            fragments['谓语'].append(word)
+        elif flag.startswith('a') or flag.startswith('an'):
+            fragments['定语'].append(word)
+        elif flag.startswith('d'):
+            fragments['状语'].append(word)
+        elif flag.startswith('p') or flag in ['ul', 'uj']:
+            fragments['补语'].append(word)
+        else:
+            fragments['宾语'].append(word)
+    return fragments
 
+# ---------- 4. 三种距离融合 ----------
+def calculate_similarity(user_vec, anchor_vec):
+    cos_sim = cosine_similarity(user_vec, anchor_vec)[0][0]
+    euclidean_dist = np.linalg.norm(user_vec - anchor_vec)
+    euclidean_sim = 1 / (1 + euclidean_dist)
+    manhattan_dist = np.sum(np.abs(user_vec - anchor_vec))
+    manhattan_sim = 1 / (1 + manhattan_dist)
+    return 0.5 * cos_sim + 0.3 * euclidean_sim + 0.2 * manhattan_sim
+
+# ---------- 5. 诊断接口 ----------
 @router.get("/diagnose")
-def diagnose_chromosome(
-    data: str = Query(
-        default="0.52,0.48,0.71,0.55,0.49,0.63,0.45,0.58,0.67,0.51",
-        description="染色体数据，逗号分隔的数值列表（0~1之间）"
-    )
+async def diagnose_chromosome(
+    data: str = Query(..., description="用户输入的文本"),
+    topic: str = Query("quant", description="主题: quant/medical/code/edu")
 ):
-    """
-    染色体诊断分析
-    - 输入：逗号分隔数值（0~1），代表不同片段的健康度
-    - 输出：平均健康度、标准差、异常片段、健康分布、整体状态判定
-    """
-    try:
-        values = [float(x.strip()) for x in data.split(",") if x.strip() != ""]
-    except ValueError:
-        return {"error": "输入格式错误，请使用逗号分隔的数值列表", "status": "error"}
+    # 主题切换
+    if topic not in TOPIC_ANCHORS:
+        topic = "quant"
+    anchor_text = TOPIC_ANCHORS[topic]["anchor_text"]
+    anchor_embedding = model.encode(anchor_text).reshape(1, -1)
 
-    if len(values) < 5:
-        return {"error": "至少需要5个数据点", "status": "error", "count": len(values)}
+    # 拆解片段
+    user_fragments = extract_syntax_fragments(data)
+    anchor_fragments = extract_syntax_fragments(anchor_text)
 
-    breakeven = THRESHOLDS["breakeven"]
-    steady = THRESHOLDS["steady"]
-    fuse = THRESHOLDS["fuse"]
+    # 加权计算
+    weights = {
+        '主语': 0.60, '谓语': 0.25, '宾语': 0.10,
+        '定语': 0.03, '状语': 0.02, '补语': 0.00
+    }
+    total_sim = 0.0
+    total_weight = 0.0
 
-    avg_health = sum(values) / len(values)
-    std_dev = statistics.stdev(values) if len(values) > 1 else 0.0
+    for frag_type in weights:
+        user_vec = model.encode(' '.join(user_fragments.get(frag_type, []))).reshape(1, -1)
+        anchor_vec = model.encode(' '.join(anchor_fragments.get(frag_type, []))).reshape(1, -1)
+        if user_vec.size > 0 and anchor_vec.size > 0:
+            sim = calculate_similarity(user_vec, anchor_vec)
+            total_sim += weights[frag_type] * sim
+            total_weight += weights[frag_type]
 
-    abnormal_positions = [i for i, v in enumerate(values) if v < breakeven or v > fuse]
+    overall_sim = total_sim / total_weight if total_weight > 0 else 0.5
 
-    healthy = sum(1 for v in values if breakeven <= v <= fuse)
-    warning = sum(1 for v in values if 0.45 <= v < breakeven or fuse < v <= 0.72)
-    critical = len(values) - healthy - warning
-
-    if avg_health < breakeven:
-        status = "critical"
-        assessment = "整体健康度低于保本线(0.48)，建议全面检查。"
-    elif avg_health > fuse:
-        status = "critical"
-        assessment = "整体健康度高于熔断线(0.68)，存在过载风险，建议降低负荷。"
-    elif len(abnormal_positions) > 3:
+    # 状态判定
+    if overall_sim >= 0.65:
+        status = "normal"
+    elif overall_sim >= 0.40:
         status = "warning"
-        assessment = f"存在{len(abnormal_positions)}个异常片段，建议重点关注。"
-    elif len(abnormal_positions) > 0:
-        status = "warning"
-        assessment = f"存在{len(abnormal_positions)}个异常片段，位置：{abnormal_positions}，建议进一步分析。"
     else:
-        status = "healthy"
-        assessment = "所有片段均在稳态区间[0.48,0.68]内，整体健康状态良好。"
+        status = "meltdown"
 
     return {
-        "status": status,
-        "avg_health": round(avg_health, 4),
-        "std_dev": round(std_dev, 4),
-        "abnormal_segments": len(abnormal_positions),
-        "abnormal_positions": abnormal_positions,
-        "health_distribution": {"healthy": healthy, "warning": warning, "critical": critical},
-        "thresholds": {"breakeven": breakeven, "steady": steady, "fuse": fuse},
-        "overall_assessment": assessment,
-        "sample_count": len(values),
-        "raw_values": values,
+        "avg_health": overall_sim,
+        "overall_status": status,
+        "status_text": {"normal": "锚定稳定", "warning": "主题漂移警告", "meltdown": "熔断告警"}[status],
+        "similarity_score": overall_sim,
+        "anchor_text": anchor_text,
+        "topic": topic
     }
