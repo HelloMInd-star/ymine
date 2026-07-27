@@ -675,6 +675,45 @@
         }
         .api-demo-status.loading .api-spinner{display:inline-block;}
         @keyframes apiSpin{to{transform:rotate(360deg);}}
+        .api-demo-btn .api-params{
+            display:flex;flex-direction:column;gap:4px;margin-top:4px;
+        }
+        .api-demo-btn .api-param{
+            display:flex;align-items:center;gap:5px;
+        }
+        .api-demo-btn .api-param label{
+            font-size:9px;color:#64748b;min-width:42px;
+            font-family:'SF Mono',ui-monospace,monospace;
+        }
+        .api-demo-btn .api-param input{
+            flex:1;background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.08);
+            border-radius:4px;padding:3px 6px;font-size:10px;color:#cbd5e1;
+            font-family:'SF Mono',ui-monospace,monospace;outline:none;
+            transition:border-color .2s;min-width:0;
+        }
+        .api-demo-btn .api-param input:focus{
+            border-color:rgba(56,189,248,0.5);background:rgba(0,0,0,0.5);
+        }
+        .api-demo-btn .api-param input:disabled{
+            opacity:0.4;
+        }
+        .api-demo-btn .api-call-row{
+            display:flex;align-items:center;justify-content:space-between;margin-top:4px;
+        }
+        .api-demo-btn .api-call-btn{
+            background:rgba(56,189,248,0.1);border:1px solid rgba(56,189,248,0.3);
+            color:#38bdf8;font-size:10px;padding:4px 12px;border-radius:5px;
+            cursor:pointer;font-family:inherit;transition:all .2s;
+        }
+        .api-demo-btn .api-call-btn:hover:not(:disabled){
+            background:rgba(56,189,248,0.2);border-color:rgba(56,189,248,0.6);
+        }
+        .api-demo-btn .api-call-btn:disabled{
+            opacity:0.4;cursor:not-allowed;
+        }
+        .api-demo-btn .api-call-btn.loading{
+            background:rgba(251,191,36,0.1);border-color:rgba(251,191,36,0.3);color:#fbbf24;
+        }
 
         /* 心智品牌区（默认3列，.four变体为4列） */
         .mind-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px;}
@@ -1854,21 +1893,53 @@
                     </div>
                 </div>
                 <div class="api-demo-btns">
-                    <button class="api-demo-btn" data-endpoint="/thresholds" data-method="GET" disabled>
+                    <div class="api-demo-btn" data-endpoint="/thresholds" data-method="GET">
                         <span class="api-endpoint">GET /thresholds</span>
                         <span class="api-label">获取全局阈值常量</span>
-                        <span class="api-action"><span class="api-btn-text">▶ 调用</span></span>
-                    </button>
-                    <button class="api-demo-btn" data-endpoint="/api/chromosome/diagnose" data-method="GET" disabled>
+                        <div class="api-params">
+                            <div class="api-param" style="color:#475569;font-size:9px;">（无参数，返回系统阈值配置）</div>
+                        </div>
+                        <div class="api-call-row">
+                            <span style="font-size:9px;color:#475569;">三基准:0.48/0.50/0.68</span>
+                            <button class="api-call-btn" disabled>▶ 调用</button>
+                        </div>
+                    </div>
+                    <div class="api-demo-btn" data-endpoint="/api/chromosome/diagnose" data-method="GET">
                         <span class="api-endpoint">GET /chromosome</span>
                         <span class="api-label">染色体锚定诊断</span>
-                        <span class="api-action"><span class="api-btn-text">▶ 调用</span></span>
-                    </button>
-                    <button class="api-demo-btn" data-endpoint="/api/storm/simulate" data-method="GET" disabled>
+                        <div class="api-params">
+                            <div class="api-param">
+                                <label>data:</label>
+                                <input type="text" class="api-input" data-param="data" value="0.52,0.48,0.71,0.55,0.49,0.63,0.45,0.58,0.67,0.51" placeholder="0~1逗号分隔" disabled>
+                            </div>
+                        </div>
+                        <div class="api-call-row">
+                            <span style="font-size:9px;color:#475569;">健康度序列</span>
+                            <button class="api-call-btn" disabled>▶ 调用</button>
+                        </div>
+                    </div>
+                    <div class="api-demo-btn" data-endpoint="/api/storm/simulate" data-method="GET">
                         <span class="api-endpoint">GET /storm</span>
                         <span class="api-label">风暴能量分配模拟</span>
-                        <span class="api-action"><span class="api-btn-text">▶ 调用</span></span>
-                    </button>
+                        <div class="api-params">
+                            <div class="api-param">
+                                <label>wind:</label>
+                                <input type="number" class="api-input" data-param="wind_speed" value="15.0" step="0.1" min="0" placeholder="风速m/s" disabled>
+                            </div>
+                            <div class="api-param">
+                                <label>precip:</label>
+                                <input type="number" class="api-input" data-param="precipitation" value="50.0" step="1" min="0" placeholder="降水mm/h" disabled>
+                            </div>
+                            <div class="api-param">
+                                <label>dur:</label>
+                                <input type="number" class="api-input" data-param="duration" value="6.0" step="0.5" min="1" placeholder="时长h" disabled>
+                            </div>
+                        </div>
+                        <div class="api-call-row">
+                            <span style="font-size:9px;color:#475569;">物理量归一化</span>
+                            <button class="api-call-btn" disabled>▶ 调用</button>
+                        </div>
+                    </div>
                 </div>
                 <div class="api-demo-result" id="apiDemoResult">// 点击上方按钮调用后端 API，返回结果将在此处显示
 // 状态：等待调用…</div>
@@ -4383,7 +4454,7 @@
         // ====== API 演示面板与后端状态联动 ======
         var apiDemoConn = document.getElementById('apiDemoConn');
         var apiDemoConnText = document.getElementById('apiDemoConnText');
-        var apiDemoBtns = document.querySelectorAll('.api-demo-btn');
+        var apiDemoCards = document.querySelectorAll('.api-demo-btn');
         var apiDemoResult = document.getElementById('apiDemoResult');
         var apiDemoStatus = document.getElementById('apiDemoStatus');
         var apiDemoStatusText = document.getElementById('apiDemoStatusText');
@@ -4394,78 +4465,119 @@
             if(online){
                 apiDemoConn.className = 'api-demo-conn online';
                 apiDemoConnText.textContent = '🟢 FastAPI 后端已连接';
-                apiDemoBtns.forEach(function(b){ if(!b.classList.contains('loading')) b.disabled = false; });
+                apiDemoCards.forEach(function(card){
+                    var btn = card.querySelector('.api-call-btn');
+                    var inputs = card.querySelectorAll('.api-input');
+                    if(btn && !btn.classList.contains('loading')) btn.disabled = false;
+                    inputs.forEach(function(i){ i.disabled = false; });
+                });
                 apiDemoStatus.className = 'api-demo-status';
-                apiDemoStatusText.textContent = '⚡ 就绪 · 点击按钮调用 API';
+                apiDemoStatusText.textContent = '⚡ 就绪 · 可修改参数后点击「调用」按钮';
             } else {
                 apiDemoConn.className = 'api-demo-conn';
                 apiDemoConnText.textContent = '🔴 未连接';
-                apiDemoBtns.forEach(function(b){ b.disabled = true; b.classList.remove('loading'); b.querySelector('.api-btn-text').textContent='▶ 调用'; });
+                apiDemoCards.forEach(function(card){
+                    var btn = card.querySelector('.api-call-btn');
+                    var inputs = card.querySelectorAll('.api-input');
+                    if(btn){ btn.disabled = true; btn.classList.remove('loading'); btn.textContent='▶ 调用'; }
+                    inputs.forEach(function(i){ i.disabled = true; });
+                });
                 apiDemoStatus.className = 'api-demo-status fail';
                 apiDemoStatusText.textContent = '⚠ 后端未连接，请先启动 FastAPI 服务';
                 apiDemoResult.className = 'api-demo-result error';
-                apiDemoResult.textContent = '// 后端未连接\n// 启动命令：cd backend && pip install -r requirements.txt && uvicorn main:app --reload\n// 或在项目根目录：uvicorn main:app --reload';
+                apiDemoResult.textContent = '// 后端未连接\n// 启动命令：uvicorn main:app --reload\n// 访问 http://localhost:8000/docs 查看API文档';
             }
         }
-        // 监听顶部后端状态指示器的变化（通过轮询检查 statusEl class）
+        // 监听顶部后端状态指示器的变化
         var _observerTick = setInterval(function(){
             if(!statusEl){ return; }
             var isOnline = statusEl.classList.contains('online');
             if(isOnline !== apiDemoOnline){ setApiDemoOnline(isOnline); }
         }, 800);
-
-        // 首次渲染前延迟一下，等待顶部指示器完成首次检测
         setTimeout(function(){ setApiDemoOnline(lastOk); }, 1500);
 
-        // 按钮点击事件
-        apiDemoBtns.forEach(function(btn){
-            btn.addEventListener('click', function(){
-                if(!apiDemoOnline || btn.classList.contains('loading')) return;
-                var endpoint = btn.getAttribute('data-endpoint');
-                var method = btn.getAttribute('data-method') || 'GET';
-                var btnText = btn.querySelector('.api-btn-text');
-                var origText = btnText.textContent;
+        // 调用函数
+        function callApi(card){
+            if(!apiDemoOnline) return;
+            var btn = card.querySelector('.api-call-btn');
+            if(!btn || btn.classList.contains('loading')) return;
 
-                // 进入loading
-                btn.classList.add('loading');
-                btn.disabled = true;
-                btnText.textContent = '⏳ 加载中…';
-                apiDemoResult.className = 'api-demo-result';
-                apiDemoResult.textContent = '// 请求发送中… ' + method + ' ' + BACKEND_URL + endpoint;
-                apiDemoStatus.className = 'api-demo-status loading';
-                apiDemoStatusText.textContent = '⌛ 请求已发出，等待响应…';
+            var endpoint = card.getAttribute('data-endpoint');
+            var method = card.getAttribute('data-method') || 'GET';
+            var origText = btn.textContent;
 
-                var t0 = performance.now();
-                var ctrl = new AbortController();
-                var to = setTimeout(function(){ ctrl.abort(); }, 8000);
+            // 收集参数
+            var params = [];
+            card.querySelectorAll('.api-input').forEach(function(inp){
+                var key = inp.getAttribute('data-param');
+                var val = inp.value.trim();
+                if(key && val !== ''){
+                    params.push(encodeURIComponent(key) + '=' + encodeURIComponent(val));
+                }
+            });
+            var url = BACKEND_URL + endpoint + (params.length ? '?' + params.join('&') : '');
 
-                fetch(BACKEND_URL + endpoint, { signal: ctrl.signal, cache: 'no-store', method: method, mode: 'cors' })
-                    .then(function(r){
-                        clearTimeout(to);
-                        var dt = Math.round(performance.now() - t0);
-                        if(!r.ok) throw new Error('HTTP ' + r.status);
-                        return r.json().then(function(data){ return {data:data, dt:dt, status:r.status}; });
-                    })
-                    .then(function(res){
-                        var pretty = JSON.stringify(res.data, null, 2);
-                        apiDemoResult.className = 'api-demo-result has-data';
-                        apiDemoResult.textContent = pretty;
-                        apiDemoStatus.className = 'api-demo-status success';
-                        apiDemoStatusText.textContent = '✅ 调用成功 · HTTP ' + res.status + ' · 响应时间 ' + res.dt + 'ms · ' + method + ' ' + endpoint;
-                    })
-                    .catch(function(err){
-                        clearTimeout(to);
-                        var dt = Math.round(performance.now() - t0);
-                        apiDemoResult.className = 'api-demo-result error';
-                        apiDemoResult.textContent = '// ❌ 请求失败\n// 错误：' + (err.message || err) + '\n// 端点：' + method + ' ' + BACKEND_URL + endpoint;
-                        apiDemoStatus.className = 'api-demo-status fail';
-                        apiDemoStatusText.textContent = '❌ 调用失败 · ' + (err.message || '网络错误') + ' · ' + dt + 'ms';
-                    })
-                    .finally(function(){
-                        btn.classList.remove('loading');
-                        if(apiDemoOnline){ btn.disabled = false; }
-                        btnText.textContent = origText;
-                    });
+            btn.classList.add('loading');
+            btn.disabled = true;
+            btn.textContent = '⏳ 调用中…';
+            // 禁用该卡片所有输入框防止编辑
+            card.querySelectorAll('.api-input').forEach(function(i){ i.disabled = true; });
+
+            apiDemoResult.className = 'api-demo-result';
+            apiDemoResult.textContent = '// 请求发送中…\n// ' + method + ' ' + url;
+            apiDemoStatus.className = 'api-demo-status loading';
+            apiDemoStatusText.textContent = '⌛ 请求已发出，等待响应…';
+
+            var t0 = performance.now();
+            var ctrl = new AbortController();
+            var to = setTimeout(function(){ ctrl.abort(); }, 8000);
+
+            fetch(url, { signal: ctrl.signal, cache: 'no-store', method: method, mode: 'cors' })
+                .then(function(r){
+                    clearTimeout(to);
+                    var dt = Math.round(performance.now() - t0);
+                    if(!r.ok) throw new Error('HTTP ' + r.status);
+                    return r.json().then(function(data){ return {data:data, dt:dt, status:r.status}; });
+                })
+                .then(function(res){
+                    var pretty = JSON.stringify(res.data, null, 2);
+                    apiDemoResult.className = 'api-demo-result has-data';
+                    apiDemoResult.textContent = pretty;
+                    apiDemoStatus.className = 'api-demo-status success';
+                    apiDemoStatusText.textContent = '✅ 调用成功 · HTTP ' + res.status + ' · 响应时间 ' + res.dt + 'ms · ' + method + ' ' + endpoint;
+                })
+                .catch(function(err){
+                    clearTimeout(to);
+                    var dt = Math.round(performance.now() - t0);
+                    apiDemoResult.className = 'api-demo-result error';
+                    apiDemoResult.textContent = '// ❌ 请求失败\n// 错误：' + (err.message || err) + '\n// 端点：' + method + ' ' + url;
+                    apiDemoStatus.className = 'api-demo-status fail';
+                    apiDemoStatusText.textContent = '❌ 调用失败 · ' + (err.message || '网络错误') + ' · ' + dt + 'ms';
+                })
+                .finally(function(){
+                    btn.classList.remove('loading');
+                    if(apiDemoOnline){
+                        btn.disabled = false;
+                        card.querySelectorAll('.api-input').forEach(function(i){ i.disabled = false; });
+                    }
+                    btn.textContent = origText;
+                });
+        }
+
+        // 绑定每个卡片的"调用"按钮；点击卡片区域也可触发
+        apiDemoCards.forEach(function(card){
+            var btn = card.querySelector('.api-call-btn');
+            if(btn){
+                btn.addEventListener('click', function(e){
+                    e.stopPropagation();
+                    callApi(card);
+                });
+            }
+            // 回车提交
+            card.querySelectorAll('.api-input').forEach(function(inp){
+                inp.addEventListener('keydown', function(e){
+                    if(e.key === 'Enter'){ e.preventDefault(); callApi(card); }
+                });
             });
         });
     })();

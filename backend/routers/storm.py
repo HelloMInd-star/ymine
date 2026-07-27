@@ -1,144 +1,79 @@
-"""
-Storm Energy Simulator Router
-=============================
-Thunder-lightning-wind energy conservation simulation API.
-Energy constraint: lightning_slope + wind_slope = total_energy (head pool).
-"""
-
 import math
-import random
-import time
-from typing import List, Literal
-
 from fastapi import APIRouter, Query
-from pydantic import BaseModel, Field
-
-from config import THRESHOLDS, RISK_LEVELS
+import sys, os
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+try:
+    from config import THRESHOLDS
+except Exception:
+    THRESHOLDS = {"breakeven": 0.48, "steady": 0.50, "fuse": 0.68}
 
 router = APIRouter(prefix="/api/storm", tags=["storm"])
 
 
-class StormState(BaseModel):
-    t: float
-    lightning_slope: float
-    wind_slope: float
-    total_energy: float
-    energy_conserved: bool
-    signal: float
-    status: str
-    status_label: str
-    status_color: str
-    lightning_pct: float
-    wind_pct: float
-
-
-class StormSimResponse(BaseModel):
-    state: StormState
-    history: List[StormState]
-    thresholds: dict
-
-
-def _get_risk(v: float) -> dict:
-    for lvl in RISK_LEVELS:
-        if v < lvl["max"]:
-            return lvl
-    return RISK_LEVELS[-1]
-
-
-def _classify(signal: float):
-    if signal >= THRESHOLDS["FUSE"]:
-        return "danger", "熔断", RISK_LEVELS[4]["color"]
-    if signal >= THRESHOLDS["WARNING"]:
-        return "warning", "预警", RISK_LEVELS[3]["color"]
-    if signal >= THRESHOLDS["BREAKEVEN"]:
-        return "steady", "稳态", RISK_LEVELS[2]["color"]
-    return "safe", "正常", RISK_LEVELS[0]["color"]
-
-
 @router.get("/status")
-def storm_status():
-    return {
-        "module": "Storm Energy Distribution Simulator",
-        "version": "1.0",
-        "thresholds": THRESHOLDS,
-        "energy_law": "lightning_slope + wind_slope = total_energy",
-    }
+def status():
+    return {"module": "storm-energy-simulator", "status": "ready", "version": "2.4"}
 
 
-@router.get("/simulate", response_model=StormSimResponse)
+@router.get("/simulate")
 def simulate_storm(
-    total_energy: float = Query(6.0, ge=1.0, le=10.0, description="Total energy pool (1-10)"),
-    duration: float = Query(10.0, ge=1.0, le=60.0, description="Simulation duration in seconds"),
-    steps: int = Query(50, ge=5, le=200, description="Number of data points"),
-    seed: int = Query(None, description="Random seed for reproducibility"),
+    wind_speed: float = Query(default=15.0, description="风速 (m/s)", ge=0),
+    precipitation: float = Query(default=50.0, description="降水量 (mm/h)", ge=0),
+    duration: float = Query(default=6.0, description="持续时间 (小时)", ge=1)
 ):
-    rng = random.Random(seed if seed is not None else int(time.time()*1000) % (2**32))
-    dt = duration / steps
-    history: List[StormState] = []
+    """
+    风暴能量模拟
+    - 输入：风速、降水量、持续时间（物理单位）
+    - 输出：风暴强度、能量评级、熔断状态
+    """
+    breakeven = THRESHOLDS["breakeven"]
+    steady = THRESHOLDS["steady"]
+    fuse = THRESHOLDS["fuse"]
 
-    lightning = total_energy * 0.63
-    wind = total_energy * 0.37
-    t = 0.0
+    WIND_MAX = 30.0
+    PRECIP_MAX = 100.0
+    DUR_MAX = 12.0
 
-    for i in range(steps):
-        noise_l = (rng.random() - 0.5) * 0.3
-        noise_w = (rng.random() - 0.5) * 0.3
-        phase = math.sin(t * 0.8) * 0.5
-        target_l = total_energy * (0.5 + phase * 0.3)
-        target_w = total_energy - target_l
-        lightning = max(0.1, lightning + (target_l - lightning) * 0.15 + noise_l)
-        wind = max(0.1, total_energy - lightning + noise_w * 0.1)
-        total_now = lightning + wind
-        conserved = abs(total_now - total_energy) < 0.2
-        signal = max(lightning, wind) / total_energy
-        status, label, color = _classify(signal)
+    w_norm = min(wind_speed / WIND_MAX, 1.0)
+    p_norm = min(precipitation / PRECIP_MAX, 1.0)
+    d_norm = min(duration / DUR_MAX, 1.0)
 
-        history.append(StormState(
-            t=round(t, 2),
-            lightning_slope=round(lightning, 2),
-            wind_slope=round(wind, 2),
-            total_energy=round(total_now, 2),
-            energy_conserved=conserved,
-            signal=round(signal, 3),
-            status=status,
-            status_label=label,
-            status_color=color,
-            lightning_pct=round(lightning / total_now * 100, 1),
-            wind_pct=round(wind / total_now * 100, 1),
-        ))
-        t += dt
+    intensity = w_norm * 0.6 + p_norm * 0.3 + d_norm * 0.1
+    intensity = round(min(max(intensity, 0.0), 1.0), 4)
 
-    state = history[-1]
-    return StormSimResponse(state=state, history=history, thresholds=THRESHOLDS)
+    if intensity < breakeven:
+        rating = "低"
+        description = "风暴能量低于保本线，影响有限。"
+    elif intensity < fuse:
+        rating = "中"
+        description = "风暴能量处于预警区，建议做好防范并持续监测。"
+    else:
+        rating = "高"
+        description = "风暴能量超过熔断线，建议启动应急预案。"
 
+    if intensity >= fuse:
+        fuse_status = "triggered"
+        fuse_action = "已触发熔断（≥0.68），建议立即启动应急预案。"
+    elif intensity >= steady:
+        fuse_status = "warning"
+        description = "风暴能量已越过稳态中轴线（≥0.50），建议持续监测。"
+        fuse_action = "进入预警区，保持关注。"
+    else:
+        fuse_status = "safe"
+        fuse_action = "处于安全区间（<0.50），无需特殊操作。"
 
-@router.get("/tick")
-def storm_tick(
-    t: float = Query(0.0, ge=0.0),
-    total_energy: float = Query(6.0, ge=1.0, le=10.0),
-    lightning: float = Query(3.8, ge=0.0),
-    wind: float = Query(2.2, ge=0.0),
-    dt: float = Query(0.1, gt=0.0, le=1.0),
-):
-    rng = random.Random(int(time.time()*1000) % (2**32))
-    phase = math.sin(t * 0.8) * 0.5
-    target_l = total_energy * (0.5 + phase * 0.3)
-    new_l = max(0.1, lightning + (target_l - lightning) * 0.2 + (rng.random()-0.5)*0.2)
-    new_w = max(0.1, total_energy - new_l + (rng.random()-0.5)*0.05)
-    total = new_l + new_w
-    signal = max(new_l, new_w) / total
-    status, label, color = _classify(signal)
     return {
-        "t": round(t + dt, 2),
-        "lightning_slope": round(new_l, 2),
-        "wind_slope": round(new_w, 2),
-        "total_energy": round(total, 2),
-        "energy_conserved": abs(total - total_energy) < 0.2,
-        "signal": round(signal, 3),
-        "status": status,
-        "status_label": label,
-        "status_color": color,
-        "lightning_pct": round(new_l / total * 100, 1),
-        "wind_pct": round(new_w / total * 100, 1),
-        "thresholds": THRESHOLDS,
+        "intensity": intensity,
+        "rating": rating,
+        "description": description,
+        "fuse_status": fuse_status,
+        "fuse_action": fuse_action,
+        "energy_breakdown": {
+            "wind_contribution": round(w_norm * 0.6, 4),
+            "precipitation_contribution": round(p_norm * 0.3, 4),
+            "duration_contribution": round(d_norm * 0.1, 4),
+        },
+        "thresholds": {"breakeven": breakeven, "steady": steady, "fuse": fuse},
+        "input": {"wind_speed": wind_speed, "precipitation": precipitation, "duration": duration},
+        "normalized": {"wind": round(w_norm, 4), "precipitation": round(p_norm, 4), "duration": round(d_norm, 4)},
     }
