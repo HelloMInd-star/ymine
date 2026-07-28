@@ -101,8 +101,6 @@ Streamlit仪表盘包含3个页面：
 - **pages/1_Chromosome_Lab.py**：染色体诊断实验台
 - **pages/2_Storm_Simulator.py**：风暴能量模拟实验室
 
-![Streamlit 仪表盘实时界面](docs/screenshots/dashboard-preview.png)
-
 ### 3. Remotion 视频生成
 ```bash
 # 预览端口：3000，Studio端口：3001
