@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🔺 Game-OS V2.5 FullStack-Verified
+# 🔺 Game-OS V2.5.1 FullStack-Verified
 
 ### 面向金融资管机构的可信赖决策AI中台
 
@@ -9,12 +9,14 @@
 > **核心价值：通过「三模型冗余审计」+「七层熔断体系」，将AI决策的幻觉率从行业平均的15%降低至可审计的0.5%以内，解决大模型在投资风控、量化投研等场景中"不可信、不可控"的致命缺陷。**
 
 ✅ V2.5 实现 FastAPI + Streamlit + Remotion 全栈验证  
-✅ 148 项单元测试全部通过 · 七轮安全审计 A+ 合规度  
-✅ 7 个 REST API 端点 · 真实算法引擎
+✅ V2.5.1 第八轮审计修复：阈值大写键名 · CORS白名单 · HTTP状态码规范 · NLP懒加载  
+✅ 148 项单元测试全部通过 · 八轮安全审计 A+ 合规度  
+✅ 9 个 REST API 端点 · 真实算法引擎 · 全端点22项回归测试通过
 
-[![Version](https://img.shields.io/badge/version-V2.5_FullStack--Verified-blueviolet)](#)
-[![Audit](https://img.shields.io/badge/audit-7%E8%BD%AE%E9%80%9A%E8%BF%87-success)](#)
+[![Version](https://img.shields.io/badge/version-V2.5.1_FullStack--Verified-blueviolet)](#)
+[![Audit](https://img.shields.io/badge/audit-8%E8%BD%AE%E9%80%9A%E8%BF%87-success)](#)
 [![Tests](https://img.shields.io/badge/tests-148%20passed-brightgreen)](#)
+[![API](https://img.shields.io/badge/API-9%20endpoints-009688)](#)
 [![Compliance](https://img.shields.io/badge/compliance-97.71%2F100_(A%2B)-orange)](#)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.140.0-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
 [![Streamlit](https://img.shields.io/badge/Streamlit-1.60.0-FF4B4B?logo=streamlit&logoColor=white)](https://streamlit.io/)
@@ -191,14 +193,15 @@ npm run build
 - **11维金融向量体系**：金融信号多维特征向量展示框架
 - **大模型学习记忆系统**：KMP·IPD·7D向量框架基座
 
-### 🚀 FastAPI 后端支持（V2.4+V2.5增强）
-系统内置 **FastAPI 后端服务**，核心算法已从 JavaScript 模拟迁移至 Python 后端，提供7个REST API端点
+### 🚀 FastAPI 后端支持（V2.4+V2.5+V2.5.1增强）
+系统内置 **FastAPI 后端服务**，核心算法已从 JavaScript 模拟迁移至 Python 后端，提供9个REST API端点，支持两种部署方式：
+- **主入口（推荐）**：`uvicorn main:app --port 8000` — 轻量独立版，零额外ML依赖，数值版染色体诊断
+- **备用模块化版**：`cd backend && uvicorn main:app --port 8001` — routers拆分，含NLP语义染色体诊断（需sentence-transformers/jieba/sklearn），NLP依赖懒加载缺省时优雅降级返回503
 - 总控台顶部实时显示后端连接状态：「🟢 已连接」/「🔴 未连接」
 - **V2.5新增全栈服务状态面板**：集中监控FastAPI/Streamlit/Remotion三服务状态
-- **V2.5新增/api/system/status端点**：返回全栈服务状态、版本、测试统计、页面数
+- **V2.5.1修复**：阈值键名统一大写（`BREAKEVEN/STEADY/FUSE`）；CORS从通配符`*`改为白名单集中配置；输入校验错误返回HTTP 400/422规范状态码；补齐`/api/chromosome/status`和`/api/storm/status`模块状态端点
 - 自动生成 **Swagger UI** 文档（`/docs`），所有接口在线可调试
-- CORS 已配置，支持跨域调用，前端与后端可独立部署
-- 核心端点：`/health`、`/thresholds`、`/version`、`/api/system/status`、`/api/chromosome/diagnose`、`/api/storm/simulate`
+- 核心端点：`/health`、`/thresholds`、`/version`、`/api/system/status`、`/api/chromosome/status`、`/api/chromosome/diagnose`、`/api/storm/status`、`/api/storm/simulate`
 
 ### 📊 Streamlit 数据仪表盘（V2.5新增）
 - 独立Python数据可视化应用，提供交互式数据分析体验
@@ -227,14 +230,14 @@ npm run build
 | 横幅式特色入口 | **4张** |
 | 快速入口卡片 | **4张** |
 | 全栈服务 | **3个**（FastAPI + Streamlit + Remotion） |
-| FastAPI后端API端点 | **7个** |
+| FastAPI后端API端点 | **9个** |
 | YBus通信通道 | 标准通道全覆盖 |
 | 单元测试 | **148个（全部通过）** |
 | Node.js后端测试 | 73个 |
 | 浏览器前端测试 | 75个（含YBus、VRComponents测试） |
 | Streamlit仪表盘页面 | **3个** |
 | Remotion视频组件 | 完整React+Three.js技术栈 |
-| 专项审计轮次 | **7轮** |
+| 专项审计轮次 | **8轮**（V2.5.1第八轮P2修复） |
 | A类缺陷修复率 | **100% (25/25)** |
 | 全域合规度 | **97.71/100 (A+)** |
 
@@ -242,17 +245,23 @@ npm run build
 
 ## 🔌 REST API 端点速查
 
-V2.5共提供 **7个REST API端点**，所有端点均支持CORS跨域调用：
+V2.5.1共提供 **9个REST API端点**，所有端点均支持CORS白名单跨域调用，阈值键名统一大写（`BREAKEVEN`/`STEADY`/`FUSE`）：
 
-| 方法 | 端点 | 说明 | 参数 |
-|------|------|------|------|
-| GET | `/` | API根信息 | - |
-| GET | `/health` | 健康检查 | - |
-| GET | `/thresholds` | 获取全局阈值常量 | - |
-| GET | `/version` | 获取版本详细信息 | - |
-| GET | `/api/system/status` | 🆕 全栈服务状态（总控台面板用） | - |
-| GET | `/api/chromosome/diagnose` | 染色体锚定诊断（真实算法） | `data` - 逗号分隔数值(0~1) |
-| GET | `/api/storm/simulate` | 风暴能量模拟（真实算法） | `wind_speed`(风速), `precipitation`(降水量), `duration`(持续时间) |
+| 方法 | 端点 | 说明 | 参数 | 错误码 |
+|------|------|------|------|--------|
+| GET | `/` | API根信息 | - | - |
+| GET | `/health` | 健康检查 | - | - |
+| GET | `/thresholds` | 获取全局阈值常量（大写键名） | - | - |
+| GET | `/version` | 获取版本详细信息 | - | - |
+| GET | `/api/system/status` | 🆕 全栈服务状态（总控台面板用） | - | - |
+| GET | `/api/chromosome/status` | 🆕 染色体模块状态 | - | - |
+| GET | `/api/chromosome/diagnose` | 染色体诊断（主入口=数值健康度版；备用版=NLP语义版） | `data` - 逗号分隔数值(0~1)，≥5个 | 格式错误→400，数据不足→400 |
+| GET | `/api/storm/status` | 🆕 风暴模块状态 | - | - |
+| GET | `/api/storm/simulate` | 风暴能量模拟（真实算法） | `wind_speed`≥0, `precipitation`≥0, `duration`≥1 | 非法参数→422 |
+
+> **染色体诊断双版本说明**：
+> - 主入口 `main.py`：数值健康度诊断（输入0~1数值，输出健康度分布），零额外依赖
+> - 备用版 `backend/main.py`：NLP语义漂移诊断（输入文本，检测主题偏离度），需安装 sentence-transformers、jieba、scikit-learn，缺依赖时返回503
 
 启动FastAPI后访问 **http://localhost:8000/docs** 查看完整Swagger文档并在线调试。
 
@@ -262,6 +271,10 @@ V2.5共提供 **7个REST API端点**，所有端点均支持CORS跨域调用：
 # 健康检查
 curl http://localhost:8000/health
 
+# 获取全局阈值（返回大写键名）
+curl http://localhost:8000/thresholds
+# 返回: {"BREAKEVEN":0.48, "STEADY":0.5, "FUSE":0.68, ...}
+
 # 染色体诊断（默认数据）
 curl "http://localhost:8000/api/chromosome/diagnose"
 
@@ -270,6 +283,10 @@ curl "http://localhost:8000/api/chromosome/diagnose?data=0.52,0.48,0.71,0.55,0.4
 
 # 风暴模拟
 curl "http://localhost:8000/api/storm/simulate?wind_speed=25&precipitation=80&duration=8"
+
+# 模块状态检查
+curl http://localhost:8000/api/chromosome/status
+curl http://localhost:8000/api/storm/status
 
 # 全栈系统状态
 curl http://localhost:8000/api/system/status
@@ -281,19 +298,19 @@ curl http://localhost:8000/api/system/status
 
 ```
 workspace/
-├── index.html                     # 🎯 主控台入口（推荐从这里开始）· V2.5新增全栈服务状态面板
+├── index.html                     # 🎯 主控台入口（推荐从这里开始）· V2.5全栈服务状态面板
 ├── ymine-studio.html              # 🛠️ YMine Studio全功能控制台
-├── main.py                        # 🚀 FastAPI 后端主入口（V2.5新增/api/system/status）
-├── config.py                      # ⚙️ 全局配置（版本号、阈值、系统信息）
+├── main.py                        # 🚀 FastAPI 后端【主入口】（推荐，9个端点，零额外ML依赖）
+├── config.py                      # ⚙️ 全局配置（版本V2.5.1、大写键名阈值、CORS白名单、系统信息）
 ├── requirements.txt               #    Python 依赖
 │
-├── dashboard/                     # 📊 V2.5新增：Streamlit 数据仪表盘
-│   ├── Home.py                    #    系统概览仪表盘
+├── dashboard/                     # 📊 Streamlit 数据仪表盘
+│   ├── Home.py                    #    系统概览仪表盘（调用/thresholds使用大写键名）
 │   └── pages/
 │       ├── 1_Chromosome_Lab.py    #    染色体诊断实验台
 │       └── 2_Storm_Simulator.py   #    风暴能量模拟实验室
 │
-├── video/                         # 🎬 V2.5新增：Remotion 视频生成
+├── video/                         # 🎬 Remotion 视频生成
 │   ├── package.json               #    npm依赖配置（版本2.5.0）
 │   ├── src/
 │   │   ├── index.ts               #    Remotion 入口
@@ -301,10 +318,12 @@ workspace/
 │   │   └── MolecularMixology.tsx  #    主视频组件（Three.js 3D）
 │   └── remotion.config.ts         #    Remotion 配置
 │
-├── backend/                       # 🚀 FastAPI 后端服务（备用目录）
-│   ├── main.py                    #    API 主入口
-│   ├── config.py                  #    全局阈值常量
-│   └── routers/                   #    路由模块
+├── backend/                       # 🚀 FastAPI 后端【备用/模块化版本】（routers拆分，含NLP版染色体诊断）
+│   ├── main.py                    #    模块化API入口（标注为备用版，推荐使用根目录主入口）
+│   ├── config.py                  #    全局阈值常量（大写键名、CORS白名单、RISK_LEVELS预警线）
+│   └── routers/                   #    路由模块化拆分
+│       ├── chromosome.py          #    NLP语义染色体诊断（sentence-transformers懒加载，缺依赖返回503）
+│       └── storm.py              #    风暴能量模拟（与主入口算法一致）
 │
 ├── assets/                        # ⚙️ 核心公共资源层
 │   ├── css/
@@ -465,6 +484,7 @@ Game-OS走了一条不同的路：
 | V2.3 Component-Optimized | 2026-07-27 | ✅ 公共组件层抽取(components.css/js)、VR可验证信号类2个新实验、横幅式特色入口、YBus+VRComponents单元测试24项新增、测试总数148 |
 | V2.4 Backend-Integrated | 2026-07-27 | 🚀 新增 FastAPI 后端服务，系统从纯前端演示升级为前后端分离的全栈架构；REST API端点；总控台后端状态指示器实时联动 /health；自动Swagger UI文档；CORS跨域支持 |
 | **V2.5 FullStack-Verified** | **2026-07-27** | **🎯 首个完整全栈验证版本：FastAPI真实算法引擎（7个API端点，新增/api/system/status）、Streamlit数据仪表盘（3页面）、Remotion视频生成（React+Three.js）、总控台全栈服务状态面板、版本号统一对齐、启动命令标准化、148项测试全通过** |
+| **V2.5.1 Audit-Fixed** | **2026-07-28** | **🔧 第八轮审计修复：①阈值键名统一大写（BREAKEVEN/STEADY/FUSE）②CORS从通配符改为白名单集中配置 ③双后端入口标注（主入口/备用版）④补齐/api/chromosome/status和/api/storm/status端点（9端点）⑤输入校验返回HTTP 400/422规范状态码 ⑥NLP染色体诊断懒加载（无ML依赖也能启动，缺依赖返回503）⑦全端点回归测试22项全部通过** |
 
 ---
 
@@ -481,24 +501,34 @@ Game-OS V2.5 FullStack-Verified 为内部研究/教学/仿真平台。
 
 ```
 ================================================================================
-       G A M E - O S   V 2 . 5   F U L L S T A C K - V E R I F I E D
+       G A M E - O S   V 2 . 5 . 1   F U L L S T A C K - V E R I F I E D
 ================================================================================
 
-  七轮专项审计 ......... ✅ 全部通过
+  八轮专项审计 ......... ✅ 全部通过（V2.5.1第八轮P2修复完成）
   A类缺陷修复 ........... ✅ 25/25 (100%)
   公共组件层 ............ ✅ CSS+JS 双端统一（含服务状态面板）
   VR可验证信号 .......... ✅ 2个实验上线（真实算法API）
-  FastAPI 后端 .......... ✅ 7个REST API端点
+  FastAPI 后端 .......... ✅ 9个REST API端点（CORS白名单+大写键名）
   Streamlit 仪表盘 ...... ✅ 3个交互页面
   Remotion 视频 ......... ✅ React+Three.js 技术栈
   全栈服务监控 .......... ✅ 总控台实时状态面板
   安全红线 .............. ✅ 7/7 零违反
   单元测试 .............. ✅ 148/148 全部通过
+  API回归测试 ........... ✅ 22/22 全部通过（主入口9端点+校验+边界）
 
-  🚀 三服务启动命令：
-     FastAPI:    uvicorn main:app --reload --port 8000
-     Streamlit:  streamlit run dashboard/Home.py
-     Remotion:   cd video && npm run dev
+  🚀 三服务启动命令（推荐主入口）：
+     FastAPI(主入口):  uvicorn main:app --reload --port 8000     ← 推荐
+     FastAPI(备用版):  cd backend && uvicorn main:app --port 8001  ← routers拆分+NLP版
+     Streamlit:        streamlit run dashboard/Home.py
+     Remotion:         cd video && npm run dev
+
+  ⚙️ V2.5.1 关键修复：
+     · 阈值键名统一大写：BREAKEVEN / STEADY / FUSE
+     · CORS白名单：localhost各端口（生产需替换为实际域名）
+     · 双入口标注：main.py=主入口，backend/main.py=备用/模块化版
+     · 补齐2个模块状态端点：/api/chromosome/status · /api/storm/status
+     · 输入校验返回规范HTTP状态码：400（格式/数据错误）/ 422（Query校验）
+     · NLP染色体诊断懒加载：无sentence-transformers依赖也能启动服务
 
   🎯 从 index.html 开始探索
 ================================================================================
