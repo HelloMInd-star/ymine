@@ -1,20 +1,29 @@
+"""
+================================================================================
+  Game-OS V2.5.1 FullStack-Verified · FastAPI 后端【主入口】
+================================================================================
+  ⚠️ 这是推荐使用的主入口文件。启动命令：
+     uvicorn main:app --reload --port 8000
+
+  📌 backend/main.py 为备用/模块化版本（routers拆分，含NLP依赖），
+     如无需模块化部署或NLP染色体诊断，建议使用本主入口。
+
+  📖 API文档（启动后访问）：http://localhost:8000/docs
+================================================================================
+"""
+
 import statistics
-from fastapi import FastAPI, Query
+from fastapi import FastAPI, Query, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from config import THRESHOLDS, VERSION, VERSION_DATE, SYSTEM_INFO
+from config import THRESHOLDS, VERSION, VERSION_DATE, SYSTEM_INFO, CORS_SETTINGS
 
 app = FastAPI(
-    title="Game-OS Backend API",
-    version="2.5.0",
-    description="Game-OS 后端服务 · V2.5 FullStack-Verified · 提供核心算法 REST API 调用（真实算法引擎）+ Streamlit 仪表盘 + Remotion 视频生成"
+    title="🔺 Game-OS Backend API",
+    version="2.5.1",
+    description="Game-OS 后端服务 · V2.5.1 FullStack-Verified (Audit-Fixed) · 提供核心算法 REST API 调用（真实算法引擎）+ Streamlit 仪表盘 + Remotion 视频生成"
 )
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+app.add_middleware(CORSMiddleware, **CORS_SETTINGS)
 
 
 @app.get("/")
@@ -35,9 +44,11 @@ async def root():
             "GET /health",
             "GET /thresholds",
             "GET /version",
+            "GET /api/system/status",
+            "GET /api/chromosome/status",
             "GET /api/chromosome/diagnose",
-            "GET /api/storm/simulate",
-            "GET /api/system/status"
+            "GET /api/storm/status",
+            "GET /api/storm/simulate"
         ]
     }
 
@@ -70,9 +81,6 @@ async def get_version():
 
 @app.get("/api/system/status")
 async def get_system_status():
-    """
-    获取所有服务的状态信息（供总控台服务状态面板使用）
-    """
     return {
         "version": VERSION,
         "version_date": VERSION_DATE,
@@ -81,7 +89,7 @@ async def get_system_status():
                 "name": "FastAPI 后端",
                 "status": "online",
                 "port": 8000,
-                "api_endpoints": 7,
+                "api_endpoints": 9,
                 "docs": "/docs"
             },
             "streamlit": {
@@ -104,6 +112,11 @@ async def get_system_status():
 
 
 # ============== 染色体诊断 API（真实算法） ==============
+@app.get("/api/chromosome/status")
+def chromosome_status():
+    return {"module": "chromosome-diagnostic", "status": "ready", "version": "2.5.1"}
+
+
 @app.get("/api/chromosome/diagnose")
 def diagnose_chromosome(
     data: str = Query(
@@ -112,37 +125,33 @@ def diagnose_chromosome(
     )
 ):
     """
-    染色体诊断分析
+    染色体诊断分析（数值健康度版本）
     - 输入：逗号分隔数值（0~1），代表不同片段的健康度
     - 输出：平均健康度、标准差、异常片段、健康分布、整体状态判定
     """
     try:
         values = [float(x.strip()) for x in data.split(",") if x.strip() != ""]
     except ValueError:
-        return {"error": "输入格式错误，请使用逗号分隔的数值列表", "status": "error"}
+        raise HTTPException(status_code=400, detail="输入格式错误，请使用逗号分隔的数值列表")
 
     if len(values) < 5:
-        return {"error": "至少需要5个数据点", "status": "error", "count": len(values)}
+        raise HTTPException(status_code=400, detail=f"至少需要5个数据点，当前仅提供{len(values)}个")
 
-    breakeven = THRESHOLDS["breakeven"]   # 0.48
-    steady = THRESHOLDS["steady"]         # 0.50
-    fuse = THRESHOLDS["fuse"]             # 0.68
+    breakeven = THRESHOLDS["BREAKEVEN"]
+    steady = THRESHOLDS["STEADY"]
+    fuse = THRESHOLDS["FUSE"]
 
-    # 1. 基础统计
     avg_health = sum(values) / len(values)
     std_dev = statistics.stdev(values) if len(values) > 1 else 0.0
 
-    # 2. 异常检测（低于保本线或高于熔断线）
     abnormal_positions = [
         i for i, v in enumerate(values) if v < breakeven or v > fuse
     ]
 
-    # 3. 健康分布
     healthy = sum(1 for v in values if breakeven <= v <= fuse)
     warning = sum(1 for v in values if 0.45 <= v < breakeven or fuse < v <= 0.72)
     critical = len(values) - healthy - warning
 
-    # 4. 整体状态判定（基于 THRESHOLDS 三基准）
     if avg_health < breakeven:
         status = "critical"
         assessment = "整体健康度低于保本线(0.48)，建议全面检查。"
@@ -171,9 +180,9 @@ def diagnose_chromosome(
             "critical": critical
         },
         "thresholds": {
-            "breakeven": breakeven,
-            "steady": steady,
-            "fuse": fuse
+            "BREAKEVEN": breakeven,
+            "STEADY": steady,
+            "FUSE": fuse
         },
         "overall_assessment": assessment,
         "sample_count": len(values),
@@ -182,6 +191,11 @@ def diagnose_chromosome(
 
 
 # ============== 风暴能量模拟 API（真实算法） ==============
+@app.get("/api/storm/status")
+def storm_status():
+    return {"module": "storm-energy-simulator", "status": "ready", "version": "2.5.1"}
+
+
 @app.get("/api/storm/simulate")
 def simulate_storm(
     wind_speed: float = Query(default=15.0, description="风速 (m/s)", ge=0),
@@ -192,26 +206,22 @@ def simulate_storm(
     风暴能量模拟
     - 输入：风速、降水量、持续时间（物理单位）
     - 输出：风暴强度、能量评级、熔断状态
-    - 阈值：0.48 安全线 / 0.50 稳态线 / 0.68 熔断线
     """
-    breakeven = THRESHOLDS["breakeven"]
-    steady = THRESHOLDS["steady"]
-    fuse = THRESHOLDS["fuse"]
+    breakeven = THRESHOLDS["BREAKEVEN"]
+    steady = THRESHOLDS["STEADY"]
+    fuse = THRESHOLDS["FUSE"]
 
-    # 归一化参考最大值（用于把物理量映射到 0~1 区间）
-    WIND_MAX = 30.0       # m/s，约12级台风
-    PRECIP_MAX = 100.0    # mm/h，特大暴雨
-    DUR_MAX = 12.0        # 小时
+    WIND_MAX = 30.0
+    PRECIP_MAX = 100.0
+    DUR_MAX = 12.0
 
     w_norm = min(wind_speed / WIND_MAX, 1.0)
     p_norm = min(precipitation / PRECIP_MAX, 1.0)
     d_norm = min(duration / DUR_MAX, 1.0)
 
-    # 加权融合得到风暴强度 (0~1)
     intensity = w_norm * 0.6 + p_norm * 0.3 + d_norm * 0.1
     intensity = round(min(max(intensity, 0.0), 1.0), 4)
 
-    # 能量评级（基于 THRESHOLDS 三基准）
     if intensity < breakeven:
         rating = "低"
         description = "风暴能量低于保本线，影响有限。"
@@ -222,7 +232,6 @@ def simulate_storm(
         rating = "高"
         description = "风暴能量超过熔断线，建议启动应急预案。"
 
-    # 熔断状态判定
     if intensity >= fuse:
         fuse_status = "triggered"
         fuse_action = "已触发熔断（≥0.68），建议立即启动应急预案。"
@@ -246,9 +255,9 @@ def simulate_storm(
             "duration_contribution": round(d_norm * 0.1, 4)
         },
         "thresholds": {
-            "breakeven": breakeven,
-            "steady": steady,
-            "fuse": fuse
+            "BREAKEVEN": breakeven,
+            "STEADY": steady,
+            "FUSE": fuse
         },
         "input": {
             "wind_speed": wind_speed,

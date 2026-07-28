@@ -5,14 +5,14 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 try:
     from config import THRESHOLDS
 except Exception:
-    THRESHOLDS = {"breakeven": 0.48, "steady": 0.50, "fuse": 0.68}
+    THRESHOLDS = {"BREAKEVEN": 0.48, "STEADY": 0.50, "FUSE": 0.68}
 
 router = APIRouter(prefix="/api/storm", tags=["storm"])
 
 
 @router.get("/status")
 def status():
-    return {"module": "storm-energy-simulator", "status": "ready", "version": "2.5"}
+    return {"module": "storm-energy-simulator", "status": "ready", "version": "2.5.1"}
 
 
 @router.get("/simulate")
@@ -26,9 +26,9 @@ def simulate_storm(
     - 输入：风速、降水量、持续时间（物理单位）
     - 输出：风暴强度、能量评级、熔断状态
     """
-    breakeven = THRESHOLDS["breakeven"]
-    steady = THRESHOLDS["steady"]
-    fuse = THRESHOLDS["fuse"]
+    breakeven = THRESHOLDS["BREAKEVEN"]
+    steady = THRESHOLDS["STEADY"]
+    fuse = THRESHOLDS["FUSE"]
 
     WIND_MAX = 30.0
     PRECIP_MAX = 100.0
@@ -73,7 +73,7 @@ def simulate_storm(
             "precipitation_contribution": round(p_norm * 0.3, 4),
             "duration_contribution": round(d_norm * 0.1, 4),
         },
-        "thresholds": {"breakeven": breakeven, "steady": steady, "fuse": fuse},
+        "thresholds": {"BREAKEVEN": breakeven, "STEADY": steady, "FUSE": fuse},
         "input": {"wind_speed": wind_speed, "precipitation": precipitation, "duration": duration},
         "normalized": {"wind": round(w_norm, 4), "precipitation": round(p_norm, 4), "duration": round(d_norm, 4)},
     }
