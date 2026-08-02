@@ -135,7 +135,7 @@ node tests/core-engine.test.js
 
 如果这个项目对你有启发，欢迎给个 ⭐️ 支持一下。
 
-- 📦 前端体验：https://hellomind-star.github.io/game-os
+- 📦 前端体验：https://hellomind-star.github.io/ymine/
 - 📖 API 文档：启动后访问 `/docs`
 
 ---
