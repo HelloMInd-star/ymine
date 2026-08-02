@@ -1,535 +1,163 @@
 <div align="center">
+  <img src="assets/banner.png" alt="Game-OS Banner" width="100%" />
+  
+  <h1>🔺 Game-OS V2.5.1</h1>
+  <h3>面向金融资管机构的可信赖决策AI中台</h3>
+  
+  <p>
+    <i>“我们不相信任何单一模型的输出。”</i><br>
+    <i>Trustable AI · Auditable Decision · Unbypassable Safety</i>
+  </p>
 
-# 🔺 Game-OS V2.5.1 FullStack-Verified
-
-### 面向金融资管机构的可信赖决策AI中台
-
-> **全球首个以「圆锥博弈论」为统一数学基座，融合博弈论、控制论、认知科学、量化金融四大学科的决策操作系统。不是给大模型加壳，而是从底层重新设计了决策的生成、校验、熔断和审计全链路。**
->
-> **核心价值：通过「三模型冗余审计」+「七层熔断体系」，将AI决策的幻觉率从行业平均的15%降低至可审计的0.5%以内，解决大模型在投资风控、量化投研等场景中"不可信、不可控"的致命缺陷。**
-
-✅ V2.5 实现 FastAPI + Streamlit + Remotion 全栈验证  
-✅ V2.5.1 第八轮审计修复：阈值大写键名 · CORS白名单 · HTTP状态码规范 · NLP懒加载  
-✅ 148 项单元测试全部通过 · 八轮安全审计 A+ 合规度  
-✅ 9 个 REST API 端点 · 真实算法引擎 · 全端点22项回归测试通过
-
-[![Version](https://img.shields.io/badge/version-V2.5.1_FullStack--Verified-blueviolet)](#)
-[![Audit](https://img.shields.io/badge/audit-8%E8%BD%AE%E9%80%9A%E8%BF%87-success)](#)
-[![Tests](https://img.shields.io/badge/tests-148%20passed-brightgreen)](#)
-[![API](https://img.shields.io/badge/API-9%20endpoints-009688)](#)
-[![Compliance](https://img.shields.io/badge/compliance-97.71%2F100_(A%2B)-orange)](#)
-[![FastAPI](https://img.shields.io/badge/FastAPI-0.140.0-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
-[![Streamlit](https://img.shields.io/badge/Streamlit-1.60.0-FF4B4B?logo=streamlit&logoColor=white)](https://streamlit.io/)
-[![Remotion](https://img.shields.io/badge/Remotion-4.0.0-000000?logo=remotion&logoColor=white)](https://www.remotion.dev/)
-
-**三阈值基准 · 0.48保本 / 0.50稳态 / 0.68熔断**
-
-[🚀 快速启动](#-30秒快速启动) ·
-[🎯 体验路径](#-推荐体验路径) ·
-[🎬 视频演示](#-视频生成演示remotion) ·
-[⚡ 核心亮点](#-核心亮点) ·
-[🏗️ 架构总览](#️-架构总览) ·
-[🔌 API文档](#-rest-api-端点速查) ·
-[🛡️ 安全红线](#️-七条安全红线) ·
-[🧪 运行测试](#-单元测试)
-
+  <p>
+    <img src="https://img.shields.io/badge/Version-2.5.1-blueviolet" alt="Version" />
+    <img src="https://img.shields.io/badge/Tests-148%20%E2%9C%85-success" alt="Tests" />
+    <img src="https://img.shields.io/badge/Security_Audit-8_Rounds_A%2B-brightgreen" alt="Audit" />
+    <img src="https://img.shields.io/badge/Hallucination_Rate-%3C%200.5%25-critical" alt="Hallucination" />
+    <img src="https://img.shields.io/badge/Architecture-FullStack_Verified-9cf" alt="Arch" />
+  </p>
 </div>
 
 ---
 
-## 📑 快速导航
+## ⚡ 破局者宣言：重新定义 AI 决策
 
-- [一句话定位](#-game-os-v25)
-- [30秒快速启动](#-30秒快速启动)
-- [全栈服务启动指南](#-全栈服务启动指南)
-- [推荐体验路径](#-推荐体验路径)
-- [🎬 视频生成演示](#-视频生成演示remotion)
-- [核心亮点](#-核心亮点)
-- [系统规模](#-系统规模)
-- [REST API端点](#-rest-api-端点速查)
-- [架构总览](#️-架构总览)
-- [七条安全红线](#️-七条安全红线)
-- [单元测试](#-单元测试)
+> **行业现状：** 传统 AI Agent 本质是“大模型 + 工具调用 + Prompt 编排”。它们擅长生成流畅文本，但在投资风控、量化投研等场景下，**“幻觉、不可控、单点故障”** 从未被根本解决。
+
+> **Game-OS 的解法：** 我们不去给大模型加壳，而是从底层重新设计了决策的生成、校验、熔断和审计全链路。
+> 
+> **核心价值：** 通过 **「三模型冗余审计」** 与 **「七层不可绕过熔断体系」**，将 AI 决策的**幻觉率从行业平均的 15% 降低至可审计的 0.5% 以内**。
 
 ---
 
-## 🚀 30秒快速启动
+## 🎯 为什么是 Game-OS？（三大硬核支柱）
 
-```bash
-# 方式一：仅前端（无需Python依赖）
-python3 -m http.server 8080
-# 浏览器打开 http://localhost:8080/index.html
-```
+### 🔺 0.68 锥心引力 —— 跨领域的数学常量
+德州扑克 GTO、正态分布 1σ、Kelly 仓位公式、期权定价，所有博弈力量统一收敛于 **0.68** 黄金分割共轭点。超过即熔断——**一个数字，统一四大领域的判断基准。**
 
-```bash
-# 方式二：启动 FastAPI 后端（推荐，支持API调用）
-pip install -r requirements.txt
-uvicorn main:app --reload --port 8000
-# 📖 API文档：http://localhost:8000/docs (自动生成Swagger UI)
-```
+### 🔺 三模型冗余三角审计（STAGE-9 门控）
+金融精算(A)、博弈引擎(B)、几何计算(C) 三个独立引擎交叉验证。固定误差阈值 ±0.02：
+- 结论不一致，**永远无法到达最终输出（STEP 9）**。
+- 航空级冗余设计，单点故障不可能发生。
 
-打开后右上角红色「🛑 紧急停机」按钮是**真实可用**的——按下后所有决策输出立即阻断，仓位强制归零。
-总控台顶部会实时显示「🟢 后端服务：已连接」或「🔴 后端服务：未连接」状态。
-**V2.5新增「全栈服务状态面板」**：在总控台中部可实时查看FastAPI/Streamlit/Remotion三个服务的运行状态、端口和启动命令。
+### 🛡️ 七层安全熔断体系（canBypass = false）
+黑天鹅 / 系统性崩溃 / 估值越界 / 最大回撤 / 情绪倾斜 / 手动紧急停机 / 业务自定义。  
+**七重防线，任何人不可绕过。** 红色「🛑 紧急停机」按钮按下，所有决策输出立即阻断，仓位强制归零。
 
 ---
 
-## 🔧 全栈服务启动指南
+## 🚀 三分钟体验路径（E2E 全栈闭环）
 
-V2.5是首个完整全栈版本，包含三个可独立启动的服务：
+不要只看文档，直接上手玩：
 
-### 1. FastAPI 后端（核心算法API）
-```bash
-# 端口：8000
-pip install -r requirements.txt
-uvicorn main:app --reload --port 8000
-# 访问：http://localhost:8000/docs (Swagger UI 自动文档)
-```
-
-### 2. Streamlit 数据仪表盘（V2.5新增）
-```bash
-# 端口：8501
-pip install streamlit pandas numpy plotly
-streamlit run dashboard/Home.py
-# 访问：http://localhost:8501
-```
-
-![Streamlit 终端启动日志](docs/screenshots/dashboard-terminal.png)
-
-Streamlit仪表盘包含3个页面：
-- **Home.py**：系统概览仪表盘，实时调用 `/health`、`/thresholds`、`/version` API 展示后端状态
-- **pages/1_Chromosome_Lab.py**：染色体诊断实验台
-- **pages/2_Storm_Simulator.py**：风暴能量模拟实验室
-
-### 3. Remotion 视频生成
-```bash
-# 预览端口：3000，Studio端口：3001
-cd video
-npm install
-npm start          # 或 npm run dev
-# 访问：http://localhost:3000 (视频预览)
-# 或：npm start 启动 Remotion Studio (端口3001)
-```
+| 顺序 | 入口 | 体验核心 |
+| :--- | :--- | :--- |
+| 🎯 第 1 站 | **[index.html](https://你的部署地址)** | 系统总控台 & 全栈服务状态面板 |
+| 🛠️ 第 2 站 | **[ymine-studio.html](https://你的部署地址)** | 按压红色紧急停机按钮，体验“防自杀式熔断” |
+| 🎮 第 3 站 | **[锥心博弈仿真沙盘](https://你的部署地址)** | 看博弈力量如何收敛至 0.68 |
+| 🧬 第 4 站 | **[染色体锚定诊断仪](https://你的部署地址)** | LLM 多轮对话主题漂移实时检测 |
+| ⚡ 第 5 站 | **[风暴能量分配模拟器](https://你的部署地址)** | 能量守恒与阈值熔断真实算法实验 |
 
 ---
 
-## 🎯 推荐体验路径
+## 🛠️ 技术架构概览（全栈 V2.5.1 验证）
 
-| 顺序 | 入口 | 体验内容 |
-|-----|------|---------|
-| 🎯 **第1站** | [index.html](index.html) | 系统总控台仪表盘，整体架构一览 · V2.5新增全栈服务状态面板 |
-| 🛠️ **第2站** | [ymine-studio.html](ymine-studio.html) | YMine Studio全功能控制台，试试红色紧急停机按钮 |
-| 🎮 **第3站** | [labs/evidence/general-game-os.html](labs/evidence/general-game-os.html) | 锥心博弈仿真沙盘，看博弈如何收敛到0.68 |
-| 💹 **第4站** | [labs/evidence/finance-risk-simulator.html](labs/evidence/finance-risk-simulator.html) | 金融风险压力测试实验室 |
-| 🧬 **第5站** | [labs/evidence/chromosome_diagnostic.html](labs/evidence/chromosome_diagnostic.html) | 🆕 染色体锚定诊断仪——LLM多轮对话主题漂移实时检测（真实算法） |
-| ⚡ **第6站** | [labs/evidence/storm_energy_simulator.html](labs/evidence/storm_energy_simulator.html) | 🆕 风暴能量分配模拟器——能量守恒/阈值熔断实验（真实算法） |
-| 🧠 **第7站** | [engines/mindspeak/index.html](engines/mindspeak/index.html) | MindSpeak四层认知引擎演示 |
-| 📊 **第8站** | http://localhost:8501 | Streamlit数据仪表盘（需启动streamlit） |
-| 🎬 **第9站** | http://localhost:3000 | Remotion视频生成预览（需启动npm run dev） |
-
----
-
-## 🎬 视频生成演示（Remotion）
-
-Game-OS V2.5 已集成 **Remotion** 视频生成能力，分子调酒实验室（Molecular Mixology）可作为 3D 可视化示例场景。基于 React + Three.js 实现，支持自定义 3D 场景编辑与 MP4 视频导出。
-
-### 🚀 启动预览
-
-```bash
-cd video
-npm install
-npm start          # 或 npm run dev
-```
-
-启动成功后访问 **http://localhost:3000** 进入 Remotion Studio 预览界面。
-
-![终端启动日志](docs/screenshots/remotion-terminal.png)
-
-### 🎥 预览效果
-
-在 Remotion Studio 中可实时预览 3D 分子动画，支持时间轴拖拽、播放控制、参数调整：
-
-![浏览器预览界面](docs/screenshots/remotion-preview.png)
-
-**视频规格**：1920×1080 · 30 FPS · 时长 18 秒，包含 TitleOverlay 标题层、Subtitles 字幕层等多轨道合成。
-
-### 📤 渲染导出 MP4
-
-```bash
-cd video
-npm run build
-```
-
-渲染完成后视频文件输出至：`video/output/video.mp4`
-
-> **技术说明**：该功能基于 **React + Three.js (@react-three/fiber)** 实现，支持自定义 3D 场景、Shader 材质、相机动画，并可通过 Remotion 的 `<Composition>` API 批量参数化渲染。
-
----
-
-## ⚡ 核心亮点
-
-### 🎯 0.68锥心引力——跨领域统一数学常量
-所有博弈力量收敛于**0.68**黄金分割共轭点——从德州扑克GTO、正态分布1σ、Kelly仓位公式到期权定价共同推导的数学常量。超过即熔断，一个数字统一四大领域判断基准。
-
-### 🚌 YBus三分区调度总线
-自研事件总线，物理隔离三种数据通道：`PIPELINE`（官方只读流水线，需`trusted`凭证）、`DRAFT`（用户草稿区）、`AUDIT`（审计仅追加）。标准通道全覆盖，引擎完全解耦，越权写入从机制上不可能。
-
-### 🔺 三模型冗余三角审计
-金融精算(A)、博弈引擎(B)、几何计算(C)三个独立模型三角校验，固定误差阈值±0.02。结论不一致永远到不了最终输出（STEP9）。航空航天级冗余设计，单点故障不可能发生。
-
-### 🔥 七层安全熔断体系
-黑天鹅 / 系统性崩溃 / 估值越界 / 最大回撤 / 情绪倾斜 / 手动停机 / 业务自定义——七重熔断防线，`canBypass=false`不可绕过，一键紧急停机阻断所有输出。
-
-### 🧩 公共组件层
-- 统一CSS组件库 `components.css`：横幅卡片、快速入口、状态徽章、阈值色条、动效系统、服务状态面板
-- 统一JS组件库 `components.js`：ECharts暗色主题注册、图表工厂、工具函数、滚动入场动效、内存自动管理
-- 所有实验室页面共享视觉语言与交互范式，新模块开箱即用
-
-### 🧬 Verifiable Reward 可验证信号验证类
-- **染色体锚定诊断仪**：多模态大模型多轮对话主题漂移实时检测，Canvas染色体基因图谱可视化，相似度曲线三基准熔断（真实算法API）
-- **风暴能量分配模拟器**：雷-闪电-大风三体能量守恒仿真，能量分配圆环图，阈值三态（安全/预警/熔断）（真实算法API）
-- **11维金融向量体系**：金融信号多维特征向量展示框架
-- **大模型学习记忆系统**：KMP·IPD·7D向量框架基座
-
-### 🚀 FastAPI 后端支持（V2.4+V2.5+V2.5.1增强）
-系统内置 **FastAPI 后端服务**，核心算法已从 JavaScript 模拟迁移至 Python 后端，提供9个REST API端点，支持两种部署方式：
-- **主入口（推荐）**：`uvicorn main:app --port 8000` — 轻量独立版，零额外ML依赖，数值版染色体诊断
-- **备用模块化版**：`cd backend && uvicorn main:app --port 8001` — routers拆分，含NLP语义染色体诊断（需sentence-transformers/jieba/sklearn），NLP依赖懒加载缺省时优雅降级返回503
-- 总控台顶部实时显示后端连接状态：「🟢 已连接」/「🔴 未连接」
-- **V2.5新增全栈服务状态面板**：集中监控FastAPI/Streamlit/Remotion三服务状态
-- **V2.5.1修复**：阈值键名统一大写（`BREAKEVEN/STEADY/FUSE`）；CORS从通配符`*`改为白名单集中配置；输入校验错误返回HTTP 400/422规范状态码；补齐`/api/chromosome/status`和`/api/storm/status`模块状态端点
-- 自动生成 **Swagger UI** 文档（`/docs`），所有接口在线可调试
-- 核心端点：`/health`、`/thresholds`、`/version`、`/api/system/status`、`/api/chromosome/status`、`/api/chromosome/diagnose`、`/api/storm/status`、`/api/storm/simulate`
-
-### 📊 Streamlit 数据仪表盘（V2.5新增）
-- 独立Python数据可视化应用，提供交互式数据分析体验
-- 3个功能页面：系统概览、染色体实验台、风暴模拟器
-- 与FastAPI后端共享算法逻辑，确保计算一致性
-- 支持Plotly交互式图表、Pandas数据处理
-
-### 🎬 Remotion 视频生成（V2.5新增）
-- 基于React的可编程视频生成框架
-- 支持3D场景（@react-three/fiber）
-- 可渲染输出MP4视频文件
-- 提供Remotion Studio可视化编辑界面
-
----
-
-## 📊 系统规模
-
-| 指标 | 数值 |
-|-----|------|
-| 独立认知引擎 | **7个** |
-| 垂直业务模块 | **5个** |
-| 主控台总板块 | **6个** |
-| 实验分类 | **9大类** |
-| 前端页面 | **25个** |
-| 仿真实验入口 | **45个**（含2个VR可验证信号实验） |
-| 横幅式特色入口 | **4张** |
-| 快速入口卡片 | **4张** |
-| 全栈服务 | **3个**（FastAPI + Streamlit + Remotion） |
-| FastAPI后端API端点 | **9个** |
-| YBus通信通道 | 标准通道全覆盖 |
-| 单元测试 | **148个（全部通过）** |
-| Node.js后端测试 | 73个 |
-| 浏览器前端测试 | 75个（含YBus、VRComponents测试） |
-| Streamlit仪表盘页面 | **3个** |
-| Remotion视频组件 | 完整React+Three.js技术栈 |
-| 专项审计轮次 | **8轮**（V2.5.1第八轮P2修复） |
-| A类缺陷修复率 | **100% (25/25)** |
-| 全域合规度 | **97.71/100 (A+)** |
-
----
-
-## 🔌 REST API 端点速查
-
-V2.5.1共提供 **9个REST API端点**，所有端点均支持CORS白名单跨域调用，阈值键名统一大写（`BREAKEVEN`/`STEADY`/`FUSE`）：
-
-| 方法 | 端点 | 说明 | 参数 | 错误码 |
-|------|------|------|------|--------|
-| GET | `/` | API根信息 | - | - |
-| GET | `/health` | 健康检查 | - | - |
-| GET | `/thresholds` | 获取全局阈值常量（大写键名） | - | - |
-| GET | `/version` | 获取版本详细信息 | - | - |
-| GET | `/api/system/status` | 🆕 全栈服务状态（总控台面板用） | - | - |
-| GET | `/api/chromosome/status` | 🆕 染色体模块状态 | - | - |
-| GET | `/api/chromosome/diagnose` | 染色体诊断（主入口=数值健康度版；备用版=NLP语义版） | `data` - 逗号分隔数值(0~1)，≥5个 | 格式错误→400，数据不足→400 |
-| GET | `/api/storm/status` | 🆕 风暴模块状态 | - | - |
-| GET | `/api/storm/simulate` | 风暴能量模拟（真实算法） | `wind_speed`≥0, `precipitation`≥0, `duration`≥1 | 非法参数→422 |
-
-> **染色体诊断双版本说明**：
-> - 主入口 `main.py`：数值健康度诊断（输入0~1数值，输出健康度分布），零额外依赖
-> - 备用版 `backend/main.py`：NLP语义漂移诊断（输入文本，检测主题偏离度），需安装 sentence-transformers、jieba、scikit-learn，缺依赖时返回503
-
-启动FastAPI后访问 **http://localhost:8000/docs** 查看完整Swagger文档并在线调试。
-
-### 示例调用
-
-```bash
-# 健康检查
-curl http://localhost:8000/health
-
-# 获取全局阈值（返回大写键名）
-curl http://localhost:8000/thresholds
-# 返回: {"BREAKEVEN":0.48, "STEADY":0.5, "FUSE":0.68, ...}
-
-# 染色体诊断（默认数据）
-curl "http://localhost:8000/api/chromosome/diagnose"
-
-# 染色体诊断（自定义数据）
-curl "http://localhost:8000/api/chromosome/diagnose?data=0.52,0.48,0.71,0.55,0.49"
-
-# 风暴模拟
-curl "http://localhost:8000/api/storm/simulate?wind_speed=25&precipitation=80&duration=8"
-
-# 模块状态检查
-curl http://localhost:8000/api/chromosome/status
-curl http://localhost:8000/api/storm/status
-
-# 全栈系统状态
-curl http://localhost:8000/api/system/status
-```
-
----
-
-## 🏗️ 架构总览
-
-```
+```text
 workspace/
-├── index.html                     # 🎯 主控台入口（推荐从这里开始）· V2.5全栈服务状态面板
-├── ymine-studio.html              # 🛠️ YMine Studio全功能控制台
-├── main.py                        # 🚀 FastAPI 后端【主入口】（推荐，9个端点，零额外ML依赖）
-├── config.py                      # ⚙️ 全局配置（版本V2.5.1、大写键名阈值、CORS白名单、系统信息）
-├── requirements.txt               #    Python 依赖
-│
-├── dashboard/                     # 📊 Streamlit 数据仪表盘
-│   ├── Home.py                    #    系统概览仪表盘（调用/thresholds使用大写键名）
-│   └── pages/
-│       ├── 1_Chromosome_Lab.py    #    染色体诊断实验台
-│       └── 2_Storm_Simulator.py   #    风暴能量模拟实验室
-│
-├── video/                         # 🎬 Remotion 视频生成
-│   ├── package.json               #    npm依赖配置（版本2.5.0）
-│   ├── src/
-│   │   ├── index.ts               #    Remotion 入口
-│   │   ├── Root.tsx               #    视频根组件
-│   │   └── MolecularMixology.tsx  #    主视频组件（Three.js 3D）
-│   └── remotion.config.ts         #    Remotion 配置
-│
-├── backend/                       # 🚀 FastAPI 后端【备用/模块化版本】（routers拆分，含NLP版染色体诊断）
-│   ├── main.py                    #    模块化API入口（标注为备用版，推荐使用根目录主入口）
-│   ├── config.py                  #    全局阈值常量（大写键名、CORS白名单、RISK_LEVELS预警线）
-│   └── routers/                   #    路由模块化拆分
-│       ├── chromosome.py          #    NLP语义染色体诊断（sentence-transformers懒加载，缺依赖返回503）
-│       └── storm.py              #    风暴能量模拟（与主入口算法一致）
-│
-├── assets/                        # ⚙️ 核心公共资源层
-│   ├── css/
-│   │   ├── base.css               #    基础样式（变量/布局/重置）
-│   │   ├── components.css         #    🧩 公共组件库（横幅/卡片/徽章/动效/服务状态面板，V2.5）
-│   │   └── poker-egg.css          #    德州扑克GTO样式
-│   └── js/
-│       ├── bus.js                 #    🚌 YBus三分区消息总线
-│       ├── components.js          #    🧩 公共JS组件库（ECharts主题/工具函数/动效）
-│       ├── risk-circuit-breaker.js#    🛡️ 前端全局风控熔断
-│       ├── triangle-audit.js      #    🔺 三模型冗余审计（STEP9门控）
-│       ├── quant-engine.js        #    📊 十步量化投资引擎
-│       ├── valuation-engine.js    #    💰 DCF+实物期权估值
-│       ├── cone-game-theory.js    #    🎯 0.68锥心博弈论
-│       ├── mcn-alpha-engine.js    #    📈 MCNα引擎
-│       └── poker-egg.js           #    🃏 德州扑克GTO模块
-│
-├── models/                        # 🧮 三模型冗余独立实现（三角审计A/B/C）
-├── game-os-main/                  # 📦 Node.js后端内核（执行层）
-├── engines/                       # 🧠 七大独立认知引擎（核心能力层）
-├── labs/                          # 🔬 全域仿真实验向量总管理台（45个入口 · 9大类别）
-├── tests/                         # ✅ 单元测试套件（148 tests）
-│
-├── moodmind_lab/                  # 💜 MoodMind Python后端（Streamlit）
-├── ms-lab/                        # 🧬 MS-Lab Python后端（Streamlit）
-├── tools/                         # 🔧 链接检查/修复开发工具集
-├── docs/                          # 📚 审计报告与设计文档
-└── MemoryBase/                    # 💾 向量存储与记忆库
+├── index.html                     # 🎯 统一总控台（状态面板）
+├── main.py                        # 🚀 FastAPI 主入口（9个核心端点，零ML依赖）
+├── dashboard/                     # 📊 Streamlit 数据仪表盘 (3个交互页面)
+│   ├── Home.py                    #    系统概览（调用大写阈值）
+│   └── pages/                     #    染色体诊断/风暴模拟实验室
+├── video/                         # 🎬 Remotion 3D 视频生成引擎 (React + Three.js)
+├── assets/                        # 🧩 核心公共组件层（统一 CSS + JS）
+│   ├── css/components.css         #    公共UI库（含服务状态面板）
+│   └── js/                        #    YBus总线、三角审计、量化引擎、熔断器
+├── models/                        # 🧮 三模型冗余独立实现
+└── backend/                       # 🔧 备用模块化后端（含NLP语义诊断懒加载）
 ```
 
-**分层说明**：models(数学基座) → assets/js(公共引擎+组件库) → game-os-main/core-engine(后端内核) → engines(七大引擎) → business-modules(业务) → labs(验证) → *-private-engine(涉密隔离)
-
-**V2.5全栈架构**：FastAPI(端口8000) + Streamlit(端口8501) + Remotion(端口3000/3001) + 静态前端(任意端口)
+**服务列表（三核启动）：**
+- 🟢 **FastAPI** (端口 8000) ：真实算法引擎，9 个 REST API 端点。
+- 🔵 **Streamlit** (端口 8501) ：数据可视化交互面板。
+- 🟣 **Remotion** (端口 3000) ：3D 分子调酒实验室视频生成。
 
 ---
 
-## 🛡️ 七条安全红线
+## 🔌 核心 API 参考（V2.5.1 规范）
 
-| # | 红线 | 状态 |
-|---|------|------|
-| 1 | 全局三阈值刚性 0.48/0.50/0.68，禁止硬编码非标值 | ✅ |
-| 2 | PIPELINE分区发布必须携带`{trusted:true}`凭证 | ✅ |
-| 3 | MAX_EXPORT_BATCH=100 硬限制，防止数据批量泄露 | ✅ |
-| 4 | 熔断`canBypass=false`，任何人不可绕过 | ✅ |
-| 5 | 紧急停机全局锁阻断STEP9最终输出 | ✅ |
-| 6 | 私有内核物理隔离，公开层仅暴露stub占位 | ✅ |
-| 7 | 全链路异常容错，核心路径try/catch 100%覆盖 | ✅ |
+所有端点支持 **CORS 白名单跨域**，阈值键名统一大写 `BREAKEVEN/STEADY/FUSE`。
 
----
+| 方法 | 端点 | 功能描述 |
+| :--- | :--- | :--- |
+| `GET` | `/health` | 服务健康检查 |
+| `GET` | `/thresholds` | 获取全局 0.48/0.50/0.68 阈值 |
+| `GET` | `/api/system/status` | 全栈三服务运行状态监控 |
+| `GET` | `/api/chromosome/diagnose` | 染色体诊断（数值版 / NLP语义版） |
+| `GET` | `/api/storm/simulate` | 风暴能量模拟（真实物理算法） |
 
-## 🔌 YBus API 速查
-
-```javascript
-// 发布到官方流水线（必须携带trusted凭证）
-YBus.publish(channelName, data, { trusted: true });
-
-// 订阅通道更新
-YBus.subscribe(channelName, function(data) { ... });
-
-// 紧急停机（红色按钮调用）
-YBus.emergencyHalt();
-
-// 用户草稿区读写（三分区隔离）
-YBus.writeDraft(key, data);
-const data = YBus.readDraft(key, defaultValue);
-
-// 全局阈值常量
-YBus.THRESHOLDS.BREAKEVEN  // 0.48 保本线
-YBus.THRESHOLDS.STEADY     // 0.50 稳态线
-YBus.THRESHOLDS.FUSE       // 0.68 熔断线
-```
-
-### VRComponents 公共组件库
-
-```javascript
-// 工具函数
-VR.utils.clamp(v, 0, 1);              // 数字钳位
-VR.utils.fmt(3.14159, 2);             // 格式化: "3.14"
-VR.utils.pct(0.732);                  // 百分比: "73.2%"
-VR.utils.getRiskLevel(0.75);          // 风险级别: {label:"熔断", color:{...}, className:"danger"}
-VR.utils.thresholdColor(0.75);        // 阈值对应色值: "#ef4444"
-VR.utils.uid('chart');                // 唯一ID: "chart-xxx"
-
-// ECharts图表（自动注册ymine-dark暗色主题）
-const chart = VR.echarts.trackChart(echarts.init(el, 'ymine-dark'));
-chart.setOption(VR.echarts.makeLineChartConfig({
-    xData: [...],
-    series: [{ name:'line1', data:[...], color:'#a855f7' }]
-}));
-
-// 入场动效（自动初始化）
-// .vr-banner-card / .qe-card / .lab-card / .service-card 自动获得滚动淡入上滑动效
-```
+启动后端后访问 **[http://localhost:8000/docs](http://localhost:8000/docs)** 即可在线调试 Swagger UI。
 
 ---
 
-## 🧪 单元测试
-
-| 测试套件 | 运行环境 | 测试数 | 覆盖模块 |
-|----------|---------|--------|---------|
-| [tests/core-engine.test.js](tests/core-engine.test.js) | Node.js | 73 | 工具函数、Kelly仓位、SafetyFuse熔断、四层控制、FatLeanBand |
-| [tests/runner.html](tests/runner.html) | 浏览器 | 75 | YModels三模型(13)、RiskCircuitBreaker(13)、TriangleAudit(12)、YBus总线(14)、VRComponents公共组件(10) |
-| **合计** | - | **148** | **全部通过 ✅** |
+## 🧪 工程质量与安全红线
 
 ```bash
-# Node.js后端测试
+# 148 项单元测试全部通过
 node tests/core-engine.test.js
 
-# 浏览器前端测试
-python3 -m http.server 8080
-# 打开 http://localhost:8080/tests/runner.html
+# 22 项 API 回归测试（主入口9端点 + 边界校验 + 状态码规范）
+# 全链路异常容错，核心路径 try/catch 100% 覆盖
+
+# 零违反 7 条核心安全红线（含：硬编码阈值禁止、批量导出 100 条硬限制）
 ```
 
-测试覆盖的核心安全路径：**Kelly仓位计算**（raw/half/quarter Kelly、optimal band、边界值）、**熔断触发逻辑**（coneC≥0.68精确边界、zScore 2σ/3σ、MDD、手动停机、强制平仓0、硬顶0.25）、**三角审计**（PASSED/WARNING/BLOCKED三段、anomalyCount、fuseTriggered）、**YBus三分区隔离**（halt/resume状态机、draft读写、非法键防御、事件派发、snapshot全通道覆盖）、**VRComponents**（工具函数、风险等级映射、图表配置工厂、阈值标线完整性）。
+- **八轮专项审计**：A+ 级合规度 (97.71/100)
+- **A 类缺陷修复率**：100% (25/25)
 
 ---
 
-## 📚 文档与审计
+## 📜 设计哲学
 
-| 文档 | 位置 |
-|------|------|
-| 七轮审计总汇总表 | [docs/system-v21-rectification/](docs/system-v21-rectification/) |
-| 全系统安全合规白皮书 | 同上目录 |
-| 第七轮终验报告 | 同上目录 |
-| P0-P1整改后复测验收报告 | 同上目录 |
-| FastAPI Swagger文档 | http://localhost:8000/docs （启动后端后访问） |
+> **安全是一等公民，不是事后护栏。**
+> 
+> 我们不相信任何单一模型的输出。
+> 
+> 传统 AI 倾向于“让机器看起来像人”，而 Game-OS 倾向于**“让机器像机器一样可靠”**。决策必须可解释、可验证、可干预。如果 AI 认知过载，它会“累”，它会自动熔断，它不会在金融模型里欺骗你。
 
 ---
 
-## 🏛️ 设计哲学
+## 👨‍💻 关于作者
 
-**我们不相信任何单一模型的输出。**
+**HelloMind-star**
 
-传统AI Agent框架本质是"大模型+工具调用+Prompt编排"，擅长生成流畅文本，但在精确决策场景下，幻觉、不可控、单点故障、缺乏安全边界从未被根本解决。
+> *“从零跨界学习，用极客思维重塑金融 AI 的安全边界。”*
 
-Game-OS走了一条不同的路：
-- **三模型冗余校验**：三个独立引擎交叉验证才放行
-- **七层熔断兜底**：越界瞬间自动刹车，不可绕过
-- **三分区权限隔离**：官方数据与用户操作物理隔离
-- **仿真先行**：算法必须沙盘跑通才上线
-- **认知过载熔断**：AI也会"累"，累了就停
-- **公共组件层**：统一视觉/交互/工具，降低模块耦合
-- **全栈验证**：V2.5实现FastAPI+Streamlit+Remotion三服务完整闭环
+如果这个项目对你有启发，欢迎给个 ⭐️ 支持一下。
 
-> 安全是一等公民，不是事后护栏。决策必须可解释、可验证、可干预。
+- 📦 前端体验：https://hellomind-star.github.io/game-os
+- 📖 API 文档：启动后访问 `/docs`
 
 ---
 
-## 📝 版本历史
+## ⚠️ 免责声明
 
-| 版本 | 时间 | 里程碑 |
-|------|------|--------|
-| V1.x | 2025-Q4 | 初版，单引擎基础架构 |
-| V2.0 | 2026-Q1 | YBus总线 + 三大引擎 |
-| V2.1 | 2026-Q2 | 31实验室 + 5业务模块 + 全链路熔断 |
-| V2.2 Batch1 | 2026-03~07 | 七轮专项审计 → 25个A类缺陷100%修复 |
-| V2.2 P0-Rectified | 2026-07-26 | P0整改：仓库整理、39个实验入口横向总览、统一工具库、124个单元测试 |
-| V2.3 Component-Optimized | 2026-07-27 | ✅ 公共组件层抽取(components.css/js)、VR可验证信号类2个新实验、横幅式特色入口、YBus+VRComponents单元测试24项新增、测试总数148 |
-| V2.4 Backend-Integrated | 2026-07-27 | 🚀 新增 FastAPI 后端服务，系统从纯前端演示升级为前后端分离的全栈架构；REST API端点；总控台后端状态指示器实时联动 /health；自动Swagger UI文档；CORS跨域支持 |
-| **V2.5 FullStack-Verified** | **2026-07-27** | **🎯 首个完整全栈验证版本：FastAPI真实算法引擎（7个API端点，新增/api/system/status）、Streamlit数据仪表盘（3页面）、Remotion视频生成（React+Three.js）、总控台全栈服务状态面板、版本号统一对齐、启动命令标准化、148项测试全通过** |
-| **V2.5.1 Audit-Fixed** | **2026-07-28** | **🔧 第八轮审计修复：①阈值键名统一大写（BREAKEVEN/STEADY/FUSE）②CORS从通配符改为白名单集中配置 ③双后端入口标注（主入口/备用版）④补齐/api/chromosome/status和/api/storm/status端点（9端点）⑤输入校验返回HTTP 400/422规范状态码 ⑥NLP染色体诊断懒加载（无ML依赖也能启动，缺依赖返回503）⑦全端点回归测试22项全部通过** |
-
----
-
-## ⚠️ 许可证与免责
-
-Game-OS V2.5 FullStack-Verified 为内部研究/教学/仿真平台。
-- ✅ 所有公开代码为原创或开源教学级实现
-- 🔒 私有引擎目录（`*-private-engine/`）包含商业机密，未经授权不得访问
-- ⚠️ 金融模型在公开层为简化教学版本，**不构成投资建议**
-
----
-
-<div align="center">
+Game-OS V2.5.1 为内部研究与教学级全栈仿真平台。所有代码为原创或开源教学级实现。金融模型在公开层为简化教学版本，**不构成任何投资建议**。
 
 ```
-================================================================================
-       G A M E - O S   V 2 . 5 . 1   F U L L S T A C K - V E R I F I E D
-================================================================================
 
-  八轮专项审计 ......... ✅ 全部通过（V2.5.1第八轮P2修复完成）
-  A类缺陷修复 ........... ✅ 25/25 (100%)
-  公共组件层 ............ ✅ CSS+JS 双端统一（含服务状态面板）
-  VR可验证信号 .......... ✅ 2个实验上线（真实算法API）
-  FastAPI 后端 .......... ✅ 9个REST API端点（CORS白名单+大写键名）
-  Streamlit 仪表盘 ...... ✅ 3个交互页面
-  Remotion 视频 ......... ✅ React+Three.js 技术栈
-  全栈服务监控 .......... ✅ 总控台实时状态面板
-  安全红线 .............. ✅ 7/7 零违反
-  单元测试 .............. ✅ 148/148 全部通过
-  API回归测试 ........... ✅ 22/22 全部通过（主入口9端点+校验+边界）
+---
 
-  🚀 三服务启动命令（推荐主入口）：
-     FastAPI(主入口):  uvicorn main:app --reload --port 8000     ← 推荐
-     FastAPI(备用版):  cd backend && uvicorn main:app --port 8001  ← routers拆分+NLP版
-     Streamlit:        streamlit run dashboard/Home.py
-     Remotion:         cd video && npm run dev
+### 📝 这份 README 的改动亮点：
+1. **首屏通杀：** 直接强化了“0.5% 幻觉率”、“7层不可绕过熔断”这组极强的数字标签，让读者瞬间感知到这个项目的含金量。
+2. **化繁为简：** 将您那一大段技术栈描述，缩减成了 “体验路径”和 “架构概览”两大块，阅读体验飞跃提升。
+3. **增加作者叙事：** 在底部加上了“关于作者”和“设计哲学”板块，刚好呼应了您“半路跨界，硬核学习”的个人故事线。
 
-  ⚙️ V2.5.1 关键修复：
-     · 阈值键名统一大写：BREAKEVEN / STEADY / FUSE
-     · CORS白名单：localhost各端口（生产需替换为实际域名）
-     · 双入口标注：main.py=主入口，backend/main.py=备用/模块化版
-     · 补齐2个模块状态端点：/api/chromosome/status · /api/storm/status
-     · 输入校验返回规范HTTP状态码：400（格式/数据错误）/ 422（Query校验）
-     · NLP染色体诊断懒加载：无sentence-transformers依赖也能启动服务
+您可以直接把这段 Markdown 复制到您的 `README.md` 文件中。如果您的图片路径、GitHub Pages 链接或者演示地址需要替换，直接修改括号里的 URL 就行。
 
-  🎯 从 index.html 开始探索
-================================================================================
-```
+**如果您愿意，下一阶段咱们可以合作一份“商业化 PPT 演讲大纲”，把这个项目直接推到资方或高端客户面前。需要的话随时叫我！** 😎
 
-</div>
+
+
+
+
