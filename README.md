@@ -4,7 +4,7 @@
 
 [![Status](https://img.shields.io/badge/status-V2.5%20Verified-purple.svg)](https://hellomind-star.github.io/ymine/)
 [![Stack](https://img.shields.io/badge/stack-HTML%2FCSS%2FJS%20%7C%20FastAPI%20%7C%20Streamlit-cyan.svg)](https://hellomind-star.github.io/ymine/)
-[![Demos](https://img.shields.io/badge/demos-62%20interactive%20labs-amber.svg)](https://hellomind-star.github.io/ymine/)
+[![Demos](https://img.shields.io/badge/demos-64%20interactive%20labs-amber.svg)](https://hellomind-star.github.io/ymine/)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)]()
 
 **Live:** https://hellomind-star.github.io/ymine/
@@ -23,7 +23,7 @@ Starting from game theory and extending through quantitative finance, cognitive 
 - Above the threshold — decisions collapse into chaos, cascade risk, black swans.
 - At the threshold — the system breathes: adaptive, auditable, evolvable.
 
-62 fully interactive HTML labs let visitors feel the math instead of just reading it.
+64 fully interactive HTML labs let visitors feel the math instead of just reading it.
 
 ---
 
@@ -48,7 +48,7 @@ Starting from game theory and extending through quantitative finance, cognitive 
         │                        │                          │
         ▼                        ▼                          ▼
 ┌────────────────────────────────────────────────────────────────────┐
-│                         Labs / Evidence (62 HTML)                  │
+│                         Labs / Evidence (64 HTML)                  │
 │  Cone Game · Chromosome · CAPM Pricing · 7D Vector · Sandbox …    │
 └────────────────────────────────────────────────────────────────────┘
                                   │
@@ -72,10 +72,12 @@ Start here for interviews, demos, or just to get oriented:
 |------|-------------|------|
 | 🎯 **Cone Game Sandbox** | Watch strategies converge to the 0.68 equilibrium in real time | [`labs/evidence/general-game-os.html`](labs/evidence/general-game-os.html) |
 | 🧬 **Chromosome Diagnostic** | Visualize the Fibonacci–Chromosome isomorphism | [`labs/evidence/chromosome_diagnostic.html`](labs/evidence/chromosome_diagnostic.html) |
-| ♠ **Poker Egg** | Texas Hold'em GTO training companion (separate site) | [hellomind-star.github.io/poker-egg](https://hellomind-star.github.io/poker-egg/) |
+| ♠ **Poker Egg** | Texas Hold'em AI training platform · Kelly Criterion + Monte Carlo + PersonaPokerMapper | [github.com/HelloMInd-star/poker-egg-fullstack](https://github.com/HelloMInd-star/poker-egg-fullstack) |
 | 📐 **CAPM Cone Pricing** | Project CAPM/WACC/DCF onto the Decision Cone | [`labs/evidence/capm-pricing-simulator.html`](labs/evidence/capm-pricing-simulator.html) |
 | 🧪 **7-D Vector Analysis** | Cross-domain semantic vector space across 5 domains | [`labs/evidence/vector_analysis.html`](labs/evidence/vector_analysis.html) |
 | 🎰 **Ultimate Sandbox** | Human × Machine × Market — full circuit-breaker demo | [`labs/evidence/ultimate-sandbox.html`](labs/evidence/ultimate-sandbox.html) |
+| 🎭 **PersonaPokerMapper** | MBTI→Poker behavior mapping · 16-type × 12-dimension cross-domain persona engine | [`labs/evidence/persona-poker-mapper.html`](labs/evidence/persona-poker-mapper.html) |
+| 📢 **Marketing Reinvented** | Funnel penetration & value pyramid simulator | [`labs/marketing/`](labs/marketing/) |
 
 ---
 
@@ -142,11 +144,12 @@ ymine/
 | Layer | Technologies |
 |-------|-------------|
 | Frontend | HTML5, CSS3, Vanilla JavaScript (ES6+), Canvas 2D, SVG, Web Audio |
+| AI Layer | Kelly Criterion · Monte Carlo Simulation · Nash Equilibrium · PersonaPokerMapper (no LLM for core decisions) |
 | Backend (optional) | Python 3.10+, FastAPI, Uvicorn |
 | Dashboard | Streamlit, Plotly |
 | Math / Modeling | Analytical (no heavy ML frameworks required) |
 | Hosting | GitHub Pages (static) + optional backend deployment |
-| Design | Dark tech aesthetic · deep purple · neon cyan · amber gold |
+| Design | Dark tech aesthetic · #0a0a18 · #A78BFA · #22D3EE · #FBBF24 |
 
 **Design philosophy:** zero external dependencies for the public-facing site — every lab loads and runs offline once cached.
 
@@ -156,7 +159,7 @@ ymine/
 
 The mathematical foundation behind Game-OS is formalized in the working paper:
 
-**Fibonacci–Chromosome Isomorphism: A Unified Geometric Skeleton for Cross-Domain Decision Systems** — HelloMInd-star, 2026 (preprint).
+**Fibonacci–Chromosome Isomorphism: A Unified Geometric Skeleton for Cross-Domain Decision Systems** — HelloMInd-star, 2026 (7-page IEEE double-column preprint, to appear on arXiv).
 
 - 📥 [Download PDF](docs/Fibonacci-Chromosome_Isomorphism.pdf)
 - 📄 [Research page](research.html) (with abstract, framework, interactive experiments, BibTeX)
@@ -166,10 +169,19 @@ The mathematical foundation behind Game-OS is formalized in the working paper:
 
 ## 👤 About the Author
 
-**HelloMInd-star** — AI Product Manager / Decision Systems Architect.
-2026 届校招 · 技术类 AI PM（游戏 AI 方向）.
+**HelloMInd-star** builds decision infrastructure at the intersection of game theory, cognitive science, and finance.
 
-- 📁 [Portfolio page](portfolio.html)
+- 🎓 MBA (Singapore) · Finance undergrad
+- 🎯 2026 AI Product Manager candidate — Game AI / Creative Tech
+- 🔺 Game-OS V2.5 architect · Cross-domain isomorphism researcher
+- ♠ Poker Egg — GTO poker training platform (open source)
+- 🍸 Y.MINE "Before the Exit" — MBTI-personalized cocktail system
+- 🎵 400h+/month music listener · Latin jazz + Trap Soul aesthetic
+
+**Core thesis:** Every decision domain — from asset allocation to poker to mixology — shares the same geometric skeleton. The Decision Cone and the 0.68 universal threshold are not metaphors; they are measurable, auditable, and exploitable.
+
+- 📁 [Portfolio](https://hellomind-star.github.io/ymine/portfolio.html)
+- 📄 [Research](https://hellomind-star.github.io/ymine/research.html)
 - ⭐ [GitHub](https://github.com/HelloMInd-star)
 
 ---
@@ -196,5 +208,5 @@ MIT — feel free to fork, study, and build on top. If this work helps your rese
 ---
 
 <p align="center">
-<sub>KMP → IPD → 7D Vector → THRESHOLDS → 01 解码 · 0.68 Cone · Triangle Audit · Seven-Layer Fuse</sub>
+<sub>KMP → IPD → 7D Vector → 0.68 Cone · Triangle Audit · Seven-Layer Fuse · Cross-Domain Isomorphism</sub>
 </p>
