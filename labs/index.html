@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>🧪 Game-OS 实验控制台 · Y.Mine Labs</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧪</text></svg>" />
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg-deep:#0a0a18;
+  --bg-card:rgba(20,18,42,0.75);
+  --bg-card-hover:rgba(28,24,58,0.9);
+  --purple:#a78bfa;
+  --cyan:#22d3ee;
+  --gold:#fbbf24;
+  --pink:#f472b6;
+  --green:#34d399;
+  --red:#f87171;
+  --border:rgba(167,139,250,0.12);
+  --border-hover:rgba(167,139,250,0.35);
+  --text-primary:#e8edff;
+  --text-secondary:#8b93b8;
+  --text-muted:#4a5070;
+  --mono:'SF Mono','Consolas','Monaco',ui-monospace,monospace;
+}
+html,body{
+  width:100%;min-height:100vh;
+  background:var(--bg-deep);
+  color:var(--text-primary);
+  font-family:-apple-system,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;
+  overflow-x:hidden;
+  position:relative;
+}
+/* 背景星光 + 光晕 */
+#bgCanvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none}
+.glow-orb{
+  position:fixed;border-radius:50%;filter:blur(100px);pointer-events:none;z-index:0;opacity:.35;
+}
+.orb-p{width:520px;height:520px;background:radial-gradient(circle,rgba(167,139,250,.35),transparent 70%);top:-120px;left:-100px;animation:floatA 18s ease-in-out infinite}
+.orb-c{width:480px;height:480px;background:radial-gradient(circle,rgba(34,211,238,.28),transparent 70%);bottom:-120px;right:-80px;animation:floatB 22s ease-in-out infinite}
+.orb-g{width:360px;height:360px;background:radial-gradient(circle,rgba(251,191,36,.2),transparent 70%);top:40%;left:50%;transform:translate(-50%,-50%);animation:floatA 26s ease-in-out infinite reverse}
+@keyframes floatA{0%,100%{transform:translate(0,0)}50%{transform:translate(40px,30px)}}
+@keyframes floatB{0%,100%{transform:translate(0,0)}50%{transform:translate(-30px,-40px)}}
+
+.wrap{position:relative;z-index:2;max-width:1280px;margin:0 auto;padding:28px 24px 80px}
+
+/* 返回按钮 */
+.top-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:12px}
+.back-btn{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:9px 16px;
+  background:rgba(255,255,255,0.04);
+  border:1px solid var(--border);
+  border-radius:10px;
+  color:var(--text-secondary);
+  text-decoration:none;font-size:13px;
+  backdrop-filter:blur(12px);
+  transition:all .25s ease;
+}
+.back-btn:hover{border-color:var(--purple);color:var(--purple);background:rgba(167,139,250,.08);transform:translateX(-3px)}
+.breadcrumb{font-size:12px;color:var(--text-muted);font-family:var(--mono)}
+.breadcrumb a{color:var(--text-secondary);text-decoration:none}
+.breadcrumb a:hover{color:var(--cyan)}
+
+/* ===== 页面标题 ===== */
+.hero{text-align:center;margin-bottom:36px;position:relative}
+.hero-tag{
+  display:inline-block;padding:4px 14px;
+  background:linear-gradient(135deg,rgba(167,139,250,.12),rgba(34,211,238,.08));
+  border:1px solid rgba(167,139,250,.25);border-radius:20px;
+  font-size:11px;color:var(--purple);letter-spacing:2px;
+  font-family:var(--mono);margin-bottom:16px;
+}
+.hero h1{
+  font-size:clamp(28px,4.5vw,44px);font-weight:800;
+  background:linear-gradient(135deg,#fff 0%,var(--purple) 40%,var(--cyan) 70%,var(--gold) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  background-size:200% auto;animation:shimmer 6s ease-in-out infinite;
+  letter-spacing:-0.5px;margin-bottom:10px;
+}
+@keyframes shimmer{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+.hero .sub{
+  font-size:clamp(13px,1.5vw,15px);color:var(--text-secondary);
+  letter-spacing:1px;
+}
+.hero .sub .sep{color:var(--purple);margin:0 10px;opacity:.5}
+
+/* ===== 统计数字条 ===== */
+.stats{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:14px;
+  margin:28px 0 40px;
+}
+@media(max-width:640px){.stats{grid-template-columns:repeat(2,1fr)}}
+.stat{
+  background:linear-gradient(135deg,rgba(167,139,250,.06),rgba(34,211,238,.03));
+  border:1px solid var(--border);border-radius:14px;
+  padding:18px 16px;text-align:center;
+  backdrop-filter:blur(12px);position:relative;overflow:hidden;
+  transition:all .3s ease;
+}
+.stat:hover{border-color:var(--border-hover);transform:translateY(-2px)}
+.stat::before{
+  content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);
+  width:40%;height:2px;border-radius:0 0 2px 2px;
+}
+.stat.s-p::before{background:var(--purple);box-shadow:0 0 12px var(--purple)}
+.stat.s-c::before{background:var(--cyan);box-shadow:0 0 12px var(--cyan)}
+.stat.s-g::before{background:var(--gold);box-shadow:0 0 12px var(--gold)}
+.stat.s-pk::before{background:var(--pink);box-shadow:0 0 12px var(--pink)}
+.stat-num{
+  font-size:clamp(24px,3.2vw,34px);font-weight:800;
+  font-family:var(--mono);line-height:1;margin-bottom:6px;
+}
+.stat.s-p .stat-num{color:var(--purple)}
+.stat.s-c .stat-num{color:var(--cyan)}
+.stat.s-g .stat-num{color:var(--gold)}
+.stat.s-pk .stat-num{color:var(--pink)}
+.stat-label{font-size:11px;color:var(--text-secondary);letter-spacing:1px;text-transform:uppercase}
+
+/* ===== 实验卡片网格 ===== */
+.section-title{
+  display:flex;align-items:center;gap:12px;margin-bottom:18px;
+  font-size:15px;font-weight:700;color:var(--text-primary);
+}
+.section-title::before{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--border),transparent)}
+.section-title::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,transparent,var(--border))}
+.section-title .st-label{white-space:nowrap}
+.section-title .st-icon{font-size:18px}
+
+.cards-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(320px,1fr));
+  gap:18px;
+  margin-bottom:48px;
+}
+@media(max-width:480px){.cards-grid{grid-template-columns:1fr}}
+
+.card{
+  position:relative;
+  background:var(--bg-card);
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:24px;
+  backdrop-filter:blur(16px);
+  overflow:hidden;
+  transition:all .35s cubic-bezier(.4,0,.2,1);
+  display:flex;flex-direction:column;
+  text-decoration:none;color:inherit;
+}
+.card::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,transparent 0%,rgba(255,255,255,.03) 50%,transparent 100%);
+  pointer-events:none;
+}
+.card::after{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--accent,var(--purple)),transparent);
+  opacity:.6;
+}
+.card:hover{
+  transform:translateY(-4px);
+  border-color:var(--border-hover);
+  background:var(--bg-card-hover);
+  box-shadow:0 20px 60px -20px var(--accent-glow,rgba(167,139,250,.35));
+}
+.card.locked{cursor:default;opacity:.78}
+.card.locked:hover{transform:none;box-shadow:none;border-color:var(--border);background:var(--bg-card)}
+
+.card-head{display:flex;align-items:flex-start;gap:14px;margin-bottom:14px}
+.card-icon{
+  width:52px;height:52px;flex-shrink:0;
+  border-radius:14px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:26px;
+  background:var(--icon-bg,linear-gradient(135deg,rgba(167,139,250,.18),rgba(167,139,250,.05)));
+  border:1px solid var(--icon-border,rgba(167,139,250,.25));
+  position:relative;
+}
+.card-icon::after{
+  content:'';position:absolute;inset:-3px;border-radius:16px;
+  background:var(--icon-glow,transparent);filter:blur(10px);z-index:-1;opacity:.5;
+}
+.card-title-wrap{flex:1;min-width:0}
+.card-name{
+  font-size:16px;font-weight:700;color:var(--text-primary);
+  margin-bottom:4px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+}
+.card-en{font-size:10px;color:var(--text-muted);font-family:var(--mono);letter-spacing:.5px}
+
+.card-status{
+  display:inline-flex;align-items:center;gap:4px;
+  padding:2px 9px;border-radius:10px;font-size:10px;font-weight:600;
+  font-family:var(--mono);letter-spacing:.3px;
+}
+.status-live{background:rgba(52,211,153,.12);color:var(--green);border:1px solid rgba(52,211,153,.25)}
+.status-live::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);animation:pulse 2s infinite}
+.status-wip{background:rgba(251,191,36,.1);color:var(--gold);border:1px solid rgba(251,191,36,.25)}
+.status-wip::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--gold);box-shadow:0 0 8px var(--gold);animation:pulse 1.2s infinite}
+.status-plan{background:rgba(139,147,184,.1);color:var(--text-secondary);border:1px solid rgba(139,147,184,.2)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+.card-desc{font-size:12.5px;color:var(--text-secondary);line-height:1.7;margin-bottom:14px;flex:1}
+.card-feed{
+  font-size:11px;color:var(--text-muted);
+  padding:10px 12px;border-radius:10px;
+  background:rgba(255,255,255,.02);
+  border:1px dashed rgba(255,255,255,.06);
+  margin-bottom:16px;line-height:1.6;
+}
+.card-feed .feed-arrow{color:var(--accent,var(--purple));margin:0 4px;font-weight:700}
+.card-feed .feed-target{color:var(--cyan);font-weight:600}
+
+.card-action{
+  display:flex;align-items:center;justify-content:space-between;
+  padding-top:14px;border-top:1px solid rgba(255,255,255,.05);
+}
+.btn-enter{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:9px 18px;border-radius:10px;
+  background:linear-gradient(135deg,var(--accent,var(--purple)),var(--accent2,var(--cyan)));
+  color:#0a0a18;font-size:12.5px;font-weight:700;
+  text-decoration:none;border:none;cursor:pointer;
+  transition:all .25s ease;
+  box-shadow:0 4px 16px -4px var(--accent-glow,rgba(167,139,250,.5));
+}
+.btn-enter:hover{transform:translateY(-1px);box-shadow:0 8px 24px -4px var(--accent-glow,rgba(167,139,250,.6))}
+.btn-locked{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:9px 18px;border-radius:10px;
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.08);
+  color:var(--text-muted);font-size:12.5px;font-weight:600;
+  cursor:not-allowed;
+}
+.card-meta{font-size:10px;color:var(--text-muted);font-family:var(--mono)}
+
+/* 各卡片主题色 */
+.card.c-persona{--accent:#a78bfa;--accent2:#22d3ee;--accent-glow:rgba(167,139,250,.45);--icon-bg:linear-gradient(135deg,rgba(167,139,250,.2),rgba(34,211,238,.08));--icon-border:rgba(167,139,250,.3);--icon-glow:rgba(167,139,250,.4)}
+.card.c-chromo{--accent:#f472b6;--accent2:#a78bfa;--accent-glow:rgba(244,114,182,.4);--icon-bg:linear-gradient(135deg,rgba(244,114,182,.18),rgba(167,139,250,.08));--icon-border:rgba(244,114,182,.3);--icon-glow:rgba(244,114,182,.4)}
+.card.c-kelly{--accent:#fbbf24;--accent2:#f59e0b;--accent-glow:rgba(251,191,36,.4);--icon-bg:linear-gradient(135deg,rgba(251,191,36,.18),rgba(245,158,11,.06));--icon-border:rgba(251,191,36,.3);--icon-glow:rgba(251,191,36,.4)}
+.card.c-cone{--accent:#fb923c;--accent2:#fbbf24;--accent-glow:rgba(251,146,60,.4);--icon-bg:linear-gradient(135deg,rgba(251,146,60,.18),rgba(251,191,36,.06));--icon-border:rgba(251,146,60,.3);--icon-glow:rgba(251,146,60,.4)}
+.card.c-3d{--accent:#22d3ee;--accent2:#60a5fa;--accent-glow:rgba(34,211,238,.4);--icon-bg:linear-gradient(135deg,rgba(34,211,238,.18),rgba(96,165,250,.08));--icon-border:rgba(34,211,238,.3);--icon-glow:rgba(34,211,238,.4)}
+.card.c-cocktail{--accent:#34d399;--accent2:#22d3ee;--accent-glow:rgba(52,211,153,.4);--icon-bg:linear-gradient(135deg,rgba(52,211,153,.18),rgba(34,211,238,.06));--icon-border:rgba(52,211,153,.3);--icon-glow:rgba(52,211,153,.4)}
+
+/* ===== 数据反哺关系图 ===== */
+.relation-section{
+  background:linear-gradient(135deg,rgba(167,139,250,.04),rgba(34,211,238,.02),rgba(251,191,36,.02));
+  border:1px solid var(--border);
+  border-radius:22px;
+  padding:28px 24px;
+  backdrop-filter:blur(12px);
+  position:relative;overflow:hidden;
+}
+.relation-head{text-align:center;margin-bottom:20px}
+.relation-head h2{
+  font-size:20px;font-weight:700;margin-bottom:6px;
+  background:linear-gradient(135deg,var(--purple),var(--cyan));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.relation-head p{font-size:12px;color:var(--text-secondary);line-height:1.6}
+
+.relation-svg-wrap{
+  width:100%;overflow-x:auto;
+  margin:0 auto;
+}
+.relation-svg{width:100%;height:auto;display:block;min-height:380px}
+@media(max-width:720px){.relation-svg{min-height:520px}}
+
+/* 节点文字样式在SVG里 */
+.node-label{font-family:-apple-system,'PingFang SC',sans-serif;font-size:11px;fill:#e8edff;font-weight:600;pointer-events:none}
+.node-sub{font-family:var(--mono);font-size:9px;fill:#8b93b8;pointer-events:none}
+.edge-label{font-family:var(--mono);font-size:9px;fill:#c4b5fd;pointer-events:none}
+.edge-label-bg{fill:rgba(10,10,24,.85);rx:3;ry:3}
+
+/* ===== 底部说明 ===== */
+.footer-note{
+  margin-top:32px;text-align:center;
+  font-size:11px;color:var(--text-muted);
+  font-family:var(--mono);letter-spacing:.5px;
+}
+.footer-note span{color:var(--purple)}
+</style>
+</head>
+<body>
+
+<canvas id="bgCanvas"></canvas>
+<div class="glow-orb orb-p"></div>
+<div class="glow-orb orb-c"></div>
+<div class="glow-orb orb-g"></div>
+
+<div class="wrap">
+
+  <!-- 顶部导航 -->
+  <div class="top-bar">
+    <a href="../index.html" class="back-btn">← 返回 Y.Mine 总控台</a>
+    <div class="breadcrumb"><a href="../index.html">Y.Mine</a> / <a href="./index.html" style="color:var(--purple)">Labs</a> / <span style="color:var(--text-primary)">Console</span></div>
+  </div>
+
+  <!-- 标题区 -->
+  <div class="hero">
+    <div class="hero-tag">// EXPERIMENT · CONSOLE · v0.1</div>
+    <h1>🧪 Game-OS 实验控制台</h1>
+    <div class="sub">
+      41个仿真实验<span class="sep">·</span>6大子引擎<span class="sep">·</span>跨域同构验证
+    </div>
+  </div>
+
+  <!-- 统计数字 -->
+  <div class="stats">
+    <div class="stat s-p">
+      <div class="stat-num">41</div>
+      <div class="stat-label">Experiments · 仿真实验</div>
+    </div>
+    <div class="stat s-c">
+      <div class="stat-num">6</div>
+      <div class="stat-label">Sub-Engines · 子引擎</div>
+    </div>
+    <div class="stat s-g">
+      <div class="stat-num">12</div>
+      <div class="stat-label">Dimensions · 行为维度</div>
+    </div>
+    <div class="stat s-pk">
+      <div class="stat-num">4</div>
+      <div class="stat-label">Temperaments · 气质组</div>
+    </div>
+  </div>
+
+  <!-- 实验卡片标题 -->
+  <div class="section-title">
+    <span class="st-icon">⚗️</span>
+    <span class="st-label">六大核心实验 · Core Experiments</span>
+  </div>
+
+  <!-- 卡片网格 -->
+  <div class="cards-grid">
+
+    <!-- 1. PersonaPokerMapper -->
+    <a href="persona-poker-mapper.html" class="card c-persona">
+      <div class="card-head">
+        <div class="card-icon">🃏</div>
+        <div class="card-title-wrap">
+          <div class="card-name">
+            人格扑克映射器
+            <span class="card-status status-wip">开发中</span>
+          </div>
+          <div class="card-en">PersonaPokerMapper · v0.3</div>
+        </div>
+      </div>
+      <div class="card-desc">
+        以 54 张扑克牌为元语，将人格特质映射到花色/点数/王牌维度，输出 12 维行为画像向量。
+      </div>
+      <div class="card-feed">
+        输出 12 维行为画像 <span class="feed-arrow">→</span> 反哺 <span class="feed-target">Poker Face Arena</span> 人格层配置
+      </div>
+      <div class="card-action">
+        <span class="btn-enter">▶ 进入实验</span>
+        <span class="card-meta">12-DIM · POKER</span>
+      </div>
+    </a>
+
+    <!-- 2. 染色体诊断仪 -->
+    <div class="card c-chromo locked">
+      <div class="card-head">
+        <div class="card-icon">🧬</div>
+        <div class="card-title-wrap">
+          <div class="card-name">
+            染色体诊断仪
+            <span class="card-status status-plan">筹备中</span>
+          </div>
+          <div class="card-en">Chromosome Diagnostics · Core Doc Pending</div>
+        </div>
+      </div>
+      <div class="card-desc">
+        基于决策行为轨迹识别"决策漂移模式"，定位人格染色体上的变异段，为熔断机制提供溯源诊断。
+      </div>
+      <div class="card-feed">
+        输出 决策漂移模式 <span class="feed-arrow">→</span> 反哺 <span class="feed-target">Game-OS 七层熔断</span> 参数
+      </div>
+      <div class="card-action">
+        <span class="btn-locked">🔒 实验筹备中</span>
+        <span class="card-meta">DIAGNOSE · DRIFT</span>
+      </div>
+    </div>
+
+    <!-- 3. Kelly计算器 -->
+    <div class="card c-kelly locked">
+      <div class="card-head">
+        <div class="card-icon">📐</div>
+        <div class="card-title-wrap">
+          <div class="card-name">
+            Kelly 计算器
+            <span class="card-status status-plan">规划中</span>
+          </div>
+          <div class="card-en">Kelly Criterion Optimizer</div>
+        </div>
+      </div>
+      <div class="card-desc">
+        凯利公式 (f* = (bp - q) / b) 的可视化推演平台，在胜率/赔率/本金三维下给出最优投注比例与回撤边界。
+      </div>
+      <div class="card-feed">
+        输出 最优投注比例 <span class="feed-arrow">→</span> 反哺 <span class="feed-target">数学层风控阈值</span>
+      </div>
+      <div class="card-action">
+        <span class="btn-locked">🔒 实验筹备中</span>
+        <span class="card-meta">MATH · RISK · f*</span>
+      </div>
+    </div>
+
+    <!-- 4. 浓度圆锥调酒 -->
+    <a href="molecular-mixology.html" class="card c-cone">
+      <div class="card-head">
+        <div class="card-icon">🍸</div>
+        <div class="card-title-wrap">
+          <div class="card-name">
+            浓度圆锥调酒
+            <span class="card-status status-live">已上线</span>
+          </div>
+          <div class="card-en">Concentration Cone Mixology · Private Core</div>
+        </div>
+      </div>
+      <div class="card-desc">
+        基于"圆锥浓度稳态模型"的分子调酒实验室：基酒-利口-酸度-气泡四元浓度梯度可视化与稳态验证。
+      </div>
+      <div class="card-feed">
+        输出 风味浓度曲线 <span class="feed-arrow">→</span> 反哺 <span class="feed-target">味觉向量/调酒推荐</span>
+      </div>
+      <div class="card-action">
+        <span class="btn-enter">▶ 进入实验</span>
+        <span class="card-meta">CONE · PRIVATE</span>
+      </div>
+    </a>
+
+    <!-- 5. 3D人格实验平台 -->
+    <div class="card c-3d locked">
+      <div class="card-head">
+        <div class="card-icon">🧊</div>
+        <div class="card-title-wrap">
+          <div class="card-name">
+            3D 人格实验平台
+            <span class="card-status status-plan">规划中</span>
+          </div>
+          <div class="card-en">3D Persona Lab · WebGL</div>
+        </div>
+      </div>
+      <div class="card-desc">
+        在三维空间中实时渲染人格状态立方体：维度轴=行为画像，颜色=情绪浓度，体积=决策置信度，支持轨迹回放。
+      </div>
+      <div class="card-feed">
+        输出 3D 行为轨迹 <span class="feed-arrow">→</span> 反哺 <span class="feed-target">人格层可视化与回放</span>
+      </div>
+      <div class="card-action">
+        <span class="btn-locked">🔒 实验筹备中</span>
+        <span class="card-meta">WEBGL · 3D</span>
+      </div>
+    </div>
+
+    <!-- 6. 经典鸡尾酒库 -->
+    <a href="../data/classic_cocktails.json" class="card c-cocktail" target="_blank">
+      <div class="card-head">
+        <div class="card-icon">📚</div>
+        <div class="card-title-wrap">
+          <div class="card-name">
+            经典鸡尾酒库
+            <span class="card-status status-wip">数据就绪</span>
+          </div>
+          <div class="card-en">Classic Cocktails Library · JSON Dataset</div>
+        </div>
+      </div>
+      <div class="card-desc">
+        已结构化收录经典鸡尾酒配方库：基酒、配料、技法、载杯、风味轮映射，为调酒推荐算法提供训练数据。
+      </div>
+      <div class="card-feed">
+        输出 风味/气质匹配 <span class="feed-arrow">→</span> 反哺 <span class="feed-target">调酒推荐算法</span>
+      </div>
+      <div class="card-action">
+        <span class="btn-enter">▶ 查看数据</span>
+        <span class="card-meta">DATA · JSON</span>
+      </div>
+    </a>
+
+  </div>
+
+  <!-- 数据反哺关系图 -->
+  <div class="section-title">
+    <span class="st-icon">🕸️</span>
+    <span class="st-label">数据反哺关系 · Data Feedback Graph</span>
+  </div>
+
+  <div class="relation-section">
+    <div class="relation-head">
+      <h2>跨域同构验证 · Cross-Domain Isomorphism</h2>
+      <p>每个实验产出 → 定向反哺对应 Game-OS 子引擎 → 所有数据汇入中台验证"跨域同构"核心假设</p>
+    </div>
+    <div class="relation-svg-wrap">
+      <svg class="relation-svg" viewBox="0 0 900 520" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <!-- 渐变：边 -->
+          <linearGradient id="edgeP" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#a78bfa" stop-opacity=".8"/>
+            <stop offset="100%" stop-color="#22d3ee" stop-opacity=".8"/>
+          </linearGradient>
+          <linearGradient id="edgeK" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#fbbf24" stop-opacity=".8"/>
+            <stop offset="100%" stop-color="#f59e0b" stop-opacity=".8"/>
+          </linearGradient>
+          <linearGradient id="edgeC" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#34d399" stop-opacity=".8"/>
+            <stop offset="100%" stop-color="#22d3ee" stop-opacity=".8"/>
+          </linearGradient>
+          <linearGradient id="edgeCh" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#f472b6" stop-opacity=".8"/>
+            <stop offset="100%" stop-color="#a78bfa" stop-opacity=".8"/>
+          </linearGradient>
+          <linearGradient id="edgeO" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#fb923c" stop-opacity=".8"/>
+            <stop offset="100%" stop-color="#fbbf24" stop-opacity=".8"/>
+          </linearGradient>
+          <linearGradient id="edge3d" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#22d3ee" stop-opacity=".8"/>
+            <stop offset="100%" stop-color="#60a5fa" stop-opacity=".8"/>
+          </linearGradient>
+          <linearGradient id="edgeHub" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#a78bfa" stop-opacity=".9"/>
+            <stop offset="50%" stop-color="#22d3ee" stop-opacity=".9"/>
+            <stop offset="100%" stop-color="#fbbf24" stop-opacity=".9"/>
+          </linearGradient>
+          <!-- 箭头 -->
+          <marker id="arrP" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M0,0 L10,5 L0,10 z" fill="#a78bfa"/>
+          </marker>
+          <marker id="arrK" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M0,0 L10,5 L0,10 z" fill="#fbbf24"/>
+          </marker>
+          <marker id="arrC" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M0,0 L10,5 L0,10 z" fill="#34d399"/>
+          </marker>
+          <marker id="arrCh" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M0,0 L10,5 L0,10 z" fill="#f472b6"/>
+          </marker>
+          <marker id="arrO" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M0,0 L10,5 L0,10 z" fill="#fb923c"/>
+          </marker>
+          <marker id="arr3d" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M0,0 L10,5 L0,10 z" fill="#22d3ee"/>
+          </marker>
+          <marker id="arrHub" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+            <path d="M0,0 L10,5 L0,10 z" fill="#fff"/>
+          </marker>
+          <!-- 发光滤镜 -->
+          <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="3" result="blur"/>
+            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+        </defs>
+
+        <!-- 左侧：实验节点 (源) -->
+        <!-- 1 PersonaPokerMapper -->
+        <g transform="translate(60,80)">
+          <rect x="0" y="0" width="180" height="56" rx="12" fill="rgba(167,139,250,.12)" stroke="#a78bfa" stroke-width="1.5" filter="url(#glow)"/>
+          <text x="90" y="24" text-anchor="middle" class="node-label">🃏 人格扑克映射器</text>
+          <text x="90" y="42" text-anchor="middle" class="node-sub">PersonaPokerMapper</text>
+        </g>
+        <!-- 2 染色体诊断仪 -->
+        <g transform="translate(60,170)">
+          <rect x="0" y="0" width="180" height="56" rx="12" fill="rgba(244,114,182,.1)" stroke="#f472b6" stroke-width="1.5" filter="url(#glow)"/>
+          <text x="90" y="24" text-anchor="middle" class="node-label">🧬 染色体诊断仪</text>
+          <text x="90" y="42" text-anchor="middle" class="node-sub">Chromosome Diag.</text>
+        </g>
+        <!-- 3 Kelly -->
+        <g transform="translate(60,260)">
+          <rect x="0" y="0" width="180" height="56" rx="12" fill="rgba(251,191,36,.1)" stroke="#fbbf24" stroke-width="1.5" filter="url(#glow)"/>
+          <text x="90" y="24" text-anchor="middle" class="node-label">📐 Kelly 计算器</text>
+          <text x="90" y="42" text-anchor="middle" class="node-sub">Kelly Criterion</text>
+        </g>
+        <!-- 4 圆锥调酒 -->
+        <g transform="translate(60,350)">
+          <rect x="0" y="0" width="180" height="56" rx="12" fill="rgba(251,146,60,.1)" stroke="#fb923c" stroke-width="1.5" filter="url(#glow)"/>
+          <text x="90" y="24" text-anchor="middle" class="node-label">🍸 浓度圆锥调酒</text>
+          <text x="90" y="42" text-anchor="middle" class="node-sub">Concentration Cone</text>
+        </g>
+        <!-- 5 3D人格 -->
+        <g transform="translate(60,440)">
+          <rect x="0" y="0" width="180" height="56" rx="12" fill="rgba(34,211,238,.1)" stroke="#22d3ee" stroke-width="1.5" filter="url(#glow)"/>
+          <text x="90" y="24" text-anchor="middle" class="node-label">🧊 3D 人格平台</text>
+          <text x="90" y="42" text-anchor="middle" class="node-sub">3D Persona Lab</text>
+        </g>
+
+        <!-- 中间：反哺目标 (Game-OS 子引擎) -->
+        <g transform="translate(420,60)">
+          <rect x="0" y="0" width="170" height="50" rx="10" fill="rgba(167,139,250,.08)" stroke="rgba(167,139,250,.45)" stroke-width="1.2" stroke-dasharray="3,3"/>
+          <text x="85" y="22" text-anchor="middle" class="node-label">Poker Face Arena</text>
+          <text x="85" y="38" text-anchor="middle" class="node-sub">人格层配置</text>
+        </g>
+        <g transform="translate(420,150)">
+          <rect x="0" y="0" width="170" height="50" rx="10" fill="rgba(244,114,182,.08)" stroke="rgba(244,114,182,.4)" stroke-width="1.2" stroke-dasharray="3,3"/>
+          <text x="85" y="22" text-anchor="middle" class="node-label">Game-OS 七层熔断</text>
+          <text x="85" y="38" text-anchor="middle" class="node-sub">Circuit Breaker</text>
+        </g>
+        <g transform="translate(420,240)">
+          <rect x="0" y="0" width="170" height="50" rx="10" fill="rgba(251,191,36,.08)" stroke="rgba(251,191,36,.4)" stroke-width="1.2" stroke-dasharray="3,3"/>
+          <text x="85" y="22" text-anchor="middle" class="node-label">数学层风控</text>
+          <text x="85" y="38" text-anchor="middle" class="node-sub">Risk Threshold</text>
+        </g>
+        <g transform="translate(420,330)">
+          <rect x="0" y="0" width="170" height="50" rx="10" fill="rgba(52,211,153,.08)" stroke="rgba(52,211,153,.4)" stroke-width="1.2" stroke-dasharray="3,3"/>
+          <text x="85" y="22" text-anchor="middle" class="node-label">调酒推荐算法</text>
+          <text x="85" y="38" text-anchor="middle" class="node-sub">Flavor Matching</text>
+        </g>
+        <g transform="translate(420,420)">
+          <rect x="0" y="0" width="170" height="50" rx="10" fill="rgba(34,211,238,.08)" stroke="rgba(34,211,238,.4)" stroke-width="1.2" stroke-dasharray="3,3"/>
+          <text x="85" y="22" text-anchor="middle" class="node-label">人格可视化层</text>
+          <text x="85" y="38" text-anchor="middle" class="node-sub">Visualization</text>
+        </g>
+
+        <!-- 右侧：Game-OS 中台 Hub -->
+        <g transform="translate(730,210)">
+          <circle cx="70" cy="70" r="62" fill="rgba(167,139,250,.15)" stroke="url(#edgeHub)" stroke-width="2" filter="url(#glow)"/>
+          <circle cx="70" cy="70" r="48" fill="rgba(10,10,24,.6)" stroke="rgba(255,255,255,.1)" stroke-width="1"/>
+          <text x="70" y="60" text-anchor="middle" class="node-label" style="font-size:13px;fill:#fff">🎯 Game-OS</text>
+          <text x="70" y="78" text-anchor="middle" class="node-label" style="font-size:12px">中台验证</text>
+          <text x="70" y="96" text-anchor="middle" class="node-sub" style="fill:#fbbf24">跨域同构</text>
+        </g>
+
+        <!-- 边：实验 → 子引擎 -->
+        <!-- 1 PersonaPoker → Arena -->
+        <path d="M 240 108 C 320 108, 340 85, 420 85" stroke="url(#edgeP)" stroke-width="2" fill="none" marker-end="url(#arrP)"/>
+        <rect x="300" y="88" width="76" height="16" class="edge-label-bg"/>
+        <text x="338" y="100" text-anchor="middle" class="edge-label" fill="#c4b5fd">12维画像</text>
+
+        <!-- 2 染色体 → 七层熔断 -->
+        <path d="M 240 198 C 320 198, 340 175, 420 175" stroke="url(#edgeCh)" stroke-width="2" fill="none" marker-end="url(#arrCh)"/>
+        <rect x="300" y="178" width="88" height="16" class="edge-label-bg"/>
+        <text x="344" y="190" text-anchor="middle" class="edge-label" fill="#f9a8d4">决策漂移</text>
+
+        <!-- 3 Kelly → 风控 -->
+        <path d="M 240 288 C 320 288, 340 265, 420 265" stroke="url(#edgeK)" stroke-width="2" fill="none" marker-end="url(#arrK)"/>
+        <rect x="300" y="268" width="88" height="16" class="edge-label-bg"/>
+        <text x="344" y="280" text-anchor="middle" class="edge-label" fill="#fcd34d">最优投注 f*</text>
+
+        <!-- 4 圆锥调酒 + 6 鸡尾酒库(独立) → 调酒推荐 (两条合并) -->
+        <path d="M 240 378 C 320 378, 340 355, 420 355" stroke="url(#edgeO)" stroke-width="2" fill="none" marker-end="url(#arrO)"/>
+        <rect x="296" y="358" width="96" height="16" class="edge-label-bg"/>
+        <text x="344" y="370" text-anchor="middle" class="edge-label" fill="#fdba74">浓度曲线</text>
+
+        <!-- 5 3D → 可视化 -->
+        <path d="M 240 468 C 320 468, 340 445, 420 445" stroke="url(#edge3d)" stroke-width="2" fill="none" marker-end="url(#arr3d)"/>
+        <rect x="300" y="448" width="88" height="16" class="edge-label-bg"/>
+        <text x="344" y="460" text-anchor="middle" class="edge-label" fill="#67e8f9">3D 轨迹</text>
+
+        <!-- 经典鸡尾酒库 → 调酒推荐 (从底部斜向上) -->
+        <path d="M 60 516 C 200 516, 280 380, 420 375" stroke="url(#edgeC)" stroke-width="1.5" fill="none" stroke-dasharray="5,3" marker-end="url(#arrC)"/>
+        <rect x="180" y="460" width="100" height="16" class="edge-label-bg"/>
+        <text x="230" y="472" text-anchor="middle" class="edge-label" fill="#6ee7b7">📚 风味/气质匹配</text>
+
+        <!-- 边：子引擎 → Game-OS Hub (汇聚) -->
+        <path d="M 590 85 C 660 95, 680 180, 730 210" stroke="url(#edgeHub)" stroke-width="1.5" fill="none" opacity=".7" marker-end="url(#arrHub)"/>
+        <path d="M 590 175 C 655 180, 690 200, 730 230" stroke="url(#edgeHub)" stroke-width="1.5" fill="none" opacity=".7" marker-end="url(#arrHub)"/>
+        <path d="M 590 265 L 730 270" stroke="url(#edgeHub)" stroke-width="1.5" fill="none" opacity=".7" marker-end="url(#arrHub)"/>
+        <path d="M 590 355 C 655 350, 690 330, 730 310" stroke="url(#edgeHub)" stroke-width="1.5" fill="none" opacity=".7" marker-end="url(#arrHub)"/>
+        <path d="M 590 445 C 660 435, 680 350, 730 320" stroke="url(#edgeHub)" stroke-width="1.5" fill="none" opacity=".7" marker-end="url(#arrHub)"/>
+
+        <!-- 汇聚标签 -->
+        <rect x="645" y="245" width="90" height="22" rx="4" fill="url(#edgeHub)" opacity=".9"/>
+        <text x="690" y="260" text-anchor="middle" style="font-size:10px;font-weight:700;fill:#0a0a18;font-family:var(--mono)">Σ 验证同构</text>
+
+        <!-- 图例 -->
+        <g transform="translate(420,500)">
+          <text x="0" y="0" class="node-sub" style="fill:#8b93b8;font-size:10">─── 实线上线 · ┄┄ 规划中 · ⟶ 数据流向</text>
+        </g>
+      </svg>
+    </div>
+  </div>
+
+  <div class="footer-note">
+    <span>Y.Mine</span> Labs Console · v0.1 · Game-OS Isomorphism Layer · <span id="buildTime"></span>
+  </div>
+
+</div>
+
+<script>
+// 构建时间
+document.getElementById('buildTime').textContent = new Date().toISOString().slice(0,10);
+
+// 背景粒子
+(function(){
+  const c=document.getElementById('bgCanvas'),ctx=c.getContext('2d');
+  let w,h,stars=[];
+  function resize(){w=c.width=innerWidth;h=c.height=innerHeight;
+    stars=[];const n=Math.floor(w*h/18000);
+    for(let i=0;i<n;i++)stars.push({x:Math.random()*w,y:Math.random()*h,r:Math.random()*1.2+.2,a:Math.random(),s:Math.random()*.008+.002});
+  }
+  resize();addEventListener('resize',resize);
+  function loop(){
+    ctx.clearRect(0,0,w,h);
+    stars.forEach(s=>{
+      s.a+=s.s;if(s.a>1||s.a<0)s.s=-s.s;
+      ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+      ctx.fillStyle=`rgba(167,139,250,${s.a*.5})`;ctx.fill();
+    });
+    requestAnimationFrame(loop);
+  }
+  loop();
+})();
+
+// 鼠标光晕
+document.addEventListener('mousemove',e=>{
+  document.documentElement.style.setProperty('--mx',e.clientX+'px');
+  document.documentElement.style.setProperty('--my',e.clientY+'px');
+});
+</script>
+</body>
+</html>
