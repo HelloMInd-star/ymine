@@ -1332,7 +1332,60 @@
             .gameos-hero .gbadge{position:static;display:inline-block;margin-bottom:6px;}
             .gameos-hero .gtags{justify-content:center;}
         }
-    </style>
+    
+        /* ===== Core Demo Label ===== */
+        .core-demo-label{
+            display:flex;align-items:center;gap:10px;margin:24px 0 14px;
+            padding:0 2px;
+        }
+        .cdl-dot{width:8px;height:8px;border-radius:50%;background:#22d3ee;box-shadow:0 0 12px #22d3ee;animation:pulse-dot 2s ease-in-out infinite;}
+        @keyframes pulse-dot{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.5;transform:scale(0.8);}}
+        .cdl-text{font-size:12px;font-weight:600;letter-spacing:2px;color:#67e8f9;font-family:'SF Mono',ui-monospace,monospace;}
+        .cdl-sub{font-size:11px;color:rgba(255,255,255,0.35);margin-left:auto;letter-spacing:0.5px;}
+
+        /* ===== Portal Row (About/Research/Studio) ===== */
+        .portal-row{
+            display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-top:14px;
+        }
+        .portal-chip{
+            display:flex;align-items:center;gap:12px;
+            padding:12px 16px;border-radius:10px;text-decoration:none;color:#f1f5f9;
+            background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);
+            transition:all .25s ease;position:relative;overflow:hidden;
+        }
+        .portal-chip::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,0.04),transparent 60%);pointer-events:none;}
+        .portal-chip:hover{transform:translateY(-2px);border-color:rgba(167,139,250,0.35);background:rgba(167,139,250,0.06);box-shadow:0 6px 20px rgba(167,139,250,0.12);}
+        .portal-chip.pc-portfolio{border-color:rgba(245,158,11,0.22);}
+        .portal-chip.pc-portfolio:hover{border-color:rgba(245,158,11,0.5);background:rgba(245,158,11,0.06);box-shadow:0 6px 20px rgba(245,158,11,0.12);}
+        .portal-chip.pc-research{border-color:rgba(34,211,238,0.22);}
+        .portal-chip.pc-research:hover{border-color:rgba(34,211,238,0.5);background:rgba(34,211,238,0.06);box-shadow:0 6px 20px rgba(34,211,238,0.12);}
+        .pc-icon{font-size:20px;flex-shrink:0;}
+        .pc-text{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;}
+        .pc-title{font-size:13px;font-weight:600;line-height:1.2;}
+        .pc-desc{font-size:10.5px;color:rgba(255,255,255,0.4);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+        .pc-arrow{margin-left:auto;font-size:14px;opacity:0;transform:translateX(-4px);transition:all .25s ease;color:#c4b5fd;flex-shrink:0;}
+        .portal-chip.pc-portfolio .pc-arrow{color:#fbbf24;}
+        .portal-chip.pc-research .pc-arrow{color:#22d3ee;}
+        .portal-chip:hover .pc-arrow{opacity:1;transform:translateX(0);}
+
+        /* qe-indigo and qe-green already exist in components.css? add fallback inline */
+        .qe-indigo{background:linear-gradient(135deg,rgba(99,102,241,0.10),rgba(139,92,246,0.05));border-color:rgba(129,140,248,0.22);}
+        .qe-indigo:hover{border-color:rgba(129,140,248,0.5);box-shadow:0 8px 28px rgba(129,140,248,0.18);}
+        .qe-indigo .qe-icon{background:linear-gradient(135deg,rgba(129,140,248,0.25),rgba(99,102,241,0.1));border:1px solid rgba(129,140,248,0.25);display:flex;align-items:center;justify-content:center;}
+        .qe-indigo .qe-title{color:#c7d2fe}.qe-indigo .qe-desc{color:rgba(199,210,254,0.55)}.qe-indigo .qe-arrow{color:#818cf8}
+        .qe-green .qe-icon{display:flex;align-items:center;justify-content:center;}
+
+        /* ===== Footer · Portfolio link ===== */
+        .site-footer{
+            margin-top:40px;padding:20px 0 10px;
+            border-top:1px solid rgba(255,255,255,0.05);
+            display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;
+            font-size:11px;color:rgba(255,255,255,0.3);
+        }
+        .site-footer a{color:#a78bfa;text-decoration:none;transition:color .2s;}
+        .site-footer a:hover{color:#c4b5fd;}
+        .site-footer .sf-links{display:flex;gap:16px;flex-wrap:wrap;}
+</style>
 </head>
 <body>
 
@@ -1510,71 +1563,96 @@
                 </a>
             </div>
 
-            <!-- ===== 快速入口（新访客推荐）===== -->
+                        <!-- ===== 核心Demo快速入口 ===== -->
+            <div class="core-demo-label">
+                <span class="cdl-dot"></span>
+                <span class="cdl-text">CORE DEMOS · 核心演示</span>
+                <span class="cdl-sub">推荐面试/分享时从这里进入</span>
+            </div>
             <div class="quick-entry-grid">
-                <a href="#top" class="qe-card qe-purple">
-                    <div class="qe-icon">
-                        <svg viewBox="0 0 28 28" xmlns="http://www.w3.org/2000/svg">
-                            <defs><linearGradient id="qeDash" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#c4b5fd"/><stop offset="100%" stop-color="#818cf8"/></linearGradient></defs>
-                            <rect x="3" y="18" width="22" height="7" rx="1.5" fill="none" stroke="url(#qeDash)" stroke-width="1.8"/>
-                            <rect x="6" y="8" width="4" height="10" rx="1" fill="url(#qeDash)" opacity="0.5"/>
-                            <rect x="12" y="5" width="4" height="13" rx="1" fill="url(#qeDash)" opacity="0.7"/>
-                            <rect x="18" y="11" width="4" height="7" rx="1" fill="url(#qeDash)"/>
-                            <line x1="3" y1="18" x2="25" y2="18" stroke="url(#qeDash)" stroke-width="1.5"/>
-                        </svg>
-                    </div>
-                    <div>
-                        <div class="qe-title">总控台仪表盘</div>
-                        <div class="qe-desc">当前页面 · 系统架构一览</div>
-                    </div>
-                    <span class="qe-arrow">→</span>
-                </a>
-                <a href="ymine-studio.html" class="qe-card qe-amber">
-                    <div class="qe-icon">
-                        <svg viewBox="0 0 28 28" xmlns="http://www.w3.org/2000/svg">
-                            <defs><linearGradient id="qeTarget" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#fde047"/><stop offset="100%" stop-color="#f59e0b"/></linearGradient></defs>
-                            <circle cx="14" cy="14" r="10" fill="none" stroke="url(#qeTarget)" stroke-width="1.8"/>
-                            <circle cx="14" cy="14" r="6" fill="none" stroke="url(#qeTarget)" stroke-width="1.5" opacity="0.7"/>
-                            <circle cx="14" cy="14" r="2.5" fill="url(#qeTarget)"/>
-                            <line x1="14" y1="2" x2="14" y2="6" stroke="url(#qeTarget)" stroke-width="1.5" stroke-linecap="round"/>
-                        </svg>
-                    </div>
-                    <div>
-                        <div class="qe-title">YMine Studio</div>
-                        <div class="qe-desc">全功能控制台 · 试试停机按钮</div>
-                    </div>
-                    <span class="qe-arrow">→</span>
-                </a>
                 <a href="labs/evidence/general-game-os.html" class="qe-card qe-cyan">
-                    <div class="qe-icon">
-                        <svg viewBox="0 0 28 28" xmlns="http://www.w3.org/2000/svg">
-                            <defs><linearGradient id="qeCone" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#67e8f9"/><stop offset="100%" stop-color="#0891b2"/></linearGradient></defs>
-                            <path d="M14 4 L24 23 L4 23 Z" fill="none" stroke="url(#qeCone)" stroke-width="1.8" stroke-linejoin="round"/>
-                            <ellipse cx="14" cy="23" rx="10" ry="2.5" fill="none" stroke="url(#qeCone)" stroke-width="1.5" opacity="0.6"/>
-                            <line x1="14" y1="4" x2="14" y2="23" stroke="url(#qeCone)" stroke-width="1" stroke-dasharray="2 2" opacity="0.5"/>
-                        </svg>
-                    </div>
+                    <div class="qe-icon"><span style="font-size:22px;">🎯</span></div>
                     <div>
                         <div class="qe-title">锥心博弈沙盘</div>
-                        <div class="qe-desc">博弈收敛到0.68</div>
+                        <div class="qe-desc">Cone Game · 博弈收敛到0.68 · 核心Demo</div>
                     </div>
                     <span class="qe-arrow">→</span>
                 </a>
-                <a href="labs/evidence/finance-risk-simulator.html" class="qe-card qe-red">
-                    <div class="qe-icon">
-                        <svg viewBox="0 0 28 28" xmlns="http://www.w3.org/2000/svg">
-                            <defs><linearGradient id="qeRisk" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#fca5a5"/><stop offset="100%" stop-color="#ef4444"/></linearGradient></defs>
-                            <path d="M4 22 L10 14 L16 18 L24 6" fill="none" stroke="url(#qeRisk)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            <path d="M20 6 L24 6 L24 10" fill="none" stroke="url(#qeRisk)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            <circle cx="10" cy="14" r="2" fill="url(#qeRisk)"/>
-                            <circle cx="16" cy="18" r="2" fill="url(#qeRisk)"/>
-                        </svg>
-                    </div>
+                <a href="labs/evidence/chromosome_diagnostic.html" class="qe-card qe-purple">
+                    <div class="qe-icon"><span style="font-size:22px;">🧬</span></div>
                     <div>
-                        <div class="qe-title">金融风险压力测试</div>
-                        <div class="qe-desc">Kelly仓位+熔断+黑天鹅</div>
+                        <div class="qe-title">染色体诊断仪</div>
+                        <div class="qe-desc">Chromosome Diagnostic · Fibonacci同构可视化</div>
                     </div>
                     <span class="qe-arrow">→</span>
+                </a>
+                <a href="https://github.com/HelloMInd-star/poker-egg-fullstack" target="_blank" rel="noopener" class="qe-card qe-amber">
+                    <div class="qe-icon"><span style="font-size:22px;">♠</span></div>
+                    <div>
+                        <div class="qe-title">Poker Egg</div>
+                        <div class="qe-desc">德州扑克AI陪练 · GTO训练器 · 外部站点 ↗</div>
+                    </div>
+                    <span class="qe-arrow">↗</span>
+                </a>
+                <a href="labs/evidence/capm-pricing-simulator.html" class="qe-card qe-green">
+                    <div class="qe-icon"><span style="font-size:22px;">📐</span></div>
+                    <div>
+                        <div class="qe-title">浓度圆锥模型</div>
+                        <div class="qe-desc">CAPM Cone Pricing · 风险-收益几何定价</div>
+                    </div>
+                    <span class="qe-arrow">→</span>
+                </a>
+                <a href="labs/evidence/vector_analysis.html" class="qe-card qe-indigo">
+                    <div class="qe-icon"><span style="font-size:22px;">🧪</span></div>
+                    <div>
+                        <div class="qe-title">七维向量分析</div>
+                        <div class="qe-desc">7-D Vector Analysis · 跨域语义向量空间</div>
+                    </div>
+                    <span class="qe-arrow">→</span>
+                </a>
+                <a href="labs/evidence/ultimate-sandbox.html" class="qe-card qe-red">
+                    <div class="qe-icon"><span style="font-size:22px;">🎰</span></div>
+                    <div>
+                        <div class="qe-title">终极模拟沙盘</div>
+                        <div class="qe-desc">Ultimate Sandbox · 人性×机器×市场</div>
+                    </div>
+                    <span class="qe-arrow">→</span>
+                </a>
+            </div>
+
+            <!-- ===== 系统入口 · Portfolio & Research ===== -->
+            <div class="portal-row">
+                <a href="#top" class="portal-chip">
+                    <span class="pc-icon">🏛️</span>
+                    <span class="pc-text">
+                        <span class="pc-title">操作台总览</span>
+                        <span class="pc-desc">当前页面 · 系统架构与全部模块</span>
+                    </span>
+                    <span class="pc-arrow">→</span>
+                </a>
+                <a href="ymine-studio.html" class="portal-chip">
+                    <span class="pc-icon">🎛️</span>
+                    <span class="pc-text">
+                        <span class="pc-title">YMine Studio</span>
+                        <span class="pc-desc">全功能控制台 · 十步闭环</span>
+                    </span>
+                    <span class="pc-arrow">→</span>
+                </a>
+                <a href="portfolio.html" class="portal-chip pc-portfolio">
+                    <span class="pc-icon">👤</span>
+                    <span class="pc-text">
+                        <span class="pc-title">About / Portfolio</span>
+                        <span class="pc-desc">作者 · 项目简历 · 求职作品集</span>
+                    </span>
+                    <span class="pc-arrow">→</span>
+                </a>
+                <a href="research.html" class="portal-chip pc-research">
+                    <span class="pc-icon">📄</span>
+                    <span class="pc-text">
+                        <span class="pc-title">Research</span>
+                        <span class="pc-desc">论文 · Decision Isomorphism · 跨域同构</span>
+                    </span>
+                    <span class="pc-arrow">→</span>
                 </a>
             </div>
 
@@ -4757,6 +4835,17 @@
         });
     })();
     </script>
+
+
+            <!-- ===== 页脚 ===== -->
+            <footer class="site-footer">
+                <div>© 2026 HelloMInd-star · Game-OS V2.5 · Decision AI Platform</div>
+                <div class="sf-links">
+                    <a href="portfolio.html">👤 About / Portfolio</a>
+                    <a href="research.html">📄 Research</a>
+                    <a href="https://github.com/HelloMInd-star/ymine" target="_blank" rel="noopener">⭐ GitHub</a>
+                </div>
+            </footer>
 
 </body>
 </html>

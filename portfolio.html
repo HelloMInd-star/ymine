@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Portfolio · HelloMInd-star · AI Product Manager</title>
+    <meta name="description" content="HelloMInd-star — AI Product Manager / Decision Systems Architect. Game-OS V2.5, Poker Egg, Fibonacci-Chromosome Isomorphism." />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔺</text></svg>" />
+    <style>
+        :root{
+            --bg:#0a0a18;
+            --bg-soft:#10102a;
+            --surface:rgba(255,255,255,0.03);
+            --border:rgba(255,255,255,0.08);
+            --border-strong:rgba(255,255,255,0.14);
+            --text:#e8eaf6;
+            --text-dim:rgba(232,234,246,0.6);
+            --text-mute:rgba(232,234,246,0.4);
+            --purple:#a78bfa;
+            --purple-soft:rgba(167,139,250,0.15);
+            --cyan:#22d3ee;
+            --cyan-soft:rgba(34,211,238,0.12);
+            --amber:#fbbf24;
+            --amber-soft:rgba(251,191,36,0.12);
+            --green:#4ade80;
+            --red:#f87171;
+        }
+        *{margin:0;padding:0;box-sizing:border-box;}
+        html{scroll-behavior:smooth;}
+        body{
+            background:var(--bg);
+            color:var(--text);
+            font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;
+            line-height:1.7;
+            overflow-x:hidden;
+            -webkit-font-smoothing:antialiased;
+        }
+        /* Background grid + glow */
+        body::before{
+            content:'';position:fixed;inset:0;
+            background:
+                radial-gradient(ellipse 80% 50% at 50% -20%,rgba(167,139,250,0.12),transparent),
+                radial-gradient(ellipse 60% 40% at 80% 100%,rgba(34,211,238,0.08),transparent);
+            pointer-events:none;z-index:0;
+        }
+        body::after{
+            content:'';position:fixed;inset:0;
+            background-image:
+                linear-gradient(rgba(255,255,255,0.025) 1px,transparent 1px),
+                linear-gradient(90deg,rgba(255,255,255,0.025) 1px,transparent 1px);
+            background-size:48px 48px;
+            mask-image:radial-gradient(ellipse 70% 60% at 50% 40%,#000 40%,transparent 80%);
+            -webkit-mask-image:radial-gradient(ellipse 70% 60% at 50% 40%,#000 40%,transparent 80%);
+            pointer-events:none;z-index:0;
+        }
+
+        /* Top nav */
+        .topnav{
+            position:fixed;top:0;left:0;right:0;z-index:100;
+            padding:16px 32px;
+            display:flex;align-items:center;justify-content:space-between;
+            backdrop-filter:blur(16px);
+            background:rgba(10,10,24,0.6);
+            border-bottom:1px solid var(--border);
+        }
+        .topnav .brand{
+            font-size:14px;font-weight:700;letter-spacing:0.5px;
+            display:flex;align-items:center;gap:8px;
+        }
+        .topnav .brand .logo-mark{
+            width:28px;height:28px;border-radius:8px;
+            background:linear-gradient(135deg,var(--purple),var(--cyan));
+            display:flex;align-items:center;justify-content:center;
+            font-size:14px;
+        }
+        .topnav .brand .name{color:var(--text);}
+        .topnav .brand .name span{color:var(--purple);}
+        .topnav .links{display:flex;gap:24px;align-items:center;}
+        .topnav .links a{
+            color:var(--text-dim);text-decoration:none;font-size:13px;
+            transition:color .2s;
+        }
+        .topnav .links a:hover{color:var(--text);}
+        .topnav .links a.cta{
+            padding:7px 16px;border-radius:8px;
+            background:linear-gradient(135deg,var(--purple),#818cf8);
+            color:#fff;font-weight:600;
+        }
+        .topnav .links a.cta:hover{opacity:0.9;color:#fff;}
+
+        main{position:relative;z-index:1;}
+
+        /* Sections */
+        section{
+            max-width:960px;margin:0 auto;padding:120px 32px 0;
+        }
+        section:first-of-type{padding-top:140px;}
+        .section-kicker{
+            font-size:11px;letter-spacing:3px;color:var(--cyan);
+            text-transform:uppercase;font-family:'SF Mono',ui-monospace,monospace;
+            margin-bottom:12px;display:flex;align-items:center;gap:8px;
+        }
+        .section-kicker::before{
+            content:'';width:24px;height:1px;background:var(--cyan);
+        }
+
+        /* HERO */
+        .hero{
+            min-height:92vh;display:flex;flex-direction:column;justify-content:center;
+            padding-top:120px !important;
+        }
+        .hero-badge{
+            display:inline-flex;align-items:center;gap:8px;
+            padding:6px 14px;border-radius:20px;
+            background:var(--purple-soft);border:1px solid rgba(167,139,250,0.25);
+            font-size:12px;color:var(--purple);font-weight:500;
+            margin-bottom:28px;width:fit-content;
+        }
+        .hero-badge .dot{
+            width:6px;height:6px;border-radius:50%;background:var(--green);
+            box-shadow:0 0 8px var(--green);animation:pulse 2s infinite;
+        }
+        @keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.4;}}
+        .hero h1{
+            font-size:clamp(40px,7vw,72px);
+            font-weight:800;line-height:1.05;letter-spacing:-2px;
+            margin-bottom:20px;
+            background:linear-gradient(135deg,#fff 0%,var(--purple) 50%,var(--cyan) 100%);
+            -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+        }
+        .hero h1 .handle{
+            display:block;font-size:0.45em;font-weight:500;letter-spacing:0;
+            -webkit-text-fill-color:var(--text-dim);margin-top:8px;
+        }
+        .hero .tagline{
+            font-size:clamp(16px,2vw,20px);color:var(--text-dim);
+            max-width:640px;line-height:1.7;margin-bottom:40px;
+        }
+        .hero .tagline strong{color:var(--text);font-weight:600;}
+        .hero .cta-row{display:flex;gap:14px;flex-wrap:wrap;}
+        .btn{
+            display:inline-flex;align-items:center;gap:8px;
+            padding:12px 22px;border-radius:10px;font-size:14px;font-weight:600;
+            text-decoration:none;transition:all .25s;cursor:pointer;border:none;
+        }
+        .btn-primary{
+            background:linear-gradient(135deg,var(--purple),#818cf8);color:#fff;
+            box-shadow:0 4px 20px rgba(167,139,250,0.3);
+        }
+        .btn-primary:hover{transform:translateY(-2px);box-shadow:0 6px 28px rgba(167,139,250,0.4);}
+        .btn-ghost{
+            background:var(--surface);color:var(--text);border:1px solid var(--border);
+        }
+        .btn-ghost:hover{background:rgba(255,255,255,0.06);border-color:var(--border-strong);}
+
+        .hero-meta{
+            margin-top:48px;display:flex;gap:32px;flex-wrap:wrap;
+            padding-top:28px;border-top:1px solid var(--border);
+        }
+        .hero-meta .mi{display:flex;flex-direction:column;gap:2px;}
+        .hero-meta .mi .v{font-size:22px;font-weight:700;color:var(--purple);}
+        .hero-meta .mi .l{font-size:11px;color:var(--text-mute);letter-spacing:1px;text-transform:uppercase;}
+
+        /* PROJECTS */
+        .projects{display:flex;flex-direction:column;gap:20px;margin-top:40px;}
+        .project-card{
+            display:grid;grid-template-columns:56px 1fr auto;gap:20px;align-items:center;
+            padding:24px 28px;border-radius:16px;
+            background:var(--surface);border:1px solid var(--border);
+            text-decoration:none;color:var(--text);
+            transition:all .3s ease;position:relative;overflow:hidden;
+        }
+        .project-card::before{
+            content:'';position:absolute;inset:0;
+            background:linear-gradient(135deg,rgba(255,255,255,0.03),transparent 60%);
+            pointer-events:none;
+        }
+        .project-card:hover{
+            transform:translateY(-3px);border-color:var(--border-strong);
+            background:rgba(255,255,255,0.05);
+        }
+        .project-card.p-purple:hover{border-color:rgba(167,139,250,0.4);box-shadow:0 12px 40px rgba(167,139,250,0.12);}
+        .project-card.p-amber:hover{border-color:rgba(251,191,36,0.4);box-shadow:0 12px 40px rgba(251,191,36,0.1);}
+        .project-card.p-cyan:hover{border-color:rgba(34,211,238,0.4);box-shadow:0 12px 40px rgba(34,211,238,0.1);}
+        .project-card.p-soft:hover{border-color:rgba(74,222,128,0.3);box-shadow:0 12px 40px rgba(74,222,128,0.08);}
+
+        .p-icon{
+            width:56px;height:56px;border-radius:14px;
+            display:flex;align-items:center;justify-content:center;
+            font-size:26px;flex-shrink:0;
+        }
+        .p-purple .p-icon{background:var(--purple-soft);border:1px solid rgba(167,139,250,0.25);}
+        .p-amber .p-icon{background:var(--amber-soft);border:1px solid rgba(251,191,36,0.25);}
+        .p-cyan .p-icon{background:var(--cyan-soft);border:1px solid rgba(34,211,238,0.25);}
+        .p-soft .p-icon{background:rgba(74,222,128,0.1);border:1px solid rgba(74,222,128,0.2);}
+
+        .p-body .p-title{
+            font-size:18px;font-weight:700;margin-bottom:6px;
+            display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+        }
+        .p-badge{
+            font-size:10px;font-weight:600;padding:3px 9px;border-radius:6px;letter-spacing:0.5px;
+        }
+        .p-badge.flagship{background:var(--purple-soft);color:var(--purple);}
+        .p-badge.paper{background:var(--cyan-soft);color:var(--cyan);}
+        .p-badge.wip{background:var(--amber-soft);color:var(--amber);}
+        .p-badge.ext{background:rgba(255,255,255,0.06);color:var(--text-dim);}
+        .p-body .p-desc{font-size:14px;color:var(--text-dim);margin-bottom:10px;line-height:1.6;}
+        .p-body .p-tags{display:flex;gap:6px;flex-wrap:wrap;}
+        .p-tag{
+            font-size:11px;padding:3px 10px;border-radius:6px;
+            background:rgba(255,255,255,0.04);color:var(--text-mute);
+            border:1px solid rgba(255,255,255,0.05);
+        }
+        .p-arrow{
+            font-size:20px;color:var(--text-mute);transition:all .3s;
+            display:flex;align-items:center;
+        }
+        .project-card:hover .p-arrow{color:var(--purple);transform:translateX(4px);}
+        .p-cyan:hover .p-arrow{color:var(--cyan);}
+        .p-amber:hover .p-arrow{color:var(--amber);}
+        .p-ext{font-size:14px;opacity:0.6;}
+
+        /* TECH STACK */
+        .tech-groups{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px;margin-top:32px;}
+        .tech-group{
+            padding:22px;border-radius:14px;
+            background:var(--surface);border:1px solid var(--border);
+        }
+        .tech-group h4{
+            font-size:12px;letter-spacing:2px;color:var(--text-mute);
+            text-transform:uppercase;margin-bottom:14px;font-weight:600;
+        }
+        .tech-chips{display:flex;flex-wrap:wrap;gap:8px;}
+        .chip{
+            font-size:12px;padding:5px 12px;border-radius:8px;
+            background:rgba(255,255,255,0.04);border:1px solid var(--border);
+            color:var(--text-dim);transition:all .2s;
+        }
+        .chip:hover{background:var(--purple-soft);border-color:rgba(167,139,250,0.3);color:var(--text);}
+
+        /* CONTACT */
+        .contact{
+            text-align:center;padding-bottom:80px;
+        }
+        .contact h2{
+            font-size:clamp(28px,4vw,40px);font-weight:700;letter-spacing:-1px;
+            margin-bottom:14px;
+        }
+        .contact p{color:var(--text-dim);margin-bottom:28px;font-size:15px;}
+        .contact-links{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;}
+
+        /* Footer */
+        .page-footer{
+            text-align:center;padding:32px;font-size:12px;color:var(--text-mute);
+            border-top:1px solid var(--border);
+        }
+        .page-footer a{color:var(--purple);text-decoration:none;}
+
+        /* Mobile */
+        @media(max-width:640px){
+            .topnav{padding:12px 16px;}
+            .topnav .links{gap:14px;}
+            .topnav .links a:not(.cta){display:none;}
+            section{padding:80px 20px 0;}
+            .hero{padding-top:90px !important;min-height:auto;padding-bottom:40px;}
+            .project-card{grid-template-columns:44px 1fr;gap:14px;padding:18px;}
+            .p-icon{width:44px;height:44px;font-size:22px;}
+            .p-arrow{display:none;}
+            .hero-meta{gap:20px;}
+        }
+    </style>
+</head>
+<body>
+    <nav class="topnav">
+        <div class="brand">
+            <div class="logo-mark">🔺</div>
+            <div class="name">HelloMInd<span>-star</span></div>
+        </div>
+        <div class="links">
+            <a href="#projects">Projects</a>
+            <a href="#research">Research</a>
+            <a href="#stack">Tech Stack</a>
+            <a href="https://github.com/HelloMInd-star" target="_blank" rel="noopener">GitHub</a>
+            <a href="index.html" class="cta">进入操作台 →</a>
+        </div>
+    </nav>
+
+    <main>
+        <!-- HERO -->
+        <section class="hero" id="top">
+            <div class="hero-badge">
+                <span class="dot"></span>
+                <span>Open to work · 2026 届校招 · AI PM · Game AI 方向</span>
+            </div>
+            <h1>
+                Building Decision Systems
+                <span class="handle">— HelloMInd-star · AI Product Manager / Decision Systems Architect</span>
+            </h1>
+            <p class="tagline">
+                从<strong>博弈论</strong>出发，穿过<strong>金融定价</strong>、<strong>认知建模</strong>与<strong>分子调酒</strong>，
+                我相信一切决策问题背后存在一套跨域同构的数学骨架——
+                <strong>Game-OS</strong> 是把这套骨架做成可交互操作台的尝试。
+            </p>
+            <div class="cta-row">
+                <a href="index.html" class="btn btn-primary">🔺 进入 Game-OS 操作台</a>
+                <a href="research.html" class="btn btn-ghost">📄 查看研究论文</a>
+                <a href="https://github.com/HelloMInd-star" target="_blank" rel="noopener" class="btn btn-ghost">⭐ GitHub</a>
+            </div>
+            <div class="hero-meta">
+                <div class="mi"><div class="v">62</div><div class="l">HTML Labs</div></div>
+                <div class="mi"><div class="v">5</div><div class="l">Core Demos</div></div>
+                <div class="mi"><div class="v">1</div><div class="l">arXiv Paper</div></div>
+                <div class="mi"><div class="v">0.68</div><div class="l">Cone Threshold</div></div>
+            </div>
+        </section>
+
+        <!-- PROJECTS -->
+        <section id="projects">
+            <div class="section-kicker">Core Projects</div>
+            <h2 style="font-size:clamp(28px,4vw,40px);font-weight:700;letter-spacing:-1px;margin-bottom:6px;">精选项目</h2>
+            <p style="color:var(--text-dim);max-width:640px;">从可交互操作台到陪练产品，每一个项目都是同一套"决策同构"思路在不同域的投影。</p>
+
+            <div class="projects">
+                <a href="index.html" class="project-card p-purple">
+                    <div class="p-icon">🔺</div>
+                    <div class="p-body">
+                        <div class="p-title">
+                            Game-OS V2.5 决策AI中台
+                            <span class="p-badge flagship">FLAGSHIP</span>
+                        </div>
+                        <div class="p-desc">面向资管/博弈场景的可信赖决策中台——三模型审计、七层熔断、三角校验，把"黑盒AI"拆成可解释、可审计、可熔断的决策流水线。62 个可交互 HTML 实验室 + FastAPI 后端。</div>
+                        <div class="p-tags">
+                            <span class="p-tag">Game Theory</span>
+                            <span class="p-tag">Decision System</span>
+                            <span class="p-tag">Risk Circuit Breaker</span>
+                            <span class="p-tag">FastAPI</span>
+                            <span class="p-tag">Canvas Viz</span>
+                        </div>
+                    </div>
+                    <div class="p-arrow">→</div>
+                </a>
+
+                <a href="https://github.com/HelloMInd-star/poker-egg-fullstack" target="_blank" rel="noopener" class="project-card p-amber">
+                    <div class="p-icon">♠</div>
+                    <div class="p-body">
+                        <div class="p-title">
+                            Poker Egg 德州扑克AI陪练
+                            <span class="p-badge ext">EXTERNAL ↗</span>
+                        </div>
+                        <div class="p-desc">基于 GTO（Game Theory Optimal）的德州扑克 AI 训练器，实时 EV 计算、手牌范围可视化、决策偏差诊断——让玩家在对局中即时理解"为什么这手该弃牌"。</div>
+                        <div class="p-tags">
+                            <span class="p-tag">GTO Solver</span>
+                            <span class="p-tag">Realtime EV</span>
+                            <span class="p-tag">Range Visualization</span>
+                            <span class="p-tag">Vanilla JS</span>
+                        </div>
+                    </div>
+                    <div class="p-arrow"><span class="p-ext">↗</span></div>
+                </a>
+
+                <a href="research.html" class="project-card p-cyan">
+                    <div class="p-icon">📄</div>
+                    <div class="p-body">
+                        <div class="p-title">
+                            Fibonacci-Chromosome Isomorphism
+                            <span class="p-badge paper">PAPER</span>
+                        </div>
+                        <div class="p-desc">论文预印本 · 揭示斐波那契数列结构与染色体遗传重组之间的深层数学同构——为跨域决策建模提供了一套统一的几何骨架：圆锥、阈值 0.68、三角审计。</div>
+                        <div class="p-tags">
+                            <span class="p-tag">Mathematical Isomorphism</span>
+                            <span class="p-tag">Fibonacci</span>
+                            <span class="p-tag">Chromosome Crossover</span>
+                            <span class="p-tag">Decision Geometry</span>
+                        </div>
+                    </div>
+                    <div class="p-arrow">→</div>
+                </a>
+
+                <a href="labs/molecular-mixology.html" class="project-card p-soft">
+                    <div class="p-icon">🍸</div>
+                    <div class="p-body">
+                        <div class="p-title">
+                            MBTI 人格调酒系统
+                            <span class="p-badge wip">EXPERIMENTAL</span>
+                        </div>
+                        <div class="p-desc">把 MBTI 十六型人格映射为七种味觉/情感基酒的浓度向量，结合圆锥浓度模型与 Remotion 视频生成——"你喝的不是酒，是你人格的向量投影"。</div>
+                        <div class="p-tags">
+                            <span class="p-tag">Vector Mapping</span>
+                            <span class="p-tag">MBTI</span>
+                            <span class="p-tag">Generative Video</span>
+                        </div>
+                    </div>
+                    <div class="p-arrow">→</div>
+                </a>
+            </div>
+        </section>
+
+        <!-- TECH STACK -->
+        <section id="stack">
+            <div class="section-kicker">Tech Stack</div>
+            <h2 style="font-size:clamp(28px,4vw,40px);font-weight:700;letter-spacing:-1px;margin-bottom:6px;">技术栈</h2>
+            <p style="color:var(--text-dim);max-width:640px;">前端操作台原生实现，后端轻量可插拔；整套系统追求"零依赖、可离线、可解释"。</p>
+
+            <div class="tech-groups">
+                <div class="tech-group">
+                    <h4>Frontend</h4>
+                    <div class="tech-chips">
+                        <span class="chip">HTML5</span>
+                        <span class="chip">Vanilla JS</span>
+                        <span class="chip">CSS3 / Canvas</span>
+                        <span class="chip">SVG</span>
+                        <span class="chip">Web Audio</span>
+                    </div>
+                </div>
+                <div class="tech-group">
+                    <h4>Backend / Data</h4>
+                    <div class="tech-chips">
+                        <span class="chip">Python</span>
+                        <span class="chip">FastAPI</span>
+                        <span class="chip">Streamlit</span>
+                        <span class="chip">NumPy</span>
+                    </div>
+                </div>
+                <div class="tech-group">
+                    <h4>AI / Modeling</h4>
+                    <div class="tech-chips">
+                        <span class="chip">Game Theory (GTO)</span>
+                        <span class="chip">Kelly Criterion</span>
+                        <span class="chip">CAPM / WACC</span>
+                        <span class="chip">Vector Space</span>
+                        <span class="chip">Circuit Breaker</span>
+                    </div>
+                </div>
+                <div class="tech-group">
+                    <h4>Product / Design</h4>
+                    <div class="tech-chips">
+                        <span class="chip">Decision System Design</span>
+                        <span class="chip">AI PM</span>
+                        <span class="chip">Information Density UX</span>
+                        <span class="chip">Figma</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CONTACT -->
+        <section id="contact" class="contact">
+            <div class="section-kicker" style="justify-content:center;">Get in Touch</div>
+            <h2>Let's build something decisive.</h2>
+            <p>如果你对决策系统、游戏 AI 或跨域同构感兴趣——欢迎交流。</p>
+            <div class="contact-links">
+                <a href="https://github.com/HelloMInd-star" target="_blank" rel="noopener" class="btn btn-primary">⭐ GitHub / HelloMInd-star</a>
+                <a href="index.html" class="btn btn-ghost">🔺 返回操作台</a>
+            </div>
+        </section>
+    </main>
+
+    <footer class="page-footer">
+        © 2026 HelloMInd-star · Built with <a href="index.html">Game-OS V2.5</a> · Hosted on GitHub Pages
+    </footer>
+</body>
+</html>

@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Research · Decision Isomorphism · HelloMInd-star</title>
+    <meta name="description" content="Fibonacci-Chromosome Isomorphism — A unified geometric skeleton for cross-domain decision systems." />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📄</text></svg>" />
+    <style>
+        :root{
+            --bg:#0a0a18;
+            --surface:rgba(255,255,255,0.03);
+            --surface-2:rgba(255,255,255,0.05);
+            --border:rgba(255,255,255,0.08);
+            --border-strong:rgba(255,255,255,0.16);
+            --text:#e8eaf6;
+            --text-dim:rgba(232,234,246,0.62);
+            --text-mute:rgba(232,234,246,0.4);
+            --purple:#a78bfa;
+            --purple-soft:rgba(167,139,250,0.14);
+            --cyan:#22d3ee;
+            --cyan-soft:rgba(34,211,238,0.12);
+            --amber:#fbbf24;
+            --amber-soft:rgba(251,191,36,0.12);
+        }
+        *{margin:0;padding:0;box-sizing:border-box;}
+        html{scroll-behavior:smooth;}
+        body{
+            background:var(--bg);color:var(--text);
+            font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Hiragino Sans GB','Microsoft YaHei',Georgia,serif;
+            line-height:1.8;-webkit-font-smoothing:antialiased;overflow-x:hidden;
+        }
+        body::before{
+            content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+            background:
+                radial-gradient(ellipse 60% 40% at 20% 0%,rgba(167,139,250,0.1),transparent),
+                radial-gradient(ellipse 50% 40% at 90% 100%,rgba(34,211,238,0.07),transparent);
+        }
+
+        /* Top nav — paper style minimal */
+        .topnav{
+            position:sticky;top:0;z-index:100;
+            padding:16px 40px;display:flex;align-items:center;justify-content:space-between;
+            backdrop-filter:blur(16px);background:rgba(10,10,24,0.7);
+            border-bottom:1px solid var(--border);
+        }
+        .brand{font-size:14px;font-weight:700;display:flex;align-items:center;gap:10px;}
+        .brand .mark{
+            width:28px;height:28px;border-radius:7px;
+            background:linear-gradient(135deg,var(--purple),var(--cyan));
+            display:flex;align-items:center;justify-content:center;font-size:13px;
+        }
+        .brand .sub{color:var(--text-mute);font-weight:400;font-size:12px;margin-left:4px;}
+        .nav-links{display:flex;gap:22px;align-items:center;}
+        .nav-links a{color:var(--text-dim);text-decoration:none;font-size:13px;transition:color .2s;}
+        .nav-links a:hover{color:var(--text);}
+
+        .container{max-width:860px;margin:0 auto;padding:80px 32px 100px;position:relative;z-index:1;}
+
+        /* Paper header */
+        .paper-header{
+            text-align:center;margin-bottom:60px;padding-bottom:40px;
+            border-bottom:1px solid var(--border);
+        }
+        .journal-tag{
+            display:inline-flex;align-items:center;gap:8px;
+            font-size:11px;letter-spacing:3px;text-transform:uppercase;
+            color:var(--cyan);font-family:'SF Mono',ui-monospace,monospace;
+            margin-bottom:20px;
+        }
+        .journal-tag::before,.journal-tag::after{content:'';width:20px;height:1px;background:var(--cyan);opacity:0.5;}
+        h1.title{
+            font-size:clamp(28px,4.5vw,44px);font-weight:800;line-height:1.25;letter-spacing:-1px;
+            margin-bottom:16px;
+            background:linear-gradient(135deg,#fff 0%,var(--purple) 60%,var(--cyan) 100%);
+            -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+        }
+        .authors{font-size:15px;color:var(--text-dim);margin-bottom:8px;}
+        .authors strong{color:var(--text);font-weight:600;}
+        .affiliation{font-size:13px;color:var(--text-mute);font-style:italic;margin-bottom:24px;}
+        .meta-row{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:24px;}
+        .meta-pill{
+            font-size:12px;padding:6px 14px;border-radius:20px;
+            background:var(--surface);border:1px solid var(--border);color:var(--text-dim);
+        }
+        .meta-pill.draft{background:var(--amber-soft);border-color:rgba(251,191,36,0.25);color:var(--amber);}
+        .action-row{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:28px;}
+        .btn{
+            display:inline-flex;align-items:center;gap:8px;
+            padding:11px 22px;border-radius:10px;font-size:13px;font-weight:600;
+            text-decoration:none;transition:all .25s;border:none;cursor:pointer;
+        }
+        .btn-primary{
+            background:linear-gradient(135deg,var(--purple),#818cf8);color:#fff;
+            box-shadow:0 4px 18px rgba(167,139,250,0.3);
+        }
+        .btn-primary:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(167,139,250,0.4);}
+        .btn-ghost{background:var(--surface);color:var(--text);border:1px solid var(--border);}
+        .btn-ghost:hover{background:var(--surface-2);border-color:var(--border-strong);}
+
+        /* Section blocks */
+        .sec{margin-bottom:48px;}
+        .sec-label{
+            font-size:11px;letter-spacing:2.5px;text-transform:uppercase;
+            color:var(--cyan);font-family:'SF Mono',ui-monospace,monospace;
+            margin-bottom:14px;display:flex;align-items:center;gap:10px;
+        }
+        .sec-label::before{content:'§';color:var(--purple);font-weight:700;}
+        h2.sec-title{
+            font-size:24px;font-weight:700;letter-spacing:-0.5px;margin-bottom:16px;
+        }
+        .abstract{
+            font-size:15.5px;line-height:1.9;color:var(--text-dim);
+            padding:28px 32px;border-radius:14px;
+            background:var(--surface);border:1px solid var(--border);
+            border-left:3px solid var(--purple);
+        }
+        .abstract p+p{margin-top:12px;}
+
+        .keywords{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px;}
+        .kw{
+            font-size:11.5px;padding:4px 12px;border-radius:6px;
+            background:var(--cyan-soft);color:var(--cyan);border:1px solid rgba(34,211,238,0.2);
+            font-family:'SF Mono',ui-monospace,monospace;
+        }
+
+        /* Framework diagram (textual) */
+        .framework{
+            display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-top:24px;
+        }
+        .domain-card{
+            padding:18px 14px;border-radius:12px;text-align:center;
+            background:var(--surface);border:1px solid var(--border);
+            transition:all .3s;
+        }
+        .domain-card:hover{border-color:var(--border-strong);transform:translateY(-3px);}
+        .domain-card .ico{font-size:28px;margin-bottom:8px;}
+        .domain-card .name{font-size:13px;font-weight:600;margin-bottom:4px;}
+        .domain-card .ratio{
+            font-size:11px;color:var(--amber);font-family:'SF Mono',ui-monospace,monospace;
+            letter-spacing:1px;
+        }
+        .connector{
+            text-align:center;color:var(--purple);font-size:20px;margin:14px 0;
+            letter-spacing:8px;opacity:0.4;
+        }
+        .core-statement{
+            text-align:center;padding:24px;border-radius:14px;
+            background:linear-gradient(135deg,var(--purple-soft),var(--cyan-soft));
+            border:1px solid rgba(167,139,250,0.2);
+            font-size:16px;font-weight:500;line-height:1.7;
+        }
+        .core-statement .ratio{
+            display:block;font-size:32px;font-weight:800;color:var(--amber);
+            font-family:'SF Mono',ui-monospace,monospace;margin:8px 0;letter-spacing:2px;
+        }
+
+        /* Experiments */
+        .exp-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin-top:24px;}
+        .exp-card{
+            display:block;padding:22px;border-radius:14px;
+            background:var(--surface);border:1px solid var(--border);
+            text-decoration:none;color:var(--text);transition:all .3s;
+        }
+        .exp-card:hover{transform:translateY(-3px);border-color:var(--border-strong);background:var(--surface-2);}
+        .exp-card .exp-ico{font-size:26px;margin-bottom:10px;}
+        .exp-card h4{font-size:15px;font-weight:700;margin-bottom:6px;}
+        .exp-card p{font-size:13px;color:var(--text-mute);line-height:1.6;margin-bottom:12px;}
+        .exp-card .exp-link{font-size:12px;color:var(--cyan);font-weight:600;}
+        .exp-card:hover .exp-link{color:var(--text);}
+
+        /* Citation block */
+        .cite-box{
+            padding:20px 24px;border-radius:12px;
+            background:#0d0d20;border:1px solid var(--border);
+            font-family:'SF Mono',ui-monospace,monospace;font-size:12px;
+            color:var(--text-mute);line-height:1.8;overflow-x:auto;
+        }
+        .cite-box .copy-btn{
+            float:right;background:var(--surface);border:1px solid var(--border);
+            color:var(--text-dim);padding:4px 10px;border-radius:6px;font-size:11px;
+            cursor:pointer;font-family:inherit;transition:all .2s;
+        }
+        .cite-box .copy-btn:hover{background:var(--purple-soft);color:var(--purple);border-color:rgba(167,139,250,0.3);}
+
+        /* Back link */
+        .back-link{
+            display:inline-flex;align-items:center;gap:6px;
+            color:var(--text-mute);text-decoration:none;font-size:13px;margin-bottom:24px;
+            transition:color .2s;
+        }
+        .back-link:hover{color:var(--purple);}
+
+        footer{
+            text-align:center;padding:32px;font-size:12px;color:var(--text-mute);
+            border-top:1px solid var(--border);
+        }
+        footer a{color:var(--purple);text-decoration:none;}
+
+        @media(max-width:640px){
+            .topnav{padding:12px 16px;}
+            .nav-links a:not(.cta){display:none;}
+            .container{padding:50px 20px 60px;}
+            .framework{grid-template-columns:repeat(2,1fr);}
+            .abstract{padding:20px;}
+        }
+    </style>
+</head>
+<body>
+    <nav class="topnav">
+        <div class="brand">
+            <div class="mark">📄</div>
+            <div>Research<span class="sub">· Decision Isomorphism</span></div>
+        </div>
+        <div class="nav-links">
+            <a href="#paper">Paper</a>
+            <a href="#framework">Framework</a>
+            <a href="#experiments">Experiments</a>
+            <a href="portfolio.html">Portfolio</a>
+            <a href="index.html">操作台</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <a href="index.html" class="back-link">← 返回 Game-OS 操作台</a>
+
+        <!-- ===== PAPER HEADER ===== -->
+        <header class="paper-header" id="paper">
+            <div class="journal-tag">Preprint · 2026</div>
+            <h1 class="title">Fibonacci–Chromosome Isomorphism:<br/>A Unified Geometric Skeleton for Cross-Domain Decision Systems</h1>
+            <div class="authors"><strong>HelloMInd-star</strong></div>
+            <div class="affiliation">Independent Research · Game-OS Decision Lab</div>
+
+            <div class="meta-row">
+                <span class="meta-pill draft">⚗️ Working Draft</span>
+                <span class="meta-pill">Applied Mathematics</span>
+                <span class="meta-pill">Decision Theory</span>
+                <span class="meta-pill">Cross-Domain Isomorphism</span>
+            </div>
+
+            <div class="action-row">
+                <a href="docs/Fibonacci-Chromosome_Isomorphism.pdf" class="btn btn-primary" download>📥 Download PDF</a>
+                <a href="#" class="btn btn-ghost" onclick="alert('arXiv 预印本链接即将更新');return false;">🔗 arXiv (soon)</a>
+                <a href="portfolio.html" class="btn btn-ghost">👤 Author</a>
+            </div>
+        </header>
+
+        <!-- ===== ABSTRACT ===== -->
+        <section class="sec">
+            <div class="sec-label">Abstract</div>
+            <div class="abstract">
+                <p>
+                    本文提出并形式化了一个猜想：<strong>斐波那契递归结构与染色体遗传重组过程之间存在深层数学同构</strong>。
+                    黄金分割比 φ ≈ 0.618 及其对称补 1 − φ ≈ 0.382，在圆锥几何、博弈均衡、金融定价阈值、认知张力分配、分子调酒浓度等五个看似无关的域中，反复以 0.68（含熔断冗余）这一关键阈值出现。
+                </p>
+                <p>
+                    我们将这一观察抽象为<strong>"决策圆锥"(Decision Cone)</strong>模型——任何包含「探索/利用权衡」「风险/收益折衷」「秩序/混沌边界」的系统，都会收敛到同一个几何骨架：顶点是 0（绝对确定/死寂），底面是 1（完全混沌/热寂），而<strong>有效决策区的上界稳定在 0.68</strong>。
+                </p>
+                <p>
+                    基于这一同构，我们构建了 <strong>Game-OS V2.5 决策AI中台</strong>，在金融风险、德州扑克 GTO、七维向量认知建模三个实验域中验证了阈值的普适性。
+                </p>
+                <div class="keywords">
+                    <span class="kw">Fibonacci Sequence</span>
+                    <span class="kw">Chromosome Crossover</span>
+                    <span class="kw">Golden Ratio φ</span>
+                    <span class="kw">Decision Cone</span>
+                    <span class="kw">0.68 Threshold</span>
+                    <span class="kw">Cross-Domain Isomorphism</span>
+                    <span class="kw">Circuit Breaker</span>
+                    <span class="kw">Game Theory</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== FRAMEWORK ===== -->
+        <section class="sec" id="framework">
+            <div class="sec-label">Unified Framework</div>
+            <h2 class="sec-title">跨域同构：五个域，一个骨架</h2>
+            <p style="color:var(--text-dim);font-size:15px;margin-bottom:20px;">
+                看似毫不相关的五个领域，在"圆锥 + 0.68 阈值"这一几何视角下收敛为同一结构：
+            </p>
+
+            <div class="framework">
+                <div class="domain-card">
+                    <div class="ico">📈</div>
+                    <div class="name">金融定价</div>
+                    <div class="ratio">CAPM · WACC</div>
+                </div>
+                <div class="domain-card">
+                    <div class="ico">♠</div>
+                    <div class="name">博弈均衡</div>
+                    <div class="ratio">GTO · Kelly</div>
+                </div>
+                <div class="domain-card">
+                    <div class="ico">🍸</div>
+                    <div class="name">分子调酒</div>
+                    <div class="ratio">浓度向量</div>
+                </div>
+                <div class="domain-card">
+                    <div class="ico">✈️</div>
+                    <div class="name">空域调度</div>
+                    <div class="ratio">级联阻尼</div>
+                </div>
+                <div class="domain-card">
+                    <div class="ico">🧠</div>
+                    <div class="name">认知建模</div>
+                    <div class="ratio">七维向量</div>
+                </div>
+            </div>
+
+            <div class="connector">↓ ↓ ↓ ↓ ↓</div>
+
+            <div class="core-statement">
+                所有"含决策"的系统都投影到同一个圆锥
+                <span class="ratio">threshold = 0.68</span>
+                过此线，系统进入混沌熔断区；低于此线，系统进入僵化死寂区。
+            </div>
+        </section>
+
+        <!-- ===== EXPERIMENTS ===== -->
+        <section class="sec" id="experiments">
+            <div class="sec-label">Interactive Experiments</div>
+            <h2 class="sec-title">核心交互实验</h2>
+            <p style="color:var(--text-dim);font-size:15px;">
+                所有实验均以纯前端 HTML 实现，可在浏览器中直接运行——数学可视化即证明。
+            </p>
+
+            <div class="exp-grid">
+                <a href="labs/evidence/general-game-os.html" class="exp-card">
+                    <div class="exp-ico">🎯</div>
+                    <h4>锥心博弈沙盘</h4>
+                    <p>在圆锥几何中直接观察博弈策略如何收敛到 0.68 均衡点——动态可调对手类型、初始信念、学习速率。</p>
+                    <div class="exp-link">Launch Experiment →</div>
+                </a>
+                <a href="labs/evidence/ultimate-sandbox.html" class="exp-card">
+                    <div class="exp-ico">🎰</div>
+                    <h4>终极模拟沙盘</h4>
+                    <p>人性×机器×市场三引擎联动，观察熔断机制如何在黑天鹅事件下保护决策系统免于越界。</p>
+                    <div class="exp-link">Launch Experiment →</div>
+                </a>
+                <a href="labs/evidence/chromosome_diagnostic.html" class="exp-card">
+                    <div class="exp-ico">🧬</div>
+                    <h4>染色体诊断仪</h4>
+                    <p>可视化 Fibonacci 数列与染色体交叉重组的同构关系——每一代码对应一个重组位点。</p>
+                    <div class="exp-link">Launch Experiment →</div>
+                </a>
+                <a href="labs/evidence/capm-pricing-simulator.html" class="exp-card">
+                    <div class="exp-ico">📐</div>
+                    <h4>浓度圆锥定价</h4>
+                    <p>把 CAPM、WACC、DCF 搬到圆锥上——看折现率如何从锥顶（无风险利率）向锥底扩散到 0.68 风险警戒。</p>
+                    <div class="exp-link">Launch Experiment →</div>
+                </a>
+                <a href="labs/evidence/vector_analysis.html" class="exp-card">
+                    <div class="exp-ico">🧪</div>
+                    <h4>七维向量分析</h4>
+                    <p>跨域语义向量空间——观察金融、博弈、认知、调度、调酒五域向量在 0.68 超球面上的聚类。</p>
+                    <div class="exp-link">Launch Experiment →</div>
+                </a>
+                <a href="https://hellomind-star.github.io/poker-egg/" target="_blank" rel="noopener" class="exp-card">
+                    <div class="exp-ico">♠</div>
+                    <h4>Poker Egg GTO 陪练</h4>
+                    <p>真实德州扑克场景下的 GTO 决策——0.68 阈值即"是否跟注"的 EV 边界。</p>
+                    <div class="exp-link">External Site ↗</div>
+                </a>
+            </div>
+        </section>
+
+        <!-- ===== CITATION ===== -->
+        <section class="sec">
+            <div class="sec-label">Citation</div>
+            <h2 class="sec-title">引用（BibTeX）</h2>
+            <div class="cite-box">
+                <button class="copy-btn" onclick="navigator.clipboard && navigator.clipboard.writeText(this.parentElement.innerText.replace('Copy','').trim());this.textContent='Copied ✓';setTimeout(()=>this.textContent='Copy',2000);">Copy</button>
+@misc{hellomind2026fibonaccichromosome,<br/>
+&nbsp;&nbsp;title={Fibonacci--Chromosome Isomorphism: A Unified Geometric Skeleton for Cross-Domain Decision Systems},<br/>
+&nbsp;&nbsp;author={HelloMInd-star},<br/>
+&nbsp;&nbsp;year={2026},<br/>
+&nbsp;&nbsp;eprint={2026.xxxxx},<br/>
+&nbsp;&nbsp;archivePrefix={arXiv},<br/>
+&nbsp;&nbsp;primaryClass={math.HO}<br/>
+}
+            </div>
+        </section>
+    </div>
+
+    <footer>
+        © 2026 HelloMInd-star · Research on Decision Isomorphism ·
+        <a href="portfolio.html">Portfolio</a> ·
+        <a href="index.html">Game-OS</a> ·
+        <a href="https://github.com/HelloMInd-star" target="_blank" rel="noopener">GitHub</a>
+    </footer>
+</body>
+</html>
