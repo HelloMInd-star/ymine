@@ -397,73 +397,57 @@ input[type=range].neon::-moz-range-thumb{width:18px;height:18px;border-radius:50
 // 基于persona_poker_data.json的8维输出扩展到12维
 // 扩展维度（callFreq, positionBias, thinkingSpeed, bluffCatch）根据群体特征推断
 const MBTI_DATA = {
-  // ===== NF 紫人组·理想主义者 =====
-  INFJ: {group:"NF", archetype:"诗意弈者", cnName:"劝告者",
-    playStyle:"理想型松弱玩家 · 直觉先行 · 高频诈唬 · 情绪敏感",
-    signals:{openingAggression:0.25,moveIntuition:0.85,decisionLogic:0.30,endgameDecisiveness:0.82},
+  // ===== NF 紫人组·理想主义者 · bluffFreq 62-66%, tiltResist 28-31% =====
+  INFJ: {group:"NF", archetype:"先知弈者", cnName:"劝告者",
+    playStyle:"理想型松弱玩家 · 直觉洞察 · 高频诈唬 · 情绪敏感",
     v:{foldRate:50,raiseRate:17,allinRate:2.2,bluffFreq:64,aggression:63,tiltResist:30,potControl:38,noiseResist:36,callFreq:33,positionBias:42,thinkingSpeed:72,bluffCatch:35}},
-  INFP: {group:"NF", archetype:"诗意弈者", cnName:"治愈者",
-    playStyle:"理想型松弱玩家 · 直觉先行 · 高频诈唬 · 情绪敏感",
-    signals:{openingAggression:0.18,moveIntuition:0.92,decisionLogic:0.22,endgameDecisiveness:0.25},
+  INFP: {group:"NF", archetype:"浪漫弈者", cnName:"治愈者",
+    playStyle:"理想型松弱玩家 · 超直觉 · 最高诈唬 · 情绪驱动",
     v:{foldRate:45,raiseRate:22,allinRate:7.3,bluffFreq:66,aggression:62,tiltResist:28,potControl:24,noiseResist:34,callFreq:33,positionBias:30,thinkingSpeed:82,bluffCatch:28}},
-  ENFJ: {group:"NF", archetype:"诗意弈者", cnName:"教导者",
-    playStyle:"理想型松弱玩家 · 主动社交 · 情绪激励 · 易受影响",
-    signals:{openingAggression:0.80,moveIntuition:0.78,decisionLogic:0.35,endgameDecisiveness:0.78},
+  ENFJ: {group:"NF", archetype:"魅力演说家", cnName:"教导者",
+    playStyle:"理想型社交玩家 · 主动施压 · 情绪感染 · 易受他人影响",
     v:{foldRate:41,raiseRate:26,allinRate:7.6,bluffFreq:62,aggression:74,tiltResist:31,potControl:37,noiseResist:37,callFreq:33,positionBias:68,thinkingSpeed:68,bluffCatch:38}},
-  ENFP: {group:"NF", archetype:"诗意弈者", cnName:"冠军者",
-    playStyle:"理想型松凶玩家 · 进攻性强 · 全下频率高 · 最易tilt",
-    signals:{openingAggression:0.88,moveIntuition:0.90,decisionLogic:0.28,endgameDecisiveness:0.20},
+  ENFP: {group:"NF", archetype:"狂想赌徒", cnName:"冠军者",
+    playStyle:"理想型松凶玩家 · 进攻极强 · 全下最高 · 最易tilt",
     v:{foldRate:34,raiseRate:33,allinRate:14.9,bluffFreq:65,aggression:77,tiltResist:30,potControl:23,noiseResist:35,callFreq:33,positionBias:70,thinkingSpeed:85,bluffCatch:30}},
-  // ===== NT 黄人组·理性者 =====
+  // ===== NT 黄人组·理性者 · tiltResist 93-95%, noiseResist 87-89% =====
   INTJ: {group:"NT", archetype:"策略大师", cnName:"专家",
     playStyle:"紧凶型精算玩家 · 深思熟虑 · 低诈唬 · 抗噪最强",
-    signals:{openingAggression:0.30,moveIntuition:0.88,decisionLogic:0.92,endgameDecisiveness:0.85},
     v:{foldRate:59,raiseRate:21,allinRate:2.0,bluffFreq:32,aggression:69,tiltResist:95,potControl:68,noiseResist:89,callFreq:20,positionBias:62,thinkingSpeed:55,bluffCatch:82}},
   INTP: {group:"NT", archetype:"逻辑学家", cnName:"思想家",
     playStyle:"紧弱型精算玩家 · 长考分析 · 收局犹豫 · 抗噪极强",
-    signals:{openingAggression:0.22,moveIntuition:0.85,decisionLogic:0.88,endgameDecisiveness:0.30},
     v:{foldRate:55,raiseRate:25,allinRate:5.5,bluffFreq:32,aggression:67,tiltResist:94,potControl:55,noiseResist:88,callFreq:20,positionBias:48,thinkingSpeed:38,bluffCatch:85}},
-  ENTJ: {group:"NT", archetype:"统帅", cnName:"元帅",
+  ENTJ: {group:"NT", archetype:"铁腕统帅", cnName:"元帅",
     playStyle:"松凶型统帅玩家 · 高逻辑高进攻 · 果断收局 · 抗噪极强",
-    signals:{openingAggression:0.92,moveIntuition:0.82,decisionLogic:0.90,endgameDecisiveness:0.88},
     v:{foldRate:50,raiseRate:30,allinRate:7.3,bluffFreq:31,aggression:82,tiltResist:95,potControl:69,noiseResist:88,callFreq:20,positionBias:85,thinkingSpeed:78,bluffCatch:80}},
-  ENTP: {group:"NT", archetype:"辩论家", cnName:"发明家",
-    playStyle:"松凶型辩论玩家 · 高直觉高逻辑 · 施压不收局 · 最会诈唬",
-    signals:{openingAggression:0.85,moveIntuition:0.88,decisionLogic:0.82,endgameDecisiveness:0.22},
+  ENTP: {group:"NT", archetype:"诡辩大师", cnName:"发明家",
+    playStyle:"松凶型辩论玩家 · 高直觉高逻辑 · 持续施压 · NT中最会诈唬",
     v:{foldRate:45,raiseRate:35,allinRate:13.2,bluffFreq:33,aggression:81,tiltResist:93,potControl:53,noiseResist:87,callFreq:20,positionBias:75,thinkingSpeed:88,bluffCatch:78}},
-  // ===== SJ 蓝人组·守护者 =====
-  ISTJ: {group:"SJ", archetype:"检查官", cnName:"检查者",
+  // ===== SJ 蓝人组·守护者 · foldRate 72-83%, bluffFreq 2-7%, potControl 88-90% =====
+  ISTJ: {group:"SJ", archetype:"岩石守卫", cnName:"检查者",
     playStyle:"保守型紧弱玩家 · 稳扎稳打 · 极少诈唬 · 耐心等牌",
-    signals:{openingAggression:0.15,moveIntuition:0.20,decisionLogic:0.85,endgameDecisiveness:0.88},
     v:{foldRate:82,raiseRate:2,allinRate:2.0,bluffFreq:2,aggression:15,tiltResist:78,potControl:89,noiseResist:72,callFreq:16,positionBias:45,thinkingSpeed:42,bluffCatch:60}},
-  ISFJ: {group:"SJ", archetype:"保护者", cnName:"保护者",
+  ISFJ: {group:"SJ", archetype:"温柔盾卫", cnName:"保护者",
     playStyle:"保守型紧弱玩家 · 情绪敏感 · 极少加注 · 锅控极强",
-    signals:{openingAggression:0.12,moveIntuition:0.18,decisionLogic:0.30,endgameDecisiveness:0.82},
     v:{foldRate:83,raiseRate:2,allinRate:2.0,bluffFreq:7,aggression:14,tiltResist:65,potControl:88,noiseResist:61,callFreq:15,positionBias:40,thinkingSpeed:38,bluffCatch:45}},
-  ESTJ: {group:"SJ", archetype:"管理者", cnName:"监督者",
-    playStyle:"紧凶型管理者 · 高进攻高逻辑 · 果断管理 · 锅控最强",
-    signals:{openingAggression:0.82,moveIntuition:0.22,decisionLogic:0.88,endgameDecisiveness:0.90},
+  ESTJ: {group:"SJ", archetype:"铁面管理者", cnName:"监督者",
+    playStyle:"紧凶型管理者 · 高纪律高逻辑 · 果断管理 · 锅控最强",
     v:{foldRate:72,raiseRate:12,allinRate:2.0,bluffFreq:2,aggression:29,tiltResist:79,potControl:90,noiseResist:73,callFreq:16,positionBias:78,thinkingSpeed:62,bluffCatch:58}},
-  ESFJ: {group:"SJ", archetype:"供给者", cnName:"销售员",
+  ESFJ: {group:"SJ", archetype:"社交管家", cnName:"销售员",
     playStyle:"紧弱型社交家 · 情绪导向 · 跟注为主 · 锅控极强",
-    signals:{openingAggression:0.78,moveIntuition:0.20,decisionLogic:0.28,endgameDecisiveness:0.85},
     v:{foldRate:73,raiseRate:11,allinRate:2.0,bluffFreq:7,aggression:28,tiltResist:65,potControl:88,noiseResist:60,callFreq:16,positionBias:72,thinkingSpeed:48,bluffCatch:42}},
-  // ===== SP 绿人组·艺术创造者 =====
-  ISTP: {group:"SP", archetype:"手艺者", cnName:"工匠",
-    playStyle:"灵活型松凶玩家 · 战术敏锐 · 高频诈唬 · 随势而变",
-    signals:{openingAggression:0.25,moveIntuition:0.22,decisionLogic:0.82,endgameDecisiveness:0.28},
+  // ===== SP 绿人组·艺术创造者 · aggression 66-81%, potControl 28-30% =====
+  ISTP: {group:"SP", archetype:"冷静猎手", cnName:"工匠",
+    playStyle:"灵活型松凶玩家 · 战术敏锐 · 中高诈唬 · 随势而变",
     v:{foldRate:43,raiseRate:25,allinRate:2.4,bluffFreq:56,aggression:67,tiltResist:58,potControl:30,noiseResist:62,callFreq:32,positionBias:50,thinkingSpeed:72,bluffCatch:55}},
-  ISFP: {group:"SP", archetype:"作曲家", cnName:"作曲家",
+  ISFP: {group:"SP", archetype:"灵动艺术家", cnName:"作曲家",
     playStyle:"灵活型松弱玩家 · 感觉先行 · 高频诈唬 · 锅控最弱",
-    signals:{openingAggression:0.20,moveIntuition:0.25,decisionLogic:0.25,endgameDecisiveness:0.22},
     v:{foldRate:43,raiseRate:25,allinRate:2.7,bluffFreq:64,aggression:66,tiltResist:44,potControl:28,noiseResist:50,callFreq:32,positionBias:38,thinkingSpeed:68,bluffCatch:40}},
-  ESTP: {group:"SP", archetype:"推动者", cnName:"冒险家",
+  ESTP: {group:"SP", archetype:"冒险王", cnName:"冒险家",
     playStyle:"超松凶战术猎手 · 最高进攻 · 高诈唬 · 最不控池",
-    signals:{openingAggression:0.90,moveIntuition:0.28,decisionLogic:0.78,endgameDecisiveness:0.25},
     v:{foldRate:33,raiseRate:35,allinRate:10.1,bluffFreq:58,aggression:81,tiltResist:57,potControl:29,noiseResist:61,callFreq:32,positionBias:82,thinkingSpeed:88,bluffCatch:62}},
-  ESFP: {group:"SP", archetype:"表演者", cnName:"表演家",
-    playStyle:"超松凶表演家 · 最高诈唬 · 情绪驱动 · 最易tilt",
-    signals:{openingAggression:0.88,moveIntuition:0.30,decisionLogic:0.22,endgameDecisiveness:0.20},
+  ESFP: {group:"SP", archetype:"狂野表演家", cnName:"表演家",
+    playStyle:"超松凶表演家 · 最高诈唬 · 情绪驱动 · 极易tilt",
     v:{foldRate:33,raiseRate:35,allinRate:10.6,bluffFreq:65,aggression:81,tiltResist:43,potControl:28,noiseResist:49,callFreq:32,positionBias:78,thinkingSpeed:90,bluffCatch:38}}
 };
 
@@ -483,12 +467,12 @@ const DIMS = [
   {key:"bluffCatch",   label:"抓诈能力", en:"Bluff Catch",   max:100}
 ];
 
-// ---- 气质组预设（典型四维滑块值 0-100） ----
+// ---- 气质组预设（典型四维滑块值 0-100，由组质心反解得到） ----
 const PRESETS = {
-  SJ: {aggro:22, bluff:5,  ratio:75, risk:88},
-  NT: {aggro:55, bluff:32, ratio:93, risk:62},
-  NF: {aggro:55, bluff:64, ratio:28, risk:30},
-  SP: {aggro:78, bluff:60, ratio:52, risk:28}
+  SJ: {aggro:15, bluff:5,  ratio:70, risk:90},
+  NT: {aggro:60, bluff:32, ratio:95, risk:55},
+  NF: {aggro:55, bluff:65, ratio:28, risk:28},
+  SP: {aggro:75, bluff:60, ratio:50, risk:25}
 };
 
 const GROUP_CN = {SJ:"蓝·阵地守将", NT:"黄·算度大师", NF:"紫·诗意弈者", SP:"绿·战术猎手"};
@@ -496,29 +480,34 @@ const GROUP_COLOR = {SJ:"#4d6b8f", NT:"#f0c674", NF:"#9d6bbf", SP:"#8fa86b"};
 const GROUP_DOT = {SJ:"#9cb4d0", NT:"#f5deb3", NF:"#d8bfd8", SP:"#b6c78f"};
 
 // ---- 四维滑块 → 12维向量 的映射算法 ----
-// 这是纯配置驱动的映射函数，体现"不用LLM做核心决策"
+// 纯配置驱动：通过4×4线性方程组精确拟合四大气质组质心
+// 每个输出维度 = base + cA·A + cB·B + cR·R + cK·K (A/B/R/K为0-100滑块)
+// 系数通过解质心拟合线性方程组得到，保证四大气质组一键预设准确落组
+const MAP_COEFFS = {
+  // dim:       [base,  cA,     cB,     cR,     cK,     lo,  hi]
+  foldRate:     [ 20,  0.0171,  0.0768, -0.1252, 0.7347,  15,  90],
+  raiseRate:    [  0,  0.0276,  0.3129,  0.2539, -0.1417,  0,  45],
+  allinRate:    [  0, -0.2016,  0.2602,  0.1626, -0.0851,  0,  18],
+  bluffFreq:    [  0,  0.1640,  0.8623, -0.0833,  0.0451,  2,  85],
+  aggression:   [ 10, -0.6476,  1.2846,  1.0226, -0.6255, 10,  90],
+  tiltResist:   [ 15, -0.0117, -0.1246,  0.9262, -0.0782,  15,  98],
+  potControl:   [ 15, -0.2001,  0.0291,  0.1936,  0.7034,  15,  95],
+  noiseResist:  [ 20,  0.2184, -0.2162,  0.6594, -0.0150,  20,  95],
+  callFreq:     [  8,  0.2485,  0.1777, -0.2042,  0.1964,   8,  40],
+  positionBias: [ 20,  0.4385, -0.0238,  0.0491,  0.3234,  20,  90],
+  thinkingSpeed:[ 25,  0.4284,  0.3798, -0.1307,  0.2647,  25,  95],
+  bluffCatch:   [ 15, -0.2735,  0.2278,  0.9825, -0.3313,  15,  90]
+};
+
 function slidersToVector(aggro, bluff, ratio, risk){
-  // aggro, bluff, ratio, risk 均为 0-100
-  const A = aggro/100, B = bluff/100, R = ratio/100, K = risk/100;
-
-  // 基础映射 + 交互项（非线性微调）
-  const foldRate     = clamp( 85 - A*50 - B*25 + K*40 + R*5, 10, 95 );
-  const raiseRate    = clamp( 2 + A*35 - K*12 + B*8, 0, 50 );
-  const allinRate    = clamp( A*15*(1-K*0.7) + B*5 - R*5, 0, 20 );
-  const bluffFreq    = clamp( B*85 + (1-R)*15 - K*20, 0, 90 );
-  const aggression   = clamp( A*85 + B*10 - K*25, 5, 95 );
-  const tiltResist   = clamp( R*80 + K*10 - B*5 - A*5, 10, 98 );
-  const potControl   = clamp( K*75 + R*15 - A*30 - B*10, 10, 95 );
-  const noiseResist  = clamp( R*85 + K*5 - B*5, 15, 95 );
-  const callFreq     = clamp( (1-K)*25 + (1-A)*10 - B*5, 5, 45 );
-  const positionBias = clamp( A*50 + R*30 + K*10, 15, 90 );
-  const thinkingSpeed= clamp( (1-R)*40 + A*30 + B*20 + 25, 20, 95 );
-  const bluffCatch   = clamp( R*60 + K*20 - B*15 + 15, 10, 95 );
-
-  return {foldRate,raiseRate,allinRate,bluffFreq,aggression,tiltResist,potControl,noiseResist,callFreq,positionBias,thinkingSpeed,bluffCatch};
+  const out = {};
+  for(const [dim, c] of Object.entries(MAP_COEFFS)){
+    const [base, cA, cB, cR, cK, lo, hi] = c;
+    let v = base + cA*aggro + cB*bluff + cR*ratio + cK*risk;
+    out[dim] = Math.max(lo, Math.min(hi, v));
+  }
+  return out;
 }
-
-function clamp(v, lo, hi){ return Math.max(lo, Math.min(hi, v)); }
 
 // ---- 向量与MBTI距离计算（加权欧氏距离） ----
 // 8个核心维度权重更高，4个扩展维度权重较低
