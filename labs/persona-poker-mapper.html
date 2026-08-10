@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>🎴 PersonaPokerMapper · 人格扑克映射器 · Game-OS</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎴</text></svg>" />
+<link rel="stylesheet" href="../assets/css/base.css?v=3">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+/* ===== PersonaPokerMapper 专属样式 · ymine深色科技风 ===== */
+:root{
+  --bg:#0a0a18;--card:rgba(255,255,255,0.025);--card-hover:rgba(255,255,255,0.045);
+  --border:rgba(255,255,255,0.06);--border-strong:rgba(255,255,255,0.12);
+  --text:#e8eaf6;--text-sec:rgba(232,234,246,0.72);--text-dim:rgba(232,234,246,0.5);
+  --text-mute:rgba(232,234,246,0.3);
+  --purple:#a78bfa;--purple-dim:#8b5cf6;--purple-glow:rgba(167,139,250,0.15);
+  --cyan:#22d3ee;--cyan-dim:#06b6d4;--cyan-glow:rgba(34,211,238,0.12);
+  --amber:#fbbf24;--amber-dim:#f59e0b;--amber-glow:rgba(251,191,36,0.12);
+  --green:#8fa86b;--green-glow:rgba(143,168,107,0.15);
+  --blue:#4d6b8f;--blue-glow:rgba(77,107,143,0.15);
+  --nf:#9d6bbf;--nt:#f0c674;--sj:#4d6b8f;--sp:#8fa86b;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Hiragino Sans GB','Microsoft YaHei',system-ui,sans-serif;line-height:1.6;min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;top:0;left:0;right:0;bottom:0;
+  background:
+    radial-gradient(ellipse at 15% 20%,rgba(167,139,250,0.08),transparent 55%),
+    radial-gradient(ellipse at 85% 80%,rgba(34,211,238,0.06),transparent 55%),
+    radial-gradient(ellipse at 50% 50%,rgba(251,191,36,0.03),transparent 70%);
+  pointer-events:none;z-index:0;
+}
+.wrap{max-width:1280px;margin:0 auto;padding:24px;position:relative;z-index:1;}
+
+/* 面包屑 */
+.breadcrumb{display:flex;align-items:center;gap:10px;margin-bottom:18px;font-size:12px;color:var(--text-dim);}
+.breadcrumb a{color:var(--cyan);text-decoration:none;transition:color .2s;}
+.breadcrumb a:hover{color:var(--purple);}
+.breadcrumb .sep{color:var(--text-mute);}
+.breadcrumb .cur{color:var(--text-sec);}
+
+/* Hero 标题区 */
+.hero{
+  background:linear-gradient(135deg,rgba(167,139,250,0.10),rgba(34,211,238,0.05),rgba(251,191,36,0.04));
+  border:1px solid rgba(167,139,250,0.2);
+  border-radius:20px;padding:32px 36px;margin-bottom:22px;position:relative;overflow:hidden;
+}
+.hero::before{content:'';position:absolute;inset:0;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,0.04),transparent);
+  transform:translateX(-100%);animation:scan 8s linear infinite;pointer-events:none;}
+@keyframes scan{to{transform:translateX(100%);}}
+.hero-badge{display:inline-flex;align-items:center;gap:6px;
+  font-size:10px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;
+  padding:3px 12px;border-radius:20px;
+  background:rgba(251,191,36,0.12);border:1px solid rgba(251,191,36,0.3);color:var(--amber);
+  margin-bottom:14px;
+}
+.hero-badge .pulse{width:6px;height:6px;border-radius:50%;background:var(--amber);animation:pulse-dot 2s infinite;box-shadow:0 0 8px var(--amber);}
+@keyframes pulse-dot{0%,100%{opacity:1;}50%{opacity:0.4;}}
+.hero h1{font-size:clamp(24px,4vw,34px);font-weight:800;letter-spacing:-0.5px;
+  background:linear-gradient(135deg,#c4b5fd,#22d3ee,#fbbf24);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  margin-bottom:8px;
+}
+.hero .sub{color:var(--text-dim);font-size:14px;letter-spacing:0.3px;}
+
+/* 主布局网格 */
+.main-grid{display:grid;grid-template-columns:320px 1fr 340px;gap:18px;align-items:start;}
+@media(max-width:1100px){.main-grid{grid-template-columns:1fr 1fr;} .panel-radar{grid-column:1/-1;}}
+@media(max-width:720px){.main-grid{grid-template-columns:1fr;} .wrap{padding:14px;} .hero{padding:22px 20px;}}
+
+/* 卡片 */
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px 22px;backdrop-filter:blur(8px);transition:border-color .25s,background .25s;}
+.card:hover{border-color:rgba(167,139,250,0.15);}
+.card-title{font-size:14px;font-weight:700;margin-bottom:4px;display:flex;align-items:center;gap:8px;color:var(--text);}
+.card-title .icon{font-size:18px;}
+.card-desc{font-size:11px;color:var(--text-dim);margin-bottom:14px;line-height:1.6;letter-spacing:0.2px;}
+
+/* ===== 滑块控制台 ===== */
+.sliders{display:flex;flex-direction:column;gap:16px;}
+.slider-group{background:rgba(0,0,0,0.25);border:1px solid var(--border);border-radius:12px;padding:14px 16px;transition:border-color .2s;}
+.slider-group:hover{border-color:rgba(34,211,238,0.25);}
+.slider-header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px;}
+.slider-name{font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px;}
+.slider-name .dot{width:6px;height:6px;border-radius:50%;}
+.slider-name .dot.aggro{background:#f87171;box-shadow:0 0 8px #f87171;}
+.slider-name .dot.bluff{background:var(--amber);box-shadow:0 0 8px var(--amber);}
+.slider-name .dot.ratio{background:var(--cyan);box-shadow:0 0 8px var(--cyan);}
+.slider-name .dot.risk{background:var(--purple);box-shadow:0 0 8px var(--purple);}
+.slider-name small{color:var(--text-dim);font-size:10px;font-weight:400;letter-spacing:0.5px;}
+.slider-val{font-family:'SF Mono',ui-monospace,Consolas,monospace;font-size:20px;font-weight:700;color:var(--cyan);min-width:48px;text-align:right;}
+.slider-track{position:relative;}
+input[type=range].neon{
+  -webkit-appearance:none;appearance:none;width:100%;height:6px;border-radius:3px;
+  background:linear-gradient(90deg,rgba(34,211,238,0.15),rgba(167,139,250,0.15));
+  outline:none;cursor:pointer;
+}
+input[type=range].neon::-webkit-slider-runnable-track{height:6px;border-radius:3px;
+  background:linear-gradient(90deg,rgba(34,211,238,0.4) 0%,var(--cyan) var(--fill,50%),rgba(255,255,255,0.06) var(--fill,50%));}
+input[type=range].neon::-moz-range-track{height:6px;border-radius:3px;background:rgba(255,255,255,0.06);}
+input[type=range].neon::-moz-range-progress{height:6px;border-radius:3px;background:linear-gradient(90deg,rgba(34,211,238,0.4),var(--cyan));}
+input[type=range].neon::-webkit-slider-thumb{
+  -webkit-appearance:none;width:18px;height:18px;border-radius:50%;
+  background:var(--amber);border:3px solid #0a0a18;
+  box-shadow:0 0 0 2px var(--amber),0 0 16px rgba(251,191,36,0.6);
+  cursor:pointer;margin-top:-6px;transition:transform .15s,box-shadow .15s;
+}
+input[type=range].neon::-webkit-slider-thumb:hover{transform:scale(1.15);box-shadow:0 0 0 2px var(--amber),0 0 24px rgba(251,191,36,0.9);}
+input[type=range].neon::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:var(--amber);border:3px solid #0a0a18;box-shadow:0 0 0 2px var(--amber),0 0 16px rgba(251,191,36,0.6);cursor:pointer;}
+.slider-hints{display:flex;justify-content:space-between;margin-top:6px;font-size:10px;color:var(--text-mute);font-family:'SF Mono',monospace;}
+.slider-affects{margin-top:8px;display:flex;flex-wrap:wrap;gap:4px;}
+.affect-tag{font-size:9px;padding:2px 7px;border-radius:10px;background:rgba(255,255,255,0.04);color:var(--text-dim);letter-spacing:0.3px;border:1px solid var(--border);}
+
+/* 气质组快捷按钮 */
+.temper-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:14px;}
+.temper-btn{
+  padding:10px 6px;border-radius:10px;border:1.5px solid var(--border);
+  background:rgba(0,0,0,0.2);cursor:pointer;font-size:11px;font-weight:700;
+  color:var(--text);text-align:center;transition:all .25s;letter-spacing:0.5px;position:relative;overflow:hidden;
+}
+.temper-btn .tg-code{font-size:15px;display:block;margin-bottom:2px;font-family:'SF Mono',monospace;}
+.temper-btn .tg-name{font-size:9px;opacity:0.7;font-weight:500;}
+.temper-btn.sj{border-color:rgba(77,107,143,0.4);}
+.temper-btn.sj:hover,.temper-btn.sj.active{background:rgba(77,107,143,0.18);border-color:var(--sj);color:#b0c4de;box-shadow:0 0 16px rgba(77,107,143,0.25);}
+.temper-btn.nt{border-color:rgba(240,198,116,0.4);}
+.temper-btn.nt:hover,.temper-btn.nt.active{background:rgba(240,198,116,0.15);border-color:var(--nt);color:#f5deb3;box-shadow:0 0 16px rgba(240,198,116,0.25);}
+.temper-btn.nf{border-color:rgba(157,107,191,0.4);}
+.temper-btn.nf:hover,.temper-btn.nf.active{background:rgba(157,107,191,0.18);border-color:var(--nf);color:#d8bfd8;box-shadow:0 0 16px rgba(157,107,191,0.25);}
+.temper-btn.sp{border-color:rgba(143,168,107,0.4);}
+.temper-btn.sp:hover,.temper-btn.sp.active{background:rgba(143,168,107,0.18);border-color:var(--sp);color:#c5d0a8;box-shadow:0 0 16px rgba(143,168,107,0.25);}
+
+/* ===== 雷达图区域 ===== */
+.panel-radar{display:flex;flex-direction:column;min-height:500px;}
+.radar-wrap{position:relative;flex:1;min-height:400px;}
+.radar-wrap canvas{width:100%!important;height:100%!important;}
+.radar-controls{display:flex;align-items:center;gap:10px;margin-top:10px;flex-wrap:wrap;}
+.toggle-wrap{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--text-sec);cursor:pointer;user-select:none;}
+.toggle-switch{position:relative;width:36px;height:20px;border-radius:10px;background:rgba(255,255,255,0.08);transition:background .2s;}
+.toggle-switch::after{content:'';position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:var(--text-dim);transition:all .2s;}
+.toggle-wrap.on .toggle-switch{background:rgba(167,139,250,0.3);}
+.toggle-wrap.on .toggle-switch::after{left:18px;background:var(--purple);box-shadow:0 0 8px var(--purple);}
+.radar-legend{display:flex;gap:14px;font-size:11px;margin-left:auto;color:var(--text-dim);}
+.radar-legend .lg{display:flex;align-items:center;gap:6px;}
+.radar-legend .sw{width:14px;height:3px;border-radius:2px;}
+
+/* ===== 匹配面板 ===== */
+.match-hero{
+  background:linear-gradient(135deg,rgba(167,139,250,0.10),rgba(34,211,238,0.04));
+  border:1px solid rgba(167,139,250,0.2);
+  border-radius:14px;padding:20px;margin-bottom:14px;position:relative;overflow:hidden;
+}
+.match-hero.mbti-NF{background:linear-gradient(135deg,rgba(157,107,191,0.15),rgba(157,107,191,0.03));border-color:rgba(157,107,191,0.3);}
+.match-hero.mbti-NT{background:linear-gradient(135deg,rgba(240,198,116,0.12),rgba(240,198,116,0.03));border-color:rgba(240,198,116,0.3);}
+.match-hero.mbti-SJ{background:linear-gradient(135deg,rgba(77,107,143,0.15),rgba(77,107,143,0.03));border-color:rgba(77,107,143,0.3);}
+.match-hero.mbti-SP{background:linear-gradient(135deg,rgba(143,168,107,0.15),rgba(143,168,107,0.03));border-color:rgba(143,168,107,0.3);}
+.match-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:10px;}
+.match-type{font-size:clamp(22px,3vw,28px);font-weight:800;letter-spacing:-0.5px;}
+.match-type small{font-size:14px;font-weight:500;color:var(--text-sec);margin-left:4px;}
+.group-badge{font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;letter-spacing:0.5px;flex-shrink:0;}
+.group-badge.NF{background:rgba(157,107,191,0.2);color:var(--nf);border:1px solid rgba(157,107,191,0.35);}
+.group-badge.NT{background:rgba(240,198,116,0.2);color:var(--nt);border:1px solid rgba(240,198,116,0.35);}
+.group-badge.SJ{background:rgba(77,107,143,0.2);color:#9cb4d0;border:1px solid rgba(77,107,143,0.35);}
+.group-badge.SP{background:rgba(143,168,107,0.2);color:#b6c78f;border:1px solid rgba(143,168,107,0.35);}
+.match-pct{font-family:'SF Mono',monospace;font-size:13px;color:var(--cyan);font-weight:600;margin-bottom:10px;}
+.match-pct .pct-val{font-size:24px;font-weight:800;color:var(--text);}
+.match-desc{font-size:12px;color:var(--text-sec);line-height:1.7;}
+
+/* Top 3 匹配 */
+.top3-title{font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;font-weight:700;margin-bottom:10px;}
+.top3-list{display:flex;flex-direction:column;gap:8px;}
+.top3-item{background:rgba(0,0,0,0.2);border:1px solid var(--border);border-radius:10px;padding:10px 12px;display:flex;align-items:center;gap:10px;transition:all .2s;}
+.top3-item.best{border-color:rgba(167,139,250,0.3);background:rgba(167,139,250,0.06);}
+.top3-rank{font-family:'SF Mono',monospace;font-size:11px;color:var(--text-mute);width:18px;font-weight:700;}
+.top3-item.best .top3-rank{color:var(--amber);}
+.top3-code{font-family:'SF Mono',monospace;font-size:13px;font-weight:700;width:48px;}
+.top3-name{flex:1;min-width:0;font-size:11px;color:var(--text-sec);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.top3-bar{flex:1;max-width:100px;height:4px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden;}
+.top3-fill{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--cyan),var(--purple));transition:width .4s ease;}
+.top3-pct{font-family:'SF Mono',monospace;font-size:11px;color:var(--text-dim);width:38px;text-align:right;}
+
+/* 行为描述卡 */
+.desc-card{background:linear-gradient(135deg,rgba(0,0,0,0.25),rgba(167,139,250,0.04));border:1px solid var(--border);border-radius:14px;padding:18px 20px;margin-top:14px;position:relative;}
+.desc-card::before{content:'"';position:absolute;top:8px;left:14px;font-size:40px;font-family:Georgia,serif;color:var(--purple);opacity:0.3;line-height:1;}
+.desc-text{font-size:13px;color:var(--text-sec);line-height:1.8;padding-left:8px;}
+.desc-text .hl{color:var(--cyan);font-weight:600;}
+.desc-text .hl-p{color:var(--purple);font-weight:600;}
+.desc-text .hl-a{color:var(--amber);font-weight:600;}
+
+/* 指标小网格 */
+.metrics-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px;}
+.metric-mini{background:rgba(0,0,0,0.2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;text-align:center;}
+.metric-mini .mv{font-family:'SF Mono',monospace;font-size:16px;font-weight:700;color:var(--text);}
+.metric-mini .ml{font-size:9px;color:var(--text-mute);text-transform:uppercase;letter-spacing:0.5px;margin-top:2px;}
+
+/* 页脚 */
+.footer{margin-top:32px;padding:24px 0;text-align:center;font-size:11px;color:var(--text-mute);border-top:1px solid var(--border);}
+.footer .f-brand{color:var(--text-dim);font-weight:600;margin-bottom:4px;letter-spacing:0.5px;}
+.footer .f-src{color:var(--text-mute);}
+
+/* 响应式 */
+@media(max-width:1100px){
+  .panel-sliders{order:1;}
+  .panel-radar{order:2;}
+  .panel-match{order:3;grid-column:1/-1;}
+  .metrics-grid{grid-template-columns:repeat(4,1fr);}
+}
+@media(max-width:720px){
+  .hero{padding:20px 18px;border-radius:14px;margin-bottom:14px;}
+  .card{padding:16px;border-radius:12px;}
+  .metrics-grid{grid-template-columns:repeat(3,1fr);}
+  .temper-row{grid-template-columns:repeat(2,1fr);}
+  .radar-wrap{min-height:320px;}
+}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <!-- 面包屑 -->
+  <div class="breadcrumb">
+    <a href="../index.html">🏠 Y.Mine</a>
+    <span class="sep">/</span>
+    <a href="./index.html">Labs</a>
+    <span class="sep">/</span>
+    <span class="cur">🎴 PersonaPokerMapper</span>
+  </div>
+
+  <!-- Hero 标题区 -->
+  <div class="hero">
+    <div class="hero-badge"><span class="pulse"></span>Game-OS V2.5 · 人格层实验</div>
+    <h1>🎴 PersonaPokerMapper · 人格扑克映射器</h1>
+    <div class="sub">12维行为向量 × 16型人格配置驱动 · 毫秒级人格切换 · 零LLM延迟</div>
+  </div>
+
+  <!-- 主网格 -->
+  <div class="main-grid">
+
+    <!-- 左侧：滑块控制台 + 气质组 -->
+    <div class="panel-sliders">
+      <div class="card">
+        <div class="card-title"><span class="icon">🎛️</span>四维控制台 <small style="color:var(--text-dim);font-weight:400;font-size:11px;">Control Vectors</small></div>
+        <div class="card-desc">拖动滑块调节四维控制向量，实时计算12维行为画像并匹配最近人格</div>
+
+        <div class="sliders">
+          <!-- 攻击性 -->
+          <div class="slider-group">
+            <div class="slider-header">
+              <div class="slider-name"><span class="dot aggro"></span>攻击性 <small>Aggression</small></div>
+              <div class="slider-val" id="val-aggro">50</div>
+            </div>
+            <div class="slider-track">
+              <input type="range" class="neon" id="slider-aggro" min="0" max="100" value="50">
+            </div>
+            <div class="slider-hints"><span>被动跟注</span><span>松凶激进</span></div>
+            <div class="slider-affects">
+              <span class="affect-tag">aggressionLevel</span>
+              <span class="affect-tag">raiseRate ↑</span>
+              <span class="affect-tag">allinRate ↑</span>
+            </div>
+          </div>
+
+          <!-- 诈唬频率 -->
+          <div class="slider-group">
+            <div class="slider-header">
+              <div class="slider-name"><span class="dot bluff"></span>诈唬频率 <small>Bluff Freq</small></div>
+              <div class="slider-val" id="val-bluff">35</div>
+            </div>
+            <div class="slider-track">
+              <input type="range" class="neon" id="slider-bluff" min="0" max="100" value="35">
+            </div>
+            <div class="slider-hints"><span>价值下注</span><span>空气诈唬</span></div>
+            <div class="slider-affects">
+              <span class="affect-tag">bluffFrequency ↑</span>
+              <span class="affect-tag">foldRate ↓</span>
+              <span class="affect-tag">bluffCatch</span>
+            </div>
+          </div>
+
+          <!-- 理性度 -->
+          <div class="slider-group">
+            <div class="slider-header">
+              <div class="slider-name"><span class="dot ratio"></span>理性度 <small>Rationality</small></div>
+              <div class="slider-val" id="val-ratio">70</div>
+            </div>
+            <div class="slider-track">
+              <input type="range" class="neon" id="slider-ratio" min="0" max="100" value="70">
+            </div>
+            <div class="slider-hints"><span>情绪驱动</span><span>EV精算</span></div>
+            <div class="slider-affects">
+              <span class="affect-tag">tiltResistance ↑</span>
+              <span class="affect-tag">noiseResistance ↑</span>
+              <span class="affect-tag">decisionLogic ↑</span>
+            </div>
+          </div>
+
+          <!-- 风控松紧 -->
+          <div class="slider-group">
+            <div class="slider-header">
+              <div class="slider-name"><span class="dot risk"></span>风控松紧 <small>Risk Control</small></div>
+              <div class="slider-val" id="val-risk">60</div>
+            </div>
+            <div class="slider-track">
+              <input type="range" class="neon" id="slider-risk" min="0" max="100" value="60">
+            </div>
+            <div class="slider-hints"><span>松浪冒险</span><span>紧控风控</span></div>
+            <div class="slider-affects">
+              <span class="affect-tag">potControlTight ↑</span>
+              <span class="affect-tag">foldRate ↑</span>
+              <span class="affect-tag">callFreq ↓</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 气质组快捷按钮 -->
+        <div class="top3-title" style="margin-top:18px;">⚡ 四大气质组 · One-Click Preset</div>
+        <div class="temper-row">
+          <button class="temper-btn sj" data-preset="SJ" onclick="applyPreset('SJ')">
+            <span class="tg-code">SJ</span><span class="tg-name">蓝·阵地守将</span>
+          </button>
+          <button class="temper-btn nt active" data-preset="NT" onclick="applyPreset('NT')">
+            <span class="tg-code">NT</span><span class="tg-name">黄·算度大师</span>
+          </button>
+          <button class="temper-btn nf" data-preset="NF" onclick="applyPreset('NF')">
+            <span class="tg-code">NF</span><span class="tg-name">紫·诗意弈者</span>
+          </button>
+          <button class="temper-btn sp" data-preset="SP" onclick="applyPreset('SP')">
+            <span class="tg-code">SP</span><span class="tg-name">绿·战术猎手</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 中间：雷达图 -->
+    <div class="card panel-radar">
+      <div class="card-title"><span class="icon">📡</span>12维行为雷达 <small style="color:var(--text-dim);font-weight:400;font-size:11px;">Behavior Radar</small></div>
+      <div class="card-desc">当前配置画像（紫色填充）vs 最佳匹配MBTI标准画像（青色虚线），可切换叠加对比</div>
+      <div class="radar-wrap">
+        <canvas id="radarChart"></canvas>
+      </div>
+      <div class="radar-controls">
+        <label class="toggle-wrap on" id="toggleCompare">
+          <span class="toggle-switch"></span>
+          <span>叠加对比画像</span>
+        </label>
+        <div class="radar-legend">
+          <span class="lg"><span class="sw" style="background:var(--purple);"></span>当前配置</span>
+          <span class="lg"><span class="sw" style="background:var(--cyan);border-top:2px dashed var(--cyan);height:0;"></span>最佳MBTI</span>
+        </div>
+      </div>
+
+      <!-- 关键指标小卡 -->
+      <div class="metrics-grid" id="metricsGrid"></div>
+    </div>
+
+    <!-- 右侧：人格匹配 + 行为描述 -->
+    <div class="panel-match">
+      <div class="card">
+        <div class="card-title"><span class="icon">🎭</span>人格匹配 <small style="color:var(--text-dim);font-weight:400;font-size:11px;">Persona Match</small></div>
+        <div class="card-desc">四维向量在16型MBTI空间中找最近邻，毫秒级响应</div>
+
+        <div class="match-hero mbti-NT" id="matchHero">
+          <div class="match-top">
+            <div class="match-type" id="matchType">INTJ <small>· 策略大师</small></div>
+            <span class="group-badge NT" id="matchGroup">NT 黄人组</span>
+          </div>
+          <div class="match-pct">匹配度 <span class="pct-val" id="matchPct">—</span>%</div>
+          <div class="match-desc" id="matchDesc">加载中…</div>
+        </div>
+
+        <div class="top3-title">🏆 Top 3 最近人格</div>
+        <div class="top3-list" id="top3List"></div>
+
+        <div class="desc-card">
+          <div class="desc-text" id="descText">加载中…</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 页脚 -->
+  <div class="footer">
+    <div class="f-brand">🎭 Game-OS V2.5 决策AI中台 · 人格层实验控制台</div>
+    <div class="f-src">数据来源：16型MBTI×12维行为实证研究 · 配置驱动 · 零LLM延迟</div>
+  </div>
+
+</div>
+
+<script>
+// ============================================================
+// PersonaPokerMapper · 配置驱动的人格扑克映射引擎
+// 纯前端计算，毫秒级响应，零LLM调用
+// ============================================================
+
+// ---- MBTI 16型完整数据（含12维行为向量） ----
+// 基于persona_poker_data.json的8维输出扩展到12维
+// 扩展维度（callFreq, positionBias, thinkingSpeed, bluffCatch）根据群体特征推断
+const MBTI_DATA = {
+  // ===== NF 紫人组·理想主义者 =====
+  INFJ: {group:"NF", archetype:"诗意弈者", cnName:"劝告者",
+    playStyle:"理想型松弱玩家 · 直觉先行 · 高频诈唬 · 情绪敏感",
+    signals:{openingAggression:0.25,moveIntuition:0.85,decisionLogic:0.30,endgameDecisiveness:0.82},
+    v:{foldRate:50,raiseRate:17,allinRate:2.2,bluffFreq:64,aggression:63,tiltResist:30,potControl:38,noiseResist:36,callFreq:33,positionBias:42,thinkingSpeed:72,bluffCatch:35}},
+  INFP: {group:"NF", archetype:"诗意弈者", cnName:"治愈者",
+    playStyle:"理想型松弱玩家 · 直觉先行 · 高频诈唬 · 情绪敏感",
+    signals:{openingAggression:0.18,moveIntuition:0.92,decisionLogic:0.22,endgameDecisiveness:0.25},
+    v:{foldRate:45,raiseRate:22,allinRate:7.3,bluffFreq:66,aggression:62,tiltResist:28,potControl:24,noiseResist:34,callFreq:33,positionBias:30,thinkingSpeed:82,bluffCatch:28}},
+  ENFJ: {group:"NF", archetype:"诗意弈者", cnName:"教导者",
+    playStyle:"理想型松弱玩家 · 主动社交 · 情绪激励 · 易受影响",
+    signals:{openingAggression:0.80,moveIntuition:0.78,decisionLogic:0.35,endgameDecisiveness:0.78},
+    v:{foldRate:41,raiseRate:26,allinRate:7.6,bluffFreq:62,aggression:74,tiltResist:31,potControl:37,noiseResist:37,callFreq:33,positionBias:68,thinkingSpeed:68,bluffCatch:38}},
+  ENFP: {group:"NF", archetype:"诗意弈者", cnName:"冠军者",
+    playStyle:"理想型松凶玩家 · 进攻性强 · 全下频率高 · 最易tilt",
+    signals:{openingAggression:0.88,moveIntuition:0.90,decisionLogic:0.28,endgameDecisiveness:0.20},
+    v:{foldRate:34,raiseRate:33,allinRate:14.9,bluffFreq:65,aggression:77,tiltResist:30,potControl:23,noiseResist:35,callFreq:33,positionBias:70,thinkingSpeed:85,bluffCatch:30}},
+  // ===== NT 黄人组·理性者 =====
+  INTJ: {group:"NT", archetype:"策略大师", cnName:"专家",
+    playStyle:"紧凶型精算玩家 · 深思熟虑 · 低诈唬 · 抗噪最强",
+    signals:{openingAggression:0.30,moveIntuition:0.88,decisionLogic:0.92,endgameDecisiveness:0.85},
+    v:{foldRate:59,raiseRate:21,allinRate:2.0,bluffFreq:32,aggression:69,tiltResist:95,potControl:68,noiseResist:89,callFreq:20,positionBias:62,thinkingSpeed:55,bluffCatch:82}},
+  INTP: {group:"NT", archetype:"逻辑学家", cnName:"思想家",
+    playStyle:"紧弱型精算玩家 · 长考分析 · 收局犹豫 · 抗噪极强",
+    signals:{openingAggression:0.22,moveIntuition:0.85,decisionLogic:0.88,endgameDecisiveness:0.30},
+    v:{foldRate:55,raiseRate:25,allinRate:5.5,bluffFreq:32,aggression:67,tiltResist:94,potControl:55,noiseResist:88,callFreq:20,positionBias:48,thinkingSpeed:38,bluffCatch:85}},
+  ENTJ: {group:"NT", archetype:"统帅", cnName:"元帅",
+    playStyle:"松凶型统帅玩家 · 高逻辑高进攻 · 果断收局 · 抗噪极强",
+    signals:{openingAggression:0.92,moveIntuition:0.82,decisionLogic:0.90,endgameDecisiveness:0.88},
+    v:{foldRate:50,raiseRate:30,allinRate:7.3,bluffFreq:31,aggression:82,tiltResist:95,potControl:69,noiseResist:88,callFreq:20,positionBias:85,thinkingSpeed:78,bluffCatch:80}},
+  ENTP: {group:"NT", archetype:"辩论家", cnName:"发明家",
+    playStyle:"松凶型辩论玩家 · 高直觉高逻辑 · 施压不收局 · 最会诈唬",
+    signals:{openingAggression:0.85,moveIntuition:0.88,decisionLogic:0.82,endgameDecisiveness:0.22},
+    v:{foldRate:45,raiseRate:35,allinRate:13.2,bluffFreq:33,aggression:81,tiltResist:93,potControl:53,noiseResist:87,callFreq:20,positionBias:75,thinkingSpeed:88,bluffCatch:78}},
+  // ===== SJ 蓝人组·守护者 =====
+  ISTJ: {group:"SJ", archetype:"检查官", cnName:"检查者",
+    playStyle:"保守型紧弱玩家 · 稳扎稳打 · 极少诈唬 · 耐心等牌",
+    signals:{openingAggression:0.15,moveIntuition:0.20,decisionLogic:0.85,endgameDecisiveness:0.88},
+    v:{foldRate:82,raiseRate:2,allinRate:2.0,bluffFreq:2,aggression:15,tiltResist:78,potControl:89,noiseResist:72,callFreq:16,positionBias:45,thinkingSpeed:42,bluffCatch:60}},
+  ISFJ: {group:"SJ", archetype:"保护者", cnName:"保护者",
+    playStyle:"保守型紧弱玩家 · 情绪敏感 · 极少加注 · 锅控极强",
+    signals:{openingAggression:0.12,moveIntuition:0.18,decisionLogic:0.30,endgameDecisiveness:0.82},
+    v:{foldRate:83,raiseRate:2,allinRate:2.0,bluffFreq:7,aggression:14,tiltResist:65,potControl:88,noiseResist:61,callFreq:15,positionBias:40,thinkingSpeed:38,bluffCatch:45}},
+  ESTJ: {group:"SJ", archetype:"管理者", cnName:"监督者",
+    playStyle:"紧凶型管理者 · 高进攻高逻辑 · 果断管理 · 锅控最强",
+    signals:{openingAggression:0.82,moveIntuition:0.22,decisionLogic:0.88,endgameDecisiveness:0.90},
+    v:{foldRate:72,raiseRate:12,allinRate:2.0,bluffFreq:2,aggression:29,tiltResist:79,potControl:90,noiseResist:73,callFreq:16,positionBias:78,thinkingSpeed:62,bluffCatch:58}},
+  ESFJ: {group:"SJ", archetype:"供给者", cnName:"销售员",
+    playStyle:"紧弱型社交家 · 情绪导向 · 跟注为主 · 锅控极强",
+    signals:{openingAggression:0.78,moveIntuition:0.20,decisionLogic:0.28,endgameDecisiveness:0.85},
+    v:{foldRate:73,raiseRate:11,allinRate:2.0,bluffFreq:7,aggression:28,tiltResist:65,potControl:88,noiseResist:60,callFreq:16,positionBias:72,thinkingSpeed:48,bluffCatch:42}},
+  // ===== SP 绿人组·艺术创造者 =====
+  ISTP: {group:"SP", archetype:"手艺者", cnName:"工匠",
+    playStyle:"灵活型松凶玩家 · 战术敏锐 · 高频诈唬 · 随势而变",
+    signals:{openingAggression:0.25,moveIntuition:0.22,decisionLogic:0.82,endgameDecisiveness:0.28},
+    v:{foldRate:43,raiseRate:25,allinRate:2.4,bluffFreq:56,aggression:67,tiltResist:58,potControl:30,noiseResist:62,callFreq:32,positionBias:50,thinkingSpeed:72,bluffCatch:55}},
+  ISFP: {group:"SP", archetype:"作曲家", cnName:"作曲家",
+    playStyle:"灵活型松弱玩家 · 感觉先行 · 高频诈唬 · 锅控最弱",
+    signals:{openingAggression:0.20,moveIntuition:0.25,decisionLogic:0.25,endgameDecisiveness:0.22},
+    v:{foldRate:43,raiseRate:25,allinRate:2.7,bluffFreq:64,aggression:66,tiltResist:44,potControl:28,noiseResist:50,callFreq:32,positionBias:38,thinkingSpeed:68,bluffCatch:40}},
+  ESTP: {group:"SP", archetype:"推动者", cnName:"冒险家",
+    playStyle:"超松凶战术猎手 · 最高进攻 · 高诈唬 · 最不控池",
+    signals:{openingAggression:0.90,moveIntuition:0.28,decisionLogic:0.78,endgameDecisiveness:0.25},
+    v:{foldRate:33,raiseRate:35,allinRate:10.1,bluffFreq:58,aggression:81,tiltResist:57,potControl:29,noiseResist:61,callFreq:32,positionBias:82,thinkingSpeed:88,bluffCatch:62}},
+  ESFP: {group:"SP", archetype:"表演者", cnName:"表演家",
+    playStyle:"超松凶表演家 · 最高诈唬 · 情绪驱动 · 最易tilt",
+    signals:{openingAggression:0.88,moveIntuition:0.30,decisionLogic:0.22,endgameDecisiveness:0.20},
+    v:{foldRate:33,raiseRate:35,allinRate:10.6,bluffFreq:65,aggression:81,tiltResist:43,potControl:28,noiseResist:49,callFreq:32,positionBias:78,thinkingSpeed:90,bluffCatch:38}}
+};
+
+// ---- 12维标签（中英） ----
+const DIMS = [
+  {key:"foldRate",     label:"弃牌率",   en:"Fold Rate",     max:100},
+  {key:"raiseRate",    label:"加注率",   en:"Raise Rate",    max:50},
+  {key:"allinRate",    label:"全下率",   en:"All-in Rate",   max:20},
+  {key:"bluffFreq",    label:"诈唬频率", en:"Bluff Freq",    max:100},
+  {key:"aggression",   label:"攻击性",   en:"Aggression",    max:100},
+  {key:"tiltResist",   label:"抗Tilt",   en:"Tilt Resist",   max:100},
+  {key:"potControl",   label:"控池力",   en:"Pot Control",   max:100},
+  {key:"noiseResist",  label:"抗噪声",   en:"Noise Resist",  max:100},
+  {key:"callFreq",     label:"跟注率",   en:"Call Freq",     max:50},
+  {key:"positionBias", label:"位置意识", en:"Position Bias", max:100},
+  {key:"thinkingSpeed",label:"思考速度", en:"Think Speed",   max:100},
+  {key:"bluffCatch",   label:"抓诈能力", en:"Bluff Catch",   max:100}
+];
+
+// ---- 气质组预设（典型四维滑块值 0-100） ----
+const PRESETS = {
+  SJ: {aggro:22, bluff:5,  ratio:75, risk:88},
+  NT: {aggro:55, bluff:32, ratio:93, risk:62},
+  NF: {aggro:55, bluff:64, ratio:28, risk:30},
+  SP: {aggro:78, bluff:60, ratio:52, risk:28}
+};
+
+const GROUP_CN = {SJ:"蓝·阵地守将", NT:"黄·算度大师", NF:"紫·诗意弈者", SP:"绿·战术猎手"};
+const GROUP_COLOR = {SJ:"#4d6b8f", NT:"#f0c674", NF:"#9d6bbf", SP:"#8fa86b"};
+const GROUP_DOT = {SJ:"#9cb4d0", NT:"#f5deb3", NF:"#d8bfd8", SP:"#b6c78f"};
+
+// ---- 四维滑块 → 12维向量 的映射算法 ----
+// 这是纯配置驱动的映射函数，体现"不用LLM做核心决策"
+function slidersToVector(aggro, bluff, ratio, risk){
+  // aggro, bluff, ratio, risk 均为 0-100
+  const A = aggro/100, B = bluff/100, R = ratio/100, K = risk/100;
+
+  // 基础映射 + 交互项（非线性微调）
+  const foldRate     = clamp( 85 - A*50 - B*25 + K*40 + R*5, 10, 95 );
+  const raiseRate    = clamp( 2 + A*35 - K*12 + B*8, 0, 50 );
+  const allinRate    = clamp( A*15*(1-K*0.7) + B*5 - R*5, 0, 20 );
+  const bluffFreq    = clamp( B*85 + (1-R)*15 - K*20, 0, 90 );
+  const aggression   = clamp( A*85 + B*10 - K*25, 5, 95 );
+  const tiltResist   = clamp( R*80 + K*10 - B*5 - A*5, 10, 98 );
+  const potControl   = clamp( K*75 + R*15 - A*30 - B*10, 10, 95 );
+  const noiseResist  = clamp( R*85 + K*5 - B*5, 15, 95 );
+  const callFreq     = clamp( (1-K)*25 + (1-A)*10 - B*5, 5, 45 );
+  const positionBias = clamp( A*50 + R*30 + K*10, 15, 90 );
+  const thinkingSpeed= clamp( (1-R)*40 + A*30 + B*20 + 25, 20, 95 );
+  const bluffCatch   = clamp( R*60 + K*20 - B*15 + 15, 10, 95 );
+
+  return {foldRate,raiseRate,allinRate,bluffFreq,aggression,tiltResist,potControl,noiseResist,callFreq,positionBias,thinkingSpeed,bluffCatch};
+}
+
+function clamp(v, lo, hi){ return Math.max(lo, Math.min(hi, v)); }
+
+// ---- 向量与MBTI距离计算（加权欧氏距离） ----
+// 8个核心维度权重更高，4个扩展维度权重较低
+const DIM_WEIGHTS = {
+  foldRate:1.2, raiseRate:1.0, allinRate:1.0, bluffFreq:1.3,
+  aggression:1.2, tiltResist:1.2, potControl:1.1, noiseResist:1.1,
+  callFreq:0.7, positionBias:0.6, thinkingSpeed:0.6, bluffCatch:0.7
+};
+
+function vectorDistance(v1, v2){
+  let sum = 0, wsum = 0;
+  for(const d of DIMS){
+    const k = d.key;
+    const w = DIM_WEIGHTS[k];
+    // 归一化到0-1再比较
+    const n1 = v1[k]/d.max, n2 = v2[k]/d.max;
+    sum += w * (n1-n2)*(n1-n2);
+    wsum += w;
+  }
+  return Math.sqrt(sum/wsum); // 0~1之间，越小越近
+}
+
+function matchMBTI(vec){
+  const results = [];
+  for(const [code, data] of Object.entries(MBTI_DATA)){
+    const dist = vectorDistance(vec, data.v);
+    // 匹配度 = (1 - dist) * 100，经过微调让高分更突出
+    const score = Math.max(0, Math.round((1 - dist*1.1) * 100));
+    results.push({code, data, dist, score});
+  }
+  results.sort((a,b)=>a.dist - b.dist);
+  return results;
+}
+
+// ---- 行为描述生成（模板化，非LLM） ----
+function generateDescription(vec, best){
+  const {foldRate,raiseRate,bluffFreq,tiltResist,aggression,potControl,noiseResist,allinRate} = vec;
+  const g = best.data.group;
+  const arch = best.data.archetype;
+  const code = best.code;
+
+  let style;
+  if(g === "SJ"){
+    style = `典型<span class="hl">SJ蓝人组</span>阵地守将——弃牌率<span class="hl">${Math.round(foldRate)}%</span>（全场最高区间），诈唬频率<span class="hl">${Math.round(bluffFreq)}%</span>（极低），锅控力<span class="hl">${Math.round(potControl)}%</span>。这类玩家打法极紧，风险厌恶，耐心等待坚果牌才出手，是牌桌上最稳健的"岩石"。他们在长局中靠极高的弃牌率规避风险，但容易被松凶玩家针对剥削。`;
+  } else if(g === "NT"){
+    style = `典型<span class="hl">NT黄人组</span>算度大师——弃牌率<span class="hl">${Math.round(foldRate)}%</span>，加注率<span class="hl">${Math.round(raiseRate)}%</span>，诈唬频率<span class="hl">${Math.round(bluffFreq)}%</span>，抗情绪失控<span class="hl-p">${Math.round(tiltResist)}%</span>。这类玩家以数学期望（EV）为决策基准，对噪声和情绪干扰有极强免疫力，冷静理性，精算赔率，在长局中靠正EV决策稳定积累优势，是最难被tilt的对手。`;
+  } else if(g === "NF"){
+    style = `典型<span class="hl-a">NF紫人组</span>诗意弈者——诈唬频率<span class="hl-a">${Math.round(bluffFreq)}%</span>（全场最高区间），抗Tilt<span class="hl-a">${Math.round(tiltResist)}%</span>（偏低），全下率<span class="hl-a">${allinRate.toFixed(1)}%</span>。这类玩家情绪驱动，高频诈唬，依赖直觉和读人，打牌富有创造力和表演欲，但容易上头tilt，在情绪波动时容易出现大起大落。对付他们的最好方式是等待强牌价值下注，诱使他们用空气诈唬入坑。`;
+  } else {
+    style = `典型<span class="hl" style="color:#b6c78f">SP绿人组</span>战术猎手——攻击性<span class="hl" style="color:#b6c78f">${Math.round(aggression)}%</span>，锅控力<span class="hl" style="color:#b6c78f">${Math.round(potControl)}%</span>（最松），加注率<span class="hl" style="color:#b6c78f">${Math.round(raiseRate)}%</span>。这类玩家松凶激进，随势而变，位置意识强，善于利用动态信息做战术调整，是牌桌上最难以捉摸的"野派"对手。他们擅长在合适时机施压，但风控薄弱时容易过度卷入底池。`;
+  }
+  return style;
+}
+
+// ============================================================
+// UI 绑定 & 实时更新
+// ============================================================
+
+let radarChart = null;
+let showCompare = true;
+let currentVec = null;
+let currentBest = null;
+
+function $(id){ return document.getElementById(id); }
+
+// 滑块填充渐变
+function updateSliderFill(slider){
+  const v = (slider.value - slider.min)/(slider.max - slider.min)*100;
+  slider.style.setProperty('--fill', v+'%');
+}
+
+function readSliders(){
+  return {
+    aggro: parseInt($('slider-aggro').value),
+    bluff: parseInt($('slider-bluff').value),
+    ratio: parseInt($('slider-ratio').value),
+    risk:  parseInt($('slider-risk').value)
+  };
+}
+
+function setSliders(a,b,r,k){
+  $('slider-aggro').value = a;
+  $('slider-bluff').value = b;
+  $('slider-ratio').value = r;
+  $('slider-risk').value  = k;
+  updateSliderFill($('slider-aggro'));
+  updateSliderFill($('slider-bluff'));
+  updateSliderFill($('slider-ratio'));
+  updateSliderFill($('slider-risk'));
+  $('val-aggro').textContent = a;
+  $('val-bluff').textContent = b;
+  $('val-ratio').textContent = r;
+  $('val-risk').textContent  = k;
+}
+
+function applyPreset(group){
+  const p = PRESETS[group];
+  setSliders(p.aggro, p.bluff, p.ratio, p.risk);
+  // 更新按钮状态
+  document.querySelectorAll('.temper-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelector(`.temper-btn[data-preset="${group}"]`).classList.add('active');
+  update();
+}
+
+function update(){
+  const s = readSliders();
+  $('val-aggro').textContent = s.aggro;
+  $('val-bluff').textContent = s.bluff;
+  $('val-ratio').textContent = s.ratio;
+  $('val-risk').textContent  = s.risk;
+
+  // 计算12维
+  const vec = slidersToVector(s.aggro, s.bluff, s.ratio, s.risk);
+  currentVec = vec;
+
+  // 匹配MBTI
+  const matches = matchMBTI(vec);
+  currentBest = matches[0];
+
+  // 更新匹配面板
+  updateMatchPanel(matches);
+
+  // 更新雷达图
+  updateRadar(vec, currentBest);
+
+  // 更新指标小卡
+  updateMetrics(vec);
+
+  // 更新行为描述
+  $('descText').innerHTML = generateDescription(vec, currentBest);
+
+  // 更新气质按钮高亮（根据最佳匹配）
+  document.querySelectorAll('.temper-btn').forEach(b=>b.classList.remove('active'));
+  const bestBtn = document.querySelector(`.temper-btn[data-preset="${currentBest.data.group}"]`);
+  if(bestBtn) bestBtn.classList.add('active');
+}
+
+function updateMatchPanel(matches){
+  const best = matches[0];
+  const d = best.data;
+  const hero = $('matchHero');
+  hero.className = 'match-hero mbti-' + d.group;
+  $('matchType').innerHTML = `${best.code} <small>· ${d.archetype}</small>`;
+  $('matchGroup').textContent = `${d.group} ${GROUP_CN[d.group].split('·')[0]}人组`;
+  $('matchGroup').className = 'group-badge ' + d.group;
+  $('matchPct').innerHTML = `<span class="pct-val">${best.score}</span>`;
+  $('matchDesc').textContent = d.playStyle;
+
+  // Top 3
+  const top3 = $('top3List');
+  top3.innerHTML = '';
+  for(let i=0;i<3;i++){
+    const m = matches[i];
+    const item = document.createElement('div');
+    item.className = 'top3-item' + (i===0?' best':'');
+    item.innerHTML = `
+      <span class="top3-rank">#${i+1}</span>
+      <span class="top3-code" style="color:${GROUP_COLOR[m.data.group]}">${m.code}</span>
+      <span class="top3-name">${m.data.archetype}</span>
+      <div class="top3-bar"><div class="top3-fill" style="width:${m.score}%"></div></div>
+      <span class="top3-pct">${m.score}%</span>
+    `;
+    top3.appendChild(item);
+  }
+}
+
+function updateMetrics(vec){
+  const metrics = [
+    {v:Math.round(vec.foldRate)+'%', l:'弃牌率'},
+    {v:Math.round(vec.raiseRate)+'%', l:'加注率'},
+    {v:vec.allinRate.toFixed(1)+'%', l:'全下率'},
+    {v:Math.round(vec.bluffFreq)+'%', l:'诈唬率'},
+    {v:Math.round(vec.tiltResist)+'%', l:'抗Tilt'},
+    {v:Math.round(vec.potControl)+'%', l:'控池力'},
+    {v:Math.round(vec.noiseResist)+'%', l:'抗噪声'},
+    {v:Math.round(vec.aggression)+'%', l:'攻击性'},
+    {v:Math.round(vec.thinkingSpeed), l:'思考速度'}
+  ];
+  const grid = $('metricsGrid');
+  grid.innerHTML = metrics.map(m=>`
+    <div class="metric-mini">
+      <div class="mv">${m.v}</div>
+      <div class="ml">${m.l}</div>
+    </div>
+  `).join('');
+}
+
+// ---- Chart.js 雷达图 ----
+function initRadar(){
+  const ctx = $('radarChart').getContext('2d');
+  radarChart = new Chart(ctx, {
+    type:'radar',
+    data:{
+      labels: DIMS.map(d=>d.label),
+      datasets:[
+        {
+          label:'当前配置',
+          data: DIMS.map(d=>50),
+          backgroundColor:'rgba(167,139,250,0.2)',
+          borderColor:'#a78bfa',
+          borderWidth:2,
+          pointBackgroundColor:'#a78bfa',
+          pointBorderColor:'#0a0a18',
+          pointBorderWidth:2,
+          pointRadius:4,
+          pointHoverRadius:6,
+          fill:true
+        },
+        {
+          label:'最佳MBTI',
+          data: DIMS.map(d=>MBTI_DATA.INTJ.v[d.key]),
+          backgroundColor:'rgba(34,211,238,0.06)',
+          borderColor:'rgba(34,211,238,0.6)',
+          borderWidth:1.5,
+          borderDash:[5,4],
+          pointBackgroundColor:'#22d3ee',
+          pointBorderColor:'#0a0a18',
+          pointBorderWidth:2,
+          pointRadius:3,
+          pointHoverRadius:5,
+          fill:false
+        }
+      ]
+    },
+    options:{
+      responsive:true,
+      maintainAspectRatio:false,
+      animation:{duration:400},
+      plugins:{
+        legend:{display:false},
+        tooltip:{
+          backgroundColor:'rgba(15,15,34,0.95)',
+          borderColor:'rgba(167,139,250,0.3)',
+          borderWidth:1,
+          titleColor:'#e8eaf6',
+          bodyColor:'rgba(232,234,246,0.8)',
+          padding:10,
+          cornerRadius:8,
+          callbacks:{
+            label:function(ctx){
+              return ` ${ctx.dataset.label}: ${ctx.parsed.r.toFixed(1)}`;
+            }
+          }
+        }
+      },
+      scales:{
+        r:{
+          min:0, max:100,
+          ticks:{
+            display:true, stepSize:25,
+            color:'rgba(232,234,246,0.2)',
+            backdropColor:'transparent',
+            font:{size:9}
+          },
+          grid:{
+            color:'rgba(255,255,255,0.06)',
+            circular:true
+          },
+          angleLines:{color:'rgba(255,255,255,0.08)'},
+          pointLabels:{
+            color:'rgba(232,234,246,0.6)',
+            font:{size:11, family:"-apple-system,sans-serif"},
+            callback:function(label){return label;}
+          }
+        }
+      }
+    }
+  });
+}
+
+function updateRadar(vec, best){
+  if(!radarChart) return;
+  radarChart.data.datasets[0].data = DIMS.map(d=>vec[d.key]);
+  radarChart.data.datasets[1].data = DIMS.map(d=>best.data.v[d.key]);
+  radarChart.data.datasets[1].label = `${best.code} · ${best.data.archetype}`;
+  radarChart.data.datasets[1].hidden = !showCompare;
+  radarChart.update('none');
+}
+
+// ---- 事件绑定 ----
+function bindEvents(){
+  ['aggro','bluff','ratio','risk'].forEach(k=>{
+    const slider = $('slider-'+k);
+    slider.addEventListener('input', ()=>{
+      updateSliderFill(slider);
+      update();
+    });
+  });
+
+  // 对比开关
+  $('toggleCompare').addEventListener('click', function(){
+    showCompare = !showCompare;
+    this.classList.toggle('on', showCompare);
+    if(radarChart){
+      radarChart.data.datasets[1].hidden = !showCompare;
+      radarChart.update();
+    }
+  });
+
+  // 鼠标跟随光晕
+  document.addEventListener('mousemove', e=>{
+    document.documentElement.style.setProperty('--x', e.clientX+'px');
+    document.documentElement.style.setProperty('--y', e.clientY+'px');
+  });
+}
+
+// ---- 初始化 ----
+document.addEventListener('DOMContentLoaded', ()=>{
+  initRadar();
+  bindEvents();
+  // 默认NT预设
+  applyPreset('NT');
+});
+</script>
+
+</body>
+</html>
