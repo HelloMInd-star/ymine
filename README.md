@@ -72,7 +72,7 @@ Start here for interviews, demos, or just to get oriented:
 |------|-------------|------|
 | 🎯 **Cone Game Sandbox** | Watch strategies converge to the 0.68 equilibrium in real time | [`labs/evidence/general-game-os.html`](labs/evidence/general-game-os.html) |
 | 🧬 **Chromosome Diagnostic** | Visualize the Fibonacci–Chromosome isomorphism | [`labs/evidence/chromosome_diagnostic.html`](labs/evidence/chromosome_diagnostic.html) |
-| ♠ **Poker Egg** | Texas Hold'em AI training platform · Kelly Criterion + Monte Carlo + PersonaPokerMapper | [github.com/HelloMInd-star/poker-egg-fullstack](https://github.com/HelloMInd-star/poker-egg-fullstack) |
+| ♠️♥️ **Poker Face Arena** ♦️♣️ | 扑克人格竞技场 · MBTI 16型AI陪练 · Kelly+Persona+LLM 三层AI架构 · WS实时对战 | [poker-face-arena.vercel.app](https://poker-face-arena.vercel.app) · [API Health](https://poker-egg-fullstack-production.up.railway.app/api/health) |
 | 📐 **CAPM Cone Pricing** | Project CAPM/WACC/DCF onto the Decision Cone | [`labs/evidence/capm-pricing-simulator.html`](labs/evidence/capm-pricing-simulator.html) |
 | 🧪 **7-D Vector Analysis** | Cross-domain semantic vector space across 5 domains | [`labs/evidence/vector_analysis.html`](labs/evidence/vector_analysis.html) |
 | 🎰 **Ultimate Sandbox** | Human × Machine × Market — full circuit-breaker demo | [`labs/evidence/ultimate-sandbox.html`](labs/evidence/ultimate-sandbox.html) |
@@ -174,7 +174,7 @@ The mathematical foundation behind Game-OS is formalized in the working paper:
 - 🎓 MBA (Singapore) · Finance undergrad
 - 🎯 2026 AI Product Manager candidate — Game AI / Creative Tech
 - 🔺 Game-OS V2.5 architect · Cross-domain isomorphism researcher
-- ♠ Poker Egg — GTO poker training platform (open source)
+- ♠️♥️♦️♣️ Poker Face Arena — 扑克人格竞技场（MBTI 16型AI陪练 · Game-OS V2.5首个公开Demo）
 - 🍸 Y.MINE "Before the Exit" — MBTI-personalized cocktail system
 - 🎵 400h+/month music listener · Latin jazz + Trap Soul aesthetic
 
