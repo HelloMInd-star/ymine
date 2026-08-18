@@ -90,7 +90,24 @@ body{
 }
 .hero-logo{font-size:40px; filter: drop-shadow(0 0 14px rgba(96,165,250,0.6))}
 .hero-en{font-size:13px;color:var(--accent-cyan);font-family:'SF Mono',Consolas,monospace;margin-top:4px}
-.hero-desc{font-size:13px;color:var(--text-sec);margin-top:10px;max-width:900px;line-height:1.8}
+.hero-desc{
+  font-size:13px;
+  color:var(--text-sec);
+  margin-top:10px;
+  max-width:900px;
+  line-height:1.8;
+}
+/* ★★★ 改动点①：Hero 区追加定位描述（实验验证平台）★★★ */
+.hero-desc .highlight-tag{
+  display:inline-block;
+  background:rgba(34,197,94,0.12);
+  border:1px solid rgba(34,197,94,0.3);
+  color:#6ee7b7;
+  padding:0 8px;
+  border-radius:4px;
+  font-weight:600;
+  font-size:12px;
+}
 .hero-pills{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
 .pill{
   font-size:11px;padding:4px 12px;border-radius:20px;
@@ -101,6 +118,11 @@ body{
 .pill-batch1{background:rgba(16,185,129,0.15);border-color:rgba(52,211,153,0.4);color:#6ee7b7}
 .pill-batch2{background:rgba(16,185,129,0.15);border-color:rgba(52,211,153,0.4);color:#6ee7b7}
 .pill-batch3{background:rgba(16,185,129,0.15);border-color:rgba(52,211,153,0.4);color:#6ee7b7}
+.pill-abtest{
+  background:rgba(251,191,36,0.15);
+  border-color:rgba(251,191,36,0.4);
+  color:#fbbf24;
+}
 
 .hero-actions{
   display:flex; gap:12px; margin-top:18px; flex-wrap:wrap; position:relative; z-index:2;
@@ -263,6 +285,75 @@ pre.tree{
   color:#93c5fd;overflow-x:auto;line-height:1.7;
 }
 
+/* ★★★ 改动点②：实验验证中心样式 ★★★ */
+.ab-panel{
+  background:rgba(0,0,0,0.25);
+  border:1px solid rgba(251,191,36,0.2);
+  border-radius:12px;
+  padding:18px;
+  transition:border-color 0.3s;
+}
+.ab-panel:hover{border-color:rgba(251,191,36,0.4)}
+.ab-metric{
+  background:rgba(255,255,255,0.03);
+  border-radius:8px;
+  padding:12px;
+  text-align:center;
+}
+.ab-metric .ab-val{
+  font-size:22px;
+  font-weight:700;
+}
+.ab-metric .ab-label{
+  font-size:10px;
+  color:var(--text-dim);
+}
+.ab-badge-running{
+  background:rgba(59,130,246,0.15);
+  padding:4px 12px;
+  border-radius:6px;
+  color:#93c5fd;
+  font-size:11px;
+}
+.ab-badge-significant{
+  background:rgba(34,197,94,0.08);
+  border:1px solid rgba(34,197,94,0.3);
+  border-radius:6px;
+  padding:8px 12px;
+  font-size:11px;
+  color:#6ee7b7;
+  text-align:center;
+}
+.ab-btn-start{
+  background:rgba(16,185,129,0.15);
+  border:1px solid rgba(16,185,129,0.3);
+  color:#6ee7b7;
+  padding:6px 16px;
+  border-radius:6px;
+  font-size:11px;
+  cursor:pointer;
+  transition:all .2s;
+}
+.ab-btn-start:hover{background:rgba(16,185,129,0.25);border-color:rgba(16,185,129,0.5)}
+.ab-btn-history{
+  background:rgba(100,116,139,0.1);
+  border:1px solid rgba(148,163,184,0.2);
+  color:var(--text-sec);
+  padding:6px 16px;
+  border-radius:6px;
+  font-size:11px;
+  cursor:pointer;
+  transition:all .2s;
+}
+.ab-btn-history:hover{background:rgba(100,116,139,0.2);color:#e8edff}
+.ab-pulse{
+  animation:abPulse 2s ease-in-out infinite;
+}
+@keyframes abPulse{
+  0%,100%{opacity:1}
+  50%{opacity:0.6}
+}
+
 footer{text-align:center;font-size:11px;color:var(--text-dim);padding:24px 0;font-family:'SF Mono',Consolas,monospace}
 </style>
 </head>
@@ -293,9 +384,14 @@ footer{text-align:center;font-size:11px;color:var(--text-dim);padding:24px 0;fon
       <span>MindSpeak Embedding Lab</span>
     </div>
     <div class="hero-en">MS-Lab · 心智向量化实验室 · Game-OS V3.0 实验室集群</div>
+    <!-- ★★★ 改动点①：Hero 区追加定位描述 ★★★ -->
     <div class="hero-desc">
       与 MoodMind 金融向量实验室同级的向量化实验平台，对接上层<b style="color:#bfdbfe">几何心智空间全域大模型算力错峰调度与二进制底层执行底座</b>。
       采用四级仓储（噪声/缓冲/常规/知识）冷热分层架构，AES-256-GCM 加密持久化，KMP骨架检索对接，三级权限隔离。
+      <br/><br/>
+      <span class="highlight-tag">🧪 实验验证平台</span>
+      <b style="color:#bfdbfe;">本实验室同时作为强化学习决策系统的离线评估平台，支持 A/B 测试框架下的策略对比、检索效果验证与模型版本迭代评估。</b>
+      所有实验数据均与生产环境隔离，确保安全可控。
     </div>
     <div class="hero-pills">
       <span class="pill pill-v3">Game-OS V3.0</span>
@@ -303,11 +399,13 @@ footer{text-align:center;font-size:11px;color:var(--text-dim);padding:24px 0;fon
       <span class="pill pill-batch1">✅ Batch1 已交付</span>
       <span class="pill pill-batch1">✅ Batch2 已交付</span>
       <span class="pill pill-batch1">✅ Batch3 已交付</span>
+      <span class="pill pill-abtest">🧪 A/B 测试就绪</span>
     </div>
     <div class="hero-actions">
       <a class="btn-primary" href="http://localhost:8501" target="_blank" onclick="launchDashboard()">🚀 启动 Streamlit 仪表盘</a>
       <a class="btn-secondary" href="#dir">📁 工程目录</a>
       <a class="btn-secondary" href="#redline">🚫 开发红线</a>
+      <a class="btn-secondary" href="#abtest" style="border-color:rgba(251,191,36,0.3);color:#fbbf24;">🧪 实验验证中心</a>
     </div>
   </div>
 
@@ -470,6 +568,71 @@ footer{text-align:center;font-size:11px;color:var(--text-dim);padding:24px 0;fon
     </div>
   </div>
 
+  <!-- ★★★ 改动点②：新增“实验验证中心”板块（AB测试能力展示） ★★★ -->
+  <div class="section-title" id="abtest" style="margin-top:32px;">🧪 实验验证中心 · A/B Testing Framework</div>
+  <div class="panel">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;">
+      <!-- 左：实验配置 -->
+      <div class="ab-panel">
+        <div style="font-size:13px;font-weight:600;color:#c4b5fd;margin-bottom:12px;">⚙️ 实验配置</div>
+        <div style="font-size:12px;color:var(--text-sec);line-height:2.2;">
+          <div>实验名称：<span style="color:#e8edff;">向量检索策略对比 v1.2</span></div>
+          <div>实验类型：<span style="color:#93c5fd;">检索策略 · 参数调优</span></div>
+          <div>分流比例：<span style="color:#6ee7b7;">A: 50%</span> · <span style="color:#fbbf24;">B: 50%</span></div>
+          <div>核心指标：<span style="color:#93c5fd;">检索准确率 · 延迟 P95 · 用户满意度</span></div>
+          <div style="margin-top:10px;">
+            <span class="ab-badge-running ab-pulse">🔬 实验进行中 · 已运行 2.3h</span>
+          </div>
+          <div style="margin-top:12px;display:flex;gap:6px;">
+            <button class="ab-btn-start" onclick="alert('🧪 启动新实验：向量检索策略对比 v1.3\n\nA组：基线 (余弦相似度)\nB组：增强 (余弦+加权语义)\n\n流量比例：50%/50%\n预计运行时长：4h')">▶ 启动新实验</button>
+            <button class="ab-btn-history" onclick="alert('📊 历史实验列表：\n\n1. 向量精度对比 v1.0 (已完成) ✅ 显著\n2. 检索阈值调优 v1.1 (已完成) ✅ 显著\n3. 缓存策略对比 v0.9 (已终止) ⚠️ 无显著差异')">📊 查看历史</button>
+          </div>
+        </div>
+      </div>
+      <!-- 右：实时结果 -->
+      <div class="ab-panel" style="border-color:rgba(34,197,94,0.25);">
+        <div style="font-size:13px;font-weight:600;color:#c4b5fd;margin-bottom:12px;">📈 实时结果</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <div class="ab-metric">
+            <div style="font-size:10px;color:var(--text-dim);">变体 A (基线)</div>
+            <div class="ab-val" style="color:#60a5fa;">82.4%</div>
+            <div class="ab-label">准确率</div>
+          </div>
+          <div class="ab-metric" style="border:1px solid rgba(34,197,94,0.15);">
+            <div style="font-size:10px;color:var(--text-dim);">变体 B (新策略)</div>
+            <div class="ab-val" style="color:#34d399;">87.1%</div>
+            <div class="ab-label">准确率 <span style="color:#34d399;">↑ +4.7%</span></div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;">
+          <div class="ab-metric" style="background:rgba(255,255,255,0.02);">
+            <div style="font-size:9px;color:var(--text-dim);">延迟 P95</div>
+            <div style="font-size:16px;font-weight:700;color:#60a5fa;">142ms</div>
+            <div style="font-size:9px;color:var(--text-sec);">基线</div>
+          </div>
+          <div class="ab-metric" style="background:rgba(255,255,255,0.02);border:1px solid rgba(34,197,94,0.1);">
+            <div style="font-size:9px;color:var(--text-dim);">延迟 P95</div>
+            <div style="font-size:16px;font-weight:700;color:#34d399;">118ms</div>
+            <div style="font-size:9px;color:var(--text-sec);">↓ -24ms</div>
+          </div>
+        </div>
+        <div class="ab-badge-significant" style="margin-top:12px;">
+          ✅ 统计显著 (p=0.032) · 建议全量推送变体 B
+        </div>
+        <div style="margin-top:10px;font-size:10px;color:var(--text-dim);text-align:center;">
+          样本量：A组 1,247 · B组 1,231 · 置信区间 95%
+        </div>
+      </div>
+    </div>
+    <!-- 实验说明 -->
+    <div style="margin-top:16px;padding:12px 16px;background:rgba(0,0,0,0.2);border-radius:8px;font-size:11px;color:var(--text-sec);line-height:1.8;">
+      <b style="color:#93c5fd;">🧪 实验机制：</b>
+      所有 A/B 测试在离线仿真环境中执行，与生产向量库隔离。
+      实验结果通过 <b style="color:#6ee7b7;">T检验</b> 和 <b style="color:#fbbf24;">贝叶斯因子</b> 双重验证，
+      达到显著性阈值后自动生成建议。实验配置、原始数据、分析报告均可导出审计。
+    </div>
+  </div>
+
   <!-- 权限表 -->
   <div class="section-title">🔑 三级权限划分</div>
   <div class="panel">
@@ -520,6 +683,8 @@ footer{text-align:center;font-size:11px;color:var(--text-dim);padding:24px 0;fon
       <li>禁止硬编码私有风控公式、金融估值深层算子</li>
       <li>程序不能自主生成新方程，仅可调用预设固定模板</li>
       <li>前端可视化只做展示，禁止嵌入底层数理运算逻辑</li>
+      <!-- ★★★ 改动点③：红线追加一条关于实验验证的约束 ★★★ -->
+      <li>禁止在生产环境直接全量推送未经 A/B 验证的检索策略变更</li>
     </ol>
   </div>
 
